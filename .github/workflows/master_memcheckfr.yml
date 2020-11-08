@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  build-test-deploy:
     name: "MemCheck compilation and deployment to prod"
 
     runs-on: windows-latest
