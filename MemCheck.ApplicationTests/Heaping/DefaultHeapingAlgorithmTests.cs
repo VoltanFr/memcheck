@@ -26,7 +26,7 @@ namespace MemCheck.Application.Heaping.Tests
         [TestMethod()]
         public void HasExpiredOnHeap1()
         {
-            var lastLearnDate = DateTime.Now;
+            var lastLearnDate = DateTime.UtcNow;
 
             Assert.IsFalse(new DefaultHeapingAlgorithm(() => lastLearnDate).HasExpired(1, lastLearnDate));
             Assert.IsFalse(new DefaultHeapingAlgorithm(() => lastLearnDate.AddDays(1.9)).HasExpired(1, lastLearnDate));
@@ -36,7 +36,7 @@ namespace MemCheck.Application.Heaping.Tests
         [TestMethod()]
         public void HasExpiredOnRealProdCase()
         {
-            var lastLearnDate = new DateTime(2020, 04, 21, 22, 43, 00);
+            var lastLearnDate = new DateTime(2020, 04, 21, 22, 43, 00).ToUniversalTime();
             Assert.IsFalse(new DefaultHeapingAlgorithm(() => new DateTime(2020, 04, 23, 10, 06, 00)).HasExpired(3, lastLearnDate));
         }
     }
