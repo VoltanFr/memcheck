@@ -1,0 +1,839 @@
+﻿.tag {
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+    background-color: blue;
+    color: white;
+    margin-right: 3px;
+}
+
+.debug-info-div {
+    border: 5px solid red;
+}
+
+.learning-card {
+    border: none;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    font-size: 100%;
+    line-height: 1;
+    text-align: left;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 2px;
+    color: black;
+}
+
+.learning-card-header {
+    height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: left;
+    vertical-align: middle;
+    background-color: darkgray;
+    color: white;
+}
+
+.learning-card-footer {
+    border: none;
+    padding-top: 5px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: left;
+    vertical-align: bottom;
+    background-color: white;
+    color: white;
+}
+
+.learning-card-tags {
+    border: none;
+    height: 40px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    line-height: 1;
+    text-align: left;
+    vertical-align: middle;
+    background-color: white;
+    color: white;
+}
+
+.learning-card-body {
+    display: block;
+    flex-direction: column;
+}
+
+    .learning-card-body * {
+        margin: 0px;
+        padding-top: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+    }
+
+    .learning-card-body p {
+        white-space: normal;
+        padding-bottom: 20px;
+    }
+
+    .learning-card-body ul,
+    .learning-card-body ol {
+        display: grid;
+        padding-left: 25px;
+        padding-bottom: 20px;
+    }
+
+    .learning-card-body li {
+        display: list-item;
+        white-space: pre-wrap;
+        padding-bottom: 6px;
+    }
+
+    .learning-card-body h1,
+    .learning-card-body h2,
+    .learning-card-body h3,
+    .learning-card-body h4,
+    .learning-card-body h5,
+    .learning-card-body h6 {
+        display: block;
+        padding-top: 5px;
+    }
+
+    .learning-card-body table,
+    .learning-card-body tbody,
+    .learning-card-body thead,
+    .learning-card-body th,
+    .learning-card-body tr,
+    .learning-card-body td {
+        border-style: solid;
+        border-width: 1px;
+        padding: 10px;
+    }
+
+    .learning-card-body table {
+        width: auto;
+        display: table;
+        padding-bottom: 20px;
+    }
+
+    .learning-card-body tbody {
+        display: table-row-group;
+    }
+
+    .learning-card-body thead {
+        display: table-row-group;
+    }
+
+    .learning-card-body th {
+        display: table-cell
+    }
+
+    .learning-card-body tr {
+        display: table-row
+    }
+
+    .learning-card-body td {
+        display: table-cell;
+        white-space: pre-wrap;
+    }
+
+.learning-card-body-image-div {
+    display: block;
+    text-align: center;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.learn-filtering-display-div {
+    border-width: 1px;
+    border-style: solid;
+}
+
+.learn-filtering-ok-button {
+    margin-top: 20px;
+}
+
+[v-cloak] > * {
+    display: none
+}
+
+[v-cloak]::before {
+    content: "Loading, please wait…"
+}
+
+.page-responsive-padding {
+    padding-left: 100px;
+    padding-right: 100px;
+}
+
+.responsive-padding-edit {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.authoring-card-div {
+    padding: 0px;
+    margin-bottom: 0px;
+}
+
+.authoring-table {
+}
+
+.authoring-table-body {
+    display: block;
+}
+
+.authoring-row-caption {
+    border-top-width: 1px;
+    border-top-style: solid;
+    font-weight: bold;
+    display: block;
+}
+
+.authoring-row-input {
+    display: block;
+    padding-bottom: 10px;
+    padding-left: 0px;
+}
+
+.authoring-td {
+    display: block;
+    padding: 0px;
+}
+
+.authoring-select {
+    display: block;
+    width: 100%
+}
+
+.authoring-image-choice {
+}
+
+.authoring-image-choice-input {
+    width: 100px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.authoring-image-show {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.authoring-send-button {
+    margin-top: 20px;
+}
+
+.authoring-textarea {
+    display: block;
+    width: 100%;
+    resize: both;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+}
+
+.image-list-inputs-container {
+    margin-bottom: 10px;
+    border-color: lightgray;
+}
+
+.image-list-card {
+    margin-bottom: 10px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+    width: 100%;
+    display: inline-block;
+}
+
+.image-list-card-columns {
+    column-count: 3;
+}
+
+.image-list-card-header {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 100%;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+    background-color: darkgray;
+    color: white;
+}
+
+.image-list-card-body {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+    vertical-align: middle;
+    background-color: white;
+}
+
+.image-list-card-footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 100%;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+    background-color: whitesmoke;
+    color: white;
+}
+
+.image-delete-alert-mesg {
+    font-weight: bolder;
+    color: red;
+}
+
+.image-delete-image-div {
+    display: block;
+    text-align: center;
+}
+
+.image-delete-image {
+    display: inline-block;
+    width: 400px;
+    height: auto;
+    text-align: center;
+}
+
+.card-history-ul {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 60px;
+    margin-right: 60px;
+    line-height: 2;
+    text-align: left;
+}
+
+.card-history-li {
+    position: relative;
+    left: 20px;
+}
+
+.image-history-li {
+    text-align: left;
+}
+
+.preview-image {
+    width: 400px;
+    height: auto;
+}
+
+.authoring-fullscreen-image-name {
+    font-weight: bolder;
+    font-size: larger;
+    text-align: center;
+}
+
+.authoring-fullscreen-small-buttons {
+}
+
+.deck-index-deckname-td {
+    display: block;
+    padding: 0px;
+    vertical-align: middle;
+}
+
+.deck-index-deckname-span {
+    display: flex;
+}
+
+.deck-index-deckname-textarea {
+    flex-direction: row;
+    display: inline-flex;
+}
+
+.deck-index-deckname-button {
+    flex-direction: row-reverse;
+}
+
+.fullscreen-image-div {
+    display: block;
+    text-align: center;
+}
+
+.fullscreen-image {
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.learn-image {
+    width: 400px;
+    height: auto;
+    padding-bottom: 50px;
+}
+
+.thumbnail-image {
+    width: 100px;
+    height: auto;
+}
+
+.main-body {
+    padding: 0px; /*Don't forget that we don't want padding on the card search page */
+}
+
+.wait-message {
+    font-weight: bolder;
+}
+
+.btn-nav-pages {
+    height: 30px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 3px;
+    font-size: .75rem;
+    text-align: center;
+    color: white;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    border-width: 2px;
+    border-style: solid;
+    border-image: stretch;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.learning-small-button {
+    height: 30px;
+    padding: 0px;
+    border-radius: 4px;
+    font-size: 17px;
+    text-align: center;
+    vertical-align: middle;
+    color: ButtonText;
+    background-color: ButtonFace;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+}
+
+.learning-rating-button {
+    height: 30px;
+    padding: 0px;
+    border-radius: 4px;
+    font-size: 15px;
+    text-align: center;
+    vertical-align: middle;
+    color: ButtonText;
+    background-color: ButtonFace;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+    line-height: 15px;
+}
+
+@media (max-width: 550px) {
+    .learning-small-button {
+        height: 22px;
+        border-radius: 2px;
+        font-size: 14px;
+        border-width: 1px;
+    }
+
+    .learning-rating-button {
+        height: 22px;
+        border-radius: 2px;
+        font-size: 11px;
+        line-height: 10px;
+    }
+
+    #MoveFivePagesBackward, #MoveFivePagesForward {
+        display: none;
+    }
+
+    .preview-image {
+        width: 200px;
+    }
+
+    .learn-image {
+        width: 200px;
+        padding-bottom: 5px;
+    }
+
+    .image-delete-image {
+        width: 200px;
+    }
+
+    .page-responsive-padding {
+        padding: 1px;
+    }
+
+    .responsive-padding-edit {
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    .tag {
+        margin-right: 0px;
+    }
+
+    .image-list-card-columns {
+        column-count: 1;
+    }
+
+    .image-list-card-header {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        font-size: 80%;
+    }
+
+    .image-list-card-body {
+        padding-top: 1px;
+        padding-bottom: 1px;
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+
+    .image-list-card-footer {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        font-size: 80%;
+    }
+
+    .learning-card {
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+
+    .card-history-ul {
+        margin-left: 10px;
+        margin-right: 10px;
+        line-height: 1;
+    }
+
+    .card-history-li {
+        left: -5px;
+    }
+
+    .btn-nav-pages {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+        font-size: .7rem;
+        border-width: 1px;
+    }
+
+    .learning-card-body {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+
+        .learning-card-body p {
+            padding-bottom: 15px;
+        }
+
+        .learning-card-body ul,
+        .learning-card-body ol {
+            padding-bottom: 15px;
+        }
+
+        .learning-card-body h1,
+        .learning-card-body h2,
+        .learning-card-body h3,
+        .learning-card-body h4,
+        .learning-card-body h5,
+        .learning-card-body h6 {
+            padding-top: 3px;
+        }
+
+        .learning-card-body li {
+            display: list-item;
+            white-space: pre-wrap;
+            padding-bottom: 2px;
+        }
+
+        .learning-card-body table,
+        .learning-card-body tbody,
+        .learning-card-body thead,
+        .learning-card-body th,
+        .learning-card-body tr,
+        .learning-card-body td {
+            padding: 3px;
+        }
+
+        .learning-card-body table {
+            padding-bottom: 15px;
+        }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    #MoveTwoPagesBackward, #MoveTwoPagesForward, #MoveTenPagesBackward, #MoveTenPagesForward {
+        display: none;
+    }
+
+    .page-responsive-padding {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .responsive-padding-edit {
+        padding-left: 3px;
+        padding-right: 3px;
+        padding-top: 1px;
+        padding-bottom: 1px;
+    }
+
+    .preview-image {
+        width: 300px;
+    }
+
+    .learn-image {
+        width: 300px;
+        padding-bottom: 25px;
+    }
+
+    .image-delete-image {
+        width: 300px;
+    }
+
+    .tag {
+        margin-right: 1px;
+    }
+
+    .image-list-card-columns {
+        column-count: 2;
+    }
+
+
+    .learning-card {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+
+    .card-history-ul {
+        margin-left: 30px;
+        margin-right: 30px;
+        line-height: 1.5;
+    }
+
+    .card-history-li {
+        position: relative;
+        left: 10px;
+    }
+
+    .learning-card-body {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+        .learning-card-body p {
+            padding-bottom: 17px;
+        }
+
+        .learning-card-body ul,
+        .learning-card-body ol {
+            padding-bottom: 17px;
+        }
+
+        .learning-card-body h1,
+        .learning-card-body h2,
+        .learning-card-body h3,
+        .learning-card-body h4,
+        .learning-card-body h5,
+        .learning-card-body h6 {
+            padding-top: 10px;
+        }
+
+        .learning-card-body li {
+            display: list-item;
+            white-space: pre-wrap;
+            padding-bottom: 4px;
+        }
+
+        .learning-card-body table,
+        .learning-card-body tbody,
+        .learning-card-body thead,
+        .learning-card-body th,
+        .learning-card-body tr,
+        .learning-card-body td {
+            padding: 10px;
+        }
+
+        .learning-card-body table {
+            padding-bottom: 17px;
+        }
+}
+
+.btn-circle.btn-sm {
+    width: 22px;
+    height: 22px;
+    padding: 0px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: normal;
+    text-align: center;
+    color: ButtonText;
+    background-color: ButtonFace;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+}
+
+.learning-card-rating-menuentry {
+    height: 22px;
+    padding: 0px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: bolder;
+    color: black;
+    background-color: white;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+    text-align: left;
+}
+
+.learning-popover-menu {
+    text-align: left;
+}
+
+.menu-separation-line {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+br {
+    line-height: 0px;
+    margin: 0px;
+    display: block;
+    content: ''
+}
+
+.search-page-table {
+    width: 100%;
+    border-spacing: 0px;
+}
+
+    .search-page-table td,
+    .search-page-table tr {
+        vertical-align: middle;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        border-top-width: thin;
+        border-top-color: lightgray;
+        border-top-style: dashed;
+        border-bottom-style: none;
+    }
+
+.search-page-widget-td {
+    width: 1% !important;
+    text-align: center;
+}
+
+.search-page-tag {
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 1px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+    background-color: blue;
+    color: white;
+}
+
+.search-page-tag-column {
+    max-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: table-cell;
+}
+
+.search-page-nav-column {
+    font-size: x-small;
+}
+
+.search-page-tag-button-column {
+    float: right;
+    padding-right: 10px;
+    font-size: initial;
+}
+
+.search-page-heap-info {
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    background-color: ButtonFace;
+    border-width: thin;
+    border-color: lightgray;
+    padding: 0px;
+    color: black;
+}
+
+.search-page-required-text-edit {
+    width: 100%
+}
+
+.search-page-rating-button {
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    background-color: ButtonFace;
+    border-width: thin;
+    border-color: lightgray;
+    padding: 0px;
+    color: black;
+}

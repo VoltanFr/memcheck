@@ -1,0 +1,39 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<div id="CreateDeck" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <h1 class="title">@Localizer["MainCaption"]</h1>
+        <div>
+            <div class="form-group">
+                <label>@Localizer["Description"]</label>
+                <input type="text" class="form-control responsive-padding-edit" v-model="description">
+                <small class="form-text text-muted">@Localizer["DescriptionAdditionalInfo"]</small>
+            </div>
+            <div class="form-group">
+                <label>@Localizer["HeapingAlgo"]</label>
+                <select class="form-control responsive-padding-edit" v-model="heapingAlgorithm">
+                    <option v-for="ha in heapingAlgorithms" v-bind:value="ha">
+                        {{ha.nameInCurrentLanguage}}
+                    </option>
+                </select>
+                <small class="form-text text-muted">{{heapingAlgorithm.descriptionInCurrentLanguage}}</small>
+            </div>
+            <div class="form-group">
+                <label>@Localizer["AdviceForSingleDeck"]</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-success" @@click="create">@Localizer["Save"]</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Decks/Create.js" asp-append-version="true"></script>
+}

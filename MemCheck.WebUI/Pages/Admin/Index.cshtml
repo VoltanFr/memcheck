@@ -1,0 +1,61 @@
+﻿@page
+
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@model IndexModel
+@{
+    ViewData["Title"] = "Environment";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<div class="container">
+    <div class="section" style="padding-bottom:30px">
+        <h4>@ViewData["Title"]</h4>
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <th scope="row">ApplicationName</th>
+                    <td>@Model.ApplicationName</td>
+                </tr>
+                <tr>
+                    <th scope="row">EntryAssemblyName</th>
+                    <td>@Model.EntryAssemblyName</td>
+                </tr>
+                <tr>
+                    <th scope="row">EntryAssemblyVersion</th>
+                    <td>@Model.EntryAssemblyVersion</td>
+                </tr>
+                <tr>
+                    <th scope="row">EnvironmentName</th>
+                    <td>@Model.EnvironmentName</td>
+                </tr>
+                <tr>
+                    <th scope="row">WebRootPath</th>
+                    <td>@Model.WebRootPath</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="section" style="padding-bottom:30px">
+        <h4>MemCheck assemblies</h4>
+        <table class="table table-striped">
+            <tbody>
+                @foreach (var a in Model.MemCheckAssemblies)
+                {
+                    <tr><td>@a</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="section" style="padding-bottom:30px">
+        <h4>Other assemblies</h4>
+        <table class="table table-striped">
+            <tbody>
+                @foreach (var a in Model.OtherAssemblies)
+                {
+                    <tr><td>@a</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+﻿@page
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@model RegisterModel
+@{
+    ViewData["Title"] = @Localizer["Register"];
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <form asp-route-returnUrl="/" method="post">
+        <h4>@Localizer["CreateNewAccount"]</h4>
+        <hr />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label>@Localizer["EMailAddress"]</label>
+            <input asp-for="Input.Email" class="form-control" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>@Localizer["UserName"]</label>
+            <input asp-for="Input.UserName" class="form-control" />
+            <span asp-validation-for="Input.UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>@Localizer["Password"]</label>
+            <input asp-for="Input.Password" class="form-control" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label>@Localizer["ConfirmPassword"]</label>
+            <input asp-for="Input.ConfirmPassword" class="form-control" />
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

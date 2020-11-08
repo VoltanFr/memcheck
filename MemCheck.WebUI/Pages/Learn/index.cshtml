@@ -1,0 +1,220 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model LearnViewModel
+
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+<input type="text" asp-for="LearnMode" id="LearnModeInput" hidden="hidden" />
+
+<div id="LearnMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="WaitingOrLoading" v-if="!mountFinished || loading">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="FilteringDisplayDiv" v-if="mountFinished && filteringDisplay && !userQuitAttemptDisplay" class="learn-filtering-display-div">
+        <div id="TagFilteringDiv">
+            <h1>@Localizer["FilterThisLearningSession"]</h1>
+            @Localizer["ExcludedTags"]
+            <select v-model="selectedExcludedTagToAdd"><option v-for="tag in activeDeck.tags" v-bind:value="tag">{{tag.tagName}}</option></select>
+            <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
+                <button type="button" class="btn btn-success btn-sm" @@click="addExcludedTag">+</button>
+            </span>
+            <button type="button" class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+        </div>
+        <button class="btn btn-info btn-sm learn-filtering-ok-button" @@click="closeFilteringMode()">@Localizer["Ok"]</button>
+    </div>
+    <div id="NormalOrFullScreenMode" v-if="mountFinished && !filteringDisplay && !userQuitAttemptDisplay">
+        <div id="FullScreenImage" v-if="currentFullScreenImage">
+            <div id="FullScreenImageTopLine" class="authoring-fullscreen-small-buttons">
+                <ul class="nav small text-decoration-none">
+                    <li id="FullScreenImageTitle" class="authoring-fullscreen-image-name">{{currentFullScreenImage.name}}</li>
+                    <li class="ml-auto"><button type="button" class="btn btn-primary btn-circle btn-sm" @@click="closeFullScreenImage()"><i class="far fa-times-circle"></i></button></li>
+                </ul>
+            </div>
+            <div id="FullScreenImage" class="fullscreen-image-div">
+                <img class="fullscreen-image" :src="currentFullScreenImage.blob" />
+            </div>
+            <div id="Details">
+                <ul>
+                    <li><strong>@Localizer["FullScreenImageName"]</strong> {{currentFullScreenImage.name}}</li>
+                    <li><strong>@Localizer["FullScreenImageOwner"]</strong> {{currentFullScreenImage.ownerName}}</li>
+                    <li><strong>@Localizer["Description"]</strong> {{currentFullScreenImage.description}}</li>
+                    <li><strong>@Localizer["Source"]</strong> {{currentFullScreenImage.source}}</li>
+                </ul>
+            </div>
+            <div id="DownloadBiggestSizeLink">
+                <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen?ImageId='+currentFullScreenImage.imageId">@Localizer["DownloadBiggestSize"]</a></p>
+            </div>
+        </div>
+        <div id="NormalMode" v-else>
+            <div id="Deck choice and global info" class="table-responsive" v-if="!singleDeckDisplay">
+                <table class="table table-responsive" width="100%">
+                    <tbody>
+                        <tr id="Deck choice">
+                            <th>@Localizer["Deck"]</th>
+                            <td>
+                                <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
+                                <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="The card" class="card learning-card" v-if="currentCard">
+                <div id="Small buttons" class="card-header" style="padding:1px">
+                    <ul class="nav small text-decoration-none" style="align-items:center">
+                        <li id="Edit button" style="padding-right:5px">
+                            <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
+                        </li>
+                        <li id="Remove button" style="padding-right:5px">
+                            <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
+                        </li>
+                        <li id="Info button" data-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
+                            <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover"><i class="fas fa-info"></i></b-button>
+                            <b-popover target="infoPopover" triggers="focus">
+                                @Localizer["LastLearnDate"] {{dt(currentCard.lastLearnUtcTime)}}<br />
+                                @Localizer["DateAddedInDeck"] {{dt(currentCard.addToDeckUtcTime)}}<br />
+                                <hr class="menu-separation-line" />
+                                @Localizer["CardVersionCreator"] {{currentCard.owner}}<br />
+                                @Localizer["LastChangeDate"] {{dt(currentCard.lastChangeUtcTime)}}<br />
+                            </b-popover>
+                        </li>
+                        <li id="Visibility button" style="padding-right:5px" data-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>
+                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount == 0" id="visibilityPopover0" key="public"><i class="far fa-eye"></i></b-button>
+                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount == 1" id="visibilityPopover1" key="private"><i class="far fa-eye-slash"></i></b-button>
+                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount > 1" id="visibilityPopover2" key="selectedvisi"><i class="fas fa-users"></i></b-button>
+                            <b-popover v-bind:target="visibilityPopoverTarget()" v-bind:key="visibilityPopoverTarget()" triggers="focus">@Localizer["Visibility"]: {{currentCard.visibleTo}}</b-popover>
+                        </li>
+                        <li id="FilteringButton" style="padding-right:5px">
+                            <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></button>
+                        </li>
+                        <li id="Heap info" data-toggle="tooltip" data-placement="top" title=@Localizer["Heap"] style="padding-right:5px">
+                            <b-button class="btn btn-primary btn-sm learning-small-button" id="heapPopover"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</b-button>
+                            <b-popover target="heapPopover" triggers="focus">
+                                @Localizer["CurrentlyInHeap"] {{currentCard.heap}}<br />
+                                @Localizer["TimesInNotLearnedHeap"] {{currentCard.nbTimesInNotLearnedHeap}}<br />
+                                @Localizer["BiggestHeapReached"] {{currentCard.biggestHeapReached}}<br />
+                                <hr class="menu-separation-line" />
+                                <a href="#" id="MoveToHeapDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["MoveToHeap"] class="learning-popover-menu"><i class="far fa-caret-square-down"></i> @Localizer["MoveToHeap"]</a>
+                                <span class="dropdown-menu" role="menu">
+                                    <a v-for="targetHeap in currentCard.moveToHeapTargets" class="dropdown-item" @@click="moveToHeap(targetHeap)">
+                                        <span v-if="targetHeap.heapId < currentCard.heapId"><i class="fas fa-angle-left"></i></span><span v-else><i class="fas fa-angle-right"></i></span>
+                                        {{targetHeap.heapName}}
+                                    </a>
+                                </span>
+                            </b-popover>
+                        </li>
+                        <li id="Rating" data-toggle="tooltip" data-placement="top">
+                            <b-button class="btn btn-primary btn-sm learning-rating-button" id="ratingPopover">
+                                {{currentUserRatingAsStars()}}<br />
+                                {{averageRatingAsStars()}}
+                            </b-button>
+                            <b-popover id="ratingPop" target="ratingPopover" triggers="focus">
+                                @Localizer["YourRating"] <b-form-rating inline v-model="currentCard.currentUserRating" @@change="enqueueRatingUpload()"></b-form-rating><br />
+                                @Localizer["Average"] ({{currentCard.countOfUserRatings}} <span v-if="currentCard.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>)<b-form-rating inline readonly show-value v-model="currentCard.averageRating"></b-form-rating>
+                            </b-popover>
+                        </li>
+                        <li id="Last learn date" v-if="!learningUnknowns" class="ml-auto" data-toggle="tooltip" data-placement="top" title=@Localizer["Expired"]>
+                            <i class="fas fa-clock"></i> {{dt(currentCard.lastLearnUtcTime)}}
+                        </li>
+                    </ul>
+                </div>
+                <div id="Front side" class="learning-card">
+                    <div class="card" v-if="currentCard">
+                        <div class="card-header learning-card-header">
+                            <p>@Localizer["FrontSide"]</p>
+                        </div>
+                        <div class="card-body learning-card-body">
+                            <span v-html="currentCardFrontSide()"></span>
+                        </div>
+                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="learn-image" :src="image.blob" /></a>
+                        </div>
+                        <div v-if="!backSideVisible" class="card-footer learning-card-footer">
+                            <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="Back side" v-if="backSideVisible" class="learning-card">
+                    <div class="card" v-if="currentCard">
+                        <div class="card-header learning-card-header">
+                            <p>@Localizer["BackSide"]</p>
+                        </div>
+                        <div class="card-body learning-card-body">
+                            <span v-html="currentCardBackSide()"></span>
+                        </div>
+                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="learn-image" :src="image.blob" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="Knew Forgot" v-if="backSideVisible" class="card-footer learning-card-footer">
+                    <ul class="nav small">
+                        <li><button class="btn btn-success btn-md" @@click="knew">@Localizer["Knew"]</button></li>
+                        <li class="ml-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learningUnknowns">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
+                    </ul>
+                </div>
+                <div id="Additional info" v-if="backSideVisible && currentCardHasAdditionalSide()" class="learning-card">
+                    <div class="card" v-if="currentCard">
+                        <div class="card-header learning-card-header">
+                            <p>@Localizer["AdditionalInfo"]</p>
+                        </div>
+                        <div class="card-body learning-card-body">
+                            <span v-html="currentCardAdditionalInfo()"></span>
+                        </div>
+                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="learn-image" :src="image.blob" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="Tags" v-if="currentCard.tags.length > 0" class="card-footer learning-card-tags">
+                    <span v-for="tag in currentCard.tags" class="tag">{{tag}}&nbsp;</span>
+                </div>
+            </div>
+
+            <div id="No more card" class="card border-primary" v-if="!currentCard">
+                <p class="wait-message" v-if="currentImageLoadingPromise">@Localizer["PleaseWaitForImageLoad"]</p>
+                <div v-else>
+                    <p class="wait-message" v-if="preventQuittingPage()">@Localizer["PleaseWaitSavingData"]</p>
+                    <div v-else>
+                        <p class="wait-message" v-else>@Localizer["NoMoreCardTo"] <span v-if="learningUnknowns">@Localizer["Learn"]</span><span v-else>@Localizer["Repeat"]</span></p>
+                        <a href="/" class="wait-message">@Localizer["BackToHomePage"]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="UserQuitAttemptDisplayMode" v-if="userQuitAttemptDisplay">
+        <p>@Localizer["ExplainMoveOperationsBeforeIcon"] <i class="fas fa-save"></i> @Localizer["ExplainMoveOperationsAfterIcon"]</p>
+        <button type="button" class="btn btn-success btn-sm" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
+    </div>
+    <div id="Processing info">
+        <p v-if="preventQuittingPage()"><i class="fas fa-save"></i></p>
+    </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <ul>
+            <li v-if="!downloadedCards">downloadedCards is null</li>
+            <li v-if="downloadedCards">downloadedCards.length: {{downloadedCards.length}}</li>
+            <li>lastDownloadIsEmpty: {{lastDownloadIsEmpty}}</li>
+            <li v-if="!cardDownloadOperation">No cardDownloadOperation</li>
+            <li v-if="cardDownloadOperation">cardDownloadOperation: {{cardDownloadOperation}}</li>
+            <li v-if="!currentCard">No currentCard</li>
+            <li v-if="currentCard">currentCard.visibleToCount: {{currentCard.visibleToCount}}</li>
+            <li v-if="currentCard">currentCard.heapId: {{currentCard.heapId}}</li>
+            <li>pendingMoveOperations.length: {{pendingMoveOperations.length}}</li>
+            <li v-if="!currentMovePromise">currentMovePromise is null</li>
+            <li v-if="currentMovePromise">currentMovePromise: {{currentMovePromise}}</li>
+            <li v-if="!currentImageLoadingPromise">currentImageLoadingPromise is null</li>
+            <li v-if="currentImageLoadingPromise">currentImageLoadingPromise: {{currentImageLoadingPromise}}</li>
+            <li>pendingRatingOperations.length: {{pendingRatingOperations.length}}</li>
+            <li v-if="!currentRatingPromise">currentRatingPromise is null</li>
+            <li v-if="currentRatingPromise">currentRatingPromise: {{currentRatingPromise}}</li>
+        </ul>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+}

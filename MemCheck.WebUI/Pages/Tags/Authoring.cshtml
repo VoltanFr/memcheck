@@ -1,0 +1,50 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model AuthoringViewModel
+
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+<input type="text" asp-for="TagId" id="TagIdInput" hidden="hidden" />
+<input type="text" asp-for="ReturnUrl" id="ReturnUrlInput" hidden="hidden" />
+
+<div id="TagAuthoringDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <h1 class="title"><span v-if="editedTag">@Localizer["TagEdition"]</span><span v-else>@Localizer["TagCreation"]</span></h1>
+
+        <div id="Table">
+            <table class="table table-sm table-authoring" width="100%">
+                <tbody>
+                    <tr id="Hidden row to specify width of first column" style="visibility:hidden">
+                        <th style="width:20%"></th>
+                        <th style="width:80%"></th>
+                    </tr>
+                    <tr v-if="editedTag">
+                        <th>@Localizer["CurrentName"]</th>
+                        <td>{{editedTag.tagName}}</td>
+                    </tr>
+                    <tr v-if="editedTag">
+                        <th>@Localizer["CardsWithThisTag"]</th>
+                        <td>{{editedTag.cardCount}}</td>
+                    </tr>
+                    <tr>
+                        <th><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></th>
+                        <td><input class="form-control responsive-padding-edit" v-model="newName" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p v-if="newNameProblem" class="alert alert-danger">{{newNameProblem}}</p>
+        <button type="button" class="btn btn-success btn-md" disabled v-if="newNameProblem">@Localizer["Save"]</button>
+        <button type="button" class="btn btn-success btn-md" @@click="save" v-else>@Localizer["Save"]</button>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
+}

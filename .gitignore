@@ -1,0 +1,15 @@
+/MemCheck.Application/bin/
+/MemCheck.Application/obj/
+/MemCheck.ApplicationTests/bin/
+/MemCheck.ApplicationTests/obj/
+/MemCheck.CommandLineDbClient/bin/
+/MemCheck.CommandLineDbClient/obj/
+/MemCheck.Database/bin/
+/MemCheck.Database/obj/
+/MemCheck.Domain/bin/
+/MemCheck.Domain/obj/
+/MemCheck.WebUI/bin/
+/MemCheck.WebUI/obj/
+/MemCheckData/bin/
+/MemCheckData/obj/
+/.vs/

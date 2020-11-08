@@ -1,0 +1,107 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model IndexModel
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<div id="HomeDiv" class="page-responsive-padding" v-cloak>
+    <div id="WaitingForData" v-if="!allData">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="DataLoaded" v-else>
+        <div id="UserLoggedIn" v-if="allData.userName">
+            <p>@Localizer["Welcome"] {{allData.userName}}</p>
+            <div id="User has decks" v-if="allData.userDecks.length > 0">
+                <div id="User has work" v-if="allData.anythingToLearn">
+                    <div id="Multi deck display" v-if="allData.userDecks.length > 1">
+                        <p>@Localizer["YouHave"]...</p>
+                        <ul>
+                            <li v-for="deck in allData.userDecks">
+                                @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
+                                <ul>
+                                    <li id="UnknownCardsInfoMultiDeck">
+                                        <span v-if="deck.unknownCardCount == 0">@Localizer["No"] @Localizer["UnknownCard"]</span>
+                                        <span v-else>
+                                            <a asp-page="/Learn/Index" asp-route-LearnMode="Unknown">{{deck.unknownCardCount}} <span v-if="deck.unknownCardCount > 1">@Localizer["UnknownCards"]</span><span v-else>@Localizer["UnknownCard"]</span></a>.
+                                        </span>
+                                    </li>
+                                    <li id="ExpiredCardsInfoMultiDeck">
+                                        <span v-if="deck.expiredCardCount == 0">
+                                            @Localizer["No"] @Localizer["ExpiredCard"] (@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}).
+                                        </span>
+                                        <span v-else>
+                                            <a asp-page="/Learn/Index" asp-route-LearnMode="Expired">{{deck.expiredCardCount}} <span v-if="deck.expiredCardCount > 1">@Localizer["ExpiredCards"]</span><span v-else>@Localizer["ExpiredCard"]</span></a>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="Single deck screen optimization" v-else>
+                        <p>@Localizer["YouHaveIn"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">@Localizer["YourDeck"]</a>...</p>
+                        <ul>
+                            <li id="UnknownCardsInfoSingleDeck">
+                                <span v-if="allData.userDecks[0].unknownCardCount == 0">@Localizer["No"] @Localizer["UnknownCard"]</span>
+                                <span v-else>
+                                    <a asp-page="/Learn/Index" asp-route-LearnMode="Unknown">{{allData.userDecks[0].unknownCardCount}} <span v-if="allData.userDecks[0].unknownCardCount > 1">@Localizer["UnknownCards"]</span><span v-else>@Localizer["UnknownCard"]</span></a>.
+                                </span>
+                            </li>
+                            <li id="ExpiredCardsInfoSingleDeck">
+                                <span v-if="allData.userDecks[0].expiredCardCount == 0">
+                                    @Localizer["No"] @Localizer["ExpiredCard"] (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
+                                </span>
+                                <span v-else>
+                                    <a asp-page="/Learn/Index" asp-route-LearnMode="Expired">{{allData.userDecks[0].expiredCardCount}} <span v-if="allData.userDecks[0].expiredCardCount > 1">@Localizer["ExpiredCards"]</span><span v-else>@Localizer["ExpiredCard"]</span></a>.
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="Nothing to do" v-else>
+                    <p>@Localizer["PerfectMemory"]</p>
+                    <p>
+                        @Localizer["NoUnkownOrExpiredCardAmongThe"] {{allData.totalCardCountInDecksOfUser}}
+                        <span v-if="allData.userDecks.length == 1">
+                            @Localizer["CardsOfYourSingleDeck"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">{{allData.userDecks[0].description}}</a>
+                            (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
+                        </span>
+                        <div v-if="allData.userDecks.length > 1">
+                            @Localizer["CardsOfYourMultipleDecks"] {{allData.userDecks.length}} @Localizer["Decks"]
+                            <ul>
+                                <li v-for="deck in allData.userDecks">
+                                    @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
+                                    <span>(@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}})</span>.
+                                </li>
+                            </ul>
+                        </div>
+                    </p>
+                </div>
+            </div>
+            <div id="No deck" v-else>
+                <p>@Localizer["YouDontHaveADeckYet"]. @Localizer["YouCanCreateOneOn"] <a asp-page="/Decks/Create">@Localizer["TheDecksPage"]</a>.</p>
+                <p>@Localizer["YouMayAlsoWantToRead"] <a asp-page="/Doc">@Localizer["TheDoc"]</a>.</p>
+            </div>
+            <footer id="Data time" style="padding-top:50px">
+                @Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.
+            </footer>
+        </div>
+        <div id="User not loggedin" v-else>
+            <p>@Localizer["Welcome"] !</p>
+            <p>@Localizer["YouNeedTo"] <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["LogIn"]</a> @Localizer["ToUseMemCheck"] (<a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a> @Localizer["IfYouDontHaveAnAccount"]).</p>
+            <p>@Localizer["YouCan"] <a asp-page="/Search/Index">@Localizer["BrowseTheCards"]</a> @Localizer["WithoutLoggingIn"].</p>
+            <p>@Localizer["YouMayAlsoWantToRead"] <a asp-page="/Doc">@Localizer["TheDoc"]</a>.</p>
+        </div>
+    </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <p>ReloadWaitTime: {{allData.reloadWaitTime}}</p>
+        <p>window.innerWidth: {{window.innerWidth}}</p>
+        <p>screen.width: {{screen.width}}</p>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="~/js/Home/Home.js" asp-append-version="true"></script>
+}

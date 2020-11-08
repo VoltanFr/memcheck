@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddTag" xml:space="preserve">
+    <value>Ajout du label</value>
+  </data>
+  <data name="After" xml:space="preserve">
+    <value>Après</value>
+  </data>
+  <data name="AlertAddCardsToDeckPart1" xml:space="preserve">
+    <value>Ajout de</value>
+  </data>
+  <data name="AlertAddCardsToDeckPart2" xml:space="preserve">
+    <value>cartes au paquet</value>
+  </data>
+  <data name="AlertAddCardsToDeckPart3" xml:space="preserve">
+    <value>cartes sélectionnées sont déjà dans le paquet</value>
+  </data>
+  <data name="AlertAddCardToDeckPart1" xml:space="preserve">
+    <value>Ajouter une carte dans le paquet</value>
+  </data>
+  <data name="AlertAddCardToDeckPart3" xml:space="preserve">
+    <value>une carte sélectionnée est déjà dans le paquet</value>
+  </data>
+  <data name="AlertAddOneCardToDeck" xml:space="preserve">
+    <value>Ajout de la carte sélectionnée au paquet</value>
+  </data>
+  <data name="AlertAddTagToCardsPart1" xml:space="preserve">
+    <value>Êtes-vous sûr de vouloir ajouter le label</value>
+  </data>
+  <data name="AlertAddTagToCardsPart2" xml:space="preserve">
+    <value>à</value>
+  </data>
+  <data name="AlertAddTagToCardsPart3Plural" xml:space="preserve">
+    <value>cartes ?</value>
+  </data>
+  <data name="AlertAddTagToCardsPart3Single" xml:space="preserve">
+    <value>carte?</value>
+  </data>
+  <data name="AlertDeleteCardsPart1" xml:space="preserve">
+    <value>ATTENTION : vous allez effacer</value>
+  </data>
+  <data name="AlertDeleteCardsPart2Plural" xml:space="preserve">
+    <value>cartes de MemCheck. Elles ne seront plus accessibles pour aucune utilisateur.</value>
+  </data>
+  <data name="AlertDeleteCardsPart2Single" xml:space="preserve">
+    <value>une carte de MemCheck. Elle ne sera plus accessible pour aucun utilisateur.</value>
+  </data>
+  <data name="AlertMoveCardsToHeapPart1" xml:space="preserve">
+    <value>Déplacer</value>
+  </data>
+  <data name="AlertMoveCardsToHeapPart2" xml:space="preserve">
+    <value>cartes vers le tas</value>
+  </data>
+  <data name="AlertMoveCardsToHeapPart3" xml:space="preserve">
+    <value>cartes sont déjà dans le tas cible</value>
+  </data>
+  <data name="AlertMoveCardToHeapPart3" xml:space="preserve">
+    <value>une carte est déjà dans le tas cible</value>
+  </data>
+  <data name="AlertMoveOneCardToHeap" xml:space="preserve">
+    <value>Déplacer une carte sélectionnée vers le tas</value>
+  </data>
+  <data name="AlertRemoveCardFromDeckPart1" xml:space="preserve">
+    <value>Enlever la carte du paquet</value>
+  </data>
+  <data name="AlertRemoveCardFromDeckPart3" xml:space="preserve">
+    <value>une carte n'est pas dans le paquet</value>
+  </data>
+  <data name="AlertRemoveCardsFromDeckPart1" xml:space="preserve">
+    <value>Enlever</value>
+  </data>
+  <data name="AlertRemoveCardsFromDeckPart2" xml:space="preserve">
+    <value>cartes du paquet</value>
+  </data>
+  <data name="AlertRemoveCardsFromDeckPart3" xml:space="preserve">
+    <value>cartes ne sont pas dans le paquet</value>
+  </data>
+  <data name="AlertRemoveOneCardFromDeck" xml:space="preserve">
+    <value>Enlever la carte du paquet</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>&lt;Tous&gt;</value>
+  </data>
+  <data name="AllUsers" xml:space="preserve">
+    <value>publique</value>
+  </data>
+  <data name="Any" xml:space="preserve">
+    <value>&lt;Peu importe&gt;</value>
+  </data>
+  <data name="Before" xml:space="preserve">
+    <value>Avant</value>
+  </data>
+  <data name="CantAddToDeckBecauseSomeCardsAlreadyIn" xml:space="preserve">
+    <value>Au moins une carte est dans votre paquet</value>
+  </data>
+  <data name="CardAdded" xml:space="preserve">
+    <value>Carte ajoutée</value>
+  </data>
+  <data name="CardAlreadyInDeck" xml:space="preserve">
+    <value>La carte sélectionnée est déjà dans le paquet</value>
+  </data>
+  <data name="CardAlreadyInTargetHeap" xml:space="preserve">
+    <value>La carte sélectionnée est déjà dans le tas</value>
+  </data>
+  <data name="CardAlreadyNotInDeck" xml:space="preserve">
+    <value>La carte n'est pas dans le paquet</value>
+  </data>
+  <data name="CardDeleted" xml:space="preserve">
+    <value>Carte effacée</value>
+  </data>
+  <data name="CardMoved" xml:space="preserve">
+    <value>Carte déplacée</value>
+  </data>
+  <data name="CardRemoved" xml:space="preserve">
+    <value>Carte enlevée du paquet</value>
+  </data>
+  <data name="CardsAdded" xml:space="preserve">
+    <value>Cartes ajoutées</value>
+  </data>
+  <data name="CardsAlreadyInDeck" xml:space="preserve">
+    <value>Toutes les cartes sélectionnées sont déjà dans le paquet</value>
+  </data>
+  <data name="CardsAlreadyInTargetHeap" xml:space="preserve">
+    <value>Les cartes sélectionnées sont déjà dans le tas</value>
+  </data>
+  <data name="CardsAlreadyNotInDeck" xml:space="preserve">
+    <value>Les cartes ne sont pas dans le paquet</value>
+  </data>
+  <data name="CardsDeleted" xml:space="preserve">
+    <value>Cartes effacées</value>
+  </data>
+  <data name="CardsMoved" xml:space="preserve">
+    <value>Cartes déplacées</value>
+  </data>
+  <data name="CardsRemoved" xml:space="preserve">
+    <value>Cartes enlevées du paquet</value>
+  </data>
+  <data name="CardsWithoutTags" xml:space="preserve">
+    <value>&lt;Cartes sans label&gt;</value>
+  </data>
+  <data name="CardVisibleToMoreThanOwner" xml:space="preserve">
+    <value>Visibilité au-delà du propriétaire</value>
+  </data>
+  <data name="CardVisibleToOwnerOnly" xml:space="preserve">
+    <value>Cartes privées</value>
+  </data>
+  <data name="Deletion" xml:space="preserve">
+    <value>Suppression</value>
+  </data>
+  <data name="ExcludeCards" xml:space="preserve">
+    <value>Exclure les cartes</value>
+  </data>
+  <data name="Ignore" xml:space="preserve">
+    <value>&lt;Peu importe&gt;</value>
+  </data>
+  <data name="IncludeCards" xml:space="preserve">
+    <value>Inclure les cartes</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>&lt;Aucun&gt;</value>
+  </data>
+  <data name="NoRating" xml:space="preserve">
+    <value>Aucune évaluation</value>
+  </data>
+  <data name="NotAllowedToModifyAllTheseCards" xml:space="preserve">
+    <value>Vous ne pouvez pas modifier toutes ces cartes (vous devez en être propriétaire)</value>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>Le</value>
+  </data>
+  <data name="OneUserHasCardWithFrontSide" xml:space="preserve">
+    <value>Un autre utilisateur a dans un paquet la carte avec avant</value>
+  </data>
+  <data name="OperationIsForFilteringOnDeckInclusive" xml:space="preserve">
+    <value>Cette opération nécessite un filtrage incluant un paquet unique.</value>
+  </data>
+  <data name="OperationIsForSelectedCards" xml:space="preserve">
+    <value>Sélectionnez des cartes</value>
+  </data>
+  <data name="SearchTooBigForRatingFiltering" xml:space="preserve">
+    <value>Cette recherche sélectionne trop de cartes pour filtrer par évaluation. Vous devez affiner vos critères.</value>
+  </data>
+  <data name="SelectedRatingAndAbove" xml:space="preserve">
+    <value>Au moins</value>
+  </data>
+  <data name="SelectedRatingAndBelow" xml:space="preserve">
+    <value>Au plus</value>
+  </data>
+  <data name="StartingWith" xml:space="preserve">
+    <value>commençant par</value>
+  </data>
+  <data name="TagAdded" xml:space="preserve">
+    <value>Label ajouté</value>
+  </data>
+  <data name="UsersHaveCardWithFrontSide" xml:space="preserve">
+    <value>autres utilisateurs ont dans un paquet la carte avec avant</value>
+  </data>
+  <data name="Visibility" xml:space="preserve">
+    <value>Visibilité :</value>
+  </data>
+  <data name="YouAreNotTheCreatorOfAllPreviousVersions" xml:space="preserve">
+    <value>Vous n'êtes pas l'auteur de toutes les versions précédentes de la carte avec avant</value>
+  </data>
+  <data name="YouAreNotTheCreatorOfCurrentVersion" xml:space="preserve">
+    <value>Vous n'êtes pas l'auteur de la version actuelle de la carte avec avant</value>
+  </data>
+  <data name="YouOnly" xml:space="preserve">
+    <value>vous seulement</value>
+  </data>
+</root>

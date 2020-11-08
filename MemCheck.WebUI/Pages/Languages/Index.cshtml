@@ -1,0 +1,41 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Languages page";
+}
+
+<div id="LanguagesMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <div class="section">
+            <h1 class="title">Create a language...</h1>
+            <div style="border:  thin solid gray; border-radius: 10px; padding: 5px 5px 5px 5px">
+                <label>Name</label>
+                <div class="field"><div class="control"><input class="responsive-padding-edit" v-model="newLanguage.name" id="languageNameInput" /></div></div>
+            </div>
+            <button type="button" class="btn btn-success btn-lg" @@click="createNewLanguage">Add</button>
+        </div>
+        <div class="section">
+            <h1 class="title">All languages...</h1>
+            <div>
+                <table class="table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Card count</th>
+                    </tr>
+                    <tr v-for="language in allLanguages">
+                        <td>{{language.name}}</td>
+                        <td><button type="button" class="btn btn-info btn-sm" @@click="showCardsWithLanguage(language.name)">{{language.cardCount}}</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Languages/Languages.js" asp-append-version="true"></script>
+}

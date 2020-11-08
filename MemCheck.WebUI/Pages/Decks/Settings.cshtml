@@ -1,0 +1,49 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model SettingsModel
+
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+<input type="text" asp-for="DeckId" id="DeckIdInput" hidden="hidden" />
+
+<div id="DeckSettingsMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <h1 class="title">@Localizer["MainCaption"]</h1>
+
+        <div class="table-responsive">
+            <table class="table table-responsive" width="100%">
+                <tbody>
+                    <tr id="Deck choice" v-if="!singleDeckDisplay">
+                        <th>@Localizer["Deck"]</th>
+                        <td><select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select></td>
+                    </tr>
+                    <tr id="Description" v-if="activeDeck">
+                        <th>@Localizer["Description"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="activeDeck.description" /></td>
+                    </tr>
+                    <tr id="HeapingAlgorithm" v-if="activeDeck">
+                        <th>@Localizer["HeapingAlgorithm"]</th>
+                        <td>
+                            <select v-model="activeDeck.heapingAlgorithmId"><option v-for="heapingAlgorithm in heapingAlgorithms" v-bind:value="heapingAlgorithm.id">{{heapingAlgorithm.nameInCurrentLanguage}}</option></select><br />
+                            <label style="padding:0px">{{currentHeapingAlgorithmDescription()}}</label>
+                        </td>
+                    </tr>
+                    <tr id="CardCount" v-if="activeDeck">
+                        <th>@Localizer["CardCount"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="activeDeck.cardCount" readonly="readonly" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button type="button" class="btn btn-success btn-md" @@click="save">@Localizer["Save"]</button>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Decks/Settings.js" asp-append-version="true"></script>
+}

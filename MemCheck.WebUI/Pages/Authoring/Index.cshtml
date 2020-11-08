@@ -1,0 +1,240 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model IndexModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="CardId" id="CardIdInput" hidden="hidden" />
+<input type="text" asp-for="ReturnUrl" id="ReturnUrlInput" hidden="hidden" />
+
+<div id="AuthoringMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Saving" v-if="saving">
+        <p class="wait-message">@Localizer["PleaseWaitForSave"]</p>
+    </div>
+    <div id="After mount" v-if="mountFinished && !saving">
+        <div id="FullImage" v-if="currentFullScreenImage">
+            <div id="Title" class="authoring-fullscreen-image-name">{{currentFullScreenImage.name}}</div>
+            <div id="Small buttons" class="authoring-fullscreen-small-buttons">
+                <ul class="nav small text-decoration-none" style="align-items:center">
+                    <li id="RemoveButton">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromCard"] @@click="removeFullScreenImageFromCard"><i class="fas fa-trash-alt"></i></button>
+                    </li>
+                    <li class="ml-auto"><button type="button" class="btn btn-primary btn-circle btn-sm" @@click="closeFullScreenImage()"><i class="far fa-times-circle"></i></button></li>
+                </ul>
+            </div>
+            <div id="FullScreenImage" class="fullscreen-image-div">
+                <img class="fullscreen-image" :src="currentFullScreenImage.blob" />
+            </div>
+            <div id="Details">
+                <ul>
+                    <li><strong>@Localizer["FullScreenImageName"]</strong> {{currentFullScreenImage.name}}</li>
+                    <li><strong>@Localizer["ImageUploader"]</strong> {{currentFullScreenImage.ownerName}}</li>
+                    <li><strong>@Localizer["Description"]</strong> {{currentFullScreenImage.description}}</li>
+                    <li><strong>@Localizer["Source"]</strong> {{currentFullScreenImage.source}}</li>
+                    <li><strong>@Localizer["Size"]</strong> {{currentFullScreenImage.size}}</li>
+                    <li><strong>@Localizer["Type"]</strong> {{currentFullScreenImage.contentType}}</li>
+                </ul>
+            </div>
+        </div>
+        <div id="CardEditMode" v-else>
+            <div id="TitleAndTopButtons">
+                <h1 class="title">
+                    <span id="Title" v-if="creatingNewCard">@Localizer["Create"]</span><span v-else>@Localizer["Edit"]</span>
+                    <span id="Info button" v-if="!creatingNewCard">
+                        <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover" data-toggle="tooltip" data-placement="top"><i class="fas fa-info"></i></b-button>
+                        <b-popover target="infoPopover" triggers="focus">
+                            <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
+                            <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
+                            <span>{{infoAboutUsage}}</span><br />
+                        </b-popover>
+                    </span>
+                    <span id="Additional details toggle button">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableAdditionalInfo"><i class="fas fa-plus"></i></button>
+                    </span>
+                    <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
+                    </span>
+                    <span id="VisibilityToggleButton_1" v-if="card.usersWithView.length == 1">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
+                    </span>
+                    <span id="VisibilityToggleButton_2" v-if="card.usersWithView.length > 1">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
+                    </span>
+                    <span id="ImagesToggleButton">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableImages"><i class="fas fa-camera"></i></button>
+                    </span>
+                    <span id="MarkdownPreviewToggleButton">
+                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="collapse" href=".TogglableMarkdownPreview"><i class="fab fa-markdown"></i></button>
+                    </span>
+                    <span id="HistoryButton" v-if="!creatingNewCard">
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="cardHistory()"><i class="fas fa-history"></i></button>
+                    </span>
+                    <span id="Rating" v-if="!creatingNewCard">
+                        <b-button class="btn btn-primary btn-sm learning-rating-button" id="ratingPopover" data-toggle="tooltip" data-placement="top">
+                            {{currentUserRatingAsStars()}}<br />
+                            {{averageRatingAsStars()}}
+                        </b-button>
+                        <b-popover id="ratingPop" target="ratingPopover" triggers="focus">
+                            @Localizer["YourRating"] <b-form-rating inline v-model="card.currentUserRating" @@change="updateRating()"></b-form-rating><br />
+                            @Localizer["Average"] ({{card.countOfUserRatings}} <span v-if="card.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>)<b-form-rating inline readonly show-value v-model="card.averageRating"></b-form-rating>
+                        </b-popover>
+                    </span>
+                </h1>
+            </div>
+            <div id="The card" class="authoring-card-div">
+                <table class="table-responsive authoring-table">
+                    <tbody class="authoring-table-body">
+                        <tr id="FrontSideCaptionRow" class="authoring-row-caption">
+                            <td class="authoring-td">@Localizer["FrontSide"]</td>
+                        </tr>
+                        <tr id="FrontSideInputRow" class="authoring-row-input">
+                            <td class="authoring-td">
+                                <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.frontSide" rows="2" max-rows="15"></b-form-textarea>
+                                <div v-bind:class="classForImages() + ' TogglableImages'">
+                                    <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
+                                        <span>@Localizer["ImageName"]</span>
+                                        <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddFront" />
+                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="pasteImageName(1)"><i class="fas fa-paste"></i></button>
+                                        <button id="AddImageButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="addImage(1)"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                    <div id="FrontImagesDisplay" class="authoring-image-show" v-for="image in frontSideImageList">
+                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                    </div>
+                                </div>
+                                <div class="collapse TogglableMarkdownPreview">
+                                    <span class="learning-card-body" v-html="frontSideHtml()"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="BackSideCaptionRow" class="authoring-row-caption">
+                            <td class="authoring-td">@Localizer["BackSide"]</td>
+                        </tr>
+                        <tr id="BackSideInputRow" class="authoring-row-input">
+                            <td class="authoring-td">
+                                <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.backSide" rows="2" max-rows="15"></b-form-textarea>
+                                <div v-bind:class="classForImages() + ' TogglableImages'">
+                                    <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
+                                        <span>@Localizer["ImageName"]</span>
+                                        <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddBack" />
+                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="pasteImageName(2)"><i class="fas fa-paste"></i></button>
+                                        <button id="AddImageButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="addImage(2)"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                    <div id="BackImagesDisplay" class="authoring-image-show" v-for="image in backSideImageList">
+                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                    </div>
+                                </div>
+                                <div class="collapse TogglableMarkdownPreview">
+                                    <span class="learning-card-body" v-html="backSideHtml()"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="AdditionalInfoCaptionRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-caption'">
+                            <td class="authoring-td">@Localizer["AdditionalInfo"]</td>
+                        </tr>
+                        <tr id="AdditionalInfoInputRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-input'">
+                            <td class="authoring-td">
+                                <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.additionalInfo" rows="2" max-rows="15"></b-form-textarea>
+                                <div v-bind:class="classForImages() + ' TogglableImages'">
+                                    <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
+                                        <span>@Localizer["ImageName"]</span>
+                                        <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddAdditional" />
+                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="pasteImageName(3)"><i class="fas fa-paste"></i></button>
+                                        <button id="AddImageButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="addImage(3)"><i class="fas fa-plus"></i></button>
+                                    </div>
+                                    <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
+                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                    </div>
+                                </div>
+                                <div class="collapse TogglableMarkdownPreview">
+                                    <span class="learning-card-body" v-html="additionalInfoHtml()"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="LanguageCaptionRow" class="collapse authoring-row-caption TogglableAdditionalInfo">
+                            <td class="authoring-td">@Localizer["Language"]</td>
+                        </tr>
+                        <tr id="LanguageInputRow" class="collapse authoring-row-input TogglableAdditionalInfo">
+                            <td class="authoring-td">
+                                <select v-model="card.languageId" class="authoring-select">
+                                    <option v-for="language in allAvailableLanguages" v-bind:value="language.id">{{language.name}}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr id="TagsCaptionRow" class="authoring-row-caption">
+                            <td class="authoring-td">@Localizer["Tags"]</td>
+                        </tr>
+                        <tr id="TagsInputRow" class="authoring-row-input">
+                            <td class="authoring-td">
+                                <div style="flex-flow:row wrap; width:100%">
+                                    <select v-model="selectedTagToAdd" class="authoring-select"><option v-for="tag in allAvailableTags" v-bind:value="tag">{{tag.tagName}}</option></select>
+                                    <span v-if="CanAddSelectedTag()">
+                                        <button type="button" class="btn btn-success btn-sm" @@click="addTag">+</button>
+                                    </span>
+                                    <button type="button" class="tag" v-for="(tag,index) in card.tags" @@click="removeTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="VisibilityCaptionRow" class="collapse authoring-row-caption TogglableVisibility show">
+                            <td class="authoring-td">@Localizer["Users"]</td>
+                        </tr>
+                        <tr id="VisibilityInputRow" class="collapse authoring-row-input TogglableVisibility show">
+                            <td class="authoring-td">
+                                <div style="flex-flow:row wrap; width:100%">
+                                    <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
+                                    <span v-if="CanAddSelectedUser()">
+                                        <button type="button" class="btn btn-success btn-sm" @@click="addUser">+</button>
+                                    </span>
+                                    <button type="button" class="tag" v-if="card.usersWithView.length == 0" style="background-color:orange" @@click="makePrivate()">@Localizer["Public"]</button>
+                                    <span v-for="(user,index) in card.usersWithView">
+                                        <span v-if="user.userId==currentUser.userId && card.usersWithView.length > 1">
+                                            <span class="tag">{{user.userName}}</span>
+                                        </span>
+                                        <span v-else>
+                                            <button type="button" class="tag" @@click="removeUser(index)"><span aria-hidden="true">{{user.userName}} &times;</span></button>
+                                        </span>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="AddToDeckCaptionRow" v-if="creatingNewCard" class="authoring-row-caption">
+                            <td class="authoring-td">@Localizer["AddToDeck"]</td>
+                        </tr>
+                        <tr id="VersionDescriptionCaptionRow" class="authoring-row-caption" v-if="!creatingNewCard">
+                            <td class="authoring-td">@Localizer["VersionDescription"]</td>
+                        </tr>
+                        <tr id="VersionDescriptionInputRow" class="authoring-row-input" v-if="!creatingNewCard">
+                            <td class="authoring-td">
+                                <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
+                            </td>
+                        </tr>
+                        <tr id="AddToDeckInputRow" v-if="creatingNewCard" class="authoring-row-input">
+                            <td class="authoring-td">
+                                <div style="flex-flow:row wrap; width:100%">
+                                    <select v-model="addToDeck" class="authoring-select"><option v-for="deck in decksOfUser" v-bind:value="deck">{{deck.deckName}}</option></select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button id="Send card button" type="button" class="btn btn-success btn-lg authoring-send-button" @@click="sendCard">
+                <span v-if="creatingNewCard">@Localizer["Add"]</span>
+                <span v-else>@Localizer["Update"]</span>
+            </button>
+        </div>
+    </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <ul>
+            <li>card.usersWithView.length: {{card.usersWithView.length}}</li>
+        </ul>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Authoring/Authoring.js" asp-append-version="true"></script>
+}

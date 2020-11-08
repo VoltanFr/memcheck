@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdditionalInfo" xml:space="preserve">
+    <value>Additional info</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Average</value>
+  </data>
+  <data name="BackSide" xml:space="preserve">
+    <value>Back side</value>
+  </data>
+  <data name="BackToHomePage" xml:space="preserve">
+    <value>Back to home page</value>
+  </data>
+  <data name="BiggestHeapReached" xml:space="preserve">
+    <value>Biggest heap reached in this deck:</value>
+  </data>
+  <data name="CardVersionCreator" xml:space="preserve">
+    <value>Creator of current version:</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Creation date</value>
+  </data>
+  <data name="CurrentlyInHeap" xml:space="preserve">
+    <value>Current heap:</value>
+  </data>
+  <data name="DateAddedInDeck" xml:space="preserve">
+    <value>Added to the deck on</value>
+  </data>
+  <data name="Deck" xml:space="preserve">
+    <value>Deck</value>
+  </data>
+  <data name="DeckSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description:</value>
+  </data>
+  <data name="DidNotKnow" xml:space="preserve">
+    <value>I didn't know</value>
+  </data>
+  <data name="DownloadBiggestSize" xml:space="preserve">
+    <value>Download biggest size available</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ExcludedTags" xml:space="preserve">
+    <value>Excluded tags</value>
+  </data>
+  <data name="Expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ExplainMoveOperationsAfterIcon" xml:space="preserve">
+    <value>at the bottom of the page tells you that some asynchronous card move operations are pending. These operations are most of the time so fast that you will only see the icon shortly, but in case of slow network transfers, they may take some time. Navigating away from the page in this state would prevent your learning information to be saved as expected. You should wait for this icon to disappear.</value>
+  </data>
+  <data name="ExplainMoveOperationsBeforeIcon" xml:space="preserve">
+    <value>This icon</value>
+  </data>
+  <data name="ExplainMoveOperationsOkButton" xml:space="preserve">
+    <value>Got it</value>
+  </data>
+  <data name="FilterThisLearningSession" xml:space="preserve">
+    <value>Filter this learning session</value>
+  </data>
+  <data name="Forgot" xml:space="preserve">
+    <value>I had forgotten</value>
+  </data>
+  <data name="FrontSide" xml:space="preserve">
+    <value>Front side</value>
+  </data>
+  <data name="FullScreenImageName" xml:space="preserve">
+    <value>Image name:</value>
+  </data>
+  <data name="FullScreenImageOwner" xml:space="preserve">
+    <value>Uploaded by:</value>
+  </data>
+  <data name="Heap" xml:space="preserve">
+    <value>Heap</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Knew" xml:space="preserve">
+    <value>I knew it</value>
+  </data>
+  <data name="LastChangeDate" xml:space="preserve">
+    <value>Current version created on</value>
+  </data>
+  <data name="LastHeapMoveFailed" xml:space="preserve">
+    <value>Previous heap move failed, this will be ignored but the card will need learn again</value>
+  </data>
+  <data name="LastLearnDate" xml:space="preserve">
+    <value>Last learned on:</value>
+  </data>
+  <data name="LastPrefetchTimedOut" xml:space="preserve">
+    <value>Last prefetch timed out, fetching now</value>
+  </data>
+  <data name="Learn" xml:space="preserve">
+    <value>learn</value>
+  </data>
+  <data name="MoveToHeap" xml:space="preserve">
+    <value>Move to heap</value>
+  </data>
+  <data name="NoMoreCardTo" xml:space="preserve">
+    <value>No more card to</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Learn</value>
+  </data>
+  <data name="PleaseWaitForImageLoad" xml:space="preserve">
+    <value>Please wait, loading images...</value>
+  </data>
+  <data name="PleaseWaitForMount" xml:space="preserve">
+    <value>Please wait, initializing data...</value>
+  </data>
+  <data name="PleaseWaitSavingData" xml:space="preserve">
+    <value>Please wait, saving data...</value>
+  </data>
+  <data name="RemoveFromDeck" xml:space="preserve">
+    <value>Remove from deck</value>
+  </data>
+  <data name="Repeat" xml:space="preserve">
+    <value>repeat</value>
+  </data>
+  <data name="ShowBack" xml:space="preserve">
+    <value>Show back</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Size:</value>
+  </data>
+  <data name="Source" xml:space="preserve">
+    <value>Source:</value>
+  </data>
+  <data name="TimesInNotLearnedHeap" xml:space="preserve">
+    <value>Times in not learned heap:</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type:</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>user</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>users</value>
+  </data>
+  <data name="Visibility" xml:space="preserve">
+    <value>Visibility</value>
+  </data>
+  <data name="WaitingForDataLoad" xml:space="preserve">
+    <value>Waiting for data load...</value>
+  </data>
+  <data name="WaitingForPreviousHeapMove" xml:space="preserve">
+    <value>Waiting for previous heap move for a max of 3 seconds...</value>
+  </data>
+  <data name="YourRating" xml:space="preserve">
+    <value>Your rating:</value>
+  </data>
+</root>

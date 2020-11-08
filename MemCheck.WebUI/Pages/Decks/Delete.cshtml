@@ -1,0 +1,39 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<div id="DeckDeleteMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <h1 class="title">@Localizer["MainCaption"]</h1>
+
+        <div class="table-responsive">
+            <table class="table table-responsive" width="100%">
+                <tbody>
+                    <tr id="Deck choice" v-if="!singleDeckDisplay">
+                        <th>@Localizer["Deck"]</th>
+                        <td><select class="responsive-padding-edit" v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select></td>
+                    </tr>
+                    <tr id="Description" v-if="activeDeck">
+                        <th>@Localizer["Description"]</th>
+                        <td><textarea class="form-control responsive-padding-edit" v-model="activeDeck.description" readonly="readonly" rows="1"></textarea></td>
+                    </tr>
+                    <tr id="CardCount" v-if="activeDeck">
+                        <th>@Localizer["CardCount"]</th>
+                        <td><textarea class="form-control responsive-padding-edit" v-model="activeDeck.cardCount" readonly="readonly" rows="1"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button type="button" class="btn btn-danger btn-md" @@click="deleteDeck" v-if="activeDeck">@Localizer["DeleteAndLoseAll"]</button>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Decks/Delete.js" asp-append-version="true"></script>
+}

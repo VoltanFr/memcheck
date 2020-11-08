@@ -1,0 +1,134 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Identity
+@using MemCheck.Domain
+@inject SignInManager<MemCheckUser> SignInManager
+@inject UserManager<MemCheckUser> UserManager
+@inject IViewLocalizer Localizer
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MemCheck - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-vue/bootstrap-vue.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent border-bottom box-shadow">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-brand">MemCheck</span>
+                </button>
+                <div id="Left part" class="navbar-collapse collapse bg-transparent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item"><a class="navbar-brand" asp-page="/Index">MemCheck</a></li>
+                        <li id="Learn" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
+                            <div class="dropdown-menu" aria-labelledby="LearnDropdown">
+                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Unknown">@Localizer["Unknown"]</a>
+                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Expired">@Localizer["Expired"]</a>
+                            </div>
+                        </li>
+                        <li id="Decks" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="DecksDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Decks"]</a>
+                            <div class="dropdown-menu" aria-labelledby="DecksDropdown">
+                                <a class="dropdown-item" href="/Decks/Index">@Localizer["Browse"]</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/Decks/Create">@Localizer["Create"]</a>
+                                <a class="dropdown-item" href="/Decks/Delete">@Localizer["Delete"]</a>
+                                <a class="dropdown-item" href="/Decks/Settings">@Localizer["Settings"]</a>
+                            </div>
+                        </li>
+                        <li id="Cards" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Cards"]</a>
+                            <div class="dropdown-menu" aria-labelledby="CardDropdown">
+                                <a class="dropdown-item" href="/Search/Index">@Localizer["Browse"]</a>
+                                <a class="dropdown-item" href="/Authoring/Index">@Localizer["Create"]</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/Media/Index">@Localizer["BrowseMedia"]</a>
+                                <a class="dropdown-item" href="/Media/Upload">@Localizer["UploadMedia"]</a>
+                            </div>
+                        </li>
+                        <li id="Tags" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="TagDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Tags"]</a>
+                            <div class="dropdown-menu" aria-labelledby="TagDropdown">
+                                <a class="dropdown-item" href="/Tags/Authoring">@Localizer["Create"]</a>
+                                <a class="dropdown-item" href="/Tags/Index">@Localizer["Browse"]</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div id="Right part" class="navbar-collapse collapse bg-transparent">
+                    <ul class="navbar-nav ml-auto" style="align-items:center">
+                        <li id="User" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="UserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <i class="fas fa-user"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-times"></i>
+                                }
+                            </a>
+                            <div class="dropdown-menu my-2 my-lg-0" aria-labelledby="UserDropdown">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity.Name</a>
+                                    <form class="nav-item form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
+                                        <button type="submit" class="dropdown-item">@Localizer["Logout"]</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a>
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["Login"]</a>
+                                }
+                            </div>
+                        </li>
+                        <li id="Language" class="nav-item">
+                            <select id="SelectLanguageDiv" class="nav-item" v-model="activeLanguage" style="border-radius: 10px;width:auto">
+                                <option v-for="language in availableLanguages">
+                                    {{language}}
+                                </option>
+                            </select>
+
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="main-body">
+        @RenderBody()
+    </main>
+
+    <footer class="footer" style="padding-top:100px">
+        <div class="container">
+            <nav class="navbar navbar-expand-sm navbar-light bg-white border-top box-shadow nav-fill nav-justified">
+                <a class="nav-item nav-link text-primary" asp-page="/Index">MemCheck</a>
+                @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
+                <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>
+                <a class="nav-item nav-link text-primary" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/vue/vue.min.js"></script>
+    <script src="~/lib/bootstrap-vue/bootstrap-vue.min.js"></script>
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script src="~/lib/font-awesome/js/all.min.js"></script>
+    <script src="~/lib/showdown/showdown.min.js"></script>
+    <script src="~/js/Common.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

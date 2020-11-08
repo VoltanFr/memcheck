@@ -1,0 +1,67 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model UploadModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="ImageId" id="ImageIdInput" hidden="hidden" />
+<input type="text" asp-for="ReturnUrl" id="ReturnUrlInput" hidden="hidden" />
+
+<div id="UploadMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Waiting for upload" v-if="mountFinished && uploading">
+        <p class="wait-message">@Localizer["PleaseWaitWhileUploading"]</p>
+    </div>
+    <div id="After mount" v-if="mountFinished && !uploading">
+        <div id="Title">
+            <h1 class="title"><span v-if="editingImageId">@Localizer["EditMedia"]</span><span v-else>@Localizer["AddMedia"]</span></h1>
+        </div>
+        <div id="Table">
+            <table class="table table-sm table-authoring" width="100%">
+                <tbody>
+                    <tr id="Headers for column size" style="visibility:hidden">
+                        <th width="10%"></th>
+                        <th width="90%"></th>
+                    </tr>
+                    <tr>
+                        <th>@Localizer["Name"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="name" /></td>
+                    </tr>
+                    <tr>
+                        <th>@Localizer["Description"]</th>
+                        <td><b-form-textarea class="form-control responsive-padding-edit" v-model="description" rows="2" max-rows="15"></b-form-textarea></td>
+                    </tr>
+                    <tr>
+                        <th>@Localizer["Source"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="source" /></td>
+                    </tr>
+                    <tr v-if="editingImageId">
+                        <th>@Localizer["VersionDescription"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="versionDescription" /></td>
+                    </tr>
+                    <tr v-if="!editingImageId">
+                        <th>@Localizer["FilePath"]</th>
+                        <td>
+                            <input type="file" @@change="onFileSelected" style="display:none" ref="fileInput" />
+                            <span v-if="selectedFile">{{selectedFile.name}}</span>
+                            <button @@click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
+                        </td>
+                    </tr>
+                    <tr v-if="imagePreview">
+                        <th>@Localizer["Preview"]</th>
+                        <td><img class="preview-image" :src="imagePreview" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button id="UploadButton" type="button" class="btn btn-success btn-lg" @@click="upload">@Localizer["Upload"]</button>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Media/Upload.js" asp-append-version="true"></script>
+}

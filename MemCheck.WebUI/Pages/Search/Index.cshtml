@@ -1,0 +1,288 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model MemCheck.WebUI.Pages.Search.NewSearchModel
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="DeckId" id="DeckIdInput" hidden="hidden" />
+<input type="text" asp-for="HeapId" id="HeapIdInput" hidden="hidden" />
+<input type="text" asp-for="TagFilter" id="TagFilterInput" hidden="hidden" />
+
+<div id="SearchRootDiv" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Waiting for load" v-if="loadingQuery">
+        <p class="wait-message">@Localizer["PleaseWaitForQuery"]</p>
+    </div>
+    <div id="After mount and not loading" v-if="mountFinished && !loadingQuery">
+        <table class="search-page-table table table-hover">
+            <tbody>
+                <tr id="Hidden row to specify width of columns" style="visibility:hidden;height:0">
+                    <th id="Checkbox header" class="search-page-widget-td"></th>
+                    <th id="Visibility header" class="search-page-widget-td"></th>
+                    <th id="Heap info header" class="search-page-widget-td"></th>
+                    <th id="Rating header" class="search-page-widget-td"></th>
+                    <th id="Front side header"></th>
+                    <th id="Tags header" style="width:20%"></th>
+                </tr>
+                <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:lightgray">
+                    <td id="Select all checkbox" class="search-page-widget-td" style="text-align:left">
+                        <a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-toggle="dropdown"><input type="checkbox" /></a>
+                        <span class="dropdown-menu" role="menu">
+                            <a class="dropdown-item" @@click="selectAll()">@Localizer["SelectAll"]</a>
+                            <a class="dropdown-item" @@click="unselectAll()">@Localizer["SelectNone"]</a>
+                        </span>
+                    </td>
+                    <td id="Request row toggler" class="search-page-widget-td">
+                        <button type="button" class="btn btn-default" style="padding:0px" data-toggle="collapse" href="#QueryRow" data-placement="top" title=@Localizer["Request"]><i class="fas fa-ellipsis-v"></i></button>
+                    </td>
+                    <td id="DeckActionButton" class="search-page-widget-td">
+                        <span v-if="deckActionDropDownButtonEnabled()">
+                            <a href="#" id="DeckActionDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></a>
+                            <span class="dropdown-menu" role="menu">
+                                <span id="AddToDeck" v-if="addToDeckEnabled()">
+                                    <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
+                                        <a class="dropdown-item" @@click="addSelectedCardsToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToDeck"]</a>
+                                    </span>
+                                    <span id="MultiDeckAddToDeck" v-else>
+                                        <span v-for="targetDeck in possibleTargetDecksForAdd">
+                                            <a class="dropdown-item" @@click="addSelectedCardsToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="RemoveFromDeck" v-if="possibleTargetDecksForAdd.length > 0">
+                                    <span id="SingleDeckRemoveFromDeck" v-if="possibleTargetDecksForAdd.length == 1">
+                                        <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-minus"></i> @Localizer["RemoveFromDeck"]</a>
+                                    </span>
+                                    <span id="MultiDeckRemoveFromDeck" v-else>
+                                        <span v-for="targetDeck in possibleTargetDecksForAdd">
+                                            <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(targetDeck)"><i class="fas fa-minus"></i> @Localizer["RemoveFrom"] {{targetDeck.deckName}}</a>
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="MoveToHeap" v-if="moveToHeapEnabled()">
+                                    <a class="dropdown-item" v-for="targetHeap in possibleHeapsForMove" @@click="moveSelectedCardsToHeap(targetHeap)"> @Localizer["MoveToHeap"] {{targetHeap.heapName}}</a>
+                                </span>
+                            </span>
+                        </span>
+                    </td>
+                    <td id="NonDeckActionButton" class="search-page-widget-td">
+                        <span v-if="nonDeckActionDropDownButtonEnabled()">
+                            <a href="#" id="NonDeckActionDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["Card"]><i class="fas fa-ellipsis-h"></i></a>
+                            <span class="dropdown-menu" role="menu">
+                                <span id="DeleteCard" v-if="deleteCardEnabled()">
+                                    <span id="DeleteCard" v-if="selectionCount() == 1">
+                                        <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCard"]</a>
+                                    </span>
+                                    <span id="DeleteCard" v-if="selectionCount() > 1">
+                                        <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCards"]</a>
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
+                    </td>
+                    <td id="PageNavigationButtonsCardCountAndTagButton" colspan="3" class="search-page-nav-column">
+                        <button class="btn-nav-pages" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+                        <button class="btn-nav-pages" id="MoveTenPagesBackward" @@click="movePage(-10)" v-if="canMovePage(-10)">{{pageNo - 10}}</button>
+                        <button class="btn-nav-pages" id="MoveFivePagesBackward" @@click="movePage(-5)" v-if="canMovePage(-5)">{{pageNo - 5}}</button>
+                        <button class="btn-nav-pages" id="MoveTwoPagesBackward" @@click="movePage(-2)" v-if="canMovePage(-2)">{{pageNo - 2}}</button>
+                        <button class="btn-nav-pages" @@click="movePage(-1)" v-if="canMovePage(-1)">{{pageNo - 1}}</button>
+                        <button class="btn-nav-pages btn-success" disabled>{{pageNo}}</button>
+                        <button class="btn-nav-pages" @@click="movePage(+1)" v-if="canMovePage(+1)">{{pageNo + 1}}</button>
+                        <button class="btn-nav-pages" id="MoveTwoPagesForward" @@click="movePage(+2)" v-if="canMovePage(+2)">{{pageNo + 2}}</button>
+                        <button class="btn-nav-pages" id="MoveFivePagesForward" @@click="movePage(+5)" v-if="canMovePage(+5)">{{pageNo + 5}}</button>
+                        <button class="btn-nav-pages" id="MoveTenPagesForward" @@click="movePage(+10)" v-if="canMovePage(+10)">{{pageNo + 10}}</button>
+                        <button class="btn-nav-pages" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{runResult.pageCount}}</button>
+                        <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard == 0">@Localizer["NoCard"]</span>
+                        <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard > 0">{{runResult.totalNbCard}} @Localizer["Cards"]</span>
+                        <span class="label" style="white-space:nowrap" v-if="selectionCount() == 1">, {{selectionCount()}} @Localizer["Selected"]</span>
+                        <span class="label" style="white-space:nowrap" v-if="selectionCount() > 1">, {{selectionCount()}} @Localizer["Selecteds"]</span>
+                        <span v-if="addTagDropDownButtonEnabled()" class="search-page-tag-button-column">
+                            <a class="dropdown-toggle" href="#" id="TagDropdown" role="button" data-toggle="dropdown"><i class="fas fa-tags"></i></a>
+                            <span class="dropdown-menu pre-scrollable" role="menu" v-if="addTagDropDownButtonEnabled()">
+                                <a class="dropdown-item" v-for="tag in allStaticData.allApplicableTags" @@click="addTagToSelectedCards(tag)"><i class="fas fa-plus"></i>&nbsp;{{tag.tagName}}</a>
+                            </span>
+                            <span class="dropdown-menu" role="menu" v-else>
+                                <span class="dropdown-item-text">{{addTagDropDownButtonDisabledReason}}</span>
+                            </span>
+                        </span>
+                    </td>
+                </tr>
+                <tr id="QueryRow" class="collapse">
+                    <td id="Request details" colspan="100">
+                        <table class="table table-hover table-sm" style="width:100%">
+                            <tbody>
+                                <tr id="Hidden row to specify width of columns" style="visibility:hidden;height:0">
+                                    <th width="10%"></th>
+                                    <th width="90%"></th>
+                                </tr>
+                                <tr id="Deck">
+                                    <th>@Localizer["Deck"]</th>
+                                    <td>
+                                        <select v-model="selectedDeck" class="responsive-padding-edit"><option v-for="deck in possibleDecks" v-bind:value="deck">{{deck.deckName}}</option></select>
+                                        <select v-model="deckSelectionIsInclusive" class="responsive-padding-edit" v-if="possibleDecksInclusionChoicesEnabled()"><option v-for="possibleDecksInclusionChoice in possibleDecksInclusionChoices" v-bind:value="possibleDecksInclusionChoice.selectedDeckIsInclusive">{{possibleDecksInclusionChoice.choiceText}}</option></select>
+                                    </td>
+                                </tr>
+                                <tr id="Heap" v-if="filteringOnDeckInclusive()">
+                                    <th style="text-align:right">@Localizer["Heap"]</th>
+                                    <td>
+                                        <select v-model="selectedHeap" class="responsive-padding-edit"><option v-for="heap in possibleHeaps" v-bind:value="heap.heapId">{{heap.heapName}}</option></select>
+                                    </td>
+                                </tr>
+                                <tr id="Add to deck date" v-if="filteringOnDeckInclusive()">
+                                    <th style="text-align:right">@Localizer["AddToDeckDate"]</th>
+                                    <td>
+                                        <div class="form-group-sm">
+                                            <select class="input-group responsive-padding-edit" style="width:50%;float:left" v-model="selectedAddToDeckDateChoice"><option v-for="addToDeckDatePossibleChoice in addToDeckDatePossibleChoices" v-bind:value="addToDeckDatePossibleChoice.choiceId">{{addToDeckDatePossibleChoice.choiceText}}</option></select>
+                                            <b-datepicker class="input-group responsive-padding-edit" v-model="addToDeckDate" size="sm" style="width:50%;float:left" v-if="selectedAddToDeckDateChoice!=0"></b-datepicker>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="Expiry date" v-if="filteringOnDeckInclusive()">
+                                    <th style="text-align:right">@Localizer["ExpiryDate"]</th>
+                                    <td>
+                                        <div class="form-group-sm">
+                                            <select class="input-group responsive-padding-edit" style="width:50%;float:left" v-model="selectedExpiryDateChoice"><option v-for="expiryDatePossibleChoice in expiryDatePossibleChoices" v-bind:value="expiryDatePossibleChoice.choiceId">{{expiryDatePossibleChoice.choiceText}}</option></select>
+                                            <b-datepicker class="input-group responsive-padding-edit" v-model="expiryDate" size="sm" style="width:50%;float:left" v-if="selectedExpiryDateChoice!=0"></b-datepicker>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="RequiredTagsRow">
+                                    <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["RequiredTags"]</th>
+                                    <td>
+                                        <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
+                                        <span id="AddReqiredTagButton" v-if="CanAddSelectedRequiredTag()">
+                                            <button type="button" class="btn btn-success btn-sm" @@click="addRequiredTag">+</button>
+                                        </span>
+                                        <button type="button" class="tag" v-for="(tag,index) in selectedRequiredTags" @@click="removeRequiredTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                    </td>
+                                </tr>
+                                <tr id="EcludedTagsRow">
+                                    <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["ExcludedTags"]</th>
+                                    <td>
+                                        <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
+                                        <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
+                                            <button type="button" class="btn btn-success btn-sm" @@click="addExcludedTag">+</button>
+                                        </span>
+                                        <button type="button" class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                    </td>
+                                </tr>
+                                <tr id="Owner">
+                                    <th>@Localizer["Owner"]</th>
+                                    <td>
+                                        <select v-model="selectedOwner" class="responsive-padding-edit"><option v-for="owner in possibleOwners" v-bind:value="owner.userId">{{owner.userName}}</option></select>
+                                    </td>
+                                </tr>
+                                <tr id="Visibility">
+                                    <th>@Localizer["Visibility"]</th>
+                                    <td>
+                                        <select v-model="selectedVisibilityFilteringChoice" class="responsive-padding-edit"><option v-for="visibilityFilteringPossibleChoice in visibilityFilteringPossibleChoices" v-bind:value="visibilityFilteringPossibleChoice.choiceId">{{visibilityFilteringPossibleChoice.choiceText}}</option></select>
+                                    </td>
+                                </tr>
+                                <tr id="Text">
+                                    <th>@Localizer["Text"]</th>
+                                    <td><input class="form-control-sm responsive-padding-edit search-page-required-text-edit" v-model="textFilter" v-on:keyup.enter="runQuery()" /></td>
+                                </tr>
+                                <tr id="Rating">
+                                    <th>@Localizer["AverageRating"]</th>
+                                    <td>
+                                        <select v-model="selectedAverageRatingFilteringKind" class="responsive-padding-edit"><option v-for="ratingF in possibleRatingFilteringKind" v-bind:value="ratingF.choiceId">{{ratingF.choiceText}}</option></select>
+                                        <select v-model="selectedAverageRatingFilteringValue" class="responsive-padding-edit" v-if="averageRatingFilteringEnabled()"><option v-for="ratingF in possibleRatingFilteringValues" v-bind:value="ratingF.choiceId">{{ratingF.choiceText}}</option></select>
+                                    </td>
+                                </tr>
+                                <tr id="Page size">
+                                    <th>@Localizer["PageSize"]</th>
+                                    <td>
+                                        <select v-model="pageSize" class="responsive-padding-edit">
+                                            <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="Run button">
+                                    <td></td>
+                                    <td><button class="btn btn-info btn-sm" @@click="runQuery()">@Localizer["Run"]</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr id="Cards" v-for="cardWithSelectionInfo in runResult.cardsWithSelectionInfo">
+                    <td id="SelectionCheckbox" class="search-page-widget-td" style="text-align:left">
+                        <input type="checkbox" style="padding:0px;vertical-align:middle" v-model="cardWithSelectionInfo.selected" />
+                    </td>
+                    <td id="Visibility" class="search-page-widget-td">
+                        <b-button class="btn btn-primary btn-circle btn-sm" style="padding:0px" v-bind:id="'visi'+htmlClassForCard(cardWithSelectionInfo.card)">
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
+                        </b-button>
+                        <b-popover v-bind:target="'visi'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">{{cardWithSelectionInfo.card.popoverVisibility}}</b-popover>
+                    </td>
+                    <td id="Heap" info class="search-page-widget-td">
+                        <b-button class="btn btn-sm search-page-heap-info" style="width:100%" v-bind:id="'heap'+htmlClassForCard(cardWithSelectionInfo.card)">
+                            <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
+                            <span v-else>
+                                <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
+                                    <i class="fas fa-layer-group"></i> {{cardWithSelectionInfo.card.decks[0].heapId}}
+                                </span>
+                                <span v-else style="color:ButtonText"><i class="fas fa-layer-group"></i></span>
+                            </span>
+                        </b-button>
+                        <b-popover v-bind:target="'heap'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">
+                            <span v-if="cardWithSelectionInfo.card.decks.length == 0">
+                                <span v-if="singleDeckDisplayOptimization">@Localizer["NotInYourDeck"]</span><span v-else>@Localizer["InNoneOfYourDecks"]</span>
+                            </span>
+                            <span v-else>
+                                <span v-for="deck in cardWithSelectionInfo.card.decks">
+                                    <strong><span v-if="singleDeckDisplayOptimization">@Localizer["InYourDeck"]</span><span v-else>@Localizer["InYourDeck"] {{deck.deckName}}</span><br /></strong>
+                                    @Localizer["Heap"] {{deck.heapName}}<br />
+                                    @Localizer["NbTimesInNotLearnedHeap"] {{deck.nbTimesInNotLearnedHeap}}<br />
+                                    @Localizer["BiggestHeapReached"] {{deck.biggestHeapReached}}<br />
+                                    @Localizer["AddedToDeckOn"] {{dt(deck.addToDeckUtcTime)}}<br />
+                                    @Localizer["LastLearnedOn"] <span v-if="!deck.lastLearnUtcTime || deck.lastLearnUtcTime == '0001-01-01T00:00:00Z'">@Localizer["Never"]</span><span v-else>{{dt(deck.lastLearnUtcTime)}}</span><br />
+                                    <span v-if="deck.heapId > 0">
+                                        <span v-if="deck.expired" style="color:orange">@Localizer["ExpiredOn"]</span><span v-else>@Localizer["WillExpireOn"]</span> {{dt(deck.expiryUtcDate)}}
+                                    </span>
+                                    <span v-else>
+                                        <span style="color:orange">{{deck.heapName}}</span>
+                                    </span>
+                                    <br />
+                                </span>
+                            </span>
+                        </b-popover>
+                    </td>
+                    <td id="Rating" info class="search-page-widget-td">
+                        <b-button class="btn btn-sm search-page-rating-button" style="width:100%" v-bind:id="'rating'+htmlClassForCard(cardWithSelectionInfo.card)">
+                            <span v-if="cardWithSelectionInfo.card.averageRating == 0" style="color: InactiveCaptionText">{{cardWithSelectionInfo.card.ratingShort}}</span>
+                            <span v-else style="color:ButtonText">{{cardWithSelectionInfo.card.ratingShort}}</span>
+                        </b-button>
+                        <b-popover v-bind:target="'rating'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">
+                            @Localizer["YourRating"] {{cardWithSelectionInfo.card.userRatingAsStars}}<br />
+                            @Localizer["Average"] ({{cardWithSelectionInfo.card.countOfUserRatings}} <span v-if="cardWithSelectionInfo.card.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>) {{cardWithSelectionInfo.card.averageRatingAsStars}} {{cardWithSelectionInfo.card.averageRating}}
+                        </b-popover>
+                    </td>
+                    <td id="Front side" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:0">
+                        <a v-bind:href="'/Authoring?CardId='+cardWithSelectionInfo.card.cardId">{{cardWithSelectionInfo.card.frontSide}}</a>
+                    </td>
+                    <td id="Tags" class="search-page-tag-column">
+                        @* There is a problem with the ellipsis here, related to the v-for. Don't know how to fix that *@
+                        <span v-for="tag in cardWithSelectionInfo.card.tags" class="search-page-tag">{{tag}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <ul>
+            <li v-if="mountDebugInfo">{{mountDebugInfo}}</li>
+            <li v-if="lastQueryDebugInfo">{{lastQueryDebugInfo}}</li>
+        </ul>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+}

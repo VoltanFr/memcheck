@@ -1,0 +1,166 @@
+﻿using MemCheck.Application;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Data.Entity;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+
+namespace MemCheck.CommandLineDbClient.Pauker
+{
+    internal sealed class ChangeOwner : IMemCheckTest
+    {
+        #region Fields
+        private readonly ILogger<PaukerImportTest> logger;
+        private readonly MemCheckDbContext dbContext;
+        private const string sourceDir = @"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\CSharp\Vinny\MemCheck_v0.2\MemCheck.CommandLineDbClient\RegionsFrancaises";
+        #endregion
+        #region classes Region, InfoFileContents
+        private sealed class Region
+        {
+            #region Fields
+            private Guid imageDbId = Guid.Empty;
+            #endregion
+            #region Private methods
+            private ImmutableArray<string> GetFields(string dataSetFileLine)
+            {
+                IEnumerable<string> fields = dataSetFileLine.Split(';');
+                if (fields.Count() != 7)
+                    throw new Exception($"Invalid line '{dataSetFileLine}'");
+                return fields.Select(field => field.Trim()).ToImmutableArray();
+            }
+            private ImmutableArray<string> GetDepartments(string field, int expectedCount)
+            {
+                IEnumerable<string> fields = field.Split(',');
+                if (fields.Count() != expectedCount)
+                    throw new Exception($"Invalid department list '{field}'");
+                return fields.Select(field => field.Trim()).ToImmutableArray();
+            }
+            private int GetDensity(string field)
+            {
+                var withoutBlanks = field.RemoveBlanks();
+                int commaIndec = withoutBlanks.IndexOf(',');
+                string s1 = withoutBlanks.Substring(0, commaIndec == -1 ? withoutBlanks.Length : commaIndec);
+                return int.Parse(s1);
+            }
+            #endregion
+            public Region(string dataSetFileLine)
+            {
+                try
+                {
+                    var fields = GetFields(dataSetFileLine);
+                    Name = fields[0];
+                    int departmentCount = int.Parse(fields[1]);
+                    Population = int.Parse(fields[2].RemoveBlanks());
+                    Density = GetDensity(fields[3]);
+                    Departments = GetDepartments(fields[4], departmentCount);
+                    ImageFileName = fields[5];
+                    ImageSource = fields[6];
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Failed to read region from '{dataSetFileLine}'", e);
+                }
+            }
+            public string Name { get; }
+            public int Population { get; }
+            public int Density { get; }
+            public ImmutableArray<string> Departments { get; }
+            public string ImageFileName { get; }
+            public string ImageSource { get; }
+            public string ImageDbName => $"Carte.Europe.France.{Name}";
+            public Guid GetImageDbId(MemCheckDbContext dbContext)
+            {
+                if (imageDbId != Guid.Empty)
+                    return imageDbId;
+
+                if (dbContext.Images.Where(img => img.Name == ImageDbName).Any())
+                    imageDbId = dbContext.Images.Where(img => img.Name == ImageDbName).Select(img => img.Id).Single();
+
+                return imageDbId;
+            }
+        }
+        private sealed class InfoFileContents
+        {
+            #region Fields
+            #endregion
+            public InfoFileContents()
+            {
+                var contents = File.ReadAllLines(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\CSharp\Vinny\MemCheck_v0.2\MemCheck.CommandLineDbClient\RegionsFrancaises\DataSet.csv");
+                Regions = contents.Select(line => line.Trim()).Where(line => line.Length > 0).Select(line => new Region(line));
+            }
+            public IEnumerable<Region> Regions { get; }
+        }
+        private sealed class FakeStringLocalizer : IStringLocalizer
+        {
+            public LocalizedString this[string name] => new LocalizedString(name, "no translation");
+
+            public LocalizedString this[string name, params object[] arguments] => this[name];
+
+            public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
+            {
+                return new LocalizedString[0];
+            }
+
+            public IStringLocalizer WithCulture(CultureInfo culture)
+            {
+                return this;
+            }
+        }
+        #endregion
+        public ChangeOwner(IServiceProvider serviceProvider)
+        {
+            dbContext = serviceProvider.GetService<MemCheckDbContext>();
+            logger = serviceProvider.GetService<ILogger<PaukerImportTest>>();
+        }
+        public void DescribeForOpportunityToCancel()
+        {
+            logger.LogInformation("Will change owners of cards and images with null ones");
+        }
+        async public Task RunAsync(MemCheckDbContext dbContext)
+        {
+            var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single();
+
+            var images = dbContext.Images.Where(image => image.Owner == null);
+            logger.LogInformation($"Found {images.Count()} images to modify");
+            foreach (var image in images)
+            {
+                logger.LogDebug($"Changing image '{image.Name}'");
+                image.Owner = user;
+            }
+
+            var imagePreviousVersions = dbContext.ImagePreviousVersions.Where(image => image.Owner == null);
+            logger.LogInformation($"Found {imagePreviousVersions.Count()} imagePreviousVersions to modify");
+            foreach (var imagePreviousVersion in imagePreviousVersions)
+            {
+                logger.LogDebug($"Changing imagePreviousVersion '{imagePreviousVersion.Name}'");
+                imagePreviousVersion.Owner = user;
+            }
+
+            var cards = dbContext.Cards.Where(card => card.VersionCreator == null);
+            logger.LogInformation($"Found {cards.Count()} cards to modify");
+            foreach (var card in cards)
+            {
+                logger.LogDebug($"Changing card with front side {card.FrontSide}");
+                card.VersionCreator = user;
+            }
+
+            await dbContext.SaveChangesAsync();
+            logger.LogInformation($"Finished");
+        }
+    }
+}

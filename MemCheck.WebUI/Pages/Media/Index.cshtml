@@ -1,0 +1,122 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model IndexModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<div id="MediaMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Waiting for load" v-if="mountFinished && loading">
+        <p class="wait-message">@Localizer["PleaseWaitForQuery"]</p>
+    </div>
+    <div id="After mount and not loading" v-if="mountFinished && !loading">
+        <div id="FullImage" v-if="currentFullScreenImage">
+            <div id="FullScreenImageTopLine" class="authoring-fullscreen-small-buttons">
+                <ul class="nav small text-decoration-none" style="align-items:center">
+                    <li id="FullScreenTitle" class="authoring-fullscreen-image-name">
+                        {{currentFullScreenImage.imageName}}
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="copyToClipboard(currentFullScreenImage.imageName)"><i class="far fa-copy"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(currentFullScreenImage.imageId)"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="imageHistory(currentFullScreenImage.imageId)"><i class="fas fa-history"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="deleteImage(currentFullScreenImage.imageId)"><i class="far fa-trash-alt"></i></button>
+                    </li>
+                    <li class="ml-auto"><button type="button" class="btn btn-primary btn-circle btn-sm" @@click="closeFullScreenImage()"><i class="far fa-times-circle"></i></button></li>
+                </ul>
+            </div>
+            <div id="FullScreenImage" class="fullscreen-image-div">
+                <img class="fullscreen-image" :src="currentFullScreenImage.blob" />
+            </div>
+            <div id="FullScreenImageDetails">
+                <ul>
+                    <li><strong>@Localizer["FullScreenImageName"]</strong> {{currentFullScreenImage.imageName}}</li>
+                    <li><strong>@Localizer["InitialVersionCreatedOn"]</strong> {{dt(currentFullScreenImage.initialUploadUtcDate)}}</li>
+                    <li><strong>@Localizer["CurrentVersionOwner"]</strong> {{currentFullScreenImage.uploaderUserName}}</li>
+                    <li><strong>@Localizer["CurrentVersionCreatedOn"]</strong> {{dt(currentFullScreenImage.lastChangeUtcDate)}}</li>
+                    <li><strong>@Localizer["CurrentVersionDescription"]</strong> {{currentFullScreenImage.currentVersionDescription}}</li>
+                    <li><strong>@Localizer["Description"]</strong> {{currentFullScreenImage.description}}</li>
+                    <li><strong>@Localizer["Source"]</strong> {{currentFullScreenImage.source}}</li>
+                    <li><strong>@Localizer["UsedBy"]</strong> {{currentFullScreenImage.cardCount}} <span v-if="currentFullScreenImage.cardCount == 1">@Localizer["Card"]</span><span v-else>@Localizer["Cards"]</span></li>
+                    <li><strong>@Localizer["OriginalImageType"]</strong> {{currentFullScreenImage.originalImageContentType}}</li>
+                    <li><strong>@Localizer["OriginalImageSize"]</strong> {{currentFullScreenImage.originalImageSize}} @Localizer["Bytes"]</li>
+                    <li><strong>@Localizer["AlternateImageSmallSize"]</strong> {{currentFullScreenImage.smallSize}} @Localizer["Bytes"]</li>
+                    <li><strong>@Localizer["AlternateImageMediumSize"]</strong> {{currentFullScreenImage.mediumSize}} @Localizer["Bytes"]</li>
+                    <li><strong>@Localizer["AlternateImageBigSize"]</strong> {{currentFullScreenImage.bigSize}} @Localizer["Bytes"]</li>
+                </ul>
+            </div>
+            <div id="DownloadBiggestSizeLink">
+                <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen/?ImageId='+currentFullScreenImage.imageId">@Localizer["DownloadBiggestSize"]</a></p>
+            </div>
+        </div>
+        <div id="NormalMode" v-else>
+            <div id="Title" class="container">
+                <h1 class="title">@Localizer["PageTitle"]</h1>
+            </div>
+            <div id="Inputs" class="container image-list-inputs-container" style="border: 1px solid black;padding:5px">
+                <label>@Localizer["Filter"]</label><input class="form-control responsive-padding-edit" v-model="request.filter" />
+                <span id="Page size">
+                    <label>@Localizer["PageSize"]</label>&nbsp;
+                    <select v-model="request.pageSize" class="responsive-padding-edit">
+                        <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
+                    </select><br />
+                </span>
+                <button type="button" class="btn btn-success btn-sm" @@click="getImages">@Localizer["Run"]</button>
+                <span v-if="totalCount != -1">
+                    {{totalCount}}&nbsp;<label>@Localizer["Images"]</label>
+                </span>
+            </div>
+            <div id="ListAsTable" class="container" v-if="TableFormat">
+                <table class="table table-responsive" width="100%">
+                    <tr>
+                        <th>@Localizer["Name"]</th>
+                        <th>@Localizer["CardCount"]</th>
+                        <th>@Localizer["Thumbnail"]</th>
+                    </tr>
+                    <tr v-for="image in images">
+                        <td>{{image.imageName}} <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button></td>
+                        <td><button type="button" class="btn btn-info btn-sm" @@click="showCardsWithImage(image.imageId)">{{image.cardCount}}</button></td>
+                        <td><a href="#" @@click="showImageFull(image)"><img class="thumbnail-image" :src="image.thumbnail" /></a></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="ListAsCards" class="image-list-card-columns" v-if="!TableFormat">
+                <div id="ListAsCardsEntry" class="card image-list-card" v-for="image in images">
+                    <div id="CardHeader" class="card-header image-list-card-header">
+                        {{image.imageName}}
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="copyToClipboard(image.imageName)"><i class="far fa-copy"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
+                    </div>
+                    <div id="CardBody" class="card-body image-list-card-body">
+                        <a href="#" @@click="showImageFull(image)"><img class="thumbnail-image" :src="image.thumbnail" /></a>
+                    </div>
+                    <div id="CardFooter" class="card-footer image-list-card-footer">
+                        <button type="button" class="btn btn-info btn-sm" @@click="showCardsWithImage(image.imageId)">{{image.cardCount}} <span v-if="image.cardCount > 1">@Localizer["Cards"]</span><span v-else>@Localizer["Card"]</span></button>
+                    </div>
+                </div>
+            </div>
+            <div id="Paging" class="container" style="align-content:flex-end">
+                <button class="btn btn-info btn-sm" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+                <button class="btn btn-info btn-sm" @@click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
+                <button class="btn btn-success btn-sm" disabled>{{request.pageNo}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
+                <button class="btn btn-info btn-sm" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
+                <button class="btn btn-info btn-sm" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Media/ImageList.js" asp-append-version="true"></script>
+}

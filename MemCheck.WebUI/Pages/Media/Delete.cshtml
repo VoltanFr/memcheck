@@ -1,0 +1,79 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model DeleteModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="ImageId" id="ImageIdInput" hidden="hidden" />
+<input type="text" asp-for="ReturnUrl" id="ReturnUrlInput" hidden="hidden" />
+
+<div id="DeleteMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="WaitingForMount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Error" v-if="error">
+        <p class="wait-message">{{error}}</p>
+    </div>
+    <div id="Deleting" v-if="deleting">
+        <p class="wait-message">@Localizer["Deleting"]</p>
+    </div>
+    <div id="AfterMountNoErrorNotDeleting" v-if="mountFinished && !error && !deleting">
+        <div id="Title">
+            <h1 class="title">@Localizer["DeleteMedia"]</h1>
+        </div>
+        <div id="ImagePropertiesList">
+            <ul>
+                <li><strong>@Localizer["imageName"]</strong> {{image.imageName}}</li>
+                <li><strong>@Localizer["description"]</strong> {{image.description}}</li>
+                <li><strong>@Localizer["source"]</strong> {{image.source}}</li>
+                <li><strong>@Localizer["initialUploadUtcDate"]</strong> {{dt(image.initialUploadUtcDate)}}</li>
+                <li><strong>@Localizer["cardCount"]</strong> {{image.cardCount}}</li>
+                <li><strong>@Localizer["currentVersionUserName"]</strong> {{image.currentVersionUserName}}</li>
+                <li><strong>@Localizer["currentVersionDescription"]</strong> {{image.currentVersionDescription}}</li>
+                <li><strong>@Localizer["lastChangeUtcDate"]</strong> {{dt(image.lastChangeUtcDate)}}</li>
+            </ul>
+        </div>
+        <div id="DeletionDescriptionInput">
+            <table class="table table-sm table-authoring" width="100%">
+                <tbody>
+                    <tr id="Hidden row to specify width of first column" style="visibility:hidden">
+                        <th style="width:20%"></th>
+                        <th style="width:80%"></th>
+                    </tr>
+                    <tr>
+                        <th>@Localizer["DeletionDescription"]</th>
+                        <td><input class="form-control responsive-padding-edit" v-model="deletionDescription" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="BottomButton">
+            <div v-if="image.cardCount == 0">
+                <p class="image-delete-alert-mesg">@Localizer["WarningYouAreAboutToDelete"]</p>
+                <button id="DeleteButton" type="button" class="btn btn-danger btn-lg" @@click="deleteImage">@Localizer["Delete"]</button>
+            </div>
+            <div v-else>
+                <p class="image-delete-alert-mesg">@Localizer["CanNotDeleteImageUsedInCards"]</p>
+                <button id="GoBackButton" type="button" class="btn btn-warning btn-lg" @@click="goBack">@Localizer["GoBack"]</button>
+            </div>
+        </div>
+    </div>
+    <div v-if="image.blob && !deleting" class="image-delete-image-div">
+        <img class="image-delete-image" :src="image.blob" />
+    </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <ul>
+            <li>mountFinished: {{mountFinished}}</li>
+            <li v-if="error">error: {{error}}</li>
+            <li v-else>No error</li>
+            <li>Image: {{image}}</li>
+        </ul>
+    </div>
+
+</div>
+
+@section scripts {
+    <script src="~/js/Media/Delete.js" asp-append-version="true"></script>
+}

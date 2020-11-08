@@ -1,0 +1,76 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model SettingsModel
+
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+<input type="text" asp-for="DeckId" id="DeckIdInput" hidden="hidden" />
+
+<div id="HeapViewMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <h1 class="title">@Localizer["MainCaption"]</h1>
+
+        <div id="First table deck choice and global info" class="table-responsive">
+            <table class="table table-responsive" width="100%">
+                <tbody>
+                    <tr id="Deck choice" v-if="!singleDeckDisplay">
+                        <th>@Localizer["Deck"]</th>
+                        <td>
+                            <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
+                            <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                        </td>
+                    </tr>
+                    <tr id="Deck name" v-if="singleDeckDisplay">
+                        <th>@Localizer["Deck"]</th>
+                        <td class="deck-index-deckname-td">
+                            <span class="deck-index-deckname-span">
+                                <textarea class="form-control deck-index-deckname-textarea responsive-padding-edit" v-model="activeDeck.description" readonly="readonly" rows="1"></textarea><button class="btn btn-primary btn-circle btn-sm deck-index-deckname-button" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr id="HeapingAlgorithm" v-if="activeDeck">
+                        <th>@Localizer["HeapingAlgorithm"]</th>
+                        <td>
+                            <textarea class="form-control responsive-padding-edit" v-model="activeDeck.heapingAlgorithmName" readonly="readonly" rows="1"></textarea><br />
+                            <label style="padding:0px">{{activeDeck.heapingAlgorithmDescription}}</label>
+                        </td>
+                    </tr>
+                    <tr id="CardCount" v-if="activeDeck">
+                        <th>@Localizer["TotalCardCount"]</th>
+                        <td><textarea class="form-control responsive-padding-edit" v-model="activeDeck.cardCount" readonly="readonly" rows="1"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="Heaps" class="table-responsive" v-if="activeDeck">
+            <table class="table table-responsive" width="100%" style="border-top:5px solid black;text-align:center">
+                <tbody>
+                    <tr id="Headers for column size">
+                        <th width="10%">@Localizer["Heap"]</th>
+                        <th width="10%">@Localizer["TotalCardCount"]</th>
+                        <th width="10%">@Localizer["ExpiredCardCount"]</th>
+                        <th width="10%">@Localizer["NextExpiry"]</th>
+                    </tr>
+                    <tr id="Row for a heap" v-for="heap in activeDeck.heaps">
+                        <td><a v-bind:href="'/Search/Index?DeckId='+activeDeck.deckId+'&HeapId='+heap.id">{{heap.name}}</a></td>
+                        <td>{{heap.totalCardCount}}</td>
+                        <td v-if="heap.id!=0">{{heap.expiredCardCount}}</td>
+                        <td v-else></td>
+                        <td v-if="heap.id!=0">{{dt(heap.nextExpiryUtcDate)}}</td>
+                        <td v-else></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Decks/HeapView.js" asp-append-version="true"></script>
+}

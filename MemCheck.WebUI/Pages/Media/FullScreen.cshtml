@@ -1,0 +1,28 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model FullScreenModel
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="ImageId" id="ImageIdInput" hidden="hidden" />
+
+<div id="FullScreenMainDiv" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Failure" v-if="invalidRequest">
+        <p class="wait-message">@Localizer["InvalidRequest"]</p>
+    </div>
+    <div id="Failure" v-if="mountFinished && !imageBlob">
+        <p class="wait-message">@Localizer["DownloadFailure"]</p>
+    </div>
+    <div id="AfterMount" class="fullscreen-image-div" v-if="mountFinished && !invalidRequest && imageBlob">
+        <img class="fullscreen-image" :src="imageBlob" />
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Media/FullScreen.js" asp-append-version="true"></script>
+}

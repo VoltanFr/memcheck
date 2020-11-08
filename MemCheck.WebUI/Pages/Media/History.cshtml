@@ -1,0 +1,33 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model HistoryModel
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="ImageId" id="ImageIdInput" hidden="hidden" />
+
+<div id="HistoryMainDiv" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Waiting for mount" v-if="mountFinished && loading">
+        <p class="wait-message">@Localizer["LoadingHistory"]</p>
+    </div>
+    <div id="Failure" v-if="error">
+        <p class="wait-message">@Localizer["ImageNotFound"]</p>
+    </div>
+    <div id="AfterMount" class="fullscreen-image-div" v-if="mountFinished && !error && !loading">
+        <div id="Title">
+            <h1 class="title">@Localizer["VersionHistory"]</h1>
+        </div>
+        <ul>
+            <li class="image-history-li" v-for="version in versions">{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.author}} "{{version.versionDescription}}" [{{version.changedFieldList}}]</li>
+        </ul>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Media/History.js" asp-append-version="true"></script>
+}

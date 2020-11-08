@@ -1,0 +1,11 @@
+﻿@page
+@model ConfirmEmailModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<h1>@ViewData["Title"]</h1>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<p><a asp-page="./Login" asp-route-returnUrl="/Index">@Localizer["PleaseLogin"]</a>.</p>
