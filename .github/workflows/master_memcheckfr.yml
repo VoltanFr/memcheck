@@ -8,15 +8,16 @@ on:
     branches:
       - master
 
-env:
-  NETCORE_VERSION: "3.1.103"
-  COMPIL_CONFIG: "Release"
-  PUBLISH_FOLDER: ${{DOTNET_ROOT}}/Published
-
 jobs:
   build-and-deploy:
     name: "MemCheck compilation and deployment to prod"
+
     runs-on: windows-latest
+
+    env:
+      NETCORE_VERSION: "3.1.103"
+      COMPIL_CONFIG: "Release"
+      PUBLISH_FOLDER: ${{DOTNET_ROOT}}/Published
 
     steps:
     - uses: actions/checkout@v2
