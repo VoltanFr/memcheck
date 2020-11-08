@@ -10,6 +10,7 @@ on:
 
 env:
   NETCORE_VERSION: "3.1.103"
+  COMPIL_CONFIG: "Release"
 
 jobs:
   build-and-deploy:
@@ -19,24 +20,24 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: "Set up .NET Core on machine (version ${{ env.NETCORE_VERSION}})"
+    - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.NETCORE_VERSION}}
+        dotnet-version: ${{env.NETCORE_VERSION}}
 
     - name: "Restore NuGet packages"
       run: dotnet restore
 
     - name: "Build the root sln with dotnet"
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --no-restore --configuration ${{COMPIL_CONFIG}}
 
     - name: "Publish: prepare the packages to deploy"
-      run: dotnet publish --no-build -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      run: dotnet publish --no-build --configuration ${{COMPIL_CONFIG}} -o ${{env.DOTNET_ROOT}}/myapp
 
     - name: "Deploy to Azure Web App"
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'memcheckfr'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_b5e1f3343011406b9aaaf513987425e5 }}
+        publish-profile: ${{secrets.AzureAppService_PublishProfile_b5e1f3343011406b9aaaf513987425e5}}
         package: ${{env.DOTNET_ROOT}}/myapp
