@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - memcheckfr
+name: "MemCheck build and deploy to Azure"
 
 on:
   push:
@@ -10,12 +10,13 @@ on:
 
 jobs:
   build-and-deploy:
+    name: "MemCheck compilation and deployment to prod"
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
 
-    - name: Set up .NET Core
+    - name: "Set up .NET Core on machine"
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.102'
