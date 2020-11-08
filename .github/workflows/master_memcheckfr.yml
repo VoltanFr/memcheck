@@ -40,7 +40,7 @@ jobs:
     - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'memcheckfr'
+        app-name: '${{AZURE_APP_NAME}}'
         slot-name: 'production'
         publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
         package: ${{env.PUBLISH_FOLDER}}
