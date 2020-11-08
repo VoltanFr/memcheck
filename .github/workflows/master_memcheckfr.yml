@@ -24,7 +24,10 @@ jobs:
       with:
         dotnet-version: ${{ env.NETCORE_VERSION}}
 
-    - name: Build with dotnet
+    - name: "Restore NuGet packages"
+      run: dotnet restore
+
+    - name: "Build the root sln with dotnet"
       run: dotnet build --configuration Release
 
     - name: dotnet publish
