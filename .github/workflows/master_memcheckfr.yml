@@ -41,5 +41,5 @@ jobs:
       with:
         app-name: 'memcheckfr'
         slot-name: 'production'
-        publish-profile: ${{secrets.AzureAppService_PublishProfile_b5e1f3343011406b9aaaf513987425e5}}
+        publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
         package: ${{env.DOTNET_ROOT}}/${{env.PUBLISH_FOLDER}}
