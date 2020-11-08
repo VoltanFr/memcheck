@@ -11,7 +11,7 @@ on:
 env:
   NETCORE_VERSION: "3.1.103"
   COMPIL_CONFIG: "Release"
-  PUBLISH_FOLDER: ${{env.DOTNET_ROOT}}/Published
+  PUBLISH_FOLDER: ${{DOTNET_ROOT}}/Published
 
 jobs:
   build-and-deploy:
