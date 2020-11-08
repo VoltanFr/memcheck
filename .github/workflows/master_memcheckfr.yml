@@ -11,6 +11,7 @@ on:
 env:
   NETCORE_VERSION: "3.1.103"
   COMPIL_CONFIG: "Release"
+  PUBLISH_FOLDER: "${{env.DOTNET_ROOT}}/Published"
 
 jobs:
   build-and-deploy:
@@ -32,7 +33,7 @@ jobs:
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
     - name: "Publish: prepare the packages to deploy"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.DOTNET_ROOT}}/myapp
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{PUBLISH_FOLDER}}
 
     - name: "Deploy to Azure Web App"
       uses: azure/webapps-deploy@v2
@@ -40,4 +41,4 @@ jobs:
         app-name: 'memcheckfr'
         slot-name: 'production'
         publish-profile: ${{secrets.AzureAppService_PublishProfile_b5e1f3343011406b9aaaf513987425e5}}
-        package: ${{env.DOTNET_ROOT}}/myapp
+        package: ${{PUBLISH_FOLDER}}
