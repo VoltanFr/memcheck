@@ -22,7 +22,7 @@ jobs:
     - name: "Set up .NET Core on machine (version ${{ env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.NETCORE_VERSION}})
+        dotnet-version: ${{ env.NETCORE_VERSION}}
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
