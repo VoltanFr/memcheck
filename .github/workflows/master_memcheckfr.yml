@@ -17,7 +17,8 @@ jobs:
     env:
       NETCORE_VERSION: "3.1.103"
       COMPIL_CONFIG: "Release"
-      PUBLISH_FOLDER: Published
+      PUBLISH_FOLDER: "./Published"
+      AZURE_APP_NAME: "memcheckfr"
 
     steps:
     - uses: actions/checkout@v2
@@ -34,12 +35,12 @@ jobs:
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
     - name: "Publish: prepare the packages to deploy"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.DOTNET_ROOT}}/${{env.PUBLISH_FOLDER}}
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}
 
-    - name: "Deploy to Azure Web App"
+    - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'memcheckfr'
+        app-name: ${env.AZURE_APP_NAME}
         slot-name: 'production'
         publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
-        package: ${{env.DOTNET_ROOT}}/${{env.PUBLISH_FOLDER}}
+        package: ${{env.PUBLISH_FOLDER}}
