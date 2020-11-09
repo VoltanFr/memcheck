@@ -43,6 +43,12 @@ jobs:
     - name: "Publish: prepare the webjob for deployment"
       run: dotnet publish MemCheck.NotifierWebjob/MemCheck.NotifierWebjob.csproj --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}\App_Data\jobs\triggered\MemCheck.NotifierWebjob
 
+    - name: Upload published version as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: MemCheck
+        path: ${{env.PUBLISH_FOLDER}}
+
     - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
       with:
