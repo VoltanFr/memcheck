@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="settings.json">
+    <Content Include="settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>
