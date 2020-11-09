@@ -37,8 +37,11 @@ jobs:
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
-    - name: "Publish: prepare the packages to deploy"
+    - name: "Publish: prepare the projects for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}
+
+    - name: "Publish: prepare the webjob for deployment"
+      run: dotnet publish MemCheck.NotifierWebjob/MemCheck.NotifierWebjob.csproj --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}\App_Data\jobs\triggered\MemCheck.NotifierWebjob
 
     - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
