@@ -62,6 +62,5 @@ jobs:
       uses: azure/functions-action@v1.1.6
       with:
         app-name: '${{env.AZURE_FUNCTION_NAME}}'
-        slot-name: 'production'
         publish-profile: ${{secrets.MEMCHECK_AZFUNC_NOTIFIER_PUBLISH_PROFILE}}
         package: ${{env.PUBLISH_FOLDER}}
