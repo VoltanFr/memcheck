@@ -15,3 +15,5 @@
 /.vs/
 /MemCheck.NotifierWebjob/bin/
 /MemCheck.NotifierWebjob/obj/
+/MemCheck.AzFunc.Notifier/bin/
+/MemCheck.AzFunc.Notifier/obj/

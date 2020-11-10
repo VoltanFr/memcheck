@@ -51,6 +51,7 @@
 
 # In progress
 Vidéo à propos des web jobs : https://www.youtube.com/watch?v=2HFhamQvaTU
+Vidéo à propos de Azure functions avec GitHub : https://www.youtube.com/watch?v=LHJIGmJoS0c
 
 Notifications
 
@@ -88,6 +89,7 @@ Paramètres utilisateur:
 - Afficher des stats sur la page d'accueil : xxx cartes de votre paquet vont expirer aujourd'hui
 
 # To do at medium cost
+- Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).
 - De même que j'ai optimisé GetCardsToLearn qui faisait trop de Include, voir si on peut faire pareil pour ce qu'affiche la page de démarrage.
 - Search page: Improve the select all check box: should be able to select all in one click, not two (by clicking in the box)
 - Implémenter le diff de versions d'images
