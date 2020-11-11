@@ -38,6 +38,9 @@ jobs:
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
+    - name: "Delete publish folder to ensure minimal publish"
+      run: rmdir ${{env.PUBLISH_FOLDER}}
+
     - name: "Publish: prepare the projects for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --self-contained false
 
