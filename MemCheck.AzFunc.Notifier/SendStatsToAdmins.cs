@@ -24,7 +24,9 @@ namespace MemCheck.AzFunc.Notifier
         }
 
 
-        [FunctionName("SendStatsToAdmins")] //Runs everyday at 3 AM
+        private const string FunctionName = "SendStatsToAdmins";
+
+        [FunctionName(FunctionName)] //Runs everyday at 3 AM
         public async Task RunAsync([TimerTrigger("0 3 * * *"
 #if DEBUG
             , RunOnStartup=true
@@ -33,7 +35,7 @@ namespace MemCheck.AzFunc.Notifier
         {
             log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now} on {Environment.MachineName}");
 
-            telemetryClient.GetMetric(new MetricIdentifier("VinceTelemetryAttempt")).TrackValue(DateTime.Now);
+            telemetryClient.TrackEvent($"{FunctionName} VinceTelemetryEvent");
 
             Assembly? assembly = Assembly.GetExecutingAssembly();
             var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
