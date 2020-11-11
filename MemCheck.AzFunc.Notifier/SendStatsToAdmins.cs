@@ -15,18 +15,14 @@ namespace MemCheck.AzFunc.Notifier
 {
     public sealed class SendStatsToAdmins
     {
+        #region Fields
         private readonly TelemetryClient telemetryClient;
-
-
+        #endregion
         public SendStatsToAdmins(TelemetryConfiguration telemetryConfiguration)
         {
-            this.telemetryClient = new TelemetryClient(telemetryConfiguration);
+            telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
-
-
-        private const string FunctionName = "SendStatsToAdmins";
-
-        [FunctionName(FunctionName)] //Runs everyday at 3 AM
+        [FunctionName(nameof(SendStatsToAdmins))]
         public async Task RunAsync([TimerTrigger("0 3 * * *"
 #if DEBUG
             , RunOnStartup=true
@@ -35,7 +31,7 @@ namespace MemCheck.AzFunc.Notifier
         {
             log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now} on {Environment.MachineName}");
 
-            telemetryClient.TrackEvent($"{FunctionName} VinceTelemetryEvent");
+            telemetryClient.TrackEvent($"{nameof(SendStatsToAdmins)} VinceTelemetryEvent");
 
             Assembly? assembly = Assembly.GetExecutingAssembly();
             var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
