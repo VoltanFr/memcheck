@@ -25,7 +25,7 @@ namespace MemCheck.AzFunc.Notifier
 #endif
             )] TimerInfo myTimer, ExecutionContext context, ILogger log)
         {
-            log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now}");
+            log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now} on {Environment.MachineName}");
 
             Assembly? assembly = Assembly.GetExecutingAssembly();
             var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
@@ -43,14 +43,10 @@ namespace MemCheck.AzFunc.Notifier
             {
                 From = senderEmail,
                 Subject = "Mail sent from Azure function",
-                PlainTextContent = "Time here: " + DateTime.Now,
-                HtmlContent = "Time here: " + DateTime.Now
+                PlainTextContent = $"Time here: {DateTime.Now}, running on machine '{Environment.MachineName}'"
             };
-            msg.AddTo(new EmailAddress("MemCheckAdm@gmail.com"));
+            msg.AddTo(new EmailAddress("VoltanFr@gmail.com"));
             msg.AddBcc(new EmailAddress(sendGridSender));
-
-            // Disable click tracking.
-            // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.SetClickTracking(false, false);
 
             var response = await client.SendEmailAsync(msg);
