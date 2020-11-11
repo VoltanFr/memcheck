@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
@@ -18,24 +19,23 @@ namespace MemCheck.AzFunc.Notifier
     public static class SendStatsToAdmins
     {
         [FunctionName("SendStatsToAdmins")] //Runs everyday at 3 AM
-        public static async Task RunAsync([TimerTrigger("0 3 * * *")] TimerInfo myTimer, ExecutionContext context, ILogger log)
+        public static async Task RunAsync([TimerTrigger("0 3 * * *"
+#if DEBUG
+            , RunOnStartup=true
+#endif
+            )] TimerInfo myTimer, ExecutionContext context, ILogger log)
         {
             log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now}");
 
-            var config = new ConfigurationBuilder()
-  .SetBasePath(context.FunctionAppDirectory)
-  //.AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-  // This is what actually gets you the application settings in Azure
-  .AddEnvironmentVariables()
-  .Build();
+            Assembly? assembly = Assembly.GetExecutingAssembly();
+            var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
+            log.LogInformation($"Assembly name: {entryAssemblyName}");
+
+            var config = new ConfigurationBuilder().SetBasePath(context.FunctionAppDirectory).AddEnvironmentVariables().Build();
 
             string sendGridKey = config["SendGridKey"];
             string sendGridSender = config["SendGridSender"];
             string sendGridUser = config["SendGridUser"];
-
-
-            log.LogInformation($"Sender '{sendGridSender}'");
-
 
             var client = new SendGridClient(sendGridKey);
             var senderEmail = new EmailAddress(sendGridSender, sendGridUser);
@@ -53,7 +53,10 @@ namespace MemCheck.AzFunc.Notifier
             // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.SetClickTracking(false, false);
 
-            await client.SendEmailAsync(msg);
+            var response = await client.SendEmailAsync(msg);
+
+            log.LogInformation($"Mail sent, status code {response.StatusCode}");
+            log.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
 
             log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' ending, {DateTime.Now}");
         }
