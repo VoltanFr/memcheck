@@ -34,6 +34,9 @@ namespace MemCheck.AzFunc.Notifier
             string sendGridUser = config["SendGridUser"];
 
 
+            log.LogInformation($"Sender '{sendGridSender}'");
+
+
             var client = new SendGridClient(sendGridKey);
             var senderEmail = new EmailAddress(sendGridSender, sendGridUser);
             var msg = new SendGridMessage()
@@ -52,6 +55,7 @@ namespace MemCheck.AzFunc.Notifier
 
             await client.SendEmailAsync(msg);
 
+            log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' ending, {DateTime.Now}");
         }
     }
 }
