@@ -41,8 +41,8 @@ jobs:
     - name: "Publish: prepare the projects for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --self-contained false
 
-    - run: echo "Showing size of ${{env.PUBLISH_FOLDER}}"
-    - run: du -sh ${{env.PUBLISH_FOLDER}}
+    - name: "Telling size of publish folder: ${{env.PUBLISH_FOLDER}}"
+      run: du -sh ${{env.PUBLISH_FOLDER}}
 
     # - name: Upload published version as Artifact
     #   uses: actions/upload-artifact@v2
