@@ -42,8 +42,8 @@ jobs:
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --self-contained false
 
     - name: "Log publish folder size"
-      run: echo "Showing size of ${{env.PUBLISH_FOLDER}}"
-      run: du -sh ${{env.PUBLISH_FOLDER}}
+    - run: echo "Showing size of ${{env.PUBLISH_FOLDER}}"
+    - run: du -sh ${{env.PUBLISH_FOLDER}}
 
     # - name: Upload published version as Artifact
     #   uses: actions/upload-artifact@v2
