@@ -41,11 +41,11 @@ jobs:
     - name: "Publish: prepare the projects for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --self-contained false
 
-    - name: Upload published version as Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: MemCheck
-        path: ${{env.PUBLISH_FOLDER}}
+    # - name: Upload published version as Artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: MemCheck
+    #     path: ${{env.PUBLISH_FOLDER}}
 
     - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
