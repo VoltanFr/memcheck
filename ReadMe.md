@@ -50,8 +50,8 @@
 - Would you consider tag hierarchizing ? This would be convenient for such categories as "English vocabulary/Cooking". No. Tagging is in fact the sheer opposite of hierarchizing, allowing all combinations. Hierarchies quickly become a nightmare: why not Cooking/Vocabulary instead ? 
 
 # In progress
-Vidéo à propos des web jobs : https://www.youtube.com/watch?v=2HFhamQvaTU
 Vidéo à propos de Azure functions avec GitHub : https://www.youtube.com/watch?v=LHJIGmJoS0c
+Add telemetry to Azure function: https://docs.microsoft.com/fr-fr/azure/azure-functions/functions-dotnet-class-library?tabs=v2%2Ccmd
 
 Notifications
 
