@@ -1,6 +1,10 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Metrics;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,23 +13,27 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzFunc.Notifier
 {
-    public class AuthMessageSenderOptions
+    public sealed class SendStatsToAdmins
     {
-        public string SendGridUser { get; set; } = null!;
-        public string SendGridKey { get; set; } = null!;
-        public string SendGridSender { get; set; } = null!;
-    }
+        private readonly TelemetryClient telemetryClient;
 
-    public static class SendStatsToAdmins
-    {
+
+        public SendStatsToAdmins(TelemetryConfiguration telemetryConfiguration)
+        {
+            this.telemetryClient = new TelemetryClient(telemetryConfiguration);
+        }
+
+
         [FunctionName("SendStatsToAdmins")] //Runs everyday at 3 AM
-        public static async Task RunAsync([TimerTrigger("0 3 * * *"
+        public async Task RunAsync([TimerTrigger("0 3 * * *"
 #if DEBUG
             , RunOnStartup=true
 #endif
             )] TimerInfo myTimer, ExecutionContext context, ILogger log)
         {
             log.LogInformation($"Function '{nameof(SendStatsToAdmins)}' starting, {DateTime.Now} on {Environment.MachineName}");
+
+            telemetryClient.GetMetric(new MetricIdentifier("VinceTelemetryAttempt")).TrackValue(DateTime.Now);
 
             Assembly? assembly = Assembly.GetExecutingAssembly();
             var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
