@@ -41,9 +41,6 @@ jobs:
     - name: "Publish: prepare the projects for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}
 
-    - name: "Publish: prepare the webjob for deployment"
-      run: dotnet publish MemCheck.NotifierWebjob/MemCheck.NotifierWebjob.csproj --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}}\App_Data\jobs\triggered\MemCheck.NotifierWebjob
-
     - name: Upload published version as Artifact
       uses: actions/upload-artifact@v2
       with:
