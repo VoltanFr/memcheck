@@ -225,6 +225,9 @@
   <data name="NoMoreCardTo" xml:space="preserve">
     <value>No more card to</value>
   </data>
+  <data name="NotRegisteredForNotif" xml:space="preserve">
+    <value>Not registered for alerts (click to register)</value>
+  </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>
@@ -239,6 +242,9 @@
   </data>
   <data name="PleaseWaitSavingData" xml:space="preserve">
     <value>Please wait, saving data...</value>
+  </data>
+  <data name="RegisteredForNotif" xml:space="preserve">
+    <value>Registered for alerts (click to unregister)</value>
   </data>
   <data name="RemoveFromDeck" xml:space="preserve">
     <value>Remove from deck</value>

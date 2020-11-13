@@ -179,6 +179,7 @@ namespace MemCheck.WebUI.Controllers
                 MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                         new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                     ).OrderBy(heapModel => heapModel.HeapId);
+                RegisteredForNotifications = applicationResult.RegisteredForNotifications;
             }
             public Guid CardId { get; }
             public int HeapId { get; }
@@ -201,6 +202,7 @@ namespace MemCheck.WebUI.Controllers
             public int CurrentUserRating { get; }
             public double AverageRating { get; }
             public int CountOfUserRatings { get; }
+            public bool RegisteredForNotifications { get; }
         }
         public sealed class GetCardsImageViewModel
         {
@@ -304,6 +306,31 @@ namespace MemCheck.WebUI.Controllers
                 var user = await userManager.GetUserAsync(HttpContext.User);
                 var request = new SetCardRating.Request(user, cardId, rating);
                 await new SetCardRating(dbContext).RunAsync(request);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
+        #endregion
+        #region SetCardNotificationRegistration
+        [HttpPatch("SetCardNotificationRegistration/{cardId}/{notif}")]
+        public async Task<IActionResult> SetCardNotificationRegistration(Guid cardId, bool notif)
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(HttpContext.User);
+                if (notif)
+                {
+                    var request = new AddCardNotification.Request(user, cardId);
+                    await new AddCardNotification(dbContext).RunAsync(request);
+                }
+                else
+                {
+                    var request = new RemoveCardNotification.Request(user, cardId);
+                    await new RemoveCardNotification(dbContext).RunAsync(request);
+                }
                 return Ok();
             }
             catch (Exception e)

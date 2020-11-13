@@ -226,6 +226,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="NoMoreCardTo" xml:space="preserve">
     <value>Il n'y a plus de carte à</value>
   </data>
+  <data name="NotRegisteredForNotif" xml:space="preserve">
+    <value>Alertes inactives (cliquez pour activer)</value>
+  </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>
@@ -240,6 +243,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   </data>
   <data name="PleaseWaitSavingData" xml:space="preserve">
     <value>Enregistrement en cours...</value>
+  </data>
+  <data name="RegisteredForNotif" xml:space="preserve">
+    <value>Alertes actives (cliquez pour désactiver)</value>
   </data>
   <data name="RemoveFromDeck" xml:space="preserve">
     <value>Enlever du paquet</value>

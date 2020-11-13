@@ -18,6 +18,11 @@ namespace MemCheck.Application
         private readonly MemCheckDbContext dbContext;
         #endregion
         #region Private methods
+        private ImmutableDictionary<Guid, bool> GetNotifications(Guid userId, ImmutableHashSet<Guid> cardIds)
+        {
+            var notifs = dbContext.CardNotifications.Where(notif => notif.UserId == userId && cardIds.Contains(notif.CardId)).Select(notif => notif.CardId).ToImmutableHashSet();
+            return cardIds.Select(cardId => new KeyValuePair<Guid, bool>(cardId, notifs.Contains(cardId))).ToImmutableDictionary();
+        }
         private async Task<HeapingAlgorithm> GetHeapingAlgorithmAsync(Guid deckId)
         {
             var heapingAlgorithmId = await dbContext.Decks.Where(deck => deck.Id == deckId).Select(deck => deck.HeapingAlgorithmId).SingleAsync();
@@ -53,7 +58,9 @@ namespace MemCheck.Application
             });
 
             var listed = await withDetails.ToListAsync();
-            var ratings = CardRatings.Load(dbContext, userId, listed.Select(cardInDeck => cardInDeck.CardId).ToImmutableHashSet());
+            var cardIds = listed.Select(cardInDeck => cardInDeck.CardId).ToImmutableHashSet();
+            var ratings = CardRatings.Load(dbContext, userId, cardIds);
+            var notifications = GetNotifications(userId, cardIds);
 
             var result = listed.Select(cardInDeck => new ResultCard(
                 cardInDeck.CardId,
@@ -72,7 +79,8 @@ namespace MemCheck.Application
                 heapingAlgorithm,
                 ratings.User(cardInDeck.CardId),
                 ratings.Average(cardInDeck.CardId),
-                ratings.Count(cardInDeck.CardId)
+                ratings.Count(cardInDeck.CardId),
+                notifications[cardInDeck.CardId]
             ));
             return Shuffler.Shuffle(result).Take(cardCount);
         }
@@ -117,7 +125,9 @@ namespace MemCheck.Application
                     imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
                 }).ToList();
 
-                var ratings = CardRatings.Load(dbContext, userId, expired.ToImmutableHashSet());
+                var cardIds = expired.ToImmutableHashSet();
+                var ratings = CardRatings.Load(dbContext, userId, cardIds);
+                var notifications = GetNotifications(userId, cardIds);
 
                 var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
@@ -130,7 +140,8 @@ namespace MemCheck.Application
                     heapingAlgorithm,
                     ratings.User(oldestCard.CardId),
                     ratings.Average(oldestCard.CardId),
-                    ratings.Count(oldestCard.CardId)
+                    ratings.Count(oldestCard.CardId),
+                    notifications[oldestCard.CardId]
                     )
                 );
 
@@ -242,7 +253,7 @@ namespace MemCheck.Application
         {
             public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
                 string frontSide, string backSide, string additionalInfo, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-                IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings)
+                IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings, bool registeredForNotifications)
             {
                 DateServices.CheckUTC(lastLearnUtcTime);
                 CardId = cardId;
@@ -262,6 +273,7 @@ namespace MemCheck.Application
                 UserRating = userRating;
                 AverageRating = averageRating;
                 CountOfUserRatings = countOfUserRatings;
+                RegisteredForNotifications = registeredForNotifications;
                 MoveToHeapExpiryInfos = Enumerable.Range(1, MoveCardToHeap.MaxTargetHeapId)
                     .Where(heapId => heapId != heap)
                     .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
@@ -281,6 +293,7 @@ namespace MemCheck.Application
             public int UserRating { get; }
             public double AverageRating { get; }
             public int CountOfUserRatings { get; }
+            public bool RegisteredForNotifications { get; }
             public IEnumerable<string> Tags { get; }
             public IEnumerable<string> VisibleTo { get; }
             public IEnumerable<ResultImageModel> Images { get; }

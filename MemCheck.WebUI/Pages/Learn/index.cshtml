@@ -79,6 +79,8 @@
                                 <hr class="menu-separation-line" />
                                 @Localizer["CardVersionCreator"] {{currentCard.owner}}<br />
                                 @Localizer["LastChangeDate"] {{dt(currentCard.lastChangeUtcTime)}}<br />
+                                <hr class="menu-separation-line" /><br />
+                                <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                             </b-popover>
                         </li>
                         <li id="Visibility button" style="padding-right:5px" data-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>

@@ -15,6 +15,8 @@ var app = new Vue({
         currentMovePromise: null, //promise
         pendingRatingOperations: [],  //{cardId: Guid, rating: int}
         currentRatingPromise: null, //promise
+        pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
+        currentNotificationRegistrationPromise: null, //promise
         downloadedCards: [],    //LearnController.GetCardsCardViewModel
         cardDownloadOperation: null,
         currentImageLoadingPromise: null,
@@ -310,6 +312,8 @@ var app = new Vue({
             result = result && !this.currentMovePromise;
             result = result && this.pendingRatingOperations.length == 0;
             result = result && !this.currentRatingPromise;
+            result = result && this.pendingNotificationRegistrations.length == 0;
+            result = result && !this.currentNotificationRegistrationPromise;
             return result;
         },
         handlePendingRatingOperations() {
@@ -356,6 +360,41 @@ var app = new Vue({
             const truncated = Math.trunc(this.currentCard.averageRating);
             return ratingAsStars(truncated);
         },
+        unregisterForNotif() {
+            this.currentCard.registeredForNotifications = false;
+            this.enqueueNotificationRegistrationChange();
+        },
+        registerForNotif() {
+            this.currentCard.registeredForNotifications = true;
+            this.enqueueNotificationRegistrationChange();
+        },
+        enqueueNotificationRegistrationChange() {
+            this.pendingNotificationRegistrations.push({ cardId: this.currentCard.cardId, notify: this.currentCard.registeredForNotifications });
+        },
+        handlePendingNotificationRegistrations() {
+            if (!this.currentNotificationRegistrationPromise && this.pendingNotificationRegistrations.length > 0) {
+                var operation = this.pendingNotificationRegistrations.shift();
+
+                this.currentNotificationRegistrationPromise = axios.patch('/Learn/SetCardNotificationRegistration/' + operation.cardId + '/' + operation.notify)
+                    .then(result => {
+                        this.currentNotificationRegistrationPromise = null;
+                        if (this.timeToExitPage())
+                            window.location.href = '/';
+                    })
+                    .catch(error => {
+                        console.log(error);
+
+                        const sleep = (milliseconds) => {
+                            return new Promise(resolve => setTimeout(resolve, milliseconds))
+                        }
+
+                        sleep(1000).then(() => {
+                            this.currentNotificationRegistrationPromise = null;
+                            this.pendingNotificationRegistrations.push(operation);
+                        })
+                    });
+            }
+        },
     },
     watch: {
         pendingMoveOperations: {
@@ -398,6 +437,16 @@ var app = new Vue({
         currentRatingPromise: {
             handler() {
                 this.handlePendingRatingOperations();
+            },
+        },
+        pendingNotificationRegistrations: {
+            handler() {
+                this.handlePendingNotificationRegistrations();
+            },
+        },
+        currentNotificationRegistrationPromise: {
+            handler() {
+                this.handlePendingNotificationRegistrations();
             },
         },
     },
