@@ -19,6 +19,5 @@ namespace MemCheck.WebUI.Controllers
             this.dbContext = dbContext;
         }
         [HttpGet("cards")] public IActionResult GetCards() => Ok(new GetAllCardsInDb(dbContext).Run());
-        [HttpDelete("cards/{id}")] public async Task DeleteCardAsync(Guid id) => Ok(await new DeleteCard(dbContext).RunAsync(id));
     }
 }
