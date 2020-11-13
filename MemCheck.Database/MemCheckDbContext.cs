@@ -41,7 +41,12 @@ namespace MemCheck.Database
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            CreateCompositePrimaryKeys(builder);
+            AddIndexesRecomendedByAzureWebSite(builder);
+            EnforceAllDatesUtc(builder);
+        }
+        private void CreateCompositePrimaryKeys(ModelBuilder builder)
+        {
             builder.Entity<CardInDeck>().HasKey(cardInDeck => new { cardInDeck.CardId, cardInDeck.DeckId });
             builder.Entity<TagInCard>().HasKey(tagInCard => new { tagInCard.CardId, tagInCard.TagId });
             builder.Entity<UserWithViewOnCard>().HasKey(userWithViewOnCard => new { userWithViewOnCard.CardId, userWithViewOnCard.UserId });
@@ -51,10 +56,6 @@ namespace MemCheck.Database
             builder.Entity<UserWithViewOnCardPreviousVersion>().HasKey(userWithViewOnCardPreviousVersion => new { userWithViewOnCardPreviousVersion.CardPreviousVersionId, userWithViewOnCardPreviousVersion.AllowedUserId });
             builder.Entity<ImageInCardPreviousVersion>().HasKey(img => new { img.ImageId, img.CardPreviousVersionId });
             builder.Entity<UserCardRating>().HasKey(userCardRating => new { userCardRating.CardId, userCardRating.UserId });
-
-            AddIndexesRecomendedByAzureWebSite(builder);
-
-            EnforceAllDatesUtc(builder);
         }
         private void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
         {

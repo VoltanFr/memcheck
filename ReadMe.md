@@ -57,14 +57,19 @@ Notifications
 
 Table RegisteredNotifications
 Un utilisateur peut être abonné à :
-- une carte (lorsqu'une nouvelle version est créée, lorsque la carte est supprimée, optionnellement lorsque l'évaluation moyenne de la carte évolue)
-- une recherche (liste les cartes qui apparaissent dans la recherche)
+- une carte (lorsqu'une nouvelle version est créée, lorsque la carte est supprimée, optionnellement lorsque l'évaluation moyenne de la carte évolue) : type `CardNotification`
+- une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchNotifications`
 
 
 On se souvient de la date de dernière information
 
 Notifications par mail seulement, sinon la gestion de l'état lu ou pas d'une notif est un sujet pénible
 
+Pas oublier de gérer la suppression de la notif lorsqu'une carte est supprimée. Mais alors, en cas de restoration de la carte (undelete), les abonnements sero
+
+Pour pouvoir faire des notifs sur l'évolution de rating d'une carte, il faut que UserCardRating ait le datetime de l'évaluation. Est-ce qu'on veut notifier de l'évolution de la note moyenne sur toutes les cartes que l'utilisateur suit, ou seulement sur celles dont il est auteur ?
+
+Ne pas notifier un utilisateur de ses propres modifs
 
 Paramètres utilisateur:
 - Envoi de mail pour les notifs
