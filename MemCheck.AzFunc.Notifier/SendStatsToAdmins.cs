@@ -23,7 +23,7 @@ namespace MemCheck.AzFunc.Notifier
             telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
         [FunctionName(nameof(SendStatsToAdmins))]
-        public async Task RunAsync([TimerTrigger("0 3 * * *"
+        public async Task RunAsync([TimerTrigger("*/10 * * * *"
 #if DEBUG
             , RunOnStartup=true
 #endif
