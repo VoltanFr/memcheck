@@ -328,8 +328,8 @@ namespace MemCheck.WebUI.Controllers
                 }
                 else
                 {
-                    var request = new RemoveCardNotification.Request(userId, cardId);
-                    await new RemoveCardNotification(dbContext).RunAsync(request);
+                    var request = new RemoveCardNotifications.Request(userId, new[] { cardId });
+                    await new RemoveCardNotifications(dbContext).RunAsync(request);
                 }
                 return Ok();
             }

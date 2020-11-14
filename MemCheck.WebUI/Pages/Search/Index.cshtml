@@ -76,6 +76,9 @@
                                 <span id="RegisterForNotifications" v-if="registerForNotificationsEnabled()">
                                     <a class="dropdown-item" @@click="registerForNotifications()"><i class="fas fa-bell"></i> @Localizer["RegisterForNotifications"]</a>
                                 </span>
+                                <span id="UnregisterForNotifications" v-if="unRegisterForNotificationsEnabled()">
+                                    <a class="dropdown-item" @@click="unRegisterForNotifications()"><i class="fas fa-bell-slash"></i> @Localizer["UnregisterForNotifications"]</a>
+                                </span>
                                 <span id="DeleteCard" v-if="deleteCardEnabled()">
                                     <span id="DeleteCard" v-if="selectionCount() == 1">
                                         <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCard"]</a>

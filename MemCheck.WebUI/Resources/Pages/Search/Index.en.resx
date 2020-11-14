@@ -234,6 +234,9 @@
   <data name="Text" xml:space="preserve">
     <value>Text</value>
   </data>
+  <data name="UnregisterForNotifications" xml:space="preserve">
+    <value>Unregister for notifications</value>
+  </data>
   <data name="User" xml:space="preserve">
     <value>user</value>
   </data>

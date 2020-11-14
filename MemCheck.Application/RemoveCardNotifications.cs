@@ -2,47 +2,50 @@
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {
-    public sealed class RemoveCardNotification
+    public sealed class RemoveCardNotifications
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         #endregion
-        public RemoveCardNotification(MemCheckDbContext dbContext)
+        public RemoveCardNotifications(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
         public async Task RunAsync(Request request)
         {
             request.CheckValidity();
-            var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == request.CardId).SingleOrDefaultAsync();
 
-            if (existing == null)
-                return;
+            foreach (var cardId in request.CardIds)
+            {
+                var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).SingleOrDefaultAsync();
+                if (existing != null)
+                    dbContext.CardNotifications.Remove(existing);
+            }
 
-            dbContext.CardNotifications.Remove(existing);
             await dbContext.SaveChangesAsync();
         }
         #region Request class
         public sealed class Request
         {
-            public Request(Guid userId, Guid cardId)
+            public Request(Guid userId, IEnumerable<Guid> cardIds)
             {
                 UserId = userId;
-                CardId = cardId;
+                CardIds = cardIds;
             }
             public Guid UserId { get; }
-            public Guid CardId { get; }
+            public IEnumerable<Guid> CardIds { get; }
             public void CheckValidity()
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new RequestInputException("Invalid user id");
-                if (QueryValidationHelper.IsReservedGuid(CardId))
-                    throw new RequestInputException("Invalid card id");
+                if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
+                    throw new RequestInputException($"Invalid card id");
             }
         }
         #endregion

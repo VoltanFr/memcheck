@@ -635,6 +635,33 @@ var app = new Vue({
                 //For example, the user is filtering on cards not registered. If he registers some cards, the query needs to be run again
                 this.runQuery();
         },
+        unRegisterForNotificationsEnabled() {
+            return this.selectedNotificationFilteringId != 3;
+        },
+        async unRegisterForNotifications() {
+            selectedCardIds = this.getSelectedCardIds();
+            if (selectedCardIds.length == 0) {
+                alert(this.allStaticData.localizedText.operationIsForSelectedCards);
+                return;
+            }
+            this.loadingQuery = true;
+            await axios.post('/Search/UnregisterForNotifications', { cardIds: selectedCardIds })
+                .then(result => {
+                    this.$bvToast.toast(this.allStaticData.localizedText.unRegistered, {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                        solid: true,
+                        autoHideDelay: 10000,
+                    });
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                });
+            this.loadingQuery = false;
+            if (this.selectedNotificationFilteringId != 1)
+                //For example, the user is filtering on cards registered. If he unregisters some cards, the query needs to be run again
+                this.runQuery();
+        },
     },
     watch: {
         selectedDeck: {

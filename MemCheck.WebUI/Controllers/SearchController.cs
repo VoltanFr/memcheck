@@ -217,6 +217,7 @@ namespace MemCheck.WebUI.Controllers
                 CardsRegisteredForNotif = localizer["CardsRegisteredForNotif"];
                 CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"];
                 Registered = localizer["Registered"];
+                Unregistered = localizer["Unregistered"];
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -275,6 +276,7 @@ namespace MemCheck.WebUI.Controllers
             public string CardsRegisteredForNotif { get; }
             public string CardsNotRegisteredForNotif { get; }
             public string Registered { get; }
+            public string Unregistered { get; }
         }
         #endregion
         #endregion
@@ -519,6 +521,27 @@ namespace MemCheck.WebUI.Controllers
             }
         }
         public sealed class RegisterForNotificationsRequest
+        {
+            public IEnumerable<Guid> CardIds { get; set; } = null!;
+        }
+        #endregion
+        #region UnregisterForNotifications
+        [HttpPost("UnregisterForNotifications")]
+        public async Task<IActionResult> UnregisterForNotifications([FromBody] UnregisterForNotificationsRequest request)
+        {
+            try
+            {
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new RemoveCardNotifications.Request(userId, request.CardIds);
+                await new RemoveCardNotifications(dbContext).RunAsync(appRequest);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
+        public sealed class UnregisterForNotificationsRequest
         {
             public IEnumerable<Guid> CardIds { get; set; } = null!;
         }

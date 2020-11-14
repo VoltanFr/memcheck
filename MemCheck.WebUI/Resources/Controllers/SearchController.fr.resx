@@ -318,6 +318,9 @@
   <data name="TagAdded" xml:space="preserve">
     <value>Label ajouté</value>
   </data>
+  <data name="Unregistered" xml:space="preserve">
+    <value>Vous êtes désabonné</value>
+  </data>
   <data name="UsersHaveCardWithFrontSide" xml:space="preserve">
     <value>autres utilisateurs ont dans un paquet la carte avec avant</value>
   </data>
