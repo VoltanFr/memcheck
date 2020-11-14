@@ -34,8 +34,8 @@ namespace MemCheck.AzFunc.Notifier
             telemetryClient.TrackEvent($"{nameof(SendStatsToAdmins)} VinceTelemetryEvent");
 
             Assembly? assembly = Assembly.GetExecutingAssembly();
-            var entryAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
-            log.LogInformation($"Assembly name: {entryAssemblyName}");
+            var executingAssemblyName = assembly == null ? "Unknown" : (assembly.FullName == null ? "Unknown (no full name)" : assembly.FullName.ToString());
+            log.LogInformation($"Assembly name: {executingAssemblyName}");
 
             var config = new ConfigurationBuilder().SetBasePath(context.FunctionAppDirectory).AddEnvironmentVariables().Build();
 
@@ -49,7 +49,7 @@ namespace MemCheck.AzFunc.Notifier
             {
                 From = senderEmail,
                 Subject = "Mail sent from Azure function",
-                PlainTextContent = $"Time here: {DateTime.Now}, running on machine '{Environment.MachineName}'"
+                HtmlContent = $"Time here: {DateTime.Now}, running on machine '{Environment.MachineName}', assembly: {executingAssemblyName}"
             };
             msg.AddTo(new EmailAddress("VoltanFr@gmail.com"));
             msg.AddBcc(new EmailAddress(sendGridSender));
