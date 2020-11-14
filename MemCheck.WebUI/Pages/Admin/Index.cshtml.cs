@@ -19,7 +19,6 @@ namespace MemCheck.WebUI.Pages.Admin
         [BindProperty] public string EntryAssemblyVersion { get; set; } = null!;
         [BindProperty] public string EnvironmentName { get; set; } = null!;
         [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
-        [BindProperty] public IEnumerable<string> OtherAssemblies { get; set; } = null!;
         public IndexModel(IWebHostEnvironment currentEnvironment)
         {
             this.currentEnvironment = currentEnvironment;
@@ -35,7 +34,6 @@ namespace MemCheck.WebUI.Pages.Admin
             EnvironmentName = currentEnvironment.EnvironmentName;
             var assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName == null ? a.GetName().ToString() : a.FullName).OrderBy(a => a);
             MemCheckAssemblies = assemblies.Where(assemblyName => assemblyName.StartsWith("MemCheck"));
-            OtherAssemblies = assemblies.Where(assemblyName => !assemblyName.StartsWith("MemCheck"));
         }
     }
 }
