@@ -152,12 +152,12 @@ namespace MemCheck.Application
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtMost(request.RatingFilteringValue).Contains(card.Id));
             }
 
-            var finalRequest = cardsFilteredWithAverageRating;
+            var finalResult = cardsFilteredWithAverageRating;
 
-            var totalNbCards = finalRequest.Count();
+            var totalNbCards = finalResult.Count();
             var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.pageSize);
 
-            var pageCards = finalRequest.Skip((request.pageNo - 1) * request.pageSize).Take(request.pageSize);
+            var pageCards = finalResult.Skip((request.pageNo - 1) * request.pageSize).Take(request.pageSize);
 
             if (cardRatings == null)
                 cardRatings = CardRatings.Load(dbContext, userId, pageCards.Select(card => card.Id).ToImmutableHashSet());
@@ -171,7 +171,7 @@ namespace MemCheck.Application
         #region Request and result classes
         public sealed class Request
         {
-            public Request(Guid deck, bool deckIsInclusive, int heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue)
+            public Request(Guid deck, bool deckIsInclusive, int heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
             {
                 if (pageNo < 1) throw new ArgumentException($"First page is numbered 1, received a request for page {pageNo}");
                 RequiredTags = requiredTags;
@@ -185,6 +185,7 @@ namespace MemCheck.Application
                 RequiredText = requiredText;
                 RatingFilteringMode = ratingFilteringMode;
                 RatingFilteringValue = ratingFilteringValue;
+                NotificationFiltering = notificationFiltering;
             }
             public Guid Deck { get; }
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
@@ -197,6 +198,7 @@ namespace MemCheck.Application
             public int RatingFilteringValue { get; set; } //1 to 5
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
+            public int NotificationFiltering { get; set; } //1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
         }
         public sealed class Result
         {
