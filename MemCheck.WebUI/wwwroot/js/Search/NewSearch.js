@@ -631,6 +631,9 @@ var app = new Vue({
                     tellAxiosError(error, this);
                 });
             this.loadingQuery = false;
+            if (this.selectedNotificationFilteringId != 1)
+                //For example, the user is filtering on cards not registered. If he registers some cards, the query needs to be run again
+                this.runQuery();
         },
     },
     watch: {
