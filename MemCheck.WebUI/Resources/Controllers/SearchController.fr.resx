@@ -300,6 +300,9 @@
   <data name="OperationIsForSelectedCards" xml:space="preserve">
     <value>Sélectionnez des cartes</value>
   </data>
+  <data name="Registered" xml:space="preserve">
+    <value>Vous êtes abonné</value>
+  </data>
   <data name="SearchTooBigForRatingFiltering" xml:space="preserve">
     <value>Cette recherche sélectionne trop de cartes pour filtrer par évaluation. Vous devez affiner vos critères.</value>
   </data>

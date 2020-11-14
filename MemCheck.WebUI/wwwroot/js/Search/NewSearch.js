@@ -608,6 +608,30 @@ var app = new Vue({
         averageRatingFilteringEnabled() {
             return this.selectedAverageRatingFilteringKind != 1 && this.selectedAverageRatingFilteringKind != 4;
         },
+        registerForNotificationsEnabled() {
+            return this.selectedNotificationFilteringId != 2;
+        },
+        async registerForNotifications() {
+            selectedCardIds = this.getSelectedCardIds();
+            if (selectedCardIds.length == 0) {
+                alert(this.allStaticData.localizedText.operationIsForSelectedCards);
+                return;
+            }
+            this.loadingQuery = true;
+            await axios.post('/Search/RegisterForNotifications', { cardIds: selectedCardIds })
+                .then(result => {
+                    this.$bvToast.toast(this.allStaticData.localizedText.registered, {
+                        variant: 'success',
+                        toaster: 'b-toaster-top-center',
+                        solid: true,
+                        autoHideDelay: 10000,
+                    });
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                });
+            this.loadingQuery = false;
+        },
     },
     watch: {
         selectedDeck: {

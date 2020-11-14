@@ -73,6 +73,9 @@
                         <span v-if="nonDeckActionDropDownButtonEnabled()">
                             <a href="#" id="NonDeckActionDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["Card"]><i class="fas fa-ellipsis-h"></i></a>
                             <span class="dropdown-menu" role="menu">
+                                <span id="RegisterForNotifications" v-if="registerForNotificationsEnabled()">
+                                    <a class="dropdown-item" @@click="registerForNotifications()"><i class="fas fa-bell"></i> @Localizer["RegisterForNotifications"]</a>
+                                </span>
                                 <span id="DeleteCard" v-if="deleteCardEnabled()">
                                     <span id="DeleteCard" v-if="selectionCount() == 1">
                                         <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCard"]</a>

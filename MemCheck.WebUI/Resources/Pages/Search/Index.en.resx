@@ -204,6 +204,9 @@
   <data name="PleaseWaitForQuery" xml:space="preserve">
     <value>Please wait, loading query...</value>
   </data>
+  <data name="RegisterForNotifications" xml:space="preserve">
+    <value>Register for notifications</value>
+  </data>
   <data name="RemoveFrom" xml:space="preserve">
     <value>Remove from</value>
   </data>

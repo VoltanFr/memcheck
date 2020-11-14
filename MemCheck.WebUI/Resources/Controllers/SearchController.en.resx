@@ -300,6 +300,9 @@
   <data name="OperationIsForSelectedCards" xml:space="preserve">
     <value>This applies to selected cards</value>
   </data>
+  <data name="Registered" xml:space="preserve">
+    <value>Registered</value>
+  </data>
   <data name="SearchTooBigForRatingFiltering" xml:space="preserve">
     <value>The set of results is too big to filter on evaluations. You need to refine your selection.</value>
   </data>

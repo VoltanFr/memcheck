@@ -320,15 +320,15 @@ namespace MemCheck.WebUI.Controllers
         {
             try
             {
-                var user = await userManager.GetUserAsync(HttpContext.User);
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
                 if (notif)
                 {
-                    var request = new AddCardNotification.Request(user, cardId);
-                    await new AddCardNotification(dbContext).RunAsync(request);
+                    var request = new AddCardNotifications.Request(userId, new[] { cardId });
+                    await new AddCardNotifications(dbContext).RunAsync(request);
                 }
                 else
                 {
-                    var request = new RemoveCardNotification.Request(user, cardId);
+                    var request = new RemoveCardNotification.Request(userId, cardId);
                     await new RemoveCardNotification(dbContext).RunAsync(request);
                 }
                 return Ok();

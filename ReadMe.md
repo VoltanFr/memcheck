@@ -55,6 +55,8 @@ Add telemetry to Azure function: https://docs.microsoft.com/fr-fr/azure/azure-fu
 
 Notifications
 
+Remove notifications on search page
+
 Table RegisteredNotifications
 Un utilisateur peut être abonné à :
 - une carte (lorsqu'une nouvelle version est créée, lorsque la carte est supprimée, optionnellement lorsque l'évaluation moyenne de la carte évolue) : type `CardNotification`

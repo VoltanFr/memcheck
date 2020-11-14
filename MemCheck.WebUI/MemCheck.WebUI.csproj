@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.3.71</Version>
+    <Version>0.3.72</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -19,7 +19,7 @@ namespace MemCheck.Application
         public async Task RunAsync(Request request)
         {
             request.CheckValidity();
-            var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.User.Id && notif.CardId == request.CardId).SingleOrDefaultAsync();
+            var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == request.CardId).SingleOrDefaultAsync();
 
             if (existing == null)
                 return;
@@ -30,16 +30,16 @@ namespace MemCheck.Application
         #region Request class
         public sealed class Request
         {
-            public Request(MemCheckUser user, Guid cardId)
+            public Request(Guid userId, Guid cardId)
             {
-                User = user;
+                UserId = userId;
                 CardId = cardId;
             }
-            public MemCheckUser User { get; }
+            public Guid UserId { get; }
             public Guid CardId { get; }
             public void CheckValidity()
             {
-                if (QueryValidationHelper.IsReservedGuid(User.Id))
+                if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new RequestInputException("Invalid user id");
                 if (QueryValidationHelper.IsReservedGuid(CardId))
                     throw new RequestInputException("Invalid card id");
