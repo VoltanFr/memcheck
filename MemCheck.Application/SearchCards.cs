@@ -152,7 +152,16 @@ namespace MemCheck.Application
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtMost(request.RatingFilteringValue).Contains(card.Id));
             }
 
-            var finalResult = cardsFilteredWithAverageRating;
+            IQueryable<Card> cardsFilteredWithNotifications;
+            if (request.NotificationFiltering == 1)
+                cardsFilteredWithNotifications = cardsFilteredWithAverageRating;
+            else
+            {
+                var notifMustExist = request.NotificationFiltering == 2;
+                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == userId).Any() == notifMustExist);
+            }
+
+            var finalResult = cardsFilteredWithNotifications;
 
             var totalNbCards = finalResult.Count();
             var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.pageSize);

@@ -71,6 +71,8 @@ Pour pouvoir faire des notifs sur l'évolution de rating d'une carte, il faut qu
 
 Ne pas notifier un utilisateur de ses propres modifs
 
+pouvoir s'abonner/désabonner dans le mode édition
+
 Paramètres utilisateur:
 - Envoi de mail pour les notifs
 - Abonnement automatique à une carte lorsque vous créez une version

@@ -193,6 +193,12 @@
                                         <select v-model="selectedAverageRatingFilteringValue" class="responsive-padding-edit" v-if="averageRatingFilteringEnabled()"><option v-for="ratingF in possibleRatingFilteringValues" v-bind:value="ratingF.choiceId">{{ratingF.choiceText}}</option></select>
                                     </td>
                                 </tr>
+                                <tr id="Notifications">
+                                    <th>@Localizer["Notifications"]</th>
+                                    <td>
+                                        <select v-model="selectedNotificationFilteringId" class="responsive-padding-edit"><option v-for="notif in possibleSelectedNotificationFiltering" v-bind:value="notif.choiceId">{{notif.choiceText}}</option></select>
+                                    </td>
+                                </tr>
                                 <tr id="Page size">
                                     <th>@Localizer["PageSize"]</th>
                                     <td>

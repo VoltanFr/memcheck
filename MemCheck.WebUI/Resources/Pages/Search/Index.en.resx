@@ -183,6 +183,9 @@
   <data name="NoCard" xml:space="preserve">
     <value>No card</value>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
   <data name="NotInYourDeck" xml:space="preserve">
     <value>Not in your deck</value>
   </data>

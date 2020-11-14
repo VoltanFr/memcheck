@@ -213,6 +213,9 @@ namespace MemCheck.WebUI.Controllers
                 SelectedRatingAndAbove = localizer["SelectedRatingAndAbove"];
                 SelectedRatingAndBelow = localizer["SelectedRatingAndBelow"];
                 NoRating = localizer["NoRating"];
+
+                CardsRegisteredForNotif = localizer["CardsRegisteredForNotif"];
+                CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"];
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -268,6 +271,8 @@ namespace MemCheck.WebUI.Controllers
             public string SelectedRatingAndAbove { get; }
             public string SelectedRatingAndBelow { get; }
             public string NoRating { get; }
+            public string CardsRegisteredForNotif { get; }
+            public string CardsNotRegisteredForNotif { get; }
         }
         #endregion
         #endregion
@@ -298,7 +303,7 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, request.Visibility, request.RatingFilteringMode, request.RatingFilteringValue);
+                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, request.Visibility, request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering);
 
                 var applicationResult = new SearchCards(dbContext).Run(applicationRequest, userId);
 
@@ -329,6 +334,7 @@ namespace MemCheck.WebUI.Controllers
             public int RatingFilteringValue { get; set; } //1 to 5
             public IEnumerable<Guid> RequiredTags { get; set; } = null!;
             public IEnumerable<Guid> ExcludedTags { get; set; } = null!;
+            public int NotificationFiltering { get; set; } //1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
         }
         public sealed class RunQueryViewModel
         {

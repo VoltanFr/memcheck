@@ -249,6 +249,12 @@
   <data name="CardsMoved" xml:space="preserve">
     <value>Cards moved</value>
   </data>
+  <data name="CardsNotRegisteredForNotif" xml:space="preserve">
+    <value>Cards you did not subscribe to</value>
+  </data>
+  <data name="CardsRegisteredForNotif" xml:space="preserve">
+    <value>Cards you subscribed to</value>
+  </data>
   <data name="CardsRemoved" xml:space="preserve">
     <value>Cards removed</value>
   </data>

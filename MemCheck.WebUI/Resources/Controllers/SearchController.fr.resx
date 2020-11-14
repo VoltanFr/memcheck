@@ -249,6 +249,12 @@
   <data name="CardsMoved" xml:space="preserve">
     <value>Cartes déplacées</value>
   </data>
+  <data name="CardsNotRegisteredForNotif" xml:space="preserve">
+    <value>Cartes auxquelles vous n'êtes pas abonné</value>
+  </data>
+  <data name="CardsRegisteredForNotif" xml:space="preserve">
+    <value>Cartes auxquelles vous êtes abonné</value>
+  </data>
   <data name="CardsRemoved" xml:space="preserve">
     <value>Cartes enlevées du paquet</value>
   </data>

@@ -36,6 +36,8 @@ var app = new Vue({
         selectedAverageRatingFilteringKind: 1,
         possibleRatingFilteringValues: [],  //{choiceId: int, 1 to 5, choiceText: string}
         selectedAverageRatingFilteringValue: 5, //1 to 5
+        selectedNotificationFilteringId: 1,  //choiceId: int
+        possibleSelectedNotificationFiltering: [],   //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
         textFilter: "", //string
         pageNo: 1, //int. First page is number 1
         pageSize: 50,   //int
@@ -86,7 +88,7 @@ var app = new Vue({
                     this.possibleTargetDecksForAdd = result.data.allDecksForAddingCards;
                     this.possibleRatingFilteringKind = [{ choiceId: 1, choiceText: this.allStaticData.localizedText.ignore }, { choiceId: 2, choiceText: this.allStaticData.localizedText.selectedRatingAndAbove }, { choiceId: 3, choiceText: this.allStaticData.localizedText.selectedRatingAndBelow }, { choiceId: 4, choiceText: this.allStaticData.localizedText.noRating }];
                     this.possibleRatingFilteringValues = [{ choiceId: 1, choiceText: ratingAsStars(1) }, { choiceId: 2, choiceText: ratingAsStars(2) }, { choiceId: 3, choiceText: ratingAsStars(3) }, { choiceId: 4, choiceText: ratingAsStars(4) }, { choiceId: 5, choiceText: ratingAsStars(5) },];
-                    this.selectedAverageRatingFilteringValue = 5;
+                    this.possibleSelectedNotificationFiltering = [{ choiceId: 1, choiceText: this.allStaticData.localizedText.ignore }, { choiceId: 2, choiceText: this.allStaticData.localizedText.cardsRegisteredForNotif }, { choiceId: 3, choiceText: this.allStaticData.localizedText.cardsNotRegisteredForNotif }];
                     this.updateFieldsAccordingToDeck();
                 })
                 .catch(error => {
@@ -134,6 +136,7 @@ var app = new Vue({
                 visibility: this.selectedVisibilityFilteringChoice,
                 ratingFilteringMode: this.selectedAverageRatingFilteringKind,
                 ratingFilteringValue: this.selectedAverageRatingFilteringValue,
+                notificationFiltering: this.selectedNotificationFilteringId,
             };
 
             start = performance.now();
