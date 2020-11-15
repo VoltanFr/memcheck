@@ -32,7 +32,9 @@ namespace MemCheck.Application
         }
         private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
         {
-            var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking().Where(card => card.DeckId.Equals(deckId) && !excludedCardIds.Contains(card.CardId));
+            var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking()
+                .Include(card => card.Card).AsSingleQuery()
+                .Where(card => card.DeckId.Equals(deckId) && !excludedCardIds.Contains(card.CardId));
 
             var onUnknownHeap = cardsOfDeck.Where(cardInDeck => cardInDeck.CurrentHeap == 0);
             var withoutExcludedCards = onUnknownHeap;
@@ -107,23 +109,25 @@ namespace MemCheck.Application
 
                 var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime)).Select(card => card.CardId).ToList();
 
-                var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && expired.Contains(cardInDeck.CardId)).Select(cardInDeck => new
-                {
-                    cardInDeck.CardId,
-                    cardInDeck.CurrentHeap,
-                    cardInDeck.LastLearnUtcTime,
-                    cardInDeck.AddToDeckUtcTime,
-                    cardInDeck.BiggestHeapReached,
-                    cardInDeck.NbTimesInNotLearnedHeap,
-                    cardInDeck.Card.FrontSide,
-                    cardInDeck.Card.BackSide,
-                    cardInDeck.Card.AdditionalInfo,
-                    cardInDeck.Card.VersionUtcDate,
-                    VersionCreator = cardInDeck.Card.VersionCreator.Id,
-                    tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
-                    userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                    imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
-                }).ToList();
+                var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && expired.Contains(cardInDeck.CardId))
+                    .Include(cardInDeck => cardInDeck.Card).AsSingleQuery()
+                    .Select(cardInDeck => new
+                    {
+                        cardInDeck.CardId,
+                        cardInDeck.CurrentHeap,
+                        cardInDeck.LastLearnUtcTime,
+                        cardInDeck.AddToDeckUtcTime,
+                        cardInDeck.BiggestHeapReached,
+                        cardInDeck.NbTimesInNotLearnedHeap,
+                        cardInDeck.Card.FrontSide,
+                        cardInDeck.Card.BackSide,
+                        cardInDeck.Card.AdditionalInfo,
+                        cardInDeck.Card.VersionUtcDate,
+                        VersionCreator = cardInDeck.Card.VersionCreator.Id,
+                        tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
+                        userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
+                        imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
+                    }).ToList();
 
                 var cardIds = expired.ToImmutableHashSet();
                 var ratings = CardRatings.Load(dbContext, userId, cardIds);

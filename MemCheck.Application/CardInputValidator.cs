@@ -36,7 +36,7 @@ namespace MemCheck.Application
         public static void Run(ICardInput input, IStringLocalizer localizer)
         {
             if (QueryValidationHelper.IsReservedGuid(input.VersionCreator.Id))
-                throw new RequestInputException(localizer["InvalidOwner"]);
+                throw new RequestInputException(localizer["InvalidOwner"].Value);
 
             if (input.FrontSide != input.FrontSide.Trim())
                 throw new InvalidOperationException("Invalid front side: not trimmed");
@@ -67,20 +67,20 @@ namespace MemCheck.Application
 
             var unionedImageLists = input.FrontSideImageList.Concat(input.BackSideImageList).Concat(input.AdditionalInfoImageList);
             if (unionedImageLists.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
-                throw new RequestInputException(localizer["ImageDuplicated"]);
+                throw new RequestInputException(localizer["ImageDuplicated"].Value);
 
             if (QueryValidationHelper.IsReservedGuid(input.LanguageId))
-                throw new RequestInputException(localizer["InvalidInputLanguage"]);
+                throw new RequestInputException(localizer["InvalidInputLanguage"].Value);
 
             if (input.Tags.Where(tag => QueryValidationHelper.IsReservedGuid(tag)).Any())
-                throw new RequestInputException(localizer["InvalidTag"]);
+                throw new RequestInputException(localizer["InvalidTag"].Value);
 
             if (input.UsersWithVisibility.Where(userWithVisibility => QueryValidationHelper.IsReservedGuid(userWithVisibility)).Any())
-                throw new RequestInputException(localizer["InvalidUserWithVisibility"]);
+                throw new RequestInputException(localizer["InvalidUserWithVisibility"].Value);
 
             if (input.UsersWithVisibility.Any() && !input.UsersWithVisibility.Any(userWithVisibility => userWithVisibility == input.VersionCreator.Id))
                 //To be reviewed when we support card versions: I suspect we want visibility for all past owners
-                throw new RequestInputException(localizer["OwnerMustHaveVisibility"]);
+                throw new RequestInputException(localizer["OwnerMustHaveVisibility"].Value);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace MemCheck.Application
 
                 var images = dbContext.Images.Where(img => img.Id == ImageId);
                 if (!await images.AnyAsync())
-                    throw new RequestInputException(localizer["UnknownImage"]);
+                    throw new RequestInputException(localizer["UnknownImage"].Value);
                 var cardCounts = images.Select(img => img.Cards.Count());
                 var cardCount = await cardCounts.SingleAsync();
                 if (cardCount != 0)

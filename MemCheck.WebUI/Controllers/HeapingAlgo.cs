@@ -16,11 +16,11 @@ namespace MemCheck.WebUI.Controllers
     {
         public static string NameFromId(int id, IStringLocalizer<DecksController> localizer)
         {
-            return localizer["HeapingAlgoNameForId" + id];
+            return localizer["HeapingAlgoNameForId" + id].Value;
         }
         public static string DescriptionFromId(int id, IStringLocalizer<DecksController> localizer)
         {
-            return localizer["HeapingAlgoDescriptionForId" + id];
+            return localizer["HeapingAlgoDescriptionForId" + id].Value;
         }
     }
 }

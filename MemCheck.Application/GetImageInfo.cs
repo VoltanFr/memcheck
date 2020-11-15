@@ -33,7 +33,7 @@ namespace MemCheck.Application
         {
             imageName = imageName.Trim();
             if (imageName.Length == 0)
-                throw new RequestInputException(localizer["PleaseEnterAnImageName"]);
+                throw new RequestInputException(localizer["PleaseEnterAnImageName"].Value);
             var images = dbContext.Images.Include(img => img.Cards).Where(image => EF.Functions.Like(image.Name, $"{imageName}"));
             return await ResultFromSearchAsync(images, imageName);
         }

@@ -42,7 +42,7 @@ namespace MemCheck.Application
 
             var cards = dbContext.Cards.Where(card => card.Id == cardId);
             if (!await cards.AnyAsync())
-                throw new RequestInputException(localizer["UnknownCard"]);
+                throw new RequestInputException(localizer["UnknownCard"].Value);
 
             var currentVersion = await cards.Include(card => card.PreviousVersion)
                 .Select(card => new CardVersionFromDb(

@@ -70,7 +70,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = "/", string remoteError = "")
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/") ?? "/";
             if (!string.IsNullOrEmpty(remoteError))
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
@@ -87,7 +87,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity?.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -112,7 +112,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = "/")
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
+            returnUrl = returnUrl ?? Url.Content("~/") ?? "/";
             // Get the information about the user from the external login provider
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)

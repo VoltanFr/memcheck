@@ -60,7 +60,7 @@ namespace MemCheck.Application
             }
             catch
             {
-                throw new RequestInputException(localizer["SvgImageCanNotBeLoaded"]);
+                throw new RequestInputException(localizer["SvgImageCanNotBeLoaded"].Value);
             }
         }
         private Bitmap GetBitmap(Stream sourceStream, string contentType)
@@ -90,7 +90,7 @@ namespace MemCheck.Application
             image.Description = request.Description;
             image.Source = request.Source;
             image.Owner = request.Owner;
-            image.VersionDescription = localizer["InitialImageVersionCreation"];
+            image.VersionDescription = localizer["InitialImageVersionCreation"].Value;
             image.VersionType = ImageVersionType.Creation;
             image.InitialUploadUtcDate = DateTime.UtcNow;
             image.LastChangeUtcDate = image.InitialUploadUtcDate;

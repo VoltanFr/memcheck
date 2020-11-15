@@ -49,11 +49,11 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new SearchCards(serviceProvider);
+            IMemCheckTest test = new GetCardForEdit(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
-            if (!input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+            if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
             {
                 logger.LogError("User cancellation");
                 return;

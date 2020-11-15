@@ -18,7 +18,7 @@ namespace MemCheck.Application
         }
         public IEnumerable<ViewModel> Run(Guid deckId)
         {
-            Deck deck = dbContext.Decks.Where(deck => deck.Id == deckId)
+            var deck = dbContext.Decks.Where(deck => deck.Id == deckId)
                 .Include(deck => deck.CardInDecks)
                 .ThenInclude(cardInDeck => cardInDeck.Card)
                 .SingleOrDefault();

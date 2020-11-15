@@ -19,7 +19,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public static string HeapName(int heap, IStringLocalizer localizer)
         {
-            return heap == 0 ? localizer["UnknownCardsHeap"] : heap.ToString();
+            return heap == 0 ? localizer["UnknownCardsHeap"].Value : heap.ToString();
         }
         public static bool ShowDebugInfo(MemCheckUser? user)
         {

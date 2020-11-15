@@ -33,7 +33,7 @@ namespace MemCheck.Application
                 throw new RequestInputException("Invalid image id");
             var images = dbContext.Images.Where(img => img.Id == imageId);
             if (!await images.AnyAsync())
-                throw new RequestInputException(localizer["UnknownImage"]);
+                throw new RequestInputException(localizer["UnknownImage"].Value);
 
             var currentVersion = await images.Include(img => img.PreviousVersion)
                 .Select(img => new ImageVersionFromDb(

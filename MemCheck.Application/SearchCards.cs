@@ -83,7 +83,8 @@ namespace MemCheck.Application
                 .Include(card => card.TagsInCards)
                 .Include(card => card.VersionCreator)
                 .Include(card => card.CardLanguage)
-                .Include(card => card.UsersWithView);
+                .Include(card => card.UsersWithView)
+                .AsSingleQuery();
 
             var cardsViewableByUser = allCards.Where(
                 card =>
@@ -162,6 +163,7 @@ namespace MemCheck.Application
             }
 
             var finalResult = cardsFilteredWithNotifications;
+            finalResult = finalResult.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
 
             var totalNbCards = finalResult.Count();
             var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.pageSize);

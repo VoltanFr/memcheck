@@ -141,6 +141,7 @@ namespace MemCheck.Application
                     .Include(card => card.TagsInCards)
                     .ThenInclude(tag => tag.Tag)
                     .Include(card => card.UsersWithView)
+                    .AsSingleQuery()
                     .Where(card => card.Id == CardId);
 
                 if (!await cards.AnyAsync())
@@ -164,7 +165,7 @@ namespace MemCheck.Application
                     && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
                     && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
                     && SameImageLists(dataBeforeUpdate.Images))
-                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"]);
+                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"].Value);
 
                 //to do: reducing UsersWithView must check that this will not break anybody's deck, nor prevent an author of a version of this card from viewing it
             }

@@ -278,7 +278,7 @@ namespace MemCheck.WebUI.Controllers
                 DeckId = deckId;
                 Description = description;
                 ShowDebugInfo = showDebugInfo;
-                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer["None"]) }
+                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer["None"].Value) }
                     .Concat(tags.Select(tag => new UserDecksTagViewModel(tag.TagId, tag.TagName)));
             }
             public Guid DeckId { get; }

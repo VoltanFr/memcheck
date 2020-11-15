@@ -66,7 +66,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = localizer["ProfileUpdated"];
+            StatusMessage = localizer["ProfileUpdated"].Value;
             return RedirectToPage();
         }
     }

@@ -77,7 +77,7 @@
                                 }
                             </a>
                             <div class="dropdown-menu my-2 my-lg-0" aria-labelledby="UserDropdown">
-                                @if (SignInManager.IsSignedIn(User))
+                                @if (SignInManager.IsSignedIn(User) && User.Identity != null)
                                 {
                                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity.Name</a>
                                     <form class="nav-item form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">

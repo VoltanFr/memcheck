@@ -33,6 +33,7 @@ namespace MemCheck.WebUI
         #region Private methods
         private void ConfigureDataBase(IServiceCollection services)
         {
+            services.AddDatabaseDeveloperPageExceptionFilter();
             var connectionStringKey = prodEnvironment ? "AzureDbConnection" : "LocalDbConnection";
             services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(configuration[$"ConnectionStrings:{connectionStringKey}"]));
         }
@@ -46,7 +47,7 @@ namespace MemCheck.WebUI
             else
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
             }
         }
         #endregion

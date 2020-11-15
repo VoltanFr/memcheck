@@ -20,7 +20,7 @@ namespace MemCheck.WebUI.Controllers
         #region private methods
         private ControllerError(string text, bool isControllerBug, IStringLocalizer localizer)
         {
-            Title = localizer["Failure"];
+            Title = localizer["Failure"].Value;
             Text = text;
             ShowStatus = isControllerBug;
         }

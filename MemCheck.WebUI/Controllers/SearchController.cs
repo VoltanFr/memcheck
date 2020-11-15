@@ -51,18 +51,18 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer, MemCheckUser? currentUser)
             {
-                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer["Ignore"]) }
+                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer["Ignore"].Value) }
                     .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer, decksControllerLocalizer)));
                 AllDecksForAddingCards = userDecks.Select(applicationResult => new GetAllStaticDataDeckForAddViewModel(applicationResult.DeckId, applicationResult.Description));
                 AllApplicableTags = allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name));
-                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"]) }
+                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value) }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
                 AllExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"]),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"])
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"].Value)
                     }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
-                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer["Any"]) }
+                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer["Any"].Value) }
                     .Concat(allUsers.Select(user => new GetAllStaticDataUserViewModel(user.UserId, user.UserName)));
                 LocalizedText = new GetAllStaticDataLocalizedTextViewModel(localizer);
                 PossibleHeapsForMove = Enumerable.Range(0, MoveCardToHeap.MaxTargetHeapId).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, decksControllerLocalizer)));
@@ -86,13 +86,13 @@ namespace MemCheck.WebUI.Controllers
             {
                 DeckId = applicationResult.DeckId;
                 DeckName = applicationResult.Description;
-                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer["Any"]) }
+                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer["Any"].Value) }
                     .Concat(applicationResult.Heaps.OrderBy(heap => heap).Select(heap => new GetAllStaticDataHeapViewModel(heap, DisplayServices.HeapName(heap, decksControllerLocalizer))));
-                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"]) }
+                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value) }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 ExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"]),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"])
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"].Value)
                     }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
             }
@@ -155,69 +155,69 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetAllStaticDataLocalizedTextViewModel(IStringLocalizer<SearchController> localizer)
             {
-                Any = localizer["Any"];
-                Ignore = localizer["Ignore"];
-                Before = localizer["Before"];
-                ThatDay = localizer["On"];
-                After = localizer["After"];
-                CardVisibleToMoreThanOwner = localizer["CardVisibleToMoreThanOwner"];
-                CardVisibleToOwnerOnly = localizer["CardVisibleToOwnerOnly"];
-                IncludeCards = localizer["IncludeCards"];
-                ExcludeCards = localizer["ExcludeCards"];
-                OperationIsForSelectedCards = localizer["OperationIsForSelectedCards"];
-                AlertAddTagToCardsPart1 = localizer["AlertAddTagToCardsPart1"];
-                AlertAddTagToCardsPart2 = localizer["AlertAddTagToCardsPart2"];
-                AlertAddTagToCardsPart3Single = localizer["AlertAddTagToCardsPart3Single"];
-                AlertAddTagToCardsPart3Plural = localizer["AlertAddTagToCardsPart3Plural"];
-                TagAdded = localizer["TagAdded"];
-                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer["CantAddToDeckBecauseSomeCardsAlreadyIn"];
-                AlertAddCardsToDeckPart1 = localizer["AlertAddCardsToDeckPart1"];
-                AlertAddCardToDeckPart1 = localizer["AlertAddCardToDeckPart1"];
-                AlertAddCardsToDeckPart2 = localizer["AlertAddCardsToDeckPart2"];
-                AlertAddCardsToDeckPart3 = localizer["AlertAddCardsToDeckPart3"];
-                AlertAddCardToDeckPart3 = localizer["AlertAddCardToDeckPart3"];
-                AlertAddOneCardToDeck = localizer["AlertAddOneCardToDeck"];
-                CardsAdded = localizer["CardsAdded"];
-                CardAdded = localizer["CardAdded"];
-                CardAlreadyInDeck = localizer["CardAlreadyInDeck"];
-                CardsAlreadyInDeck = localizer["CardsAlreadyInDeck"];
+                Any = localizer["Any"].Value;
+                Ignore = localizer["Ignore"].Value;
+                Before = localizer["Before"].Value;
+                ThatDay = localizer["On"].Value;
+                After = localizer["After"].Value;
+                CardVisibleToMoreThanOwner = localizer["CardVisibleToMoreThanOwner"].Value;
+                CardVisibleToOwnerOnly = localizer["CardVisibleToOwnerOnly"].Value;
+                IncludeCards = localizer["IncludeCards"].Value;
+                ExcludeCards = localizer["ExcludeCards"].Value;
+                OperationIsForSelectedCards = localizer["OperationIsForSelectedCards"].Value;
+                AlertAddTagToCardsPart1 = localizer["AlertAddTagToCardsPart1"].Value;
+                AlertAddTagToCardsPart2 = localizer["AlertAddTagToCardsPart2"].Value;
+                AlertAddTagToCardsPart3Single = localizer["AlertAddTagToCardsPart3Single"].Value;
+                AlertAddTagToCardsPart3Plural = localizer["AlertAddTagToCardsPart3Plural"].Value;
+                TagAdded = localizer["TagAdded"].Value;
+                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer["CantAddToDeckBecauseSomeCardsAlreadyIn"].Value;
+                AlertAddCardsToDeckPart1 = localizer["AlertAddCardsToDeckPart1"].Value;
+                AlertAddCardToDeckPart1 = localizer["AlertAddCardToDeckPart1"].Value;
+                AlertAddCardsToDeckPart2 = localizer["AlertAddCardsToDeckPart2"].Value;
+                AlertAddCardsToDeckPart3 = localizer["AlertAddCardsToDeckPart3"].Value;
+                AlertAddCardToDeckPart3 = localizer["AlertAddCardToDeckPart3"].Value;
+                AlertAddOneCardToDeck = localizer["AlertAddOneCardToDeck"].Value;
+                CardsAdded = localizer["CardsAdded"].Value;
+                CardAdded = localizer["CardAdded"].Value;
+                CardAlreadyInDeck = localizer["CardAlreadyInDeck"].Value;
+                CardsAlreadyInDeck = localizer["CardsAlreadyInDeck"].Value;
 
-                CardAlreadyNotInDeck = localizer["CardAlreadyNotInDeck"];
-                CardsAlreadyNotInDeck = localizer["CardsAlreadyNotInDeck"];
-                AlertRemoveOneCardFromDeck = localizer["AlertRemoveOneCardFromDeck"];
-                AlertRemoveCardFromDeckPart1 = localizer["AlertRemoveCardFromDeckPart1"];
-                AlertRemoveCardsFromDeckPart1 = localizer["AlertRemoveCardsFromDeckPart1"];
-                AlertRemoveCardsFromDeckPart2 = localizer["AlertRemoveCardsFromDeckPart2"];
-                AlertRemoveCardsFromDeckPart3 = localizer["AlertRemoveCardsFromDeckPart3"];
-                AlertRemoveCardFromDeckPart3 = localizer["AlertRemoveCardFromDeckPart3"];
-                CardRemoved = localizer["CardRemoved"];
-                CardsRemoved = localizer["CardsRemoved"];
+                CardAlreadyNotInDeck = localizer["CardAlreadyNotInDeck"].Value;
+                CardsAlreadyNotInDeck = localizer["CardsAlreadyNotInDeck"].Value;
+                AlertRemoveOneCardFromDeck = localizer["AlertRemoveOneCardFromDeck"].Value;
+                AlertRemoveCardFromDeckPart1 = localizer["AlertRemoveCardFromDeckPart1"].Value;
+                AlertRemoveCardsFromDeckPart1 = localizer["AlertRemoveCardsFromDeckPart1"].Value;
+                AlertRemoveCardsFromDeckPart2 = localizer["AlertRemoveCardsFromDeckPart2"].Value;
+                AlertRemoveCardsFromDeckPart3 = localizer["AlertRemoveCardsFromDeckPart3"].Value;
+                AlertRemoveCardFromDeckPart3 = localizer["AlertRemoveCardFromDeckPart3"].Value;
+                CardRemoved = localizer["CardRemoved"].Value;
+                CardsRemoved = localizer["CardsRemoved"].Value;
 
-                OperationIsForFilteringOnDeckInclusive = localizer["OperationIsForFilteringOnDeckInclusive"];
-                CardAlreadyInTargetHeap = localizer["CardAlreadyInTargetHeap"];
-                CardsAlreadyInTargetHeap = localizer["CardsAlreadyInTargetHeap"];
-                AlertMoveOneCardToHeap = localizer["AlertMoveOneCardToHeap"];
-                AlertMoveCardsToHeapPart1 = localizer["AlertMoveCardsToHeapPart1"];
-                AlertMoveCardsToHeapPart2 = localizer["AlertMoveCardsToHeapPart2"];
-                AlertMoveCardToHeapPart3 = localizer["AlertMoveCardToHeapPart3"];
-                AlertMoveCardsToHeapPart3 = localizer["AlertMoveCardsToHeapPart3"];
-                CardMoved = localizer["CardMoved"];
-                CardsMoved = localizer["CardsMoved"];
+                OperationIsForFilteringOnDeckInclusive = localizer["OperationIsForFilteringOnDeckInclusive"].Value;
+                CardAlreadyInTargetHeap = localizer["CardAlreadyInTargetHeap"].Value;
+                CardsAlreadyInTargetHeap = localizer["CardsAlreadyInTargetHeap"].Value;
+                AlertMoveOneCardToHeap = localizer["AlertMoveOneCardToHeap"].Value;
+                AlertMoveCardsToHeapPart1 = localizer["AlertMoveCardsToHeapPart1"].Value;
+                AlertMoveCardsToHeapPart2 = localizer["AlertMoveCardsToHeapPart2"].Value;
+                AlertMoveCardToHeapPart3 = localizer["AlertMoveCardToHeapPart3"].Value;
+                AlertMoveCardsToHeapPart3 = localizer["AlertMoveCardsToHeapPart3"].Value;
+                CardMoved = localizer["CardMoved"].Value;
+                CardsMoved = localizer["CardsMoved"].Value;
 
-                AlertDeleteCardsPart1 = localizer["AlertDeleteCardsPart1"];
-                AlertDeleteCardsPart2Single = localizer["AlertDeleteCardsPart2Single"];
-                AlertDeleteCardsPart2Plural = localizer["AlertDeleteCardsPart2Plural"];
-                CardDeleted = localizer["CardDeleted"];
-                CardsDeleted = localizer["CardsDeleted"];
+                AlertDeleteCardsPart1 = localizer["AlertDeleteCardsPart1"].Value;
+                AlertDeleteCardsPart2Single = localizer["AlertDeleteCardsPart2Single"].Value;
+                AlertDeleteCardsPart2Plural = localizer["AlertDeleteCardsPart2Plural"].Value;
+                CardDeleted = localizer["CardDeleted"].Value;
+                CardsDeleted = localizer["CardsDeleted"].Value;
 
-                SelectedRatingAndAbove = localizer["SelectedRatingAndAbove"];
-                SelectedRatingAndBelow = localizer["SelectedRatingAndBelow"];
-                NoRating = localizer["NoRating"];
+                SelectedRatingAndAbove = localizer["SelectedRatingAndAbove"].Value;
+                SelectedRatingAndBelow = localizer["SelectedRatingAndBelow"].Value;
+                NoRating = localizer["NoRating"].Value;
 
-                CardsRegisteredForNotif = localizer["CardsRegisteredForNotif"];
-                CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"];
-                Registered = localizer["Registered"];
-                Unregistered = localizer["Unregistered"];
+                CardsRegisteredForNotif = localizer["CardsRegisteredForNotif"].Value;
+                CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"].Value;
+                Registered = localizer["Registered"].Value;
+                Unregistered = localizer["Unregistered"].Value;
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -317,7 +317,7 @@ namespace MemCheck.WebUI.Controllers
             }
             catch (SearchResultTooBigForRatingException)
             {
-                return ControllerError.BadRequest(localizer["SearchTooBigForRatingFiltering"], this);
+                return ControllerError.BadRequest(localizer["SearchTooBigForRatingFiltering"].Value, this);
             }
             catch (Exception e)
             {
@@ -363,7 +363,7 @@ namespace MemCheck.WebUI.Controllers
                 AverageRating = card.AverageRating;
                 CurrentUserRating = card.CurrentUserRating;
                 CountOfUserRatings = card.CountOfUserRatings;
-                PopoverVisibility = localizer["Visibility"];
+                PopoverVisibility = localizer["Visibility"].Value;
                 if (VisibleToCount == 1)
                 {
                     var visibleToUser = card.VisibleTo.First();

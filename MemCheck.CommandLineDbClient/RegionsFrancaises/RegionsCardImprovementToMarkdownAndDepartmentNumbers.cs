@@ -125,8 +125,8 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public RegionsCardImprovementToMarkdownAndDepartmentNumbers(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetService<MemCheckDbContext>();
-            logger = serviceProvider.GetService<ILogger<PaukerImportTest>>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()
         {

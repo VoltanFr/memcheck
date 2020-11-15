@@ -27,25 +27,40 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var cards = new List<PaukerCard>();
 
             var cardNodes = n.SelectNodes("Card");
-            for (int i = 0; i < cardNodes.Count; i++)
-                cards.Add(ReadCard((XmlElement)cardNodes[i]));
-
+            if (cardNodes != null)
+                for (int i = 0; i < cardNodes.Count; i++)
+                {
+                    var cardNode = cardNodes[i] as XmlElement;
+                    if (cardNode != null)
+                        cards.Add(ReadCard(cardNode));
+                }
             return new PaukerStack(name, cards);
+        }
+        private static XmlElement FirstElem(XmlElement parent, string tagName)
+        {
+            XmlNodeList xmlNodeList = parent.GetElementsByTagName(tagName);
+            if (xmlNodeList == null)
+                throw new IOException();
+            var result = xmlNodeList[0] as XmlElement;
+            if (result == null)
+                throw new IOException();
+            return result;
+
         }
         private static PaukerCard ReadCard(XmlElement cardNode)
         {
-            return new PaukerCard(ReadSide((XmlElement)cardNode.GetElementsByTagName("FrontSide")[0]), ReadSide((XmlElement)cardNode.GetElementsByTagName("ReverseSide")[0]));
+            return new PaukerCard(ReadSide(FirstElem(cardNode, "FrontSide")), ReadSide(FirstElem(cardNode, "ReverseSide")));
         }
         public PaukerLesson(XmlDocument d, FileInfo inputFile)
         {
             this.inputFile = inputFile;
             stacks = new List<PaukerStack>();
             cardsInStacks = new Dictionary<PaukerCard, List<PaukerStack>>();
-            lessonFormat = d.DocumentElement.GetAttribute("LessonFormat");
+            lessonFormat = d.DocumentElement!.GetAttribute("LessonFormat");
             var stackNodes = d.DocumentElement.SelectNodes("Batch");
-            for (int i = 0; i < stackNodes.Count; i++)
+            for (int i = 0; i < stackNodes!.Count; i++)
             {
-                var currentStack = ReadStack(stackNodes[i], i);
+                var currentStack = ReadStack(stackNodes[i]!, i);
                 stacks.Add(currentStack);
                 foreach (var c in currentStack.Cards)
                     if (cardsInStacks.ContainsKey(c))
@@ -73,7 +88,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 learnedTimestamp,
                 n.GetAttribute("Orientation"),
                 n.GetAttribute("RepeatByTyping"),
-                textNode.InnerText);
+                textNode!.InnerText);
         }
 
         public void RemoveDoublons()
@@ -99,7 +114,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var doc = new XmlDocument();
 
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-            XmlElement root = doc.DocumentElement;
+            XmlElement root = doc.DocumentElement!;
             doc.InsertBefore(xmlDeclaration, root);
 
             doc.AppendChild(doc.CreateComment("This is a lesson file for Pauker (http://pauker.sourceforge.net)"));

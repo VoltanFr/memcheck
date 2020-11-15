@@ -34,19 +34,19 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> UploadImage([FromForm] UploadImageRequest request)
         {
             if (request.Name == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"].Value, false, localizer));
             if (request.Description == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"].Value, false, localizer));
             if (request.Source == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"].Value, false, localizer));
             if (request.File == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["FileNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["FileNotSet"].Value, false, localizer));
 
             try
             {
                 var user = await userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
-                    return BadRequest(UploadImageResultViewModel.Failure(localizer["NeedLogin"], false, localizer));
+                    return BadRequest(UploadImageResultViewModel.Failure(localizer["NeedLogin"].Value, false, localizer));
 
                 using (var stream = request.File.OpenReadStream())
                 using (var reader = new BinaryReader(stream))
@@ -56,7 +56,7 @@ namespace MemCheck.WebUI.Controllers
                     var id = await new StoreImage(dbContext, localizer).RunAsync(applicationRequest);
                     if (id == Guid.Empty)
                         throw new ApplicationException("Stored image with empty GUID as id");
-                    return Ok(UploadImageResultViewModel.Success(localizer["ImageSavedWithName"] + $" '{applicationRequest.Name}'", localizer));
+                    return Ok(UploadImageResultViewModel.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", localizer));
                 }
             }
             catch (Exception e)
@@ -83,11 +83,11 @@ namespace MemCheck.WebUI.Controllers
             #endregion
             public static UploadImageResultViewModel Failure(string toastText, bool showStatus, IStringLocalizer<MediaController> localizer)
             {
-                return new UploadImageResultViewModel(localizer["Failure"], toastText, showStatus);
+                return new UploadImageResultViewModel(localizer["Failure"].Value, toastText, showStatus);
             }
             public static UploadImageResultViewModel Success(string toastText, IStringLocalizer<MediaController> localizer)
             {
-                return new UploadImageResultViewModel(localizer["Success"], toastText, false);
+                return new UploadImageResultViewModel(localizer["Success"].Value, toastText, false);
             }
             public string ToastTitle { get; }
             public string ToastText { get; }
@@ -196,13 +196,13 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
         {
             if (request.ImageName == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"].Value, false, localizer));
             if (request.Description == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"].Value, false, localizer));
             if (request.Source == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"].Value, false, localizer));
             if (request.VersionDescription == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["VersionDescriptionNotSet"], false, localizer));
+                return BadRequest(UploadImageResultViewModel.Failure(localizer["VersionDescriptionNotSet"].Value, false, localizer));
 
             try
             {

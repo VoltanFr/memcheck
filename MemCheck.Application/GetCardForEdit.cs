@@ -23,16 +23,29 @@ namespace MemCheck.Application
         {
             await request.CheckValidityAsync(dbContext);
 
-            var cardsInDecksWithThisCard = dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.CardId == request.CardId);
-            var ownersOfDecksWithThisCard = cardsInDecksWithThisCard.Select(cardInDeck => cardInDeck.Deck.Owner.UserName).Distinct().ToList();
+            var card = await dbContext.Cards
+                .Include(card => card.Images)
+                .ThenInclude(img => img.Image)
+                .ThenInclude(img => img.Owner)
+                .Include(card => card.CardLanguage)
+                .Include(card => card.TagsInCards)
+                .ThenInclude(tagInCard => tagInCard.Tag)
+                .Include(card => card.UsersWithView)
+                .Where(card => card.Id == request.CardId)
+                .AsSingleQuery()
+                .SingleOrDefaultAsync();
 
-            var card = dbContext.Cards.Where(card => card.Id == request.CardId).Include(card => card.Images).ThenInclude(img => img.Image).ThenInclude(img => img.Owner);
-            if (!card.Any())
+            if (card == null)
                 throw new RequestInputException("Card not found in database");
 
             var ratings = CardRatings.Load(dbContext, request.CurrentUserId, ImmutableHashSet.Create(request.CardId));
 
-            return card.Select(card => new ResultModel(
+            var ownersOfDecksWithThisCard = dbContext.CardsInDecks
+                .Where(cardInDeck => cardInDeck.CardId == request.CardId)
+                .Select(cardInDeck => cardInDeck.Deck.Owner.UserName)
+                .Distinct();
+
+            return new ResultModel(
                 card.FrontSide,
                 card.BackSide,
                 card.AdditionalInfo,
@@ -46,8 +59,7 @@ namespace MemCheck.Application
                 ratings.User(request.CardId),
                 ratings.Average(request.CardId),
                 ratings.Count(request.CardId)
-                )
-            ).Single();
+                );
         }
         #region Result classes
         public sealed class Request

@@ -63,7 +63,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 UserId = user.Id;
                 UserName = user.UserName;
-                var cardLanguage = user.PreferredCardCreationLanguage ?? dbContext.CardLanguages.First();
+                var cardLanguage = user.PreferredCardCreationLanguage ?? dbContext.CardLanguages.OrderBy(lang => lang.Name).First();
                 PreferredCardCreationLanguageId = cardLanguage.Id;
             }
             public Guid UserId { get; }
@@ -76,7 +76,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> PostCardOfUser([FromBody] PostCardOfUserRequest card)
         {
             if (card.FrontSide == null)
-                return ControllerError.BadRequest(localizer["InvalidCardEmptyFrontSide"], this);
+                return ControllerError.BadRequest(localizer["InvalidCardEmptyFrontSide"].Value, this);
             if (card.BackSide == null)
                 card.BackSide = "";
             if (card.AdditionalInfo == null)
@@ -132,7 +132,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> UpdateCard(Guid cardId, [FromBody] UpdateCardRequest card)
         {
             if (card.FrontSide == null)
-                return ControllerError.BadRequest(localizer["InvalidCardEmptyFrontSide"], this);
+                return ControllerError.BadRequest(localizer["InvalidCardEmptyFrontSide"].Value, this);
             if (card.BackSide == null)
                 card.BackSide = "";
             if (card.AdditionalInfo == null)
@@ -148,7 +148,7 @@ namespace MemCheck.WebUI.Controllers
             if (card.Tags == null)
                 return ControllerError.BadRequest("Invalid input: card.Tags == null", this);
             if (string.IsNullOrWhiteSpace(card.VersionDescription))
-                return ControllerError.BadRequest(localizer["InvalidCardEmptyVersionDescription"], this);
+                return ControllerError.BadRequest(localizer["InvalidCardEmptyVersionDescription"].Value, this);
 
             try
             {
@@ -223,7 +223,7 @@ namespace MemCheck.WebUI.Controllers
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
                 CreationUtcDate = applicationResult.CreationUtcDate;
                 LastChangeUtcDate = applicationResult.LastChangeUtcDate;
-                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer["AppearsInDecksOf"] + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer["NotIncludedInAnyDeck"];
+                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer["AppearsInDecksOf"].Value + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer["NotIncludedInAnyDeck"].Value;
                 Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage, localizer));
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
@@ -268,12 +268,12 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetGuiMessages()
         {
             return Ok(new GetGuiMessagesViewModel(
-                localizer["Success"],
-                localizer["CardSavedOk"],
-                localizer["Failure"],
-                localizer["SureCreateWithoutTag"],
-                localizer["Saved"],
-                localizer["RatingSavedOk"]
+                localizer["Success"].Value,
+                localizer["CardSavedOk"].Value,
+                localizer["Failure"].Value,
+                localizer["SureCreateWithoutTag"].Value,
+                localizer["Saved"].Value,
+                localizer["RatingSavedOk"].Value
                 ));
         }
         public sealed class GetGuiMessagesViewModel

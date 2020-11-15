@@ -59,7 +59,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? localizer["ThankYou"] : localizer["Error"];
+            StatusMessage = result.Succeeded ? localizer["ThankYou"].Value : localizer["Error"].Value;
 
             await SendWelcomeMailAsync(user);
 

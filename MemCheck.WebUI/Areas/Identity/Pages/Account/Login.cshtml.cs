@@ -91,7 +91,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, localizer["InvalidLoginAttempt"]);
+                    ModelState.AddModelError(string.Empty, localizer["InvalidLoginAttempt"].Value);
                     return Page();
                 }
             }

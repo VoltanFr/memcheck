@@ -134,7 +134,7 @@ namespace MemCheck.Application
                 if (VersionDescription != VersionDescription.Trim())
                     throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
                 if (VersionDescription.Length < CardInputValidator.minVersionDescriptionLength || VersionDescription.Length > CardInputValidator.maxVersionDescriptionLength)
-                    throw new RequestInputException(localizer["InvalidVersionDescriptionLength"] + $" {VersionDescription.Length}" + localizer["MustBeBetween"] + $" {CardInputValidator.minVersionDescriptionLength} " + localizer["And"] + $" {CardInputValidator.maxVersionDescriptionLength}");
+                    throw new RequestInputException(localizer["InvalidVersionDescriptionLength"].Value + $" {VersionDescription.Length}" + localizer["MustBeBetween"].Value + $" {CardInputValidator.minVersionDescriptionLength} " + localizer["And"] + $" {CardInputValidator.maxVersionDescriptionLength}");
 
                 var images = dbContext.Images.Where(img => img.Id == ImageId);
 
@@ -144,7 +144,7 @@ namespace MemCheck.Application
                 var imageDataBeforeUpdate = await images.Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description }).SingleAsync();
 
                 if ((imageDataBeforeUpdate.nameBeforeUpdate == Name) && (imageDataBeforeUpdate.sourceBeforeUpdate == Source) && (imageDataBeforeUpdate.descriptionBeforeUpdate == Description))
-                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"]);
+                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"].Value);
             }
         }
         #endregion

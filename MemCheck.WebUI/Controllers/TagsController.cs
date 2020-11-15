@@ -26,10 +26,10 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetGuiMessages()
         {
             return Ok(new GetGuiMessagesViewModel(
-                localizer["AlreadyExistsErrMesg"],
-                localizer["NameLengthErrMesg"],
-                localizer["Saved"],
-                localizer["LabelName"]));
+                localizer["AlreadyExistsErrMesg"].Value,
+                localizer["NameLengthErrMesg"].Value,
+                localizer["Saved"].Value,
+                localizer["LabelName"].Value));
         }
         public sealed class GetGuiMessagesViewModel
         {
