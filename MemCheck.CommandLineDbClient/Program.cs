@@ -50,13 +50,13 @@ namespace MemCheck.CommandLineDbClient
             return hostBuilder;
         }
         #endregion
-        public static void Main()
+        public static async Task Main()
         {
             var config = GetConfig();
             SetupStaticLogger(config);
             try
             {
-                CreateHostBuilder(config).RunConsoleAsync();
+                await CreateHostBuilder(config).RunConsoleAsync();
             }
             catch (Exception ex)
             {

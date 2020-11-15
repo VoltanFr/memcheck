@@ -22,21 +22,28 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         private readonly ILogger<ManageRoles> logger;
         private readonly MemCheckDbContext dbContext;
         private readonly RoleManager<MemCheckUserRole> roleManager;
+        private readonly UserManager<MemCheckUser> userManager;
         #endregion
         public ManageRoles(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<ManageRoles>>();
             roleManager = serviceProvider.GetRequiredService<RoleManager<MemCheckUserRole>>();
+            userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {
-            var adminRole = new MemCheckUserRole() { Name = "Admin" };
-            await roleManager.CreateAsync(adminRole);
+            const string adminRoleName = "Admin";
 
+            if (!await roleManager.RoleExistsAsync(adminRoleName))
+            {
+                var adminRole = new MemCheckUserRole() { Name = adminRoleName };
+                await roleManager.CreateAsync(adminRole);
+            }
 
-
-
+            var toto1 = await dbContext.Users.Where(user => user.UserName == "Toto1").SingleOrDefaultAsync();
+            if (toto1 != null)
+                await userManager.AddToRoleAsync(toto1, adminRoleName);
         }
         public void DescribeForOpportunityToCancel()
         {
