@@ -1,0 +1,59 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@model IndexModel
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<div id="UsersMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <div id="Inputs" class="container">
+            <h1 class="title">@Localizer["PageTitle"]</h1>
+        </div>
+        <div id="Inputs" class="container" style="border: 1px solid black;padding:5px">
+            <label>@Localizer["Filter"]</label><textarea class="form-control responsive-padding-edit" v-model="request.filter" rows="1"></textarea>
+            <span id="Page size">
+                <label>@Localizer["PageSize"]</label>&nbsp;
+                <select v-model="request.pageSize" class="responsive-padding-edit">
+                    <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
+                </select><br />
+            </span>
+            <button type="button" class="btn btn-success btn-sm" @@click="getUsers">@Localizer["Run"]</button>
+            <span v-if="totalUserCount != -1">
+                {{totalUserCount}}&nbsp;<label>@Localizer["PageTitle"]</label>
+            </span>
+        </div>
+        <div id="List" class="container">
+            <table class="table table-responsive" width="100%">
+                <tr>
+                    <th>@Localizer["Name"]</th>
+                    <th>@Localizer["DeckCount"]</th>
+                </tr>
+                <tr v-for="user in users">
+                    <td>{{user.userName}}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="Paging" class="container" style="align-content:flex-end">
+            <button class="btn btn-info btn-sm" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+            <button class="btn btn-info btn-sm" @@click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
+            <button class="btn btn-success btn-sm" disabled>{{request.pageNo}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
+            <button class="btn btn-info btn-sm" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
+            <button class="btn btn-info btn-sm" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Users/Users.js" asp-append-version="true"></script>
+}
