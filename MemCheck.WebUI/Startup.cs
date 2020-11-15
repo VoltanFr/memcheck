@@ -79,6 +79,11 @@ namespace MemCheck.WebUI
                 .AddDefaultUI()
                 .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+            });
+
             services.AddTransient<IEmailSender, SendGridEmailSender>();
             services.Configure<AuthMessageSenderOptions>(options => configuration.Bind(options));
 
@@ -91,6 +96,10 @@ namespace MemCheck.WebUI
                     config.Conventions.AuthorizeFolder("/Authoring");
                     config.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                     config.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+
+                    config.Conventions.AuthorizeFolder("/Admin", "AdminPolicy");
+                    config.Conventions.AuthorizeFolder("/Users", "AdminPolicy");
+                    config.Conventions.AuthorizeFolder("/Languages", "AdminPolicy");
                 })
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
