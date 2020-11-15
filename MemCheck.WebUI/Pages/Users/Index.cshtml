@@ -32,10 +32,12 @@
                 <tr>
                     <th>@Localizer["Name"]</th>
                     <th>@Localizer["Roles"]</th>
+                    <th>@Localizer["Email"]</th>
                 </tr>
                 <tr v-for="user in users">
                     <td>{{user.userName}}</td>
                     <td>{{user.roles}}</td>
+                    <td>{{user.email}}</td>
                 </tr>
             </table>
         </div>

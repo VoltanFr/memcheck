@@ -72,9 +72,11 @@ namespace MemCheck.WebUI.Controllers
             {
                 UserName = user.UserName;
                 Roles = user.Roles;
+                Email = user.Email;
             }
             public string UserName { get; }
             public string Roles { get; }
+            public string Email { get; }
         }
         #endregion
         #endregion

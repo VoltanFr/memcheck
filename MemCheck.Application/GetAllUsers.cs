@@ -34,7 +34,7 @@ namespace MemCheck.Application
             foreach (var user in pageEntries)
             {
                 var roles = await userManager.GetRolesAsync(user);
-                resultUsers.Add(new ResultUserModel(user.UserName, string.Join(',', roles)));
+                resultUsers.Add(new ResultUserModel(user.UserName, string.Join(',', roles), user.Email));
             }
             return new ResultModel(totalCount, pageCount, resultUsers);
         }
@@ -78,13 +78,15 @@ namespace MemCheck.Application
         }
         public sealed class ResultUserModel
         {
-            public ResultUserModel(string userName, string roles)
+            public ResultUserModel(string userName, string roles, string email)
             {
                 UserName = userName;
                 Roles = roles;
+                Email = email;
             }
             public string UserName { get; }
             public string Roles { get; }
+            public string Email { get; }
         }
         #endregion
     }
