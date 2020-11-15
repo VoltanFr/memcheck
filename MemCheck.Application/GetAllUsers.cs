@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application
@@ -22,7 +23,7 @@ namespace MemCheck.Application
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(userManager);
 
             var users = dbContext.Users.Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
 
@@ -52,7 +53,7 @@ namespace MemCheck.Application
             public int PageSize { get; }
             public int PageNo { get; }
             public string Filter { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(UserManager<MemCheckUser> userManager)
             {
                 if (QueryValidationHelper.IsReservedGuid(CurrentUser.Id))
                     throw new RequestInputException($"Invalid user id '{CurrentUser.Id}'");
@@ -60,8 +61,8 @@ namespace MemCheck.Application
                     throw new RequestInputException($"Invalid page size: {PageSize}");
                 if (PageNo < 0)
                     throw new RequestInputException($"Invalid page index: {PageNo}");
-
-                await Task.CompletedTask;
+                if (!await userManager.IsInRoleAsync(CurrentUser, "Admin"))
+                    throw new SecurityException($"User not admin: {CurrentUser.UserName}");
             }
         }
         public sealed class ResultModel

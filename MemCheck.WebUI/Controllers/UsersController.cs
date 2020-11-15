@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -27,7 +28,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public IStringLocalizer Localizer => localizer;
         #region GetUsers
-        [HttpPost("GetUsers")]
+        [HttpPost("GetUsers"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
             if (request.Filter == null)

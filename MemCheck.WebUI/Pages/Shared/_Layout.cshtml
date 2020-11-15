@@ -115,7 +115,10 @@
                 <a class="nav-item nav-link text-primary" asp-page="/Index">MemCheck</a>
                 @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
                 <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>
-                <a class="nav-item nav-link text-primary" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                {
+                    <a class="nav-item nav-link text-primary" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+                }
             </nav>
         </div>
     </footer>
