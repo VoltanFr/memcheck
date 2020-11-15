@@ -31,10 +31,11 @@
             <table class="table table-responsive" width="100%">
                 <tr>
                     <th>@Localizer["Name"]</th>
-                    <th>@Localizer["DeckCount"]</th>
+                    <th>@Localizer["Roles"]</th>
                 </tr>
                 <tr v-for="user in users">
                     <td>{{user.userName}}</td>
+                    <td>{{user.roles}}</td>
                 </tr>
             </table>
         </div>

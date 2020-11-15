@@ -39,7 +39,7 @@ namespace MemCheck.WebUI.Controllers
                 if (user == null)
                     return BadRequest(localizer["NeedLogin"].Value);
                 var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
-                var result = await new GetAllUsers(dbContext).RunAsync(appRequest);
+                var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);
                 return Ok(new GetUsersViewModel(result));
             }
             catch (Exception e)
@@ -71,8 +71,10 @@ namespace MemCheck.WebUI.Controllers
             public GetUsersUserViewModel(GetAllUsers.ResultUserModel user)
             {
                 UserName = user.UserName;
+                Roles = user.Roles;
             }
-            public string UserName { get; } = null!;
+            public string UserName { get; }
+            public string Roles { get; }
         }
         #endregion
         #endregion

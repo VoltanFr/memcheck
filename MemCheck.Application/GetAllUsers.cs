@@ -1,5 +1,6 @@
 ﻿using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,21 +13,30 @@ namespace MemCheck.Application
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public GetAllUsers(MemCheckDbContext dbContext)
+        public GetAllUsers(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager)
         {
             this.dbContext = dbContext;
+            this.userManager = userManager;
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
             await request.CheckValidityAsync(dbContext);
 
             var users = dbContext.Users.Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
+
             var totalCount = users.Count();
             var pageCount = (int)Math.Ceiling(((double)totalCount) / request.PageSize);
-            var pageEntries = users.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
+            var pageEntries = await users.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
-            return new ResultModel(totalCount, pageCount, pageEntries.Select(user => new ResultUserModel(user.UserName)));
+            var resultUsers = new List<ResultUserModel>();
+            foreach (var user in pageEntries)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                resultUsers.Add(new ResultUserModel(user.UserName, string.Join(',', roles)));
+            }
+            return new ResultModel(totalCount, pageCount, resultUsers);
         }
         #region Request and result classes
         public sealed class Request
@@ -68,11 +78,13 @@ namespace MemCheck.Application
         }
         public sealed class ResultUserModel
         {
-            public ResultUserModel(string userName)
+            public ResultUserModel(string userName, string roles)
             {
                 UserName = userName;
+                Roles = roles;
             }
-            public string UserName { get; } = null!;
+            public string UserName { get; }
+            public string Roles { get; }
         }
         #endregion
     }
