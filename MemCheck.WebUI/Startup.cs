@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MemCheck.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,10 +12,7 @@ using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
-using Microsoft.Extensions.Localization;
+using System.IO;
 
 namespace MemCheck.WebUI
 {
@@ -31,11 +23,24 @@ namespace MemCheck.WebUI
         private readonly IConfiguration configuration;
         #endregion
         #region Private methods
+        private string GetConnectionString()
+        {
+            if (prodEnvironment)
+                return configuration[$"ConnectionStrings:AzureDbConnection"];
+
+            if (configuration["ConnectionStrings:DebuggingDb"] == "Local")
+                return configuration[$"ConnectionStrings:LocalDbConnection"];
+
+            if (configuration["ConnectionStrings:DebuggingDb"] == "Azure")
+                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
+
+            throw new IOException($"Invalid DebuggingDb '{configuration["ConnectionStrings:DebuggingDb"]}'");
+        }
         private void ConfigureDataBase(IServiceCollection services)
         {
             services.AddDatabaseDeveloperPageExceptionFilter();
-            var connectionStringKey = prodEnvironment ? "AzureDbConnection" : "LocalDbConnection";
-            services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(configuration[$"ConnectionStrings:{connectionStringKey}"]));
+            var connectionString = GetConnectionString();
+            services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
         }
         private void ConfigureErrorHandling(IApplicationBuilder app)
         {
