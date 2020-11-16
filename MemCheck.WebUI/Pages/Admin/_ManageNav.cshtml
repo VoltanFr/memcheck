@@ -1,5 +1,5 @@
 ﻿<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="Environment" asp-page="./Index">Environment</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="Languages" asp-page="/Languages/Languages">Languages</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="Users" asp-page="/Admin/Users">Users</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.PageNavClass(ViewContext, ManageNavPages.Index)" asp-page="./Index">Environment</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.PageNavClass(ViewContext, ManageNavPages.Languages)" asp-page="/Admin/Languages">Languages</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.PageNavClass(ViewContext, ManageNavPages.Users)" asp-page="/Admin/Users">Users</a></li>
 </ul>

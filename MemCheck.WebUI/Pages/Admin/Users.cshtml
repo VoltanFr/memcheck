@@ -1,9 +1,9 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
-@model IndexModel
 @inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
+    ViewData["ActivePage"] = ManageNavPages.Users;
 }
 
 <div id="UsersMainDiv" class="page-responsive-padding" v-cloak>
