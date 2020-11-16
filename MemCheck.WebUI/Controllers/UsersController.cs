@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]"), Authorize(Roles = "Admin")]
     public class UsersController : Controller, ILocalized
     {
         #region Fields
@@ -28,7 +28,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public IStringLocalizer Localizer => localizer;
         #region GetUsers
-        [HttpPost("GetUsers"), Authorize(Roles = "Admin")]
+        [HttpPost("GetUsers")]
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
             if (request.Filter == null)

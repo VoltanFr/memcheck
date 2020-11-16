@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]"), Authorize]
     public class AuthoringController : Controller, ILocalized
     {
         #region Fields

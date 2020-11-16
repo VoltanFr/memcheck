@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]"), Authorize]
     public class MediaController : Controller, ILocalized
     {
         #region Fields

@@ -1,14 +1,12 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]")]
+    [Route("[controller]"), Authorize(Roles = "Admin")]
     public class LanguagesController : Controller
     {
         #region Fields

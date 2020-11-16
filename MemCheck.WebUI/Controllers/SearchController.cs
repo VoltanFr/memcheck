@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -431,7 +432,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #endregion
         #region AddTagToCards
-        [HttpPost("AddTagToCards/{tagId}")]
+        [HttpPost("AddTagToCards/{tagId}"), Authorize]
         public async Task<IActionResult> AddTagToCards(Guid tagId, [FromBody] AddTagToCardsRequest request)
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
@@ -446,7 +447,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region AddCardsToDeck
-        [HttpPost("AddCardsToDeck/{deckId}")]
+        [HttpPost("AddCardsToDeck/{deckId}"), Authorize]
         public IActionResult AddCardsToDeck(Guid deckId, [FromBody] AddCardsToDeckRequest request)
         {
             new AddCardsInDeck(dbContext).Run(deckId, request.CardIds);
@@ -458,7 +459,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region RemoveCardsFromDeck
-        [HttpPost("RemoveCardsFromDeck/{deckId}")]
+        [HttpPost("RemoveCardsFromDeck/{deckId}"), Authorize]
         public IActionResult RemoveCardsFromDeck(Guid deckId, [FromBody] RemoveCardsFromDeckRequest request)
         {
             new RemoveCardsFromDeck(dbContext).Run(deckId, request.CardIds);
@@ -470,7 +471,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region MoveCardsToHeap
-        [HttpPost("MoveCardsToHeap/{deckId}/{heapId}")]
+        [HttpPost("MoveCardsToHeap/{deckId}/{heapId}"), Authorize]
         public async Task<IActionResult> MoveCardsToHeap(Guid deckId, int heapId, [FromBody] MoveCardsToHeapRequest request)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
@@ -484,7 +485,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region DeleteCards
-        [HttpPost("DeleteCards")]
+        [HttpPost("DeleteCards"), Authorize]
         public async Task<IActionResult> DeleteCards([FromBody] DeleteCardsRequest request)
         {
             try
@@ -505,7 +506,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region RegisterForNotifications
-        [HttpPost("RegisterForNotifications")]
+        [HttpPost("RegisterForNotifications"), Authorize]
         public async Task<IActionResult> RegisterForNotifications([FromBody] RegisterForNotificationsRequest request)
         {
             try
@@ -526,7 +527,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region UnregisterForNotifications
-        [HttpPost("UnregisterForNotifications")]
+        [HttpPost("UnregisterForNotifications"), Authorize]
         public async Task<IActionResult> UnregisterForNotifications([FromBody] UnregisterForNotificationsRequest request)
         {
             try

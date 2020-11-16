@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;

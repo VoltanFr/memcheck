@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace MemCheck.WebUI.Pages.Admin
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public sealed class IndexModel : PageModel
     {
         private readonly IWebHostEnvironment currentEnvironment;

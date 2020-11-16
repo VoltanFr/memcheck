@@ -87,19 +87,20 @@ namespace MemCheck.WebUI
             services.AddTransient<IEmailSender, SendGridEmailSender>();
             services.Configure<AuthMessageSenderOptions>(options => configuration.Bind(options));
 
-            services.AddRazorPages()
-                .AddRazorPagesOptions(config =>
+            services.AddRazorPages().AddRazorPagesOptions(config =>
                 {
                     config.Conventions.AuthorizeFolder("/Decks");
-                    config.Conventions.AuthorizeFolder("/LearnUnknown");
+                    config.Conventions.AuthorizeFolder("/Learn");
                     config.Conventions.AuthorizeFolder("/RepeatExpired");
                     config.Conventions.AuthorizeFolder("/Authoring");
+                    config.Conventions.AuthorizeFolder("/Media");
+
+                    config.Conventions.AuthorizePage("/Tags/Authoring");
+
                     config.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                     config.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
 
                     config.Conventions.AuthorizeFolder("/Admin", "AdminPolicy");
-                    config.Conventions.AuthorizeFolder("/Users", "AdminPolicy");
-                    config.Conventions.AuthorizeFolder("/Languages", "AdminPolicy");
                 })
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
