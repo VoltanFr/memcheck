@@ -118,7 +118,6 @@ var app = new Vue({
                         this.getCard();
                 })
                 .catch(error => {
-                    console.log(error);
                     this.currentImageLoadingPromise = null;
                 });
         },
@@ -155,8 +154,6 @@ var app = new Vue({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        console.log(error);
-
                         const sleep = (milliseconds) => {
                             return new Promise(resolve => setTimeout(resolve, milliseconds))
                         }
@@ -327,8 +324,6 @@ var app = new Vue({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        console.log(error);
-
                         const sleep = (milliseconds) => {
                             return new Promise(resolve => setTimeout(resolve, milliseconds))
                         }
@@ -382,8 +377,6 @@ var app = new Vue({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        console.log(error);
-
                         const sleep = (milliseconds) => {
                             return new Promise(resolve => setTimeout(resolve, milliseconds))
                         }

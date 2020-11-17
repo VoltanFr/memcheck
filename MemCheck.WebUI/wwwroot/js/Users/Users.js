@@ -30,7 +30,6 @@ var app = new Vue({
                     this.users = result.data.users;
                 })
                 .catch(error => {
-                    console.log(error);
                     tellAxiosError(error, this);
                 });
         },

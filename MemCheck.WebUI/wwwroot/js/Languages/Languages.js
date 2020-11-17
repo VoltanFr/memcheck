@@ -22,7 +22,7 @@ var app = new Vue({
                     this.allLanguages = result.data;
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         createNewLanguage() {
@@ -31,7 +31,7 @@ var app = new Vue({
                     this.allLanguages.push(result.data);
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         showCardsWithLanguage(languageName) {

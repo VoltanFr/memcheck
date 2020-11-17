@@ -29,7 +29,7 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         async deleteDeck() {
@@ -40,7 +40,7 @@ var app = new Vue({
                         return;
                     })
                     .catch(error => {
-                        console.log(error);
+                        tellAxiosError(error, this);
                     })
             }
         },

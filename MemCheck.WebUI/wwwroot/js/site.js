@@ -15,7 +15,7 @@
                     this.availableLanguages = result.data;
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         getActiveLanguage() {
@@ -24,17 +24,17 @@
                     this.activeLanguage = result.data;
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
-        async     activeLanguageChange() {
+        async activeLanguageChange() {
             await axios.post('/UILanguages/SetCulture/' + this.activeLanguage)
                 .then(result => {
                     if (result.data)    //Culture actually changed
                         window.location.reload(false);
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
     },

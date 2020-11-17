@@ -108,7 +108,7 @@ var app = new Vue({
                     this.guiMessages = result.data;
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         async sendCard() {
@@ -328,7 +328,6 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    console.log(error);
                 });
         },
         async addImage(side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo

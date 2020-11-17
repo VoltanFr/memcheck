@@ -92,7 +92,6 @@ var app = new Vue({
                     this.updateFieldsAccordingToDeck();
                 })
                 .catch(error => {
-                    console.log(error);
                     tellAxiosError(error, this);
                 });
         },
@@ -154,7 +153,6 @@ var app = new Vue({
                     };
                 })
                 .catch(error => {
-                    console.log(error);
                     tellAxiosError(error, this);
                 });
 
@@ -408,7 +406,6 @@ var app = new Vue({
                         });
                     })
                     .catch(error => {
-                        console.log(error);
                         alert(error.response.data.detail);
                     });
 
@@ -475,8 +472,7 @@ var app = new Vue({
                         });
                     })
                     .catch(error => {
-                        console.log(error);
-                        alert(error.response.data.detail);
+                        tellAxiosError(error, this);
                     });
 
                 this.loadingQuery = false;
@@ -552,8 +548,7 @@ var app = new Vue({
                         });
                     })
                     .catch(error => {
-                        console.log(error);
-                        alert(error.response.data.detail);
+                        tellAxiosError(error, this);
                     });
 
                 this.loadingQuery = false;

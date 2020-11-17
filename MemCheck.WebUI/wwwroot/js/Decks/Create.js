@@ -21,7 +21,7 @@ var app = new Vue({
                     this.heapingAlgorithms = result.data;
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         async create() {
@@ -30,7 +30,7 @@ var app = new Vue({
                 .then(result => {
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
             window.location.href = '/Decks';
         },

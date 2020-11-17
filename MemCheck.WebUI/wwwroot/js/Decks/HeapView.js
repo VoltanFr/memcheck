@@ -42,7 +42,7 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    console.log(error);
+                    tellAxiosError(error, this);
                 });
         },
         dt(utcFromDotNet) {
