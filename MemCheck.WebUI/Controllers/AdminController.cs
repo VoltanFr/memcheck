@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -88,13 +89,23 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("LaunchNotifier")]
         public async Task<IActionResult> LaunchNotifier()
         {
+            var user = await userManager.GetUserAsync(HttpContext.User);
             try
             {
-                await emailSender.SendEmailAsync("mahonv@gmail.com", "Notifier starting", "<h1>hop</h1>");
+                await emailSender.SendEmailAsync(user.Email, "Notifier starting", $"At {DateTime.Now}");
+
+                var chrono = Stopwatch.StartNew();
+                var notifier = new Notifier(dbContext);
+                var notifs = await notifier.GetNotificationsAsync(user.Id);
+
+                //You are registered for notifications on xxx cards
+
+                await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", $"<h1>Summary</h1><p>{notifs.Length} cards</p><p>At {DateTime.Now}, took {chrono.Elapsed}</p>");
                 return Ok();
             }
             catch (Exception e)
             {
+                await emailSender.SendEmailAsync(user.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p>");
                 return ControllerError.BadRequest(e, this);
             }
         }
