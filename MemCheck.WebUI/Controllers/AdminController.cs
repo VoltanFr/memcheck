@@ -2,15 +2,18 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
@@ -23,13 +26,15 @@ namespace MemCheck.WebUI.Controllers
         private readonly IStringLocalizer<TagsController> localizer;
         private readonly IEmailSender emailSender;
         private readonly UserManager<MemCheckUser> userManager;
+        private readonly string authoringPageLink;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender) : base()
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base()
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
             this.emailSender = emailSender;
             this.userManager = userManager;
+            authoringPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Index");
         }
         public IStringLocalizer Localizer => localizer;
         #region GetUsers
@@ -108,7 +113,7 @@ namespace MemCheck.WebUI.Controllers
                 mailBody.Append("<h1>Cards</h1>");
                 mailBody.Append("<ul>");
                 foreach (var card in notifierResult.CardVersions)
-                    mailBody.Append($"<li>https://memcheckfr.azurewebsites.net/Authoring?CardId={card.CardId}</li>");
+                    mailBody.Append($"<li>{authoringPageLink}?CardId={card.CardId}</li>");
                 mailBody.Append("/<ul>");
 
                 await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", mailBody.ToString());
