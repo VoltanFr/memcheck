@@ -79,13 +79,7 @@ var app = new Vue({
                 });
         },
         async afterSave() {
-            this.$bvToast.toast(this.guiMessages.labelName + ' ' + this.newName, {
-                title: this.guiMessages.saved,
-                variant: 'success',
-                toaster: 'b-toaster-top-center',
-                solid: true,
-                autoHideDelay: 10000,
-            });
+            tellAxiosSuccess(this.guiMessages.labelName + ' ' + this.newName, this.guiMessages.saved, this);
             this.toastVisible = true;
             this.editedTag = "";
             this.newName = "";

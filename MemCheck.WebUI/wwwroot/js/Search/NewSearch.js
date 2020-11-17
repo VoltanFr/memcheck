@@ -328,12 +328,7 @@ var app = new Vue({
 
                 await axios.post('/Search/AddTagToCards/' + tag.tagId, { cardIds: selectedCardIds })
                     .then(result => {
-                        this.$bvToast.toast(this.allStaticData.localizedText.tagAdded, {
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosSuccess(this.allStaticData.localizedText.tagAdded, '', this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -398,12 +393,7 @@ var app = new Vue({
 
                 await axios.post('/Search/AddCardsToDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        this.$bvToast.toast(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAdded : this.allStaticData.localizedText.cardsAdded, {
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAdded : this.allStaticData.localizedText.cardsAdded, '', this);
                     })
                     .catch(error => {
                         alert(error.response.data.detail);
@@ -464,12 +454,7 @@ var app = new Vue({
 
                 await axios.post('/Search/RemoveCardsFromDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        this.$bvToast.toast(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardRemoved : this.allStaticData.localizedText.cardsRemoved, {
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardRemoved : this.allStaticData.localizedText.cardsRemoved, '', this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -540,12 +525,7 @@ var app = new Vue({
 
                 await axios.post('/Search/MoveCardsToHeap/' + this.selectedDeck.deckId + '/' + targetHeap.heapId, { cardIds: selectedCardIds })
                     .then(result => {
-                        this.$bvToast.toast(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardMoved : this.allStaticData.localizedText.cardsMoved, {
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardMoved : this.allStaticData.localizedText.cardsMoved, '', this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -585,12 +565,7 @@ var app = new Vue({
 
                 await axios.post('/Search/DeleteCards', { cardIds: selectedCardIds })
                     .then(result => {
-                        this.$bvToast.toast(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardDeleted : this.allStaticData.localizedText.cardsDeleted, {
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardDeleted : this.allStaticData.localizedText.cardsDeleted, '', this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -615,12 +590,7 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/RegisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    this.$bvToast.toast(this.allStaticData.localizedText.registered, {
-                        variant: 'success',
-                        toaster: 'b-toaster-top-center',
-                        solid: true,
-                        autoHideDelay: 10000,
-                    });
+                    tellAxiosSuccess(this.allStaticData.localizedText.registered, '', this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
@@ -642,12 +612,7 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/UnregisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    this.$bvToast.toast(this.allStaticData.localizedText.unRegistered, {
-                        variant: 'success',
-                        toaster: 'b-toaster-top-center',
-                        solid: true,
-                        autoHideDelay: 10000,
-                    });
+                    tellAxiosSuccess(this.allStaticData.localizedText.unRegistered, '', this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);

@@ -140,15 +140,9 @@ var app = new Vue({
                 await task
                     .then(response => {
                         this.clearAll();
+                        tellAxiosSuccess(this.guiMessages.cardSavedOk, this.guiMessages.saved, this);
                         if (this.returnUrl)
                             window.location = this.returnUrl;
-                        this.$bvToast.toast(this.guiMessages.cardSavedOk, {
-                            title: this.guiMessages.saved,
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 5000,
-                        });
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -346,13 +340,7 @@ var app = new Vue({
             await axios.post('/Authoring/GetImageInfo/', request)
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
-                        this.$bvToast.toast("This image is already in the list", {
-                            title: "Error",
-                            variant: 'danger',
-                            toaster: 'b-toaster-top-center',
-                            solid: false,
-                            autoHideDelay: 10000,
-                        });
+                        tellAxiosError("This image is already in the list", this);
                         return;
                     }
 
@@ -457,13 +445,7 @@ var app = new Vue({
         async updateRating() {
             await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + this.card.currentUserRating)
                 .then(response => {
-                    this.$bvToast.toast(this.guiMessages.ratingSavedOk, {
-                        title: this.guiMessages.saved,
-                        variant: 'success',
-                        toaster: 'b-toaster-top-center',
-                        solid: true,
-                        autoHideDelay: 1000,
-                    });
+                    tellAxiosSuccess(this.guiMessages.ratingSavedOk, this.guiMessages.saved, this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);

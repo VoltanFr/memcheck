@@ -126,13 +126,7 @@ var app = new Vue({
                 await axios.delete('/Decks/RemoveCardFromDeck/' + this.activeDeck.deckId + "/" + this.currentCard.cardId)
                     .then(result => {
                         this.getCard();
-                        this.$bvToast.toast(result.data.messageBody, {
-                            title: result.data.messageTitle,
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 5000,
-                        });
+                        tellAxiosSuccess(result.data.messageBody, result.data.messageTitle, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);

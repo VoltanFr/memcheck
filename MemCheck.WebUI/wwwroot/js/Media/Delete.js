@@ -75,13 +75,7 @@ var app = new Vue({
                 await axios.post('/Media/Delete/' + this.image.imageId, body)
                     .then(result => {
                         this.deleting = false;
-                        this.$bvToast.toast(result.data.toastText, {
-                            title: result.data.toastTitle,
-                            variant: 'success',
-                            toaster: 'b-toaster-top-center',
-                            solid: true,
-                            autoHideDelay: 5000,
-                        });
+                        tellAxiosSuccess(result.data.toastText, result.data.toastTitle, this);
                         this.goBack();
                     })
                     .catch(error => {

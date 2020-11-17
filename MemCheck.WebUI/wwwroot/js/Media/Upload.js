@@ -50,14 +50,7 @@ var app = new Vue({
 
             await axios.post('/Media/UploadImage/', f, { headers: { 'Content-Type': 'multipart/form-data' } })
                 .then((result) => {
-                    this.$bvToast.toast(result.data.toastText + (result.data.showStatus ? result.data.status : ""), {
-                        title: result.data.toastTitle,
-                        variant: 'success',
-                        toaster: 'b-toaster-top-center',
-                        solid: true,
-                        autoHideDelay: 10000,
-                        bodyOutputType: 'trustedHtml'
-                    });
+                    tellAxiosSuccess(result.data.toastText + (result.data.showStatus ? result.data.status : ""), result.data.toastTitle, this); //used to add bodyOutputType: 'trustedHtml'
                     this.clearAll();
                 })
                 .catch(error => {
@@ -71,14 +64,7 @@ var app = new Vue({
 
             await axios.post('/Media/Update/' + this.editingImageId, data)
                 .then((result) => {
-                    this.$bvToast.toast(result.data.toastText, {
-                        title: result.data.toastTitle,
-                        variant: 'success',
-                        toaster: 'b-toaster-top-center',
-                        solid: true,
-                        autoHideDelay: 10000,
-                        bodyOutputType: 'trustedHtml'
-                    });
+                    tellAxiosSuccess(result.data.toastText, result.data.toastTitle, this); //used to add bodyOutputType: 'trustedHtml'
                     this.clearAll();
                     if (this.returnUrl)
                         window.location = this.returnUrl;

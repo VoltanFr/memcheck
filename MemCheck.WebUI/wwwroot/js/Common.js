@@ -23,12 +23,21 @@ function tellAxiosError(error, vueObject) {
     var mesg = error.message;
     if (error.response && error.response.data && error.response.data.text)
         mesg = error.response.data.text + (error.response.data.showStatus ? ("\r\n" + mesg) : "");
+    tellAxiosMsg(mesg, "FAILURE", 'danger', 10000, vueObject);
+}
+
+function tellAxiosSuccess(mesg, title, vueObject) {
+    tellAxiosMsg(mesg, title, 'success', 3000, vueObject);
+}
+
+function tellAxiosMsg(mesg, title, variant, autoHideDelay, vueObject) {
+    //variant: 'danger', 'success'
     vueObject.$bvToast.toast(mesg, {
-        title: "FAILURE",
-        variant: 'danger',
+        title: title,
+        variant: variant,
         toaster: 'b-toaster-top-center',
         solid: false,
-        autoHideDelay: 10000,
+        autoHideDelay: autoHideDelay,
     });
 }
 
@@ -51,9 +60,9 @@ function sleep(milliseconds) {
 
 function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure, vueObject) {
     navigator.clipboard.writeText(text).then(function () {
-        vueObject.$bvToast.toast(text, { title: toastTitleOnSuccess, variant: 'success', toaster: 'b-toaster-top-center', solid: false, autoHideDelay: 5000 });
+        tellAxiosSuccess(text, toastTitleOnSuccess, vueObject);
     }, function (err) {
-        vueObject.$bvToast.toast(err, { title: toastTitleOnFailure, variant: 'danger', toaster: 'b-toaster-top-center', solid: false, autoHideDelay: 10000 });
+        tellAxiosMsg(err, toastTitleOnFailure, 'danger', 10000, vueObject);
     });
 }
 
