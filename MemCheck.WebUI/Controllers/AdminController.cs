@@ -3,6 +3,7 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -18,12 +19,14 @@ namespace MemCheck.WebUI.Controllers
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly IStringLocalizer<TagsController> localizer;
+        private readonly IEmailSender emailSender;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer) : base()
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender) : base()
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
+            this.emailSender = emailSender;
             this.userManager = userManager;
         }
         public IStringLocalizer Localizer => localizer;
@@ -80,6 +83,21 @@ namespace MemCheck.WebUI.Controllers
             public string Email { get; }
         }
         #endregion
+        #endregion
+        #region LaunchNotifier
+        [HttpPost("LaunchNotifier")]
+        public async Task<IActionResult> LaunchNotifier()
+        {
+            try
+            {
+                await emailSender.SendEmailAsync("mahonv@gmail.com", "Notifier starting", "<h1>hop</h1>");
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
         #endregion
     }
 }

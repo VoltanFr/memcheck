@@ -1,0 +1,22 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = "Notifier";
+}
+
+<div id="NotifierMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <div class="section">
+            <h1 class="title">New run...</h1>
+            <button type="button" class="btn btn-success btn-lg" @@click="launch">Launch</button>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Admin/Notifier.js" asp-append-version="true"></script>
+}

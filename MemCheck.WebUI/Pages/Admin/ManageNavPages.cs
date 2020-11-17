@@ -8,6 +8,7 @@ namespace MemCheck.WebUI.Pages.Admin
         public static string Index => "Index";
         public static string Users => "Users";
         public static string Languages => "Languages";
+        public static string Notifier => "Notifier";
 
         public static string PageNavClass(ViewContext viewContext, string page)
         {
