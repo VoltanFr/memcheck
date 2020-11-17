@@ -17,8 +17,10 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<ImmutableArray<CardVersionNotification>> GetNotificationsAsync(Guid userId)
+        public async Task<NotifierResult> GetNotificationsAsync(Guid userId)
         {
+            var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
+
             var notifsToSend = await dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.LastNotificationUtcDate < DateTime.UtcNow).ToListAsync();
             var endOfRequest = DateTime.UtcNow;
 
@@ -26,12 +28,23 @@ namespace MemCheck.Application
 
 
 
-            return notifsToSend.Select(n => new CardVersionNotification(n.CardId)).ToImmutableArray();
+            return new NotifierResult(registeredCardCount, notifsToSend.Select(notif => new CardVersion(notif.CardId)));
         }
         #region Result classes
-        public class CardVersionNotification
+        public class NotifierResult
         {
-            public CardVersionNotification(Guid cardId)
+
+            public NotifierResult(int registeredCardCount, IEnumerable<CardVersion> cardVersions)
+            {
+                RegisteredCardCount = registeredCardCount;
+                CardVersions = cardVersions.ToImmutableArray();
+            }
+            public int RegisteredCardCount { get; }
+            public ImmutableArray<CardVersion> CardVersions { get; }
+        }
+        public class CardVersion
+        {
+            public CardVersion(Guid cardId)
             {
                 CardId = cardId;
             }

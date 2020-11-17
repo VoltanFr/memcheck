@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
@@ -96,11 +97,21 @@ namespace MemCheck.WebUI.Controllers
 
                 var chrono = Stopwatch.StartNew();
                 var notifier = new Notifier(dbContext);
-                var notifs = await notifier.GetNotificationsAsync(user.Id);
+                var notifierResult = await notifier.GetNotificationsAsync(user.Id);
 
-                //You are registered for notifications on xxx cards
+                var mailBody = new StringBuilder();
+                mailBody.Append("<h1>Summary</h1>");
+                mailBody.Append($"<p>{notifierResult.RegisteredCardCount} registered cards</p>");
+                mailBody.Append($"<p>Finished at {DateTime.Now}</p>");
+                mailBody.Append($"</p>Took {chrono.Elapsed}</p>");
 
-                await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", $"<h1>Summary</h1><p>{notifs.Length} cards</p><p>At {DateTime.Now}, took {chrono.Elapsed}</p>");
+                mailBody.Append("<h1>Cards</h1>");
+                mailBody.Append("<ul>");
+                foreach (var card in notifierResult.CardVersions)
+                    mailBody.Append($"<li>https://memcheckfr.azurewebsites.net/Authoring?CardId={card.CardId}</li>");
+                mailBody.Append("/<ul>");
+
+                await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", mailBody.ToString());
                 return Ok();
             }
             catch (Exception e)
