@@ -21,14 +21,15 @@ namespace MemCheck.Application
         {
             var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
 
-            var notifsToSend = await dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.LastNotificationUtcDate < DateTime.UtcNow).ToListAsync();
+            var cardsToReport = await dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.LastNotificationUtcDate < notif.Card.VersionUtcDate).ToListAsync();
             var endOfRequest = DateTime.UtcNow;
 
+            foreach (var cardToReport in cardsToReport)
+                cardToReport.LastNotificationUtcDate = endOfRequest;
 
+            await dbContext.SaveChangesAsync();
 
-
-
-            return new NotifierResult(registeredCardCount, notifsToSend.Select(notif => new CardVersion(notif.CardId)));
+            return new NotifierResult(registeredCardCount, cardsToReport.Select(cardToReport => new CardVersion(cardToReport.CardId)));
         }
         #region Result classes
         public class NotifierResult

@@ -32,7 +32,7 @@ namespace MemCheck.Application
                         UserId = request.UserId,
                         RegistrationUtcDate = DateTime.UtcNow,
                         RegistrationMethod = CardNotification.CardNotificationRegistrationMethod_ExplicitByUser,
-                        LastNotificationUtcDate = DateTime.MinValue
+                        LastNotificationUtcDate = DateTime.UtcNow
                     };
                     dbContext.CardNotifications.Add(notif);
                 }
