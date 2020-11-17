@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]"), Authorize(Roles = "Admin")]
-    public class UsersController : Controller, ILocalized
+    public class AdminController : Controller, ILocalized
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly IStringLocalizer<TagsController> localizer;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public UsersController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer) : base()
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer) : base()
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
