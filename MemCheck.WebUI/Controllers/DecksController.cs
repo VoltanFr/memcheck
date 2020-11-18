@@ -64,7 +64,7 @@ namespace MemCheck.WebUI.Controllers
                 var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
                 var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
                 var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
-                var frontSide = " '" + (applicationResult.FrontSideText.Length <= 30 ? (applicationResult.FrontSideText + "'") : (applicationResult.FrontSideText.Substring(0, 30) + "'[...]"));
+                var frontSide = $" '{applicationResult.FrontSideText.Truncate(30, true)}'";
                 var mesgBody = localizer["CardWithFrontSideHead"] + frontSide + ' ' + localizer["RemovedFromDeck"] + ' ' + applicationResult.DeckName;
                 var result = new { MessageTitle = localizer["Success"].Value, MessageBody = mesgBody };
                 return base.Ok(result);
