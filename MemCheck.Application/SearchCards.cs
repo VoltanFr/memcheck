@@ -228,7 +228,7 @@ namespace MemCheck.Application
             public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<string> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings)
             {
                 CardId = cardId;
-                FrontSide = frontSide;
+                FrontSide = frontSide.Truncate(200, true);
                 Tags = tags;
                 VisibleTo = visibleTo;
                 DeckInfo = deckInfo;
