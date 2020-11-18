@@ -105,18 +105,29 @@ namespace MemCheck.WebUI.Controllers
                 var notifierResult = await notifier.GetNotificationsAsync(user.Id);
 
                 var mailBody = new StringBuilder();
+                mailBody.Append("<html>");
+                mailBody.Append("<body>");
                 mailBody.Append("<h1>Summary</h1>");
-                mailBody.Append($"<p>{notifierResult.RegisteredCardCount} registered cards</p>");
-                mailBody.Append($"<p>Finished at {DateTime.Now}</p>");
-                mailBody.Append($"</p>Took {chrono.Elapsed}</p>");
+                mailBody.Append("<p>");
+                mailBody.Append($"{notifierResult.RegisteredCardCount} registered cards<br/>");
+                mailBody.Append($"Finished at {DateTime.Now}<br/>");
+                mailBody.Append($"Notifier execution took {chrono.Elapsed}");
+                mailBody.Append("</p>");
 
-                mailBody.Append("<h1>Cards</h1>");
+                mailBody.Append("<h1>Cards with new versions</h1>");
                 mailBody.Append("<ul>");
                 foreach (var card in notifierResult.CardVersions)
                 {
-                    mailBody.Append($"<li><a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide.Truncate(30, true)}</a></li>");
+                    mailBody.Append("<li>");
+                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide.Truncate(100, true)}</a><br/>");
+                    mailBody.Append($"By {card.VersionCreator}<br/>");
+                    mailBody.Append($"On {card.VersionUtcDate} (UTC)");
+                    mailBody.Append("</li>");
                 }
-                mailBody.Append("/<ul>");
+                mailBody.Append("</ul>");
+
+                mailBody.Append("</body>");
+                mailBody.Append("</html>");
 
                 await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", mailBody.ToString());
                 return Ok();

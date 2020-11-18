@@ -32,7 +32,14 @@ namespace MemCheck.Application
 
             await dbContext.SaveChangesAsync();
 
-            return new NotifierResult(registeredCardCount, cardsToReport.Select(cardToReport => new CardVersion(cardToReport.CardId, cardToReport.Card.FrontSide)));
+            return new NotifierResult(registeredCardCount, cardsToReport.Select(
+                cardToReport => new CardVersion(
+                    cardToReport.CardId,
+                    cardToReport.Card.FrontSide,
+                    cardToReport.Card.VersionCreator.UserName,
+                    cardToReport.Card.VersionUtcDate
+                    )
+                ));
         }
         #region Result classes
         public class NotifierResult
@@ -48,13 +55,17 @@ namespace MemCheck.Application
         }
         public class CardVersion
         {
-            public CardVersion(Guid cardId, string frontSide)
+            public CardVersion(Guid cardId, string frontSide, string versionCreator, DateTime versionUtcDate)
             {
                 CardId = cardId;
                 FrontSide = frontSide;
+                VersionCreator = versionCreator;
+                VersionUtcDate = versionUtcDate;
             }
             public Guid CardId { get; }
             public string FrontSide { get; }
+            public string VersionCreator { get; }
+            public DateTime VersionUtcDate { get; }
         }
         #endregion
     }
