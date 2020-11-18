@@ -21,7 +21,10 @@ namespace MemCheck.Application
         {
             var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
 
-            var cardsToReport = await dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.LastNotificationUtcDate < notif.Card.VersionUtcDate).ToListAsync();
+            var cardsToReport = await dbContext.CardNotifications
+                .Include(notif => notif.Card)
+                .Where(notif => notif.UserId == userId && notif.LastNotificationUtcDate < notif.Card.VersionUtcDate)
+                .ToListAsync();
             var endOfRequest = DateTime.UtcNow;
 
             foreach (var cardToReport in cardsToReport)
@@ -29,7 +32,7 @@ namespace MemCheck.Application
 
             await dbContext.SaveChangesAsync();
 
-            return new NotifierResult(registeredCardCount, cardsToReport.Select(cardToReport => new CardVersion(cardToReport.CardId)));
+            return new NotifierResult(registeredCardCount, cardsToReport.Select(cardToReport => new CardVersion(cardToReport.CardId, cardToReport.Card.FrontSide)));
         }
         #region Result classes
         public class NotifierResult
@@ -45,11 +48,13 @@ namespace MemCheck.Application
         }
         public class CardVersion
         {
-            public CardVersion(Guid cardId)
+            public CardVersion(Guid cardId, string frontSide)
             {
                 CardId = cardId;
+                FrontSide = frontSide;
             }
             public Guid CardId { get; }
+            public string FrontSide { get; }
         }
         #endregion
     }

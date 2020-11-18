@@ -113,7 +113,9 @@ namespace MemCheck.WebUI.Controllers
                 mailBody.Append("<h1>Cards</h1>");
                 mailBody.Append("<ul>");
                 foreach (var card in notifierResult.CardVersions)
-                    mailBody.Append($"<li>{authoringPageLink}?CardId={card.CardId}</li>");
+                {
+                    mailBody.Append($"<li><a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide.Truncate(30, true)}</a></li>");
+                }
                 mailBody.Append("/<ul>");
 
                 await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", mailBody.ToString());
