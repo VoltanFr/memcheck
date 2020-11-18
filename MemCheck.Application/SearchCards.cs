@@ -159,7 +159,7 @@ namespace MemCheck.Application
             else
             {
                 var notifMustExist = request.NotificationFiltering == 2;
-                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == userId).Any() == notifMustExist);
+                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == userId).Any() == notifMustExist);
             }
 
             var finalResult = cardsFilteredWithNotifications;
@@ -198,7 +198,7 @@ namespace MemCheck.Application
                 RatingFilteringValue = ratingFilteringValue;
                 NotificationFiltering = notificationFiltering;
             }
-            public Guid Deck { get; }
+            public Guid Deck { get; } //Guid.Empty means ignore
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
             public int Heap { get; set; }   //-1 stands for ignore
             public int pageNo { get; }
@@ -228,7 +228,7 @@ namespace MemCheck.Application
             public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<string> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings)
             {
                 CardId = cardId;
-                FrontSide = frontSide.Truncate(200, true);
+                FrontSide = frontSide.Truncate(150, true);
                 Tags = tags;
                 VisibleTo = visibleTo;
                 DeckInfo = deckInfo;
