@@ -95,46 +95,66 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("LaunchNotifier")]
         public async Task<IActionResult> LaunchNotifier()
         {
-            var user = await userManager.GetUserAsync(HttpContext.User);
+            var launchingUser = await userManager.GetUserAsync(HttpContext.User);
             try
             {
-                await emailSender.SendEmailAsync(user.Email, "Notifier starting", $"At {DateTime.Now}");
+                await emailSender.SendEmailAsync(launchingUser.Email, "Notifier starting", $"At {DateTime.Now}");
 
                 var chrono = Stopwatch.StartNew();
                 var notifier = new Notifier(dbContext);
-                var notifierResult = await notifier.GetNotificationsAsync(user.Id);
+                var notifierResult = await notifier.GetNotificationsAsync();
 
-                var mailBody = new StringBuilder();
-                mailBody.Append("<html>");
-                mailBody.Append("<body>");
-                mailBody.Append("<h1>Summary</h1>");
-                mailBody.Append("<p>");
-                mailBody.Append($"{notifierResult.RegisteredCardCount} registered cards<br/>");
-                mailBody.Append($"Finished at {DateTime.Now}<br/>");
-                mailBody.Append($"Notifier execution took {chrono.Elapsed}");
-                mailBody.Append("</p>");
-
-                mailBody.Append("<h1>Cards with new versions</h1>");
-                mailBody.Append("<ul>");
-                foreach (var card in notifierResult.CardVersions)
+                foreach (var userNotifications in notifierResult.UserNotifications)
                 {
-                    mailBody.Append("<li>");
-                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide.Truncate(100, true)}</a><br/>");
-                    mailBody.Append($"By {card.VersionCreator}<br/>");
-                    mailBody.Append($"On {card.VersionUtcDate} (UTC)");
-                    mailBody.Append("</li>");
+                    var mailBody = new StringBuilder();
+                    mailBody.Append("<html>");
+                    mailBody.Append("<body>");
+                    mailBody.Append($"<p>Hello {userNotifications.UserName}</p>");
+                    mailBody.Append("<h1>Summary</h1>");
+                    mailBody.Append("<p>");
+                    mailBody.Append($"{userNotifications.RegisteredCardCount} registered cards<br/>");
+                    mailBody.Append($"Finished at {DateTime.Now}<br/>");
+                    mailBody.Append($"Notifier execution took {chrono.Elapsed}");
+                    mailBody.Append("</p>");
+
+                    mailBody.Append("<h1>Cards with new versions</h1>");
+                    mailBody.Append("<ul>");
+                    foreach (var card in userNotifications.CardVersions)
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                        mailBody.Append($"By {card.VersionCreator}<br/>");
+                        mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
+                        mailBody.Append($"Version description: '{card.VersionDescription}'");
+                        mailBody.Append("</li>");
+                    }
+                    mailBody.Append("</ul>");
+
+                    mailBody.Append("<h1>Deleted cards</h1>");
+                    mailBody.Append("<ul>");
+                    foreach (var card in userNotifications.DeletedCards)
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"{card.FrontSide}<br/>");
+                        mailBody.Append($"By {card.DeletionAuthor}<br/>");
+                        mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
+                        mailBody.Append($"Deletion description: '{card.DeletionDescription}'");
+                        mailBody.Append("</li>");
+                    }
+                    mailBody.Append("</ul>");
+
+                    mailBody.Append("</body>");
+                    mailBody.Append("</html>");
+
+                    await emailSender.SendEmailAsync(userNotifications.UserEmail, "MemCheck notifications", mailBody.ToString());
                 }
-                mailBody.Append("</ul>");
 
-                mailBody.Append("</body>");
-                mailBody.Append("</html>");
-
-                await emailSender.SendEmailAsync(user.Email, "Notifier ended on success", mailBody.ToString());
+                await emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on success", $"<html><body><p>Finished at {DateTime.Now}<br/>Notifier execution took {chrono.Elapsed}</p></body></html>");
                 return Ok();
             }
             catch (Exception e)
             {
-                await emailSender.SendEmailAsync(user.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p>");
+                await emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p>");
                 return ControllerError.BadRequest(e, this);
             }
         }
