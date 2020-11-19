@@ -17,3 +17,5 @@
 /MemCheck.NotifierWebjob/obj/
 /MemCheck.AzFunc.Notifier/bin/
 /MemCheck.AzFunc.Notifier/obj/
+/MemCheck.DatabaseTests/obj/
+/MemCheck.DatabaseTests/bin/
