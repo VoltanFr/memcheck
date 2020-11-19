@@ -13,7 +13,6 @@ namespace MemCheck.Domain
         public MemCheckUser Owner { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public string Dxescription { get; set; } = null!;
         public string Source { get; set; } = null!;  //eg copyright
         public DateTime InitialUploadUtcDate { get; set; }  //This field is immutable accross versions, we should remove it: having it in the Image class is usefuly for perf
         public DateTime VersionUtcDate { get; set; }
