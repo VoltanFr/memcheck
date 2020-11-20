@@ -44,12 +44,21 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestNoDbUpdateNeededCore()
         {
-            var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+            //I planned to put this code to prod, to check that all migrations have been applied on the prod db
+            //On second thought, I don't see how to implement that and not have a serious production problem: that would need to have the connection string somewhere (say, as a GitHub secret)
+            //Then someone could display this connection string in a PR
 
-            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
+            //If the DB does not exist, this code will consider all the migrations to run on an empty DB
 
-            var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
-            Assert.AreEqual(0, pendingDbUpdates.Count());
+            //var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+
+            //using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
+
+            //var appliedMigrations = dbContext.Database.GetAppliedMigrations();
+            //Assert.AreNotEqual(0, appliedMigrations.Count(), "The DB has had no migration at all, it is not the expected DB");
+
+            //var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
+            //Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
         }
     }
 }
