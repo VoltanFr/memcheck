@@ -38,6 +38,19 @@ jobs:
     - name: "Build the root sln with dotnet"
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
+    - name: "Show the compil output directory tree"
+      run: tree ${{env.COMPIL_CONFIG}}
+
+  #   - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
+  #     uses: microsoft/variable-substitution@v1
+  #     with:
+  #       files: '${{env.COMPIL_CONFIG}}/myapp/appsettings.json'
+  # env:
+  #   ConnectionStrings.Default: ${{ secrets.some_connection_string }}
+  #   App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
+
+
+
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 

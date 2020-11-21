@@ -50,15 +50,15 @@ namespace MemCheck.DatabaseTests
 
             //If the DB does not exist, this code will consider all the migrations to run on an empty DB
 
-            //var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+            var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
 
-            //using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
+            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
 
-            //var appliedMigrations = dbContext.Database.GetAppliedMigrations();
-            //Assert.AreNotEqual(0, appliedMigrations.Count(), "The DB has had no migration at all, it is not the expected DB");
+            var appliedMigrations = dbContext.Database.GetAppliedMigrations();
+            Assert.AreNotEqual(0, appliedMigrations.Count(), "The DB has had no migration at all, it is not the expected DB");
 
-            //var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
-            //Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
+            var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
+            Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
         }
     }
 }
