@@ -38,8 +38,8 @@ jobs:
     - name: "Build the root sln with dotnet"
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
-    - name: "Show the directory tree"
-      run: tree /F /A
+    # - name: "Show the directory tree"
+    #   run: tree /F /A
 
     - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
       uses: microsoft/variable-substitution@v1
