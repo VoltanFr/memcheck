@@ -1,4 +1,5 @@
 using MemCheck.Database;
+using MemCheck.Database.Migrations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,8 +16,11 @@ using System.Reflection;
 namespace MemCheck.DatabaseTests
 {
     [TestClass()]
-    public class ModelTests
+    public class ModelTests : IDisposable
     {
+        #region Fields
+        private readonly DbContext dbContext;
+        #endregion
         #region Private method
         private static IConfigurationRoot GetIConfigurationRoot()
         {
@@ -26,6 +31,11 @@ namespace MemCheck.DatabaseTests
                 .Build();
         }
         #endregion
+        public ModelTests()
+        {
+            var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+            dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
+        }
         [TestMethod()]
         public void TestNoDbMigrationNeeded()
         {
@@ -42,19 +52,32 @@ namespace MemCheck.DatabaseTests
             Assert.AreEqual(0, changes.Count, "A DB model update is needed - Run dotnet ef migrations add - " + string.Join(',', changes.Select(change => change.ToString())));
         }
         [TestMethod()]
-        public void TestNoDbUpdateNeededCore()
+        public void TestConnectionToRightDB()
         {
             //If the DB does not exist, this code will consider all the migrations to run on an empty DB
 
-            var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
-
-            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
-
             var appliedMigrations = dbContext.Database.GetAppliedMigrations();
             Assert.AreNotEqual(0, appliedMigrations.Count(), "The DB has had no migration at all, it is not the expected DB");
+        }
+        [TestMethod()]
+        public void TestLastMigrationName()
+        {
+            var expectedLastMigration = typeof(UpdateToNet5);
 
+            var expectedLastMigrationName = ((MigrationAttribute)(expectedLastMigration.GetCustomAttribute(typeof(MigrationAttribute)))!).Id;
+            var actual = dbContext.Database.GetAppliedMigrations().Last();
+
+            Assert.AreEqual(expectedLastMigrationName, actual);
+        }
+        [TestMethod()]
+        public void TestNoDbUpdateNeededCore()
+        {
             var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
             Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
+        }
+        public void Dispose()
+        {
+            dbContext.Dispose();
         }
     }
 }
