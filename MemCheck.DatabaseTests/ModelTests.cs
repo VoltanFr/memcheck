@@ -44,10 +44,6 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestNoDbUpdateNeededCore()
         {
-            //I planned to put this code to prod, to check that all migrations have been applied on the prod db
-            //On second thought, I don't see how to implement that and not have a serious production problem: that would need to have the connection string somewhere (say, as a GitHub secret)
-            //Then someone could display this connection string in a PR
-
             //If the DB does not exist, this code will consider all the migrations to run on an empty DB
 
             var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
