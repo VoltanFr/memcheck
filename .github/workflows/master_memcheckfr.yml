@@ -41,15 +41,12 @@ jobs:
     - name: "Show the directory tree"
       run: tree .
 
-  #   - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
-  #     uses: microsoft/variable-substitution@v1
-  #     with:
-  #       files: '${{env.COMPIL_CONFIG}}/myapp/appsettings.json'
-  # env:
-  #   ConnectionStrings.Default: ${{ secrets.some_connection_string }}
-  #   App.ServerRootAddress: ${{ env.SERVER_ROOT_ADDRESS }}
-
-
+    - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'MemCheck.DatabaseTests/bin/Release/net5.0/appsettings.json'
+      env:
+        ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
 
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
