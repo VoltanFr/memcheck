@@ -29,7 +29,7 @@ namespace MemCheck.Application
                 if (!dbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
                     var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator, localizer["AddTag"].Value + $" '{tagName}'");
-                    card.VersionCreator = request.VersionCreator;
+                    card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
                     dbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }
             await dbContext.SaveChangesAsync();

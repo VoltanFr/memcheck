@@ -47,7 +47,13 @@
 - The db is deployed as an Azure SQL Database
 
 ## Tags
-- Would you consider tag hierarchizing ? This would be convenient for such categories as "English vocabulary/Cooking". No. Tagging is in fact the sheer opposite of hierarchizing, allowing all combinations. Hierarchies quickly become a nightmare: why not Cooking/Vocabulary instead ? 
+- Would you consider tag hierarchizing ? This would be convenient for such categories as "English vocabulary/Cooking". No. Tagging is in fact the sheer opposite of hierarchizing, allowing all combinations. Hierarchies quickly become a nightmare: why not Cooking/Vocabulary instead ?
+
+## Unit tests
+- My initial plan was to use an in-memory database for unit tests (see `UserCardDeletionsNotifierTests.OptionsForNewDB`). Unfortunately, I discovered that this is not at all a good substitute to mimic the prod db. For example:
+  - It will accept null values for non-nullable fields, where SQL Server throws an exception.
+  - Some foreign key constraints can be violated without failure.
+  - Cascade delete behaves differently.
 
 # In progress
 Vidéo à propos de Azure functions avec GitHub : https://www.youtube.com/watch?v=LHJIGmJoS0c

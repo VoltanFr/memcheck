@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace MemCheck.Domain
 {
@@ -9,8 +8,7 @@ namespace MemCheck.Domain
         public const int CardNotificationRegistrationMethod_ExplicitByUser = 2; //Eg in card edit page
         public const int CardNotificationRegistrationMethod_VersionCreation = 3;
 
-        public Guid CardId { get; set; }
-        public Card Card { get; set; } = null!;
+        public Guid CardId { get; set; }    //Note that we can not have a navigational property to the card, because it would not work for a deleted card (we don't want to lose the notif even after deletion), and a navigational property brings a cascade delete strategy
 
         public Guid UserId { get; set; }
         public MemCheckUser User { get; set; } = null!;
