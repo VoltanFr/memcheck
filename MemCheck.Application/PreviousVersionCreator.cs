@@ -85,7 +85,7 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<Card> RunAsync(Guid cardId, MemCheckUser newVersionCreator, string newVersionDescription)
+        public async Task<Card> RunAsync(Guid cardId, MemCheckUser newVersionCreator, string newVersionDescription, DateTime? cardNewVersionUtcDate = null)
         {
             var card = await dbContext.Cards
                 .Include(card => card.Images)
@@ -102,13 +102,13 @@ namespace MemCheck.Application
 
             card.PreviousVersion = previousVersion;
             card.VersionCreator = newVersionCreator;
-            card.VersionUtcDate = DateTime.UtcNow;
+            card.VersionUtcDate = cardNewVersionUtcDate ?? DateTime.UtcNow;
             card.VersionDescription = newVersionDescription;
             card.VersionType = CardVersionType.Changes;
 
             return card;
         }
-        public async Task RunForDeletionAsync(Card card)
+        public async Task RunForDeletionAsync(Card card, DateTime? versionUtcDate = null)
         {
             var previousVersion = await CreatePreviousVersionAsync(card);
             previousVersion.VersionType = CardPreviousVersionType.Deletion;

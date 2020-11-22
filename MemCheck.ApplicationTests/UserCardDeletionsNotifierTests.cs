@@ -39,7 +39,14 @@ namespace MemCheck.Application.Tests
         #region Private methods
         private DbContextOptions<MemCheckDbContext> OptionsForNewDB()
         {
-            return new DbContextOptionsBuilder<MemCheckDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+            var connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserCardDeletionsNotifierTests;Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            var result = new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options;
+            using (var dbContext = new MemCheckDbContext(result))
+            {
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
+            }
+            return result;
         }
         private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> db)
         {
@@ -60,6 +67,8 @@ namespace MemCheck.Application.Tests
             result.Card = Guid.NewGuid();
             result.VersionCreator = creator;
             result.FrontSide = Guid.NewGuid().ToString();
+            result.BackSide = Guid.NewGuid().ToString();
+            result.AdditionalInfo = Guid.NewGuid().ToString();
             result.VersionDescription = Guid.NewGuid().ToString();
             result.VersionType = CardPreviousVersionType.Deletion;
             result.VersionUtcDate = versionDate;
@@ -103,6 +112,8 @@ namespace MemCheck.Application.Tests
             var result = new Card();
             result.VersionCreator = creator;
             result.FrontSide = Guid.NewGuid().ToString();
+            result.BackSide = Guid.NewGuid().ToString();
+            result.AdditionalInfo = Guid.NewGuid().ToString();
             result.VersionDescription = Guid.NewGuid().ToString();
             result.VersionType = CardVersionType.Creation;
             result.InitialCreationUtcDate = versionDate;
@@ -127,6 +138,15 @@ namespace MemCheck.Application.Tests
             await dbContext.SaveChangesAsync();
             return result;
         }
+        private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime deletionDate)
+        {
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext, new EmptyLocalizer());
+                var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == userId).Single(), new[] { cardId });
+                await deleter.RunAsync(deletionRequest, deletionDate);
+            }
+        }
         #endregion
         [TestMethod()]
         public async Task EmptyDB()
@@ -147,8 +167,9 @@ namespace MemCheck.Application.Tests
             var options = OptionsForNewDB();
 
             var user = await CreateUserAsync(options);
-            var deletedCard = await CreateDeletedCardAsync(options, user.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(options, user.Id, deletedCard.Id, new DateTime(2020, 11, 3));
+            var card = await CreateCardAsync(options, user.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(options, user.Id, card.Id, new DateTime(2020, 11, 3));
+            await DeleteCardAsync(options, user.Id, card.Id, new DateTime(2020, 11, 2));
 
             using (var dbContext = new MemCheckDbContext(options))
             {
@@ -185,10 +206,13 @@ namespace MemCheck.Application.Tests
 
             var user1 = await CreateUserAsync(options);
             var user2 = await CreateUserAsync(options);
-            var deletedCard = await CreateDeletedCardAsync(options, user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id, user2.Id });
 
-            await CreateCardNotificationAsync(options, user1.Id, deletedCard.Card, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(options, user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
+            var card = await CreateCardAsync(options, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
+            await CreateCardNotificationAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(options, user2.Id, card.Id, new DateTime(2020, 11, 1));
+
+            await DeleteCardAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 2));
+
 
             using (var dbContext = new MemCheckDbContext(options))
             {
@@ -197,14 +221,14 @@ namespace MemCheck.Application.Tests
                 var user1versions = notifier.Run(user1);
                 Assert.AreEqual(1, user1versions.Length);
                 Assert.IsTrue(user1versions[0].CardIsViewable);
-                Assert.AreEqual(deletedCard.FrontSide, user1versions[0].FrontSide);
-                Assert.AreEqual(deletedCard.VersionDescription, user1versions[0].DeletionDescription);
+                Assert.AreEqual(card.FrontSide, user1versions[0].FrontSide);
+                Assert.AreEqual(DeletionDescription, user1versions[0].DeletionDescription);
 
                 var user2versions = notifier.Run(user2);
                 Assert.AreEqual(1, user2versions.Length);
                 Assert.IsTrue(user2versions[0].CardIsViewable);
-                Assert.AreEqual(deletedCard.FrontSide, user2versions[0].FrontSide);
-                Assert.AreEqual(deletedCard.VersionDescription, user2versions[0].DeletionDescription);
+                Assert.AreEqual(card.FrontSide, user2versions[0].FrontSide);
+                Assert.AreEqual(DeletionDescription, user2versions[0].DeletionDescription);
             }
         }
         [TestMethod()]
@@ -217,11 +241,11 @@ namespace MemCheck.Application.Tests
 
             await CreateCardNotificationAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 1));
 
+            await DeleteCardAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 2));
+
             using (var dbContext = new MemCheckDbContext(options))
             {
-                var deleter = new DeleteCards(dbContext, new EmptyLocalizer());
-                var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == user1.Id).Single(), new[] { card.Id });
-                await deleter.RunAsync(deletionRequest);
+                Assert.IsTrue(dbContext.CardNotifications.Any(cn => cn.CardId == card.Id)); //DeleteCards must not cascade delete the notifications
             }
 
             using (var dbContext = new MemCheckDbContext(options))
