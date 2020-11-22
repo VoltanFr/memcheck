@@ -2,7 +2,7 @@
 
 namespace MemCheck.Domain
 {
-    public sealed class CardNotification
+    public sealed class CardNotificationSubscription
     {
         public const int CardNotificationRegistrationMethod_AddToDeck = 1;
         public const int CardNotificationRegistrationMethod_ExplicitByUser = 2; //Eg in card edit page

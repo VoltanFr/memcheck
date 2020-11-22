@@ -62,7 +62,7 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestLastMigrationName()
         {
-            var expectedLastMigration = typeof(RemoveNavigationalPropertyFromNotif);
+            var expectedLastMigration = typeof(RenameNotifTable);
 
             var expectedLastMigrationName = ((MigrationAttribute)(expectedLastMigration.GetCustomAttribute(typeof(MigrationAttribute)))!).Id;
             var actual = dbContext.Database.GetAppliedMigrations().Last();

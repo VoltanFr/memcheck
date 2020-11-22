@@ -38,7 +38,7 @@ namespace MemCheck.Database
         public DbSet<ImageInCardPreviousVersion> ImagesInCardPreviousVersions { get; set; } = null!;
         public DbSet<UserWithViewOnCardPreviousVersion> UsersWithViewOnCardPreviousVersions { get; set; } = null!;
         public DbSet<UserCardRating> UserCardRatings { get; set; } = null!;
-        public DbSet<CardNotification> CardNotifications { get; set; } = null!;
+        public DbSet<CardNotificationSubscription> CardNotifications { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -57,7 +57,7 @@ namespace MemCheck.Database
             builder.Entity<UserWithViewOnCardPreviousVersion>().HasKey(userWithViewOnCardPreviousVersion => new { userWithViewOnCardPreviousVersion.CardPreviousVersionId, userWithViewOnCardPreviousVersion.AllowedUserId });
             builder.Entity<ImageInCardPreviousVersion>().HasKey(img => new { img.ImageId, img.CardPreviousVersionId });
             builder.Entity<UserCardRating>().HasKey(userCardRating => new { userCardRating.CardId, userCardRating.UserId });
-            builder.Entity<CardNotification>().HasKey(cardNotif => new { cardNotif.CardId, cardNotif.UserId });
+            builder.Entity<CardNotificationSubscription>().HasKey(cardNotif => new { cardNotif.CardId, cardNotif.UserId });
         }
         private void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
         {

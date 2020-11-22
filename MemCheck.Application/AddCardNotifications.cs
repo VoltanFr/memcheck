@@ -26,12 +26,12 @@ namespace MemCheck.Application
             {
                 if (!dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).Any())
                 {
-                    CardNotification notif = new CardNotification
+                    CardNotificationSubscription notif = new CardNotificationSubscription
                     {
                         CardId = cardId,
                         UserId = request.UserId,
                         RegistrationUtcDate = DateTime.UtcNow,
-                        RegistrationMethod = CardNotification.CardNotificationRegistrationMethod_ExplicitByUser,
+                        RegistrationMethod = CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser,
                         LastNotificationUtcDate = DateTime.UtcNow
                     };
                     dbContext.CardNotifications.Add(notif);

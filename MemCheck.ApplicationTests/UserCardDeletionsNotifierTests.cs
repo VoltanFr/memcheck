@@ -95,7 +95,7 @@ namespace MemCheck.Application.Tests
         private async Task CreateCardNotificationAsync(DbContextOptions<MemCheckDbContext> db, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
         {
             using var dbContext = new MemCheckDbContext(db);
-            var notif = new CardNotification();
+            var notif = new CardNotificationSubscription();
             notif.CardId = cardId;
             notif.UserId = subscriberId;
             notif.LastNotificationUtcDate = lastNotificationDate;
