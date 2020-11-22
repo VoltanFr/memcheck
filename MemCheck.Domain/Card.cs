@@ -19,7 +19,7 @@ namespace MemCheck.Domain
         public IEnumerable<TagInCard> TagsInCards { get; set; } = null!;
         public DateTime InitialCreationUtcDate { get; set; } //This field is immutable accross versions, but keeping it avoids the need to walk all the versions to find the initial creation date
         public DateTime VersionUtcDate { get; set; }
-        public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; Only owner in list means private ; Some users in list means visible for them
+        public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
         public IEnumerable<ImageInCard> Images { get; set; } = null!;
         public string VersionDescription { get; set; } = null!;
         [Column(TypeName = "int")] public CardVersionType VersionType { get; set; }

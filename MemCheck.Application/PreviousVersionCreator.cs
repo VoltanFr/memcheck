@@ -95,7 +95,7 @@ namespace MemCheck.Application
                 .Include(card => card.CardLanguage)
                 .Include(card => card.TagsInCards)
                 .Include(card => card.VersionCreator)
-                .AsSingleQuery()
+                //.AsSingleQuery()
                 .SingleAsync(img => img.Id == cardId);
 
             var previousVersion = await CreatePreviousVersionAsync(card);
