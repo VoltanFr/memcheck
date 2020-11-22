@@ -25,25 +25,10 @@ namespace MemCheck.Application.Notifying
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
         {
             var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == user.Id).CountAsync();
-
-            //var registeredCardsForUser = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).ToDictionaryAsync(notif => notif.CardId, notif => notif);
-
             var cardVersions = userCardVersionsNotifier.Run(user);
             var cardDeletions = userCardDeletionsNotifier.Run(user);
 
-            //var previousVersions = dbContext.CardPreviousVersions.ToList();
-
-            //var deletedVersions = dbContext.CardPreviousVersions.Where(pv => pv.VersionType == CardPreviousVersionType.Deletion).ToList();
-            //var lastDeleted = deletedVersions.Last();
-
-            //var notifs = dbContext.CardNotifications.ToList();
-
-
-            //var cardVersions = await dbContext.Cards.Where(card => registeredCardsForUser.ContainsKey(card.Id) && card.VersionUtcDate > registeredCardsForUser[card.Id].LastNotificationUtcDate).ToListAsync();
-            //var deletedCards = await dbContext.CardPreviousVersions.Where(deletedCard => registeredCardsForUser.ContainsKey(deletedCard.Card) && deletedCard.VersionType == CardPreviousVersionType.Deletion && deletedCard.VersionUtcDate > registeredCardsForUser[deletedCard.Card].LastNotificationUtcDate).ToListAsync();
-
             //var endOfRequest = DateTime.UtcNow;
-
             //foreach (var registeredCard in registeredCardsForUser.Values)
             //    registeredCard.LastNotificationUtcDate = endOfRequest;
 
@@ -55,7 +40,6 @@ namespace MemCheck.Application.Notifying
                 registeredCardCount,
                 cardVersions,
                 cardDeletions
-                //deletedCards.Select(deletedCard => new DeletedCard(deletedCard.FrontSide, deletedCard.VersionCreator.UserName, deletedCard.VersionUtcDate, deletedCard.VersionDescription))
                 );
         }
         public async Task<NotifierResult> GetNotificationsAsync()
