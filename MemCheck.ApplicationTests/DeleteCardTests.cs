@@ -26,10 +26,6 @@ namespace MemCheck.Application.Tests
         }
         #endregion
         #region Private methods
-        private static string RandomString()
-        {
-            return Guid.NewGuid().ToString();
-        }
         private DbContextOptions<MemCheckDbContext> DbContextOptions()
         {
             var connectionString = @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={GetType().Name};Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
@@ -64,10 +60,10 @@ namespace MemCheck.Application.Tests
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
             var result = new Card();
             result.VersionCreator = creator;
-            result.FrontSide = RandomString();
-            result.BackSide = RandomString();
-            result.AdditionalInfo = RandomString();
-            result.VersionDescription = RandomString();
+            result.FrontSide = StringServices.RandomString();
+            result.BackSide = StringServices.RandomString();
+            result.AdditionalInfo = StringServices.RandomString();
+            result.VersionDescription = StringServices.RandomString();
             result.VersionType = CardVersionType.Creation;
             dbContext.Cards.Add(result);
             await dbContext.SaveChangesAsync();
