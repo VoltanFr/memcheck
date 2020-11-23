@@ -8,7 +8,7 @@ using MemCheck.Domain;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace MemCheck.Application.Tests
+namespace MemCheck.Application.Tests.Notifying
 {
     [TestClass()]
     public class UsersToNotifyGetterTests

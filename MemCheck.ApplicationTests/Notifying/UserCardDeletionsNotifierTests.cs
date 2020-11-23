@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Localization;
 
-namespace MemCheck.Application.Tests
+namespace MemCheck.Application.Tests.Notifying
 {
     [TestClass()]
     public class UserCardDeletionsNotifierTests
     {
         #region Fields
         private static readonly string DeletionDescription = Guid.NewGuid().ToString();
+        private static readonly DbContextOptions<MemCheckDbContext> testDB = DbServices.GetEmptyTestDB(typeof(UserCardDeletionsNotifierTests));
         #endregion
         #region private sealed class EmptyLocalizer
         private sealed class EmptyLocalizer : IStringLocalizer
@@ -37,30 +38,19 @@ namespace MemCheck.Application.Tests
         }
         #endregion
         #region Private methods
-        private DbContextOptions<MemCheckDbContext> OptionsForNewDB()
+        private async Task<MemCheckUser> CreateUserAsync()
         {
-            var connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserCardDeletionsNotifierTests;Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-            var result = new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options;
-            using (var dbContext = new MemCheckDbContext(result))
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-            }
-            return result;
-        }
-        private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> db)
-        {
-            using var dbContext = new MemCheckDbContext(db);
+            using var dbContext = new MemCheckDbContext(testDB);
             var result = new MemCheckUser();
             dbContext.Users.Add(result);
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task<CardPreviousVersion> CreateDeletedCardAsync(DbContextOptions<MemCheckDbContext> db, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
+        private async Task<CardPreviousVersion> CreateDeletedCardAsync(Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
 
-            using var dbContext = new MemCheckDbContext(db);
+            using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
             var result = new CardPreviousVersion();
@@ -92,9 +82,9 @@ namespace MemCheck.Application.Tests
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task CreateCardNotificationAsync(DbContextOptions<MemCheckDbContext> db, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
+        private async Task CreateCardNotificationAsync(Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
         {
-            using var dbContext = new MemCheckDbContext(db);
+            using var dbContext = new MemCheckDbContext(testDB);
             var notif = new CardNotificationSubscription();
             notif.CardId = cardId;
             notif.UserId = subscriberId;
@@ -102,11 +92,11 @@ namespace MemCheck.Application.Tests
             dbContext.CardNotifications.Add(notif);
             await dbContext.SaveChangesAsync();
         }
-        private async Task<Card> CreateCardAsync(DbContextOptions<MemCheckDbContext> db, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
+        private async Task<Card> CreateCardAsync(Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
 
-            using var dbContext = new MemCheckDbContext(db);
+            using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
             var result = new Card();
@@ -138,9 +128,9 @@ namespace MemCheck.Application.Tests
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime deletionDate)
+        private async Task DeleteCardAsync(Guid userId, Guid cardId, DateTime deletionDate)
         {
-            using (var dbContext = new MemCheckDbContext(db))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var deleter = new DeleteCards(dbContext, new EmptyLocalizer());
                 var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == userId).Single(), new[] { cardId });
@@ -151,10 +141,9 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task EmptyDB()
         {
-            var options = OptionsForNewDB();
-            var user1 = await CreateUserAsync(options);
+            var user1 = await CreateUserAsync();
 
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardDeletionsNotifier(dbContext);
                 var versions = notifier.Run(user1);
@@ -164,14 +153,12 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_NotToBeNotified()
         {
-            var options = OptionsForNewDB();
+            var user = await CreateUserAsync();
+            var card = await CreateCardAsync(user.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(user.Id, card.Id, new DateTime(2020, 11, 3));
+            await DeleteCardAsync(user.Id, card.Id, new DateTime(2020, 11, 2));
 
-            var user = await CreateUserAsync(options);
-            var card = await CreateCardAsync(options, user.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(options, user.Id, card.Id, new DateTime(2020, 11, 3));
-            await DeleteCardAsync(options, user.Id, card.Id, new DateTime(2020, 11, 2));
-
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardDeletionsNotifier(dbContext);
                 var versions = notifier.Run(user);
@@ -181,15 +168,13 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_ToBeNotifiedWithoutVisibility()
         {
-            var options = OptionsForNewDB();
+            var user1 = await CreateUserAsync();
+            var deletedCard = await CreateDeletedCardAsync(user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
 
-            var user1 = await CreateUserAsync(options);
-            var deletedCard = await CreateDeletedCardAsync(options, user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
+            var user2 = await CreateUserAsync();
+            await CreateCardNotificationAsync(user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
 
-            var user2 = await CreateUserAsync(options);
-            await CreateCardNotificationAsync(options, user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
-
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardDeletionsNotifier(dbContext);
                 var versions = notifier.Run(user2);
@@ -202,19 +187,17 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_ToBeNotified()
         {
-            var options = OptionsForNewDB();
+            var user1 = await CreateUserAsync();
+            var user2 = await CreateUserAsync();
 
-            var user1 = await CreateUserAsync(options);
-            var user2 = await CreateUserAsync(options);
+            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
+            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(user2.Id, card.Id, new DateTime(2020, 11, 1));
 
-            var card = await CreateCardAsync(options, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
-            await CreateCardNotificationAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(options, user2.Id, card.Id, new DateTime(2020, 11, 1));
-
-            await DeleteCardAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 2));
+            await DeleteCardAsync(user1.Id, card.Id, new DateTime(2020, 11, 2));
 
 
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardDeletionsNotifier(dbContext);
 
@@ -234,21 +217,19 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_ToBeNotified_UsingApplicationDelete()
         {
-            var options = OptionsForNewDB();
+            var user1 = await CreateUserAsync();
+            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 1));
 
-            var user1 = await CreateUserAsync(options);
-            var card = await CreateCardAsync(options, user1.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 1));
 
-            await CreateCardNotificationAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 1));
+            await DeleteCardAsync(user1.Id, card.Id, new DateTime(2020, 11, 2));
 
-            await DeleteCardAsync(options, user1.Id, card.Id, new DateTime(2020, 11, 2));
-
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 Assert.IsTrue(dbContext.CardNotifications.Any(cn => cn.CardId == card.Id)); //DeleteCards must not cascade delete the notifications
             }
 
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardDeletionsNotifier(dbContext);
 

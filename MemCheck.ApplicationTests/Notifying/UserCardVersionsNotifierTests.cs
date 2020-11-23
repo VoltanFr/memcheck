@@ -8,7 +8,7 @@ using MemCheck.Domain;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-namespace MemCheck.Application.Tests
+namespace MemCheck.Application.Tests.Notifying
 {
     [TestClass()]
     public class UserCardVersionsNotifierTests
@@ -35,8 +35,10 @@ namespace MemCheck.Application.Tests
 
             var result = new Card();
             result.VersionCreator = creator;
-            result.FrontSide = Guid.NewGuid().ToString();
-            result.VersionDescription = Guid.NewGuid().ToString();
+            result.FrontSide = StringServices.RandomString();
+            result.BackSide = StringServices.RandomString();
+            result.AdditionalInfo = StringServices.RandomString();
+            result.VersionDescription = StringServices.RandomString();
             result.VersionType = CardVersionType.Creation;
             result.InitialCreationUtcDate = versionDate;
             result.VersionUtcDate = versionDate;
