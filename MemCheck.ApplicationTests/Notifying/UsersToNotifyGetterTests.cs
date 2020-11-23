@@ -14,10 +14,6 @@ namespace MemCheck.Application.Tests.Notifying
     public class UsersToNotifyGetterTests
     {
         #region Private methods
-        private DbContextOptions<MemCheckDbContext> OptionsForNewDB()
-        {
-            return new DbContextOptionsBuilder<MemCheckDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
-        }
         private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> db)
         {
             using var dbContext = new MemCheckDbContext(db);
@@ -32,6 +28,10 @@ namespace MemCheck.Application.Tests.Notifying
             var creator = await dbContext.Users.Where(u => u.Id == versionCreator.Id).SingleAsync();
             var result = new Card();
             result.VersionCreator = creator;
+            result.FrontSide = StringServices.RandomString();
+            result.BackSide = StringServices.RandomString();
+            result.AdditionalInfo = StringServices.RandomString();
+            result.VersionDescription = StringServices.RandomString();
             dbContext.Cards.Add(result);
             await dbContext.SaveChangesAsync();
             return result;
@@ -49,9 +49,8 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public void TestRun_EmptyDB()
         {
-            var options = OptionsForNewDB();
-
-            using (var dbContext = new MemCheckDbContext(options))
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var getter = new UsersToNotifyGetter(dbContext);
                 var users = getter.Run();
@@ -61,11 +60,11 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithUsersAndCardsButNoNotification()
         {
-            var options = OptionsForNewDB();
-            var user1 = await CreateUserAsync(options);
-            await CreateCardAsync(options, user1);
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            await CreateCardAsync(testDB, user1);
 
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var getter = new UsersToNotifyGetter(dbContext);
                 var users = getter.Run();
@@ -75,16 +74,16 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithOneUserWithOneNotification()
         {
-            var options = OptionsForNewDB();
-            var user1 = await CreateUserAsync(options);
-            var user2 = await CreateUserAsync(options);
-            var user3 = await CreateUserAsync(options);
-            var card1 = await CreateCardAsync(options, user1);
-            await CreateCardAsync(options, user1);
-            await CreateCardAsync(options, user2);
-            await CreateCardNotificationAsync(options, user3.Id, card1.Id);
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var user2 = await CreateUserAsync(testDB);
+            var user3 = await CreateUserAsync(testDB);
+            var card1 = await CreateCardAsync(testDB, user1);
+            await CreateCardAsync(testDB, user1);
+            await CreateCardAsync(testDB, user2);
+            await CreateCardNotificationAsync(testDB, user3.Id, card1.Id);
 
-            using (var dbContext = new MemCheckDbContext(options))
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var getter = new UsersToNotifyGetter(dbContext);
                 var users = getter.Run();
@@ -95,19 +94,20 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithNotifications()
         {
-            var options = OptionsForNewDB();
-            var user1 = await CreateUserAsync(options);
-            var user2 = await CreateUserAsync(options);
-            var user3 = await CreateUserAsync(options);
-            var card1 = await CreateCardAsync(options, user1);
-            var card2 = await CreateCardAsync(options, user1);
-            var card3 = await CreateCardAsync(options, user2);
-            await CreateCardNotificationAsync(options, user3.Id, card1.Id);
-            await CreateCardNotificationAsync(options, user3.Id, card2.Id);
-            await CreateCardNotificationAsync(options, user3.Id, card3.Id);
-            await CreateCardNotificationAsync(options, user1.Id, card2.Id);
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            using (var dbContext = new MemCheckDbContext(options))
+            var user1 = await CreateUserAsync(testDB);
+            var user2 = await CreateUserAsync(testDB);
+            var user3 = await CreateUserAsync(testDB);
+            var card1 = await CreateCardAsync(testDB, user1);
+            var card2 = await CreateCardAsync(testDB, user1);
+            var card3 = await CreateCardAsync(testDB, user2);
+            await CreateCardNotificationAsync(testDB, user3.Id, card1.Id);
+            await CreateCardNotificationAsync(testDB, user3.Id, card2.Id);
+            await CreateCardNotificationAsync(testDB, user3.Id, card3.Id);
+            await CreateCardNotificationAsync(testDB, user1.Id, card2.Id);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var getter = new UsersToNotifyGetter(dbContext);
                 var users = getter.Run();
