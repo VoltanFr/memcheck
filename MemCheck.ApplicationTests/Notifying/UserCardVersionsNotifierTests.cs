@@ -13,11 +13,8 @@ namespace MemCheck.Application.Tests.Notifying
     [TestClass()]
     public class UserCardVersionsNotifierTests
     {
-        #region Fields
-        private static readonly DbContextOptions<MemCheckDbContext> testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
-        #endregion
         #region Private methods
-        private async Task<MemCheckUser> CreateUserAsync()
+        private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> testDB)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new MemCheckUser();
@@ -25,7 +22,7 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task<Card> CreateCardAsync(Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
+        private async Task<Card> CreateCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
 
@@ -61,7 +58,7 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task<CardPreviousVersion> CreateCardPreviousVersionAsync(Guid versionCreatorId, Guid cardId, DateTime versionDate)
+        private async Task<CardPreviousVersion> CreateCardPreviousVersionAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, Guid cardId, DateTime versionDate)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
@@ -84,7 +81,7 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task<CardPreviousVersion> CreatePreviousVersionPreviousVersionAsync(Guid versionCreatorId, CardPreviousVersion previousVersion, DateTime versionDate)
+        private async Task<CardPreviousVersion> CreatePreviousVersionPreviousVersionAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, CardPreviousVersion previousVersion, DateTime versionDate)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
@@ -106,7 +103,7 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task CreateCardNotificationAsync(Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
+        private async Task CreateCardNotificationAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var notif = new CardNotificationSubscription();
@@ -120,7 +117,8 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task EmptyDB()
         {
-            var user1 = await CreateUserAsync();
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -132,9 +130,11 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_NotToBeNotified()
         {
-            var user = await CreateUserAsync();
-            var card = await CreateCardAsync(user.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(user.Id, card.Id, new DateTime(2020, 11, 3));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user.Id, new DateTime(2020, 11, 2));
+            var lastNotificationDate = new DateTime(2020, 11, 3);
+            await CreateCardNotificationAsync(testDB, user.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -142,13 +142,20 @@ namespace MemCheck.Application.Tests.Notifying
                 var versions = notifier.Run(user);
                 Assert.AreEqual(0, versions.Length);
             }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user.Id);
+                Assert.IsTrue(notif.LastNotificationUtcDate == lastNotificationDate);
+            }
         }
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_ToBeNotified()
         {
-            var user = await CreateUserAsync();
-            var card = await CreateCardAsync(user.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(user.Id, card.Id, new DateTime(2020, 11, 1));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user.Id, new DateTime(2020, 11, 2));
+            await CreateCardNotificationAsync(testDB, user.Id, card.Id, new DateTime(2020, 11, 1));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -159,115 +166,169 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.IsTrue(versions[0].CardIsViewable);
                 Assert.AreEqual(card.FrontSide, versions[0].FrontSide);
                 Assert.AreEqual(card.VersionDescription, versions[0].VersionDescription);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user.Id);
+                Assert.IsTrue(notif.LastNotificationUtcDate > new DateTime(2020, 11, 1));
             }
         }
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_NotToBeNotifiedBecauseOfDate()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 2));
-            var user2 = await CreateUserAsync();
-            await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 3));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 2));
+            var user2 = await CreateUserAsync(testDB);
+            await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            var lastNotificationDate = new DateTime(2020, 11, 3);
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
                 var versions = notifier.Run(user1);
                 Assert.AreEqual(0, versions.Length);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.IsTrue(notif.LastNotificationUtcDate == lastNotificationDate);
             }
         }
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotifiedWithoutAccessibility()
         {
-            var user1 = await CreateUserAsync();
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
 
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
-            await CreateCardPreviousVersionAsync(user1.Id, card.Id, new DateTime(2020, 11, 1));
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
+            await CreateCardPreviousVersionAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
 
-            var user2 = await CreateUserAsync();
-            await CreateCardNotificationAsync(user2.Id, card.Id, new DateTime(2020, 11, 1));
+            var user2 = await CreateUserAsync(testDB);
+            await CreateCardNotificationAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            var now = new DateTime(2020, 11, 2);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
 
-                var user1versions = notifier.Run(user1);
+                var user1versions = notifier.Run(user1, now);
                 Assert.AreEqual(0, user1versions.Length);
 
-                var user2versions = notifier.Run(user2);
+                var user2versions = notifier.Run(user2, now);
                 Assert.AreEqual(1, user2versions.Length);
                 Assert.AreEqual(card.Id, user2versions[0].CardId);
                 Assert.IsFalse(user2versions[0].CardIsViewable);
                 Assert.IsNull(user2versions[0].VersionDescription);
                 Assert.IsNull(user2versions[0].FrontSide);
+
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user2.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotifiedWithAccessibility()
         {
-            var user1 = await CreateUserAsync();
-            var user2 = await CreateUserAsync();
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var user2 = await CreateUserAsync(testDB);
 
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 2), new Guid[] { user1.Id, user2.Id });
-            await CreateCardPreviousVersionAsync(user1.Id, card.Id, new DateTime(2020, 11, 1));
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 2), new Guid[] { user1.Id, user2.Id });
+            await CreateCardPreviousVersionAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
 
-            await CreateCardNotificationAsync(user2.Id, card.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            var now = new DateTime(2020, 11, 3);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = notifier.Run(user2);
+                var versions = notifier.Run(user2, now);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user2.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifAfterInitialCreation()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 3));
-            var user2 = await CreateUserAsync();
-            await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 2));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 3));
+            var user2 = await CreateUserAsync(testDB);
+            await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
+            var now = new DateTime(2020, 11, 4);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = notifier.Run(user1);
+                var versions = notifier.Run(user1, now);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifBeforeInitialCreation()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 3));
-            var user2 = await CreateUserAsync();
-            await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 1));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 3));
+            var user2 = await CreateUserAsync(testDB);
+            await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 2));
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
+            var now = new DateTime(2020, 11, 4);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = notifier.Run(user1);
+                var versions = notifier.Run(user1, now);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task CardWitPreviousVersions_NotToBeNotified()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 3));
-            var user2 = await CreateUserAsync();
-            var previousVersion1 = await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 2));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, previousVersion1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 3));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 3));
+            var user2 = await CreateUserAsync(testDB);
+            var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 2));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
+            var lastNotificationDate = new DateTime(2020, 11, 3);
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -275,78 +336,106 @@ namespace MemCheck.Application.Tests.Notifying
                 var versions = notifier.Run(user1);
                 Assert.AreEqual(0, versions.Length);
             }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.AreEqual(lastNotificationDate, notif.LastNotificationUtcDate);
+            }
         }
         [TestMethod()]
         public async Task CardWitPreviousVersions_ToBeNotified_LastNotifAfterPreviousVersionCreation()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 5));
-            var user2 = await CreateUserAsync();
-            var previousVersion1 = await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 3));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, previousVersion1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 4));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 5));
+            var user2 = await CreateUserAsync(testDB);
+            var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 3));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 4));
+            var now = new DateTime(2020, 11, 5);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = notifier.Run(user1);
+                var versions = notifier.Run(user1, now);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task CardWitPreviousVersions_ToBeNotified_LastNotifBeforePreviousVersionCreation()
         {
-            var user1 = await CreateUserAsync();
-            var card = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 5));
-            var user2 = await CreateUserAsync();
-            var previousVersion1 = await CreateCardPreviousVersionAsync(user2.Id, card.Id, new DateTime(2020, 11, 3));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, previousVersion1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card.Id, new DateTime(2020, 11, 2));
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var card = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 5));
+            var user2 = await CreateUserAsync(testDB);
+            var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 3));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
+            var now = new DateTime(2020, 11, 5);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = notifier.Run(user1);
+                var versions = notifier.Run(user1, now);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user1.Id);
+                Assert.AreEqual(now, notif.LastNotificationUtcDate);
             }
         }
         [TestMethod()]
         public async Task MultipleVersions()
         {
-            var user1 = await CreateUserAsync();
-            var user2 = await CreateUserAsync();
+            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var user1 = await CreateUserAsync(testDB);
+            var user2 = await CreateUserAsync(testDB);
 
-            var card1 = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 10));
-            var card1PV1 = await CreateCardPreviousVersionAsync(user2.Id, card1.Id, new DateTime(2020, 11, 5));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, card1PV1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(user1.Id, card1.Id, new DateTime(2020, 11, 2));
+            var card1 = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
+            var card1PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card1.Id, new DateTime(2020, 11, 5));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card1PV1, new DateTime(2020, 11, 1));
+            await CreateCardNotificationAsync(testDB, user1.Id, card1.Id, new DateTime(2020, 11, 2));
 
-            var card2 = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 10));
-            var card2PV1 = await CreateCardPreviousVersionAsync(user2.Id, card2.Id, new DateTime(2020, 11, 5));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, card2PV1, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(user1.Id, card2.Id, new DateTime(2020, 11, 1));
+            var card2 = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
+            var card2PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card2.Id, new DateTime(2020, 11, 5));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card2PV1, new DateTime(2020, 11, 2));
+            await CreateCardNotificationAsync(testDB, user1.Id, card2.Id, new DateTime(2020, 11, 1));
 
-            var card3 = await CreateCardAsync(user1.Id, new DateTime(2020, 11, 10));
-            var card3PV1 = await CreateCardPreviousVersionAsync(user2.Id, card3.Id, new DateTime(2020, 11, 5));
-            await CreatePreviousVersionPreviousVersionAsync(user2.Id, card3PV1, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(user1.Id, card3.Id, new DateTime(2020, 11, 11));
+            var card3 = await CreateCardAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
+            var card3PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card3.Id, new DateTime(2020, 11, 5));
+            await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card3PV1, new DateTime(2020, 11, 2));
+            var card3LastNotifDate = new DateTime(2020, 11, 11);
+            await CreateCardNotificationAsync(testDB, user1.Id, card3.Id, card3LastNotifDate);
 
-            var card4 = await CreateCardAsync(user2.Id, new DateTime(2020, 11, 10), new Guid[] { user2.Id });  //Not to be notified because no access for user1
-            await CreateCardPreviousVersionAsync(user2.Id, card4.Id, new DateTime(2020, 11, 5));
-            await CreateCardNotificationAsync(user1.Id, card4.Id, new DateTime(2020, 11, 2));
+            var card4 = await CreateCardAsync(testDB, user2.Id, new DateTime(2020, 11, 10), new Guid[] { user2.Id });  //Not to be notified because no access for user1
+            await CreateCardPreviousVersionAsync(testDB, user2.Id, card4.Id, new DateTime(2020, 11, 5));
+            await CreateCardNotificationAsync(testDB, user1.Id, card4.Id, new DateTime(2020, 11, 2));
 
-            var card5 = await CreateCardAsync(user2.Id, new DateTime(2020, 11, 10), new Guid[] { user1.Id, user2.Id });
-            await CreateCardPreviousVersionAsync(user2.Id, card5.Id, new DateTime(2020, 11, 5));
-            await CreateCardNotificationAsync(user1.Id, card5.Id, new DateTime(2020, 11, 2));
+            var card5 = await CreateCardAsync(testDB, user2.Id, new DateTime(2020, 11, 10), new Guid[] { user1.Id, user2.Id });
+            await CreateCardPreviousVersionAsync(testDB, user2.Id, card5.Id, new DateTime(2020, 11, 5));
+            await CreateCardNotificationAsync(testDB, user1.Id, card5.Id, new DateTime(2020, 11, 2));
+
+            var now = new DateTime(2020, 11, 5);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var notifier = new UserCardVersionsNotifier(dbContext);
-                var user1Versions = notifier.Run(user1);
+                var user1Versions = notifier.Run(user1, now);
                 Assert.AreEqual(4, user1Versions.Length);
 
                 var notifForCard1 = user1Versions.Where(v => v.CardId == card1.Id).Single();
@@ -363,6 +452,16 @@ namespace MemCheck.Application.Tests.Notifying
                 var notifForCard5 = user1Versions.Where(v => v.CardId == card5.Id).Single();
                 Assert.IsTrue(notifForCard5.CardIsViewable);
 
+                await dbContext.SaveChangesAsync();
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                Assert.AreEqual(now, dbContext.CardNotifications.Single(cn => cn.CardId == card1.Id && cn.UserId == user1.Id).LastNotificationUtcDate);
+                Assert.AreEqual(now, dbContext.CardNotifications.Single(cn => cn.CardId == card2.Id && cn.UserId == user1.Id).LastNotificationUtcDate);
+                Assert.AreEqual(card3LastNotifDate, dbContext.CardNotifications.Single(cn => cn.CardId == card3.Id && cn.UserId == user1.Id).LastNotificationUtcDate);
+                Assert.AreEqual(now, dbContext.CardNotifications.Single(cn => cn.CardId == card4.Id && cn.UserId == user1.Id).LastNotificationUtcDate);
+                Assert.AreEqual(now, dbContext.CardNotifications.Single(cn => cn.CardId == card5.Id && cn.UserId == user1.Id).LastNotificationUtcDate);
             }
         }
     }
