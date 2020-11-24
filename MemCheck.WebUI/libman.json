@@ -3,37 +3,6 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "jquery@3.4.1",
-      "destination": "wwwroot/lib/jquery/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "jquery-validation@1.19.1",
-      "destination": "wwwroot/lib/jquery-validation/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "jquery-validation-unobtrusive@3.2.11",
-      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "bootstrap@4.4.1",
-      "destination": "wwwroot/lib/bootstrap/"
-    },
-    {
-      "library": "vue@2.6.11",
-      "destination": "wwwroot/lib/vue/"
-    },
-    {
-      "library": "axios@0.19.2",
-      "destination": "wwwroot/lib/axios/"
-    },
-    {
-      "library": "showdown@1.9.1",
-      "destination": "wwwroot/lib/showdown/"
-    },
-    {
       "library": "bootstrap-vue@2.19.0",
       "destination": "wwwroot/lib/bootstrap-vue/",
       "files": [
@@ -48,6 +17,56 @@
         "css/all.min.css",
         "js/all.min.js"
       ]
+    },
+    {
+      "library": "showdown@1.9.1",
+      "destination": "wwwroot/lib/showdown/",
+      "files": [
+        "showdown.min.js"
+      ]
+    },
+    {
+      "library": "axios@0.21.0",
+      "destination": "wwwroot/lib/axios/",
+      "files": [
+        "axios.min.js"
+      ]
+    },
+    {
+      "library": "vue@2.6.11",
+      "destination": "wwwroot/lib/vue/",
+      "files": [
+        "vue.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bootstrap@4.5.3",
+      "destination": "wwwroot/lib/bootstrap/",
+      "files": [
+        "dist/css/bootstrap.min.css",
+        "dist/js/bootstrap.bundle.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/",
+      "files": [
+        "dist/jquery.validate.unobtrusive.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "jquery-validation@1.19.2",
+      "destination": "wwwroot/lib/jquery-validation/",
+      "files": [
+        "dist/jquery.validate.min.js"
+      ]
+    },
+    {
+      "library": "jquery@3.5.1",
+      "destination": "wwwroot/lib/jquery/"
     }
   ]
 }
