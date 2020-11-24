@@ -22,10 +22,6 @@
       "destination": "wwwroot/lib/bootstrap/"
     },
     {
-      "library": "mdbootstrap@4.17.0",
-      "destination": "wwwroot/lib/mdbootstrap/"
-    },
-    {
       "library": "bootstrap-vue@2.13.0",
       "destination": "wwwroot/lib/bootstrap-vue/"
     },
