@@ -30,10 +30,6 @@
       "destination": "wwwroot/lib/axios/"
     },
     {
-      "library": "font-awesome@5.13.0",
-      "destination": "wwwroot/lib/font-awesome/"
-    },
-    {
       "library": "showdown@1.9.1",
       "destination": "wwwroot/lib/showdown/"
     },
@@ -43,6 +39,14 @@
       "files": [
         "bootstrap-vue.min.js",
         "bootstrap-vue.min.css"
+      ]
+    },
+    {
+      "library": "font-awesome@5.15.1",
+      "destination": "wwwroot/lib/font-awesome/",
+      "files": [
+        "css/all.min.css",
+        "js/all.min.js"
       ]
     }
   ]
