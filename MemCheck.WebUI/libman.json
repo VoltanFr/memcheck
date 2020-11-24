@@ -22,10 +22,6 @@
       "destination": "wwwroot/lib/bootstrap/"
     },
     {
-      "library": "bootstrap-vue@2.13.0",
-      "destination": "wwwroot/lib/bootstrap-vue/"
-    },
-    {
       "library": "vue@2.6.11",
       "destination": "wwwroot/lib/vue/"
     },
@@ -40,6 +36,14 @@
     {
       "library": "showdown@1.9.1",
       "destination": "wwwroot/lib/showdown/"
+    },
+    {
+      "library": "bootstrap-vue@2.19.0",
+      "destination": "wwwroot/lib/bootstrap-vue/",
+      "files": [
+        "bootstrap-vue.min.js",
+        "bootstrap-vue.min.css"
+      ]
     }
   ]
 }
