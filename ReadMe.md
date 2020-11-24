@@ -93,6 +93,7 @@ Paramètres utilisateur:
 # Bugs
 
 # To do, at little cost
+- Upgrade Vue
 - Check by unit test that when a card is created, if the visibility is not public, the version creator is in the visibility list.
 - Check by unit test that it is not possible for a user to learn a card he does not have access to (both in repeat and learn modes)
 - Effacement image si pas utilisée. Nécessite d'abord recherche avec une image donnée pour pouvoir remplacer, et affichage "Utilisée dans n pages" avec lien
