@@ -57,11 +57,11 @@ jobs:
     - name: "Telling size of publish folder"
       run: du -sh ${{env.PUBLISH_FOLDER}}
 
-    # - name: Upload published version as Artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: MemCheck
-    #     path: ${{env.PUBLISH_FOLDER}}
+    - name: Upload published version as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: MemCheck
+        path: ${{env.PUBLISH_FOLDER}}
 
     - name: "Deploy to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2
