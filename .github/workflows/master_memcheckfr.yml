@@ -12,7 +12,7 @@ jobs:
   build-test-deploy:
     name: "MemCheck compilation and deployment to prod"
 
-    runs-on: windows-latest
+    runs-on: ubuntu-20.04
 
     env:
       NETCORE_VERSION: "5.0.100"
