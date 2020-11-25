@@ -7,7 +7,9 @@ on:
   push:
     branches:
       - master
-
+  pull_request:
+    branches:
+      - main
 jobs:
   build-test-deploy:
     name: "MemCheck compilation and deployment to prod"
