@@ -1,16 +1,16 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: "MemCheck build, test and deploy to Azure"
+name: "MemCheck build and test"
 
 on:
-  push:
+  pull_request:
     branches:
       - master
 
 jobs:
-  build-test-deploy:
-    name: "MemCheck compilation and deployment to prod"
+  build-test:
+    name: "MemCheck compilation and test"
 
     runs-on: windows-latest
 
@@ -38,16 +38,6 @@ jobs:
     - name: "Build the root sln with dotnet"
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
-    # - name: "Show the directory tree"
-    #   run: tree /F /A
-
-    - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: 'MemCheck.DatabaseTests/bin/Release/net5.0/appsettings.json'
-      env:
-        ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
-
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
@@ -62,18 +52,3 @@ jobs:
       with:
         name: MemCheck
         path: ${{env.PUBLISH_FOLDER}}
-
-    - name: "Deploy to MemCheck Azure Web App"
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: '${{env.AZURE_WEBAPP_NAME}}'
-        slot-name: 'production'
-        publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
-        package: ${{env.PUBLISH_FOLDER}}
-
-    # - name: "Deploy to MemCheck Azure function"
-    #   uses: azure/functions-action@v1.1.6
-    #   with:
-    #     app-name: '${{env.AZURE_FUNCTION_NAME}}'
-    #     publish-profile: ${{secrets.MEMCHECK_AZFUNC_NOTIFIER_PUBLISH_PROFILE}}
-    #     package: ${{env.PUBLISH_FOLDER}}
