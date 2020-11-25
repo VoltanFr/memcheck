@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <TargetFramework>net5.0</TargetFramework>
     <!--<RuntimeIdentifier>win-x86</RuntimeIdentifier>-->
-    <Version>0.4.36</Version>
+    <Version>0.4.37</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

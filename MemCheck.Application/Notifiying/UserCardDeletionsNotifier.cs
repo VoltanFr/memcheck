@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Immutable;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace MemCheck.Application.Notifying
 {
@@ -16,23 +17,30 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public ImmutableArray<CardDeletion> Run(MemCheckUser user)
+        public ImmutableArray<CardDeletion> Run(MemCheckUser user, DateTime? now = null)
         {
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
-            var deletedCards = from previousVersion in dbContext.CardPreviousVersions.Include(pv => pv.UsersWithView)
-                               join cardNotif in dbContext.CardNotifications
-                               on previousVersion.Card equals cardNotif.CardId
-                               where (cardNotif.UserId == user.Id) && (previousVersion.VersionType == CardPreviousVersionType.Deletion) && (previousVersion.VersionUtcDate > cardNotif.LastNotificationUtcDate)
-                               select new { previousVersion.FrontSide, previousVersion.VersionCreator, previousVersion.VersionUtcDate, previousVersion.VersionDescription, previousVersion.UsersWithView };
+            var deletedCards = dbContext.CardPreviousVersions.Include(card => card.UsersWithView)
+                .Join(
+                    dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == user.Id),
+                    previousVersion => previousVersion.Card,
+                    cardNotif => cardNotif.CardId,
+                    (previousVersion, cardNotif) => new { previousVersion, cardNotif }
+                )
+                .Where(cardAndNotif => (cardAndNotif.previousVersion.VersionType == CardPreviousVersionType.Deletion) && cardAndNotif.previousVersion.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate);
+
+            now = now ?? DateTime.UtcNow;
+            foreach (var cardVersion in deletedCards)
+                cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
 
             return deletedCards.Select(cardToReport =>
               new CardDeletion(
-                  cardToReport.FrontSide,
-                  cardToReport.VersionCreator.UserName,
-                  cardToReport.VersionUtcDate,
-                  cardToReport.VersionDescription,
-                  !cardToReport.UsersWithView.Any() || cardToReport.UsersWithView.Any(u => u.AllowedUserId == user.Id)
+                  cardToReport.previousVersion.FrontSide,
+                  cardToReport.previousVersion.VersionCreator.UserName,
+                  cardToReport.previousVersion.VersionUtcDate,
+                  cardToReport.previousVersion.VersionDescription,
+                  !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == user.Id)
               )
           ).ToImmutableArray();
         }
