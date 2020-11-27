@@ -117,9 +117,9 @@ namespace MemCheck.WebUI.Controllers
                     mailBody.Append($"Notifier execution took {chrono.Elapsed}");
                     mailBody.Append("</p>");
 
-                    mailBody.Append("<h1>Cards with new versions</h1>");
+                    mailBody.Append($"<h1>{userNotifications.CardVersions.Length} Cards with new versions</h1>");
                     mailBody.Append("<ul>");
-                    foreach (var card in userNotifications.CardVersions)
+                    foreach (var card in userNotifications.CardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
                     {
                         mailBody.Append("<li>");
                         mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
@@ -130,9 +130,9 @@ namespace MemCheck.WebUI.Controllers
                     }
                     mailBody.Append("</ul>");
 
-                    mailBody.Append("<h1>Deleted cards</h1>");
+                    mailBody.Append($"<h1>{userNotifications.DeletedCards.Length} Deleted cards</h1>");
                     mailBody.Append("<ul>");
-                    foreach (var card in userNotifications.DeletedCards)
+                    foreach (var card in userNotifications.DeletedCards.OrderBy(card => card.DeletionUtcDate))
                     {
                         mailBody.Append("<li>");
                         mailBody.Append($"{card.FrontSide}<br/>");

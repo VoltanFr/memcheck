@@ -3,14 +3,12 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>net5.0</TargetFramework>
-    <!--<RuntimeIdentifier>win-x86</RuntimeIdentifier>-->
-    <Version>0.4.37</Version>
+    <Version>0.4.38</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>2</WarningLevel>
-    <!--<PlatformTarget>x86</PlatformTarget>-->
   </PropertyGroup>
 
   <ItemGroup>
