@@ -14,14 +14,6 @@ namespace MemCheck.Application.Tests.Notifying
     public class UsersToNotifyGetterTests
     {
         #region Private methods
-        private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> db)
-        {
-            using var dbContext = new MemCheckDbContext(db);
-            var result = new MemCheckUser();
-            dbContext.Users.Add(result);
-            await dbContext.SaveChangesAsync();
-            return result;
-        }
         private async Task<Card> CreateCardAsync(DbContextOptions<MemCheckDbContext> db, MemCheckUser versionCreator)
         {
             using var dbContext = new MemCheckDbContext(db);
@@ -61,7 +53,7 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task TestRun_DBWithUsersAndCardsButNoNotification()
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
-            var user1 = await CreateUserAsync(testDB);
+            var user1 = await UserHelper.CreateUserAsync(testDB);
             await CreateCardAsync(testDB, user1);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -75,9 +67,9 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task TestRun_DBWithOneUserWithOneNotification()
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
-            var user1 = await CreateUserAsync(testDB);
-            var user2 = await CreateUserAsync(testDB);
-            var user3 = await CreateUserAsync(testDB);
+            var user1 = await UserHelper.CreateUserAsync(testDB);
+            var user2 = await UserHelper.CreateUserAsync(testDB);
+            var user3 = await UserHelper.CreateUserAsync(testDB);
             var card1 = await CreateCardAsync(testDB, user1);
             await CreateCardAsync(testDB, user1);
             await CreateCardAsync(testDB, user2);
@@ -96,9 +88,9 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var user1 = await CreateUserAsync(testDB);
-            var user2 = await CreateUserAsync(testDB);
-            var user3 = await CreateUserAsync(testDB);
+            var user1 = await UserHelper.CreateUserAsync(testDB);
+            var user2 = await UserHelper.CreateUserAsync(testDB);
+            var user3 = await UserHelper.CreateUserAsync(testDB);
             var card1 = await CreateCardAsync(testDB, user1);
             var card2 = await CreateCardAsync(testDB, user1);
             var card3 = await CreateCardAsync(testDB, user2);
