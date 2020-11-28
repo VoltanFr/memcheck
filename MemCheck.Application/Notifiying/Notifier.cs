@@ -28,10 +28,6 @@ namespace MemCheck.Application.Notifying
             var cardVersions = userCardVersionsNotifier.Run(user);
             var cardDeletions = userCardDeletionsNotifier.Run(user);
 
-            //var endOfRequest = DateTime.UtcNow;
-            //foreach (var registeredCard in registeredCardsForUser.Values)
-            //    registeredCard.LastNotificationUtcDate = endOfRequest;
-
             await dbContext.SaveChangesAsync();
 
             return new UserNotifications(
