@@ -70,7 +70,7 @@ namespace MemCheck.DatabaseTests
             Assert.AreEqual(expectedLastMigrationName, actual);
         }
         [TestMethod()]
-        public void TestNoDbUpdateNeededCore()
+        public void TestNoDbUpdateNeeded()
         {
             var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
             Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
