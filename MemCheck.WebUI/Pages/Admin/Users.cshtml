@@ -33,11 +33,13 @@
                     <th>@Localizer["Name"]</th>
                     <th>@Localizer["Roles"]</th>
                     <th>@Localizer["Email"]</th>
+                    <th>@Localizer["Notif interval"]</th>
                 </tr>
                 <tr v-for="user in users">
                     <td>{{user.userName}}</td>
                     <td>{{user.roles}}</td>
                     <td>{{user.email}}</td>
+                    <td>{{user.notifInterval}}</td>
                 </tr>
             </table>
         </div>

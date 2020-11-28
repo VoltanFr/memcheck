@@ -84,10 +84,12 @@ namespace MemCheck.WebUI.Controllers
                 UserName = user.UserName;
                 Roles = user.Roles;
                 Email = user.Email;
+                NotifInterval = user.NotifInterval;
             }
             public string UserName { get; }
             public string Roles { get; }
             public string Email { get; }
+            public int NotifInterval { get; }
         }
         #endregion
         #endregion
