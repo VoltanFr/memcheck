@@ -1,8 +1,9 @@
 ﻿using MemCheck.Database;
-using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
 using MemCheck.Domain;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace MemCheck.Application.Notifying
 {
@@ -15,10 +16,10 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public ImmutableArray<MemCheckUser> Run()
+        public ImmutableArray<MemCheckUser> Run(DateTime? now = null)
         {
-            //Will be reviwed when we have the table of registration info
-            var userList = dbContext.CardNotifications.Select(notif => notif.User).Distinct();
+            now = now ?? DateTime.UtcNow;
+            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffDay(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs);
             return userList.ToImmutableArray();
         }
     }

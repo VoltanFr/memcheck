@@ -9,5 +9,7 @@ namespace MemCheck.Domain
     {
         public string? UILanguage { get; set; } = null;
         public CardLanguage? PreferredCardCreationLanguage { get; set; } = null;
+        public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0;   //A number of days. <= 0 means never send any email
+        public DateTime LastNotificationUtcDate { get; set; }
     }
 }
