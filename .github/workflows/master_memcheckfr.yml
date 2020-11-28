@@ -24,52 +24,52 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
-    #   uses: actions/setup-dotnet@v1
-    #   with:
-    #     dotnet-version: ${{env.NETCORE_VERSION}}
+    - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{env.NETCORE_VERSION}}
 
-    # - name: "Clean with dotnet"
-    #   run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
+    - name: "Clean with dotnet"
+      run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
 
-    # - name: "Restore NuGet packages"
-    #   run: dotnet restore
+    - name: "Restore NuGet packages"
+      run: dotnet restore
 
-    # - name: "Build the root sln with dotnet"
-    #   run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
+    - name: "Build the root sln with dotnet"
+      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
 
-    # # - name: "Show the directory tree"
-    # #   run: tree /F /A
+    # - name: "Show the directory tree"
+    #   run: tree /F /A
 
-    # - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
-    #   uses: microsoft/variable-substitution@v1
-    #   with:
-    #     files: 'MemCheck.DatabaseTests/bin/Release/net5.0/appsettings.json'
-    #   env:
-    #     ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
+    - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: 'MemCheck.DatabaseTests/bin/Release/net5.0/appsettings.json'
+      env:
+        ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
 
-    # - name: "Run unit tests"
-    #   run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
+    - name: "Run unit tests"
+      run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
-    # - name: "Publish: prepare the projects for deployment"
-    #   run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
+    - name: "Publish: prepare the projects for deployment"
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
 
-    # - name: "Telling size of publish folder"
-    #   run: du -sh ${{env.PUBLISH_FOLDER}}
+    - name: "Telling size of publish folder"
+      run: du -sh ${{env.PUBLISH_FOLDER}}
 
-    # - name: Upload published version as Artifact
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: MemCheck
-    #     path: ${{env.PUBLISH_FOLDER}}
+    - name: Upload published version as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: MemCheck
+        path: ${{env.PUBLISH_FOLDER}}
 
-    # - name: "Deploy to MemCheck Azure Web App"
-    #   uses: azure/webapps-deploy@v2
-    #   with:
-    #     app-name: '${{env.AZURE_WEBAPP_NAME}}'
-    #     slot-name: 'production'
-    #     publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
-    #     package: ${{env.PUBLISH_FOLDER}}
+    - name: "Deploy to MemCheck Azure Web App"
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: '${{env.AZURE_WEBAPP_NAME}}'
+        slot-name: 'production'
+        publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
+        package: ${{env.PUBLISH_FOLDER}}
 
     # - name: "Deploy to MemCheck Azure function"
     #   uses: azure/functions-action@v1.1.6
@@ -77,14 +77,3 @@ jobs:
     #     app-name: '${{env.AZURE_FUNCTION_NAME}}'
     #     publish-profile: ${{secrets.MEMCHECK_AZFUNC_NOTIFIER_PUBLISH_PROFILE}}
     #     package: ${{env.PUBLISH_FOLDER}}
-
-    - name: "Send info mail to admin"
-      uses: mmeisels/action-send-an-email-@v1
-      with:
-        emailToAddress: ${{secrets.DEPLOY_SUCCESS_MAIL_RECIPIENT}}
-        emailFromAddress: ${{secrets.DEPLOY_SUCCESS_MAIL_SENDER}}
-        emailBody: 'MemCheck successfully deployed'
-        # unSubscribeGroupID: 'unsusbcribe group ID from step 3'
-        # emailTemplateID: 'Email Template ID from Step 4'
-      env:
-        SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
