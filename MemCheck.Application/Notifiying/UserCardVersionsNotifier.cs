@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifying
 {
     internal interface IUserCardVersionsNotifier
     {
-        public Task<ImmutableArray<CardVersion>> RunAsync(MemCheckUser user, DateTime? now = null);
+        public Task<ImmutableArray<CardVersion>> RunAsync(Guid userId, DateTime? now = null);
     }
     internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
     {
@@ -22,11 +22,11 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public async Task<ImmutableArray<CardVersion>> RunAsync(MemCheckUser user, DateTime? now = null)
+        public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId, DateTime? now = null)
         {
             var cardVersions = dbContext.Cards.Include(card => card.UsersWithView)
                 .Join(
-                dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == user.Id),
+                dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId),
                 card => card.Id,
                 cardNotif => cardNotif.CardId,
                 (card, cardNotif) => new { card, cardNotif }
@@ -44,7 +44,7 @@ namespace MemCheck.Application.Notifying
                                    cardToReport.card.VersionCreator.UserName,
                                    cardToReport.card.VersionUtcDate,
                                    cardToReport.card.VersionDescription,
-                                   !cardToReport.card.UsersWithView.Any() || cardToReport.card.UsersWithView.Any(u => u.UserId == user.Id)
+                                   !cardToReport.card.UsersWithView.Any() || cardToReport.card.UsersWithView.Any(u => u.UserId == userId)
                                )
                         ).ToImmutableArray();
 

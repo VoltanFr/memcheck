@@ -21,7 +21,7 @@ namespace MemCheck.Application.Notifying
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user, DateTime now)
         {
             var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user.Id);
-            var cardVersions = await userCardVersionsNotifier.RunAsync(user, now);
+            var cardVersions = await userCardVersionsNotifier.RunAsync(user.Id, now);
             var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id, now);
 
             await userLastNotifDateUpdater.RunAsync(user.Id, now);
