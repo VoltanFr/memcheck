@@ -102,7 +102,7 @@ namespace MemCheck.WebUI.Controllers
             mailBody.Append($"<p>Hello {userNotifications.UserName}</p>");
             mailBody.Append("<h1>Summary</h1>");
             mailBody.Append("<p>");
-            mailBody.Append($"{userNotifications.RegisteredCardCount} registered cards<br/>");
+            mailBody.Append($"{userNotifications.SubscribedCardCount} registered cards<br/>");
             mailBody.Append($"Search finished at {DateTime.UtcNow}<br/>");
             mailBody.Append("</p>");
 

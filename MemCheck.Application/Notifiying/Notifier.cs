@@ -19,14 +19,14 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user, DateTime now)
         {
-            var registeredCardCount = await userCardSubscriptionCounter.RunAsync(user);
+            var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user);
             var cardVersions = await userCardVersionsNotifier.RunAsync(user, now);
             var cardDeletions = await userCardDeletionsNotifier.RunAsync(user, now);
 
             return new UserNotifications(
                 user.UserName,
                 user.Email,
-                registeredCardCount,
+                subscribedCardCount,
                 cardVersions,
                 cardDeletions
                 );
@@ -62,17 +62,17 @@ namespace MemCheck.Application.Notifying
         }
         public class UserNotifications
         {
-            public UserNotifications(string userName, string userEmail, int registeredCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<CardDeletion> deletedCards)
+            public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<CardDeletion> deletedCards)
             {
                 UserName = userName;
                 UserEmail = userEmail;
-                RegisteredCardCount = registeredCardCount;
+                SubscribedCardCount = subscribedCardCount;
                 CardVersions = cardVersions.ToImmutableArray();
                 DeletedCards = deletedCards.ToImmutableArray();
             }
             public string UserName { get; }
             public string UserEmail { get; }
-            public int RegisteredCardCount { get; }
+            public int SubscribedCardCount { get; }
             public ImmutableArray<CardVersion> CardVersions { get; }
             public ImmutableArray<CardDeletion> DeletedCards { get; }
         }

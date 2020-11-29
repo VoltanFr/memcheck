@@ -55,7 +55,7 @@ namespace MemCheck.Application.Tests.Notifying
             Assert.AreEqual(1, result.UserNotifications[0].CardVersions.Length);
             Assert.AreEqual(cardVersion, result.UserNotifications[0].CardVersions[0]);
             Assert.AreEqual(0, result.UserNotifications[0].DeletedCards.Length);
-            Assert.AreEqual(12, result.UserNotifications[0].RegisteredCardCount);
+            Assert.AreEqual(12, result.UserNotifications[0].SubscribedCardCount);
 
             userCardDeletionsNotifier.VerifyAll();
             usersToNotifyGetter.VerifyAll();
@@ -88,7 +88,7 @@ namespace MemCheck.Application.Tests.Notifying
             Assert.AreEqual(0, result.UserNotifications[0].CardVersions.Length);
             Assert.AreEqual(1, result.UserNotifications[0].DeletedCards.Length);
             Assert.AreEqual(cardDeletion, result.UserNotifications[0].DeletedCards[0]);
-            Assert.AreEqual(1, result.UserNotifications[0].RegisteredCardCount);
+            Assert.AreEqual(1, result.UserNotifications[0].SubscribedCardCount);
 
             userCardDeletionsNotifier.VerifyAll();
             usersToNotifyGetter.VerifyAll();
