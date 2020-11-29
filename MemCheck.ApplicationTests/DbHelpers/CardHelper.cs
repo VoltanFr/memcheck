@@ -9,9 +9,9 @@ using System.Collections.Generic;
 
 namespace MemCheck.Application.Tests.Notifying
 {
-    public class CardHelper
+    public static class CardHelper
     {
-        public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
+        public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
 
@@ -25,8 +25,11 @@ namespace MemCheck.Application.Tests.Notifying
             result.AdditionalInfo = StringServices.RandomString();
             result.VersionDescription = StringServices.RandomString();
             result.VersionType = CardVersionType.Creation;
-            result.InitialCreationUtcDate = versionDate;
-            result.VersionUtcDate = versionDate;
+            if (versionDate != null)
+            {
+                result.InitialCreationUtcDate = versionDate.Value;
+                result.VersionUtcDate = versionDate.Value;
+            }
             dbContext.Cards.Add(result);
 
             var usersWithView = new List<UserWithViewOnCard>();
