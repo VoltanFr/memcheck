@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    internal sealed class UserCardVersionsNotifier
+    internal interface IUserCardVersionsNotifier
+    {
+        public Task<ImmutableArray<CardVersion>> RunAsync(MemCheckUser user, DateTime? now = null);
+    }
+    internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;

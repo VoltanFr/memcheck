@@ -11,10 +11,10 @@ namespace MemCheck.Application.Notifying
     public sealed class Notifier
     {
         #region Fields
-        private readonly UserCardSubscriptionCounter userCardSubscriptionCounter;
-        private readonly UserCardVersionsNotifier userCardVersionsNotifier;
-        private readonly UserCardDeletionsNotifier userCardDeletionsNotifier;
-        private readonly UsersToNotifyGetter usersToNotifyGetter;
+        private readonly IUserCardSubscriptionCounter userCardSubscriptionCounter;
+        private readonly IUserCardVersionsNotifier userCardVersionsNotifier;
+        private readonly IUserCardDeletionsNotifier userCardDeletionsNotifier;
+        private readonly IUsersToNotifyGetter usersToNotifyGetter;
         public const int MaxLengthForTextFields = 150;
         #endregion
         #region Private methods
@@ -33,12 +33,15 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext)
+        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext))
         {
-            userCardSubscriptionCounter = new UserCardSubscriptionCounter(dbContext);
-            userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
-            userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);
-            usersToNotifyGetter = new UsersToNotifyGetter(dbContext);
+        }
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter)
+        {
+            this.userCardSubscriptionCounter = userCardSubscriptionCounter;
+            this.userCardVersionsNotifier = userCardVersionsNotifier;
+            this.userCardDeletionsNotifier = userCardDeletionsNotifier;
+            this.usersToNotifyGetter = usersToNotifyGetter;
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync()
         {

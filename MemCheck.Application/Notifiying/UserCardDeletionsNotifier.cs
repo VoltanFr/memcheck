@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    internal sealed class UserCardDeletionsNotifier
+    internal interface IUserCardDeletionsNotifier
+    {
+        public Task<ImmutableArray<CardDeletion>> RunAsync(MemCheckUser user, DateTime? now = null);
+    }
+    internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;

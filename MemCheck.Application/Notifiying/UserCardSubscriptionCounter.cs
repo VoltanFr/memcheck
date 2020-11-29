@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    internal sealed class UserCardSubscriptionCounter
+    internal interface IUserCardSubscriptionCounter
+    {
+        public Task<int> RunAsync(MemCheckUser user);
+    }
+    internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;

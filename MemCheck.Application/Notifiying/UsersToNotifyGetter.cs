@@ -7,7 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MemCheck.Application.Notifying
 {
-    internal sealed class UsersToNotifyGetter
+    internal interface IUsersToNotifyGetter
+    {
+        public ImmutableArray<MemCheckUser> Run(DateTime? now = null);
+    }
+    internal sealed class UsersToNotifyGetter : IUsersToNotifyGetter
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
