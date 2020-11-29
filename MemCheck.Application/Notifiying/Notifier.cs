@@ -15,6 +15,7 @@ namespace MemCheck.Application.Notifying
         private readonly UserCardSubscriptionCounter userCardSubscriptionCounter;
         private readonly UserCardVersionsNotifier userCardVersionsNotifier;
         private readonly UserCardDeletionsNotifier userCardDeletionsNotifier;
+        private readonly UsersToNotifyGetter usersToNotifyGetter;
         public const int MaxLengthForTextFields = 150;
         #endregion
         #region Private methods
@@ -41,10 +42,11 @@ namespace MemCheck.Application.Notifying
             userCardSubscriptionCounter = new UserCardSubscriptionCounter(dbContext);
             userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
             userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);
+            usersToNotifyGetter = new UsersToNotifyGetter(dbContext);
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync()
         {
-            var users = new UsersToNotifyGetter(dbContext).Run();
+            var users = usersToNotifyGetter.Run();
             var userNotifications = new List<UserNotifications>();
             foreach (var user in users)
                 userNotifications.Add(await GetUserNotificationsAsync(user));
