@@ -91,7 +91,7 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task EmptyDB()
         {
             var db = GetEmptyTestDB();
-            var user = await UserHelper.CreateAsync(db);
+            var user = await UserHelper.CreateInDbAsync(db);
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -104,7 +104,7 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task CardWithoutPreviousVersion_NotToBeNotified()
         {
             var db = GetEmptyTestDB();
-            var user = await UserHelper.CreateAsync(db);
+            var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
             await CardSubscriptionHelper.CreateAsync(db, user.Id, card.Id, new DateTime(2020, 11, 3));
             var lastNotificationDate = new DateTime(2020, 11, 3);
@@ -124,10 +124,10 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task CardWithoutPreviousVersion_ToBeNotifiedWithoutVisibility()
         {
             var db = GetEmptyTestDB();
-            var user1 = await UserHelper.CreateAsync(db);
+            var user1 = await UserHelper.CreateInDbAsync(db);
             var deletedCard = await CreateDeletedCardAsync(db, user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
 
-            var user2 = await UserHelper.CreateAsync(db);
+            var user2 = await UserHelper.CreateInDbAsync(db);
             await CardSubscriptionHelper.CreateAsync(db, user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
 
             var now = new DateTime(2020, 11, 2);
@@ -149,8 +149,8 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task CardWithoutPreviousVersion_ToBeNotified()
         {
             var db = GetEmptyTestDB();
-            var user1 = await UserHelper.CreateAsync(db);
-            var user2 = await UserHelper.CreateAsync(db);
+            var user1 = await UserHelper.CreateInDbAsync(db);
+            var user2 = await UserHelper.CreateInDbAsync(db);
 
             var card = await CardHelper.CreateAsync(db, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
             await CardSubscriptionHelper.CreateAsync(db, user1.Id, card.Id, new DateTime(2020, 11, 1));
@@ -187,7 +187,7 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task CardWithoutPreviousVersion_ToBeNotified_UsingApplicationDelete()
         {
             var db = GetEmptyTestDB();
-            var user = await UserHelper.CreateAsync(db);
+            var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
 
             await CardSubscriptionHelper.CreateAsync(db, user.Id, card.Id, new DateTime(2020, 11, 1));

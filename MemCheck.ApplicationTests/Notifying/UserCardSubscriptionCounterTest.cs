@@ -15,7 +15,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var user = await UserHelper.CreateAsync(testDB);
+            var user = await UserHelper.CreateInDbAsync(testDB);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -28,7 +28,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var user = await UserHelper.CreateAsync(testDB);
+            var user = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user.Id);
             await CardSubscriptionHelper.CreateAsync(testDB, user.Id, card.Id);
 
@@ -43,7 +43,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var user = await UserHelper.CreateAsync(testDB);
+            var user = await UserHelper.CreateInDbAsync(testDB);
             await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
             await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
             await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
@@ -59,12 +59,12 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var user1 = await UserHelper.CreateAsync(testDB);
+            var user1 = await UserHelper.CreateInDbAsync(testDB);
 
-            var user2 = await UserHelper.CreateAsync(testDB);
+            var user2 = await UserHelper.CreateInDbAsync(testDB);
             await CardSubscriptionHelper.CreateAsync(testDB, user2.Id, (await CardHelper.CreateAsync(testDB, user1.Id)).Id);
 
-            var user3 = await UserHelper.CreateAsync(testDB);
+            var user3 = await UserHelper.CreateInDbAsync(testDB);
             await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user1.Id)).Id);
             await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user2.Id)).Id);
             await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user3.Id)).Id);
