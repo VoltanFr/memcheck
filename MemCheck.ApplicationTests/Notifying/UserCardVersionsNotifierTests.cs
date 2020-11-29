@@ -6,7 +6,6 @@ using System;
 using MemCheck.Application.Notifying;
 using MemCheck.Domain;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -59,16 +58,6 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task CreateCardNotificationAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
-        {
-            using var dbContext = new MemCheckDbContext(testDB);
-            var notif = new CardNotificationSubscription();
-            notif.CardId = cardId;
-            notif.UserId = subscriberId;
-            notif.LastNotificationUtcDate = lastNotificationDate;
-            dbContext.CardNotifications.Add(notif);
-            await dbContext.SaveChangesAsync();
-        }
         #endregion
         [TestMethod()]
         public async Task EmptyDB()
@@ -90,7 +79,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user = await UserHelper.CreateAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user.Id, new DateTime(2020, 11, 2));
             var lastNotificationDate = new DateTime(2020, 11, 3);
-            await CreateCardNotificationAsync(testDB, user.Id, card.Id, lastNotificationDate);
+            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -111,7 +100,7 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
             var user = await UserHelper.CreateAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(testDB, user.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, card.Id, new DateTime(2020, 11, 1));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -140,7 +129,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user2 = await UserHelper.CreateAsync(testDB);
             await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
             var lastNotificationDate = new DateTime(2020, 11, 3);
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, lastNotificationDate);
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -165,7 +154,7 @@ namespace MemCheck.Application.Tests.Notifying
             await CreateCardPreviousVersionAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
 
             var user2 = await UserHelper.CreateAsync(testDB);
-            await CreateCardNotificationAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
             var now = new DateTime(2020, 11, 2);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -201,7 +190,7 @@ namespace MemCheck.Application.Tests.Notifying
             var card = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 2), new Guid[] { user1.Id, user2.Id });
             await CreateCardPreviousVersionAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
 
-            await CreateCardNotificationAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
             var now = new DateTime(2020, 11, 3);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -228,7 +217,7 @@ namespace MemCheck.Application.Tests.Notifying
             var card = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateAsync(testDB);
             await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
             var now = new DateTime(2020, 11, 4);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -255,7 +244,7 @@ namespace MemCheck.Application.Tests.Notifying
             var card = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateAsync(testDB);
             await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 1));
             var now = new DateTime(2020, 11, 4);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -284,7 +273,7 @@ namespace MemCheck.Application.Tests.Notifying
             var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 2));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
             var lastNotificationDate = new DateTime(2020, 11, 3);
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, lastNotificationDate);
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, lastNotificationDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -308,7 +297,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user2 = await UserHelper.CreateAsync(testDB);
             var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 3));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 4));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 4));
             var now = new DateTime(2020, 11, 5);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -336,7 +325,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user2 = await UserHelper.CreateAsync(testDB);
             var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card.Id, new DateTime(2020, 11, 3));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, previousVersion1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card.Id, new DateTime(2020, 11, 2));
             var now = new DateTime(2020, 11, 5);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -365,26 +354,26 @@ namespace MemCheck.Application.Tests.Notifying
             var card1 = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
             var card1PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card1.Id, new DateTime(2020, 11, 5));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card1PV1, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(testDB, user1.Id, card1.Id, new DateTime(2020, 11, 2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card1.Id, new DateTime(2020, 11, 2));
 
             var card2 = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
             var card2PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card2.Id, new DateTime(2020, 11, 5));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card2PV1, new DateTime(2020, 11, 2));
-            await CreateCardNotificationAsync(testDB, user1.Id, card2.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card2.Id, new DateTime(2020, 11, 1));
 
             var card3 = await CardHelper.CreateAsync(testDB, user1.Id, new DateTime(2020, 11, 10));
             var card3PV1 = await CreateCardPreviousVersionAsync(testDB, user2.Id, card3.Id, new DateTime(2020, 11, 5));
             await CreatePreviousVersionPreviousVersionAsync(testDB, user2.Id, card3PV1, new DateTime(2020, 11, 2));
             var card3LastNotifDate = new DateTime(2020, 11, 11);
-            await CreateCardNotificationAsync(testDB, user1.Id, card3.Id, card3LastNotifDate);
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card3.Id, card3LastNotifDate);
 
             var card4 = await CardHelper.CreateAsync(testDB, user2.Id, new DateTime(2020, 11, 10), new Guid[] { user2.Id });  //Not to be notified because no access for user1
             await CreateCardPreviousVersionAsync(testDB, user2.Id, card4.Id, new DateTime(2020, 11, 5));
-            await CreateCardNotificationAsync(testDB, user1.Id, card4.Id, new DateTime(2020, 11, 2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card4.Id, new DateTime(2020, 11, 2));
 
             var card5 = await CardHelper.CreateAsync(testDB, user2.Id, new DateTime(2020, 11, 10), new Guid[] { user1.Id, user2.Id });
             await CreateCardPreviousVersionAsync(testDB, user2.Id, card5.Id, new DateTime(2020, 11, 5));
-            await CreateCardNotificationAsync(testDB, user1.Id, card5.Id, new DateTime(2020, 11, 2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user1.Id, card5.Id, new DateTime(2020, 11, 2));
 
             var now = new DateTime(2020, 11, 5);
 

@@ -77,16 +77,6 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task CreateCardNotificationAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
-        {
-            using var dbContext = new MemCheckDbContext(testDB);
-            var notif = new CardNotificationSubscription();
-            notif.CardId = cardId;
-            notif.UserId = subscriberId;
-            notif.LastNotificationUtcDate = lastNotificationDate;
-            dbContext.CardNotifications.Add(notif);
-            await dbContext.SaveChangesAsync();
-        }
         private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -116,7 +106,7 @@ namespace MemCheck.Application.Tests.Notifying
             var db = GetEmptyTestDB();
             var user = await UserHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(db, user.Id, card.Id, new DateTime(2020, 11, 3));
+            await CardSubscriptionHelper.CreateAsync(db, user.Id, card.Id, new DateTime(2020, 11, 3));
             var lastNotificationDate = new DateTime(2020, 11, 3);
             await DeleteCardAsync(db, user.Id, card.Id, lastNotificationDate);
 
@@ -138,7 +128,7 @@ namespace MemCheck.Application.Tests.Notifying
             var deletedCard = await CreateDeletedCardAsync(db, user1.Id, new DateTime(2020, 11, 2), new[] { user1.Id });
 
             var user2 = await UserHelper.CreateAsync(db);
-            await CreateCardNotificationAsync(db, user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(db, user2.Id, deletedCard.Card, new DateTime(2020, 11, 1));
 
             var now = new DateTime(2020, 11, 2);
 
@@ -164,8 +154,8 @@ namespace MemCheck.Application.Tests.Notifying
             var user2 = await UserHelper.CreateAsync(db);
 
             var card = await CardHelper.CreateAsync(db, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
-            await CreateCardNotificationAsync(db, user1.Id, card.Id, new DateTime(2020, 11, 1));
-            await CreateCardNotificationAsync(db, user2.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(db, user1.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(db, user2.Id, card.Id, new DateTime(2020, 11, 1));
 
             await DeleteCardAsync(db, user1.Id, card.Id, new DateTime(2020, 11, 2));
 
@@ -203,7 +193,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user = await UserHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
 
-            await CreateCardNotificationAsync(db, user.Id, card.Id, new DateTime(2020, 11, 1));
+            await CardSubscriptionHelper.CreateAsync(db, user.Id, card.Id, new DateTime(2020, 11, 1));
 
             await DeleteCardAsync(db, user.Id, card.Id, new DateTime(2020, 11, 2));
 
