@@ -8,13 +8,14 @@ namespace MemCheck.Application.Tests.Notifying
 {
     public static class CardSubscriptionHelper
     {
-        public static async Task CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime lastNotificationDate)
+        public static async Task CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime? lastNotificationDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var notif = new CardNotificationSubscription();
             notif.CardId = cardId;
             notif.UserId = subscriberId;
-            notif.LastNotificationUtcDate = lastNotificationDate;
+            if (lastNotificationDate != null)
+                notif.LastNotificationUtcDate = lastNotificationDate.Value;
             dbContext.CardNotifications.Add(notif);
             await dbContext.SaveChangesAsync();
         }
