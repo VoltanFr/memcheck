@@ -56,39 +56,9 @@
   - Cascade delete behaves differently.
 
 # In progress
-Vidéo à propos de Azure functions avec GitHub : https://www.youtube.com/watch?v=LHJIGmJoS0c
-Add telemetry to Azure function: https://docs.microsoft.com/fr-fr/azure/azure-functions/functions-dotnet-class-library?tabs=v2%2Ccmd
-
-Notifications
-
-Remove notifications on search page
-
-Table RegisteredNotifications
-Un utilisateur peut être abonné à :
-- une carte (lorsqu'une nouvelle version est créée, lorsque la carte est supprimée, optionnellement lorsque l'évaluation moyenne de la carte évolue) : type `CardNotification`
-- une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchNotifications`
-
-
-On se souvient de la date de dernière information
-
-Notifications par mail seulement, sinon la gestion de l'état lu ou pas d'une notif est un sujet pénible
-
-Pas oublier de gérer la suppression de la notif lorsqu'une carte est supprimée. Mais alors, en cas de restoration de la carte (undelete), les abonnements sero
-
-Pour pouvoir faire des notifs sur l'évolution de rating d'une carte, il faut que UserCardRating ait le datetime de l'évaluation. Est-ce qu'on veut notifier de l'évolution de la note moyenne sur toutes les cartes que l'utilisateur suit, ou seulement sur celles dont il est auteur ?
-
-Ne pas notifier un utilisateur de ses propres modifs
-
-pouvoir s'abonner/désabonner dans le mode édition
-
-cartes supprimées 
-
-Paramètres utilisateur:
-- Envoi de mail pour les notifs
-- Abonnement automatique à une carte lorsque vous créez une version
-- Intervalle de notifications pour les changements d'évaluations moyennes sur les cartes auxquelles vous êtes abonné
-- Intervalle de notifications pour les recherches
-- Intervalle de notifications pour les versions de cartes (je ne suis pas clair si on veut ou pas supporter la notif immédiate)
+- Un utilisateur peut être abonné à une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchSubscriptions`. On ne supporte pas les recherches avec info d'évaluation, et sans doute d'autres, à voir (parce qu'on ne sait pas raisonnablement identifier qu'une carte est apparue dans la recherche).
+- pouvoir s'abonner/désabonner aux notifs sur une carte dans le mode édition
+- Paramètres utilisateur : abonnement automatique à une carte lorsque vous créez une version
 
 # Bugs
 
@@ -118,6 +88,8 @@ Paramètres utilisateur:
 - Review the code of UpdateCard: it must not be possible to lower a card's visibility so that an author of a version can't see it.
 - Supporter les gifs animés : https://commons.m.wikimedia.org/wiki/File:Cardinal_W_Q.gif (cardinale ouest)
 - User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public)
+- Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
+- Use Azure functions to run Notifier on cron intervals. This is not implemented yet because Azure functions don't support .NET 5 yet (should be available by Jan 2021).
 
 # To do at big cost
 - Card authoring: Have the user review his changes before saving a new version of a resource (card, tag, deck)
