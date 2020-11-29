@@ -155,7 +155,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var mailSendingsToWaitFor = new List<Task>();
                 var chrono = Stopwatch.StartNew();
-                var notifierResult = await new Notifier(dbContext).GetNotificationsAsync();
+                var notifierResult = await new Notifier(dbContext).GetNotificationsAndUpdateLastNotifDatesAsync();
                 var sentEmailCount = 0;
 
                 foreach (var userNotifications in notifierResult.UserNotifications)

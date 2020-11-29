@@ -16,12 +16,7 @@ namespace MemCheck.Application.Notifying
         private readonly UserCardDeletionsNotifier userCardDeletionsNotifier;
         public const int MaxLengthForTextFields = 150;
         #endregion
-        public Notifier(MemCheckDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-            userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
-            userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);
-        }
+        #region Private methods
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
         {
             var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == user.Id).CountAsync();
@@ -38,7 +33,14 @@ namespace MemCheck.Application.Notifying
                 cardDeletions
                 );
         }
-        public async Task<NotifierResult> GetNotificationsAsync()
+        #endregion
+        public Notifier(MemCheckDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+            userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
+            userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);
+        }
+        public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync()
         {
             var users = new UsersToNotifyGetter(dbContext).Run();
             var userNotifications = new List<UserNotifications>();
