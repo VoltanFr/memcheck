@@ -26,7 +26,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            await UserHelper.CreateUserAsync(testDB);
+            await UserHelper.CreateAsync(testDB);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -39,10 +39,10 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            await UserHelper.CreateUserAsync(testDB, 1, new DateTime(2020, 11, 10));
-            await UserHelper.CreateUserAsync(testDB, 10, new DateTime(2020, 11, 1));
-            var userToNotify = await UserHelper.CreateUserAsync(testDB, 9, new DateTime(2020, 11, 1));
-            await UserHelper.CreateUserAsync(testDB);
+            await UserHelper.CreateAsync(testDB, 1, new DateTime(2020, 11, 10));
+            await UserHelper.CreateAsync(testDB, 10, new DateTime(2020, 11, 1));
+            var userToNotify = await UserHelper.CreateAsync(testDB, 9, new DateTime(2020, 11, 1));
+            await UserHelper.CreateAsync(testDB);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -56,10 +56,10 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            var userToNotify1 = await UserHelper.CreateUserAsync(testDB, 1, new DateTime(2030, 10, 19));
-            await UserHelper.CreateUserAsync(testDB);
-            await UserHelper.CreateUserAsync(testDB, 2, new DateTime(2030, 10, 19));
-            var userToNotify2 = await UserHelper.CreateUserAsync(testDB, 30, new DateTime(2030, 9, 20));
+            var userToNotify1 = await UserHelper.CreateAsync(testDB, 1, new DateTime(2030, 10, 19));
+            await UserHelper.CreateAsync(testDB);
+            await UserHelper.CreateAsync(testDB, 2, new DateTime(2030, 10, 19));
+            var userToNotify2 = await UserHelper.CreateAsync(testDB, 30, new DateTime(2030, 9, 20));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
