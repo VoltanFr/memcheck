@@ -12,6 +12,7 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly UserCardSubscriptionCounter userCardSubscriptionCounter;
         private readonly UserCardVersionsNotifier userCardVersionsNotifier;
         private readonly UserCardDeletionsNotifier userCardDeletionsNotifier;
         public const int MaxLengthForTextFields = 150;
@@ -19,7 +20,7 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
         {
-            var registeredCardCount = await dbContext.CardNotifications.Where(notif => notif.UserId == user.Id).CountAsync();
+            var registeredCardCount = await userCardSubscriptionCounter.RunAsync(user);
             var cardVersions = userCardVersionsNotifier.Run(user);
             var cardDeletions = userCardDeletionsNotifier.Run(user);
 
@@ -37,6 +38,7 @@ namespace MemCheck.Application.Notifying
         public Notifier(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
+            userCardSubscriptionCounter = new UserCardSubscriptionCounter(dbContext);
             userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
             userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);
         }
