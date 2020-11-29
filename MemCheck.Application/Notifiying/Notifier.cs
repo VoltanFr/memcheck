@@ -14,6 +14,7 @@ namespace MemCheck.Application.Notifying
         private readonly IUserCardVersionsNotifier userCardVersionsNotifier;
         private readonly IUserCardDeletionsNotifier userCardDeletionsNotifier;
         private readonly IUsersToNotifyGetter usersToNotifyGetter;
+        private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
         public const int MaxLengthForTextFields = 150;
         #endregion
         #region Private methods
@@ -22,6 +23,8 @@ namespace MemCheck.Application.Notifying
             var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user);
             var cardVersions = await userCardVersionsNotifier.RunAsync(user, now);
             var cardDeletions = await userCardDeletionsNotifier.RunAsync(user, now);
+
+            await userLastNotifDateUpdater.RunAsync(user.Id, now);
 
             return new UserNotifications(
                 user.UserName,
@@ -32,15 +35,16 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext))
+        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext))
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter)
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
             this.userCardDeletionsNotifier = userCardDeletionsNotifier;
             this.usersToNotifyGetter = usersToNotifyGetter;
+            this.userLastNotifDateUpdater = userLastNotifDateUpdater;
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
         {
