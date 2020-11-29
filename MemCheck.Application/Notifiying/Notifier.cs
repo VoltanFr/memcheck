@@ -11,7 +11,6 @@ namespace MemCheck.Application.Notifying
     public sealed class Notifier
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
         private readonly UserCardSubscriptionCounter userCardSubscriptionCounter;
         private readonly UserCardVersionsNotifier userCardVersionsNotifier;
         private readonly UserCardDeletionsNotifier userCardDeletionsNotifier;
@@ -22,10 +21,8 @@ namespace MemCheck.Application.Notifying
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
         {
             var registeredCardCount = await userCardSubscriptionCounter.RunAsync(user);
-            var cardVersions = userCardVersionsNotifier.Run(user);
-            var cardDeletions = userCardDeletionsNotifier.Run(user);
-
-            await dbContext.SaveChangesAsync();
+            var cardVersions = await userCardVersionsNotifier.RunAsync(user);
+            var cardDeletions = await userCardDeletionsNotifier.RunAsync(user);
 
             return new UserNotifications(
                 user.UserName,
@@ -38,7 +35,6 @@ namespace MemCheck.Application.Notifying
         #endregion
         public Notifier(MemCheckDbContext dbContext)
         {
-            this.dbContext = dbContext;
             userCardSubscriptionCounter = new UserCardSubscriptionCounter(dbContext);
             userCardVersionsNotifier = new UserCardVersionsNotifier(dbContext);
             userCardDeletionsNotifier = new UserCardDeletionsNotifier(dbContext);

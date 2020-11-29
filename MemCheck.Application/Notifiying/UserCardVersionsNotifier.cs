@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using MemCheck.Domain;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
@@ -17,7 +18,7 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public ImmutableArray<CardVersion> Run(MemCheckUser user, DateTime? now = null)
+        public async Task<ImmutableArray<CardVersion>> RunAsync(MemCheckUser user, DateTime? now = null)
         {
             var cardVersions = dbContext.Cards.Include(card => card.UsersWithView)
                 .Join(
@@ -32,16 +33,20 @@ namespace MemCheck.Application.Notifying
             foreach (var cardVersion in cardVersions)
                 cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
 
-            return cardVersions.Select(cardToReport =>
-                new CardVersion(
-                    cardToReport.card.Id,
-                    cardToReport.card.FrontSide,
-                    cardToReport.card.VersionCreator.UserName,
-                    cardToReport.card.VersionUtcDate,
-                    cardToReport.card.VersionDescription,
-                    !cardToReport.card.UsersWithView.Any() || cardToReport.card.UsersWithView.Any(u => u.UserId == user.Id)
-                )
-            ).ToImmutableArray();
+            var result = cardVersions.Select(cardToReport =>
+                               new CardVersion(
+                                   cardToReport.card.Id,
+                                   cardToReport.card.FrontSide,
+                                   cardToReport.card.VersionCreator.UserName,
+                                   cardToReport.card.VersionUtcDate,
+                                   cardToReport.card.VersionDescription,
+                                   !cardToReport.card.UsersWithView.Any() || cardToReport.card.UsersWithView.Any(u => u.UserId == user.Id)
+                               )
+                        ).ToImmutableArray();
+
+            await dbContext.SaveChangesAsync();
+
+            return result;
         }
     }
 }

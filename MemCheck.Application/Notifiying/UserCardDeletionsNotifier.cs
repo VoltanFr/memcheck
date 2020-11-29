@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
@@ -17,7 +18,7 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public ImmutableArray<CardDeletion> Run(MemCheckUser user, DateTime? now = null)
+        public async Task<ImmutableArray<CardDeletion>> RunAsync(MemCheckUser user, DateTime? now = null)
         {
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
@@ -34,15 +35,19 @@ namespace MemCheck.Application.Notifying
             foreach (var cardVersion in deletedCards)
                 cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
 
-            return deletedCards.Select(cardToReport =>
-              new CardDeletion(
-                  cardToReport.previousVersion.FrontSide,
-                  cardToReport.previousVersion.VersionCreator.UserName,
-                  cardToReport.previousVersion.VersionUtcDate,
-                  cardToReport.previousVersion.VersionDescription,
-                  !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == user.Id)
-              )
-          ).ToImmutableArray();
+            var result = deletedCards.Select(cardToReport =>
+                             new CardDeletion(
+                                 cardToReport.previousVersion.FrontSide,
+                                 cardToReport.previousVersion.VersionCreator.UserName,
+                                 cardToReport.previousVersion.VersionUtcDate,
+                                 cardToReport.previousVersion.VersionDescription,
+                                 !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == user.Id)
+                             )
+                      ).ToImmutableArray();
+
+            await dbContext.SaveChangesAsync();
+
+            return result;
         }
     }
 }
