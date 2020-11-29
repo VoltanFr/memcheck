@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifying
 {
     internal interface IUserCardDeletionsNotifier
     {
-        public Task<ImmutableArray<CardDeletion>> RunAsync(MemCheckUser user, DateTime? now = null);
+        public Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId, DateTime? now = null);
     }
     internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
     {
@@ -22,13 +22,13 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public async Task<ImmutableArray<CardDeletion>> RunAsync(MemCheckUser user, DateTime? now = null)
+        public async Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId, DateTime? now = null)
         {
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
             var deletedCards = dbContext.CardPreviousVersions.Include(card => card.UsersWithView)
                 .Join(
-                    dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == user.Id),
+                    dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId),
                     previousVersion => previousVersion.Card,
                     cardNotif => cardNotif.CardId,
                     (previousVersion, cardNotif) => new { previousVersion, cardNotif }
@@ -45,7 +45,7 @@ namespace MemCheck.Application.Notifying
                                  cardToReport.previousVersion.VersionCreator.UserName,
                                  cardToReport.previousVersion.VersionUtcDate,
                                  cardToReport.previousVersion.VersionDescription,
-                                 !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == user.Id)
+                                 !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == userId)
                              )
                       ).ToImmutableArray();
 

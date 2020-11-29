@@ -22,7 +22,7 @@ namespace MemCheck.Application.Notifying
         {
             var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user);
             var cardVersions = await userCardVersionsNotifier.RunAsync(user, now);
-            var cardDeletions = await userCardDeletionsNotifier.RunAsync(user, now);
+            var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id, now);
 
             await userLastNotifDateUpdater.RunAsync(user.Id, now);
 
