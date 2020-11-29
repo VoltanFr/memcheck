@@ -28,6 +28,13 @@
                 <input asp-for="UILanguage" class="form-control" readonly />
                 <span type="text" asp-validation-for="UILanguage" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label class="form-control"><input id="SendNottifCheckbox" type="checkbox" asp-for="SendNotificationsByEmail" onclick="showHideDiv();" /><span> @Localizer["SendNotificationsByEmail"]</span></label>
+                <div id="MinimumCountOfDaysBetweenNotifsDiv" class="form-group">
+                    <label><span>@Localizer["MinimumCountOfDaysBetweenNotifs"] </span><input id="MinimumCountOfDaysBetweenNotifsInput" asp-for="MinimumCountOfDaysBetweenNotifs" style="width:80px" /></label>
+                    <span type="text" asp-validation-for="MinimumCountOfDaysBetweenNotifs" class="text-danger"></span>
+                </div>
+            </div>
             <button id="update-profile-button" type="submit" class="btn btn-primary">@Localizer["Save"]</button>
         </form>
     </div>
@@ -35,4 +42,26 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script language="javascript" type="text/javascript">
+        (function () {
+            //This is the page initialization code
+            showHideDiv();
+        })();
+
+        function showHideDiv() {
+            box = document.getElementById("SendNottifCheckbox");
+            div = document.getElementById("MinimumCountOfDaysBetweenNotifsDiv");
+            input = document.getElementById("MinimumCountOfDaysBetweenNotifsInput");
+
+            if (box.checked == true) {
+                div.style.visibility = "visible";
+                if (input.value <= 0 || input.value > 30)
+                    input.value = "1";
+            }
+            else {
+                div.style.visibility = "hidden";
+            }
+        }
+    </script>
 }

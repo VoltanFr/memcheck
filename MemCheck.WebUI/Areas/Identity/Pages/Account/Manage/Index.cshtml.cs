@@ -39,6 +39,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty] public string UILanguage { get; set; } = null!;
 
+        [BindProperty] public bool SendNotificationsByEmail { get; set; } = false;
+
+        [BindProperty, Range(1, 30, ErrorMessage = "Valeur incorrecte, doit être entre 1 et 30 jours")] public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0; //I didn't manage to localize the error message
+
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -48,6 +52,8 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             UserEmail = user.Email;
             Username = await _userManager.GetUserNameAsync(user);
             UILanguage = user.UILanguage ?? "<Not stored>";
+            MinimumCountOfDaysBetweenNotifs = user.MinimumCountOfDaysBetweenNotifs;
+            SendNotificationsByEmail = user.MinimumCountOfDaysBetweenNotifs > 0;
 
             return Page();
         }
@@ -63,6 +69,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            user.MinimumCountOfDaysBetweenNotifs = SendNotificationsByEmail ? MinimumCountOfDaysBetweenNotifs : 0;
             await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);

@@ -123,11 +123,17 @@
   <data name="Language" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="MinimumCountOfDaysBetweenNotifs" xml:space="preserve">
+    <value>Interval (days) :</value>
+  </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Profile</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="SendNotificationsByEmail" xml:space="preserve">
+    <value>Send notification emails</value>
   </data>
   <data name="UserEMail" xml:space="preserve">
     <value>EMail</value>
