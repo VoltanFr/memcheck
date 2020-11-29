@@ -85,11 +85,13 @@ namespace MemCheck.WebUI.Controllers
                 Roles = user.Roles;
                 Email = user.Email;
                 NotifInterval = user.NotifInterval;
+                LastNotifUtcDate = user.LastNotifUtcDate;
             }
             public string UserName { get; }
             public string Roles { get; }
             public string Email { get; }
             public int NotifInterval { get; }
+            public DateTime LastNotifUtcDate { get; }
         }
         #endregion
         #endregion
