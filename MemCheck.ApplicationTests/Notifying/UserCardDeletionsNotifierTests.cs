@@ -87,42 +87,6 @@ namespace MemCheck.Application.Tests.Notifying
             dbContext.CardNotifications.Add(notif);
             await dbContext.SaveChangesAsync();
         }
-        private async Task<Card> CreateCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
-        {
-            //userWithViewIds null means public card
-
-            using var dbContext = new MemCheckDbContext(testDB);
-            var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
-
-            var result = new Card();
-            result.VersionCreator = creator;
-            result.FrontSide = Guid.NewGuid().ToString();
-            result.BackSide = Guid.NewGuid().ToString();
-            result.AdditionalInfo = Guid.NewGuid().ToString();
-            result.VersionDescription = Guid.NewGuid().ToString();
-            result.VersionType = CardVersionType.Creation;
-            result.InitialCreationUtcDate = versionDate;
-            result.VersionUtcDate = versionDate;
-            dbContext.Cards.Add(result);
-
-            var usersWithView = new List<UserWithViewOnCard>();
-            if (userWithViewIds != null)
-            {
-                Assert.IsTrue(userWithViewIds.Any(id => id == versionCreatorId), "Version creator must be allowed to view");
-                foreach (var userWithViewId in userWithViewIds)
-                {
-                    var userWithView = new UserWithViewOnCard();
-                    userWithView.CardId = result.Id;
-                    userWithView.UserId = userWithViewId;
-                    dbContext.UsersWithViewOnCards.Add(userWithView);
-                    usersWithView.Add(userWithView);
-                }
-            }
-            result.UsersWithView = usersWithView;
-
-            await dbContext.SaveChangesAsync();
-            return result;
-        }
         private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -151,7 +115,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var db = GetEmptyTestDB();
             var user = await UserHelper.CreateUserAsync(db);
-            var card = await CreateCardAsync(db, user.Id, new DateTime(2020, 11, 1));
+            var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
             await CreateCardNotificationAsync(db, user.Id, card.Id, new DateTime(2020, 11, 3));
             var lastNotificationDate = new DateTime(2020, 11, 3);
             await DeleteCardAsync(db, user.Id, card.Id, lastNotificationDate);
@@ -199,7 +163,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user1 = await UserHelper.CreateUserAsync(db);
             var user2 = await UserHelper.CreateUserAsync(db);
 
-            var card = await CreateCardAsync(db, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
+            var card = await CardHelper.CreateAsync(db, user1.Id, new DateTime(2020, 11, 1), new[] { user1.Id, user2.Id });
             await CreateCardNotificationAsync(db, user1.Id, card.Id, new DateTime(2020, 11, 1));
             await CreateCardNotificationAsync(db, user2.Id, card.Id, new DateTime(2020, 11, 1));
 
@@ -237,7 +201,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var db = GetEmptyTestDB();
             var user = await UserHelper.CreateUserAsync(db);
-            var card = await CreateCardAsync(db, user.Id, new DateTime(2020, 11, 1));
+            var card = await CardHelper.CreateAsync(db, user.Id, new DateTime(2020, 11, 1));
 
             await CreateCardNotificationAsync(db, user.Id, card.Id, new DateTime(2020, 11, 1));
 
