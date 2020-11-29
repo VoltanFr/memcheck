@@ -40,7 +40,7 @@ namespace MemCheck.Application.Tests.Notifying
             usersToNotifyGetter.Setup(getter => getter.Run(It.IsAny<DateTime?>())).Returns(ImmutableArray.Create(user));
 
             var userCardSubscriptionCounter = new Mock<IUserCardSubscriptionCounter>(MockBehavior.Strict);
-            userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user)).ReturnsAsync(12);
+            userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(12);
 
             var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
             var cardVersion = new CardVersion(Guid.NewGuid(), StringServices.RandomString(), StringServices.RandomString(), new DateTime(2029, 12, 15), StringServices.RandomString(), true);
@@ -77,7 +77,7 @@ namespace MemCheck.Application.Tests.Notifying
             usersToNotifyGetter.Setup(getter => getter.Run(It.IsAny<DateTime?>())).Returns(ImmutableArray.Create(user));
 
             var userCardSubscriptionCounter = new Mock<IUserCardSubscriptionCounter>(MockBehavior.Strict);
-            userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user)).ReturnsAsync(1);
+            userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(1);
 
             var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
             userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user, now)).ReturnsAsync(ImmutableArray<CardVersion>.Empty);

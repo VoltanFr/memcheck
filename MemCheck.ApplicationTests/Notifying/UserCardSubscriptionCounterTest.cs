@@ -19,7 +19,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
                 Assert.AreEqual(0, count);
             }
         }
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
                 Assert.AreEqual(1, count);
             }
         }
@@ -50,7 +50,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
                 Assert.AreEqual(3, count);
             }
         }
@@ -72,9 +72,9 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var counter = new UserCardSubscriptionCounter(dbContext);
-                Assert.AreEqual(0, await counter.RunAsync(user1));
-                Assert.AreEqual(1, await counter.RunAsync(user2));
-                Assert.AreEqual(3, await counter.RunAsync(user3));
+                Assert.AreEqual(0, await counter.RunAsync(user1.Id));
+                Assert.AreEqual(1, await counter.RunAsync(user2.Id));
+                Assert.AreEqual(3, await counter.RunAsync(user3.Id));
             }
         }
     }
