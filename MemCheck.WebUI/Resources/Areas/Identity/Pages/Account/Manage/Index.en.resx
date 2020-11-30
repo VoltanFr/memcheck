@@ -135,6 +135,9 @@
   <data name="SendNotificationsByEmail" xml:space="preserve">
     <value>Send notification emails</value>
   </data>
+  <data name="SubscribeToCardOnEdit" xml:space="preserve">
+    <value>Register for notifications when you create or edit a card</value>
+  </data>
   <data name="UserEMail" xml:space="preserve">
     <value>EMail</value>
   </data>

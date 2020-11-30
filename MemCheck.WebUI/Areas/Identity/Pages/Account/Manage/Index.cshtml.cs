@@ -39,6 +39,8 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty] public string UILanguage { get; set; } = null!;
 
+        [BindProperty] public bool SubscribeToCardOnEdit { get; set; } = false;
+
         [BindProperty] public bool SendNotificationsByEmail { get; set; } = false;
 
         [BindProperty, Range(1, 30, ErrorMessage = "Valeur incorrecte, doit être entre 1 et 30 jours")] public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0; //I didn't manage to localize the error message
@@ -54,6 +56,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             UILanguage = user.UILanguage ?? "<Not stored>";
             MinimumCountOfDaysBetweenNotifs = user.MinimumCountOfDaysBetweenNotifs;
             SendNotificationsByEmail = user.MinimumCountOfDaysBetweenNotifs > 0;
+            SubscribeToCardOnEdit = user.SubscribeToCardOnEdit;
 
             return Page();
         }
@@ -70,6 +73,8 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             }
 
             user.MinimumCountOfDaysBetweenNotifs = SendNotificationsByEmail ? MinimumCountOfDaysBetweenNotifs : 0;
+            user.SubscribeToCardOnEdit = SubscribeToCardOnEdit;
+
             await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
