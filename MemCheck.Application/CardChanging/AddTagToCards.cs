@@ -28,7 +28,7 @@ namespace MemCheck.Application.CardChanging
             foreach (var cardId in request.CardIds)
                 if (!dbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator, localizer["AddTag"].Value + $" '{tagName}'");
+                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, localizer["AddTag"].Value + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
                     dbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }

@@ -27,7 +27,7 @@ namespace MemCheck.Application.CardChanging
             foreach (var cardId in request.CardIds)
             {
                 var previousVersionCreator = new PreviousVersionCreator(dbContext);
-                var card = await previousVersionCreator.RunAsync(cardId, request.User, localizer["Deletion"].Value, deletionUtcDate);
+                var card = await previousVersionCreator.RunAsync(cardId, request.User.Id, localizer["Deletion"].Value, deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card);
                 dbContext.Cards.Remove(card);
             }

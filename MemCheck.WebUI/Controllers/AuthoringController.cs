@@ -98,7 +98,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var user = await userManager.GetUserAsync(HttpContext.User);
                 var versionDescription = localizer["InitialCardVersionCreation"].Value;
-                var request = new CreateCard.Request(user, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+                var request = new CreateCard.Request(user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
                 var cardId = await new CreateCard(dbContext).RunAsync(request, localizer);
 
                 if (card.AddToDeck != Guid.Empty)
@@ -155,7 +155,7 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 var user = await userManager.GetUserAsync(HttpContext.User);
-                var request = new UpdateCard.Request(cardId, user, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
+                var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
                 await new UpdateCard(dbContext).RunAsync(request, localizer);
                 return Ok();
             }

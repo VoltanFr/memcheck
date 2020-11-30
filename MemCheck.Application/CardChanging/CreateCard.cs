@@ -32,6 +32,7 @@ namespace MemCheck.Application.CardChanging
             CardInputValidator.Run(request, localizer);
 
             var language = dbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
+            var versionCreator = dbContext.Users.Where(user => user.Id == request.VersionCreatorId).Single();
 
             var card = new Card()
             {
@@ -39,7 +40,7 @@ namespace MemCheck.Application.CardChanging
                 BackSide = request.BackSide,
                 AdditionalInfo = request.AdditionalInfo,
                 CardLanguage = language,
-                VersionCreator = request.VersionCreator,
+                VersionCreator = versionCreator,
                 InitialCreationUtcDate = DateTime.Now.ToUniversalTime(),
                 VersionUtcDate = DateTime.Now.ToUniversalTime(),
                 VersionDescription = request.VersionDescription
@@ -82,9 +83,9 @@ namespace MemCheck.Application.CardChanging
         #region Request class
         public sealed class Request : ICardInput
         {
-            public Request(MemCheckUser versionCreator, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+            public Request(Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
-                VersionCreator = versionCreator;
+                VersionCreatorId = versionCreatorId;
                 FrontSide = frontSide.Trim();
                 BackSide = backSide.Trim();
                 AdditionalInfo = additionalInfo.Trim();
@@ -96,7 +97,7 @@ namespace MemCheck.Application.CardChanging
                 UsersWithVisibility = usersWithVisibility;
                 VersionDescription = versionDescription;
             }
-            public MemCheckUser VersionCreator { get; }
+            public Guid VersionCreatorId { get; }
             public string FrontSide { get; }
             public IEnumerable<Guid> FrontSideImageList { get; }
             public string BackSide { get; }

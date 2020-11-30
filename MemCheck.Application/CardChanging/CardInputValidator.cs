@@ -8,7 +8,7 @@ namespace MemCheck.Application.CardChanging
 {
     public interface ICardInput
     {
-        public MemCheckUser VersionCreator { get; }
+        public Guid VersionCreatorId { get; }
         public string FrontSide { get; }
         public IEnumerable<Guid> FrontSideImageList { get; }
         public string BackSide { get; }
@@ -35,7 +35,7 @@ namespace MemCheck.Application.CardChanging
         #endregion
         public static void Run(ICardInput input, IStringLocalizer localizer)
         {
-            if (QueryValidationHelper.IsReservedGuid(input.VersionCreator.Id))
+            if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
                 throw new RequestInputException(localizer["InvalidOwner"].Value);
 
             if (input.FrontSide != input.FrontSide.Trim())
@@ -78,7 +78,7 @@ namespace MemCheck.Application.CardChanging
             if (input.UsersWithVisibility.Where(userWithVisibility => QueryValidationHelper.IsReservedGuid(userWithVisibility)).Any())
                 throw new RequestInputException(localizer["InvalidUserWithVisibility"].Value);
 
-            if (input.UsersWithVisibility.Any() && !input.UsersWithVisibility.Any(userWithVisibility => userWithVisibility == input.VersionCreator.Id))
+            if (input.UsersWithVisibility.Any() && !input.UsersWithVisibility.Any(userWithVisibility => userWithVisibility == input.VersionCreatorId))
                 //To be reviewed when we support card versions: I suspect we want visibility for all past owners
                 throw new RequestInputException(localizer["OwnerMustHaveVisibility"].Value);
         }

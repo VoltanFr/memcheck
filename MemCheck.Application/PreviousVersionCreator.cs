@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -85,7 +86,7 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<Card> RunAsync(Guid cardId, MemCheckUser newVersionCreator, string newVersionDescription, DateTime? cardNewVersionUtcDate = null)
+        public async Task<Card> RunAsync(Guid cardId, Guid newVersionCreatorId, string newVersionDescription, DateTime? cardNewVersionUtcDate = null)
         {
             var card = await dbContext.Cards
                 .Include(card => card.Images)
@@ -99,6 +100,8 @@ namespace MemCheck.Application
                 .SingleAsync(img => img.Id == cardId);
 
             var previousVersion = await CreatePreviousVersionAsync(card);
+
+            var newVersionCreator = dbContext.Users.Single(u => u.Id == newVersionCreatorId);
 
             card.PreviousVersion = previousVersion;
             card.VersionCreator = newVersionCreator;

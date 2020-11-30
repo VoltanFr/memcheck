@@ -124,7 +124,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 else
                 {
                     CreateCard.Request request = new CreateCard.Request(
-                        user,
+                        user.Id,
                         paukerCard.Front.Text.Trim(),
                         new Guid[0],
                         paukerCard.Reverse.Text.Trim(),

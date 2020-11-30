@@ -81,7 +81,7 @@ namespace MemCheck.Application.CardChanging
             await request.CheckValidityAsync(localizer, dbContext);
 
             var previousVersionCreator = new PreviousVersionCreator(dbContext);
-            var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreator, request.VersionDescription);
+            var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreatorId, request.VersionDescription);
 
             card.CardLanguage = dbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
             card.FrontSide = request.FrontSide;
@@ -104,10 +104,10 @@ namespace MemCheck.Application.CardChanging
                     && AdditionalInfoImageList.SequenceEqual(originalImages.Where(img => img.CardSide == 3).Select(img => img.ImageId));
             }
             #endregion
-            public Request(Guid cardId, MemCheckUser versionCreator, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+            public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
                 CardId = cardId;
-                VersionCreator = versionCreator;
+                VersionCreatorId = versionCreatorId;
                 FrontSide = frontSide.Trim();
                 BackSide = backSide.Trim();
                 AdditionalInfo = additionalInfo.Trim();
@@ -120,7 +120,7 @@ namespace MemCheck.Application.CardChanging
                 VersionDescription = versionDescription.Trim();
             }
             public Guid CardId { get; }
-            public MemCheckUser VersionCreator { get; }
+            public Guid VersionCreatorId { get; }
             public string FrontSide { get; }
             public IEnumerable<Guid> FrontSideImageList { get; }
             public string BackSide { get; }
