@@ -7,29 +7,25 @@
       "destination": "wwwroot/lib/bootstrap-vue/",
       "files": [
         "bootstrap-vue.min.js",
-        "bootstrap-vue.min.css"
-      ]
-    },
-    {
-      "library": "font-awesome@5.15.1",
-      "destination": "wwwroot/lib/font-awesome/",
-      "files": [
-        "css/all.min.css",
-        "js/all.min.js"
+        "bootstrap-vue.min.css",
+        "bootstrap-vue.min.js.map",
+        "bootstrap-vue.min.css.map"
       ]
     },
     {
       "library": "showdown@1.9.1",
       "destination": "wwwroot/lib/showdown/",
       "files": [
-        "showdown.min.js"
+        "showdown.min.js",
+        "showdown.min.js.map"
       ]
     },
     {
       "library": "axios@0.21.0",
       "destination": "wwwroot/lib/axios/",
       "files": [
-        "axios.min.js"
+        "axios.min.js",
+        "axios.min.map"
       ]
     },
     {
@@ -45,7 +41,9 @@
       "destination": "wwwroot/lib/bootstrap/",
       "files": [
         "dist/css/bootstrap.min.css",
-        "dist/js/bootstrap.bundle.min.js"
+        "dist/js/bootstrap.bundle.min.js",
+        "dist/css/bootstrap.min.css.map",
+        "dist/js/bootstrap.bundle.min.js.map"
       ]
     },
     {
@@ -67,6 +65,19 @@
     {
       "library": "jquery@3.5.1",
       "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "library": "font-awesome@5.15.1",
+      "destination": "wwwroot/lib/font-awesome/",
+      "files": [
+        "css/all.min.css",
+        "js/all.min.js",
+        "webfonts/fa-solid-900.ttf",
+        "webfonts/fa-solid-900.woff",
+        "webfonts/fa-solid-900.woff2",
+        "webfonts/fa-regular-400.woff2",
+        "webfonts/fa-brands-400.woff2"
+      ]
     }
   ]
 }
