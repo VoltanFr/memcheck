@@ -41,7 +41,7 @@
                     <td>{{user.roles}}</td>
                     <td>{{user.email}}</td>
                     <td>{{user.notifInterval}}</td>
-                    <td>{{user.lastNotifUtcDate}}</td>
+                    <td>{{new Date(user.lastNotifUtcDate).toLocaleString([], { year: "numeric", month: "numeric", day: "numeric", hour: '2-digit', minute: '2-digit' })}}</td>
                 </tr>
             </table>
         </div>
