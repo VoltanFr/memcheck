@@ -6,7 +6,7 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.CardChanging
 {
     internal sealed class PreviousVersionCreator
     {
