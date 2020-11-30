@@ -19,7 +19,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
                 Assert.AreEqual(0, count);
             }
         }
@@ -29,12 +29,12 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
 
             var user = await UserHelper.CreateInDbAsync(testDB);
-            var card = await CardHelper.CreateAsync(testDB, user.Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, card.Id);
+            var card = await CardHelper.CreateAsync(testDB, user);
+            await CardSubscriptionHelper.CreateAsync(testDB, user, card.Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
                 Assert.AreEqual(1, count);
             }
         }
@@ -44,13 +44,13 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
 
             var user = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user.Id, (await CardHelper.CreateAsync(testDB, user.Id)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user.Id);
+                var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
                 Assert.AreEqual(3, count);
             }
         }
@@ -62,19 +62,19 @@ namespace MemCheck.Application.Tests.Notifying
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
             var user2 = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user2.Id, (await CardHelper.CreateAsync(testDB, user1.Id)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user2, (await CardHelper.CreateAsync(testDB, user1)).Id);
 
             var user3 = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user1.Id)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user2.Id)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3.Id, (await CardHelper.CreateAsync(testDB, user3.Id)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user1)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user2)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user3)).Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var counter = new UserCardSubscriptionCounter(dbContext);
-                Assert.AreEqual(0, await counter.RunAsync(user1.Id));
-                Assert.AreEqual(1, await counter.RunAsync(user2.Id));
-                Assert.AreEqual(3, await counter.RunAsync(user3.Id));
+                Assert.AreEqual(0, await counter.RunAsync(user1));
+                Assert.AreEqual(1, await counter.RunAsync(user2));
+                Assert.AreEqual(3, await counter.RunAsync(user3));
             }
         }
     }

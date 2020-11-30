@@ -8,13 +8,13 @@ namespace MemCheck.Application.Tests.Notifying
 {
     public class UserHelper
     {
-        public static async Task<MemCheckUser> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null)
+        public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null)
         {
             using var dbContext = new MemCheckDbContext(db);
             var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate);
             dbContext.Users.Add(result);
             await dbContext.SaveChangesAsync();
-            return result;
+            return result.Id;
         }
         public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null)
         {

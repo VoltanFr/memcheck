@@ -48,7 +48,7 @@ namespace MemCheck.Application.Tests.Notifying
             {
                 var users = new UsersToNotifyGetter(dbContext).Run(new DateTime(2020, 11, 10));
                 Assert.AreEqual(1, users.Length);
-                Assert.AreEqual(userToNotify.Id, users[0].Id);
+                Assert.AreEqual(userToNotify, users[0].Id);
             }
         }
         [TestMethod()]
@@ -65,8 +65,8 @@ namespace MemCheck.Application.Tests.Notifying
             {
                 var users = new UsersToNotifyGetter(dbContext).Run(new DateTime(2030, 10, 20));
                 Assert.AreEqual(2, users.Length);
-                Assert.IsTrue(users.Any(u => u.Id == userToNotify1.Id));
-                Assert.IsTrue(users.Any(u => u.Id == userToNotify2.Id));
+                Assert.IsTrue(users.Any(u => u.Id == userToNotify1));
+                Assert.IsTrue(users.Any(u => u.Id == userToNotify2));
             }
         }
     }

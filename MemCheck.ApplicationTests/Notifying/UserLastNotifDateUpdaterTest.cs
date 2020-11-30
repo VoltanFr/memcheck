@@ -19,7 +19,7 @@ namespace MemCheck.Application.Tests.Notifying
             var lastNotifDate = new DateTime(2040, 1, 2);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new UserLastNotifDateUpdater(dbContext).RunAsync(user.Id, lastNotifDate);
+                await new UserLastNotifDateUpdater(dbContext).RunAsync(user, lastNotifDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
                 Assert.AreEqual(lastNotifDate, dbContext.Users.First().LastNotificationUtcDate);
