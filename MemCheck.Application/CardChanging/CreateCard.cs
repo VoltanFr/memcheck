@@ -76,6 +76,17 @@ namespace MemCheck.Application.CardChanging
                 AddImage(card.Id, image, 3, cardImageList);
             card.Images = cardImageList;
 
+            if (versionCreator.SubscribeToCardOnEdit)
+            {
+                var subscription = new CardNotificationSubscription();
+                subscription.CardId = card.Id;
+                subscription.UserId = versionCreator.Id;
+                subscription.RegistrationUtcDate = card.VersionUtcDate;
+                subscription.LastNotificationUtcDate = DateTime.MinValue;
+                subscription.RegistrationMethod = CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation;
+                dbContext.CardNotifications.Add(subscription);
+            }
+
             await dbContext.SaveChangesAsync();
 
             return card.Id;

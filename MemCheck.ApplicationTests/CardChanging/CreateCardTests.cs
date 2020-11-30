@@ -77,5 +77,34 @@ namespace MemCheck.Application.CardChanging
                 Assert.IsFalse(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
             }
         }
+        [TestMethod()]
+        public async Task TestCreationWithUserSubscribingToCardOnEdit()
+        {
+            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+
+            var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: true);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+
+            Guid cardGuid = Guid.Empty;
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var request = new CreateCard.Request(
+                    ownerId,
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    languageId,
+                    new Guid[0],
+                    new Guid[0],
+                    StringServices.RandomString());
+                cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                Assert.IsTrue(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
+        }
     }
 }
