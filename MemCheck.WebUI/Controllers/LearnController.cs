@@ -7,6 +7,7 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MemCheck.Application;
 using MemCheck.Application.Heaping;
+using MemCheck.Application.Notifying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -324,13 +325,13 @@ namespace MemCheck.WebUI.Controllers
                 var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
                 if (notif)
                 {
-                    var request = new AddCardNotifications.Request(userId, new[] { cardId });
-                    await new AddCardNotifications(dbContext).RunAsync(request);
+                    var request = new AddCardSubscriptions.Request(userId, new[] { cardId });
+                    await new AddCardSubscriptions(dbContext).RunAsync(request);
                 }
                 else
                 {
-                    var request = new RemoveCardNotifications.Request(userId, new[] { cardId });
-                    await new RemoveCardNotifications(dbContext).RunAsync(request);
+                    var request = new RemoveCardSubscriptions.Request(userId, new[] { cardId });
+                    await new RemoveCardSubscriptions(dbContext).RunAsync(request);
                 }
                 return Ok();
             }

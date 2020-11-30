@@ -1,19 +1,18 @@
 ﻿using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Notifying
 {
-    public sealed class RemoveCardNotifications
+    public sealed class AddCardSubscriptions
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         #endregion
-        public RemoveCardNotifications(MemCheckDbContext dbContext)
+        public AddCardSubscriptions(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
@@ -23,9 +22,18 @@ namespace MemCheck.Application
 
             foreach (var cardId in request.CardIds)
             {
-                var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).SingleOrDefaultAsync();
-                if (existing != null)
-                    dbContext.CardNotifications.Remove(existing);
+                if (!dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).Any())
+                {
+                    CardNotificationSubscription notif = new CardNotificationSubscription
+                    {
+                        CardId = cardId,
+                        UserId = request.UserId,
+                        RegistrationUtcDate = DateTime.UtcNow,
+                        RegistrationMethod = CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser,
+                        LastNotificationUtcDate = DateTime.UtcNow
+                    };
+                    dbContext.CardNotifications.Add(notif);
+                }
             }
 
             await dbContext.SaveChangesAsync();

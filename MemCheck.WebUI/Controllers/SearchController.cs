@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.Notifying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -513,8 +514,8 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new AddCardNotifications.Request(userId, request.CardIds);
-                await new AddCardNotifications(dbContext).RunAsync(appRequest);
+                var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
+                await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
                 return Ok();
             }
             catch (Exception e)
@@ -534,8 +535,8 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new RemoveCardNotifications.Request(userId, request.CardIds);
-                await new RemoveCardNotifications(dbContext).RunAsync(appRequest);
+                var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
+                await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
                 return Ok();
             }
             catch (Exception e)
