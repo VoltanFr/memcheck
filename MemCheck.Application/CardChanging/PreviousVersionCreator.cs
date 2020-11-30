@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MemCheck.Application.Notifying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -108,6 +109,9 @@ namespace MemCheck.Application.CardChanging
             card.VersionUtcDate = cardNewVersionUtcDate ?? DateTime.UtcNow;
             card.VersionDescription = newVersionDescription;
             card.VersionType = CardVersionType.Changes;
+
+            if (newVersionCreator.SubscribeToCardOnEdit)
+                AddCardSubscriptions.CreateSubscription(dbContext, newVersionCreator.Id, cardId, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
 
             return card;
         }

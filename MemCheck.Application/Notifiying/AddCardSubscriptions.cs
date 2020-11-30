@@ -20,23 +20,26 @@ namespace MemCheck.Application.Notifying
         {
             request.CheckValidity();
 
+            var now = DateTime.UtcNow;
+
             foreach (var cardId in request.CardIds)
-            {
-                if (!dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).Any())
-                {
-                    CardNotificationSubscription notif = new CardNotificationSubscription
-                    {
-                        CardId = cardId,
-                        UserId = request.UserId,
-                        RegistrationUtcDate = DateTime.UtcNow,
-                        RegistrationMethod = CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser,
-                        LastNotificationUtcDate = DateTime.UtcNow
-                    };
-                    dbContext.CardNotifications.Add(notif);
-                }
-            }
+                CreateSubscription(dbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
 
             await dbContext.SaveChangesAsync();
+        }
+        public static void CreateSubscription(MemCheckDbContext dbContext, Guid userId, Guid cardId, DateTime registrationUtcDate, int registrationMethod)
+        {
+            if (dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.CardId == cardId).Any())
+                return;
+            CardNotificationSubscription notif = new CardNotificationSubscription
+            {
+                CardId = cardId,
+                UserId = userId,
+                RegistrationUtcDate = registrationUtcDate,
+                RegistrationMethod = registrationMethod,
+                LastNotificationUtcDate = registrationUtcDate
+            };
+            dbContext.CardNotifications.Add(notif);
         }
         #region Request class
         public sealed class Request

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MemCheck.Application.Notifying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.Localization;
@@ -77,15 +78,7 @@ namespace MemCheck.Application.CardChanging
             card.Images = cardImageList;
 
             if (versionCreator.SubscribeToCardOnEdit)
-            {
-                var subscription = new CardNotificationSubscription();
-                subscription.CardId = card.Id;
-                subscription.UserId = versionCreator.Id;
-                subscription.RegistrationUtcDate = card.VersionUtcDate;
-                subscription.LastNotificationUtcDate = DateTime.MinValue;
-                subscription.RegistrationMethod = CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation;
-                dbContext.CardNotifications.Add(subscription);
-            }
+                AddCardSubscriptions.CreateSubscription(dbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
 
             await dbContext.SaveChangesAsync();
 
