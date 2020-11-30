@@ -19,6 +19,8 @@ namespace MemCheck.Application
         private const string svgImageContentType = "image/svg+xml";
         private readonly MemCheckDbContext dbContext;
         private readonly IStringLocalizer localizer;
+        private const int minDescriptionLength = 3;
+        private const int maxDescriptionLength = 1000;
         #endregion
         #region Private methods
         private static ImmutableHashSet<string> GetSupportedContentTypes()
@@ -133,8 +135,8 @@ namespace MemCheck.Application
 
                 if (VersionDescription != VersionDescription.Trim())
                     throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
-                if (VersionDescription.Length < CardInputValidator.minVersionDescriptionLength || VersionDescription.Length > CardInputValidator.maxVersionDescriptionLength)
-                    throw new RequestInputException(localizer["InvalidVersionDescriptionLength"].Value + $" {VersionDescription.Length}" + localizer["MustBeBetween"].Value + $" {CardInputValidator.minVersionDescriptionLength} " + localizer["And"] + $" {CardInputValidator.maxVersionDescriptionLength}");
+                if (VersionDescription.Length < minDescriptionLength || VersionDescription.Length > maxDescriptionLength)
+                    throw new RequestInputException(localizer["InvalidVersionDescriptionLength"].Value + $" {VersionDescription.Length}" + localizer["MustBeBetween"].Value + $" {minDescriptionLength} " + localizer["And"] + $" {maxDescriptionLength}");
 
                 var images = dbContext.Images.Where(img => img.Id == ImageId);
 

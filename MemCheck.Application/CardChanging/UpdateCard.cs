@@ -8,7 +8,7 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.CardChanging
 {
     public sealed class UpdateCard
     {

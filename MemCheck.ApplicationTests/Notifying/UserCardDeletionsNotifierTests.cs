@@ -8,6 +8,7 @@ using MemCheck.Domain;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Localization;
+using MemCheck.Application.CardChanging;
 
 namespace MemCheck.Application.Tests.Notifying
 {

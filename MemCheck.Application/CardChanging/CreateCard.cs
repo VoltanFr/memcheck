@@ -7,7 +7,7 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.Localization;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.CardChanging
 {
     public sealed class CreateCard
     {
@@ -79,6 +79,7 @@ namespace MemCheck.Application
 
             return card.Id;
         }
+        #region Request class
         public sealed class Request : ICardInput
         {
             public Request(MemCheckUser versionCreator, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
@@ -107,5 +108,6 @@ namespace MemCheck.Application
             public IEnumerable<Guid> UsersWithVisibility { get; }
             public string VersionDescription { get; }
         }
+        #endregion
     }
 }

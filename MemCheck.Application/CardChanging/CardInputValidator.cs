@@ -4,7 +4,7 @@ using System.Linq;
 using MemCheck.Domain;
 using Microsoft.Extensions.Localization;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.CardChanging
 {
     public interface ICardInput
     {
@@ -29,8 +29,8 @@ namespace MemCheck.Application
         private const int maxBackSideLength = 5000;
         private const int minAdditionalInfoLength = 0;
         private const int maxAdditionalInfoLength = 20000;
-        public const int minVersionDescriptionLength = 3;
-        public const int maxVersionDescriptionLength = 1000;
+        private const int minVersionDescriptionLength = 3;
+        private const int maxVersionDescriptionLength = 1000;
         private const int maxImageCountPerSide = 10;
         #endregion
         public static void Run(ICardInput input, IStringLocalizer localizer)

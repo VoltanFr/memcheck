@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.CardChanging
 {
     public sealed class AddTagToCards
     {

@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application;
+using MemCheck.Application.CardChanging;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -122,7 +123,6 @@ namespace MemCheck.CommandLineDbClient.Pauker
                     logger.LogInformation($"Card already exists in MemCheck with this front, skipping: {paukerCard.Front.Text}");
                 else
                 {
-                    //var creator = new CreateCard(dbContext);
                     CreateCard.Request request = new CreateCard.Request(
                         user,
                         paukerCard.Front.Text.Trim(),
