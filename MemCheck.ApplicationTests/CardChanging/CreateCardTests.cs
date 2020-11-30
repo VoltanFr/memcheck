@@ -7,6 +7,7 @@ using MemCheck.Application.Tests;
 using MemCheck.Application.Tests.BasicHelpers;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace MemCheck.Application.CardChanging
 {
@@ -105,6 +106,36 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(testDB))
                 Assert.IsTrue(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
+        }
+        [TestMethod()]
+        public async Task TestCreatioFailsIfCreatorNotInVisibilityList()
+        {
+            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var otherUser = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+
+            Guid cardGuid = Guid.Empty;
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var request = new CreateCard.Request(
+                    creatorId,
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    StringServices.RandomString(),
+                    new Guid[0],
+                    languageId,
+                    new Guid[0],
+                    new Guid[] { otherUser },
+                    StringServices.RandomString());
+                var ownerMustHaveVisibility = StringServices.RandomString();
+                var localizer = new TestLocalizer(new[] { new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility) });
+                var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
+                Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
+            }
         }
     }
 }
