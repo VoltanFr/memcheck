@@ -3,29 +3,16 @@ using Microsoft.EntityFrameworkCore;
 using MemCheck.Database;
 using System.Linq;
 using System;
-using MemCheck.Application.Notifying;
 using MemCheck.Domain;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.Extensions.Localization;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.Tests.BasicHelpers;
 
 namespace MemCheck.Application.Tests
 {
     [TestClass()]
     public class DeleteCardTests
     {
-        #region private sealed class EmptyLocalizer
-        private sealed class EmptyLocalizer : IStringLocalizer
-        {
-            public LocalizedString this[string name] => new LocalizedString(name, "");
-            public LocalizedString this[string name, params object[] arguments] => new LocalizedString(name, "");
-            public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
-            {
-                return new LocalizedString[0];
-            }
-        }
-        #endregion
         #region Private methods
         private DbContextOptions<MemCheckDbContext> DbContextOptions()
         {
@@ -73,7 +60,7 @@ namespace MemCheck.Application.Tests
         private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using var dbContext = new MemCheckDbContext(db);
-            var deleter = new DeleteCards(dbContext, new EmptyLocalizer());
+            var deleter = new DeleteCards(dbContext, new TestLocalizer());
             var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == userId).Single(), new[] { cardId });
             await deleter.RunAsync(deletionRequest, deletionDate);
         }
