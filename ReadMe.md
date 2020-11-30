@@ -57,7 +57,7 @@
 
 # In progress
 - Un utilisateur peut être abonné à une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchSubscriptions`. On ne supporte pas les recherches avec info d'évaluation, et sans doute d'autres, à voir (parce qu'on ne sait pas raisonnablement identifier qu'une carte est apparue dans la recherche).
-- Selon config utilisateur, abonnement auto à une carte à la création d'une nouvelle carte
+- **Selon config utilisateur, abonnement auto à une carte à la création d'une nouvelle carte**
 - Selon config utilisateur, abonnement auto à une carte à la création d'une version de carte
 - Paramètres utilisateur : abonnement automatique à une carte lorsque vous créez une version
 

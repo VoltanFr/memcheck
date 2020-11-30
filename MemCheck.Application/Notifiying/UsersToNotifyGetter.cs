@@ -25,7 +25,8 @@ namespace MemCheck.Application.Notifying
         public ImmutableArray<MemCheckUser> Run(DateTime? now = null)
         {
             now = now ?? DateTime.UtcNow;
-            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffDay(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs);
+            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
+            //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
             return userList.ToImmutableArray();
         }
     }

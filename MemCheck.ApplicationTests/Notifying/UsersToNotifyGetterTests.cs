@@ -26,11 +26,11 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
 
-            await UserHelper.CreateInDbAsync(testDB);
+            var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2020, 11, 29, 20, 00, 00));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var users = new UsersToNotifyGetter(dbContext).Run();
+                var users = new UsersToNotifyGetter(dbContext).Run(new DateTime(2020, 11, 30, 13, 30, 00));
                 Assert.AreEqual(0, users.Length);
             }
         }
