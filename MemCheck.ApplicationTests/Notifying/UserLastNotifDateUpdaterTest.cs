@@ -4,6 +4,7 @@ using MemCheck.Application.Notifying;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -13,7 +14,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UserWithoutSubscription()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserLastNotifDateUpdaterTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2040, 1, 1));
             var lastNotifDate = new DateTime(2040, 1, 2);

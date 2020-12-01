@@ -7,6 +7,7 @@ using MemCheck.Domain;
 using System.Threading.Tasks;
 using MemCheck.Application.CardChanging;
 using MemCheck.Application.Tests.BasicHelpers;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests
 {
@@ -14,17 +15,6 @@ namespace MemCheck.Application.Tests
     public class DeleteCardTests
     {
         #region Private methods
-        private DbContextOptions<MemCheckDbContext> DbContextOptions()
-        {
-            var connectionString = @$"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog={GetType().Name};Integrated Security=True;Connect Timeout=60;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-            var result = new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options;
-            using (var dbContext = new MemCheckDbContext(result))
-            {
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-            }
-            return result;
-        }
         private async Task<MemCheckUser> CreateUserAsync(DbContextOptions<MemCheckDbContext> db)
         {
             using var dbContext = new MemCheckDbContext(db);
@@ -68,7 +58,7 @@ namespace MemCheck.Application.Tests
         [TestMethod()]
         public async Task DeletingMustNotDeleteCardNotifications()
         {
-            var options = DbContextOptions();
+            var options = DbHelper.GetEmptyTestDB();
             var user1 = await CreateUserAsync(options);
             var card = await CreateCardAsync(options, user1.Id, new DateTime(2020, 11, 1));
             await CreateCardNotificationAsync(options, user1.Id, card.Id);

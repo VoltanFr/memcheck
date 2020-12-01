@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using MemCheck.Application.Notifying;
 using System.Threading.Tasks;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -13,7 +14,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public void TestRun_EmptyDB()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -24,7 +25,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithUserNotToNotify()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2020, 11, 29, 20, 00, 00));
 
@@ -37,7 +38,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithOneUserToNotify()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2020, 11, 10));
             await UserHelper.CreateInDbAsync(testDB, 10, new DateTime(2020, 11, 1));
@@ -54,7 +55,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_DBWithTwoUsersToNotify()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var userToNotify1 = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2030, 10, 19));
             await UserHelper.CreateInDbAsync(testDB);

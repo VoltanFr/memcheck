@@ -4,7 +4,7 @@ using MemCheck.Domain;
 using System.Threading.Tasks;
 using System;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Tests.Helpers
 {
     public static class ImageHelper
     {

@@ -8,6 +8,7 @@ using MemCheck.Application.Tests.BasicHelpers;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.CardChanging
 {
@@ -17,7 +18,7 @@ namespace MemCheck.Application.CardChanging
         [TestMethod()]
         public async Task TestCreationWithAllData()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var userWithViewId = await UserHelper.CreateInDbAsync(testDB);
 
@@ -81,7 +82,7 @@ namespace MemCheck.Application.CardChanging
         [TestMethod()]
         public async Task TestCreationWithUserSubscribingToCardOnEdit()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: true);
             var languageId = await CardLanguagHelper.CreateAsync(testDB);
@@ -110,7 +111,7 @@ namespace MemCheck.Application.CardChanging
         [TestMethod()]
         public async Task TestCreatioFailsIfCreatorNotInVisibilityList()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var creatorId = await UserHelper.CreateInDbAsync(testDB);
             var otherUser = await UserHelper.CreateInDbAsync(testDB);

@@ -6,6 +6,7 @@ using System;
 using MemCheck.Application.Notifying;
 using MemCheck.Domain;
 using System.Threading.Tasks;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -62,7 +63,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task EmptyDB()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -74,7 +75,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_NotToBeNotified()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user, new DateTime(2020, 11, 2));
             var lastNotificationDate = new DateTime(2020, 11, 3);
@@ -95,7 +96,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_ToBeNotified()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user, new DateTime(2020, 11, 2));
             await CardSubscriptionHelper.CreateAsync(testDB, user, card.Id, new DateTime(2020, 11, 1));
@@ -119,7 +120,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_NotToBeNotifiedBecauseOfDate()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -142,7 +143,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotifiedWithoutAccessibility()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2), new[] { user1 });
@@ -176,7 +177,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotifiedWithAccessibility()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var user2 = await UserHelper.CreateInDbAsync(testDB);
 
@@ -203,7 +204,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifAfterInitialCreation()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -229,7 +230,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifBeforeInitialCreation()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -255,7 +256,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitPreviousVersions_NotToBeNotified()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -279,7 +280,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitPreviousVersions_ToBeNotified_LastNotifAfterPreviousVersionCreation()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 5));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -305,7 +306,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task CardWitPreviousVersions_ToBeNotified_LastNotifBeforePreviousVersionCreation()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 5));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
@@ -331,7 +332,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task MultipleVersions()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardVersionsNotifierTests));
+            var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var user2 = await UserHelper.CreateInDbAsync(testDB);
 

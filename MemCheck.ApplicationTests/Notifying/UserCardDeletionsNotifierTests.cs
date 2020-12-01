@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using MemCheck.Application.CardChanging;
 using MemCheck.Application.Tests.BasicHelpers;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -21,7 +22,7 @@ namespace MemCheck.Application.Tests.Notifying
         #region Private methods
         private DbContextOptions<MemCheckDbContext> GetEmptyTestDB()
         {
-            return DbServices.GetEmptyTestDB(typeof(UserCardDeletionsNotifierTests));
+            return DbHelper.GetEmptyTestDB();
         }
         private async Task<CardPreviousVersion> CreateDeletedCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {

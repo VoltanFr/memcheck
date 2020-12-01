@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using MemCheck.Application.Notifying;
 using System.Threading.Tasks;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -13,7 +14,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UserWithoutSubscription()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB);
 
@@ -26,7 +27,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UserWithOneSubscription()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user);
@@ -41,7 +42,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UserWithSubscriptions()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB);
             await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
@@ -57,7 +58,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UsersWithSubscriptions()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(UserCardSubscriptionCounterTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 

@@ -6,6 +6,7 @@ using MemCheck.Database;
 using MemCheck.Application.Tests;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.CardChanging
 {
@@ -15,7 +16,7 @@ namespace MemCheck.Application.CardChanging
         [TestMethod()]
         public async Task TestSameUserCreatesVersion()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var ownerId = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, ownerId);
@@ -36,7 +37,7 @@ namespace MemCheck.Application.CardChanging
         [TestMethod()]
         public async Task TestOtherUserCreatesVersion()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(CreateCardTests));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var ownerId = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, ownerId);

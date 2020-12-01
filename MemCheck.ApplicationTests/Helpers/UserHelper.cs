@@ -4,7 +4,7 @@ using System;
 using MemCheck.Domain;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Tests.Helpers
 {
     public class UserHelper
     {

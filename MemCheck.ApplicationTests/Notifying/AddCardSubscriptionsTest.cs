@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System;
 using Microsoft.EntityFrameworkCore;
 using MemCheck.Domain;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -14,7 +15,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(AddCardSubscriptionsTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var card = await CardHelper.CreateAsync(testDB, await UserHelper.CreateInDbAsync(testDB));
             var otherUserId = await UserHelper.CreateInDbAsync(testDB);
@@ -34,7 +35,7 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestRun_UserNotAllowedBecauseHasNoVisibility()
         {
-            var testDB = DbServices.GetEmptyTestDB(typeof(AddCardSubscriptionsTest));
+            var testDB = DbHelper.GetEmptyTestDB();
 
             var cardCreatorId = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, cardCreatorId, userWithViewIds: new Guid[] { cardCreatorId });

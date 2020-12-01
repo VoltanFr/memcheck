@@ -7,6 +7,7 @@ using Moq;
 using System;
 using MemCheck.Domain;
 using System.Collections.Immutable;
+using MemCheck.Application.Tests.Helpers;
 
 namespace MemCheck.Application.Tests.Notifying
 {
