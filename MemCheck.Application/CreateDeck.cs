@@ -18,14 +18,14 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<bool> RunAsync(Request request)
+        public async Task<Guid> RunAsync(Request request)
         {
             request.CheckValidity(dbContext);
 
             var deck = new Deck() { Owner = request.User, Description = request.Description, HeapingAlgorithmId = request.HeapingAlgorithmId };
             dbContext.Decks.Add(deck);
             await dbContext.SaveChangesAsync();
-            return true;
+            return deck.Id;
         }
         public sealed class Request
         {
