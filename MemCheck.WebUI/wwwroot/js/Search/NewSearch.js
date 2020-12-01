@@ -115,15 +115,8 @@ var app = new Vue({
                         this.selectedRequiredTags.push(this.possibleRequiredTags[i]);
             }
         },
-        async runQuery() {
-            if (this.runResult.cardsWithSelectionInfo && this.runResult.cardsWithSelectionInfo.length > 0)
-                this.runResult.cardsWithSelectionInfo = [];
-
-            this.loadingQuery = true;
-            this.runResult.pageCount = 0;
-            this.runResult.cardsWithSelectionInfo = [];
-
-            request = {
+        getRequest() {
+            return {
                 pageNo: this.pageNo,
                 pageSize: this.pageSize,
                 requiredTags: this.selectedRequiredTags.map(tag => tag.tagId),
@@ -137,6 +130,16 @@ var app = new Vue({
                 ratingFilteringValue: this.selectedAverageRatingFilteringValue,
                 notificationFiltering: this.selectedNotificationFilteringId,
             };
+        },
+        async runQuery() {
+            if (this.runResult.cardsWithSelectionInfo && this.runResult.cardsWithSelectionInfo.length > 0)
+                this.runResult.cardsWithSelectionInfo = [];
+
+            this.loadingQuery = true;
+            this.runResult.pageCount = 0;
+            this.runResult.cardsWithSelectionInfo = [];
+
+            request = this.getRequest();
 
             start = performance.now();
             await axios.post('/Search/RunQuery/', request)
