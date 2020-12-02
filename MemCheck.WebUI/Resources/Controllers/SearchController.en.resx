@@ -207,6 +207,15 @@
   <data name="Before" xml:space="preserve">
     <value>Before</value>
   </data>
+  <data name="CanNotSubscribeToSearchInDeck" xml:space="preserve">
+    <value>Subscribing to a search in a deck is not supported</value>
+  </data>
+  <data name="CanNotSubscribeToSearchWithRatingCriteria" xml:space="preserve">
+    <value>Subscribing to a search with rating criteria is not supported</value>
+  </data>
+  <data name="CanNotSubscribeToSearchWithVisibilityCriteria" xml:space="preserve">
+    <value>Subscribing to a search with visibility criteria is not supported</value>
+  </data>
   <data name="CantAddToDeckBecauseSomeCardsAlreadyIn" xml:space="preserve">
     <value>At least one card is in your deck</value>
   </data>
@@ -267,6 +276,9 @@
   <data name="CardVisibleToOwnerOnly" xml:space="preserve">
     <value>Visible to owner only (private)</value>
   </data>
+  <data name="ConfirmSubscription" xml:space="preserve">
+    <value>Sure you want to subscribe to this search? You will be notified by email when the result changes (according to your user settings).</value>
+  </data>
   <data name="Deletion" xml:space="preserve">
     <value>Deletion</value>
   </data>
@@ -314,6 +326,12 @@
   </data>
   <data name="StartingWith" xml:space="preserve">
     <value>starting with</value>
+  </data>
+  <data name="SubscriptionRecorded" xml:space="preserve">
+    <value>Subscription recorded</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
   </data>
   <data name="TagAdded" xml:space="preserve">
     <value>Tag added</value>

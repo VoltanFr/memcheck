@@ -207,6 +207,15 @@
   <data name="Before" xml:space="preserve">
     <value>Avant</value>
   </data>
+  <data name="CanNotSubscribeToSearchInDeck" xml:space="preserve">
+    <value>Il n'est pas possible de s'abonner à une recherche dans un paquet</value>
+  </data>
+  <data name="CanNotSubscribeToSearchWithRatingCriteria" xml:space="preserve">
+    <value>Il n'est pas possible de s'abonner à une recherche avec critère d'évaluation</value>
+  </data>
+  <data name="CanNotSubscribeToSearchWithVisibilityCriteria" xml:space="preserve">
+    <value>Il n'est pas possible de s'abonner à une recherche avec critère de visibilité</value>
+  </data>
   <data name="CantAddToDeckBecauseSomeCardsAlreadyIn" xml:space="preserve">
     <value>Au moins une carte est dans votre paquet</value>
   </data>
@@ -267,6 +276,9 @@
   <data name="CardVisibleToOwnerOnly" xml:space="preserve">
     <value>Cartes privées</value>
   </data>
+  <data name="ConfirmSubscription" xml:space="preserve">
+    <value>Veuillez confirmer que vous souhaitez vous abonner à cette recherche et être prévenu par courrier électronique lorsque les résultats changent (selon vos paramètres utilisateur).</value>
+  </data>
   <data name="Deletion" xml:space="preserve">
     <value>Suppression</value>
   </data>
@@ -314,6 +326,12 @@
   </data>
   <data name="StartingWith" xml:space="preserve">
     <value>commençant par</value>
+  </data>
+  <data name="SubscriptionRecorded" xml:space="preserve">
+    <value>Abonnement enregistré</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Ok</value>
   </data>
   <data name="TagAdded" xml:space="preserve">
     <value>Label ajouté</value>

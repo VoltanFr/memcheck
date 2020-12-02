@@ -4,14 +4,16 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201201230950_SearchSubscriptions")]
+    partial class SearchSubscriptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,15 +221,15 @@ namespace MemCheck.Database.Migrations
 
             modelBuilder.Entity("MemCheck.Domain.ExcludedTagInSearchSubscription", b =>
                 {
-                    b.Property<Guid>("SearchSubscriptionId")
+                    b.Property<Guid>("SearchId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("TagId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("SearchSubscriptionId", "TagId");
+                    b.HasKey("SearchId", "TagId");
 
-                    b.ToTable("ExcludedTagInSearchSubscriptions");
+                    b.ToTable("ExcludedTagInSearchSubscription");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.Image", b =>
@@ -520,15 +522,15 @@ namespace MemCheck.Database.Migrations
 
             modelBuilder.Entity("MemCheck.Domain.RequiredTagInSearchSubscription", b =>
                 {
-                    b.Property<Guid>("SearchSubscriptionId")
+                    b.Property<Guid>("SearchId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("TagId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("SearchSubscriptionId", "TagId");
+                    b.HasKey("SearchId", "TagId");
 
-                    b.ToTable("RequiredTagInSearchSubscriptions");
+                    b.ToTable("RequiredTagInSearchSubscription");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.SearchSubscription", b =>
@@ -552,9 +554,6 @@ namespace MemCheck.Database.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("excludeAllTags")
-                        .HasColumnType("bit");
 
                     b.HasKey("SearchId");
 
@@ -840,7 +839,7 @@ namespace MemCheck.Database.Migrations
                 {
                     b.HasOne("MemCheck.Domain.SearchSubscription", null)
                         .WithMany("ExcludedTags")
-                        .HasForeignKey("SearchSubscriptionId")
+                        .HasForeignKey("SearchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -926,7 +925,7 @@ namespace MemCheck.Database.Migrations
                 {
                     b.HasOne("MemCheck.Domain.SearchSubscription", null)
                         .WithMany("RequiredTags")
-                        .HasForeignKey("SearchSubscriptionId")
+                        .HasForeignKey("SearchId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

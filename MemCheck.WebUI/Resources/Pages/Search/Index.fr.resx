@@ -231,6 +231,9 @@
   <data name="SelectNone" xml:space="preserve">
     <value>Aucune</value>
   </data>
+  <data name="Subscribe" xml:space="preserve">
+    <value>Abonnement</value>
+  </data>
   <data name="Text" xml:space="preserve">
     <value>Texte</value>
   </data>

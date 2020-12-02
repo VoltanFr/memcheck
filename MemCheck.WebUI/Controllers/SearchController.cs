@@ -221,6 +221,8 @@ namespace MemCheck.WebUI.Controllers
                 CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"].Value;
                 Registered = localizer["Registered"].Value;
                 Unregistered = localizer["Unregistered"].Value;
+
+                ConfirmSubscription = localizer["ConfirmSubscription"].Value;
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -280,6 +282,7 @@ namespace MemCheck.WebUI.Controllers
             public string CardsNotRegisteredForNotif { get; }
             public string Registered { get; }
             public string Unregistered { get; }
+            public string ConfirmSubscription { get; }
         }
         #endregion
         #endregion
@@ -547,6 +550,55 @@ namespace MemCheck.WebUI.Controllers
         public sealed class UnregisterForNotificationsRequest
         {
             public IEnumerable<Guid> CardIds { get; set; } = null!;
+        }
+        #endregion
+        #region Subscribe
+        private void ChecSubscribeToSearchRequestValidity(RunQueryRequest request)
+        {
+            if (request == null)
+                throw new ArgumentException("Request not received, probably a serialization problem");
+            if (request.RequiredTags.Contains(noTagFakeGuid))
+                throw new ArgumentException("The noTagFakeGuid is not meant to be received in a request, it is just a tool for the javascript code, meaning 'remove all tags'");
+            if (request.RequiredTags.Contains(allTagsFakeGuid))
+                throw new ArgumentException("The allTagsFakeGuid is not meant to be received in required tags, it is meant to be used in excluded tags only");
+            if (request.ExcludedTags.Contains(noTagFakeGuid))
+                throw new ArgumentException("The noTagFakeGuid is not meant to be received in a request, it is just a tool for the javascript code, meaning 'remove all tags'");
+            if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
+                throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
+            if (request.Deck != Guid.Empty && request.DeckIsInclusive)
+                throw new RequestInputException(localizer["CanNotSubscribeToSearchInDeck"].Value);
+            if (request.Visibility != 1)
+                throw new RequestInputException(localizer["CanNotSubscribeToSearchWithVisibilityCriteria"].Value);
+            if (request.RatingFilteringMode != 1)
+                throw new RequestInputException(localizer["CanNotSubscribeToSearchWithRatingCriteria"].Value);
+        }
+        [HttpPost("SubscribeToSearch")]
+        public async Task<IActionResult> SubscribeToSearch([FromBody] RunQueryRequest request)
+        {
+            try
+            {
+                ChecSubscribeToSearchRequestValidity(request);
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
+                var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, request.RequiredText, request.RequiredTags, excludedTags);
+                await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
+                var result = new SubscribeToSearchViewModel(localizer["Success"].Value, localizer["SubscriptionRecorded"].Value);
+                return base.Ok(result);
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
+        public sealed class SubscribeToSearchViewModel
+        {
+            public SubscribeToSearchViewModel(string toastTitle, string toastMesg)
+            {
+                this.toastTitle = toastTitle;
+                ToastMesg = toastMesg;
+            }
+            public string toastTitle { get; }
+            public string ToastMesg { get; }
         }
         #endregion
     }

@@ -20,15 +20,16 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<bool> RunAsync(string name)
+        public async Task<Guid> RunAsync(string name)
         {
             name = name.Trim();
             CheckNameValidity(dbContext, name);
 
-            dbContext.Tags.Add(new Tag() { Name = name });
+            Tag tag = new Tag() { Name = name };
+            dbContext.Tags.Add(tag);
             await dbContext.SaveChangesAsync();
 
-            return true;
+            return tag.Id;
         }
         public static void CheckNameValidity(MemCheckDbContext dbContext, string name)
         {

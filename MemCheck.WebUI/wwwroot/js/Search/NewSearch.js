@@ -625,6 +625,19 @@ var app = new Vue({
                 //For example, the user is filtering on cards registered. If he unregisters some cards, the query needs to be run again
                 this.runQuery();
         },
+        async subscribe() {
+            if (confirm(this.allStaticData.localizedText.confirmSubscription)) {
+                request = this.getRequest();
+
+                await axios.post('/Search/SubscribeToSearch/', request)
+                    .then(result => {
+                        tellAxiosSuccess(result.data.toastMesg, result.data.toastTitle, this);
+                    })
+                    .catch(error => {
+                        tellAxiosError(error, this);
+                    });
+            }
+        },
     },
     watch: {
         selectedDeck: {

@@ -4,14 +4,16 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201201233824_ImproveSearchSubscriptions")]
+    partial class ImproveSearchSubscriptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -553,9 +555,6 @@ namespace MemCheck.Database.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("excludeAllTags")
-                        .HasColumnType("bit");
-
                     b.HasKey("SearchId");
 
                     b.ToTable("SearchSubscriptions");
@@ -838,11 +837,13 @@ namespace MemCheck.Database.Migrations
 
             modelBuilder.Entity("MemCheck.Domain.ExcludedTagInSearchSubscription", b =>
                 {
-                    b.HasOne("MemCheck.Domain.SearchSubscription", null)
+                    b.HasOne("MemCheck.Domain.SearchSubscription", "SearchSubscription")
                         .WithMany("ExcludedTags")
                         .HasForeignKey("SearchSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("SearchSubscription");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.Image", b =>
@@ -924,11 +925,13 @@ namespace MemCheck.Database.Migrations
 
             modelBuilder.Entity("MemCheck.Domain.RequiredTagInSearchSubscription", b =>
                 {
-                    b.HasOne("MemCheck.Domain.SearchSubscription", null)
+                    b.HasOne("MemCheck.Domain.SearchSubscription", "SearchSubscription")
                         .WithMany("RequiredTags")
                         .HasForeignKey("SearchSubscriptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("SearchSubscription");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.TagInCard", b =>

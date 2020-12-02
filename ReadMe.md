@@ -57,6 +57,10 @@
 
 # In progress
 - Un utilisateur peut être abonné à une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchSubscriptions`. On ne supporte pas les recherches avec info d'évaluation, et sans doute d'autres, à voir (parce qu'on ne sait pas raisonnablement identifier qu'une carte est apparue dans la recherche).
+- Tests de la notification quand une carte apparaît dans une recherche enregistrée
+- Tests de la notification quand une carte disparaît d'une recherche enregistrée
+- L'abonnement à une même recherche une deuxième fois doit être refusé
+- Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
 
 # Bugs
 
@@ -87,6 +91,7 @@
 - User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public)
 - Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
 - Use Azure functions to run Notifier on cron intervals. This is not implemented yet because Azure functions don't support .NET 5 yet (should be available by Jan 2021).
+- Provide a way to review the list of subscribed searches, and delete some.
 
 # To do at big cost
 - Card authoring: Have the user review his changes before saving a new version of a resource (card, tag, deck)
