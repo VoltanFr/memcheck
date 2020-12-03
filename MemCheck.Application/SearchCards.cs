@@ -221,6 +221,8 @@ namespace MemCheck.Application
                     throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
                 if (PageSize > 500)
                     throw new RequestInputException($"PageSize too big: {PageSize}");
+                if ((RatingFiltering == RatingFilteringMode.AtLeast || RatingFiltering == RatingFilteringMode.AtMost) && (RatingFilteringValue < 1 || RatingFilteringValue > 5))
+                    throw new RequestInputException($"Invalid RatingFilteringValue: {RatingFilteringValue}");
             }
         }
         public sealed class Result
