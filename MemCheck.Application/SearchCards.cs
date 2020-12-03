@@ -156,11 +156,11 @@ namespace MemCheck.Application
             }
 
             IQueryable<Card> cardsFilteredWithNotifications;
-            if (request.NotificationFiltering == 1)
+            if (request.Notification == Request.NotificationFiltering.Ignore)
                 cardsFilteredWithNotifications = cardsFilteredWithAverageRating;
             else
             {
-                var notifMustExist = request.NotificationFiltering == 2;
+                var notifMustExist = request.Notification == Request.NotificationFiltering.RegisteredCards;
                 cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == userId).Any() == notifMustExist);
             }
 
@@ -186,7 +186,8 @@ namespace MemCheck.Application
         {
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
-            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, int notificationFiltering)
+            public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
+            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification)
             {
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
@@ -199,7 +200,7 @@ namespace MemCheck.Application
                 RequiredText = requiredText;
                 RatingFiltering = ratingFiltering;
                 RatingFilteringValue = ratingFilteringValue;
-                NotificationFiltering = notificationFiltering;
+                Notification = notification;
             }
             public Guid Deck { get; } //Guid.Empty means ignore
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
@@ -209,10 +210,10 @@ namespace MemCheck.Application
             public string RequiredText { get; }
             public VibilityFiltering Visibility { get; }
             public RatingFilteringMode RatingFiltering { get; set; }
-            public int RatingFilteringValue { get; set; } //1 to 5
+            public int RatingFilteringValue { get; set; }
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
-            public int NotificationFiltering { get; set; } //1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
+            public NotificationFiltering Notification { get; set; }
             public void CheckValidity()
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
