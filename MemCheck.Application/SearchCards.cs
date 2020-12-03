@@ -168,9 +168,9 @@ namespace MemCheck.Application
             finalResult = finalResult.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
 
             var totalNbCards = finalResult.Count();
-            var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.pageSize);
+            var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-            var pageCards = finalResult.Skip((request.pageNo - 1) * request.pageSize).Take(request.pageSize);
+            var pageCards = finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
 
             if (cardRatings == null)
                 cardRatings = CardRatings.Load(dbContext, userId, pageCards.Select(card => card.Id).ToImmutableHashSet());
@@ -186,15 +186,14 @@ namespace MemCheck.Application
         {
             public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
             {
-                if (pageNo < 1) throw new ArgumentException($"First page is numbered 1, received a request for page {pageNo}");
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
                 Visibility = visibility;
                 Deck = deck;
                 DeckIsInclusive = deckIsInclusive;
                 Heap = heap;
-                this.pageNo = pageNo;
-                this.pageSize = pageSize;
+                PageNo = pageNo;
+                PageSize = pageSize;
                 RequiredText = requiredText;
                 RatingFilteringMode = ratingFilteringMode;
                 RatingFilteringValue = ratingFilteringValue;
@@ -203,8 +202,8 @@ namespace MemCheck.Application
             public Guid Deck { get; } //Guid.Empty means ignore
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
             public int? Heap { get; set; }
-            public int pageNo { get; }
-            public int pageSize { get; }
+            public int PageNo { get; }
+            public int PageSize { get; }
             public string RequiredText { get; }
             public int Visibility { get; }//1 = ignore this criteria, 2 = cards which can be seen by more than their owner, 3 = cards visible to their owner only
             public int RatingFilteringMode { get; set; } //1 = ignore this criteria, 2 = at least RatingFilteringValue, 3 = at most RatingFilteringValue, 4 = without any rating
@@ -216,6 +215,10 @@ namespace MemCheck.Application
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
                     throw new RequestInputException($"Invalid heap {Heap}");
+                if (PageNo < 1)
+                    throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
+                if (PageSize > 500)
+                    throw new RequestInputException($"PageSize too big: {PageSize}");
             }
         }
         public sealed class Result
