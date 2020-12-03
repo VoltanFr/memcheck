@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
 using MemCheck.Application.Notifying;
+using MemCheck.Application.Searching;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
