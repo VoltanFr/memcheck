@@ -79,6 +79,8 @@ namespace MemCheck.Application
         }
         public Result Run(Request request, Guid userId)
         {
+            request.CheckValidity();
+
             var allCards = dbContext.Cards.AsNoTracking()
                 .Include(card => card.TagsInCards)
                 .Include(card => card.VersionCreator)
@@ -99,7 +101,7 @@ namespace MemCheck.Application
                 if (request.DeckIsInclusive)
                     cardsFilteredWithDeck = cardsViewableByUser.Where(card =>
                         dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any()
-                        && (request.Heap == -1 || dbContext.CardsInDecks.AsNoTracking().Single(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).CurrentHeap == request.Heap)
+                        && (request.Heap == null || dbContext.CardsInDecks.AsNoTracking().Single(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).CurrentHeap == request.Heap.Value)
                         );
                 else
                     cardsFilteredWithDeck = cardsViewableByUser.Where(card => !dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any());
@@ -182,7 +184,7 @@ namespace MemCheck.Application
         #region Request and result classes
         public sealed class Request
         {
-            public Request(Guid deck, bool deckIsInclusive, int heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
+            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
             {
                 if (pageNo < 1) throw new ArgumentException($"First page is numbered 1, received a request for page {pageNo}");
                 RequiredTags = requiredTags;
@@ -200,7 +202,7 @@ namespace MemCheck.Application
             }
             public Guid Deck { get; } //Guid.Empty means ignore
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
-            public int Heap { get; set; }   //-1 stands for ignore
+            public int? Heap { get; set; }
             public int pageNo { get; }
             public int pageSize { get; }
             public string RequiredText { get; }
@@ -210,6 +212,11 @@ namespace MemCheck.Application
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
             public int NotificationFiltering { get; set; } //1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
+            public void CheckValidity()
+            {
+                if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
+                    throw new RequestInputException($"Invalid heap {Heap}");
+            }
         }
         public sealed class Result
         {

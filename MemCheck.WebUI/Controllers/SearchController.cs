@@ -68,7 +68,7 @@ namespace MemCheck.WebUI.Controllers
                 AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer["Any"].Value) }
                     .Concat(allUsers.Select(user => new GetAllStaticDataUserViewModel(user.UserId, user.UserName)));
                 LocalizedText = new GetAllStaticDataLocalizedTextViewModel(localizer);
-                PossibleHeapsForMove = Enumerable.Range(0, MoveCardToHeap.MaxTargetHeapId).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, decksControllerLocalizer)));
+                PossibleHeapsForMove = Enumerable.Range(0, CardInDeck.MaxHeapValue).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, decksControllerLocalizer)));
                 CurrentUserId = currentUser == null ? Guid.Empty : currentUser.Id;
                 ShowDebugInfo = DisplayServices.ShowDebugInfo(currentUser);
             }
@@ -313,7 +313,7 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, request.Visibility, request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering);
+                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, request.Visibility, request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering); ;
 
                 var applicationResult = new SearchCards(dbContext).Run(applicationRequest, userId);
 

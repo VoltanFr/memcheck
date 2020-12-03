@@ -90,7 +90,7 @@ namespace MemCheck.Application
         {
             var result = new List<ResultCard>();
 
-            for (var heap = MoveCardToHeap.MaxTargetHeapId; heap > 0 && result.Count < cardCount; heap--)
+            for (var heap = CardInDeck.MaxHeapValue; heap > 0 && result.Count < cardCount; heap--)
             {
                 var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && cardInDeck.CurrentHeap == heap);
 
@@ -278,7 +278,7 @@ namespace MemCheck.Application
                 AverageRating = averageRating;
                 CountOfUserRatings = countOfUserRatings;
                 RegisteredForNotifications = registeredForNotifications;
-                MoveToHeapExpiryInfos = Enumerable.Range(1, MoveCardToHeap.MaxTargetHeapId)
+                MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
                     .Where(heapId => heapId != heap)
                     .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
                     .Concat(new[] { new MoveToHeapExpiryInfo(0, DateTime.MinValue.ToUniversalTime()) });

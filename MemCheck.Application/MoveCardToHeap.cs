@@ -1,4 +1,5 @@
 ﻿using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -8,7 +9,6 @@ namespace MemCheck.Application
 {
     public sealed class MoveCardToHeap
     {
-        public const int MaxTargetHeapId = 15;
         #region Fields
         private readonly MemCheckDbContext dbContext;
         #endregion
@@ -65,7 +65,7 @@ namespace MemCheck.Application
                     throw new RequestInputException($"Invalid DeckId '{DeckId}'");
                 if (QueryValidationHelper.IsReservedGuid(CardId))
                     throw new RequestInputException($"Invalid DeckId '{DeckId}'");
-                if (TargetHeap < minHeapId || TargetHeap > MaxTargetHeapId)
+                if (TargetHeap < minHeapId || TargetHeap > CardInDeck.MaxHeapValue)
                     throw new RequestInputException($"Invalid target heap {TargetHeap}");
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
             }

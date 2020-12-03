@@ -1,4 +1,5 @@
 ﻿using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace MemCheck.Application
             {
                 if (QueryValidationHelper.IsReservedGuid(DeckId))
                     throw new RequestInputException($"Invalid DeckId '{DeckId}'");
-                if (TargetHeapId < 0 || TargetHeapId > MoveCardToHeap.MaxTargetHeapId)
+                if (TargetHeapId < 0 || TargetHeapId > CardInDeck.MaxHeapValue)
                     throw new RequestInputException($"Invalid target heap {TargetHeapId}");
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");

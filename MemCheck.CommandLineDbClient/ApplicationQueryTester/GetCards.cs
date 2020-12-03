@@ -201,7 +201,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 UserRating = userRating;
                 AverageRating = averageRating;
                 CountOfUserRatings = countOfUserRatings;
-                MoveToHeapExpiryInfos = Enumerable.Range(1, MoveCardToHeap.MaxTargetHeapId)
+                MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
                     .Where(heapId => heapId != heap)
                     .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
                     .Concat(new[] { new MoveToHeapExpiryInfo(0, DateTime.MinValue.ToUniversalTime()) });
