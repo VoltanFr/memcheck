@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Collections.Immutable;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application
 {

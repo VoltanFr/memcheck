@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.CardChanging
 {

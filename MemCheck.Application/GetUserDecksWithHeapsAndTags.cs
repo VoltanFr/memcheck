@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;

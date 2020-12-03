@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.QueryValidation
 {
     internal static class QueryValidationHelper
     {
@@ -26,11 +26,16 @@ namespace MemCheck.Application
         {
             return reservedGuids.Contains(g);
         }
+        public static void CheckNotReservedGuid(Guid g)
+        {
+            if (IsReservedGuid(g))
+                throw new RequestInputException("Bad Guid");
+        }
         public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {
             var owner = dbContext.Decks.AsNoTracking().Where(deck => deck.Id == deckId).Select(deck => deck.Owner.Id).Single();
             if (owner != userId)
-                throw new ApplicationException("Current user not owner of deck");
+                throw new RequestInputException("Current user not owner of deck");
         }
         public static async Task CheckUserIsOwnerOfDeckAsync(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {

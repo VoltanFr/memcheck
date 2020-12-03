@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -77,9 +78,9 @@ namespace MemCheck.Application.Searching
         {
             this.dbContext = dbContext;
         }
-        public Result Run(Request request)
+        public async Task<Result> RunAsync(Request request)
         {
-            request.CheckValidity();
+            await request.CheckValidityAsync(dbContext);
 
             var allCards = dbContext.Cards.AsNoTracking()
                 .Include(card => card.TagsInCards)
@@ -216,7 +217,7 @@ namespace MemCheck.Application.Searching
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
             public NotificationFiltering Notification { get; set; }
-            public void CheckValidity()
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
                     throw new RequestInputException($"Invalid heap {Heap}");
@@ -226,6 +227,14 @@ namespace MemCheck.Application.Searching
                     throw new RequestInputException($"PageSize too big: {PageSize}");
                 if ((RatingFiltering == RatingFilteringMode.AtLeast || RatingFiltering == RatingFilteringMode.AtMost) && (RatingFilteringValue < 1 || RatingFilteringValue > 5))
                     throw new RequestInputException($"Invalid RatingFilteringValue: {RatingFilteringValue}");
+                if (UserId == Guid.Empty && Deck != Guid.Empty)
+                    throw new RequestInputException("Can not search a deck if not logged in");
+                if (UserId != Guid.Empty)
+                {
+                    QueryValidationHelper.CheckNotReservedGuid(UserId);
+                    if (Deck != Guid.Empty)
+                        await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, Deck);
+                }
             }
         }
         public sealed class Result

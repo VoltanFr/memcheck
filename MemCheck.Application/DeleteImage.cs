@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application
 {

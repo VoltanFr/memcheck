@@ -39,7 +39,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 var request = new Application.Searching.SearchCards.Request(user, Guid.Empty, true, null, 1, 3000, "", new Guid[0].ToImmutableArray(), new Guid[0].ToImmutableArray(), Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner, Application.Searching.SearchCards.Request.RatingFilteringMode.Ignore, 0, Application.Searching.SearchCards.Request.NotificationFiltering.Ignore);
                 var runner = new Application.Searching.SearchCards(dbContext);
                 var realCodeChrono = Stopwatch.StartNew();
-                var result = runner.Run(request);
+                var result = await runner.RunAsync(request);
                 chronos.Add(realCodeChrono.Elapsed.TotalSeconds);
                 logger.LogInformation($"Got {result.TotalNbCards} cards in {realCodeChrono.Elapsed}");
                 logger.LogInformation($"First card has {result.Cards.First().Tags.Count()} tags, the first tag is {result.Cards.First().Tags.First()}");

@@ -1,25 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MemCheck.Application.CardChanging;
 using MemCheck.Domain;
 using Microsoft.Extensions.Localization;
 
-namespace MemCheck.Application.CardChanging
+namespace MemCheck.Application.QueryValidation
 {
-    public interface ICardInput
-    {
-        public Guid VersionCreatorId { get; }
-        public string FrontSide { get; }
-        public IEnumerable<Guid> FrontSideImageList { get; }
-        public string BackSide { get; }
-        public IEnumerable<Guid> BackSideImageList { get; }
-        public string AdditionalInfo { get; }
-        public IEnumerable<Guid> AdditionalInfoImageList { get; }
-        public Guid LanguageId { get; }
-        public IEnumerable<Guid> Tags { get; }
-        public IEnumerable<Guid> UsersWithVisibility { get; }
-        public string VersionDescription { get; }
-    }
     internal static class CardInputValidator
     {
         #region Fields

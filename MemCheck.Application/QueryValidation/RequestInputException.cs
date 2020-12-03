@@ -1,19 +1,13 @@
 ﻿using System;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.QueryValidation
 {
-    public sealed class RequestInputException : Exception
+    internal sealed class RequestInputException : Exception
     {
         public RequestInputException(string message) : base(message)
         {
         }
         public RequestInputException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-    }
-    public sealed class SearchResultTooBigForRatingException : Exception
-    {
-        public SearchResultTooBigForRatingException() : base()
         {
         }
     }

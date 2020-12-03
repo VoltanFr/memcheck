@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -14,6 +15,12 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {
+    internal interface IImageMetadata
+    {
+        public string Name { get; }
+        public string Description { get; }
+        public string Source { get; }
+    }
     public sealed class StoreImage
     {
         #region Fields

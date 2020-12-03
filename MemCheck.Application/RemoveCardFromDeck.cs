@@ -4,6 +4,7 @@ using MemCheck.Domain;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application
 {

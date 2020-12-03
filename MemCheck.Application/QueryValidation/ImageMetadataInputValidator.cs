@@ -1,14 +1,8 @@
 ﻿using Microsoft.Extensions.Localization;
 using System;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.QueryValidation
 {
-    public interface IImageMetadata
-    {
-        public string Name { get; }
-        public string Description { get; }
-        public string Source { get; }
-    }
     internal static class ImageMetadataInputValidator
     {
         #region Fields

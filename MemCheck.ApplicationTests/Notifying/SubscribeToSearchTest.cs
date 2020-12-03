@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MemCheck.Application.Tests.Helpers;
 using System.Linq;
 using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.Tests.Notifying
 {
