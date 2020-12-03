@@ -46,7 +46,7 @@ namespace MemCheck.Application.QueryValidation
                 .Select(deck => deck.Owner.Id)
                 .SingleAsync();
             if (deckOwnerId != userId)
-                throw new ApplicationException("Current user not owner of deck");
+                throw new RequestInputException("Current user not owner of deck");
         }
         public static async Task CheckUserIsAllowedToViewCardAsync(MemCheckDbContext dbContext, Guid userId, Guid cardId)
         {
