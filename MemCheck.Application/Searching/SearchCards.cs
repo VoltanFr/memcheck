@@ -77,7 +77,7 @@ namespace MemCheck.Application.Searching
         {
             this.dbContext = dbContext;
         }
-        public Result Run(Request request, Guid userId)
+        public Result Run(Request request)
         {
             request.CheckValidity();
 
@@ -90,9 +90,9 @@ namespace MemCheck.Application.Searching
 
             var cardsViewableByUser = allCards.Where(
                 card =>
-                card.VersionCreator.Id == userId
+                card.VersionCreator.Id == request.UserId
                 || !card.UsersWithView.Any()    //card is public
-                || card.UsersWithView.Where(userWithView => userWithView.UserId == userId).Any()
+                || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any()
                 );
 
             IQueryable<Card> cardsFilteredWithDeck;
@@ -145,7 +145,7 @@ namespace MemCheck.Application.Searching
                 if (cardsFilteredWithVisibility.Count() > 20000)
                     throw new SearchResultTooBigForRatingException();
 
-                cardRatings = CardRatings.Load(dbContext, userId, cardsFilteredWithVisibility.Select(card => card.Id).ToImmutableHashSet());
+                cardRatings = CardRatings.Load(dbContext, request.UserId, cardsFilteredWithVisibility.Select(card => card.Id).ToImmutableHashSet());
                 if (request.RatingFiltering == Request.RatingFilteringMode.NoRating)
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithoutEval.Contains(card.Id));
                 else
@@ -161,7 +161,7 @@ namespace MemCheck.Application.Searching
             else
             {
                 var notifMustExist = request.Notification == Request.NotificationFiltering.RegisteredCards;
-                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == userId).Any() == notifMustExist);
+                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == request.UserId).Any() == notifMustExist);
             }
 
             var finalResult = cardsFilteredWithNotifications;
@@ -173,11 +173,11 @@ namespace MemCheck.Application.Searching
             var pageCards = finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
 
             if (cardRatings == null)
-                cardRatings = CardRatings.Load(dbContext, userId, pageCards.Select(card => card.Id).ToImmutableHashSet());
+                cardRatings = CardRatings.Load(dbContext, request.UserId, pageCards.Select(card => card.Id).ToImmutableHashSet());
 
             var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(card.Id, card.FrontSide, card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name), card.UsersWithView.Select(userWithView => userWithView.User.UserName), cardRatings)).ToList();
 
-            var withUserDeckInfo = AddDeckInfo(userId, resultCards);
+            var withUserDeckInfo = AddDeckInfo(request.UserId, resultCards);
 
             return new Result(totalNbCards, totalPageCount, withUserDeckInfo);
         }
@@ -187,7 +187,7 @@ namespace MemCheck.Application.Searching
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
             public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
-            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification)
+            public Request(Guid userId, Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification)
             {
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
@@ -201,7 +201,9 @@ namespace MemCheck.Application.Searching
                 RatingFiltering = ratingFiltering;
                 RatingFilteringValue = ratingFilteringValue;
                 Notification = notification;
+                UserId = userId;
             }
+            public Guid UserId { get; } //Guid.Empty means no user logged in
             public Guid Deck { get; } //Guid.Empty means ignore
             public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
             public int? Heap { get; set; }

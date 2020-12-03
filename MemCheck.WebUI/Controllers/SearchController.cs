@@ -345,9 +345,9 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), AppRatingMode(request), request.RatingFilteringValue, AppNotificationFiltering(request)); ;
+                var applicationRequest = new SearchCards.Request(userId, request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), AppRatingMode(request), request.RatingFilteringValue, AppNotificationFiltering(request)); ;
 
-                var applicationResult = new SearchCards(dbContext).Run(applicationRequest, userId);
+                var applicationResult = new SearchCards(dbContext).Run(applicationRequest);
 
                 var result = new RunQueryViewModel(applicationResult, userName, localizer, decksControllerLocalizer);
 
