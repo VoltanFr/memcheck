@@ -128,10 +128,10 @@ namespace MemCheck.Application
                 );
 
             IQueryable<Card> cardsFilteredWithVisibility;
-            if (request.Visibility == 2)
+            if (request.Visibility == Request.VibilityFiltering.CardsVisibleByMoreThanOwner)
                 cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() != 1);
             else
-            if (request.Visibility == 3)
+            if (request.Visibility == Request.VibilityFiltering.PrivateToOwner)
                 cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() == 1);
             else
                 cardsFilteredWithVisibility = cardsFilteredWithText;
@@ -184,7 +184,8 @@ namespace MemCheck.Application
         #region Request and result classes
         public sealed class Request
         {
-            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, int visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
+            public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
+            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
             {
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
@@ -205,7 +206,7 @@ namespace MemCheck.Application
             public int PageNo { get; }
             public int PageSize { get; }
             public string RequiredText { get; }
-            public int Visibility { get; }//1 = ignore this criteria, 2 = cards which can be seen by more than their owner, 3 = cards visible to their owner only
+            public VibilityFiltering Visibility { get; }
             public int RatingFilteringMode { get; set; } //1 = ignore this criteria, 2 = at least RatingFilteringValue, 3 = at most RatingFilteringValue, 4 = without any rating
             public int RatingFilteringValue { get; set; } //1 to 5
             public IEnumerable<Guid> RequiredTags { get; }

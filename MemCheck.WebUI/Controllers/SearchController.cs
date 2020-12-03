@@ -300,6 +300,16 @@ namespace MemCheck.WebUI.Controllers
             if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
                 throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
         }
+        private SearchCards.Request.VibilityFiltering AppVisibility(RunQueryRequest request)
+        {
+            switch (request.Visibility)
+            {
+                case 1: return SearchCards.Request.VibilityFiltering.Ignore;
+                case 2: return SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner;
+                case 3: return SearchCards.Request.VibilityFiltering.PrivateToOwner;
+                default: throw new RequestInputException($"Invalid Visibility {request.Visibility}");
+            }
+        }
         [HttpPost("RunQuery")]
         public async Task<IActionResult> RunQuery([FromBody] RunQueryRequest request)
         {
@@ -313,7 +323,7 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, request.Visibility, request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering); ;
+                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering); ;
 
                 var applicationResult = new SearchCards(dbContext).Run(applicationRequest, userId);
 
