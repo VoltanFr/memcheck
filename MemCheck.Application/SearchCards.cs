@@ -138,7 +138,7 @@ namespace MemCheck.Application
 
             IQueryable<Card> cardsFilteredWithAverageRating;
             CardRatings? cardRatings = null;
-            if (request.RatingFilteringMode == 1)
+            if (request.RatingFiltering == Request.RatingFilteringMode.Ignore)
                 cardsFilteredWithAverageRating = cardsFilteredWithVisibility;
             else
             {
@@ -146,10 +146,10 @@ namespace MemCheck.Application
                     throw new SearchResultTooBigForRatingException();
 
                 cardRatings = CardRatings.Load(dbContext, userId, cardsFilteredWithVisibility.Select(card => card.Id).ToImmutableHashSet());
-                if (request.RatingFilteringMode == 4)
+                if (request.RatingFiltering == Request.RatingFilteringMode.NoRating)
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithoutEval.Contains(card.Id));
                 else
-                if (request.RatingFilteringMode == 2)
+                if (request.RatingFiltering == Request.RatingFilteringMode.AtLeast)
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtLeast(request.RatingFilteringValue).Contains(card.Id));
                 else
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtMost(request.RatingFilteringValue).Contains(card.Id));
@@ -185,7 +185,8 @@ namespace MemCheck.Application
         public sealed class Request
         {
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
-            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, int ratingFilteringMode, int ratingFilteringValue, int notificationFiltering)
+            public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
+            public Request(Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, int notificationFiltering)
             {
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
@@ -196,7 +197,7 @@ namespace MemCheck.Application
                 PageNo = pageNo;
                 PageSize = pageSize;
                 RequiredText = requiredText;
-                RatingFilteringMode = ratingFilteringMode;
+                RatingFiltering = ratingFiltering;
                 RatingFilteringValue = ratingFilteringValue;
                 NotificationFiltering = notificationFiltering;
             }
@@ -207,7 +208,7 @@ namespace MemCheck.Application
             public int PageSize { get; }
             public string RequiredText { get; }
             public VibilityFiltering Visibility { get; }
-            public int RatingFilteringMode { get; set; } //1 = ignore this criteria, 2 = at least RatingFilteringValue, 3 = at most RatingFilteringValue, 4 = without any rating
+            public RatingFilteringMode RatingFiltering { get; set; }
             public int RatingFilteringValue { get; set; } //1 to 5
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)

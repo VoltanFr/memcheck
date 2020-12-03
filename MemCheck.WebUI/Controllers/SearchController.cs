@@ -310,6 +310,18 @@ namespace MemCheck.WebUI.Controllers
                 default: throw new RequestInputException($"Invalid Visibility {request.Visibility}");
             }
         }
+        private SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
+        {
+            //1 = ignore this criteria, 2 = at least RatingFilteringValue, 3 = at most RatingFilteringValue, 4 = without any rating
+            switch (request.RatingFilteringMode)
+            {
+                case 1: return SearchCards.Request.RatingFilteringMode.Ignore;
+                case 2: return SearchCards.Request.RatingFilteringMode.AtLeast;
+                case 3: return SearchCards.Request.RatingFilteringMode.AtMost;
+                case 4: return SearchCards.Request.RatingFilteringMode.NoRating;
+                default: throw new RequestInputException($"Invalid RatingFilteringMode {request.RatingFilteringMode}");
+            }
+        }
         [HttpPost("RunQuery")]
         public async Task<IActionResult> RunQuery([FromBody] RunQueryRequest request)
         {
@@ -323,7 +335,7 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), request.RatingFilteringMode, request.RatingFilteringValue, request.NotificationFiltering); ;
+                var applicationRequest = new SearchCards.Request(request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), AppRatingMode(request), request.RatingFilteringValue, request.NotificationFiltering); ;
 
                 var applicationResult = new SearchCards(dbContext).Run(applicationRequest, userId);
 
