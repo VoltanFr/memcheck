@@ -185,42 +185,27 @@ namespace MemCheck.Application.Searching
             return new Result(totalNbCards, totalPageCount, withUserDeckInfo);
         }
         #region Request and result classes
-        public sealed class Request
+        public sealed record Request
         {
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
             public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
-            public Request(Guid userId, Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification, DateTime? minimumUtcDateOfCards)
-            {
-                RequiredTags = requiredTags;
-                ExcludedTags = excludedTags;
-                Visibility = visibility;
-                Deck = deck;
-                DeckIsInclusive = deckIsInclusive;
-                Heap = heap;
-                PageNo = pageNo;
-                PageSize = pageSize;
-                RequiredText = requiredText;
-                RatingFiltering = ratingFiltering;
-                RatingFilteringValue = ratingFilteringValue;
-                Notification = notification;
-                UserId = userId;
-                MinimumUtcDateOfCards = minimumUtcDateOfCards;
-            }
-            public Guid UserId { get; } //Guid.Empty means no user logged in
-            public Guid Deck { get; } //Guid.Empty means ignore
-            public bool DeckIsInclusive { get; }    //Makes sense only if Deck is not Guid.Empty
-            public int? Heap { get; set; }
-            public int PageNo { get; }
-            public int PageSize { get; }
-            public string RequiredText { get; }
-            public VibilityFiltering Visibility { get; }
-            public RatingFilteringMode RatingFiltering { get; set; }
-            public int RatingFilteringValue { get; set; }
-            public IEnumerable<Guid> RequiredTags { get; }
-            public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
-            public NotificationFiltering Notification { get; set; }
-            public DateTime? MinimumUtcDateOfCards { get; set; }
+
+            public Guid UserId { get; init; } = Guid.Empty; //Guid.Empty means no user logged in
+            public Guid Deck { get; init; } = Guid.Empty; //Guid.Empty means ignore
+            public bool DeckIsInclusive { get; init; } = true;   //Makes sense only if Deck is not Guid.Empty
+            public int? Heap { get; init; } = null;
+            public int PageNo { get; init; } = 1;
+            public int PageSize { get; init; } = 10;
+            public string RequiredText { get; init; } = "";
+            public VibilityFiltering Visibility { get; init; } = VibilityFiltering.Ignore;
+            public RatingFilteringMode RatingFiltering { get; init; } = RatingFilteringMode.Ignore;
+            public int RatingFilteringValue { get; init; } = 1;
+            public IEnumerable<Guid> RequiredTags { get; init; } = new Guid[0];
+            public IEnumerable<Guid>? ExcludedTags { get; init; } = new Guid[0]; //null means that we return only cards which have no tag (we exclude all tags)
+            public NotificationFiltering Notification { get; init; } = NotificationFiltering.Ignore;
+            public DateTime? MinimumUtcDateOfCards { get; init; } = null;
+
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))

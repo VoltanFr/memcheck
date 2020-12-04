@@ -346,7 +346,25 @@ namespace MemCheck.WebUI.Controllers
 
                 var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-                var applicationRequest = new SearchCards.Request(userId, request.Deck, request.DeckIsInclusive, request.Heap == -1 ? null : request.Heap, request.PageNo, request.PageSize, request.RequiredText, request.RequiredTags, excludedTags, AppVisibility(request), AppRatingMode(request), request.RatingFilteringValue, AppNotificationFiltering(request), null);
+                var applicationRequest = new SearchCards.Request
+                {
+                    UserId = userId,
+                    Deck = request.Deck,
+                    DeckIsInclusive = request.DeckIsInclusive,
+                    PageNo = request.PageNo,
+                    PageSize = request.PageSize,
+                    RequiredText = request.RequiredText,
+                    RequiredTags = request.RequiredTags,
+                    ExcludedTags = excludedTags,
+                    Visibility = AppVisibility(request),
+                    RatingFiltering = AppRatingMode(request),
+                    Notification = AppNotificationFiltering(request)
+                };
+
+                if (applicationRequest.RatingFiltering != SearchCards.Request.RatingFilteringMode.Ignore)
+                    applicationRequest = applicationRequest with { RatingFilteringValue = request.RatingFilteringValue };
+                if (request.Heap != -1)
+                    applicationRequest = applicationRequest with { Heap = request.Heap };
 
                 var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
 
