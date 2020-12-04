@@ -24,7 +24,7 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var request = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var result = await new SearchCards(dbContext).RunAsync(request);
                 Assert.AreEqual(0, result.TotalNbCards);
                 Assert.AreEqual(0, result.PageCount);
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SearchCards.Request(userId, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var request = new SearchCards.Request(userId, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var result = await new SearchCards(dbContext).RunAsync(request);
                 Assert.AreEqual(0, result.TotalNbCards);
                 Assert.AreEqual(0, result.PageCount);
@@ -55,13 +55,13 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var requestWithUser = new SearchCards.Request(userId, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithUser = new SearchCards.Request(userId, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultWithUser = await new SearchCards(dbContext).RunAsync(requestWithUser);
                 Assert.AreEqual(1, resultWithUser.TotalNbCards);
                 Assert.AreEqual(1, resultWithUser.PageCount);
                 Assert.AreEqual(card.Id, resultWithUser.Cards.First().CardId);
 
-                var requestWithoutUser = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithoutUser = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultWithoutUser = await new SearchCards(dbContext).RunAsync(requestWithUser);
                 Assert.AreEqual(1, resultWithoutUser.TotalNbCards);
                 Assert.AreEqual(1, resultWithoutUser.PageCount);
@@ -83,13 +83,13 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var requestWithoutUser = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithoutUser = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultWithoutUser = await new SearchCards(dbContext).RunAsync(requestWithoutUser);
                 Assert.AreEqual(1, resultWithoutUser.TotalNbCards);
                 Assert.AreEqual(1, resultWithoutUser.PageCount);
                 Assert.AreEqual(publicCard.Id, resultWithoutUser.Cards.First().CardId);
 
-                var requestWithUser1 = new SearchCards.Request(user1Id, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithUser1 = new SearchCards.Request(user1Id, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultWithUser1 = await new SearchCards(dbContext).RunAsync(requestWithUser1);
                 Assert.AreEqual(3, resultWithUser1.TotalNbCards);
                 Assert.AreEqual(1, resultWithUser1.PageCount);
@@ -97,7 +97,7 @@ namespace MemCheck.Application.Searching
                 Assert.IsTrue(resultWithUser1.Cards.Any(card => card.CardId == privateCard_BothUsers.Id));
                 Assert.IsTrue(resultWithUser1.Cards.Any(card => card.CardId == publicCard.Id));
 
-                var requestWithUser2 = new SearchCards.Request(user2Id, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithUser2 = new SearchCards.Request(user2Id, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultWithUser2 = await new SearchCards(dbContext).RunAsync(requestWithUser2);
                 Assert.AreEqual(3, resultWithUser2.TotalNbCards);
                 Assert.AreEqual(1, resultWithUser2.PageCount);
@@ -126,19 +126,19 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var requestOnEmptyDeck = new SearchCards.Request(user1Id, user1Emptydeck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestOnEmptyDeck = new SearchCards.Request(user1Id, user1Emptydeck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 Assert.AreEqual(0, (await new SearchCards(dbContext).RunAsync(requestOnEmptyDeck)).TotalNbCards);
 
-                var requestOnDeck = new SearchCards.Request(user1Id, user1deck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestOnDeck = new SearchCards.Request(user1Id, user1deck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultOnDeck = await new SearchCards(dbContext).RunAsync(requestOnDeck);
                 Assert.AreEqual(2, resultOnDeck.TotalNbCards);
                 Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card1.Id));
                 Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card2.Id));
 
-                var requestWithoutUser = new SearchCards.Request(Guid.Empty, user1Emptydeck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithoutUser = new SearchCards.Request(Guid.Empty, user1Emptydeck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(requestWithoutUser));
 
-                var requestWithUser2 = new SearchCards.Request(user2Id, user1deck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithUser2 = new SearchCards.Request(user2Id, user1deck, true, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(requestWithUser2));
             }
         }
@@ -162,19 +162,51 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var requestOnEmptyDeck = new SearchCards.Request(user1Id, user1Emptydeck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestOnEmptyDeck = new SearchCards.Request(user1Id, user1Emptydeck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 Assert.AreEqual(3, (await new SearchCards(dbContext).RunAsync(requestOnEmptyDeck)).TotalNbCards);
 
-                var requestOnDeck = new SearchCards.Request(user1Id, user1deck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestOnDeck = new SearchCards.Request(user1Id, user1deck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 var resultOnDeck = await new SearchCards(dbContext).RunAsync(requestOnDeck);
                 Assert.AreEqual(1, resultOnDeck.TotalNbCards);
                 Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card3.Id));
 
-                var requestWithoutUser = new SearchCards.Request(Guid.Empty, user1Emptydeck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithoutUser = new SearchCards.Request(Guid.Empty, user1Emptydeck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(requestWithoutUser));
 
-                var requestWithUser2 = new SearchCards.Request(user2Id, user1deck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore);
+                var requestWithUser2 = new SearchCards.Request(user2Id, user1deck, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, null);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(requestWithUser2));
+            }
+        }
+        [TestMethod()]
+        public async Task Test_AfterDate()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            await CardHelper.CreateAsync(testDB, userId, new DateTime(2040, 1, 5));
+            await CardHelper.CreateAsync(testDB, userId, new DateTime(2040, 1, 7));
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var request1Jan = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, new DateTime(2040, 1, 1));
+                var result1Jan = await new SearchCards(dbContext).RunAsync(request1Jan);
+                Assert.AreEqual(2, result1Jan.TotalNbCards);
+
+                var request5Jan = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, new DateTime(2040, 1, 5));
+                var result5Jan = await new SearchCards(dbContext).RunAsync(request5Jan);
+                Assert.AreEqual(2, result5Jan.TotalNbCards);
+
+                var request6Jan = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, new DateTime(2040, 1, 6));
+                var result6Jan = await new SearchCards(dbContext).RunAsync(request6Jan);
+                Assert.AreEqual(1, result6Jan.TotalNbCards);
+
+                var request7Jan = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, new DateTime(2040, 1, 7));
+                var result7Jan = await new SearchCards(dbContext).RunAsync(request7Jan);
+                Assert.AreEqual(1, result7Jan.TotalNbCards);
+
+                var request8Jan = new SearchCards.Request(Guid.Empty, Guid.Empty, false, null, 1, 10, "", new Guid[0], new Guid[0], SearchCards.Request.VibilityFiltering.Ignore, SearchCards.Request.RatingFilteringMode.Ignore, 0, SearchCards.Request.NotificationFiltering.Ignore, new DateTime(2040, 1, 8));
+                var result8Jan = await new SearchCards(dbContext).RunAsync(request8Jan);
+                Assert.AreEqual(0, result8Jan.TotalNbCards);
             }
         }
     }

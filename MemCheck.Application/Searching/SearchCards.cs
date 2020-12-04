@@ -96,19 +96,21 @@ namespace MemCheck.Application.Searching
                 || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any()
                 );
 
+            var cardsFilteredWithDate = request.MinimumUtcDateOfCards == null ? cardsViewableByUser : cardsViewableByUser.Where(card => card.VersionUtcDate >= request.MinimumUtcDateOfCards.Value);
+
             IQueryable<Card> cardsFilteredWithDeck;
             if (request.Deck != Guid.Empty)
             {
                 if (request.DeckIsInclusive)
-                    cardsFilteredWithDeck = cardsViewableByUser.Where(card =>
+                    cardsFilteredWithDeck = cardsFilteredWithDate.Where(card =>
                         dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any()
                         && (request.Heap == null || dbContext.CardsInDecks.AsNoTracking().Single(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).CurrentHeap == request.Heap.Value)
                         );
                 else
-                    cardsFilteredWithDeck = cardsViewableByUser.Where(card => !dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any());
+                    cardsFilteredWithDeck = cardsFilteredWithDate.Where(card => !dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any());
             }
             else
-                cardsFilteredWithDeck = cardsViewableByUser;
+                cardsFilteredWithDeck = cardsFilteredWithDate;
 
             var cardsFilteredWithRequiredTags = cardsFilteredWithDeck;
             foreach (var tag in request.RequiredTags)   //I tried to do better with an intersect between the two sets, but that failed
@@ -188,7 +190,7 @@ namespace MemCheck.Application.Searching
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
             public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
-            public Request(Guid userId, Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification)
+            public Request(Guid userId, Guid deck, bool deckIsInclusive, int? heap, int pageNo, int pageSize, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags, VibilityFiltering visibility, RatingFilteringMode ratingFiltering, int ratingFilteringValue, NotificationFiltering notification, DateTime? minimumUtcDateOfCards)
             {
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
@@ -203,6 +205,7 @@ namespace MemCheck.Application.Searching
                 RatingFilteringValue = ratingFilteringValue;
                 Notification = notification;
                 UserId = userId;
+                MinimumUtcDateOfCards = minimumUtcDateOfCards;
             }
             public Guid UserId { get; } //Guid.Empty means no user logged in
             public Guid Deck { get; } //Guid.Empty means ignore
@@ -217,6 +220,7 @@ namespace MemCheck.Application.Searching
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
             public NotificationFiltering Notification { get; set; }
+            public DateTime? MinimumUtcDateOfCards { get; set; }
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))

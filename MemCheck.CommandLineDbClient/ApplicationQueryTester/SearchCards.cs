@@ -36,7 +36,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 
             for (int i = 0; i < 5; i++)
             {
-                var request = new Application.Searching.SearchCards.Request(user, Guid.Empty, true, null, 1, 3000, "", new Guid[0].ToImmutableArray(), new Guid[0].ToImmutableArray(), Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner, Application.Searching.SearchCards.Request.RatingFilteringMode.Ignore, 0, Application.Searching.SearchCards.Request.NotificationFiltering.Ignore);
+                var request = new Application.Searching.SearchCards.Request(user, Guid.Empty, true, null, 1, 3000, "", new Guid[0].ToImmutableArray(), new Guid[0].ToImmutableArray(), Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner, Application.Searching.SearchCards.Request.RatingFilteringMode.Ignore, 0, Application.Searching.SearchCards.Request.NotificationFiltering.Ignore, null);
                 var runner = new Application.Searching.SearchCards(dbContext);
                 var realCodeChrono = Stopwatch.StartNew();
                 var result = await runner.RunAsync(request);
