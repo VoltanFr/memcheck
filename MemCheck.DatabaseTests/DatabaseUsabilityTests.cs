@@ -15,8 +15,8 @@ using System.Reflection;
 
 namespace MemCheck.DatabaseTests
 {
-    [TestClass()]
-    public class ModelTests : IDisposable
+    [TestClass(), TestCategory("IntegrationTests")]
+    public class DatabaseUsabilityTests : IDisposable
     {
         #region Fields
         private readonly DbContext dbContext;
@@ -25,13 +25,13 @@ namespace MemCheck.DatabaseTests
         private static IConfigurationRoot GetIConfigurationRoot()
         {
             return new ConfigurationBuilder()
-                .SetBasePath(Path.GetDirectoryName(typeof(ModelTests).Assembly.Location))
+                .SetBasePath(Path.GetDirectoryName(typeof(DatabaseUsabilityTests).Assembly.Location))
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
         }
         #endregion
-        public ModelTests()
+        public DatabaseUsabilityTests()
         {
             var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
             dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
