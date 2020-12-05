@@ -24,6 +24,9 @@ jobs:
     - name: "Show GITHUB_RUN_ID"
       run: echo ${env:GITHUB_RUN_ID}
 
+    - name: "Show GITHUB_RUN_NUMBER"
+      run: echo ${env:GITHUB_RUN_NUMBER}
+
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
       with:
@@ -36,7 +39,7 @@ jobs:
       run: dotnet restore
 
     - name: "Build the root sln with dotnet"
-      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
+      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}} --version-suffix ${env:GITHUB_RUN_NUMBER}
 
     # - name: "Show the directory tree"
     #   run: tree /F /A
