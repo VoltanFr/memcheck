@@ -21,6 +21,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: "Show Workflow info"
+      run: |
+      echo ${GITHUB.RUN_ID}
+      echo ${GITHUB.RUN_NUMBER}
+      echo NETCORE_VERSION: ${{env.NETCORE_VERSION}}
+
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
       with:
@@ -33,7 +39,7 @@ jobs:
       run: dotnet restore
 
     - name: "Build the root sln with dotnet"
-      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}}
+      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}} --version-suffix PR_${GITHUB.RUN_NUMBER}
 
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}} --filter TestCategory!=IntegrationTests
