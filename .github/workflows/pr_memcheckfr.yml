@@ -14,7 +14,7 @@ jobs:
     env:
       NETCORE_VERSION: "5.0.100"
       COMPIL_CONFIG: "Release"
-      PUBLISH_FOLDER: "./Published"
+      PUBLISH_FOLDER_PATH: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
       AZURE_FUNCTION_NAME: "memcheck-notifier"
 
@@ -45,7 +45,7 @@ jobs:
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}} --filter TestCategory!=IntegrationTests
 
     - name: "Publish: prepare the projects for deployment"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER_PATH}} --no-self-contained MemCheck.WebUI
 
     - name: "Telling size of publish folder"
-      run: du -sh ${{env.PUBLISH_FOLDER}}
+      run: du -sh ${{env.PUBLISH_FOLDER_PATH}}
