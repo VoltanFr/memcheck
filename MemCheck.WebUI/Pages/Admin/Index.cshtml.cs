@@ -17,25 +17,31 @@ namespace MemCheck.WebUI.Pages.Admin
 
         [BindProperty] public string WebRootPath { get; set; } = null!;
         [BindProperty] public string ApplicationName { get; set; } = null!;
-        [BindProperty] public string EntryAssemblyName { get; set; } = null!;
-        [BindProperty] public string EntryAssemblyVersion { get; set; } = null!;
+        [BindProperty] public string EntryAssembly { get; set; } = null!;
         [BindProperty] public string EnvironmentName { get; set; } = null!;
         [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
         public IndexModel(IWebHostEnvironment currentEnvironment)
         {
             this.currentEnvironment = currentEnvironment;
         }
+        private string GetDisplayInfoForAssembly(Assembly? a)
+        {
+            if (a == null)
+                return "Unknown";
+
+            var informationalVersionAttribute = a.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            var version = informationalVersionAttribute == null ? "Unknown" : informationalVersionAttribute.InformationalVersion;
+            return a.GetName().Name + ' ' + version;
+
+        }
         public void OnGet()
         {
             WebRootPath = currentEnvironment.WebRootPath;
             ApplicationName = currentEnvironment.ApplicationName;
-            Assembly? entryAssembly = Assembly.GetEntryAssembly();
-            EntryAssemblyName = entryAssembly == null ? "Unknown" : (entryAssembly.FullName == null ? "Unknown (no full name)" : entryAssembly.FullName.ToString());
-            AssemblyFileVersionAttribute? fileVersionAttribute = entryAssembly?.GetCustomAttribute<AssemblyFileVersionAttribute>();
-            EntryAssemblyVersion = fileVersionAttribute == null ? "Unknown" : fileVersionAttribute.Version;
             EnvironmentName = currentEnvironment.EnvironmentName;
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName == null ? a.GetName().ToString() : a.FullName).OrderBy(a => a);
-            MemCheckAssemblies = assemblies.Where(assemblyName => assemblyName.StartsWith("MemCheck"));
+            EntryAssembly = GetDisplayInfoForAssembly(Assembly.GetEntryAssembly());
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName!.StartsWith("MemCheck"));
+            MemCheckAssemblies = assemblies.Select(a => GetDisplayInfoForAssembly(a)).OrderBy(a => a);
         }
     }
 }
