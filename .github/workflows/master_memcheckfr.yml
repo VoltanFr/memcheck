@@ -21,6 +21,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: "Show GITHUB_RUN_ID"
+      run: echo ${env:GITHUB_RUN_ID}
+
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
       with:
