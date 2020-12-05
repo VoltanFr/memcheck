@@ -10,7 +10,6 @@ jobs:
     name: "MemCheck compilation, test and deployment to prod"
 
     runs-on: windows-latest
-    shell: pwsh
 
     env:
       NETCORE_VERSION: "5.0.100"
