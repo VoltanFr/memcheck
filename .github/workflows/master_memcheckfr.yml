@@ -10,6 +10,7 @@ jobs:
     name: "MemCheck compilation, test and deployment to prod"
 
     runs-on: windows-latest
+    shell: pwsh
 
     env:
       NETCORE_VERSION: "5.0.100"
@@ -21,18 +22,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: "Show Workflow info"
+    - name: "Tell environment variables"
       run: |
-      echo GITHUB_WORKFLOW: ${{env.GITHUB_WORKFLOW}}
-      echo GITHUB_RUN_ID: ${{env.GITHUB_RUN_ID}}
-      echo GITHUB_RUN_NUMBER: ${{env.GITHUB_RUN_NUMBER}}
-      echo GITHUB_ACTOR: ${{env.GITHUB_ACTOR}}
-      echo GITHUB_EVENT_NAME: ${{env.GITHUB_EVENT_NAME}}
-      echo GITHUB_EVENT_PATH: ${{env.GITHUB_EVENT_PATH}}
-      echo GITHUB_WORKSPACE: ${{env.GITHUB_WORKSPACE}}
-      echo GITHUB_SHA: ${{env.GITHUB_SHA}}
-      echo GITHUB_REF: ${{env.GITHUB_REF}}
-      echo NETCORE_VERSION: ${{env.NETCORE_VERSION}}
+        echo "Several environment variables"
+        echo "GITHUB_WORKFLOW: $env:GITHUB_WORKFLOW"
+        echo "GITHUB_RUN_ID: $env:GITHUB_RUN_ID"
+        echo "GITHUB_RUN_NUMBER: ${env:GITHUB_RUN_NUMBER}"
+        echo "GITHUB_ACTOR: $env:GITHUB_ACTOR"
+        echo "GITHUB_EVENT_NAME: $env:GITHUB_EVENT_NAME"
+        echo "GITHUB_EVENT_PATH: $env:GITHUB_EVENT_PATH"
+        echo "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+        echo "GITHUB_SHA: $env:GITHUB_SHA"
+        echo "GITHUB_REF: $env:GITHUB_REF"
+        echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
       uses: actions/setup-dotnet@v1
