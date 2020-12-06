@@ -190,6 +190,7 @@ namespace MemCheck.Application.Searching
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
             public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
+            public const int MaxPageSize = 500;
 
             public Guid UserId { get; init; } = Guid.Empty; //Guid.Empty means no user logged in
             public Guid Deck { get; init; } = Guid.Empty; //Guid.Empty means ignore
@@ -212,8 +213,8 @@ namespace MemCheck.Application.Searching
                     throw new RequestInputException($"Invalid heap {Heap}");
                 if (PageNo < 1)
                     throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
-                if (PageSize > 500)
-                    throw new RequestInputException($"PageSize too big: {PageSize}");
+                if (PageSize > MaxPageSize)
+                    throw new RequestInputException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
                 if ((RatingFiltering == RatingFilteringMode.AtLeast || RatingFiltering == RatingFilteringMode.AtMost) && (RatingFilteringValue < 1 || RatingFilteringValue > 5))
                     throw new RequestInputException($"Invalid RatingFilteringValue: {RatingFilteringValue}");
                 if (UserId == Guid.Empty && Deck != Guid.Empty)
