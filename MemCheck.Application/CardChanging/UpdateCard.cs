@@ -77,12 +77,12 @@ namespace MemCheck.Application.CardChanging
         {
             this.dbContext = dbContext;
         }
-        public async Task RunAsync(Request request, IStringLocalizer localizer)
+        public async Task RunAsync(Request request, IStringLocalizer localizer, DateTime? cardNewVersionUtcDate = null)
         {
             await request.CheckValidityAsync(localizer, dbContext);
 
             var previousVersionCreator = new PreviousVersionCreator(dbContext);
-            var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreatorId, request.VersionDescription);
+            var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreatorId, request.VersionDescription, cardNewVersionUtcDate);
 
             card.CardLanguage = dbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
             card.FrontSide = request.FrontSide;
