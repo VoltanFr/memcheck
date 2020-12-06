@@ -18,7 +18,7 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public async Task RunAsync(Request request)
+        public async Task<Guid> RunAsync(Request request)
         {
             request.CheckValidity(dbContext);
 
@@ -69,6 +69,8 @@ namespace MemCheck.Application.Notifying
                 search.excludeAllTags = true;
 
             await dbContext.SaveChangesAsync();
+
+            return search.Id;
         }
         #region Request class
         public sealed class Request
