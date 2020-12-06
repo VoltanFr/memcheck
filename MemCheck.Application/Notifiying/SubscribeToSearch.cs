@@ -30,7 +30,7 @@ namespace MemCheck.Application.Notifying
                 ExcludedDeck = request.ExcludedDeck,
                 RequiredText = request.RequiredText,
                 RegistrationUtcDate = now,
-                LastNotificationUtcDate = now
+                LastRunUtcDate = DateTime.MinValue
             };
 
             dbContext.SearchSubscriptions.Add(search);
