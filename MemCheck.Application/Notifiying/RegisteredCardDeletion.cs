@@ -2,9 +2,9 @@
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class CardDeletion
+    public sealed class RegisteredCardDeletion
     {
-        public CardDeletion(string frontSide, string deletionAuthor, DateTime deletionUtcDate, string deletionDescription, bool cardIsViewable)
+        public RegisteredCardDeletion(string frontSide, string deletionAuthor, DateTime deletionUtcDate, string deletionDescription, bool cardIsViewable)
         {
             FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields, true) : null;
             DeletionAuthor = deletionAuthor;

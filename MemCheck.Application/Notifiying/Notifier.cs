@@ -66,7 +66,7 @@ namespace MemCheck.Application.Notifying
         }
         public class UserNotifications
         {
-            public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<CardDeletion> deletedCards)
+            public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<RegisteredCardDeletion> deletedCards)
             {
                 UserName = userName;
                 UserEmail = userEmail;
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Notifying
             public string UserEmail { get; }
             public int SubscribedCardCount { get; }
             public ImmutableArray<CardVersion> CardVersions { get; }
-            public ImmutableArray<CardDeletion> DeletedCards { get; }
+            public ImmutableArray<RegisteredCardDeletion> DeletedCards { get; }
         }
         #endregion
     }

@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifying
 {
     internal interface IUserCardDeletionsNotifier
     {
-        public Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId, DateTime? now = null);
+        public Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId, DateTime? now = null);
     }
     internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
     {
@@ -22,7 +22,7 @@ namespace MemCheck.Application.Notifying
         {
             this.dbContext = dbContext;
         }
-        public async Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId, DateTime? now = null)
+        public async Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId, DateTime? now = null)
         {
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
@@ -40,7 +40,7 @@ namespace MemCheck.Application.Notifying
                 cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
 
             var result = deletedCards.Select(cardToReport =>
-                             new CardDeletion(
+                             new RegisteredCardDeletion(
                                  cardToReport.previousVersion.FrontSide,
                                  cardToReport.previousVersion.VersionCreator.UserName,
                                  cardToReport.previousVersion.VersionUtcDate,
