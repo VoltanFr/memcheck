@@ -11,7 +11,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class CardHelper
     {
-        public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null)
+        public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null)
         {
             //userWithViewIds null means public card
 
@@ -25,6 +25,8 @@ namespace MemCheck.Application.Tests.Helpers
             result.AdditionalInfo = StringServices.RandomString();
             result.VersionDescription = StringServices.RandomString();
             result.VersionType = CardVersionType.Creation;
+            if (language != null)
+                result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);
             if (versionDate != null)
             {
                 result.InitialCreationUtcDate = versionDate.Value;

@@ -8,13 +8,13 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class SearchSubscriptionHelper
     {
-        public static async Task<SearchSubscription> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid? excludedDeckId = null, DateTime? lastNotificationDate = null)
+        public static async Task<SearchSubscription> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, string requiredText = "", Guid? excludedDeckId = null, DateTime? lastNotificationDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new SearchSubscription();
             result.UserId = subscriberId;
             result.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
-            result.RequiredText = "";
+            result.RequiredText = requiredText;
             result.RequiredTags = new RequiredTagInSearchSubscription[0];
             result.excludeAllTags = false;
             result.ExcludedTags = new ExcludedTagInSearchSubscription[0];
