@@ -65,7 +65,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var deleter = new DeleteCards(dbContext, new TestLocalizer(new[] { new KeyValuePair<string, string>("Deletion", DeletionDescription) }));
-                var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == userId).Single(), new[] { cardId });
+                var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
                 await deleter.RunAsync(deletionRequest, deletionDate);
             }
         }

@@ -51,7 +51,7 @@ namespace MemCheck.Application.Tests
         {
             using var dbContext = new MemCheckDbContext(db);
             var deleter = new DeleteCards(dbContext, new TestLocalizer());
-            var deletionRequest = new DeleteCards.Request(dbContext.Users.Where(u => u.Id == userId).Single(), new[] { cardId });
+            var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
             await deleter.RunAsync(deletionRequest, deletionDate);
         }
         #endregion

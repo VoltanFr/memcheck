@@ -78,6 +78,7 @@
 - Vérifier si getcards dans learn affiche l'info si le chargement échoue
 - View NuGet package updates on each project (should be done regularly)
 - Afficher des stats sur la page d'accueil : xxx cartes de votre paquet vont expirer aujourd'hui
+- Implement unit test to prove that a user without visibility on a card can not delete it
 
 # To do at medium cost
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).

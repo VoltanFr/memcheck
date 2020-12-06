@@ -546,8 +546,8 @@ namespace MemCheck.WebUI.Controllers
         {
             try
             {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var appRequest = new DeleteCards.Request(user, request.CardIds);
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new DeleteCards.Request(userId, request.CardIds);
                 await new DeleteCards(dbContext, localizer).RunAsync(appRequest);
                 return Ok();
             }

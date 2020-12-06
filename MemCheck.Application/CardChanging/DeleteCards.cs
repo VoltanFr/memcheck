@@ -28,7 +28,7 @@ namespace MemCheck.Application.CardChanging
             foreach (var cardId in request.CardIds)
             {
                 var previousVersionCreator = new PreviousVersionCreator(dbContext);
-                var card = await previousVersionCreator.RunAsync(cardId, request.User.Id, localizer["Deletion"].Value, deletionUtcDate);
+                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, localizer["Deletion"].Value, deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card);
                 dbContext.Cards.Remove(card);
             }
@@ -50,7 +50,7 @@ namespace MemCheck.Application.CardChanging
                 var decksWithOtherOwner = dbContext.CardsInDecks
                     .Include(cardInDeck => cardInDeck.Deck)
                     .ThenInclude(deck => deck.Owner)
-                    .Where(cardInDeck => cardInDeck.CardId == cardId && cardInDeck.Deck.Owner.Id != User.Id);
+                    .Where(cardInDeck => cardInDeck.CardId == cardId && cardInDeck.Deck.Owner.Id != UserId);
 
                 var count = await decksWithOtherOwner.CountAsync();
 
@@ -66,7 +66,7 @@ namespace MemCheck.Application.CardChanging
                 var currentVersionOwnerIsUser = await dbContext.Cards
                     .Include(card => card.VersionCreator)
                     .Where(card => card.Id == cardId)
-                    .Select(card => card.VersionCreator.Id == User.Id).SingleAsync();
+                    .Select(card => card.VersionCreator.Id == UserId).SingleAsync();
 
                 if (!currentVersionOwnerIsUser)
                     //You are not the creator of the current version of the card with front side
@@ -75,7 +75,7 @@ namespace MemCheck.Application.CardChanging
 
                 var anyPreviousVersionHasOtherCreator = await dbContext.CardPreviousVersions
                     .Include(version => version.VersionCreator)
-                    .Where(version => version.Card == cardId && version.VersionCreator.Id != User.Id)
+                    .Where(version => version.Card == cardId && version.VersionCreator.Id != UserId)
                     .AnyAsync();
 
                 if (anyPreviousVersionHasOtherCreator)
@@ -84,12 +84,12 @@ namespace MemCheck.Application.CardChanging
                     throw new RequestInputException(localizer["YouAreNotTheCreatorOfAllPreviousVersions"] + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
             }
             #endregion
-            public Request(MemCheckUser user, IEnumerable<Guid> cardIds)
+            public Request(Guid userId, IEnumerable<Guid> cardIds)
             {
-                User = user;
+                UserId = userId;
                 CardIds = cardIds;
             }
-            public MemCheckUser User { get; }
+            public Guid UserId { get; }
             public IEnumerable<Guid> CardIds { get; }
             public async Task CheckValidityAsync(MemCheckDbContext dbContext, IStringLocalizer localizer)
             {
