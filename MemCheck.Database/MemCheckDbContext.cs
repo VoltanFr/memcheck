@@ -42,6 +42,7 @@ namespace MemCheck.Database
         public DbSet<SearchSubscription> SearchSubscriptions { get; set; } = null!;
         public DbSet<RequiredTagInSearchSubscription> RequiredTagInSearchSubscriptions { get; set; } = null!;
         public DbSet<ExcludedTagInSearchSubscription> ExcludedTagInSearchSubscriptions { get; set; } = null!;
+        public DbSet<CardInSearchResult> CardsInSearchResults { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -63,6 +64,7 @@ namespace MemCheck.Database
             builder.Entity<CardNotificationSubscription>().HasKey(cardNotif => new { cardNotif.CardId, cardNotif.UserId });
             builder.Entity<RequiredTagInSearchSubscription>().HasKey(requiredTag => new { requiredTag.SearchSubscriptionId, requiredTag.TagId });
             builder.Entity<ExcludedTagInSearchSubscription>().HasKey(requiredTag => new { requiredTag.SearchSubscriptionId, requiredTag.TagId });
+            builder.Entity<CardInSearchResult>().HasKey(cardInSearchResult => new { cardInSearchResult.SearchSubscriptionId, cardInSearchResult.CardId });
         }
         private void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
         {

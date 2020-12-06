@@ -4,14 +4,16 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201206082006_RefactorSearchSubscription")]
+    partial class RefactorSearchSubscription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,7 +115,7 @@ namespace MemCheck.Database.Migrations
 
                     b.HasKey("SearchSubscriptionId", "CardId");
 
-                    b.ToTable("CardsInSearchResults");
+                    b.ToTable("CardInSearchResult");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.CardLanguage", b =>

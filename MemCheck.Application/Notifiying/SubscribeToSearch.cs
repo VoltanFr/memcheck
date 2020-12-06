@@ -40,7 +40,7 @@ namespace MemCheck.Application.Notifying
             {
                 var required = new RequiredTagInSearchSubscription
                 {
-                    SearchSubscriptionId = search.SearchId,
+                    SearchSubscriptionId = search.Id,
                     TagId = requiredTag
                 };
                 dbContext.RequiredTagInSearchSubscriptions.Add(required);
@@ -55,7 +55,7 @@ namespace MemCheck.Application.Notifying
                 {
                     var excluded = new ExcludedTagInSearchSubscription
                     {
-                        SearchSubscriptionId = search.SearchId,
+                        SearchSubscriptionId = search.Id,
                         TagId = excludedTag
                     };
                     excludedTags.Add(excluded);

@@ -18,7 +18,7 @@ namespace MemCheck.Application.Tests.Helpers
             result.RequiredTags = new RequiredTagInSearchSubscription[0];
             result.excludeAllTags = false;
             result.ExcludedTags = new ExcludedTagInSearchSubscription[0];
-            result.LastNotificationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
+            result.LastRunUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
             result.RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
             dbContext.SearchSubscriptions.Add(result);
             await dbContext.SaveChangesAsync();
