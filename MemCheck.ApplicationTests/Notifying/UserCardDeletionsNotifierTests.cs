@@ -95,8 +95,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var notifier = new UserCardDeletionsNotifier(dbContext);
-                var versions = await notifier.RunAsync(user, new DateTime(2020, 11, 10));
+                var notifier = new UserCardDeletionsNotifier(dbContext, new DateTime(2020, 11, 10));
+                var versions = await notifier.RunAsync(user);
                 Assert.AreEqual(0, versions.Length);
             }
 
@@ -117,8 +117,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var notifier = new UserCardDeletionsNotifier(dbContext);
-                var versions = await notifier.RunAsync(user2, now);
+                var notifier = new UserCardDeletionsNotifier(dbContext, now);
+                var versions = await notifier.RunAsync(user2);
                 Assert.AreEqual(1, versions.Length);
                 Assert.IsFalse(versions[0].CardIsViewable);
                 Assert.IsNull(versions[0].FrontSide);
@@ -145,15 +145,15 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var notifier = new UserCardDeletionsNotifier(dbContext);
+                var notifier = new UserCardDeletionsNotifier(dbContext, now);
 
-                var user1versions = await notifier.RunAsync(user1, now);
+                var user1versions = await notifier.RunAsync(user1);
                 Assert.AreEqual(1, user1versions.Length);
                 Assert.IsTrue(user1versions[0].CardIsViewable);
                 Assert.AreEqual(card.FrontSide, user1versions[0].FrontSide);
                 Assert.AreEqual(DeletionDescription, user1versions[0].DeletionDescription);
 
-                var user2versions = await notifier.RunAsync(user2, now);
+                var user2versions = await notifier.RunAsync(user2);
                 Assert.AreEqual(1, user2versions.Length);
                 Assert.IsTrue(user2versions[0].CardIsViewable);
                 Assert.AreEqual(card.FrontSide, user2versions[0].FrontSide);
@@ -181,9 +181,9 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var notifier = new UserCardDeletionsNotifier(dbContext);
+                var notifier = new UserCardDeletionsNotifier(dbContext, now);
 
-                var deletions = await notifier.RunAsync(user, now);
+                var deletions = await notifier.RunAsync(user);
                 Assert.AreEqual(1, deletions.Length);
                 Assert.IsTrue(deletions[0].CardIsViewable);
                 Assert.AreEqual(card.FrontSide, deletions[0].FrontSide);

@@ -155,12 +155,12 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var notifier = new UserCardVersionsNotifier(dbContext);
+                var notifier = new UserCardVersionsNotifier(dbContext, now);
 
-                var user1versions = await notifier.RunAsync(user1, now);
+                var user1versions = await notifier.RunAsync(user1);
                 Assert.AreEqual(0, user1versions.Length);
 
-                var user2versions = await notifier.RunAsync(user2, now);
+                var user2versions = await notifier.RunAsync(user2);
                 Assert.AreEqual(1, user2versions.Length);
                 Assert.AreEqual(card.Id, user2versions[0].CardId);
                 Assert.IsFalse(user2versions[0].CardIsViewable);
@@ -189,7 +189,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user2, now);
+                var versions = await new UserCardVersionsNotifier(dbContext, now).RunAsync(user2);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -214,8 +214,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = await notifier.RunAsync(user1, now);
+                var notifier = new UserCardVersionsNotifier(dbContext, now);
+                var versions = await notifier.RunAsync(user1);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -240,8 +240,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var notifier = new UserCardVersionsNotifier(dbContext);
-                var versions = await notifier.RunAsync(user1, now);
+                var notifier = new UserCardVersionsNotifier(dbContext, now);
+                var versions = await notifier.RunAsync(user1);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -291,7 +291,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1, now);
+                var versions = await new UserCardVersionsNotifier(dbContext, now).RunAsync(user1);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -317,7 +317,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1, now);
+                var versions = await new UserCardVersionsNotifier(dbContext, now).RunAsync(user1);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -364,7 +364,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var user1Versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1, now);
+                var user1Versions = await new UserCardVersionsNotifier(dbContext, now).RunAsync(user1);
                 Assert.AreEqual(4, user1Versions.Length);
 
                 var notifForCard1 = user1Versions.Where(v => v.CardId == card1.Id).Single();

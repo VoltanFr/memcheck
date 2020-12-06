@@ -11,18 +11,20 @@ namespace MemCheck.Application.Notifying
 {
     internal interface IUserCardVersionsNotifier
     {
-        public Task<ImmutableArray<CardVersion>> RunAsync(Guid userId, DateTime? now = null);
+        public Task<ImmutableArray<CardVersion>> RunAsync(Guid userId);
     }
     internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly DateTime runningUtcDate;
         #endregion
-        public UserCardVersionsNotifier(MemCheckDbContext dbContext)
+        public UserCardVersionsNotifier(MemCheckDbContext dbContext, DateTime? runningUtcDate = null)
         {
             this.dbContext = dbContext;
+            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
         }
-        public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId, DateTime? now = null)
+        public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId)
         {
             var cardVersions = dbContext.Cards.Include(card => card.UsersWithView)
                 .Join(
@@ -33,9 +35,8 @@ namespace MemCheck.Application.Notifying
                 )
                 .Where(cardAndNotif => cardAndNotif.card.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate);
 
-            now = now ?? DateTime.UtcNow;
             foreach (var cardVersion in cardVersions)
-                cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
+                cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
 
             var result = cardVersions.Select(cardToReport =>
                                new CardVersion(

@@ -15,16 +15,17 @@ namespace MemCheck.Application.Notifying
         private readonly IUserCardDeletionsNotifier userCardDeletionsNotifier;
         private readonly IUsersToNotifyGetter usersToNotifyGetter;
         private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
+        private readonly DateTime runningUtcDate;
         public const int MaxLengthForTextFields = 150;
         #endregion
         #region Private methods
-        private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user, DateTime now)
+        private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
         {
             var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user.Id);
-            var cardVersions = await userCardVersionsNotifier.RunAsync(user.Id, now);
-            var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id, now);
+            var cardVersions = await userCardVersionsNotifier.RunAsync(user.Id);
+            var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id);
 
-            await userLastNotifDateUpdater.RunAsync(user.Id, now);
+            await userLastNotifDateUpdater.RunAsync(user.Id);
 
             return new UserNotifications(
                 user.UserName,
@@ -35,16 +36,17 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext))
+        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext, DateTime.UtcNow), DateTime.UtcNow)
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater)
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, DateTime? runningUtcDate = null)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
             this.userCardDeletionsNotifier = userCardDeletionsNotifier;
             this.usersToNotifyGetter = usersToNotifyGetter;
             this.userLastNotifDateUpdater = userLastNotifDateUpdater;
+            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
         {
@@ -52,7 +54,7 @@ namespace MemCheck.Application.Notifying
             var users = usersToNotifyGetter.Run(now);
             var userNotifications = new List<UserNotifications>();
             foreach (var user in users)
-                userNotifications.Add(await GetUserNotificationsAsync(user, now.Value));
+                userNotifications.Add(await GetUserNotificationsAsync(user));
             return new NotifierResult(userNotifications.ToImmutableArray());
         }
         #region Result classes

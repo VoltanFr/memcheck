@@ -11,18 +11,20 @@ namespace MemCheck.Application.Notifying
 {
     internal interface IUserCardDeletionsNotifier
     {
-        public Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId, DateTime? now = null);
+        public Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId);
     }
     internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly DateTime runningUtcDate;
         #endregion
-        public UserCardDeletionsNotifier(MemCheckDbContext dbContext)
+        public UserCardDeletionsNotifier(MemCheckDbContext dbContext, DateTime? runningUtcDate = null)
         {
             this.dbContext = dbContext;
+            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
         }
-        public async Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId, DateTime? now = null)
+        public async Task<ImmutableArray<RegisteredCardDeletion>> RunAsync(Guid userId)
         {
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
@@ -35,9 +37,8 @@ namespace MemCheck.Application.Notifying
                 )
                 .Where(cardAndNotif => (cardAndNotif.previousVersion.VersionType == CardPreviousVersionType.Deletion) && cardAndNotif.previousVersion.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate);
 
-            now = now ?? DateTime.UtcNow;
             foreach (var cardVersion in deletedCards)
-                cardVersion.cardNotif.LastNotificationUtcDate = now.Value;
+                cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
 
             var result = deletedCards.Select(cardToReport =>
                              new RegisteredCardDeletion(
