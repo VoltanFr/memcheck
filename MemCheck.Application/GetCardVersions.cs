@@ -58,9 +58,9 @@ namespace MemCheck.Application
                     card.AdditionalInfo,
                     card.TagsInCards.Select(tag => tag.TagId),
                     card.UsersWithView.Select(user => user.UserId),
-                    card.Images.Where(img => img.CardSide == 1).Select(img => img.ImageId),
-                    card.Images.Where(img => img.CardSide == 2).Select(img => img.ImageId),
-                    card.Images.Where(img => img.CardSide == 3).Select(img => img.ImageId)
+                    card.Images.Where(img => img.CardSide == ImageInCard.FrontSide).Select(img => img.ImageId),
+                    card.Images.Where(img => img.CardSide == ImageInCard.BackSide).Select(img => img.ImageId),
+                    card.Images.Where(img => img.CardSide == ImageInCard.AdditionalInfo).Select(img => img.ImageId)
                     )
                 ).SingleAsync();
 

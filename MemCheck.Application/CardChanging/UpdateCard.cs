@@ -100,9 +100,9 @@ namespace MemCheck.Application.CardChanging
             #region Private methods
             private bool SameImageLists(IEnumerable<ImageInCard> originalImages)
             {
-                return FrontSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == 1).Select(img => img.ImageId))
-                    && BackSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == 2).Select(img => img.ImageId))
-                    && AdditionalInfoImageList.SequenceEqual(originalImages.Where(img => img.CardSide == 3).Select(img => img.ImageId));
+                return FrontSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.FrontSide).Select(img => img.ImageId))
+                    && BackSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.BackSide).Select(img => img.ImageId))
+                    && AdditionalInfoImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.AdditionalInfo).Select(img => img.ImageId));
             }
             #endregion
             public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)

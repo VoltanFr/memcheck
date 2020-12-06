@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 
 namespace MemCheck.Application.CardChanging
 {
@@ -72,10 +73,10 @@ namespace MemCheck.Application.CardChanging
                 Assert.AreEqual(languageId, card.CardLanguage.Id);
                 Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == ownerId));
                 Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == userWithViewId));
-                Assert.AreEqual(1, card.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
-                Assert.AreEqual(2, card.Images.Single(i => i.ImageId == imageOnBackSide1Id).CardSide);
-                Assert.AreEqual(2, card.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
-                Assert.AreEqual(3, card.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
+                Assert.AreEqual(ImageInCard.FrontSide, card.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
+                Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide1Id).CardSide);
+                Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
+                Assert.AreEqual(ImageInCard.AdditionalInfo, card.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
                 Assert.IsTrue(card.TagsInCards.Any(t => t.TagId == tagId));
                 Assert.IsFalse(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
             }
