@@ -135,7 +135,6 @@
 - Review Site.js : where is this used? How often is it used? What is the impact on perf?
 - Use specific resource files for display on small screen, to have smaller texts. Eg replace menu entry texts with icons. I hope we can tweak localizer for that
 - Forbid uploading an image in an image in the DB already has the same blob (implement a crc, hash of the blob?)
-- Fix the information about versions of MemCheck assemblies in the Admin page. Could be related to some browser cache or cookie
 - Make the app work even if changes are made simultaneously in various sessions. We're mostly ok. The authoring window is wrong in saving the whole card. It should only update the fields the user has changed, so that for example if he has added tags in another window, this info is not lost.
 - Limit length of user name to reduce the risk of display glitches. Something like 30 to 50 chars sounds like a good limit.
 - In the profile window, the _Save_ button is useless
