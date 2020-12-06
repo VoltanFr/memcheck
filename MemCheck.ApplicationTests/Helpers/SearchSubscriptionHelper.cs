@@ -8,20 +8,21 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class SearchSubscriptionHelper
     {
-        public static async Task CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid? excludedDeckId = null, DateTime? lastNotificationDate = null)
+        public static async Task<SearchSubscription> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid? excludedDeckId = null, DateTime? lastNotificationDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var subscription = new SearchSubscription();
-            subscription.UserId = subscriberId;
-            subscription.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
-            subscription.RequiredText = "";
-            subscription.RequiredTags = new RequiredTagInSearchSubscription[0];
-            subscription.excludeAllTags = false;
-            subscription.ExcludedTags = new ExcludedTagInSearchSubscription[0];
-            subscription.LastNotificationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
-            subscription.RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
-            dbContext.SearchSubscriptions.Add(subscription);
+            var result = new SearchSubscription();
+            result.UserId = subscriberId;
+            result.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
+            result.RequiredText = "";
+            result.RequiredTags = new RequiredTagInSearchSubscription[0];
+            result.excludeAllTags = false;
+            result.ExcludedTags = new ExcludedTagInSearchSubscription[0];
+            result.LastNotificationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
+            result.RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
+            dbContext.SearchSubscriptions.Add(result);
             await dbContext.SaveChangesAsync();
+            return result;
         }
     }
 }
