@@ -422,12 +422,7 @@ namespace MemCheck.WebUI.Controllers
                 CountOfUserRatings = card.CountOfUserRatings;
                 PopoverVisibility = localizer["Visibility"].Value;
                 if (VisibleToCount == 1)
-                {
-                    var visibleToUser = card.VisibleTo.First();
-                    if (visibleToUser != currentUser)
-                        throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
                     PopoverVisibility = localizer["YouOnly"].ToString();
-                }
                 else
                 {
                     if (VisibleToCount == 0)

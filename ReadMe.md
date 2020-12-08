@@ -57,8 +57,6 @@
 
 # In progress
 - Un utilisateur peut être abonné à une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchSubscriptions`. On ne supporte pas les recherches avec info d'évaluation, et sans doute d'autres, à voir (parce qu'on ne sait pas raisonnablement identifier qu'une carte est apparue dans la recherche).
-- Tests de la notification quand une carte apparaît dans une recherche enregistrée
-- Tests de la notification quand une carte disparaît d'une recherche enregistrée
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
 
@@ -79,6 +77,8 @@
 - View NuGet package updates on each project (should be done regularly)
 - Afficher des stats sur la page d'accueil : xxx cartes de votre paquet vont expirer aujourd'hui
 - Implement unit test to prove that a user without visibility on a card can not delete it
+- Offer a diff view from the card history page
+- The mail sent by notifier should include an history and a diff links
 
 # To do at medium cost
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).

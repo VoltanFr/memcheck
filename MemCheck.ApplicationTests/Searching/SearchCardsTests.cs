@@ -49,7 +49,11 @@ namespace MemCheck.Application.Searching
             var testDB = DbHelper.GetEmptyTestDB();
 
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var card = await CardHelper.CreateAsync(testDB, userId);
+            var tag1Name = StringServices.RandomString();
+            var tag1 = await TagHelper.CreateAsync(testDB, tag1Name);
+            var tag2Name = StringServices.RandomString();
+            var tag2 = await TagHelper.CreateAsync(testDB, tag2Name);
+            var card = await CardHelper.CreateAsync(testDB, userId, tagIds: new[] { tag1, tag2 });
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -63,7 +67,20 @@ namespace MemCheck.Application.Searching
                 var resultWithoutUser = await new SearchCards(dbContext).RunAsync(requestWithoutUser);
                 Assert.AreEqual(1, resultWithoutUser.TotalNbCards);
                 Assert.AreEqual(1, resultWithoutUser.PageCount);
-                Assert.AreEqual(card.Id, resultWithoutUser.Cards.First().CardId);
+                var foundCard = resultWithoutUser.Cards.First();
+                Assert.AreEqual(card.Id, foundCard.CardId);
+                Assert.AreEqual(card.TagsInCards.Count(), foundCard.Tags.Count());
+                Assert.IsTrue(foundCard.Tags.Any(t => t == tag1Name));
+                Assert.IsTrue(foundCard.Tags.Any(t => t == tag2Name));
+                Assert.AreEqual(0, foundCard.CountOfUserRatings);
+                Assert.AreEqual(0, foundCard.AverageRating);
+                Assert.AreEqual(0, foundCard.CurrentUserRating);
+                Assert.IsTrue(!foundCard.DeckInfo.Any());
+                Assert.AreEqual(card.FrontSide, foundCard.FrontSide);
+                Assert.AreEqual(userId, foundCard.VersionCreator.Id);
+                Assert.AreEqual(card.VersionDescription, foundCard.VersionDescription);
+                Assert.AreEqual(card.VersionUtcDate, foundCard.VersionUtcDate);
+                Assert.IsTrue(!foundCard.VisibleTo.Any());
             }
         }
         [TestMethod()]

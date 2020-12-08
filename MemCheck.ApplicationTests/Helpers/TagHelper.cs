@@ -8,11 +8,11 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class TagHelper
     {
-        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB)
+        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, string? name = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new Tag();
-            result.Name = StringServices.RandomString();
+            result.Name = name ?? StringServices.RandomString();
             dbContext.Tags.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

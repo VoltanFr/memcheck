@@ -19,7 +19,7 @@ namespace MemCheck.Application.Searching
         #region Private class ResultCardBeforeDeckInfo
         private sealed class ResultCardBeforeDeckInfo
         {
-            public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<string> visibleTo, CardRatings cardRatings)
+            public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, CardRatings cardRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
             {
                 CardId = cardId;
                 FrontSide = frontSide;
@@ -29,14 +29,20 @@ namespace MemCheck.Application.Searching
                 CurrentUserRating = cardRatings.User(cardId);
                 AverageRating = cardRatings.Average(cardId);
                 CountOfUserRatings = cardRatings.Count(cardId);
+                VersionCreator = versionCreator;
+                VersionUtcDate = versionUtcDate;
+                VersionDescription = versionDescription;
             }
             public Guid CardId { get; }
             public string FrontSide { get; }
             public IEnumerable<string> Tags { get; }
-            public IEnumerable<string> VisibleTo { get; }
+            public IEnumerable<UserWithViewOnCard> VisibleTo { get; }
             public int CurrentUserRating { get; }
             public double AverageRating { get; }
             public int CountOfUserRatings { get; }
+            public MemCheckUser VersionCreator { get; }
+            public DateTime VersionUtcDate { get; }
+            public string VersionDescription { get; }
         }
         #endregion
         #region private methods
@@ -71,7 +77,7 @@ namespace MemCheck.Application.Searching
         private IEnumerable<ResultCard> AddDeckInfo(Guid userId, IEnumerable<ResultCardBeforeDeckInfo> resultCards)
         {
             var heapingAlgoCache = new Dictionary<Guid, HeapingAlgorithm>();
-            return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId, heapingAlgoCache), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings));
+            return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId, heapingAlgoCache), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
         }
         #endregion
         public SearchCards(MemCheckDbContext dbContext)
@@ -84,6 +90,7 @@ namespace MemCheck.Application.Searching
 
             var allCards = dbContext.Cards.AsNoTracking()
                 .Include(card => card.TagsInCards)
+                .ThenInclude(tagInCard => tagInCard.Tag)
                 .Include(card => card.VersionCreator)
                 .Include(card => card.CardLanguage)
                 .Include(card => card.UsersWithView)
@@ -173,12 +180,12 @@ namespace MemCheck.Application.Searching
             var totalNbCards = finalResult.Count();
             var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-            var pageCards = finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
+            var pageCards = await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
             if (cardRatings == null)
                 cardRatings = CardRatings.Load(dbContext, request.UserId, pageCards.Select(card => card.Id).ToImmutableHashSet());
 
-            var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(card.Id, card.FrontSide, card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name), card.UsersWithView.Select(userWithView => userWithView.User.UserName), cardRatings)).ToList();
+            var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(card.Id, card.FrontSide, card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name), card.UsersWithView, cardRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
 
             var withUserDeckInfo = AddDeckInfo(request.UserId, resultCards);
 
@@ -241,7 +248,7 @@ namespace MemCheck.Application.Searching
         }
         public sealed class ResultCard
         {
-            public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<string> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings)
+            public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
             {
                 CardId = cardId;
                 FrontSide = frontSide.Truncate(150, true);
@@ -251,15 +258,21 @@ namespace MemCheck.Application.Searching
                 CurrentUserRating = currentUserRating;
                 AverageRating = averageRating;
                 CountOfUserRatings = countOfUserRatings;
+                VersionCreator = versionCreator;
+                VersionUtcDate = versionUtcDate;
+                VersionDescription = versionDescription;
             }
             public Guid CardId { get; }
             public string FrontSide { get; }
             public IEnumerable<string> Tags { get; }
-            public IEnumerable<string> VisibleTo { get; }
+            public IEnumerable<UserWithViewOnCard> VisibleTo { get; }
             public IEnumerable<ResultCardDeckInfo> DeckInfo { get; }
             public int CurrentUserRating { get; }
-            public double AverageRating { get; }
+            public double AverageRating { get; }    //0 if no rating
             public int CountOfUserRatings { get; }
+            public MemCheckUser VersionCreator { get; }
+            public DateTime VersionUtcDate { get; }
+            public string VersionDescription { get; }
         }
         public sealed class ResultCardDeckInfo
         {
