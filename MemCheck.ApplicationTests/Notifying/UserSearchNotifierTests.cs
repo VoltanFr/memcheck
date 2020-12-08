@@ -158,7 +158,7 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext, 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.TotalNotFoundAnymoreCardCount);
-                Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.First());
+                Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.First().CardId);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -189,7 +189,7 @@ namespace MemCheck.Application.Tests.Notifying
             {
                 var searchResult = await new UserSearchNotifier(dbContext, 12, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
-                Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.First());
+                Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.First().CardId);
                 Assert.AreEqual(0, searchResult.TotalNotFoundAnymoreCardCount);
             }
 
@@ -206,7 +206,7 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext, 13, runDate).RunAsync(subscriptionId);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.TotalNotFoundAnymoreCardCount);
-                Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.First());
+                Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.First().CardId);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -240,7 +240,7 @@ namespace MemCheck.Application.Tests.Notifying
             {
                 var searchResult = await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
-                Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.First());
+                Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.First().CardId);
                 Assert.AreEqual(0, searchResult.TotalNotFoundAnymoreCardCount);
             }
 
@@ -261,8 +261,8 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext, 55, runDate).RunAsync(subscriptionId);
                 Assert.AreEqual(2, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.TotalNotFoundAnymoreCardCount);
-                Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c == card1.Id));
-                Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c == card3.Id));
+                Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c.CardId == card1.Id));
+                Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c.CardId == card3.Id));
                 Assert.AreEqual(card2.Id, searchResult.CardsNotFoundAnymore.First());
             }
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Immutable;
 using MemCheck.Domain;
 using System;
+using System.Linq;
 
 namespace MemCheck.Application.Notifying
 {
@@ -11,12 +12,14 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly IUserCardSubscriptionCounter userCardSubscriptionCounter;
+        private readonly IUserSearchSubscriptionLister userSearchSubscriptionLister;
         private readonly IUserCardVersionsNotifier userCardVersionsNotifier;
         private readonly IUserCardDeletionsNotifier userCardDeletionsNotifier;
         private readonly IUsersToNotifyGetter usersToNotifyGetter;
         private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
-        private readonly DateTime runningUtcDate;
+        private readonly IUserSearchNotifier userSearchNotifier;
         public const int MaxLengthForTextFields = 150;
+        public const int MaxCardsToReportPerSearch = 100;
         #endregion
         #region Private methods
         private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
@@ -24,6 +27,11 @@ namespace MemCheck.Application.Notifying
             var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user.Id);
             var cardVersions = await userCardVersionsNotifier.RunAsync(user.Id);
             var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id);
+            var subscribedSearches = await userSearchSubscriptionLister.RunAsync(user.Id);
+
+            var searchNotifs = new List<UserSearchNotifierResult>();
+            foreach (var subscribedSearch in subscribedSearches)
+                searchNotifs.Add(await userSearchNotifier.RunAsync(subscribedSearch.Id));
 
             await userLastNotifDateUpdater.RunAsync(user.Id);
 
@@ -32,21 +40,23 @@ namespace MemCheck.Application.Notifying
                 user.Email,
                 subscribedCardCount,
                 cardVersions,
-                cardDeletions
+                cardDeletions,
+                searchNotifs
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext, DateTime.UtcNow), DateTime.UtcNow)
+        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext, DateTime.UtcNow), new UserSearchSubscriptionLister(dbContext), new UserSearchNotifier(dbContext, MaxCardsToReportPerSearch), DateTime.UtcNow)
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, DateTime? runningUtcDate = null)
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, DateTime? runningUtcDate = null)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
             this.userCardDeletionsNotifier = userCardDeletionsNotifier;
             this.usersToNotifyGetter = usersToNotifyGetter;
             this.userLastNotifDateUpdater = userLastNotifDateUpdater;
-            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
+            this.userSearchSubscriptionLister = userSearchSubscriptionLister;
+            this.userSearchNotifier = userSearchNotifier;
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
         {
@@ -66,21 +76,23 @@ namespace MemCheck.Application.Notifying
             }
             public ImmutableArray<UserNotifications> UserNotifications { get; }
         }
-        public class UserNotifications
+        public record UserNotifications
         {
-            public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<RegisteredCardDeletion> deletedCards)
+            public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<RegisteredCardDeletion> deletedCards, IEnumerable<UserSearchNotifierResult> searchNotificactions)
             {
                 UserName = userName;
                 UserEmail = userEmail;
                 SubscribedCardCount = subscribedCardCount;
                 CardVersions = cardVersions.ToImmutableArray();
                 DeletedCards = deletedCards.ToImmutableArray();
+                SearchNotificactions = searchNotificactions.ToImmutableArray();
             }
             public string UserName { get; }
             public string UserEmail { get; }
             public int SubscribedCardCount { get; }
             public ImmutableArray<CardVersion> CardVersions { get; }
             public ImmutableArray<RegisteredCardDeletion> DeletedCards { get; }
+            public ImmutableArray<UserSearchNotifierResult> SearchNotificactions { get; }
         }
         #endregion
     }

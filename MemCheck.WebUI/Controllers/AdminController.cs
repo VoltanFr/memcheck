@@ -144,10 +144,42 @@ namespace MemCheck.WebUI.Controllers
                 mailBody.Append("</ul>");
             }
 
+            foreach (var searchNotifications in userNotifications.SearchNotificactions)
+            {
+                mailBody.Append($"<h1>{searchNotifications.SubscriptionName} search</h1>");
+                if (searchNotifications.TotalNewlyFoundCardCount == 0)
+                    mailBody.Append("<h2>No newly found card</h2>");
+                else
+                {
+                    mailBody.Append($"<h2>{searchNotifications.TotalNewlyFoundCardCount} newly found cards</h2>");
+                    if (searchNotifications.TotalNewlyFoundCardCount > searchNotifications.NewlyFoundCards.Length)
+                        mailBody.Append($"<p>Showing {searchNotifications.NewlyFoundCards.Length} first cards.</p>");
+                    mailBody.Append("<ul>");
+                    foreach (var card in searchNotifications.NewlyFoundCards.OrderBy(card => card.VersionUtcDate))
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                        mailBody.Append($"By {card.VersionCreator}<br/>");
+                        mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
+                        mailBody.Append($"Version description: '{card.VersionDescription}'");
+                        mailBody.Append("</li>");
+                    }
+                    mailBody.Append("</ul>");
+                }
+            }
+
             mailBody.Append("</body>");
             mailBody.Append("</html>");
 
             return mailBody.ToString();
+        }
+        private bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
+        {
+            if (userNotifications.CardVersions.Any())
+                return true;
+            if (userNotifications.DeletedCards.Any())
+                return true;
+            return userNotifications.SearchNotificactions.Any(searchNotificaction => searchNotificaction.TotalNewlyFoundCardCount > 0 || searchNotificaction.TotalNotFoundAnymoreCardCount > 0);
         }
         [HttpPost("LaunchNotifier")]
         public async Task<IActionResult> LaunchNotifier()
@@ -161,7 +193,7 @@ namespace MemCheck.WebUI.Controllers
                 var sentEmailCount = 0;
 
                 foreach (var userNotifications in notifierResult.UserNotifications)
-                    if (userNotifications.CardVersions.Any() || userNotifications.DeletedCards.Any())
+                    if (MustSendForNotifications(userNotifications))
                     {
                         var mailBody = GetMailBodyForUser(userNotifications);
                         mailSendingsToWaitFor.Add(emailSender.SendEmailAsync(userNotifications.UserEmail, "MemCheck notifications", mailBody));

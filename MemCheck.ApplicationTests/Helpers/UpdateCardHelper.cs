@@ -25,5 +25,22 @@ namespace MemCheck.Application.Tests.Helpers
                 StringServices.RandomString()
                 );
         }
+        public static UpdateCard.Request RequestForVisibilityChanges(Card card, IEnumerable<Guid> userWithViewIds)
+        {
+            return new UpdateCard.Request(
+                card.Id,
+                card.VersionCreator.Id,
+                card.FrontSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
+                card.BackSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
+                card.AdditionalInfo,
+                card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
+                card.CardLanguage.Id,
+                card.TagsInCards.Select(t => t.TagId),
+                userWithViewIds,
+                StringServices.RandomString()
+                );
+        }
     }
 }

@@ -67,7 +67,7 @@ namespace MemCheck.Application.Notifying
                 .SingleAsync(s => s.Id == searchSubscriptionId);
             var cardsInLastRun = subscription.CardsInLastRun.Select(c => c.CardId).ToImmutableHashSet();
 
-            var allCardsFromSearchHashSet = new HashSet<Guid>();
+            var allCardsFromSearchHashSet = new HashSet<CardVersion>();
             SearchCards.Request request = GetRequest(subscription);
 
             SearchCards.Result searchResult;
@@ -76,12 +76,14 @@ namespace MemCheck.Application.Notifying
                 request = request with { PageNo = request.PageNo + 1 };
                 var searcher = new SearchCards(dbContext);
                 searchResult = await searcher.RunAsync(request);
-                allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => card.CardId));
+                allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId))));
             }
             while (searchResult.TotalNbCards > allCardsFromSearchHashSet.Count);
 
-            var cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSet.Contains(c)).ToImmutableArray();
-            var newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c)).ToImmutableArray();
+            var allCardsFromSearchHashSetIds = new HashSet<Guid>(allCardsFromSearchHashSet.Select(cardVersion => cardVersion.CardId));
+
+            var cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
+            var newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
 
             foreach (var cardNotFoundAnymore in cardsNotFoundAnymore)
             {
@@ -89,12 +91,11 @@ namespace MemCheck.Application.Notifying
                 dbContext.CardsInSearchResults.Remove(entity);
             }
             foreach (var addedCard in newFoundCards)
-                dbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard });
-
+                dbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
 
             subscription.LastRunUtcDate = runningUtcDate;
             await dbContext.SaveChangesAsync();
-            return new UserSearchNotifierResult(newFoundCards.Length, cardsNotFoundAnymore.Length, newFoundCards.Take(maxCountToReport).ToImmutableArray(), cardsNotFoundAnymore.Take(maxCountToReport).ToImmutableArray());
+            return new UserSearchNotifierResult("SearchSubscriptionNameNotImplementedYet", newFoundCards.Length, cardsNotFoundAnymore.Length, newFoundCards.Take(maxCountToReport).ToImmutableArray(), cardsNotFoundAnymore.Take(maxCountToReport).ToImmutableArray());
         }
     }
 }

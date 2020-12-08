@@ -56,7 +56,7 @@
   - Cascade delete behaves differently.
 
 # In progress
-- Un utilisateur peut être abonné à une recherche (liste les cartes qui apparaissent dans la recherche) : type `SearchSubscriptions`. On ne supporte pas les recherches avec info d'évaluation, et sans doute d'autres, à voir (parce qu'on ne sait pas raisonnablement identifier qu'une carte est apparue dans la recherche).
+- Implement mail sending about cards disappearing from search results (start at UserSearchNotifierResult.CardsNotFoundAnymore which must become a RegisteredCardDeletion)
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
 
