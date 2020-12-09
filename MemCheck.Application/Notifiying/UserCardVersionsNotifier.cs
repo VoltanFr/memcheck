@@ -6,6 +6,7 @@ using MemCheck.Domain;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.Notifying
 {
@@ -45,7 +46,7 @@ namespace MemCheck.Application.Notifying
                                    cardToReport.card.VersionCreator.UserName,
                                    cardToReport.card.VersionUtcDate,
                                    cardToReport.card.VersionDescription,
-                                   !cardToReport.card.UsersWithView.Any() || cardToReport.card.UsersWithView.Any(u => u.UserId == userId)
+                                   CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView)
                                )
                         ).ToImmutableArray();
 

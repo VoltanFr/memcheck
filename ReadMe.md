@@ -59,6 +59,8 @@
 - Implement mail sending about cards disappearing from search results (start at UserSearchNotifierResult.CardsNotFoundAnymore which must become a RegisteredCardDeletion)
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
+- Write unit tests about a card the user is subscribed to, and gets a new version he is not allowed to view
+- Write unit tests about a card the user is subscribed to, gets deleted, and he is not allowed to view
 
 # Bugs
 

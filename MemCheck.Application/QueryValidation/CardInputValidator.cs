@@ -65,7 +65,7 @@ namespace MemCheck.Application.QueryValidation
             if (input.UsersWithVisibility.Where(userWithVisibility => QueryValidationHelper.IsReservedGuid(userWithVisibility)).Any())
                 throw new RequestInputException(localizer["InvalidUserWithVisibility"].Value);
 
-            if (input.UsersWithVisibility.Any() && !input.UsersWithVisibility.Any(userWithVisibility => userWithVisibility == input.VersionCreatorId))
+            if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
                 //To be reviewed when we support card versions: I suspect we want visibility for all past owners
                 throw new RequestInputException(localizer["OwnerMustHaveVisibility"].Value);
         }

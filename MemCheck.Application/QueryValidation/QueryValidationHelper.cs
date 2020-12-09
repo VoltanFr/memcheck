@@ -58,7 +58,7 @@ namespace MemCheck.Application.QueryValidation
                 .Include(card => card.VersionCreator)
                 .Where(card => card.Id == cardId)
                 .SingleAsync();
-            if ((card.VersionCreator.Id != userId) && card.UsersWithView.Any() && !card.UsersWithView.Where(userWithView => userWithView.UserId == userId).Any())
+            if (!CardVisibilityHelper.CardIsVisibleToUser(userId, card.UsersWithView))
                 throw new ApplicationException("Current user not allowed to view card");
         }
     }
