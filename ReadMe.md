@@ -1,3 +1,6 @@
+# Introduction
+MemCheck is a flashcard web site.
+
 # Archi, specification doc, resources
 - The Application project defines *what* we want to display, not how we display it. So it returns raw data, not transformed for display.
 - The UI project defines *how* we display the data sent by the Application. *The UI project is not allowed to see the model*, it only sees the Application.
@@ -56,11 +59,10 @@
   - Cascade delete behaves differently.
 
 # In progress
+- Provide a way to review the list of subscribed searches, name, delete.
 - Implement mail sending about cards disappearing from search results (start at UserSearchNotifierResult.CardsNotFoundAnymore which must become a RegisteredCardDeletion)
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
-- Write unit tests about a card the user is subscribed to, and gets a new version he is not allowed to view
-- Write unit tests about a card the user is subscribed to, gets deleted, and he is not allowed to view
 
 # Bugs
 
@@ -94,7 +96,6 @@
 - User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public)
 - Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
 - Use Azure functions to run Notifier on cron intervals. This is not implemented yet because Azure functions don't support .NET 5 yet (should be available by Jan 2021).
-- Provide a way to review the list of subscribed searches, and delete some.
 
 # To do at big cost
 - Card authoring: Have the user review his changes before saving a new version of a resource (card, tag, deck)

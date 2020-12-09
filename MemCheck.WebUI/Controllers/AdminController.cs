@@ -139,8 +139,8 @@ namespace MemCheck.WebUI.Controllers
         }
         private void AddSearchNotifications(UserSearchNotifierResult searchNotifications, StringBuilder mailBody)
         {
-            AddSearchNotifications(searchNotifications, mailBody);
             mailBody.Append($"<h1>{searchNotifications.SubscriptionName} search</h1>");
+
             if (searchNotifications.TotalNewlyFoundCardCount == 0)
                 mailBody.Append("<h2>No newly found card</h2>");
             else
@@ -153,13 +153,84 @@ namespace MemCheck.WebUI.Controllers
                 {
                     mailBody.Append("<li>");
                     mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                    mailBody.Append($"By {card.VersionCreator}<br/>");
+                    mailBody.Append($"Changed by '{card.VersionCreator}'<br/>");
                     mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
                     mailBody.Append($"Version description: '{card.VersionDescription}'");
                     mailBody.Append("</li>");
                 }
                 mailBody.Append("</ul>");
             }
+
+            if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0
+                )
+            {
+                mailBody.Append("<h2>Cards no more reported by this search</h2>");
+
+                if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0)
+                {
+                    mailBody.Append("<ul>");
+                    foreach (var card in searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.OrderBy(card => card.VersionUtcDate))
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                        mailBody.Append($"Changed by user '{card.VersionCreator}' and not reported anymore by this search<br/>");
+                        mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
+                        mailBody.Append($"Version description: '{card.VersionDescription}'");
+                        mailBody.Append("</li>");
+                    }
+                    if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length)
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"And {searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView - searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length} more");
+                        mailBody.Append("</li>");
+                    }
+                    mailBody.Append("</ul>");
+                }
+
+                if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0)
+                {
+                    mailBody.Append("<ul>");
+                    foreach (var card in searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView)
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"{card.FrontSide}<br/>");
+                        mailBody.Append($"Deleted by user '{card.DeletionAuthor}'<br/>");
+                        mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
+                        mailBody.Append($"With description: '{card.DeletionDescription}'");
+                        mailBody.Append("</li>");
+                    }
+                    if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length)
+                    {
+                        mailBody.Append("<li>");
+                        mailBody.Append($"And {searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView - searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length} more");
+                        mailBody.Append("</li>");
+                    }
+                    mailBody.Append("</ul>");
+                }
+
+                if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0)
+                {
+                    mailBody.Append("<ul>");
+                    mailBody.Append("<li>");
+                    mailBody.Append($"{searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView} cards have been modified and made private, preventing you from seeing them");
+                    mailBody.Append("</li>");
+                    mailBody.Append("</ul>");
+                }
+
+                if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0)
+                {
+                    mailBody.Append("<ul>");
+                    mailBody.Append("<li>");
+                    mailBody.Append($"{searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView} cards have been made private and deleted, can not show any detail");
+                    mailBody.Append("</li>");
+                    mailBody.Append("</ul>");
+                }
+            }
+            else
+                mailBody.Append("<h2>No card is not reported by this search anymore</h2>");
         }
         private string GetMailBodyForUser(Notifier.UserNotifications userNotifications)
         {
