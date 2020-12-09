@@ -179,7 +179,13 @@ namespace MemCheck.WebUI.Controllers
                 return true;
             if (userNotifications.DeletedCards.Any())
                 return true;
-            return userNotifications.SearchNotificactions.Any(searchNotificaction => searchNotificaction.TotalNewlyFoundCardCount > 0 || searchNotificaction.TotalNotFoundAnymoreCardCount > 0);
+            return userNotifications.SearchNotificactions.Any(searchNotificaction =>
+                searchNotificaction.TotalNewlyFoundCardCount > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0
+                );
         }
         [HttpPost("LaunchNotifier")]
         public async Task<IActionResult> LaunchNotifier()

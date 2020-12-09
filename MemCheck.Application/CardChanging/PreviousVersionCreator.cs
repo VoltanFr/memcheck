@@ -60,7 +60,7 @@ namespace MemCheck.Application.CardChanging
                     throw new NotImplementedException();
             }
         }
-        private async Task<CardPreviousVersion> CreatePreviousVersionAsync(Card card)
+        private async Task<CardPreviousVersion> CreatePreviousVersionAsync(Card card, DateTime? versionUtcDate = null)
         {
             var previousVersion = new CardPreviousVersion()
             {
@@ -70,7 +70,7 @@ namespace MemCheck.Application.CardChanging
                 FrontSide = card.FrontSide,
                 BackSide = card.BackSide,
                 AdditionalInfo = card.AdditionalInfo,
-                VersionUtcDate = card.VersionUtcDate,
+                VersionUtcDate = versionUtcDate ?? card.VersionUtcDate,
                 VersionType = CardPreviousVersionTypeFromCard(card),
                 VersionDescription = card.VersionDescription,
                 PreviousVersion = card.PreviousVersion,
@@ -117,7 +117,7 @@ namespace MemCheck.Application.CardChanging
         }
         public async Task RunForDeletionAsync(Card card, DateTime? versionUtcDate = null)
         {
-            var previousVersion = await CreatePreviousVersionAsync(card);
+            var previousVersion = await CreatePreviousVersionAsync(card, versionUtcDate);
             previousVersion.VersionType = CardPreviousVersionType.Deletion;
         }
     }

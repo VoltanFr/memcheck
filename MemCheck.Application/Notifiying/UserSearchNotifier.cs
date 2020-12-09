@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MemCheck.Application.Searching;
 using System.Linq;
 using MemCheck.Domain;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.Notifying
 {
@@ -93,9 +94,64 @@ namespace MemCheck.Application.Notifying
             foreach (var addedCard in newFoundCards)
                 dbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
 
+            var countOfCardsNotFoundAnymore_StillExists_UserAllowedToView = 0;
+            var cardsNotFoundAnymore_StillExists_UserAllowedToView = new List<CardVersion>();
+            var countOfCardsNotFoundAnymore_Deleted_UserAllowedToView = 0;
+            var cardsNotFoundAnymore_Deleted_UserAllowedToView = new List<CardDeletion>();
+            var countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView = 0;
+            var countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView = 0;
+
+            foreach (Guid notFoundId in cardsNotFoundAnymore)
+            {
+                var card = await dbContext.Cards
+                    .Include(c => c.UsersWithView)
+                    .Include(c => c.VersionCreator)
+                    .Where(c => c.Id == notFoundId).SingleOrDefaultAsync();
+                if (card != null)
+                {
+                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView))
+                    {
+                        countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
+                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView)));
+                    }
+                    else
+                        countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;
+                }
+                else
+                {
+                    var previousVersion = await dbContext.CardPreviousVersions
+                        .Include(previousVersion => previousVersion.UsersWithView)
+                        .Include(previousVersion => previousVersion.VersionCreator)
+                        .Where(previousVersion => previousVersion.Card == notFoundId && previousVersion.VersionType == CardPreviousVersionType.Deletion)
+                        .SingleOrDefaultAsync();
+                    if (previousVersion == null)
+                        //Strange! Has the card been purged from previous versions?
+                        countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
+                    else
+                    {
+                        var userWithViewIds = previousVersion.UsersWithView.Select(uwv => uwv.AllowedUserId);
+                        if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, userWithViewIds))
+                        {
+                            countOfCardsNotFoundAnymore_Deleted_UserAllowedToView++;
+                            cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, userWithViewIds)));
+                        }
+                        else
+                            countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
+                    }
+                }
+            }
+
             subscription.LastRunUtcDate = runningUtcDate;
             await dbContext.SaveChangesAsync();
-            return new UserSearchNotifierResult("SearchSubscriptionNameNotImplementedYet", newFoundCards.Length, cardsNotFoundAnymore.Length, newFoundCards.Take(maxCountToReport).ToImmutableArray(), cardsNotFoundAnymore.Take(maxCountToReport).ToImmutableArray());
+            return new UserSearchNotifierResult("SearchSubscriptionNameNotImplementedYet",
+                newFoundCards.Length,
+                newFoundCards.Take(maxCountToReport),
+                countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
+                cardsNotFoundAnymore_StillExists_UserAllowedToView,
+                countOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
+                cardsNotFoundAnymore_Deleted_UserAllowedToView,
+                countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
+                countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
         }
     }
 }
