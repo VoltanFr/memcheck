@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -96,6 +97,70 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #endregion
         #region LaunchNotifier
+        private void AddCardVersions(ImmutableArray<CardVersion> cardVersions, StringBuilder mailBody)
+        {
+            if (!cardVersions.Any())
+                mailBody.Append("<h1>No card with new version</h1>");
+            else
+            {
+                mailBody.Append($"<h1>{cardVersions.Length} Cards with new versions</h1>");
+                mailBody.Append("<ul>");
+                foreach (var card in cardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
+                {
+                    mailBody.Append("<li>");
+                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append($"By {card.VersionCreator}<br/>");
+                    mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
+                    mailBody.Append($"Version description: '{card.VersionDescription}'");
+                    mailBody.Append("</li>");
+                }
+                mailBody.Append("</ul>");
+            }
+        }
+        private void AddCardDeletions(ImmutableArray<CardDeletion> deletedCards, StringBuilder mailBody)
+        {
+            if (!deletedCards.Any())
+                mailBody.Append("<h1>No deleted card</h1>");
+            else
+            {
+                mailBody.Append($"<h1>{deletedCards.Length} Deleted cards</h1>");
+                mailBody.Append("<ul>");
+                foreach (var card in deletedCards.OrderBy(card => card.DeletionUtcDate))
+                {
+                    mailBody.Append("<li>");
+                    mailBody.Append($"{card.FrontSide}<br/>");
+                    mailBody.Append($"By {card.DeletionAuthor}<br/>");
+                    mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
+                    mailBody.Append($"Deletion description: '{card.DeletionDescription}'");
+                    mailBody.Append("</li>");
+                }
+                mailBody.Append("</ul>");
+            }
+        }
+        private void AddSearchNotifications(UserSearchNotifierResult searchNotifications, StringBuilder mailBody)
+        {
+            AddSearchNotifications(searchNotifications, mailBody);
+            mailBody.Append($"<h1>{searchNotifications.SubscriptionName} search</h1>");
+            if (searchNotifications.TotalNewlyFoundCardCount == 0)
+                mailBody.Append("<h2>No newly found card</h2>");
+            else
+            {
+                mailBody.Append($"<h2>{searchNotifications.TotalNewlyFoundCardCount} newly found cards</h2>");
+                if (searchNotifications.TotalNewlyFoundCardCount > searchNotifications.NewlyFoundCards.Length)
+                    mailBody.Append($"<p>Showing {searchNotifications.NewlyFoundCards.Length} first cards.</p>");
+                mailBody.Append("<ul>");
+                foreach (var card in searchNotifications.NewlyFoundCards.OrderBy(card => card.VersionUtcDate))
+                {
+                    mailBody.Append("<li>");
+                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append($"By {card.VersionCreator}<br/>");
+                    mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
+                    mailBody.Append($"Version description: '{card.VersionDescription}'");
+                    mailBody.Append("</li>");
+                }
+                mailBody.Append("</ul>");
+            }
+        }
         private string GetMailBodyForUser(Notifier.UserNotifications userNotifications)
         {
             var mailBody = new StringBuilder();
@@ -108,65 +173,10 @@ namespace MemCheck.WebUI.Controllers
             mailBody.Append($"Search finished at {DateTime.UtcNow}<br/>");
             mailBody.Append("</p>");
 
-            if (!userNotifications.CardVersions.Any())
-                mailBody.Append("<h1>No card with new version</h1>");
-            else
-            {
-                mailBody.Append($"<h1>{userNotifications.CardVersions.Length} Cards with new versions</h1>");
-                mailBody.Append("<ul>");
-                foreach (var card in userNotifications.CardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
-                {
-                    mailBody.Append("<li>");
-                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                    mailBody.Append($"By {card.VersionCreator}<br/>");
-                    mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Version description: '{card.VersionDescription}'");
-                    mailBody.Append("</li>");
-                }
-                mailBody.Append("</ul>");
-            }
-
-            if (!userNotifications.DeletedCards.Any())
-                mailBody.Append("<h1>No deleted card</h1>");
-            else
-            {
-                mailBody.Append($"<h1>{userNotifications.DeletedCards.Length} Deleted cards</h1>");
-                mailBody.Append("<ul>");
-                foreach (var card in userNotifications.DeletedCards.OrderBy(card => card.DeletionUtcDate))
-                {
-                    mailBody.Append("<li>");
-                    mailBody.Append($"{card.FrontSide}<br/>");
-                    mailBody.Append($"By {card.DeletionAuthor}<br/>");
-                    mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Deletion description: '{card.DeletionDescription}'");
-                    mailBody.Append("</li>");
-                }
-                mailBody.Append("</ul>");
-            }
-
+            AddCardVersions(userNotifications.CardVersions, mailBody);
+            AddCardDeletions(userNotifications.DeletedCards, mailBody);
             foreach (var searchNotifications in userNotifications.SearchNotificactions)
-            {
-                mailBody.Append($"<h1>{searchNotifications.SubscriptionName} search</h1>");
-                if (searchNotifications.TotalNewlyFoundCardCount == 0)
-                    mailBody.Append("<h2>No newly found card</h2>");
-                else
-                {
-                    mailBody.Append($"<h2>{searchNotifications.TotalNewlyFoundCardCount} newly found cards</h2>");
-                    if (searchNotifications.TotalNewlyFoundCardCount > searchNotifications.NewlyFoundCards.Length)
-                        mailBody.Append($"<p>Showing {searchNotifications.NewlyFoundCards.Length} first cards.</p>");
-                    mailBody.Append("<ul>");
-                    foreach (var card in searchNotifications.NewlyFoundCards.OrderBy(card => card.VersionUtcDate))
-                    {
-                        mailBody.Append("<li>");
-                        mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                        mailBody.Append($"By {card.VersionCreator}<br/>");
-                        mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                        mailBody.Append($"Version description: '{card.VersionDescription}'");
-                        mailBody.Append("</li>");
-                    }
-                    mailBody.Append("</ul>");
-                }
-            }
+                AddSearchNotifications(searchNotifications, mailBody);
 
             mailBody.Append("</body>");
             mailBody.Append("</html>");
