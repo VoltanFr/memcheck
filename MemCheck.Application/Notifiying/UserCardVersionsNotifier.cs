@@ -27,13 +27,10 @@ namespace MemCheck.Application.Notifying
         }
         public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId)
         {
-            var cardVersions = await dbContext.Cards.Include(card => card.UsersWithView)
-                .Join(
-                dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId),
-                card => card.Id,
-                cardNotif => cardNotif.CardId,
-                (card, cardNotif) => new { card, cardNotif }
-                )
+            var cardVersions = await dbContext.Cards
+                .Include(card => card.VersionCreator)
+                .Include(card => card.UsersWithView)
+                .Join(dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId), card => card.Id, cardNotif => cardNotif.CardId, (card, cardNotif) => new { card, cardNotif })
                 .Where(cardAndNotif => cardAndNotif.card.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate)
                 .ToListAsync();
 
