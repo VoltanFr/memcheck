@@ -47,7 +47,7 @@ jobs:
       run: dotnet restore
 
     - name: "Build the root sln with dotnet"
-      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}} --version-suffix PR_$env:GITHUB_RUN_NUMBER
+      run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}} --version-suffix "PR_$env:GITHUB_RUN_NUMBER"
 
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}} --filter TestCategory!=IntegrationTests
