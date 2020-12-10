@@ -16,7 +16,7 @@
     <PackageReference Include="Markdig" Version="0.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServicesIntegration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.0">
