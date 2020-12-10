@@ -1,5 +1,5 @@
 # Introduction
-MemCheck is a flashcard web site.
+MemCheck is a flashcard web site, a tool to help you know things by heart.
 
 # Archi, specification doc, resources
 - The Application project defines *what* we want to display, not how we display it. So it returns raw data, not transformed for display.
