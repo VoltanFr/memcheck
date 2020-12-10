@@ -68,12 +68,12 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1);
+                var versions = await new UserCardVersionsNotifier(dbContext, DateTime.UtcNow).RunAsync(user1);
                 Assert.AreEqual(0, versions.Length);
             }
         }
         [TestMethod()]
-        public async Task CardWithoutPreviousVersion_NotToBeNotified()
+        public async Task CardWithoutPreviousVersion_NotChangedSinceLastNotif()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(testDB);
@@ -83,7 +83,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user);
+                var versions = await new UserCardVersionsNotifier(dbContext, new DateTime(2020, 11, 5)).RunAsync(user);
                 Assert.AreEqual(0, versions.Length);
             }
 
@@ -103,7 +103,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user);
+                var versions = await new UserCardVersionsNotifier(dbContext, new DateTime(2020, 11, 2)).RunAsync(user);
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
@@ -130,7 +130,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1);
+                var versions = await new UserCardVersionsNotifier(dbContext, new DateTime(2020, 11, 5)).RunAsync(user1);
                 Assert.AreEqual(0, versions.Length);
             }
 
@@ -267,7 +267,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var versions = await new UserCardVersionsNotifier(dbContext).RunAsync(user1);
+                var versions = await new UserCardVersionsNotifier(dbContext, new DateTime(2020, 11, 5)).RunAsync(user1);
                 Assert.AreEqual(0, versions.Length);
             }
 

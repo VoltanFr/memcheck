@@ -8,6 +8,7 @@ using MemCheck.Application.Searching;
 using System.Linq;
 using MemCheck.Domain;
 using MemCheck.Application.QueryValidation;
+using System.Diagnostics;
 
 namespace MemCheck.Application.Notifying
 {
@@ -29,6 +30,7 @@ namespace MemCheck.Application.Notifying
         private readonly MemCheckDbContext dbContext;
         private readonly DateTime runningUtcDate;
         private readonly int maxCountToReport;
+        private readonly List<string> performanceIndicators;
         #endregion
         #region Private methods
         private SearchCards.Request GetRequest(SearchSubscription subscription)
@@ -53,24 +55,38 @@ namespace MemCheck.Application.Notifying
             return request;
         }
         #endregion
-        public UserSearchNotifier(MemCheckDbContext dbContext, int maxCountToReport, DateTime? runningUtcDate = null)
+        public UserSearchNotifier(MemCheckDbContext dbContext, int maxCountToReport, List<string> performanceIndicators)
         {
+            //Prod constructor
             this.dbContext = dbContext;
-            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
+            runningUtcDate = DateTime.UtcNow;
             this.maxCountToReport = maxCountToReport;
+            this.performanceIndicators = performanceIndicators;
+        }
+        public UserSearchNotifier(MemCheckDbContext dbContext, int maxCountToReport, DateTime runningUtcDate)
+        {
+            //Unit tests constructor
+            this.dbContext = dbContext;
+            this.runningUtcDate = runningUtcDate;
+            this.maxCountToReport = maxCountToReport;
+            performanceIndicators = new List<string>();
         }
         public async Task<UserSearchNotifierResult> RunAsync(Guid searchSubscriptionId)
         {
+            var chrono = Stopwatch.StartNew();
             var subscription = await dbContext.SearchSubscriptions
                 .Include(s => s.ExcludedTags)
                 .Include(s => s.RequiredTags)
                 .Include(s => s.CardsInLastRun)
                 .SingleAsync(s => s.Id == searchSubscriptionId);
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to get a search subscriptions");
+            chrono.Restart();
             var cardsInLastRun = subscription.CardsInLastRun.Select(c => c.CardId).ToImmutableHashSet();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {cardsInLastRun.Count} card ids in last run");
 
+            chrono.Restart();
             var allCardsFromSearchHashSet = new HashSet<CardVersion>();
             SearchCards.Request request = GetRequest(subscription);
-
             SearchCards.Result searchResult;
             do
             {
@@ -80,19 +96,26 @@ namespace MemCheck.Application.Notifying
                 allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId))));
             }
             while (searchResult.TotalNbCards > allCardsFromSearchHashSet.Count);
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {allCardsFromSearchHashSet.Count} card versions from search (in {searchResult.PageCount} pages)");
 
+            chrono.Restart();
             var allCardsFromSearchHashSetIds = new HashSet<Guid>(allCardsFromSearchHashSet.Select(cardVersion => cardVersion.CardId));
-
             var cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
             var newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to filter in memory data");
 
+            chrono.Restart();
             foreach (var cardNotFoundAnymore in cardsNotFoundAnymore)
             {
                 var entity = await dbContext.CardsInSearchResults.SingleAsync(c => c.SearchSubscriptionId == searchSubscriptionId && c.CardId == cardNotFoundAnymore);
                 dbContext.CardsInSearchResults.Remove(entity);
             }
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {cardsNotFoundAnymore.Length} search result cards for deletion in DB");
+
+            chrono.Restart();
             foreach (var addedCard in newFoundCards)
                 dbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {newFoundCards.Length} search result cards for add to DB");
 
             var countOfCardsNotFoundAnymore_StillExists_UserAllowedToView = 0;
             var cardsNotFoundAnymore_StillExists_UserAllowedToView = new List<CardVersion>();
@@ -101,6 +124,7 @@ namespace MemCheck.Application.Notifying
             var countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView = 0;
             var countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView = 0;
 
+            chrono.Restart();
             foreach (Guid notFoundId in cardsNotFoundAnymore)
             {
                 var card = await dbContext.Cards
@@ -140,6 +164,7 @@ namespace MemCheck.Application.Notifying
                     }
                 }
             }
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to work on cards not found anymore");
 
             subscription.LastRunUtcDate = runningUtcDate;
             await dbContext.SaveChangesAsync();

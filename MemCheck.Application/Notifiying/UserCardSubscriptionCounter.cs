@@ -1,9 +1,10 @@
 ﻿using MemCheck.Database;
 using System.Linq;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MemCheck.Application.Notifying
 {
@@ -15,14 +16,19 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly List<string> performanceIndicators;
         #endregion
-        public UserCardSubscriptionCounter(MemCheckDbContext dbContext)
+        public UserCardSubscriptionCounter(MemCheckDbContext dbContext, List<string>? performanceIndicators = null)
         {
             this.dbContext = dbContext;
+            this.performanceIndicators = performanceIndicators ?? new List<string>();
         }
         public async Task<int> RunAsync(Guid userId)
         {
-            return await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
+            var chrono = Stopwatch.StartNew();
+            var result = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+            return result;
         }
     }
 }

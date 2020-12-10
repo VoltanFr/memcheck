@@ -78,7 +78,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var notifier = new UserCardDeletionsNotifier(dbContext);
+                var notifier = new UserCardDeletionsNotifier(dbContext, DateTime.UtcNow);
                 var versions = await notifier.RunAsync(user);
                 Assert.AreEqual(0, versions.Length);
             }

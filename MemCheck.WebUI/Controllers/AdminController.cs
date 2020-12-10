@@ -254,6 +254,25 @@ namespace MemCheck.WebUI.Controllers
 
             return mailBody.ToString();
         }
+        private string GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
+        {
+            var mailBody = new StringBuilder();
+            mailBody.Append("<html>");
+            mailBody.Append("<body>");
+
+
+            mailBody.Append($"<p>Sent {sentEmailCount} emails.</p>");
+            mailBody.Append($"<p>Perf indicators...</p>");
+            mailBody.Append("<ul>");
+            foreach (var performanceIndicator in performanceIndicators)
+                mailBody.Append($"<li>{performanceIndicator}</li>");
+            mailBody.Append("</ul>");
+            mailBody.Append($"<p>Finished at {DateTime.UtcNow} (UTC)</p>");
+
+            mailBody.Append("</body>");
+            mailBody.Append("</html>");
+            return mailBody.ToString();
+        }
         private bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
         {
             if (userNotifications.CardVersions.Any())
@@ -275,8 +294,8 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 var mailSendingsToWaitFor = new List<Task>();
-                var chrono = Stopwatch.StartNew();
-                var notifierResult = await new Notifier(dbContext).GetNotificationsAndUpdateLastNotifDatesAsync();
+                var performanceIndicators = new List<string>();
+                var notifierResult = await new Notifier(dbContext, performanceIndicators).GetNotificationsAndUpdateLastNotifDatesAsync();
                 var sentEmailCount = 0;
 
                 foreach (var userNotifications in notifierResult.UserNotifications)
@@ -288,8 +307,7 @@ namespace MemCheck.WebUI.Controllers
                     }
 
 
-                var adminMailBody = $"<html><body><p>Sent {sentEmailCount} emails.</p><p>Finished at {DateTime.Now}<br/>Notifier execution took {chrono.Elapsed}</p></body></html>";
-                mailSendingsToWaitFor.Add(emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on success", adminMailBody));
+                mailSendingsToWaitFor.Add(emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
                 Task.WaitAll(mailSendingsToWaitFor.ToArray());
                 return Ok();
             }

@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using MemCheck.Domain;
 using System;
 using System.Linq;
+using System.Diagnostics;
 
 namespace MemCheck.Application.Notifying
 {
@@ -18,6 +19,7 @@ namespace MemCheck.Application.Notifying
         private readonly IUsersToNotifyGetter usersToNotifyGetter;
         private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
         private readonly IUserSearchNotifier userSearchNotifier;
+        private readonly List<string> performanceIndicators;
         public const int MaxLengthForTextFields = 150;
         public const int MaxCardsToReportPerSearch = 100;
         #endregion
@@ -45,10 +47,20 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext) : this(new UserCardSubscriptionCounter(dbContext), new UserCardVersionsNotifier(dbContext), new UserCardDeletionsNotifier(dbContext), new UsersToNotifyGetter(dbContext), new UserLastNotifDateUpdater(dbContext, DateTime.UtcNow), new UserSearchSubscriptionLister(dbContext), new UserSearchNotifier(dbContext, MaxCardsToReportPerSearch), DateTime.UtcNow)
+        public Notifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
+            : this(
+                  new UserCardSubscriptionCounter(dbContext, performanceIndicators),
+                  new UserCardVersionsNotifier(dbContext, performanceIndicators),
+                  new UserCardDeletionsNotifier(dbContext, performanceIndicators),
+                  new UsersToNotifyGetter(dbContext, performanceIndicators),
+                  new UserLastNotifDateUpdater(dbContext, performanceIndicators, DateTime.UtcNow),
+                  new UserSearchSubscriptionLister(dbContext, performanceIndicators),
+                  new UserSearchNotifier(dbContext, MaxCardsToReportPerSearch, performanceIndicators),
+                  performanceIndicators,
+                  DateTime.UtcNow)
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, DateTime? runningUtcDate = null)
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators, DateTime? runningUtcDate = null)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
@@ -57,14 +69,17 @@ namespace MemCheck.Application.Notifying
             this.userLastNotifDateUpdater = userLastNotifDateUpdater;
             this.userSearchSubscriptionLister = userSearchSubscriptionLister;
             this.userSearchNotifier = userSearchNotifier;
+            this.performanceIndicators = performanceIndicators;
         }
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
         {
+            var chrono = Stopwatch.StartNew();
             now = now ?? DateTime.UtcNow;
             var users = usersToNotifyGetter.Run(now);
             var userNotifications = new List<UserNotifications>();
             foreach (var user in users)
                 userNotifications.Add(await GetUserNotificationsAsync(user));
+            performanceIndicators.Add($"Total Notifier execution time: {chrono.Elapsed}");
             return new NotifierResult(userNotifications.ToImmutableArray());
         }
         #region Result classes

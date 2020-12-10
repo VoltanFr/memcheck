@@ -7,6 +7,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using MemCheck.Application.QueryValidation;
+using System.Diagnostics;
 
 namespace MemCheck.Application.Notifying
 {
@@ -18,24 +19,39 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly List<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
-        public UserCardVersionsNotifier(MemCheckDbContext dbContext, DateTime? runningUtcDate = null)
+        public UserCardVersionsNotifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
         {
+            //Prod constructor
             this.dbContext = dbContext;
-            this.runningUtcDate = runningUtcDate ?? DateTime.UtcNow;
+            this.performanceIndicators = performanceIndicators;
+            runningUtcDate = DateTime.UtcNow;
+        }
+        public UserCardVersionsNotifier(MemCheckDbContext dbContext, DateTime runningUtcDate)
+        {
+            //Unit tests constructor
+            this.dbContext = dbContext;
+            performanceIndicators = new List<string>();
+            this.runningUtcDate = runningUtcDate;
         }
         public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId)
         {
+            var chrono = Stopwatch.StartNew();
             var cardVersions = await dbContext.Cards
                 .Include(card => card.VersionCreator)
                 .Include(card => card.UsersWithView)
                 .Join(dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId), card => card.Id, cardNotif => cardNotif.CardId, (card, cardNotif) => new { card, cardNotif })
                 .Where(cardAndNotif => cardAndNotif.card.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate)
                 .ToListAsync();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's registered cards with new versions");
 
+            chrono.Restart();
             foreach (var cardVersion in cardVersions)
                 cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
+            await dbContext.SaveChangesAsync();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's registered cards last notif date");
 
             var result = cardVersions.Select(cardToReport =>
                                new CardVersion(
@@ -47,8 +63,6 @@ namespace MemCheck.Application.Notifying
                                    CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView)
                                )
                         ).ToImmutableArray();
-
-            await dbContext.SaveChangesAsync();
 
             return result;
         }

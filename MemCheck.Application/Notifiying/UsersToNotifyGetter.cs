@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using MemCheck.Domain;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MemCheck.Application.Notifying
 {
@@ -17,17 +19,22 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly List<string> performanceIndicators;
         #endregion
-        public UsersToNotifyGetter(MemCheckDbContext dbContext)
+        public UsersToNotifyGetter(MemCheckDbContext dbContext, List<string>? performanceIndicators = null)
         {
             this.dbContext = dbContext;
+            this.performanceIndicators = performanceIndicators ?? new List<string>();
         }
         public ImmutableArray<MemCheckUser> Run(DateTime? now = null)
         {
             now = now ?? DateTime.UtcNow;
-            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
+            var chrono = Stopwatch.StartNew();
+            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0);// && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
             //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
-            return userList.ToImmutableArray();
+            var result = userList.ToImmutableArray();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+            return result;
         }
     }
 }

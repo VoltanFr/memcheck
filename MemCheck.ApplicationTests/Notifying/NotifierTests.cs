@@ -8,6 +8,7 @@ using System;
 using MemCheck.Domain;
 using System.Collections.Immutable;
 using MemCheck.Application.Tests.Helpers;
+using System.Collections.Generic;
 
 namespace MemCheck.Application.Tests.Notifying
 {
@@ -27,7 +28,7 @@ namespace MemCheck.Application.Tests.Notifying
             var usersToNotifyGetter = new Mock<IUsersToNotifyGetter>(MockBehavior.Strict);
             usersToNotifyGetter.Setup(getter => getter.Run(It.IsAny<DateTime?>())).Returns(ImmutableArray<MemCheckUser>.Empty);
 
-            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object);
+            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
             var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync();
             Assert.AreEqual(0, result.UserNotifications.Length);
 
@@ -60,7 +61,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             var userSearchNotifier = new Mock<IUserSearchNotifier>(MockBehavior.Strict);
 
-            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object);
+            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
             var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync(now);
             Assert.AreEqual(1, result.UserNotifications.Length);
             Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
@@ -103,7 +104,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             var userSearchNotifier = new Mock<IUserSearchNotifier>(MockBehavior.Strict);
 
-            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object);
+            var notifier = new Notifier(userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
             var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync(now);
             Assert.AreEqual(1, result.UserNotifications.Length);
             Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
