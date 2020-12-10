@@ -30,7 +30,8 @@ namespace MemCheck.Application.Notifying
         {
             now = now ?? DateTime.UtcNow;
             var chrono = Stopwatch.StartNew();
-            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0);// && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
+            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
+            //var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0;
             //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
             var result = userList.ToImmutableArray();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
