@@ -216,7 +216,7 @@ namespace MemCheck.Application
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
             var imagesDetails = GetAllImagesDetails();
-            var tagNames = dbContext.Tags.AsNoTracking().Select(t => new { t.Id, t.Name }).ToImmutableDictionary(t => t.Id, t => t.Name);
+            var tagNames = GetAllAvailableTags.Run(dbContext);
 
             if (request.LearnModeIsUnknown)
                 return await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload);

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace MemCheck.Application
@@ -14,6 +15,10 @@ namespace MemCheck.Application
         public GetAllAvailableTags(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
+        }
+        public static ImmutableDictionary<Guid, string> Run(MemCheckDbContext dbContext)
+        {
+            return dbContext.Tags.AsNoTracking().Select(t => new { t.Id, t.Name }).ToImmutableDictionary(t => t.Id, t => t.Name);
         }
         public IEnumerable<ViewModel> Run()
         {
