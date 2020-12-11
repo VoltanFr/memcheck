@@ -168,7 +168,7 @@ namespace MemCheck.Application.Notifying
 
             subscription.LastRunUtcDate = runningUtcDate;
             await dbContext.SaveChangesAsync();
-            return new UserSearchNotifierResult("SearchSubscriptionNameNotImplementedYet",
+            return new UserSearchNotifierResult(SearchSubscription.NameNotImplem,
                 newFoundCards.Length,
                 newFoundCards.Take(maxCountToReport),
                 countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,

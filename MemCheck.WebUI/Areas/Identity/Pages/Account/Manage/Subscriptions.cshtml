@@ -1,0 +1,36 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+    ViewData["ActivePage"] = ManageNavPages.Subscriptions;
+}
+
+<div id="SubscriptionsMainDiv" class="page-responsive-padding" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="After mount" v-else>
+        <div id="Title" class="container">
+            <h1 class="title">@Localizer["PageTitle"]</h1>
+        </div>
+        <div id="List" class="container">
+            <table class="table table-responsive" width="100%">
+                <tr>
+                    <th>@Localizer["Name"]</th>
+                    <th>@Localizer["Details"]</th>
+                    <th>@Localizer["CardCountOnLastRun"]</th>
+                </tr>
+                <tr v-for="searchSubscription in searchSubscriptions">
+                    <td>{{searchSubscription.name}} <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(searchSubscription.id)"><i class="fas fa-pen"></i></button></td>
+                    <td>{{searchSubscription.details}}</td>
+                    <td>{{searchSubscription.cardCountOnLastRun}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Account/Subscriptions.js" asp-append-version="true"></script>
+}

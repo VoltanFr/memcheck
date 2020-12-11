@@ -6,6 +6,7 @@ namespace MemCheck.Domain
 {
     public sealed class SearchSubscription
     {
+        public const string NameNotImplem = "SearchSubscriptionNameNotImplementedYet";
         [Key] public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid ExcludedDeck { get; set; } //Guid.Empty means ignore
