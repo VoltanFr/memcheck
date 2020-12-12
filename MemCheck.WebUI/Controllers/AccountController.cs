@@ -91,7 +91,52 @@ namespace MemCheck.WebUI.Controllers
             public DateTime LastRunUtcDate { get; }
         }
         #endregion
+        #region GetSearchSubscription
+        [HttpGet("GetSearchSubscription/{Id}")]
+        public async Task<IActionResult> GetSearchSubscription(Guid id)
+        {
+            try
+            {
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new GetSearchSubscriptions.Request(userId);
+                var results = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
+                var result = results.Where(r => r.Id == id).Single();
+                return Ok(new SearchSubscriptionViewModel(result, localizer));
+            }
+            catch (RequestInputException e)
+            {
+                return ControllerError.BadRequest(e.Message, this);
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
+        #endregion
+        #region Update
+        [HttpPut("SetSearchSubscriptionName/{Id}")]
+        public async Task<IActionResult> SetSearchSubscriptionName(Guid id, [FromBody] SetSearchSubscriptionNameRequestModel request)
+        {
+            try
+            {
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
+                await new SetSearchSubscriptionName(dbContext).RunAsync(appRequest);
+                return Ok();
+            }
+            catch (RequestInputException e)
+            {
+                return ControllerError.BadRequest(e.Message, this);
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
+        }
+        public sealed class SetSearchSubscriptionNameRequestModel
+        {
+            public string NewName { get; set; } = null!;
+        }
+        #endregion
     }
 }
-
-
