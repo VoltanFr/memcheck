@@ -51,11 +51,11 @@ namespace MemCheck.Application.Notifying
             internal Result(SearchSubscription subscription, ImmutableDictionary<Guid, string> tagDictionary, ImmutableDictionary<Guid, string> deckDictionary, MemCheckDbContext dbContext)
             {
                 Id = subscription.Id;
-                Name = SearchSubscription.NameNotImplem;
+                Name = subscription.Name;
                 ExcludedDeck = subscription.ExcludedDeck == Guid.Empty ? null : deckDictionary[subscription.ExcludedDeck];
                 RequiredText = subscription.RequiredText;
                 RequiredTags = subscription.RequiredTags.Select(t => tagDictionary[t.TagId]);
-                ExcludeAllTags = subscription.excludeAllTags;
+                ExcludeAllTags = subscription.ExcludeAllTags;
                 ExcludedTags = subscription.ExcludedTags.Select(t => tagDictionary[t.TagId]);
                 RegistrationUtcDate = subscription.RegistrationUtcDate;
                 LastRunUtcDate = subscription.LastRunUtcDate;

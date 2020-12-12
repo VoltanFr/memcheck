@@ -6,13 +6,13 @@ namespace MemCheck.Domain
 {
     public sealed class SearchSubscription
     {
-        public const string NameNotImplem = "SearchSubscriptionNameNotImplementedYet";
         [Key] public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
         public Guid UserId { get; set; }
         public Guid ExcludedDeck { get; set; } //Guid.Empty means ignore
         public string RequiredText { get; set; } = null!;
         public IEnumerable<RequiredTagInSearchSubscription> RequiredTags { get; set; } = null!;
-        public bool excludeAllTags { get; set; }
+        public bool ExcludeAllTags { get; set; }
         public IEnumerable<ExcludedTagInSearchSubscription> ExcludedTags { get; set; } = null!;
         public DateTime RegistrationUtcDate { get; set; }
         public DateTime LastRunUtcDate { get; set; }

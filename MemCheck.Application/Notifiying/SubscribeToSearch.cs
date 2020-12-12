@@ -27,6 +27,7 @@ namespace MemCheck.Application.Notifying
             var search = new SearchSubscription
             {
                 UserId = request.UserId,
+                Name = request.Name,
                 ExcludedDeck = request.ExcludedDeck,
                 RequiredText = request.RequiredText,
                 RegistrationUtcDate = now,
@@ -63,10 +64,10 @@ namespace MemCheck.Application.Notifying
                 }
 
                 search.ExcludedTags = excludedTags;
-                search.excludeAllTags = false;
+                search.ExcludeAllTags = false;
             }
             else
-                search.excludeAllTags = true;
+                search.ExcludeAllTags = true;
 
             await dbContext.SaveChangesAsync();
 
@@ -75,15 +76,17 @@ namespace MemCheck.Application.Notifying
         #region Request class
         public sealed class Request
         {
-            public Request(Guid userId, Guid excludedDeck, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags)
+            public Request(Guid userId, Guid excludedDeck, string name, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags)
             {
                 UserId = userId;
+                Name = name;
                 ExcludedDeck = excludedDeck;
                 RequiredText = requiredText;
                 RequiredTags = requiredTags;
                 ExcludedTags = excludedTags;
             }
             public Guid UserId { get; }
+            public string Name { get; }
             public Guid ExcludedDeck { get; } //Guid.Empty means ignore
             public string RequiredText { get; }
             public IEnumerable<Guid> RequiredTags { get; }

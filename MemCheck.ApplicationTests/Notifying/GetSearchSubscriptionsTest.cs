@@ -70,15 +70,17 @@ namespace MemCheck.Application.Tests.Notifying
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var deckDescription = StringServices.RandomString();
             var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription);
+            var name = StringServices.RandomString();
             var requiredText = StringServices.RandomString();
             var lastNotifDate = new DateTime(2032, 1, 8);
-            var savedSubscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId, requiredText, deck, lastNotifDate);
+            var savedSubscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId, name: name, requiredText: requiredText, excludedDeckId: deck, lastNotificationDate: lastNotifDate);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetSearchSubscriptions.Request(userId);
                 var subscription = (await new GetSearchSubscriptions(dbContext).RunAsync(request)).Single();
                 Assert.AreEqual(savedSubscription.Id, subscription.Id);
+                Assert.AreEqual(name, subscription.Name);
                 Assert.AreEqual(requiredText, subscription.RequiredText);
                 Assert.AreEqual(deckDescription, subscription.ExcludedDeck);
                 Assert.AreEqual(lastNotifDate, subscription.LastRunUtcDate);

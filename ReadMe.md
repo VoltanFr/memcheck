@@ -60,7 +60,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 
 # In progress
 - Provide a way to review the list of subscribed searches, name, delete.
-- Implement mail sending about cards disappearing from search results (start at UserSearchNotifierResult.CardsNotFoundAnymore which must become a RegisteredCardDeletion)
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
 

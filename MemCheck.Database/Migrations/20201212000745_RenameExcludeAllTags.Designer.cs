@@ -4,14 +4,16 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201212000745_RenameExcludeAllTags")]
+    partial class RenameExcludeAllTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -558,10 +560,6 @@ namespace MemCheck.Database.Migrations
 
                     b.Property<DateTime>("LastRunUtcDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("RegistrationUtcDate")
                         .HasColumnType("datetime2");

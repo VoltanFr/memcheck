@@ -19,10 +19,11 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
+            var subscriptionName = StringServices.RandomString();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, subscriptionName, "", new Guid[0], new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -33,10 +34,11 @@ namespace MemCheck.Application.Tests.Notifying
                     .Include(subscription => subscription.RequiredTags)
                     .SingleAsync();
                 Assert.AreEqual(userId, subscription.UserId);
+                Assert.AreEqual(subscriptionName, subscription.Name);
                 Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
                 Assert.AreEqual("", subscription.RequiredText);
                 Assert.AreEqual(0, subscription.RequiredTags.Count());
-                Assert.IsFalse(subscription.excludeAllTags);
+                Assert.IsFalse(subscription.ExcludeAllTags);
                 Assert.AreEqual(0, subscription.ExcludedTags!.Count());
             }
         }
@@ -55,7 +57,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, deckId, "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, deckId, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -69,7 +71,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(deckId, subscription.ExcludedDeck);
                 Assert.AreEqual("", subscription.RequiredText);
                 Assert.AreEqual(0, subscription.RequiredTags.Count());
-                Assert.IsFalse(subscription.excludeAllTags);
+                Assert.IsFalse(subscription.ExcludeAllTags);
                 Assert.AreEqual(0, subscription.ExcludedTags!.Count());
             }
         }
@@ -79,10 +81,11 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var text = StringServices.RandomString();
+            var subscriptionName = StringServices.RandomString();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, text, new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, subscriptionName, text, new Guid[0], new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -93,10 +96,11 @@ namespace MemCheck.Application.Tests.Notifying
                     .Include(subscription => subscription.RequiredTags)
                     .SingleAsync();
                 Assert.AreEqual(userId, subscription.UserId);
+                Assert.AreEqual(subscriptionName, subscription.Name);
                 Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
                 Assert.AreEqual(text, subscription.RequiredText);
                 Assert.AreEqual(0, subscription.RequiredTags.Count());
-                Assert.IsFalse(subscription.excludeAllTags);
+                Assert.IsFalse(subscription.ExcludeAllTags);
                 Assert.AreEqual(0, subscription.ExcludedTags!.Count());
             }
         }
@@ -115,7 +119,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[] { tagId }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { tagId }, new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -129,7 +133,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
                 Assert.AreEqual("", subscription.RequiredText);
                 Assert.AreEqual(tagId, subscription.RequiredTags.First().TagId);
-                Assert.IsFalse(subscription.excludeAllTags);
+                Assert.IsFalse(subscription.ExcludeAllTags);
                 Assert.AreEqual(0, subscription.ExcludedTags!.Count());
             }
         }
@@ -148,7 +152,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[0], new Guid[] { tagId });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { tagId });
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -162,7 +166,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
                 Assert.AreEqual("", subscription.RequiredText);
                 Assert.AreEqual(0, subscription.RequiredTags.Count());
-                Assert.IsFalse(subscription.excludeAllTags);
+                Assert.IsFalse(subscription.ExcludeAllTags);
                 Assert.AreEqual(tagId, subscription.ExcludedTags.First().TagId);
             }
         }
@@ -174,7 +178,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[0], null);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], null);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -188,7 +192,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
                 Assert.AreEqual("", subscription.RequiredText);
                 Assert.AreEqual(0, subscription.RequiredTags.Count());
-                Assert.IsTrue(subscription.excludeAllTags);
+                Assert.IsTrue(subscription.ExcludeAllTags);
             }
         }
         [TestMethod()]
@@ -199,7 +203,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), StringServices.RandomString(), "", new Guid[0], new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -211,7 +215,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[] { Guid.NewGuid() }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { Guid.NewGuid() }, new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -223,7 +227,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[0], new Guid[] { Guid.NewGuid() });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { Guid.NewGuid() });
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -242,7 +246,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[] { tagId, tagId }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { tagId, tagId }, new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -261,7 +265,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, "", new Guid[0], new Guid[] { tagId, tagId });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { tagId, tagId });
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }

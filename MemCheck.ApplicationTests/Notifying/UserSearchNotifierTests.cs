@@ -175,11 +175,13 @@ namespace MemCheck.Application.Tests.Notifying
             var card2 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 04, 02), language: language);
 
             var someText = StringServices.RandomString();
-            var subscription = await SearchSubscriptionHelper.CreateAsync(db, user, requiredText: someText);
+            var subscriptionName = StringServices.RandomString();
+            var subscription = await SearchSubscriptionHelper.CreateAsync(db, user, subscriptionName, someText);
 
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var searchResult = await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(subscription.Id);
+                Assert.AreEqual(subscriptionName, searchResult.SubscriptionName);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
@@ -202,6 +204,7 @@ namespace MemCheck.Application.Tests.Notifying
             {
                 var searchResult = await new UserSearchNotifier(dbContext, 100, runDate).RunAsync(subscription.Id);
 
+                Assert.AreEqual(subscriptionName, searchResult.SubscriptionName);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
@@ -233,7 +236,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, "", new[] { requiredTag }, new[] { excludedTag });
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new[] { requiredTag }, new[] { excludedTag });
                 var subscriber = new SubscribeToSearch(dbContext);
                 subscriptionId = await subscriber.RunAsync(subscriberRequest);
             }
@@ -297,7 +300,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
                 subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
             }
 
@@ -362,7 +365,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, "", new Guid[0], new Guid[0]);
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
                 subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
             }
 

@@ -44,7 +44,7 @@ namespace MemCheck.Application.Notifying
                 PageNo = 0
             };
 
-            if (subscription.excludeAllTags)
+            if (subscription.ExcludeAllTags)
                 request = request with { ExcludedTags = null };
             else
                 request = request with { ExcludedTags = subscription.ExcludedTags.Select(t => t.TagId) };
@@ -168,7 +168,7 @@ namespace MemCheck.Application.Notifying
 
             subscription.LastRunUtcDate = runningUtcDate;
             await dbContext.SaveChangesAsync();
-            return new UserSearchNotifierResult(SearchSubscription.NameNotImplem,
+            return new UserSearchNotifierResult(subscription.Name,
                 newFoundCards.Length,
                 newFoundCards.Take(maxCountToReport),
                 countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
