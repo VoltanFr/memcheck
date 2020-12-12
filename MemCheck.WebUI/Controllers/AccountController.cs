@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class AccountController : Controller
+    public class AccountController : Controller, ILocalized
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
@@ -27,14 +27,32 @@ namespace MemCheck.WebUI.Controllers
             this.localizer = localizer;
             this.userManager = userManager;
         }
+        public IStringLocalizer Localizer
+        {
+            get
+            {
+                return localizer;
+            }
+        }
         #region GetSearchSubscriptions
         [HttpPost("GetSearchSubscriptions")]
         public async Task<IActionResult> GetSearchSubscriptions()
         {
-            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var appRequest = new GetSearchSubscriptions.Request(userId);
-            var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
-            return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, localizer)));
+            try
+            {
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new GetSearchSubscriptions.Request(userId);
+                var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
+                return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, localizer)));
+            }
+            catch (RequestInputException e)
+            {
+                return ControllerError.BadRequest(e.Message, this);
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
         }
         public sealed class SearchSubscriptionViewModel
         {
