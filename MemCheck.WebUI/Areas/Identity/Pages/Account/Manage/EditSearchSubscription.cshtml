@@ -28,7 +28,7 @@
                             <th style="width:80%"></th>
                         </tr>
                         <tr>
-                            <th>@Localizer["CurrentName"]</th>
+                            <th><span class="small-screen-text">@Localizer["CurrentName_SmallScreen"]</span><span class="medium-screen-text">@Localizer["CurrentName_MediumScreen"]</span><span class="big-screen-text">@Localizer["CurrentName_BigScreen"]</span></th>
                             <td>{{subscription.name}}</td>
                         </tr>
                         <tr>
@@ -36,15 +36,15 @@
                             <td>{{subscription.details}}</td>
                         </tr>
                         <tr>
-                            <th>@Localizer["CardCountOnLastRun"]</th>
+                            <th><span class="small-screen-text">@Localizer["CardCountOnLastRun_SmallScreen"]</span><span class="medium-screen-text">@Localizer["CardCountOnLastRun_MediumScreen"]</span><span class="big-screen-text">@Localizer["CardCountOnLastRun_BigScreen"]</span></th>
                             <td>{{subscription.cardCountOnLastRun}}</td>
                         </tr>
                         <tr>
-                            <th>@Localizer["SubscriptionDate"]</th>
+                            <th><span class="small-screen-text">@Localizer["SubscriptionDate_SmallScreen"]</span><span class="medium-screen-text">@Localizer["SubscriptionDate_MediumScreen"]</span><span class="big-screen-text">@Localizer["SubscriptionDate_BigScreen"]</span></th>
                             <td>{{dateTime(subscription.registrationUtcDate)}}</td>
                         </tr>
                         <tr>
-                            <th>@Localizer["LastRunDate"]</th>
+                            <th><span class="small-screen-text">@Localizer["LastRunDate_SmallScreen"]</span><span class="medium-screen-text">@Localizer["LastRunDate_MediumScreen"]</span><span class="big-screen-text">@Localizer["LastRunDate_BigScreen"]</span></th>
                             <td>{{dateTime(subscription.lastRunUtcDate)}}</td>
                         </tr>
                         <tr>
