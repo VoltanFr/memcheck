@@ -59,7 +59,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
   - Cascade delete behaves differently.
 
 # In progress
-- Provide a way to review the list of subscribed searches, name, delete.
 - L'abonnement à une même recherche une deuxième fois doit être refusé
 - Limiter à 5 le nombre de recherches auxquelles un utilisateur peut s'abonner
 

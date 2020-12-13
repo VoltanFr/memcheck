@@ -62,23 +62,27 @@ namespace MemCheck.WebUI.Controllers
                 Name = searchSubscription.Name;
                 var details = new StringBuilder();
                 if (searchSubscription.ExcludedDeck != null)
-                    details.Append(localizer["ExcludedDeck"].Value + ' ' + searchSubscription.ExcludedDeck + "<br/>");
+                    details.Append(localizer["ExcludedDeck"].Value + ' ' + searchSubscription.ExcludedDeck + ", ");
                 if (searchSubscription.RequiredText.Length > 0)
-                    details.Append(localizer["RequiredText"].Value + ' ' + searchSubscription.RequiredText + "<br/>");
-                if (searchSubscription.RequiredTags.Any())
-                    details.Append(localizer["RequiredTags"].Value + ' ' + string.Join(',', searchSubscription.RequiredTags) + "<br/>");
+                    details.Append(localizer["RequiredText"].Value + " '" + searchSubscription.RequiredText + "', ");
+                if (searchSubscription.RequiredTags.Count() == 1)
+                    details.Append(localizer["RequiredTag"].Value + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
+                if (searchSubscription.RequiredTags.Count() > 1)
+                    details.Append(localizer["RequiredTags"].Value + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
                 if (searchSubscription.ExcludeAllTags)
-                    details.Append(localizer["OnlyCardsWithNoTag"].Value + "<br/>");
+                    details.Append(localizer["OnlyCardsWithNoTag"].Value + ", ");
                 else
-                if (searchSubscription.ExcludedTags.Any())
-                    details.Append(localizer["ExcludedTags"].Value + ' ' + string.Join(',', searchSubscription.ExcludedTags) + "<br/>");
+                if (searchSubscription.ExcludedTags.Count() == 1)
+                    details.Append(localizer["ExcludedTag"].Value + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+                if (searchSubscription.ExcludedTags.Count() > 1)
+                    details.Append(localizer["ExcludedTags"].Value + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
                 if (details.Length == 0)
                     details.Append(localizer["AllCards"].Value);
                 Details = details.ToString();
                 CardCountOnLastRun = searchSubscription.CardCountOnLastRun;
                 RegistrationUtcDate = searchSubscription.RegistrationUtcDate;
                 LastRunUtcDate = searchSubscription.LastRunUtcDate;
-                DeleteConfirmMessage = localizer["AreYouSureYouWantToDeleteTheSearchHead"].Value + " '" + Name + "'" + localizer["AreYouSureYouWantToDeleteTheSearchTail"].Value;
+                DeleteConfirmMessage = localizer["AreYouSureYouWantToDeleteTheSearch"].Value + " '" + Name + "'";
             }
             public Guid Id { get; }
             public string Name { get; } = null!;
