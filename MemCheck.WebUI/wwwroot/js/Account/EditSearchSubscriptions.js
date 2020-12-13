@@ -19,7 +19,6 @@ var app = new Vue({
         async save() {
             await axios.put('/Account/SetSearchSubscriptionName/' + this.subscription.id, { NewName: this.newName })
                 .then(result => {
-                    tellAxiosSuccess(result.ToastMessage, result.ToastTitle, this);
                     if (this.returnUrl)
                         window.location = this.returnUrl;
                     else

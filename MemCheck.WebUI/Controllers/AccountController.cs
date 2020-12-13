@@ -113,7 +113,7 @@ namespace MemCheck.WebUI.Controllers
             }
         }
         #endregion
-        #region Update
+        #region SetSearchSubscriptionName
         [HttpPut("SetSearchSubscriptionName/{Id}")]
         public async Task<IActionResult> SetSearchSubscriptionName(Guid id, [FromBody] SetSearchSubscriptionNameRequestModel request)
         {
