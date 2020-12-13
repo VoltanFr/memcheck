@@ -3,6 +3,7 @@ var app = new Vue({
     data: {
         allData: null, //HomeController.GetAllViewModel
         reload: false,
+        dateTimeMinValue: "9999-12-31T23:59:59.9999999",
     },
     async mounted() {
         await this.getAll();

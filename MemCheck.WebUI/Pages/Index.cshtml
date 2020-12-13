@@ -49,7 +49,7 @@
                             </li>
                             <li id="ExpiredCardsInfoSingleDeck">
                                 <span v-if="allData.userDecks[0].expiredCardCount == 0">
-                                    @Localizer["No"] @Localizer["ExpiredCard"] (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
+                                    @Localizer["No"] @Localizer["ExpiredCard"]<span v-if="allData.userDecks[0].nextExpiryUTCDate != dateTimeMinValue"> (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}})</span>.
                                 </span>
                                 <span v-else>
                                     <a asp-page="/Learn/Index" asp-route-LearnMode="Expired">{{allData.userDecks[0].expiredCardCount}} <span v-if="allData.userDecks[0].expiredCardCount > 1">@Localizer["ExpiredCards"]</span><span v-else>@Localizer["ExpiredCard"]</span></a>.
