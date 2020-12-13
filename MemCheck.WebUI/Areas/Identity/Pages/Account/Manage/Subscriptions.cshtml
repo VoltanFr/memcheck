@@ -21,8 +21,8 @@
             <table class="table table-responsive" width="100%">
                 <tr>
                     <th>@Localizer["Name"]</th>
-                    <th>@Localizer["Details"]</th>
-                    <th>@Localizer["CardCountOnLastRun"]</th>
+                    <th style="text-align: center">@Localizer["Details"]</th>
+                    <th style="text-align: center"><span class="small-screen-text">@Localizer["CardCountOnLastRun_SmallScreen"]</span><span class="medium-screen-text">@Localizer["CardCountOnLastRun_MediumScreen"]</span><span class="big-screen-text">@Localizer["CardCountOnLastRun_BigScreen"]</span></th>
                 </tr>
                 <tr v-for="searchSubscription in searchSubscriptions">
                     <td>
@@ -30,8 +30,8 @@
                         <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(searchSubscription.id)"><i class="fas fa-pen"></i></button>
                         <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="deleteSubscription(searchSubscription)"><i class="far fa-trash-alt"></i></button>
                     </td>
-                    <td>{{searchSubscription.details}}</td>
-                    <td>{{searchSubscription.cardCountOnLastRun}}</td>
+                    <td style="text-align: center">{{searchSubscription.details}}</td>
+                    <td style="text-align: center">{{searchSubscription.cardCountOnLastRun}}</td>
                 </tr>
             </table>
         </div>

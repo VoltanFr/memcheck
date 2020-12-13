@@ -464,6 +464,18 @@
 }
 
 @media (max-width: 550px) {
+    .small-screen-text {
+        display: inline-block;
+    }
+
+    .medium-screen-text {
+        display: none;
+    }
+
+    .big-screen-text {
+        display: none;
+    }
+
     .learning-small-button {
         height: 22px;
         border-radius: 2px;
@@ -605,6 +617,18 @@
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
+    .small-screen-text {
+        display: none;
+    }
+
+    .medium-screen-text {
+        display: inline-block;
+    }
+
+    .big-screen-text {
+        display: none;
+    }
+
     #MoveTwoPagesBackward, #MoveTwoPagesForward, #MoveTenPagesBackward, #MoveTenPagesForward {
         display: none;
     }
@@ -702,6 +726,20 @@
         .learning-card-body table {
             padding-bottom: 17px;
         }
+}
+
+@media (min-width: 979px) {
+    .small-screen-text {
+        display: none;
+    }
+
+    .medium-screen-text {
+        display: none;
+    }
+
+    .big-screen-text {
+        display: inline-block;
+    }
 }
 
 .btn-circle.btn-sm {
