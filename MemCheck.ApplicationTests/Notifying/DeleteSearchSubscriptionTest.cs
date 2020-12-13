@@ -87,5 +87,48 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.IsFalse(subscriptions.Any(s => s.Id == subscription.Id));
             }
         }
+        [TestMethod()]
+        public async Task CascadeDeletion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+
+            Guid tagId1;
+            using (var dbContext = new MemCheckDbContext(db))
+                tagId1 = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+
+            var user = await UserHelper.CreateInDbAsync(db);
+            await CardHelper.CreateAsync(db, user, tagIds: new[] { tagId1 });
+            await CardHelper.CreateAsync(db, user);
+            await CardHelper.CreateAsync(db, user, tagIds: new[] { tagId1 });
+
+            Guid subscriptionId;
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var tagId2 = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                var tagId3 = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                var request = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new[] { tagId1 }, new[] { tagId2, tagId3 });
+                subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(2, dbContext.CardsInSearchResults.Count(c => c.SearchSubscriptionId == subscriptionId));
+                Assert.AreEqual(1, dbContext.RequiredTagInSearchSubscriptions.Count(c => c.SearchSubscriptionId == subscriptionId));
+                Assert.AreEqual(2, dbContext.ExcludedTagInSearchSubscriptions.Count(c => c.SearchSubscriptionId == subscriptionId));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteSearchSubscription(dbContext).RunAsync(new DeleteSearchSubscription.Request(user, subscriptionId));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(0, dbContext.CardsInSearchResults.Count(c => c.SearchSubscriptionId == subscriptionId));
+                Assert.AreEqual(0, dbContext.RequiredTagInSearchSubscriptions.Count(c => c.SearchSubscriptionId == subscriptionId));
+                Assert.AreEqual(0, dbContext.ExcludedTagInSearchSubscriptions.Count(c => c.SearchSubscriptionId == subscriptionId));
+            }
+        }
     }
 }
