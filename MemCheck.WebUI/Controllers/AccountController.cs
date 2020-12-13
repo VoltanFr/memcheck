@@ -56,9 +56,6 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class SearchSubscriptionViewModel
         {
-            #region Fields
-            private readonly IStringLocalizer<AccountController> localizer;
-            #endregion
             public SearchSubscriptionViewModel(GetSearchSubscriptions.Result searchSubscription, IStringLocalizer<AccountController> localizer)
             {
                 Id = searchSubscription.Id;
@@ -81,7 +78,7 @@ namespace MemCheck.WebUI.Controllers
                 CardCountOnLastRun = searchSubscription.CardCountOnLastRun;
                 RegistrationUtcDate = searchSubscription.RegistrationUtcDate;
                 LastRunUtcDate = searchSubscription.LastRunUtcDate;
-                this.localizer = localizer;
+                DeleteConfirmMessage = localizer["AreYouSureYouWantToDeleteTheSearchHead"].Value + " '" + Name + "'" + localizer["AreYouSureYouWantToDeleteTheSearchTail"].Value;
             }
             public Guid Id { get; }
             public string Name { get; } = null!;
@@ -89,6 +86,7 @@ namespace MemCheck.WebUI.Controllers
             public int CardCountOnLastRun { get; }
             public DateTime RegistrationUtcDate { get; }
             public DateTime LastRunUtcDate { get; }
+            public string DeleteConfirmMessage { get; } = null!;
         }
         #endregion
         #region GetSearchSubscription
@@ -136,6 +134,23 @@ namespace MemCheck.WebUI.Controllers
         public sealed class SetSearchSubscriptionNameRequestModel
         {
             public string NewName { get; set; } = null!;
+        }
+        #endregion
+        #region DeleteSearchSubscription
+        [HttpDelete("DeleteSearchSubscription/{Id}")]
+        public async Task<IActionResult> DeleteSearchSubscription(Guid id)
+        {
+            try
+            {
+                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+                var appRequest = new DeleteSearchSubscription.Request(userId, id);
+                await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
+                return base.Ok(localizer["Deleted"].Value);
+            }
+            catch (Exception e)
+            {
+                return ControllerError.BadRequest(e, this);
+            }
         }
         #endregion
     }

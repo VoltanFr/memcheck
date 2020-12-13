@@ -25,7 +25,11 @@
                     <th>@Localizer["CardCountOnLastRun"]</th>
                 </tr>
                 <tr v-for="searchSubscription in searchSubscriptions">
-                    <td>{{searchSubscription.name}} <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(searchSubscription.id)"><i class="fas fa-pen"></i></button></td>
+                    <td>
+                        {{searchSubscription.name}}
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(searchSubscription.id)"><i class="fas fa-pen"></i></button>
+                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="deleteSubscription(searchSubscription)"><i class="far fa-trash-alt"></i></button>
+                    </td>
                     <td>{{searchSubscription.details}}</td>
                     <td>{{searchSubscription.cardCountOnLastRun}}</td>
                 </tr>

@@ -30,5 +30,21 @@ var app = new Vue({
         edit(searchSubscriptionId) {
             window.location.href = "/Identity/Account/Manage/EditSearchSubscription?Id=" + searchSubscriptionId + "&ReturnUrl=" + window.location;
         },
+        async deleteSubscription(subscription) {
+            if (confirm(subscription.deleteConfirmMessage)) {
+                this.loading = true;
+
+                await axios.delete('/Account/DeleteSearchSubscription/' + subscription.id)
+                    .then(result => {
+                        tellAxiosSuccess(result.data, "", this);
+                    })
+                    .catch(error => {
+                        tellAxiosError(error, this);
+                    });
+
+                this.loading = false;
+                await this.getSearchSubscriptions();
+            }
+        },
     },
 });
