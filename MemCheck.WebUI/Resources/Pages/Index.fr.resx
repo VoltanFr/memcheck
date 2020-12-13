@@ -216,4 +216,22 @@
   <data name="No" xml:space="preserve">
     <value>Aucune</value>
   </data>
+  <data name="CreatingSome" xml:space="preserve">
+    <value>en créant</value>
+  </data>
+  <data name="OrBy" xml:space="preserve">
+    <value>ou en</value>
+  </data>
+  <data name="ThereIsNoCardIn" xml:space="preserve">
+    <value>Il n'y a aucune carte dans</value>
+  </data>
+  <data name="TheSearchPage" xml:space="preserve">
+    <value>la page de recherche</value>
+  </data>
+  <data name="YourDecks" xml:space="preserve">
+    <value>vos paquets</value>
+  </data>
+  <data name="YouShouldAddCardsEitherFrom" xml:space="preserve">
+    <value>Vous pouvez ajouter des cartes depuis</value>
+  </data>
 </root>

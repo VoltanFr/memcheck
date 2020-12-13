@@ -59,23 +59,31 @@
                     </div>
                 </div>
                 <div id="Nothing to do" v-else>
-                    <p>@Localizer["PerfectMemory"]</p>
-                    <p>
-                        @Localizer["NoUnkownOrExpiredCardAmongThe"] {{allData.totalCardCountInDecksOfUser}}
-                        <span v-if="allData.userDecks.length == 1">
-                            @Localizer["CardsOfYourSingleDeck"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">{{allData.userDecks[0].description}}</a>
-                            (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
-                        </span>
-                        <div v-if="allData.userDecks.length > 1">
-                            @Localizer["CardsOfYourMultipleDecks"] {{allData.userDecks.length}} @Localizer["Decks"]
-                            <ul>
-                                <li v-for="deck in allData.userDecks">
-                                    @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
-                                    <span>(@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}})</span>.
-                                </li>
-                            </ul>
-                        </div>
-                    </p>
+                    <div id="User has no card" v-if="allData.totalCardCountInDecksOfUser == 0">
+                        <p>
+                            @Localizer["ThereIsNoCardIn"] <span v-if="allData.userDecks.length > 1">{{allData.userDecks.length}} @Localizer["YourDecks"]</span><span v-else>@Localizer["YourDeck"]</span>.
+                            @Localizer["YouShouldAddCardsEitherFrom"] <a href="/Search/Index">@Localizer["TheSearchPage"]</a> @Localizer["OrBy"] <a href="/Authoring/Index">@Localizer["CreatingSome"]</a>.
+                        </p>
+                    </div>
+                    <div id="User has cards" v-else>
+                        <p>@Localizer["PerfectMemory"]</p>
+                        <p>
+                            @Localizer["NoUnkownOrExpiredCardAmongThe"] {{allData.totalCardCountInDecksOfUser}}
+                            <span id="SingleDeck" v-if="allData.userDecks.length == 1">
+                                @Localizer["CardsOfYourSingleDeck"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">{{allData.userDecks[0].description}}</a>
+                                (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
+                            </span>
+                            <div id="MultipleDeck" v-if="allData.userDecks.length > 1">
+                                @Localizer["CardsOfYourMultipleDecks"] {{allData.userDecks.length}} @Localizer["Decks"]
+                                <ul>
+                                    <li v-for="deck in allData.userDecks">
+                                        @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
+                                        <span>(@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}})</span>.
+                                    </li>
+                                </ul>
+                            </div>
+                        </p>
+                    </div>
                 </div>
             </div>
             <div id="No deck" v-else>
@@ -83,7 +91,7 @@
                 <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
             </div>
             <footer id="Data time" style="padding-top:50px">
-                @Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.
+                <small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.</small>
             </footer>
         </div>
         <div id="User not loggedin" v-else>

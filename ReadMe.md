@@ -64,13 +64,11 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Translate the email sent when creating a new account (find in the code "Please confirm your account by")
 - In the welcome mail sent after account creation, the hyperlink to the doc should open the doc page in the same language as the language of the mail (find in the code "Vous pouvez aller lire la")
 
-
 # Bugs
 
 # To do, at little cost
 - Effacement image si pas utilisée. Nécessite d'abord recherche avec une image donnée pour pouvoir remplacer, et affichage "Utilisée dans n pages" avec lien
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
-- After creating a deck, show a message such as "Congratulations, you have created a deck. Next, you probably want to browse the cards and select some to add to the deck." (browse the cards étant un lien)
 - Translate all the pages of the identity area (and consider improving each)
 - Upon creating a new version of a card, warn that this will impact n users who have it in a deck.
 - Reducing the visibility of a card should not permit to make it invisible to a user who has it in a deck, or to the owner of a version. Introduce function card visibility can be reduced : true if no other user has the card in a deck or has another version of the card. See comment in UpdateCard.Request.CheckValidityAsync.
@@ -149,3 +147,5 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - User option to not present the same not known card to learn in 24h : Stash learning failure for 24 hours in the discard pile. Carte coincée dans la pioche
 - Do something about orphan cards: cards whose only user with view is a deleted account (ie previous cards). Delete them? (by making them Previous)
 - Statistics page. Option to filter on cards the user has created a version of. See : nb decks containing a card. Average evaluation of card. Nb versions of card. Age of card. Nb versions of card. Nb users who have created versions of the card
+- Ignorer les accents dans les recherches (cartes, images, labels). Peut-être qu'il suffit d'utiliser InvariantCultureIgnoreCase. Idéalement la recherche de "Que signifie bâbord" devrait trouver "Que signifie _bâbord_". ça va dans le sens d'avoir un vrai moteur de recherche
+
