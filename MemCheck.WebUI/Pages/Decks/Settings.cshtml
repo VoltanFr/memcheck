@@ -30,7 +30,7 @@
                         <th>@Localizer["HeapingAlgorithm"]</th>
                         <td>
                             <select v-model="activeDeck.heapingAlgorithmId"><option v-for="heapingAlgorithm in heapingAlgorithms" v-bind:value="heapingAlgorithm.id">{{heapingAlgorithm.nameInCurrentLanguage}}</option></select><br />
-                            <label style="padding:0px">{{currentHeapingAlgorithmDescription()}}</label>
+                            <small class="form-text text-muted">{{currentHeapingAlgorithmDescription()}}</small>
                         </td>
                     </tr>
                     <tr id="CardCount" v-if="activeDeck">

@@ -37,7 +37,7 @@
                         <th>@Localizer["HeapingAlgorithm"]</th>
                         <td>
                             <textarea class="form-control responsive-padding-edit" v-model="activeDeck.heapingAlgorithmName" readonly="readonly" rows="1"></textarea><br />
-                            <label style="padding:0px">{{activeDeck.heapingAlgorithmDescription}}</label>
+                            <small class="form-text text-muted">{{activeDeck.heapingAlgorithmDescription}}</small>
                         </td>
                     </tr>
                     <tr id="CardCount" v-if="activeDeck">

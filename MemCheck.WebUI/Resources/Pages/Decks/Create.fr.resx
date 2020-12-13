@@ -121,7 +121,7 @@
     <value>Nom</value>
   </data>
   <data name="DescriptionAdditionalInfo" xml:space="preserve">
-    <value>Choisissez une description courte (par exemple "Principal")</value>
+    <value>Choisissez un nom court (par exemple "Mon paquet" ou "Principal")</value>
   </data>
   <data name="HeapingAlgo" xml:space="preserve">
     <value>Algorithme de parcours des piles</value>
