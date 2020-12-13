@@ -59,17 +59,15 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
   - Cascade delete behaves differently.
 
 # In progress
+- Faire le cheminement d'un nouvel utilisateur, pas à pas, pour qu'il soit bien guidé
 
 # Bugs
 
 # To do, at little cost
-- Check by unit test that it is not possible for a user to learn a card he does not have access to (both in repeat and learn modes)
 - Effacement image si pas utilisée. Nécessite d'abord recherche avec une image donnée pour pouvoir remplacer, et affichage "Utilisée dans n pages" avec lien
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
 - After creating a deck, show a message such as "Congratulations, you have created a deck. Next, you probably want to browse the cards and select some to add to the deck." (browse the cards étant un lien)
-- Faire le cheminement d'un nouvel utilisateur, pas à pas, pour qu'il soit bien guidé
 - Translate all the pages of the identity area (and consider improving each)
-- Ignorer les accents dans les recherches (cartes, images, labels). Peut-être qu'il suffit d'utiliser InvariantCultureIgnoreCase. Idéalement la recherche de "Que signifie bâbord" devrait trouver "Que signifie _bâbord_". ça va dans le sens d'avoir un vrai moteur de recherche
 - Upon creating a new version of a card, warn that this will impact n users who have it in a deck.
 - Reducing the visibility of a card should not permit to make it invisible to a user who has it in a deck, or to the owner of a version. Introduce function card visibility can be reduced : true if no other user has the card in a deck or has another version of the card. See comment in UpdateCard.Request.CheckValidityAsync.
 - Vérifier si getcards dans learn affiche l'info si le chargement échoue
@@ -78,6 +76,7 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Implement unit test to prove that a user without visibility on a card can not delete it
 - Offer a diff view from the card history page
 - The mail sent by notifier should include an history and a diff links
+- Fix the hyperlinks in the doc pages
 
 # To do at medium cost
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).
