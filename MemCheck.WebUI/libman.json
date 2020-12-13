@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "bootstrap-vue@2.19.0",
+      "library": "bootstrap-vue@2.20.1",
       "destination": "wwwroot/lib/bootstrap-vue/",
       "files": [
         "bootstrap-vue.min.js",
