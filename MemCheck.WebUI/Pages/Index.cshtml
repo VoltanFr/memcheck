@@ -80,7 +80,7 @@
             </div>
             <div id="No deck" v-else>
                 <p>@Localizer["YouDontHaveADeckYet"]. @Localizer["YouCanCreateOneOn"] <a asp-page="/Decks/Create">@Localizer["TheDecksPage"]</a>.</p>
-                <p>@Localizer["YouMayAlsoWantToRead"] <a asp-page="/Doc">@Localizer["TheDoc"]</a>.</p>
+                <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
             </div>
             <footer id="Data time" style="padding-top:50px">
                 @Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.

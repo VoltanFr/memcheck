@@ -61,6 +61,10 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 # In progress
 - Faire le cheminement d'un nouvel utilisateur, pas à pas, pour qu'il soit bien guidé
 
+- Translate the email sent when creating a new account (find in the code "Please confirm your account by")
+- In the welcome mail sent after account creation, the hyperlink to the doc should open the doc page in the same language as the language of the mail (find in the code "Vous pouvez aller lire la")
+
+
 # Bugs
 
 # To do, at little cost
@@ -90,6 +94,7 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public)
 - Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
 - Use Azure functions to run Notifier on cron intervals. This is not implemented yet because Azure functions don't support .NET 5 yet (should be available by Jan 2021).
+- Check by unit test that the documentation contains no broken hyperlink (probably needs to render it)
 
 # To do at big cost
 - Card authoring: Have the user review his changes before saving a new version of a resource (card, tag, deck)
