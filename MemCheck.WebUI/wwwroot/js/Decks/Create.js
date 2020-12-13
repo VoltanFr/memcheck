@@ -32,7 +32,7 @@ var app = new Vue({
                 .catch(error => {
                     tellAxiosError(error, this);
                 });
-            window.location.href = '/Decks';
+            window.location.href = '/';
         },
     },
 });
