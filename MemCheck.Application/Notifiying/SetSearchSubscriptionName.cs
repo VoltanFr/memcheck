@@ -1,9 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,20 +22,6 @@ namespace MemCheck.Application.Notifying
             var subscription = await dbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
             subscription.Name = request.Name;
             await dbContext.SaveChangesAsync();
-        }
-        internal static void CreateSubscription(MemCheckDbContext dbContext, Guid userId, Guid cardId, DateTime registrationUtcDate, int registrationMethod)
-        {
-            if (dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.CardId == cardId).Any())
-                return;
-            CardNotificationSubscription notif = new CardNotificationSubscription
-            {
-                CardId = cardId,
-                UserId = userId,
-                RegistrationUtcDate = registrationUtcDate,
-                RegistrationMethod = registrationMethod,
-                LastNotificationUtcDate = registrationUtcDate
-            };
-            dbContext.CardNotifications.Add(notif);
         }
         #region Request class
         public sealed class Request
