@@ -76,6 +76,7 @@ namespace MemCheck.Application.Notifying
         #region Request class
         public sealed class Request
         {
+            public const int MaxSubscriptionCount = 5;
             public Request(Guid userId, Guid excludedDeck, string name, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags)
             {
                 UserId = userId;
@@ -117,9 +118,13 @@ namespace MemCheck.Application.Notifying
                 foreach (var requiredTag in RequiredTags)
                     if (!dbContext.Tags.Any(t => t.Id == requiredTag))
                         throw new RequestInputException($"Invalid required tag id '{requiredTag}'");
+
                 if (RequiredTags.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
                     throw new RequestInputException("Required tag list contains duplicate");
 
+                int userSubscriptionsCount = dbContext.SearchSubscriptions.Count(s => s.UserId == UserId);
+                if (userSubscriptionsCount >= MaxSubscriptionCount)
+                    throw new RequestInputException($"User already has {userSubscriptionsCount} subscriptions, can not have more than {MaxSubscriptionCount}");
             }
         }
         #endregion

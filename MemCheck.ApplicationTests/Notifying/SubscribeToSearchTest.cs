@@ -269,5 +269,20 @@ namespace MemCheck.Application.Tests.Notifying
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
+        [TestMethod()]
+        public async Task TestTooManySubscriptions()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            using (var dbContext = new MemCheckDbContext(testDB))
+                for (int i = 0; i < SubscribeToSearch.Request.MaxSubscriptionCount; i++)
+                    await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]));
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
+            }
+        }
     }
 }
