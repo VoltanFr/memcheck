@@ -112,10 +112,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid tagId;
 
             using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var user = await dbContext.Users.SingleAsync();
                 tagId = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
-            }
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

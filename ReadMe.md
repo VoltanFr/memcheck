@@ -59,7 +59,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
   - Cascade delete behaves differently.
 
 # In progress
-- Add a unit test to check that deleting a search subscription cascade deletes the list of cards in the last notification
 
 # Bugs
 
