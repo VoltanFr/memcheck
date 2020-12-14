@@ -5,12 +5,12 @@ Un apprentissage consiste à regarder la question, formuler pour soi-même une r
 
 ## Vous choisissez ce que vous voulez apprendre
 - Vous pouvez sélectionner des choses à apprendre parmi la base de données des cartes disponibles.
-    La recherche se fait dans le menu [Cartes/Parcourir](https://memcheck.azurewebsites.net/Search/Index).
+    La recherche se fait dans le menu [Cartes/Parcourir](https://memcheckfr.azurewebsites.net/Search/Index).
     Dépliez la zone des critères de sélection par le menu à trois points.
     Par exemple, si voulez apprendre à identifier les régions françaises, spécifiez comme label requis "Régions françaises".
     Dans la liste, vous pouvez cocher des cartes, puis les ajouter à votre paquet en utilisant le bouton en forme de paquet en haut à gauche.
 - Créer vos cartes est aussi très facile.
-    Ça se passe dans la [page dédiée](https://memcheck.azurewebsites.net/Authoring/Index).
+    Ça se passe dans la [page dédiée](https://memcheckfr.azurewebsites.net/Authoring/Index).
     Vous contrôlez la visibilité des cartes que vous créez (strictement privées, visibles seulement par des utilisateurs spécifiés, publiques).
 
 ## L'apprentissage
@@ -29,4 +29,4 @@ Les faces des cartes peuvent aussi contenir des images en plus de texte.
 MemCheck est une solution coopérative : les cartes publiques peuvent être modifiées par tous les utilisateurs, dans le but d'amélioration continue.
 Pas de panique : quand quelqu'un modifie une carte, il s'agit d'une nouvelle version et l'historique des versions est conservé, permettant de ne pas perdre d'information.
 Vous pouvez "suivre" des cartes, et recevoir des notifications quand elles sont modifiées.
-À propos de la création de cartes publiques, nous vous recommandons la lecture de la page [Créer des cartes de qualité](https://memcheck.azurewebsites.net/Doc/MdRenderer?refererRoute=%2FAuthoring%2FIndex&cultureName=fr).
+À propos de la création de cartes publiques, nous vous recommandons la lecture de la page [Créer des cartes de qualité](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRoute=%2FAuthoring%2FIndex&cultureName=fr).
