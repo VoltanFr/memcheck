@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Linq;
 using System.Threading.Tasks;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +8,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Localization;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 {
@@ -19,15 +17,18 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IStringLocalizer<EmailModel> localizer;
 
         public EmailModel(
             UserManager<MemCheckUser> userManager,
             SignInManager<MemCheckUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IStringLocalizer<EmailModel> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            this.localizer = localizer;
         }
 
         public string Username { get; set; } = null!;
@@ -79,9 +80,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -100,12 +99,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
                     values: new { userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
 
-                var body = MailHelper.GetBody(user, callbackUrl, "Please confirm your account");
+                var mailBody = new StringBuilder();
+                mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+                mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
+                mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
 
-                await _emailSender.SendEmailAsync(
-                    Input.NewEmail,
-                    "Confirm your email",
-                    body);
+                await _emailSender.SendEmailAsync(Input.NewEmail, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
                 StatusMessage = "Confirmation link to change email sent. Please check your email.";
                 return RedirectToPage();
@@ -139,12 +138,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
                 values: new { area = "Identity", userId = userId, code = code },
                 protocol: Request.Scheme);
 
-            var body = MailHelper.GetBody(user, callbackUrl, "Please confirm your account");
+            var mailBody = new StringBuilder();
+            mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+            mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
+            mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
 
-            await _emailSender.SendEmailAsync(
-                email,
-                "Confirm your email",
-                body);
+            await _emailSender.SendEmailAsync(email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToPage();

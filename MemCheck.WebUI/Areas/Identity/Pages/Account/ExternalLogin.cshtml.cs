@@ -112,58 +112,61 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = "/")
         {
-            returnUrl = returnUrl ?? Url.Content("~/") ?? "/";
-            // Get the information about the user from the external login provider
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                ErrorMessage = "Error loading external login information during confirmation.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
-            }
+            ErrorMessage = "External login is not implemented.";
+            await Task.CompletedTask;
+            return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+            //returnUrl = returnUrl ?? Url.Content("~/") ?? "/";
+            //// Get the information about the user from the external login provider
+            //var info = await _signInManager.GetExternalLoginInfoAsync();
+            //if (info == null)
+            //{
+            //    ErrorMessage = "Error loading external login information during confirmation.";
+            //    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+            //}
 
-            if (ModelState.IsValid)
-            {
-                var user = new MemCheckUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await _userManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+            //if (ModelState.IsValid)
+            //{
+            //    var user = new MemCheckUser { UserName = Input.Email, Email = Input.Email };
+            //    var result = await _userManager.CreateAsync(user);
+            //    if (result.Succeeded)
+            //    {
+            //        result = await _userManager.AddLoginAsync(user, info);
+            //        if (result.Succeeded)
+            //        {
+            //            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
-                        // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        {
-                            return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
-                        }
+            //            // If account confirmation is required, we need to show the link if we don't have a real email sender
+            //            if (_userManager.Options.SignIn.RequireConfirmedAccount)
+            //            {
+            //                return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
+            //            }
 
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
+            //            await _signInManager.SignInAsync(user, isPersistent: false);
+            //            var userId = await _userManager.GetUserIdAsync(user);
+            //            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            //            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            //            var callbackUrl = Url.Page(
+            //                "/Account/ConfirmEmail",
+            //                pageHandler: null,
+            //                values: new { area = "Identity", userId = userId, code = code },
+            //                protocol: Request.Scheme);
 
-                        var body = MailHelper.GetBody(user, callbackUrl, "Please confirm your account");
+            //            var body = MailHelper.GetBody(user, callbackUrl, "Please confirm your account");
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", body);
+            //            await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", body);
 
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
+            //            return LocalRedirect(returnUrl);
+            //        }
+            //    }
+            //    foreach (var error in result.Errors)
+            //    {
+            //        ModelState.AddModelError(string.Empty, error.Description);
+            //    }
+            //}
 
-            LoginProvider = info.LoginProvider;
-            ReturnUrl = returnUrl;
-            return Page();
+            //LoginProvider = info.LoginProvider;
+            //ReturnUrl = returnUrl;
+            //return Page();
         }
     }
 }

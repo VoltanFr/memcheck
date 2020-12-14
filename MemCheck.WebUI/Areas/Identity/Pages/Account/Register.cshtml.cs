@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -14,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using MemCheck.WebUI.Areas.Identity.Pages.Account.Manage;
+using Microsoft.Extensions.Localization;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 {
@@ -25,17 +24,20 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IStringLocalizer<RegisterModel> localizer;
 
         public RegisterModel(
             UserManager<MemCheckUser> userManager,
             SignInManager<MemCheckUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IStringLocalizer<RegisterModel> localizer)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            this.localizer = localizer;
         }
 
         [BindProperty]
@@ -86,14 +88,15 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    var body = MailHelper.GetBody(user, callbackUrl, "Please confirm your account");
+                    var mailBody = new StringBuilder();
+                    mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+                    mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
+                    mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", body);
+                    await _emailSender.SendEmailAsync(Input.Email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
                         return RedirectToPage("RegisterConfirmation", new { userName = Input.UserName });
-                    }
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
