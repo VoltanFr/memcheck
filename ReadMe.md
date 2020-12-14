@@ -59,8 +59,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
   - Cascade delete behaves differently.
 
 # In progress
-- Translate the email sent when creating a new account (find in the code "Please confirm your account by")
-- In the welcome mail sent after account creation, the hyperlink to the doc should open the doc page in the same language as the language of the mail (find in the code "Vous pouvez aller lire la")
 
 # Bugs
 

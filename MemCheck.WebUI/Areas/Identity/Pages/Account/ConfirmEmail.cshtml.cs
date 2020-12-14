@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using MemCheck.Domain;
@@ -12,6 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Globalization;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 {
@@ -27,14 +25,14 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             var hello = localizer["Hello"];
             var welcome = localizer["Welcome"];
             var docLine = localizer["DocLine"];
-            var p = Url.Page(pageName: "/Doc/MdRenderer", pageHandler: null, values: null, protocol: Request.Scheme);
-            var docUrl = HtmlEncoder.Default.Encode(p);
+            var url = Url.Page(pageName: $"/Doc/MdRenderer", pageHandler: null, values: null, protocol: Request.Scheme);
+            url = url + $"?cultureName={CultureInfo.CurrentCulture.TwoLetterISOLanguageName}";
             var docLinkText = localizer["DocLinkText"];
             var appLine = localizer["AppLine"];
             var appUrl = HtmlEncoder.Default.Encode(Url.Page(pageName: "/Index", pageHandler: null, values: null, protocol: Request.Scheme));
             var appLinkText = localizer["AppLinkText"];
             var thank = localizer["Thank"];
-            var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='{docUrl}'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
+            var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='{HtmlEncoder.Default.Encode(url)}'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
             await emailSender.SendEmailAsync(user.Email, localizer["WelcomeMailSubject"], body);
         }
 
