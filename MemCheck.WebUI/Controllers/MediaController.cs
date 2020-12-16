@@ -344,6 +344,9 @@ namespace MemCheck.WebUI.Controllers
                 type = localizer["BigSizeImageLabel_Type"].Value,
                 closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
                 downloadBiggestSize = localizer["BigSizeImageLabel_DownloadBiggestSize"].Value,
+                copyToClipboardButtonTitle = localizer["BigSizeImageLabel_CopyToClipboard"].Value,
+                copiedToClipboardToastTitleOnSuccess = localizer["BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"].Value,
+                copiedToClipboardToastTitleOnFailure = localizer["BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure"].Value,
             });
         }
         #endregion

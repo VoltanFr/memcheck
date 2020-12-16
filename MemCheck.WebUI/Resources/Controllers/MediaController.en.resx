@@ -126,6 +126,15 @@
   <data name="BigSizeImageLabel_CloseButtonTitle" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure" xml:space="preserve">
+    <value>Failed to copy to clipboard</value>
+  </data>
+  <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess" xml:space="preserve">
+    <value>Copied to clipboard</value>
+  </data>
+  <data name="BigSizeImageLabel_CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
   <data name="BigSizeImageLabel_Description" xml:space="preserve">
     <value>Description:</value>
   </data>
