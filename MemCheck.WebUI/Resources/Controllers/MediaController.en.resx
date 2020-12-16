@@ -129,6 +129,9 @@
   <data name="BigSizeImageLabel_Description" xml:space="preserve">
     <value>Description:</value>
   </data>
+  <data name="BigSizeImageLabel_DownloadBiggestSize" xml:space="preserve">
+    <value>Download biggest size available</value>
+  </data>
   <data name="BigSizeImageLabel_Name" xml:space="preserve">
     <value>Image name:</value>
   </data>

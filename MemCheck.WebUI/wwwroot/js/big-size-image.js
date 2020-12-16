@@ -21,6 +21,7 @@
                     <li><strong>{{labels.size}}</strong> {{image.size}}</li>
                     <li><strong>{{labels.type}}</strong> {{image.contentType}}</li>
                 </ul>
+                <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen/?ImageId='+image.imageId">{{labels.downloadBiggestSize}}</a></p>
             </div>
         </div>
     `

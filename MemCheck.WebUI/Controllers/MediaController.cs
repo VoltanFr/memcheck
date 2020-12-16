@@ -343,6 +343,7 @@ namespace MemCheck.WebUI.Controllers
                 size = localizer["BigSizeImageLabel_Size"].Value,
                 type = localizer["BigSizeImageLabel_Type"].Value,
                 closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
+                downloadBiggestSize = localizer["BigSizeImageLabel_DownloadBiggestSize"].Value,
             });
         }
         #endregion
