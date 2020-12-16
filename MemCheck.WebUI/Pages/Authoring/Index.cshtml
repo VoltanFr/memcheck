@@ -18,28 +18,7 @@
     </div>
     <div id="After mount" v-if="mountFinished && !saving">
         <div id="FullImage" v-if="currentFullScreenImage">
-            <div id="Title" class="authoring-fullscreen-image-name">{{currentFullScreenImage.name}}</div>
-            <div id="Small buttons" class="authoring-fullscreen-small-buttons">
-                <ul class="nav small text-decoration-none" style="align-items:center">
-                    <li id="RemoveButton">
-                        <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromCard"] @@click="removeFullScreenImageFromCard"><i class="fas fa-trash-alt"></i></button>
-                    </li>
-                    <li class="ml-auto"><button type="button" class="btn btn-primary btn-circle btn-sm" @@click="closeFullScreenImage()"><i class="far fa-times-circle"></i></button></li>
-                </ul>
-            </div>
-            <div id="FullScreenImage" class="fullscreen-image-div">
-                <img class="fullscreen-image" :src="currentFullScreenImage.blob" />
-            </div>
-            <div id="Details">
-                <ul>
-                    <li><strong>@Localizer["FullScreenImageName"]</strong> {{currentFullScreenImage.name}}</li>
-                    <li><strong>@Localizer["ImageUploader"]</strong> {{currentFullScreenImage.ownerName}}</li>
-                    <li><strong>@Localizer["Description"]</strong> {{currentFullScreenImage.description}}</li>
-                    <li><strong>@Localizer["Source"]</strong> {{currentFullScreenImage.source}}</li>
-                    <li><strong>@Localizer["Size"]</strong> {{currentFullScreenImage.size}}</li>
-                    <li><strong>@Localizer["Type"]</strong> {{currentFullScreenImage.contentType}}</li>
-                </ul>
-            </div>
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labels="bigSizeImageLabels" v-on:remove="removeFullScreenImageFromCard()" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="CardEditMode" v-else>
             <div id="TitleAndTopButtons">

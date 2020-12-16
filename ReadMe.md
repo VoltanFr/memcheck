@@ -22,23 +22,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 #### Choisir des cartes pour découvrir MemCheck
 - MemCheck contient beaucoup de cartes sur des sujets très variés. Parcourir la liste des labels peut vous aider à vous faire une idée. Par exemple, si vous décidez d'apprendre le découpage administratif de la France en régions et départements, un lot de cartes existe. Une des façons de sélectionner ces cartes est de faire une recherche sur le label "xxx". Cette recherche liste beaucoup de cartes. Vous choisissez lesquelles vous voulez (on peut par exemple souhaiter savoir localiser une région donnée, mais pas lister ses départements).
 
-## Web resources
-- About internationalization: https://www.youtube.com/watch?v=gov2ZVUSrYs
-- Starting with ASP.Net, Razor, etc.: https://www.youtube.com/playlist?list=PLOeFnOV9YBa50nT3fEs0yzgMmK1MRKw3j
-- About Razor pages: https://www.learnrazorpages.com/
-- Intro to ASP.NET Core Razor Pages - From Start to Published: https://www.youtube.com/watch?v=68towqYcQlY
-- Razor: https://www.youtube.com/playlist?list=PL6n9fhu94yhX6J31qad0wSO1N_rgGbOPV
-- Tim Corey: https://www.youtube.com/user/IAmTimCorey
-- Deploy to Azure: https://www.youtube.com/watch?v=38Ha1OJ-i9k&t=460s
-- About console logging and Serilog: https://github.com/deadlydog/Sample.Serilog
-- About Bootstrap cards: https://o7planning.org/fr/11971/tutoriel-bootstrap-card
-- Responsive web site https://www.annytab.com/responsive-website-with-asp-net-core/
-- Vue : https://www.youtube.com/channel/UCSJbGtTlrDami-tDGPUV9-w/
-- Image recording
-  -  https://www.youtube.com/watch?v=J2Wp4_XRsWc
-  - https://stackoverflow.com/questions/25400555/save-and-retrieve-image-binary-from-sql-server-using-entity-framework-6
-  - http://www.binaryintellect.net/articles/2f55345c-1fcb-4262-89f4-c4319f95c5bd.aspx
-  - https://github.com/SixLabors/ImageSharp
 
 ## Display
 - On my phone, in portrait orientation, window.innerwidth = 424. In landscape, window.innerwidth = 809.
@@ -79,12 +62,12 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).
 - De même que j'ai optimisé GetCardsToLearn qui faisait trop de Include, voir si on peut faire pareil pour ce qu'affiche la page de démarrage.
 - Search page: Improve the select all check box: should be able to select all in one click, not two (by clicking in the box)
-- Implémenter le diff de versions d'images
-- Implémenter le restore de versions d'images
+- Implémenter le diff de versions d'images (metadata)
+- Implémenter le restore de versions d'images (metadata)
 - Revoir le critère de recherche de cartes "Propriétaire". On peut imaginer un critère "Utilisateur contributeur", au sens utilisateur créateur d'au moins une version de la carte. Voir s'il faut mentionner dans la GUI un coût en perf.
 - Review the code of UpdateCard: it must not be possible to lower a card's visibility so that an author of a version can't see it.
 - Supporter les gifs animés : https://commons.m.wikimedia.org/wiki/File:Cardinal_W_Q.gif (cardinale ouest)
-- User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public)
+- User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public). Note that there is a problem with speaking about _user's public cards_: there is no such thing as a _owner_ of a card. So, are we speaking of a card a user has created a version of?
 - Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
 - Use Azure functions to run Notifier on cron intervals. This is not implemented yet because Azure functions don't support .NET 5 yet (should be available by Jan 2021).
 - Check by unit test that the documentation contains no broken hyperlink (probably needs to render it)
@@ -98,14 +81,12 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 	- creation date
   - last version date
   - expiry date
-  - find cards containing a given image (by image name). When this is implemented, update the link in the image list page. Maybe even support with vs without image (ie "Any" image)
 	- author (including "Your cards"). This searches for a card which has this user as author of any version? Implémenter le filtrage sur le créateur de version dans la page de recherche. Garde comme nom auteur, et ça veut dire auteur d'une version. Puis implementer filteringOnOwnerCurrentUser, en faisant gaffe à la redondance avec _visibilité privée_. Supporter _Owner of current version_ et _Owner of any version_.
   - Revoir le filtre de visibilité dans la recherche de carte : Ignorer / Privée / Visibilité restreinte / Visibilité publique (dans la Doc : Visibilité restreinte signifie que la carte n'est pas publique ; il peut s'agir d'une carte complètement privée pour vous, ou d'une carte qu'un utilisateur vous partage, ou que vous partagez avec un ou des utilisateurs). La privée ne doit pas être accessible si on choisit un autre utilisateur comme auteur d'une version
 - Support sorting in the search view
 - Quand on passe d'une recherche d'image au mode édition, la return url pourrait contenir un object code (comme ce qui est fait dans l'authentication) pour que les critères de recherche ne soient pas perdus au retour. Puis faire de même pour les autres recherche.
 - To improve the speed of loading the search page, the getting of static data and the first runquery could be run in parallel?
 - Do we want to support a user's default deck, which is selected by default in the various pages?
-- Support multiple versions of images? Not sure this is useful. A new version could simply be a new image?
 - Support other media types? Video, sound
 - Personal notes about a card : a user may associate personal textual info, private, about any card he can access (eg card says something, but user wants to write But my mother used to say xxx)
 - Offer the possibility to create a tag in place (in the authoring view)
@@ -143,4 +124,3 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Do something about orphan cards: cards whose only user with view is a deleted account (ie previous cards). Delete them? (by making them Previous)
 - Statistics page. Option to filter on cards the user has created a version of. See : nb decks containing a card. Average evaluation of card. Nb versions of card. Age of card. Nb versions of card. Nb users who have created versions of the card
 - Ignorer les accents dans les recherches (cartes, images, labels). Peut-être qu'il suffit d'utiliser InvariantCultureIgnoreCase. Idéalement la recherche de "Que signifie bâbord" devrait trouver "Que signifie _bâbord_". ça va dans le sens d'avoir un vrai moteur de recherche
-

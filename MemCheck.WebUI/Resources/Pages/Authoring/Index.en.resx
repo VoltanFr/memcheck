@@ -165,33 +165,6 @@
   <data name="LastChangeDate" xml:space="preserve">
     <value>Last change date:</value>
   </data>
-  <data name="ImageName" xml:space="preserve">
-    <value>Image</value>
-  </data>
-  <data name="Close" xml:space="preserve">
-    <value>Close</value>
-  </data>
-  <data name="Description" xml:space="preserve">
-    <value>Description:</value>
-  </data>
-  <data name="FullScreenImageName" xml:space="preserve">
-    <value>Image name:</value>
-  </data>
-  <data name="ImageUploader" xml:space="preserve">
-    <value>Uploaded by:</value>
-  </data>
-  <data name="RemoveFromCard" xml:space="preserve">
-    <value>Remove from card</value>
-  </data>
-  <data name="Size" xml:space="preserve">
-    <value>Size:</value>
-  </data>
-  <data name="Source" xml:space="preserve">
-    <value>Source:</value>
-  </data>
-  <data name="Type" xml:space="preserve">
-    <value>Type:</value>
-  </data>
   <data name="PleaseWaitForSave" xml:space="preserve">
     <value>Please wait, saving data...</value>
   </data>

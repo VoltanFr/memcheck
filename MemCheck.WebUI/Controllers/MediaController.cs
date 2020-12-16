@@ -329,5 +329,22 @@ namespace MemCheck.WebUI.Controllers
             public string ChangedFieldList { get; }
         }
         #endregion
+        #region GetBigSizeImageLabels
+        [HttpGet("GetBigSizeImageLabels")]
+        public IActionResult GetBigSizeImageLabels()
+        {
+            return Ok(new
+            {
+                name = localizer["BigSizeImageLabel_Name"].Value,
+                removeButtonTitle = localizer["BigSizeImageLabel_Remove"].Value,
+                uploaderName = localizer["BigSizeImageLabel_UploaderName"].Value,
+                description = localizer["BigSizeImageLabel_Description"].Value,
+                source = localizer["BigSizeImageLabel_Source"].Value,
+                size = localizer["BigSizeImageLabel_Size"].Value,
+                type = localizer["BigSizeImageLabel_Type"].Value,
+                closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
+            });
+        }
+        #endregion
     }
 }

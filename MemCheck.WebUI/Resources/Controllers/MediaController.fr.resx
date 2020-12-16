@@ -123,6 +123,30 @@
   <data name="AreYouSure" xml:space="preserve">
     <value>Êtes-vous sûr de vouloir supprimer cette image ?</value>
   </data>
+  <data name="BigSizeImageLabel_CloseButtonTitle" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="BigSizeImageLabel_Description" xml:space="preserve">
+    <value>Description :</value>
+  </data>
+  <data name="BigSizeImageLabel_Name" xml:space="preserve">
+    <value>Nom de l'image :</value>
+  </data>
+  <data name="BigSizeImageLabel_Remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="BigSizeImageLabel_Size" xml:space="preserve">
+    <value>Taille :</value>
+  </data>
+  <data name="BigSizeImageLabel_Source" xml:space="preserve">
+    <value>Source :</value>
+  </data>
+  <data name="BigSizeImageLabel_Type" xml:space="preserve">
+    <value>Type :</value>
+  </data>
+  <data name="BigSizeImageLabel_UploaderName" xml:space="preserve">
+    <value>Téléversée par :</value>
+  </data>
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>
   </data>

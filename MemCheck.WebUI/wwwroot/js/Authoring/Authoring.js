@@ -1,3 +1,31 @@
+Vue.component('big-size-image', {
+    props: ['image', 'labels'],
+    template: `
+        <div id="big-size-image">
+            <div id="TitleAndSmallButtons" class="big-size-image-top-div">
+                <ul class="big-size-image-top-ul">
+                    <li class="big-size-image-top-li big-size-image-name">{{image.name}}</li>
+                    <li class="big-size-image-top-li"><button class="btn btn-primary btn-circle btn-sm" v-bind:title="labels.removeButtonTitle" v-on:click="$emit('remove')"><i class="fas fa-trash-alt"></i></button></li>
+                    <li class="big-size-image-top-li"><button class="btn btn-primary btn-circle btn-sm" v-bind:title="labels.closeButtonTitle" v-on:click="$emit('close')"><i class="far fa-times-circle"></i></button></li>
+                </ul>
+            </div>
+            <div id="FullScreenImage" class="big-size-image-middle-div">
+                <img class="big-size-image-img" :src="image.blob" />
+            </div>
+            <div id="Details" class="big-size-image-bottom-div">
+                <ul>
+                    <li><strong>{{labels.name}}</strong> {{image.name}}</li>
+                    <li><strong>{{labels.uploaderName}}</strong> {{image.ownerName}}</li>
+                    <li><strong>{{labels.description}}</strong> {{image.description}}</li>
+                    <li><strong>{{labels.source}}</strong> {{image.source}}</li>
+                    <li><strong>{{labels.size}}</strong> {{image.size}}</li>
+                    <li><strong>{{labels.type}}</strong> {{image.contentType}}</li>
+                </ul>
+            </div>
+        </div>
+    `
+})
+
 var app = new Vue({
     el: '#AuthoringMainDiv',
     data: {
@@ -55,6 +83,7 @@ var app = new Vue({
         originalAdditionalInfoImageList: [],   //MyImageType
         currentFullScreenImage: null,   //MyImageType
         saving: false,
+        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
     },
     async mounted() {
         try {
@@ -67,8 +96,9 @@ var app = new Vue({
             task5 = this.GetCardToEditFromPageParameter();
             task6 = this.GetGuiMessages();
             task6 = this.GetDecksOfUser();
+            task7 = this.GetBigSizeImageLabels();
             this.GetReturnUrlFromPageParameter();
-            await Promise.all([task1, task2, task3, task4, task5, task6]);
+            await Promise.all([task1, task2, task3, task4, task5, task6, task7]);
             if (this.creatingNewCard)
                 this.makePublic();
             this.CopyAllInfoToOriginalCard();
@@ -106,6 +136,15 @@ var app = new Vue({
             await axios.get('/Authoring/GetGuiMessages')
                 .then(result => {
                     this.guiMessages = result.data;
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                });
+        },
+        async GetBigSizeImageLabels() {
+            await axios.get('/Media/GetBigSizeImageLabels')
+                .then(result => {
+                    this.bigSizeImageLabels = result.data;
                 })
                 .catch(error => {
                     tellAxiosError(error, this);

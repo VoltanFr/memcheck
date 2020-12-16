@@ -1,4 +1,43 @@
-﻿.tag {
+﻿.big-size-image-top-div {
+    padding-bottom: 10px;
+}
+
+.big-size-image-middle-div {
+    display: block;
+    text-align: center;
+}
+
+.big-size-image-bottom-div {
+    padding-top: 10px;
+    font-size: smaller;
+}
+
+.big-size-image-name {
+    font-weight: bolder;
+    font-size: x-large;
+    text-align: center;
+}
+
+.big-size-image-top-ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+    align-items: center;
+}
+
+.big-size-image-img {
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.big-size-image-top-li {
+    padding-left: 5px;
+}
+
+.tag {
     display: inline-block;
     padding-top: 3px;
     padding-bottom: 3px;
@@ -355,14 +394,6 @@
     height: auto;
 }
 
-.authoring-fullscreen-image-name {
-    font-weight: bolder;
-    font-size: larger;
-    text-align: center;
-}
-
-.authoring-fullscreen-small-buttons {
-}
 
 .deck-index-deckname-td {
     display: block;
