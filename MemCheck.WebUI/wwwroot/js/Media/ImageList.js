@@ -18,13 +18,15 @@ var app = new Vue({
             copyToClipboardToastTitleOnSuccess: "",
             copyToClipboardToastTitleOnFailure: "",
         },
+        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
     },
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
             task1 = this.getImages();
             task2 = this.getStaticText();
-            await Promise.all([task1, task2]);
+            task3 = this.GetBigSizeImageLabels();
+            await Promise.all([task1, task2, task3]);
         }
         finally {
             this.mountFinished = true;
@@ -56,8 +58,8 @@ var app = new Vue({
                             imageId: image.imageId,
                             cardCount: image.cardCount,
                             initialUploadUtcDate: image.initialUploadUtcDate,
-                            removeAlertMessage: image.removeAlertMessage,
                             lastChangeUtcDate: image.lastChangeUtcDate,
+                            currentVersionCreator: image.currentVersionCreator,
                         };
                     });
                 })
@@ -122,22 +124,21 @@ var app = new Vue({
                     .then(result => {
                         this.currentFullScreenImage = {
                             imageId: image.imageId,
-                            imageName: image.imageName,
-                            uploaderUserName: image.uploaderUserName,
+                            blob: base64FromBytes(result.data),
+                            name: image.imageName,
                             description: image.description,
                             source: image.source,
+                            initialUploadUtcDate: image.initialUploadUtcDate,
+                            initialVersionCreator: image.uploaderUserName,
+                            currentVersionUtcDate: image.lastChangeUtcDate,
+                            currentVersionCreator: image.currentVersionCreator,
+                            currentVersionDescription: image.currentVersionDescription,
+                            cardCount: image.cardCount,
                             originalImageContentType: image.originalImageContentType,
                             originalImageSize: image.originalImageSize,
                             smallSize: image.smallSize,
                             mediumSize: image.mediumSize,
                             bigSize: image.bigSize,
-                            cardCount: image.cardCount,
-                            blob: base64FromBytes(result.data),
-                            currentVersionDescription: image.currentVersionDescription,
-                            initialUploadUtcDate: image.initialUploadUtcDate,
-                            removeAlertMessage: image.removeAlertMessage,
-                            lastChangeUtcDate: image.lastChangeUtcDate,
-
                         };
                     })
                     .catch(error => {
@@ -160,6 +161,15 @@ var app = new Vue({
         },
         dt(utcFromDotNet) {
             return dateTime(utcFromDotNet);
+        },
+        async GetBigSizeImageLabels() {
+            await axios.get('/Media/GetBigSizeImageLabels')
+                .then(result => {
+                    this.bigSizeImageLabels = result.data;
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                });
         },
     },
 });

@@ -34,7 +34,7 @@ namespace MemCheck.Application
                     img.Name,
                     img.Cards.Count(),
                     img.OriginalContentType,
-                    img.Owner,
+                    img.Owner.UserName,
                     img.Description,
                     img.Source,
                     img.OriginalSize,
@@ -43,7 +43,8 @@ namespace MemCheck.Application
                     img.BigBlobSize,
                     img.InitialUploadUtcDate,
                     img.LastChangeUtcDate,
-                    img.VersionDescription
+                    img.VersionDescription,
+                    "CurrentVersionCreatorNotImplemented"
                     )
                 )
             );
@@ -64,8 +65,8 @@ namespace MemCheck.Application
         public sealed class ResultImageModel
         {
             public ResultImageModel(Guid imageId, string imageName, int cardCount, string originalImageContentType,
-                MemCheckUser uploader, string description, string source, int originalImageSize, int smallSize, int mediumSize, int bigSize,
-                DateTime initialUploadUtcDate, DateTime lastChangeUtcDate, string currentVersionDescription)
+                string uploader, string description, string source, int originalImageSize, int smallSize, int mediumSize, int bigSize,
+                DateTime initialUploadUtcDate, DateTime lastChangeUtcDate, string currentVersionDescription, string currentVersionCreator)
             {
                 ImageId = imageId;
                 ImageName = imageName;
@@ -81,12 +82,13 @@ namespace MemCheck.Application
                 InitialUploadUtcDate = initialUploadUtcDate;
                 LastChangeUtcDate = lastChangeUtcDate;
                 CurrentVersionDescription = currentVersionDescription;
+                CurrentVersionCreator = currentVersionCreator;
             }
             public Guid ImageId { get; }
             public string ImageName { get; } = null!;
             public int CardCount { get; }
             public string OriginalImageContentType { get; }
-            public MemCheckUser Uploader { get; } = null!;
+            public string Uploader { get; } = null!; //aka original version creator
             public string Description { get; } = null!;
             public string Source { get; } = null!;
             public int OriginalImageSize { get; }
@@ -96,6 +98,7 @@ namespace MemCheck.Application
             public DateTime InitialUploadUtcDate { get; }
             public DateTime LastChangeUtcDate { get; }
             public string CurrentVersionDescription { get; } = null!;
+            public string CurrentVersionCreator { get; } = null!;
         }
         #endregion
     }

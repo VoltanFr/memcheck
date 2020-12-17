@@ -134,7 +134,7 @@ namespace MemCheck.WebUI.Controllers
                 ImageId = img.ImageId;
                 ImageName = img.ImageName;
                 CardCount = img.CardCount;
-                UploaderUserName = img.Uploader.UserName;
+                UploaderUserName = img.Uploader;
                 Description = img.Description;
                 Source = img.Source;
                 OriginalImageContentType = img.OriginalImageContentType;
@@ -146,6 +146,7 @@ namespace MemCheck.WebUI.Controllers
                 LastChangeUtcDate = img.LastChangeUtcDate;
                 RemoveAlertMessage = $"{localizer["SureYouWantToDeletePart1"].Value} '{ImageName}' ? {localizer["SureYouWantToDeletePart2"].Value} {UploaderUserName} {localizer["SureYouWantToDeletePart3"]} ";
                 currentVersionDescription = img.CurrentVersionDescription;
+                CurrentVersionCreator = img.CurrentVersionCreator;
             }
             public Guid ImageId { get; }
             public string ImageName { get; }
@@ -162,6 +163,7 @@ namespace MemCheck.WebUI.Controllers
             public string RemoveAlertMessage { get; }
             public DateTime LastChangeUtcDate { get; }
             public string currentVersionDescription { get; }
+            public string CurrentVersionCreator { get; }
         }
         #endregion
         #region GetImageMetadata
@@ -355,6 +357,8 @@ namespace MemCheck.WebUI.Controllers
                 removeButtonTitle = localizer["BigSizeImageLabel_Remove"].Value,
                 copyToClipboardButtonTitle = localizer["BigSizeImageLabel_CopyToClipboard"].Value,
                 closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
+                editButtonTitle = localizer["BigSizeImageLabel_EditButtonTitle"].Value,
+                versionHistoryButtonTitle = localizer["BigSizeImageLabel_VersionHistoryButtonTitle"].Value,
 
                 //Labels for Messages
                 copiedToClipboardToastTitleOnSuccess = localizer["BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"].Value,

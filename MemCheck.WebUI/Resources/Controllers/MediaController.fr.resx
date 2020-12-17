@@ -153,6 +153,9 @@
   <data name="BigSizeImageLabel_DownloadBiggestSize" xml:space="preserve">
     <value>Télécharger en résolution max.</value>
   </data>
+  <data name="BigSizeImageLabel_EditButtonTitle" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
   <data name="BigSizeImageLabel_InitialVersionCreatedBy" xml:space="preserve">
     <value>Téléversée par :</value>
   </data>
@@ -182,6 +185,9 @@
   </data>
   <data name="BigSizeImageLabel_Source" xml:space="preserve">
     <value>Source :</value>
+  </data>
+  <data name="BigSizeImageLabel_VersionHistoryButtonTitle" xml:space="preserve">
+    <value>Historique des versions</value>
   </data>
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>

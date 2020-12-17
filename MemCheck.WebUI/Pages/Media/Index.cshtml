@@ -14,43 +14,7 @@
     </div>
     <div id="After mount and not loading" v-if="mountFinished && !loading">
         <div id="FullImage" v-if="currentFullScreenImage">
-            <div id="FullScreenImageTopLine" class="authoring-fullscreen-small-buttons">
-                <ul class="nav small text-decoration-none" style="align-items:center">
-                    <li id="FullScreenTitle" class="authoring-fullscreen-image-name">
-                        {{currentFullScreenImage.imageName}}
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="copyToClipboard(currentFullScreenImage.imageName)"><i class="far fa-copy"></i></button>
-                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="edit(currentFullScreenImage.imageId)"><i class="fas fa-pen"></i></button>
-                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="imageHistory(currentFullScreenImage.imageId)"><i class="fas fa-history"></i></button>
-                        <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="deleteImage(currentFullScreenImage.imageId)"><i class="far fa-trash-alt"></i></button>
-                    </li>
-                    <li class="ml-auto"><button type="button" class="btn btn-primary btn-circle btn-sm" @@click="closeFullScreenImage()"><i class="far fa-times-circle"></i></button></li>
-                </ul>
-            </div>
-            <div id="FullScreenImage" class="fullscreen-image-div">
-                <img class="fullscreen-image" :src="currentFullScreenImage.blob" />
-            </div>
-            <div id="FullScreenImageDetails">
-                <ul>
-                    <li><strong>@Localizer["FullScreenImageName"]</strong> {{currentFullScreenImage.imageName}}</li>
-                    <li><strong>@Localizer["InitialVersionCreatedOn"]</strong> {{dt(currentFullScreenImage.initialUploadUtcDate)}}</li>
-                    <li><strong>@Localizer["CurrentVersionOwner"]</strong> {{currentFullScreenImage.uploaderUserName}}</li>
-                    <li><strong>@Localizer["CurrentVersionCreatedOn"]</strong> {{dt(currentFullScreenImage.lastChangeUtcDate)}}</li>
-                    <li><strong>@Localizer["CurrentVersionDescription"]</strong> {{currentFullScreenImage.currentVersionDescription}}</li>
-                    <li><strong>@Localizer["Description"]</strong> {{currentFullScreenImage.description}}</li>
-                    <li><strong>@Localizer["Source"]</strong> {{currentFullScreenImage.source}}</li>
-                    <li><strong>@Localizer["UsedBy"]</strong> {{currentFullScreenImage.cardCount}} <span v-if="currentFullScreenImage.cardCount == 1">@Localizer["Card"]</span><span v-else>@Localizer["Cards"]</span></li>
-                    <li><strong>@Localizer["OriginalImageType"]</strong> {{currentFullScreenImage.originalImageContentType}}</li>
-                    <li><strong>@Localizer["OriginalImageSize"]</strong> {{currentFullScreenImage.originalImageSize}} @Localizer["Bytes"]</li>
-                    <li><strong>@Localizer["AlternateImageSmallSize"]</strong> {{currentFullScreenImage.smallSize}} @Localizer["Bytes"]</li>
-                    <li><strong>@Localizer["AlternateImageMediumSize"]</strong> {{currentFullScreenImage.mediumSize}} @Localizer["Bytes"]</li>
-                    <li><strong>@Localizer["AlternateImageBigSize"]</strong> {{currentFullScreenImage.bigSize}} @Localizer["Bytes"]</li>
-                </ul>
-            </div>
-            <div id="DownloadBiggestSizeLink">
-                <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen/?ImageId='+currentFullScreenImage.imageId">@Localizer["DownloadBiggestSize"]</a></p>
-            </div>
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labels="bigSizeImageLabels" v-on:remove="deleteImage(currentFullScreenImage.imageId)" v-on:versionhistory="imageHistory(currentFullScreenImage.imageId)" v-on:edit="edit(currentFullScreenImage.imageId)" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="NormalMode" v-else>
             <div id="Title" class="container">
@@ -117,5 +81,6 @@
 </div>
 
 @section scripts {
+    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
     <script src="~/js/Media/ImageList.js" asp-append-version="true"></script>
 }
