@@ -211,17 +211,11 @@ namespace MemCheck.WebUI.Controllers
             public GetCardsImageViewModel(GetCardsToLearn.ResultImageModel appResult, IStringLocalizer localizer)
             {
                 ImageId = appResult.ImageId;
-                OwnerName = appResult.OwnerName;
                 Name = appResult.Name;
-                Description = appResult.Description;
-                Source = appResult.Source;
                 CardSide = appResult.CardSide;
             }
             public Guid ImageId { get; }
-            public string OwnerName { get; }
             public string Name { get; }
-            public string Description { get; }
-            public string Source { get; }
             public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
         }
         public sealed class GetCardsHeapModel

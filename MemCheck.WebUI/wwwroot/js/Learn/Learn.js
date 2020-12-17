@@ -26,17 +26,20 @@ var app = new Vue({
         guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
         userQuitAttemptDisplay: false,
         lastDownloadIsEmpty: false,
+        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
     },
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
+            getBigSizeImageLabelsTask = this.GetBigSizeImageLabels();
             await this.GetUserDecks();
             this.GetLearnModeFromPageParameter();
             this.downloadCardsIfNeeded();
             if (this.cardDownloadOperation)
                 await this.cardDownloadOperation;
             this.getCard();
+            await getBigSizeImageLabelsTask;
         }
         finally {
             this.mountFinished = true;
@@ -381,6 +384,15 @@ var app = new Vue({
                         })
                     });
             }
+        },
+        async GetBigSizeImageLabels() {
+            await axios.get('/Media/GetBigSizeImageLabels')
+                .then(result => {
+                    this.bigSizeImageLabels = result.data;
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                });
         },
     },
     watch: {

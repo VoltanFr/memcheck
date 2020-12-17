@@ -309,17 +309,11 @@ namespace MemCheck.Application
             public ResultImageModel(ImageDetails img, int cardSide)
             {
                 ImageId = img.ImageId;
-                OwnerName = img.OwnerName;
                 Name = img.Name;
-                Description = img.Description;
-                Source = img.Source;
                 CardSide = cardSide;
             }
             public Guid ImageId { get; }
-            public string OwnerName { get; }
             public string Name { get; }
-            public string Description { get; }
-            public string Source { get; }
             public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
         }
         public sealed class MoveToHeapExpiryInfo
