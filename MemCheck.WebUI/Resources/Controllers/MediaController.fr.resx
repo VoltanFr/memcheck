@@ -123,6 +123,9 @@
   <data name="AreYouSure" xml:space="preserve">
     <value>Êtes-vous sûr de vouloir supprimer cette image ?</value>
   </data>
+  <data name="BigSizeImageLabel_BigSize" xml:space="preserve">
+    <value>Grande taille (octets) :</value>
+  </data>
   <data name="BigSizeImageLabel_CloseButtonTitle" xml:space="preserve">
     <value>Fermer</value>
   </data>
@@ -135,29 +138,50 @@
   <data name="BigSizeImageLabel_CopyToClipboard" xml:space="preserve">
     <value>Copier dans le presse-papier</value>
   </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedBy" xml:space="preserve">
+    <value>Auteur de la version actuelle :</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedOn" xml:space="preserve">
+    <value>Version actuelle créée le :</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionDescription" xml:space="preserve">
+    <value>Description de la version actuelle :</value>
+  </data>
   <data name="BigSizeImageLabel_Description" xml:space="preserve">
     <value>Description :</value>
   </data>
   <data name="BigSizeImageLabel_DownloadBiggestSize" xml:space="preserve">
     <value>Télécharger en résolution max.</value>
   </data>
+  <data name="BigSizeImageLabel_InitialVersionCreatedBy" xml:space="preserve">
+    <value>Téléversée par :</value>
+  </data>
+  <data name="BigSizeImageLabel_InitialVersionCreatedOn" xml:space="preserve">
+    <value>Téléversée le :</value>
+  </data>
+  <data name="BigSizeImageLabel_MediumSize" xml:space="preserve">
+    <value>Taille moyenne (octets) :</value>
+  </data>
   <data name="BigSizeImageLabel_Name" xml:space="preserve">
     <value>Nom de l'image :</value>
+  </data>
+  <data name="BigSizeImageLabel_NumberOfCards" xml:space="preserve">
+    <value>Nombre de cartes utilisant cette image :</value>
+  </data>
+  <data name="BigSizeImageLabel_originalImageContentType" xml:space="preserve">
+    <value>Type de l'image :</value>
+  </data>
+  <data name="BigSizeImageLabel_OriginalImageSize" xml:space="preserve">
+    <value>Taille initiale (octets) :</value>
   </data>
   <data name="BigSizeImageLabel_Remove" xml:space="preserve">
     <value>Supprimer</value>
   </data>
-  <data name="BigSizeImageLabel_Size" xml:space="preserve">
-    <value>Taille :</value>
+  <data name="BigSizeImageLabel_SmallSize" xml:space="preserve">
+    <value>Petite taille (octets) :</value>
   </data>
   <data name="BigSizeImageLabel_Source" xml:space="preserve">
     <value>Source :</value>
-  </data>
-  <data name="BigSizeImageLabel_Type" xml:space="preserve">
-    <value>Type :</value>
-  </data>
-  <data name="BigSizeImageLabel_UploaderName" xml:space="preserve">
-    <value>Téléversée par :</value>
   </data>
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>

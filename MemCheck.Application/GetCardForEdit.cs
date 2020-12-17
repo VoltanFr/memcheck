@@ -27,7 +27,6 @@ namespace MemCheck.Application
             var card = await dbContext.Cards
                 .Include(card => card.Images)
                 .ThenInclude(img => img.Image)
-                .ThenInclude(img => img.Owner)
                 .Include(card => card.CardLanguage)
                 .Include(card => card.TagsInCards)
                 .ThenInclude(tagInCard => tagInCard.Tag)
@@ -139,20 +138,14 @@ namespace MemCheck.Application
             public ResultImageModel(ImageInCard img)
             {
                 ImageId = img.ImageId;
-                Owner = img.Image.Owner;
                 Name = img.Image.Name;
-                Description = img.Image.Description;
                 Source = img.Image.Source;
                 CardSide = img.CardSide;
-                CardCount = img.Image.Cards.Count();
             }
             public Guid ImageId { get; }
-            public MemCheckUser Owner { get; }
             public string Name { get; }
-            public string Description { get; }
             public string Source { get; }
             public int CardSide { get; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
-            public int CardCount { get; }
         }
         #endregion
     }

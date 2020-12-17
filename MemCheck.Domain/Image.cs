@@ -19,7 +19,7 @@ namespace MemCheck.Domain
         public string VersionDescription { get; set; } = null!;
         [Column(TypeName = "int")] public ImageVersionType VersionType { get; set; }
 
-        public string OriginalContentType { get; set; } = null!; //eg "image/svg+xml" or "image/jpeg"
+        public string OriginalContentType { get; set; } = null!; //eg "image/svg+xml" or "image/jpeg". But the three blobs below are always "image/jpeg"
         public int OriginalSize { get; set; }   //In bytes
         public byte[] OriginalBlob { get; set; } = null!;
 

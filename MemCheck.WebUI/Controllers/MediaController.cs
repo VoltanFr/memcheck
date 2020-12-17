@@ -335,18 +335,31 @@ namespace MemCheck.WebUI.Controllers
         {
             return Ok(new
             {
+                //Labels for fields
                 name = localizer["BigSizeImageLabel_Name"].Value,
-                removeButtonTitle = localizer["BigSizeImageLabel_Remove"].Value,
-                uploaderName = localizer["BigSizeImageLabel_UploaderName"].Value,
                 description = localizer["BigSizeImageLabel_Description"].Value,
                 source = localizer["BigSizeImageLabel_Source"].Value,
-                size = localizer["BigSizeImageLabel_Size"].Value,
-                type = localizer["BigSizeImageLabel_Type"].Value,
-                closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
-                downloadBiggestSize = localizer["BigSizeImageLabel_DownloadBiggestSize"].Value,
+                initialVersionCreatedOn = localizer["BigSizeImageLabel_InitialVersionCreatedOn"].Value,
+                initialVersionCreatedBy = localizer["BigSizeImageLabel_InitialVersionCreatedBy"].Value,
+                currentVersionCreatedOn = localizer["BigSizeImageLabel_CurrentVersionCreatedOn"].Value,
+                currentVersionCreatedBy = localizer["BigSizeImageLabel_CurrentVersionCreatedBy"].Value,
+                currentVersionDescription = localizer["BigSizeImageLabel_CurrentVersionDescription"].Value,
+                numberOfCards = localizer["BigSizeImageLabel_NumberOfCards"].Value,
+                originalImageContentType = localizer["BigSizeImageLabel_originalImageContentType"].Value,
+                originalImageSize = localizer["BigSizeImageLabel_OriginalImageSize"].Value,
+                smallSize = localizer["BigSizeImageLabel_SmallSize"].Value,
+                mediumSize = localizer["BigSizeImageLabel_MediumSize"].Value,
+                bigSize = localizer["BigSizeImageLabel_BigSize"].Value,
+
+                //Labels for Buttons
+                removeButtonTitle = localizer["BigSizeImageLabel_Remove"].Value,
                 copyToClipboardButtonTitle = localizer["BigSizeImageLabel_CopyToClipboard"].Value,
+                closeButtonTitle = localizer["BigSizeImageLabel_CloseButtonTitle"].Value,
+
+                //Labels for Messages
                 copiedToClipboardToastTitleOnSuccess = localizer["BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"].Value,
                 copiedToClipboardToastTitleOnFailure = localizer["BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure"].Value,
+                downloadBiggestSize = localizer["BigSizeImageLabel_DownloadBiggestSize"].Value,
             });
         }
         #endregion

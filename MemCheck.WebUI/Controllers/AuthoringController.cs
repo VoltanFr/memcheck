@@ -250,16 +250,12 @@ namespace MemCheck.WebUI.Controllers
             internal GetCardForEditImageViewModel(GetCardForEdit.ResultImageModel appResult, IStringLocalizer localizer)
             {
                 ImageId = appResult.ImageId;
-                OwnerName = appResult.Owner.UserName;
                 Name = appResult.Name;
-                Description = appResult.Description;
                 Source = appResult.Source;
                 CardSide = appResult.CardSide;
             }
             public Guid ImageId { get; }
-            public string OwnerName { get; }
             public string Name { get; }
-            public string Description { get; }
             public string Source { get; }
             public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
         }
@@ -326,13 +322,7 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 var appResult = await new GetImageInfo(dbContext, localizer).RunAsync(request.ImageName);
-                var popoverInfo = localizer["ImageUploader"] + ' ' + appResult.Owner.UserName + Environment.NewLine +
-                    localizer["ImageName"] + ' ' + appResult.Name + Environment.NewLine +
-                    localizer["Description"] + ' ' + appResult.Description + Environment.NewLine +
-                    localizer["Source"] + ' ' + appResult.Source + Environment.NewLine +
-                    localizer["UsedIn"] + ' ' + appResult.CardCount + localizer["Cards"];
-
-                return Ok(new GetImageInfoViewModel(appResult.ImageId, popoverInfo));
+                return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
             }
             catch (Exception e)
             {
@@ -346,13 +336,15 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetImageInfoViewModel
         {
-            public GetImageInfoViewModel(Guid imageId, string popoverInfo)
+            public GetImageInfoViewModel(Guid imageId, string name, string source)
             {
                 ImageId = imageId;
-                PopoverInfo = popoverInfo;
+                Name = name;
+                Source = source;
             }
             public Guid ImageId { get; }
-            public string PopoverInfo { get; }
+            public string Name { get; }
+            public string Source { get; }
         }
         #endregion
         #endregion

@@ -47,10 +47,10 @@ var app = new Vue({
         imageToAddFront: "", //string (name of image)
         imageToAddBack: "",
         imageToAddAdditional: "",
-        frontSideImageList: [],   //"MyImageType": {imageId: Guid, blob: base64 string, ownerName: string, name: string, description: string, source: string, size: int, contentType: string}
+        frontSideImageList: [],   //"MyImageType": see loadImage
         backSideImageList: [],   //MyImageType
         additionalInfoImageList: [],   //MyImageType
-        originalFrontSideImageList: [],   //"MyImageType": {imageId: Guid, blob: base64 string, ownerName: string, name: string, description: string, source: string, size: int, contentType: string}
+        originalFrontSideImageList: [],   //MyImageType
         originalBackSideImageList: [],   //MyImageType
         originalAdditionalInfoImageList: [],   //MyImageType
         currentFullScreenImage: null,   //MyImageType
@@ -275,7 +275,7 @@ var app = new Vue({
                 });
 
             for (var i = 0; i < images.length; i++)
-                await this.loadImage(images[i].imageId, images[i].ownerName, images[i].name, images[i].description, images[i].source, images[i].size, images[i].contentType, images[i].cardSide);
+                await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
         },
         classForAdditionalInfo() {
             if (this.card.additionalInfo || this.additionalInfoImageList.length > 0)
@@ -301,7 +301,7 @@ var app = new Vue({
                     return true;
             return false;
         },
-        async loadImage(imageId, ownerName, name, description, source, size, contentType, side) {
+        async loadImage(imageId, name, source, side) {
             await axios.get('/Learn/GetImage/' + imageId + "/2", { responseType: 'arraybuffer' })
                 .then(result => {
                     var xml = '';
@@ -309,16 +309,12 @@ var app = new Vue({
                     var len = bytes.byteLength;
                     for (var j = 0; j < len; j++)
                         xml += String.fromCharCode(bytes[j]);
-                    base64 = 'data:' + contentType + ';base64,' + window.btoa(xml);
+                    base64 = 'data:image/jpeg;base64,' + window.btoa(xml);
                     var img = {
                         imageId: imageId,
                         blob: base64,
-                        ownerName: ownerName,
                         name: name,
-                        description: description,
                         source: source,
-                        size: size,
-                        contentType: contentType
                     };
                     switch (side) {
                         case 1:
@@ -357,12 +353,8 @@ var app = new Vue({
 
                     this.loadImage(
                         getImageInfoResult.data.imageId,
-                        getImageInfoResult.data.ownerName,
                         getImageInfoResult.data.name,
-                        getImageInfoResult.data.description,
                         getImageInfoResult.data.source,
-                        getImageInfoResult.data.size,
-                        getImageInfoResult.data.contentType,
                         side
                     );
                 })

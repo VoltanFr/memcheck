@@ -123,41 +123,65 @@
   <data name="AreYouSure" xml:space="preserve">
     <value>Are you sure you want to delete this image?</value>
   </data>
+  <data name="BigSizeImageLabel_BigSize" xml:space="preserve">
+    <value>Big size (bytes):</value>
+  </data>
   <data name="BigSizeImageLabel_CloseButtonTitle" xml:space="preserve">
     <value>Close</value>
   </data>
   <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure" xml:space="preserve">
-    <value>Failed to copy to clipboard</value>
+    <value>Copy to clipboard failed</value>
   </data>
   <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess" xml:space="preserve">
-    <value>Copied to clipboard</value>
+    <value>Copy to clipboard OK</value>
   </data>
   <data name="BigSizeImageLabel_CopyToClipboard" xml:space="preserve">
     <value>Copy to clipboard</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedBy" xml:space="preserve">
+    <value>Current version author:</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedOn" xml:space="preserve">
+    <value>Current version date:</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionDescription" xml:space="preserve">
+    <value>Current version description:</value>
   </data>
   <data name="BigSizeImageLabel_Description" xml:space="preserve">
     <value>Description:</value>
   </data>
   <data name="BigSizeImageLabel_DownloadBiggestSize" xml:space="preserve">
-    <value>Download biggest size available</value>
+    <value>Download in full size</value>
+  </data>
+  <data name="BigSizeImageLabel_InitialVersionCreatedBy" xml:space="preserve">
+    <value>Uploaded by:</value>
+  </data>
+  <data name="BigSizeImageLabel_InitialVersionCreatedOn" xml:space="preserve">
+    <value>Uploaded on:</value>
+  </data>
+  <data name="BigSizeImageLabel_MediumSize" xml:space="preserve">
+    <value>Medium size (bytes):</value>
   </data>
   <data name="BigSizeImageLabel_Name" xml:space="preserve">
     <value>Image name:</value>
   </data>
+  <data name="BigSizeImageLabel_NumberOfCards" xml:space="preserve">
+    <value>Cards using this image:</value>
+  </data>
+  <data name="BigSizeImageLabel_originalImageContentType" xml:space="preserve">
+    <value>Image type:</value>
+  </data>
+  <data name="BigSizeImageLabel_OriginalImageSize" xml:space="preserve">
+    <value>Original size (bytes):</value>
+  </data>
   <data name="BigSizeImageLabel_Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
-  <data name="BigSizeImageLabel_Size" xml:space="preserve">
-    <value>Size:</value>
+  <data name="BigSizeImageLabel_SmallSize" xml:space="preserve">
+    <value>Small size (bytes):</value>
   </data>
   <data name="BigSizeImageLabel_Source" xml:space="preserve">
     <value>Source:</value>
-  </data>
-  <data name="BigSizeImageLabel_Type" xml:space="preserve">
-    <value>Type:</value>
-  </data>
-  <data name="BigSizeImageLabel_UploaderName" xml:space="preserve">
-    <value>Uploader:</value>
   </data>
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Can not update metadata because you did not change anything.</value>

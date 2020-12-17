@@ -16,11 +16,19 @@
             <div id="Details" class="big-size-image-bottom-div">
                 <ul>
                     <li><strong>{{labels.name}}</strong> {{image.name}}</li>
-                    <li><strong>{{labels.uploaderName}}</strong> {{image.ownerName}}</li>
-                    <li><strong>{{labels.description}}</strong> {{image.description}}</li>
-                    <li><strong>{{labels.source}}</strong> {{image.source}}</li>
-                    <li><strong>{{labels.size}}</strong> {{image.size}}</li>
-                    <li><strong>{{labels.type}}</strong> {{image.contentType}}</li>
+                    <li v-if="image.description"><strong>{{labels.description}}</strong> {{image.description}}</li>
+                    <li v-if="image.source"><strong>{{labels.source}}</strong> {{image.source}}</li>
+                    <li v-if="image.initialUploadUtcDate"><strong>{{labels.initialVersionCreatedOn}}</strong> {{dt(image.initialUploadUtcDate)}}</li>
+                    <li v-if="image.initialVersionCreator"><strong>{{labels.initialVersionCreatedBy}}</strong> {{image.initialVersionCreator}}</li>
+                    <li v-if="image.currentVersionUtcDate"><strong>{{labels.currentVersionCreatedOn}}</strong> {{dt(image.currentVersionUtcDate)}}</li>
+                    <li v-if="image.currentVersionCreator"><strong>{{labels.currentVersionCreatedBy}}</strong> {{dt(image.currentVersionCreator)}}</li>
+                    <li v-if="image.currentVersionDescription"><strong>{{labels.currentVersionDescription}}</strong> {{dt(image.currentVersionDescription)}}</li>
+                    <li v-if="image.cardCount"><strong>{{labels.numberOfCards}}</strong> {{dt(image.cardCount)}}</li>
+                    <li v-if="image.originalImageContentType"><strong>{{labels.originalImageContentType}}</strong> {{image.originalImageContentType}}</li>
+                    <li v-if="image.originalImageSize"><strong>{{labels.originalImageSize}}</strong> {{dt(image.originalImageSize)}}</li>
+                    <li v-if="image.smallSize"><strong>{{labels.smallSize}}</strong> {{dt(image.smallSize)}}</li>
+                    <li v-if="image.mediumSize"><strong>{{labels.mediumSize}}</strong> {{dt(image.mediumSize)}}</li>
+                    <li v-if="image.bigSize"><strong>{{labels.bigSize}}</strong> {{dt(image.bigSize)}}</li>
                 </ul>
                 <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen/?ImageId='+image.imageId">{{labels.downloadBiggestSize}}</a></p>
             </div>
