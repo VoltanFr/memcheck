@@ -23,7 +23,6 @@
                     <li v-if="image.initialUploadUtcDate"><strong>{{labels.initialVersionCreatedOn}}</strong> {{dateTime(image.initialUploadUtcDate)}}</li>
                     <li v-if="image.initialVersionCreator"><strong>{{labels.initialVersionCreatedBy}}</strong> {{image.initialVersionCreator}}</li>
                     <li v-if="image.currentVersionUtcDate"><strong>{{labels.currentVersionCreatedOn}}</strong> {{dateTime(image.currentVersionUtcDate)}}</li>
-                    <li v-if="image.currentVersionCreator"><strong>{{labels.currentVersionCreatedBy}}</strong> {{image.currentVersionCreator}}</li>
                     <li v-if="image.currentVersionDescription"><strong>{{labels.currentVersionDescription}}</strong> {{image.currentVersionDescription}}</li>
                     <li v-if="image.cardCount"><strong>{{labels.numberOfCards}}</strong> {{image.cardCount}}</li>
                     <li v-if="image.originalImageContentType"><strong>{{labels.originalImageContentType}}</strong> {{image.originalImageContentType}}</li>

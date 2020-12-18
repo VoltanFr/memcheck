@@ -146,7 +146,6 @@ namespace MemCheck.WebUI.Controllers
                 LastChangeUtcDate = img.LastChangeUtcDate;
                 RemoveAlertMessage = $"{localizer["SureYouWantToDeletePart1"].Value} '{ImageName}' ? {localizer["SureYouWantToDeletePart2"].Value} {UploaderUserName} {localizer["SureYouWantToDeletePart3"]} ";
                 currentVersionDescription = img.CurrentVersionDescription;
-                CurrentVersionCreator = img.CurrentVersionCreator;
             }
             public Guid ImageId { get; }
             public string ImageName { get; }
@@ -163,7 +162,6 @@ namespace MemCheck.WebUI.Controllers
             public string RemoveAlertMessage { get; }
             public DateTime LastChangeUtcDate { get; }
             public string currentVersionDescription { get; }
-            public string CurrentVersionCreator { get; }
         }
         #endregion
         #region GetImageMetadata

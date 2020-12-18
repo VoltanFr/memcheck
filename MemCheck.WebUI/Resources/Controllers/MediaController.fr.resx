@@ -138,9 +138,6 @@
   <data name="BigSizeImageLabel_CopyToClipboard" xml:space="preserve">
     <value>Copier dans le presse-papier</value>
   </data>
-  <data name="BigSizeImageLabel_CurrentVersionCreatedBy" xml:space="preserve">
-    <value>Auteur de la version actuelle :</value>
-  </data>
   <data name="BigSizeImageLabel_CurrentVersionCreatedOn" xml:space="preserve">
     <value>Version actuelle créée le :</value>
   </data>

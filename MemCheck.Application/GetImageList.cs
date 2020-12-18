@@ -43,8 +43,7 @@ namespace MemCheck.Application
                     img.BigBlobSize,
                     img.InitialUploadUtcDate,
                     img.LastChangeUtcDate,
-                    img.VersionDescription,
-                    "CurrentVersionCreatorNotImplemented"
+                    img.VersionDescription
                     )
                 )
             );
@@ -66,7 +65,7 @@ namespace MemCheck.Application
         {
             public ResultImageModel(Guid imageId, string imageName, int cardCount, string originalImageContentType,
                 string uploader, string description, string source, int originalImageSize, int smallSize, int mediumSize, int bigSize,
-                DateTime initialUploadUtcDate, DateTime lastChangeUtcDate, string currentVersionDescription, string currentVersionCreator)
+                DateTime initialUploadUtcDate, DateTime lastChangeUtcDate, string currentVersionDescription)
             {
                 ImageId = imageId;
                 ImageName = imageName;
@@ -82,7 +81,6 @@ namespace MemCheck.Application
                 InitialUploadUtcDate = initialUploadUtcDate;
                 LastChangeUtcDate = lastChangeUtcDate;
                 CurrentVersionDescription = currentVersionDescription;
-                CurrentVersionCreator = currentVersionCreator;
             }
             public Guid ImageId { get; }
             public string ImageName { get; } = null!;
@@ -98,7 +96,6 @@ namespace MemCheck.Application
             public DateTime InitialUploadUtcDate { get; }
             public DateTime LastChangeUtcDate { get; }
             public string CurrentVersionDescription { get; } = null!;
-            public string CurrentVersionCreator { get; } = null!;
         }
         #endregion
     }
