@@ -9,7 +9,10 @@
     <div id="Waiting for mount" v-if="!mountFinished">
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
-    <div id="After mount" v-else>
+    <div id="Waiting for mount" v-if="running">
+        <p class="wait-message">Running</p>
+    </div>
+    <div id="After mount" v-if="mountFinished && !running">
         <div class="section">
             <h1 class="title">New run...</h1>
             <button type="button" class="btn btn-success btn-lg" @@click="launch">Launch</button>

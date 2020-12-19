@@ -313,7 +313,7 @@ namespace MemCheck.WebUI.Controllers
             }
             catch (Exception e)
             {
-                await emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p>");
+                await emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p><p><pre>{e.StackTrace}</pre></p>");
                 return ControllerError.BadRequest(e, this);
             }
         }
