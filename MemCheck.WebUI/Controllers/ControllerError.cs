@@ -89,7 +89,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public static OkObjectResult Success<TController>(string toastText, TController controller) where TController : Controller, ILocalized
         {
-            return controller.Ok(new ControllerResult(Localize("Failure", controller), toastText, false));
+            return controller.Ok(new ControllerResult(Localize("Success", controller), toastText, false));
         }
         public string ToastTitle { get; }
         public string ToastText { get; }

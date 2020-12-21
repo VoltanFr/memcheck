@@ -1,0 +1,37 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MemCheck.WebUI.Controllers
+{
+    public abstract class MemCheckController : Controller, ILocalized
+    {
+        #region Fields
+        private readonly IStringLocalizer<AuthoringController> localizer;
+        #endregion
+        #region Protected methods
+        protected MemCheckController(IStringLocalizer<AuthoringController> localizer)
+        {
+            this.localizer = localizer;
+        }
+        #endregion
+        protected void CheckBodyParameter(object? bodyParameter, [CallerMemberName] string memberName = "")
+        {
+            if (bodyParameter == null)
+                throw new InvalidProgramException($"Received null body parameter in {GetType().Name}.{memberName}");
+            var properties = bodyParameter.GetType().GetProperties();
+            foreach (var property in properties)
+                if (property.GetValue(bodyParameter) == null)
+                    throw new InvalidProgramException($"Property '{property.Name}' is null in body parameter of {GetType().Name}.{memberName}");
+        }
+        protected string Localize(string resourceName)
+        {
+            var result = localizer[resourceName];
+            if (result.ResourceNotFound)
+                throw new InvalidOperationException($"Ressource '{resourceName}' not found in localizer of {GetType().Name}");
+            return result.Value;
+        }
+        public IStringLocalizer Localizer => localizer;
+    }
+}
