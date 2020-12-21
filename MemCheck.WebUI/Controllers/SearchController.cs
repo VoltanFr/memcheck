@@ -374,7 +374,7 @@ namespace MemCheck.WebUI.Controllers
             }
             catch (SearchResultTooBigForRatingException)
             {
-                return ControllerError.BadRequest(localizer["SearchTooBigForRatingFiltering"].Value, this);
+                return ControllerResult.FailureWithResourceMesg("SearchTooBigForRatingFiltering", this);
             }
             catch (Exception e)
             {
