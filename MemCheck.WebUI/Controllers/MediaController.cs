@@ -35,17 +35,17 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> UploadImage([FromForm] UploadImageRequest request)
         {
             if (request.Name == null)
-                return ControllerResult.FailureWithResourceMesg("NameNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("NameNotSet", this);
             if (request.Description == null)
-                return ControllerResult.FailureWithResourceMesg("DescriptionNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("DescriptionNotSet", this);
             if (request.Source == null)
-                return ControllerResult.FailureWithResourceMesg("SourceNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("SourceNotSet", this);
             if (request.File == null)
-                return ControllerResult.FailureWithResourceMesg("FileNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("FileNotSet", this);
 
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
-                return ControllerResult.FailureWithResourceMesg("NeedLogin", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("NeedLogin", this);
 
             using (var stream = request.File.OpenReadStream())
             using (var reader = new BinaryReader(stream))
@@ -55,7 +55,7 @@ namespace MemCheck.WebUI.Controllers
                 var id = await new StoreImage(dbContext, localizer).RunAsync(applicationRequest);
                 if (id == Guid.Empty)
                     throw new ApplicationException("Stored image with empty GUID as id");
-                return ControllerResult.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", this);
+                return ControllerResultWithToast.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", this);
             }
         }
         public sealed class UploadImageRequest
@@ -154,19 +154,19 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
         {
             if (request.ImageName == null)
-                return ControllerResult.FailureWithResourceMesg("NameNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("NameNotSet", this);
             if (request.Description == null)
-                return ControllerResult.FailureWithResourceMesg("DescriptionNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("DescriptionNotSet", this);
             if (request.Source == null)
-                return ControllerResult.FailureWithResourceMesg("SourceNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("SourceNotSet", this);
             if (request.VersionDescription == null)
-                return ControllerResult.FailureWithResourceMesg("VersionDescriptionNotSet", this);
+                return ControllerResultWithToast.FailureWithResourceMesg("VersionDescriptionNotSet", this);
 
             var user = await userManager.GetUserAsync(HttpContext.User);
             var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
             await new UpdateImageMetadata(dbContext, localizer).RunAsync(applicationRequest);
             var toastText = $"{localizer["SuccessfullyUpdatedImage"]} '{request.ImageName}'";
-            return ControllerResult.Success(toastText, this);
+            return ControllerResultWithToast.Success(toastText, this);
         }
         public sealed class UpdateRequestModel
         {
