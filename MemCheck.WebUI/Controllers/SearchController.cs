@@ -336,50 +336,39 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("RunQuery")]
         public async Task<IActionResult> RunQuery([FromBody] RunQueryRequest request)
         {
-            try
+            CheckRunQueryRequestValidity(request);
+
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var userId = user == null ? Guid.Empty : user.Id;
+            var userName = user == null ? null : user.UserName;
+
+            var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
+
+            var applicationRequest = new SearchCards.Request
             {
-                CheckRunQueryRequestValidity(request);
+                UserId = userId,
+                Deck = request.Deck,
+                DeckIsInclusive = request.DeckIsInclusive,
+                PageNo = request.PageNo,
+                PageSize = request.PageSize,
+                RequiredText = request.RequiredText,
+                RequiredTags = request.RequiredTags,
+                ExcludedTags = excludedTags,
+                Visibility = AppVisibility(request),
+                RatingFiltering = AppRatingMode(request),
+                Notification = AppNotificationFiltering(request)
+            };
 
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var userId = user == null ? Guid.Empty : user.Id;
-                var userName = user == null ? null : user.UserName;
+            if (applicationRequest.RatingFiltering != SearchCards.Request.RatingFilteringMode.Ignore)
+                applicationRequest = applicationRequest with { RatingFilteringValue = request.RatingFilteringValue };
+            if (request.Heap != -1)
+                applicationRequest = applicationRequest with { Heap = request.Heap };
 
-                var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
+            var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
 
-                var applicationRequest = new SearchCards.Request
-                {
-                    UserId = userId,
-                    Deck = request.Deck,
-                    DeckIsInclusive = request.DeckIsInclusive,
-                    PageNo = request.PageNo,
-                    PageSize = request.PageSize,
-                    RequiredText = request.RequiredText,
-                    RequiredTags = request.RequiredTags,
-                    ExcludedTags = excludedTags,
-                    Visibility = AppVisibility(request),
-                    RatingFiltering = AppRatingMode(request),
-                    Notification = AppNotificationFiltering(request)
-                };
+            var result = new RunQueryViewModel(applicationResult, userName, localizer, decksControllerLocalizer);
 
-                if (applicationRequest.RatingFiltering != SearchCards.Request.RatingFilteringMode.Ignore)
-                    applicationRequest = applicationRequest with { RatingFilteringValue = request.RatingFilteringValue };
-                if (request.Heap != -1)
-                    applicationRequest = applicationRequest with { Heap = request.Heap };
-
-                var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
-
-                var result = new RunQueryViewModel(applicationResult, userName, localizer, decksControllerLocalizer);
-
-                return base.Ok(result);
-            }
-            catch (SearchResultTooBigForRatingException)
-            {
-                return ControllerResult.FailureWithResourceMesg("SearchTooBigForRatingFiltering", this);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            return base.Ok(result);
         }
         #region Request and view model classes
         public sealed class RunQueryRequest
@@ -539,17 +528,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("DeleteCards"), Authorize]
         public async Task<IActionResult> DeleteCards([FromBody] DeleteCardsRequest request)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new DeleteCards.Request(userId, request.CardIds);
-                await new DeleteCards(dbContext, localizer).RunAsync(appRequest);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new DeleteCards.Request(userId, request.CardIds);
+            await new DeleteCards(dbContext, localizer).RunAsync(appRequest);
+            return Ok();
         }
         public sealed class DeleteCardsRequest
         {
@@ -560,17 +542,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("RegisterForNotifications"), Authorize]
         public async Task<IActionResult> RegisterForNotifications([FromBody] RegisterForNotificationsRequest request)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
-                await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
+            await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
+            return Ok();
         }
         public sealed class RegisterForNotificationsRequest
         {
@@ -581,17 +556,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("UnregisterForNotifications"), Authorize]
         public async Task<IActionResult> UnregisterForNotifications([FromBody] UnregisterForNotificationsRequest request)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
-                await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
+            await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
+            return Ok();
         }
         public sealed class UnregisterForNotificationsRequest
         {
@@ -621,20 +589,13 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("SubscribeToSearch")]
         public async Task<IActionResult> SubscribeToSearch([FromBody] RunQueryRequest request)
         {
-            try
-            {
-                ChecSubscribeToSearchRequestValidity(request);
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
-                var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, localizer["NoName"].Value, request.RequiredText, request.RequiredTags, excludedTags);
-                await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
-                var result = new SubscribeToSearchViewModel(localizer["Success"].Value, localizer["SubscriptionRecorded"].Value);
-                return base.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            ChecSubscribeToSearchRequestValidity(request);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
+            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, localizer["NoName"].Value, request.RequiredText, request.RequiredTags, excludedTags);
+            await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
+            var result = new SubscribeToSearchViewModel(localizer["Success"].Value, localizer["SubscriptionRecorded"].Value);
+            return base.Ok(result);
         }
         public sealed class SubscribeToSearchViewModel
         {

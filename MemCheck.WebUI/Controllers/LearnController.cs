@@ -43,65 +43,40 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImage/{imageId}/{size}")]
         public IActionResult GetImage(Guid imageId, int size)
         {
-            try
-            {
-                var blob = new GetImage(dbContext).Run(new GetImage.Request(imageId, size));
-                var content = new MemoryStream(blob);
-                return base.File(content, "APPLICATION/octet-stream", "noname");
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var blob = new GetImage(dbContext).Run(new GetImage.Request(imageId, size));
+            var content = new MemoryStream(blob);
+            return base.File(content, "APPLICATION/octet-stream", "noname");
         }
         #endregion
         #region MoveCardToHeap
         [HttpPatch("MoveCardToHeap/{deckId}/{cardId}/{targetHeap}/{manualMove}")]
         public async Task<IActionResult> MoveCardToHeap(Guid deckId, Guid cardId, int targetHeap, bool manualMove)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap, manualMove);
-                await new MoveCardToHeap(dbContext).RunAsync(request);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap, manualMove);
+            await new MoveCardToHeap(dbContext).RunAsync(request);
+            return Ok();
         }
         #endregion
         #region GetCards
         [HttpPost("GetCards")]
         public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
         {
-            try
-            {
-                if (request.ExcludedCardIds == null)
-                    throw new ArgumentException("request.ExcludedCardIds is null");
-                if (request.ExcludedTagIds == null)
-                    throw new ArgumentException("request.ExcludedTagIds is null");
-                var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var cardsToDownload = request.CurrentCardCount == 0 ? 1 : (request.LearnModeIsUnknown ? 30 : 5);   //loading cards to repeat is much more time consuming
-                var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetCardsToLearn(dbContext).RunAsync(applicationRequest);
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var result = new GetCardsViewModel(applicationResult, localizer, user.UserName);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var cardsToDownload = request.CurrentCardCount == 0 ? 1 : (request.LearnModeIsUnknown ? 30 : 5);   //loading cards to repeat is much more time consuming
+            var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
+            var applicationResult = await new GetCardsToLearn(dbContext).RunAsync(applicationRequest);
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var result = new GetCardsViewModel(applicationResult, localizer, user.UserName);
+            return Ok(result);
         }
         #region Request and result classes
         public sealed class GetCardsRequest
         {
             public Guid DeckId { get; set; }
             public bool LearnModeIsUnknown { get; set; }
-            public IEnumerable<Guid>? ExcludedCardIds { get; set; } = null!;
-            public IEnumerable<Guid>? ExcludedTagIds { get; set; } = null!;
+            public IEnumerable<Guid> ExcludedCardIds { get; set; } = null!;
+            public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
             public int CurrentCardCount { get; set; }
         }
         public sealed class GetCardsViewModel
@@ -254,18 +229,11 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("UserDecks")]
         public async Task<IActionResult> UserDecks()
         {
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var userId = (user == null) ? Guid.Empty : user.Id;
-                var decks = new GetUserDecksWithTags(dbContext).Run(userId);
-                var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, localizer));
-                return base.Ok(result);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var userId = (user == null) ? Guid.Empty : user.Id;
+            var decks = new GetUserDecksWithTags(dbContext).Run(userId);
+            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, localizer));
+            return base.Ok(result);
         }
         public sealed class UserDecksViewModel
         {
@@ -297,42 +265,28 @@ namespace MemCheck.WebUI.Controllers
         [HttpPatch("SetCardRating/{cardId}/{rating}")]
         public async Task<IActionResult> SetCardRating(Guid cardId, int rating)
         {
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var request = new SetCardRating.Request(user, cardId, rating);
-                await new SetCardRating(dbContext).RunAsync(request);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var request = new SetCardRating.Request(user, cardId, rating);
+            await new SetCardRating(dbContext).RunAsync(request);
+            return Ok();
         }
         #endregion
         #region SetCardNotificationRegistration
         [HttpPatch("SetCardNotificationRegistration/{cardId}/{notif}")]
         public async Task<IActionResult> SetCardNotificationRegistration(Guid cardId, bool notif)
         {
-            try
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            if (notif)
             {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                if (notif)
-                {
-                    var request = new AddCardSubscriptions.Request(userId, new[] { cardId });
-                    await new AddCardSubscriptions(dbContext).RunAsync(request);
-                }
-                else
-                {
-                    var request = new RemoveCardSubscriptions.Request(userId, new[] { cardId });
-                    await new RemoveCardSubscriptions(dbContext).RunAsync(request);
-                }
-                return Ok();
+                var request = new AddCardSubscriptions.Request(userId, new[] { cardId });
+                await new AddCardSubscriptions(dbContext).RunAsync(request);
             }
-            catch (Exception e)
+            else
             {
-                return ControllerError.BadRequest(e, this);
+                var request = new RemoveCardSubscriptions.Request(userId, new[] { cardId });
+                await new RemoveCardSubscriptions(dbContext).RunAsync(request);
             }
+            return Ok();
         }
         #endregion
     }

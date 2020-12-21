@@ -70,15 +70,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetImageList")]
         public IActionResult GetImageList([FromBody] GetImageListRequest request)
         {
-            try
-            {
-                var result = new GetImageList(dbContext).Run(request.PageSize, request.PageNo, request.Filter ?? "");
-                return Ok(new GetImageListViewModel(result, localizer));
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var result = new GetImageList(dbContext).Run(request.PageSize, request.PageNo, request.Filter ?? "");
+            return Ok(new GetImageListViewModel(result, localizer));
         }
         public sealed class GetImageListRequest
         {
@@ -139,16 +132,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImageMetadata/{imageId}")]
         public async Task<IActionResult> GetImageMetadata(Guid imageId)
         {
-            try
-            {
-                var appRequest = new GetImageInfo(dbContext, localizer);
-                var result = await appRequest.RunAsync(imageId);
-                return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var appRequest = new GetImageInfo(dbContext, localizer);
+            var result = await appRequest.RunAsync(imageId);
+            return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
         }
         public sealed class GetImageMetadataViewModel
         {
@@ -201,25 +187,15 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Delete/{imageId}")]
         public async Task<IActionResult> Delete(Guid imageId, [FromBody] DeleteRequest request)
         {
-            try
-            {
-                if (request.DeletionDescription == null)
-                    return ControllerResult.FailureWithResourceMesg("DeletionDescriptionNotSet", this);
-
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
-                var imageName = await new DeleteImage(dbContext, localizer).RunAsync(applicationRequest);
-                var toastText = $"{localizer["SuccessfullyDeletedImage"]} '{imageName}'";
-                return Ok(new { ToastText = toastText, ToastTitle = localizer["Success"] });
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
+            var imageName = await new DeleteImage(dbContext, localizer).RunAsync(applicationRequest);
+            var toastText = $"{localizer["SuccessfullyDeletedImage"]} '{imageName}'";
+            return Ok(new { ToastText = toastText, ToastTitle = localizer["Success"] });
         }
         public sealed class DeleteRequest
         {
-            public string? DeletionDescription { get; set; } = null;
+            public string DeletionDescription { get; set; } = null!;
         }
         #endregion
         #region GetImageInfoForDeletion
@@ -266,16 +242,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("ImageVersions/{imageId}")]
         public async Task<IActionResult> ImageVersions(Guid imageId)
         {
-            try
-            {
-                var appResults = await new GetImageVersions(dbContext, localizer).RunAsync(imageId);
-                var result = appResults.Select(appResult => new ImageVersion(appResult, localizer));
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var appResults = await new GetImageVersions(dbContext, localizer).RunAsync(imageId);
+            var result = appResults.Select(appResult => new ImageVersion(appResult, localizer));
+            return Ok(result);
         }
         public sealed class ImageVersion
         {

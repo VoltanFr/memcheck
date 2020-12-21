@@ -20,44 +20,29 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]"), Authorize(Roles = "Admin")]
-    public class AdminController : Controller, ILocalized
+    public class AdminController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer<TagsController> localizer;
         private readonly IEmailSender emailSender;
         private readonly UserManager<MemCheckUser> userManager;
         private readonly string authoringPageLink;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base()
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base(localizer)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
             this.emailSender = emailSender;
             this.userManager = userManager;
             authoringPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Index");
         }
-        public IStringLocalizer Localizer => localizer;
         #region GetUsers
         [HttpPost("GetUsers")]
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
-            if (request.Filter == null)
-                return BadRequest(localizer["FilterSet"].Value);
-
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                if (user == null)
-                    return BadRequest(localizer["NeedLogin"].Value);
-                var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
-                var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);
-                return Ok(new GetUsersViewModel(result));
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
+            var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);
+            return Ok(new GetUsersViewModel(result));
         }
         #region Request and result classes
         public sealed class GetUsersRequest
@@ -314,7 +299,7 @@ namespace MemCheck.WebUI.Controllers
             catch (Exception e)
             {
                 await emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on exception", $"<h1>{e.GetType().Name}</h1><p>{e.Message}</p><p><pre>{e.StackTrace}</pre></p>");
-                return ControllerError.BadRequest(e, this);
+                throw;
             }
         }
         #endregion

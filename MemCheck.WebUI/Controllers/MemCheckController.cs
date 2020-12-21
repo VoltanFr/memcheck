@@ -8,14 +8,12 @@ namespace MemCheck.WebUI.Controllers
     public abstract class MemCheckController : Controller, ILocalized
     {
         #region Fields
-        private readonly IStringLocalizer<AuthoringController> localizer;
+        private readonly IStringLocalizer localizer;
         #endregion
-        #region Protected methods
-        protected MemCheckController(IStringLocalizer<AuthoringController> localizer)
+        protected MemCheckController(IStringLocalizer localizer)
         {
             this.localizer = localizer;
         }
-        #endregion
         protected void CheckBodyParameter(object? bodyParameter, [CallerMemberName] string memberName = "")
         {
             if (bodyParameter == null)

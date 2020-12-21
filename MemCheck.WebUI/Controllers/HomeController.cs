@@ -29,22 +29,15 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllAsync()
         {
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                if (user == null)
-                    return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow));
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            if (user == null)
+                return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow));
 
-                var userDecks = new GetDecksWithLearnCounts(dbContext).Run(user.Id);
-                var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
-                var cardCount = userDecks.Sum(deck => deck.CardCount);
+            var userDecks = new GetDecksWithLearnCounts(dbContext).Run(user.Id);
+            var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
+            var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-                return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck)), DateTime.UtcNow));
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck)), DateTime.UtcNow));
         }
         #region Result classes
         public sealed class GetAllViewModel

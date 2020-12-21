@@ -15,49 +15,29 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class AccountController : Controller, ILocalized
+    public class AccountController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
-        private readonly IStringLocalizer<AccountController> localizer;
         #endregion
-        public AccountController(MemCheckDbContext dbContext, IStringLocalizer<AccountController> localizer, UserManager<MemCheckUser> userManager) : base()
+        public AccountController(MemCheckDbContext dbContext, IStringLocalizer<AccountController> localizer, UserManager<MemCheckUser> userManager) : base(localizer)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
             this.userManager = userManager;
-        }
-        public IStringLocalizer Localizer
-        {
-            get
-            {
-                return localizer;
-            }
         }
         #region GetSearchSubscriptions
         [HttpPost("GetSearchSubscriptions")]
         public async Task<IActionResult> GetSearchSubscriptions()
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new GetSearchSubscriptions.Request(userId);
-                var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
-                return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, localizer)));
-            }
-            catch (RequestInputException e)
-            {
-                return ControllerError.BadRequest(e.Message, this);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new GetSearchSubscriptions.Request(userId);
+            var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
+            return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, Localizer)));
         }
         public sealed class SearchSubscriptionViewModel
         {
-            public SearchSubscriptionViewModel(GetSearchSubscriptions.Result searchSubscription, IStringLocalizer<AccountController> localizer)
+            public SearchSubscriptionViewModel(GetSearchSubscriptions.Result searchSubscription, IStringLocalizer localizer)
             {
                 Id = searchSubscription.Id;
                 Name = searchSubscription.Name;
@@ -98,43 +78,21 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetSearchSubscription/{Id}")]
         public async Task<IActionResult> GetSearchSubscription(Guid id)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new GetSearchSubscriptions.Request(userId);
-                var results = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
-                var result = results.Where(r => r.Id == id).Single();
-                return Ok(new SearchSubscriptionViewModel(result, localizer));
-            }
-            catch (RequestInputException e)
-            {
-                return ControllerError.BadRequest(e.Message, this);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new GetSearchSubscriptions.Request(userId);
+            var results = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
+            var result = results.Where(r => r.Id == id).Single();
+            return Ok(new SearchSubscriptionViewModel(result, Localizer));
         }
         #endregion
         #region SetSearchSubscriptionName
         [HttpPut("SetSearchSubscriptionName/{Id}")]
         public async Task<IActionResult> SetSearchSubscriptionName(Guid id, [FromBody] SetSearchSubscriptionNameRequestModel request)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
-                await new SetSearchSubscriptionName(dbContext).RunAsync(appRequest);
-                return Ok();
-            }
-            catch (RequestInputException e)
-            {
-                return ControllerError.BadRequest(e.Message, this);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
+            await new SetSearchSubscriptionName(dbContext).RunAsync(appRequest);
+            return Ok();
         }
         public sealed class SetSearchSubscriptionNameRequestModel
         {
@@ -145,17 +103,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpDelete("DeleteSearchSubscription/{Id}")]
         public async Task<IActionResult> DeleteSearchSubscription(Guid id)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appRequest = new DeleteSearchSubscription.Request(userId, id);
-                await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
-                return base.Ok(localizer["Deleted"].Value);
-            }
-            catch (Exception e)
-            {
-                return ControllerError.BadRequest(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new DeleteSearchSubscription.Request(userId, id);
+            await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
+            return base.Ok(Localizer["Deleted"].Value);
         }
         #endregion
     }
