@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application;
+using MemCheck.Application.QueryValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;

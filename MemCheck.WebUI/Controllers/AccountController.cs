@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Notifying;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
