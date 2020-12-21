@@ -76,7 +76,7 @@
                                 <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.frontSide" rows="2" max-rows="15"></b-form-textarea>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
-                                        <span>@Localizer["ImageName"]</span>
+                                        <span class="small-screen-text">@Localizer["ImageName_SmallScreen"]</span><span class="medium-screen-text">@Localizer["ImageName_MediumScreen"]</span><span class="big-screen-text">@Localizer["ImageName_BigScreen"]</span>
                                         <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddFront" />
                                         <button id="PasteImageNameButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="pasteImageName(1)"><i class="fas fa-paste"></i></button>
                                         <button id="AddImageButton" type="button" class="btn btn-primary btn-circle btn-sm" @@click="addImage(1)"><i class="fas fa-plus"></i></button>

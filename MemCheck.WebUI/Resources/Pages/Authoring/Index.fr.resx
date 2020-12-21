@@ -174,4 +174,13 @@
   <data name="VersionDescription" xml:space="preserve">
     <value>Description de vos modifications</value>
   </data>
+  <data name="ImageName_BigScreen" xml:space="preserve">
+    <value>Nom d'image</value>
+  </data>
+  <data name="ImageName_MediumScreen" xml:space="preserve">
+    <value>Nom d'image</value>
+  </data>
+  <data name="ImageName_SmallScreen" xml:space="preserve">
+    <value>Image</value>
+  </data>
 </root>
