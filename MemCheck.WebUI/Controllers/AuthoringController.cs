@@ -30,15 +30,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetUsers")]
         public IActionResult GetUsers()
         {
-            try
-            {
-                var result = new GetUsers(dbContext).Run();
-                return Ok(result.Select(user => new GetUsersViewModel(user.UserId, user.UserName)));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var result = new GetUsers(dbContext).Run();
+            return Ok(result.Select(user => new GetUsersViewModel(user.UserId, user.UserName)));
         }
         public sealed class GetUsersViewModel
         {
@@ -55,15 +48,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetCurrentUser")]
         public async Task<IActionResult> GetCurrentUser()
         {
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                return Ok(new GetCurrentUserViewModel(user, dbContext));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            return Ok(new GetCurrentUserViewModel(user, dbContext));
         }
         public sealed class GetCurrentUserViewModel
         {
@@ -83,21 +69,14 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("CardsOfUser")]
         public async Task<IActionResult> PostCardOfUser([FromBody] PostCardOfUserRequest card)
         {
-            try
-            {
-                CheckBodyParameter(card);
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var versionDescription = Localizer["InitialCardVersionCreation"].Value;
-                var request = new CreateCard.Request(user.Id, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
-                var cardId = await new CreateCard(dbContext).RunAsync(request, Localizer);
-                if (card.AddToDeck != Guid.Empty)
-                    await new AddCardInDeck(dbContext).RunAsync(card.AddToDeck, cardId);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            CheckBodyParameter(card);
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var versionDescription = Localizer["InitialCardVersionCreation"].Value;
+            var request = new CreateCard.Request(user.Id, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+            var cardId = await new CreateCard(dbContext).RunAsync(request, Localizer);
+            if (card.AddToDeck != Guid.Empty)
+                await new AddCardInDeck(dbContext).RunAsync(card.AddToDeck, cardId);
+            return Ok();
         }
         public sealed class PostCardOfUserRequest
         {
@@ -117,18 +96,11 @@ namespace MemCheck.WebUI.Controllers
         [HttpPut("UpdateCard/{cardId}")]
         public async Task<IActionResult> UpdateCard(Guid cardId, [FromBody] UpdateCardRequest card)
         {
-            try
-            {
-                CheckBodyParameter(card);
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
-                await new UpdateCard(dbContext).RunAsync(request, Localizer);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            CheckBodyParameter(card);
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
+            await new UpdateCard(dbContext).RunAsync(request, Localizer);
+            return Ok();
         }
         public sealed class UpdateCardRequest
         {
@@ -149,15 +121,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("AllAvailableTags")]
         public IActionResult GetAllAvailableTags()
         {
-            try
-            {
-                var result = new GetAllAvailableTags(dbContext).Run();
-                return Ok(result.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.Name)));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var result = new GetAllAvailableTags(dbContext).Run();
+            return Ok(result.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.Name)));
         }
         public sealed class GetAllAvailableTagsViewModel
         {
@@ -174,16 +139,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetCardForEdit/{cardId}")]
         public async Task<IActionResult> GetCardForEdit(Guid cardId)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var result = new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
-                return Ok(new GetCardForEditViewModel(await result, Localizer));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var result = new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            return Ok(new GetCardForEditViewModel(await result, Localizer));
         }
         #region Request and view model classes
         internal sealed class GetCardForEditViewModel
@@ -238,21 +196,14 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetGuiMessages")]
         public IActionResult GetGuiMessages()
         {
-            try
-            {
-                return Ok(new GetGuiMessagesViewModel(
-                Localize("Success"),
-                Localize("CardSavedOk"),
-                Localize("Failure"),
-                Localize("SureCreateWithoutTag"),
-                Localize("Saved"),
-                Localize("RatingSavedOk")
-                ));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            return Ok(new GetGuiMessagesViewModel(
+            Localize("Success"),
+            Localize("CardSavedOk"),
+            Localize("Failure"),
+            Localize("SureCreateWithoutTag"),
+            Localize("Saved"),
+            Localize("RatingSavedOk")
+            ));
         }
         public sealed class GetGuiMessagesViewModel
         {
@@ -277,16 +228,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("DecksOfUser")]
         public async Task<IActionResult> DecksOfUser()
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var result = new GetUserDecks(dbContext).Run(userId);
-                return Ok(result.Select(deck => new DecksOfUserViewModel(deck.DeckId, deck.Description)));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var result = new GetUserDecks(dbContext).Run(userId);
+            return Ok(result.Select(deck => new DecksOfUserViewModel(deck.DeckId, deck.Description)));
         }
         public sealed class DecksOfUserViewModel
         {
@@ -303,16 +247,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetImageInfo")]
         public async Task<IActionResult> GetImageInfo([FromBody] GetImageInfoRequest request)
         {
-            try
-            {
-                CheckBodyParameter(request);
-                var appResult = await new GetImageInfo(dbContext, Localizer).RunAsync(request.ImageName);
-                return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            CheckBodyParameter(request);
+            var appResult = await new GetImageInfo(dbContext, Localizer).RunAsync(request.ImageName);
+            return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
         }
         #region Request and view model classes
         public sealed class GetImageInfoRequest
@@ -337,17 +274,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("CardVersions/{cardId}")]
         public async Task<IActionResult> CardVersions(Guid cardId)
         {
-            try
-            {
-                var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-                var appResults = await new GetCardVersions(dbContext, Localizer).RunAsync(cardId, userId);
-                var result = appResults.Select(appResult => new CardVersion(appResult, Localizer));
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appResults = await new GetCardVersions(dbContext, Localizer).RunAsync(cardId, userId);
+            var result = appResults.Select(appResult => new CardVersion(appResult, Localizer));
+            return Ok(result);
         }
         public sealed class CardVersion
         {
@@ -369,17 +299,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpPatch("SetCardRating/{cardId}/{rating}")]
         public async Task<IActionResult> SetCardRating(Guid cardId, int rating)
         {
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var request = new SetCardRating.Request(user, cardId, rating);
-                await new SetCardRating(dbContext).RunAsync(request);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var request = new SetCardRating.Request(user, cardId, rating);
+            await new SetCardRating(dbContext).RunAsync(request);
+            return Ok();
         }
         #endregion
     }

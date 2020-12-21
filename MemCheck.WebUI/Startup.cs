@@ -13,6 +13,9 @@ using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System.IO;
+using Microsoft.AspNetCore.Diagnostics;
+using System;
+using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.WebUI
 {
@@ -41,19 +44,6 @@ namespace MemCheck.WebUI
             services.AddDatabaseDeveloperPageExceptionFilter();
             var connectionString = GetConnectionString();
             services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
-        }
-        private void ConfigureErrorHandling(IApplicationBuilder app)
-        {
-            if (prodEnvironment)
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-            else
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseMigrationsEndPoint();
-            }
         }
         #endregion
         public Startup(IConfiguration configuration, IWebHostEnvironment currentEnvironment)
@@ -144,7 +134,16 @@ namespace MemCheck.WebUI
         }
         public void Configure(IApplicationBuilder app)
         {
-            ConfigureErrorHandling(app);
+            app.UseExceptionHandler(a => a.Run(async context =>
+            {
+                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                var e = exceptionHandlerPathFeature.Error;
+                var cultureName = context.Features.Get<IRequestCultureFeature>().RequestCulture.Culture.Name;
+                var ToastTitle = cultureName.Equals("FR", StringComparison.OrdinalIgnoreCase) ? "Échec" : "Failure";
+                var ShowStatus = !(e is RequestInputException);
+                var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
+                await context.Response.WriteAsJsonAsync(new { ToastTitle, ToastText, ShowStatus });
+            }));
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

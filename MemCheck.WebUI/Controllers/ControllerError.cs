@@ -83,10 +83,6 @@ namespace MemCheck.WebUI.Controllers
         {
             return controller.BadRequest(new ControllerResult(Localize("Failure", controller), Localize(textResourceName, controller), false));
         }
-        public static BadRequestObjectResult Failure<TController>(Exception e, TController controller) where TController : Controller, ILocalized
-        {
-            return Failure(TextFromException(e), IsBug(e), controller);
-        }
         public static OkObjectResult Success<TController>(string toastText, TController controller) where TController : Controller, ILocalized
         {
             return controller.Ok(new ControllerResult(Localize("Success", controller), toastText, false));

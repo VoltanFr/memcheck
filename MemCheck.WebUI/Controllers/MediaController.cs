@@ -43,26 +43,19 @@ namespace MemCheck.WebUI.Controllers
             if (request.File == null)
                 return ControllerResult.FailureWithResourceMesg("FileNotSet", this);
 
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                if (user == null)
-                    return ControllerResult.FailureWithResourceMesg("NeedLogin", this);
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            if (user == null)
+                return ControllerResult.FailureWithResourceMesg("NeedLogin", this);
 
-                using (var stream = request.File.OpenReadStream())
-                using (var reader = new BinaryReader(stream))
-                {
-                    var fileContent = reader.ReadBytes((int)request.File.Length);
-                    var applicationRequest = new StoreImage.Request(user, request.Name, request.Description, request.Source, request.File.ContentType, fileContent);
-                    var id = await new StoreImage(dbContext, localizer).RunAsync(applicationRequest);
-                    if (id == Guid.Empty)
-                        throw new ApplicationException("Stored image with empty GUID as id");
-                    return ControllerResult.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", this);
-                }
-            }
-            catch (Exception e)
+            using (var stream = request.File.OpenReadStream())
+            using (var reader = new BinaryReader(stream))
             {
-                return ControllerResult.Failure(e, this);
+                var fileContent = reader.ReadBytes((int)request.File.Length);
+                var applicationRequest = new StoreImage.Request(user, request.Name, request.Description, request.Source, request.File.ContentType, fileContent);
+                var id = await new StoreImage(dbContext, localizer).RunAsync(applicationRequest);
+                if (id == Guid.Empty)
+                    throw new ApplicationException("Stored image with empty GUID as id");
+                return ControllerResult.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", this);
             }
         }
         public sealed class UploadImageRequest
@@ -183,18 +176,11 @@ namespace MemCheck.WebUI.Controllers
             if (request.VersionDescription == null)
                 return ControllerResult.FailureWithResourceMesg("VersionDescriptionNotSet", this);
 
-            try
-            {
-                var user = await userManager.GetUserAsync(HttpContext.User);
-                var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
-                await new UpdateImageMetadata(dbContext, localizer).RunAsync(applicationRequest);
-                var toastText = $"{localizer["SuccessfullyUpdatedImage"]} '{request.ImageName}'";
-                return ControllerResult.Success(toastText, this);
-            }
-            catch (Exception e)
-            {
-                return ControllerResult.Failure(e, this);
-            }
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
+            await new UpdateImageMetadata(dbContext, localizer).RunAsync(applicationRequest);
+            var toastText = $"{localizer["SuccessfullyUpdatedImage"]} '{request.ImageName}'";
+            return ControllerResult.Success(toastText, this);
         }
         public sealed class UpdateRequestModel
         {
