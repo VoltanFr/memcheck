@@ -48,14 +48,13 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 # To do, at little cost
 - Effacement image si pas utilisée. Nécessite d'abord recherche avec une image donnée pour pouvoir remplacer, et affichage "Utilisée dans n pages" avec lien
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
-- Translate all the pages of the identity area (and consider improving each)
 - Upon creating a new version of a card, warn that this will impact n users who have it in a deck.
-- Reducing the visibility of a card should not permit to make it invisible to a user who has it in a deck, or to the owner of a version. Introduce function card visibility can be reduced : true if no other user has the card in a deck or has another version of the card. See comment in UpdateCard.Request.CheckValidityAsync.
+- Reducing the visibility of a card should not permit to make it invisible to a user who has it in a deck, or to the owner of a version. Introduce function card visibility can be reduced : true if no other user has the card in a deck or has another version of the card. See comment in UpdateCard.Request.CheckValidityAsync. Review the code of UpdateCard: it must not be possible to lower a card's visibility so that an author of a version can't see it.
 - Vérifier si getcards dans learn affiche l'info si le chargement échoue
 - Afficher des stats sur la page d'accueil : xxx cartes de votre paquet vont expirer aujourd'hui
 - Implement unit test to prove that a user without visibility on a card can not delete it
 - Offer a diff view from the card history page
-- The mail sent by notifier should include an history and a diff links
+- The mail sent by notifier should include an history link and a diff link
 - Fix the hyperlinks in the doc pages
 
 # To do at medium cost
@@ -65,7 +64,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Implémenter le diff de versions d'images (metadata)
 - Implémenter le restore de versions d'images (metadata)
 - Revoir le critère de recherche de cartes "Propriétaire". On peut imaginer un critère "Utilisateur contributeur", au sens utilisateur créateur d'au moins une version de la carte. Voir s'il faut mentionner dans la GUI un coût en perf.
-- Review the code of UpdateCard: it must not be possible to lower a card's visibility so that an author of a version can't see it.
 - Supporter les gifs animés : https://commons.m.wikimedia.org/wiki/File:Cardinal_W_Q.gif (cardinale ouest)
 - User reputation. Public reputation is the average of this user's public cards evaluation. Private reputation is the same, but for private cards only (this can be useful for working on cards before making them public). Note that there is a problem with speaking about _user's public cards_: there is no such thing as a _owner_ of a card. So, are we speaking of a card a user has created a version of?
 - Rename _CardNotificationSubscription_ to _CardSubscription_, and _MemCheckDbContext.CardNotifications_ to _CardSubscriptions_. Watchout: we don't want to lose any data.
@@ -89,18 +87,19 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Do we want to support a user's default deck, which is selected by default in the various pages?
 - Support other media types? Video, sound
 - Personal notes about a card : a user may associate personal textual info, private, about any card he can access (eg card says something, but user wants to write But my mother used to say xxx)
-- Offer the possibility to create a tag in place (in the authoring view)
+- Offer the possibility to create a tag in place (in the authoring view). To be done by implementing a tag Vue component. The component deals with displaying the cloud of tags, and the combo box if the list is modifiable. Decide if the same component is used for users with view. The code for using tags in the GUI is duplicated between search, authoring and learn (both in JavaScript and Html).
 - Use ValidateAntiForgeryToken
-- En fin de modification d'une carte, recharger la carte (pour le cas où on continue à la modifier) ?
+- En fin de modification d'une carte, recharger la carte (pour le cas où on continue à la modifier) ? If decide not to do that, switch the page to new card creation mode.
 - If we implement a card view mode, which is not editing, on end of edit we could switch to this mode for the edited card.
-- How to assign the admin role? Use the app settings in Azure? See class MemCheckUserRole. What actions to reserve to admin only (eg create language, rename tag)? Forbid two languages with same name. Backup method. Export database as json? Trouver où sont les backups dans Azure
+- How to assign the admin role? Use the app settings in Azure? See class MemCheckUserRole. What actions to reserve to admin only (eg create language, rename tag)?
+- Forbid two languages with same name.
+- Check Backup method. Export database as json? Trouver où sont les backups dans Azure
 - Tags garbage collector: delete a tag not used by any card for more than a month
 - Support tags on media?
 - Create metrics for each function of the application project, for perf & feature tracking
 - Since a tag doesn't have a owner, we currently have no info about who created one. That's bad. Find the good way to answer this problem. For the card language, I think we want to allow creating one for admin only. Since tags have now owner, some of their actions are reserved to admin?
 - Home page: In the multi deck display, the links to the learning pages should select the appropriate deck
 - Tag family: should we support a tag which includes other ones? Eg histoire de France could include R�volution fran�aise, Premier empire, Charles de Gaulle). Or use a dot as separator? Eg maths would include maths.college and maths.lycée, and we could have Histoire.Histoire de France.Période napoléonienne
-- Industrialization: Use a proper solution for building and deploying. Could be GitHub actions. Use this opportunity for better version numbering
 - Should we check that the user is allowed to see a card each time we load one for this user ? (And update the DB if we find a discrepancy)
 - ABout perf, review this page, and study ResponseCompression: https://www.syncfusion.com/blogs/post/10-performance-improvement-tips-for-asp-net-core-3-0-applications.aspx. https://docs.microsoft.com/fr-fr/aspnet/core/performance/performance-best-practices?view=aspnetcore-3.1
 - Introduire une notion de leçon ? Par exemple Régions, départements et préfectures Françaises. Départements dans région. Région de département. Nombre de départements dans région. Préfectures
@@ -110,17 +109,14 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
   - Needs that interactions with the application are authentified. This will need investigation of authentification tokens, or something like this.
 - Use an emulator to check usability of site on iPHone. Drop downs may not be a good idea.
 - Review Site.js : where is this used? How often is it used? What is the impact on perf?
-- Use specific resource files for display on small screen, to have smaller texts. Eg replace menu entry texts with icons. I hope we can tweak localizer for that
+- Use specific resource files for display on small screen, to have smaller texts. Eg replace menu entry texts with icons. See how I used the css to switch between _display: inline-block_ and _display: none_ according to the screen size in the page \Areas\Identity\Pages\Account\Manage\Subscriptions.cshtml
 - Forbid uploading an image in an image in the DB already has the same blob (implement a crc, hash of the blob?)
-- Make the app work even if changes are made simultaneously in various sessions. We're mostly ok. The authoring window is wrong in saving the whole card. It should only update the fields the user has changed, so that for example if he has added tags in another window, this info is not lost.
+- Make the app work even if changes are made simultaneously in various sessions. We're mostly ok. The authoring window is wrong in saving the whole card. It should only update the fields the user has changed, so that for example if someone has added tags in another window, this info is not lost.
 - Limit length of user name to reduce the risk of display glitches. Something like 30 to 50 chars sounds like a good limit.
-- In the profile window, the _Save_ button is useless
-- support displaying images in various sizes according to screen size
-- See what we need to do about RGPD, data ownership, with a cookie
+- See what we need to do about RGPD, data ownership (a cookie might be needed)
 - Multilingual cards: a card can have a link to a card in another language, meaning that it is its version in this language. This is not related to a version, but to the card.
 - A user should be allowed to download all his cards (after all, this is his data)
-- The code for using tags in the GUI is duplicated between search, authoring and learn (both in JavaScript and Html). See how to do better. A component?
-- User option to not present the same not known card to learn in 24h : Stash learning failure for 24 hours in the discard pile. Carte coincée dans la pioche
+- User option to not present the same not known card to learn in 24h : Stash learning failure for 24 hours in the discard pile. (in french: _Carte coincée dans la pioche_)
 - Do something about orphan cards: cards whose only user with view is a deleted account (ie previous cards). Delete them? (by making them Previous)
 - Statistics page. Option to filter on cards the user has created a version of. See : nb decks containing a card. Average evaluation of card. Nb versions of card. Age of card. Nb versions of card. Nb users who have created versions of the card
-- Ignorer les accents dans les recherches (cartes, images, labels). Peut-être qu'il suffit d'utiliser InvariantCultureIgnoreCase. Idéalement la recherche de "Que signifie bâbord" devrait trouver "Que signifie _bâbord_". ça va dans le sens d'avoir un vrai moteur de recherche
+- Ignorer les accents dans les recherches (cartes, images, labels). Peut-être qu'il suffit d'utiliser InvariantCultureIgnoreCase. Idéalement la recherche de "Que signifie bâbord" devrait trouver "Que signifie _bâbord_". ça va dans le sens d'avoir un vrai moteur de recherche. Chercher dans le texte après rendering markdown ne convient pas, parce que ce texte-là contient d'autres balises (eg les <strong>).
