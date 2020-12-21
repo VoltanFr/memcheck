@@ -50,7 +50,7 @@ var app = new Vue({
 
             await axios.post('/Media/UploadImage/', f, { headers: { 'Content-Type': 'multipart/form-data' } })
                 .then((result) => {
-                    tellAxiosSuccess(result.data.toastText + (result.data.showStatus ? result.data.status : ""), result.data.toastTitle, this); //used to add bodyOutputType: 'trustedHtml'
+                    tellAxiosSuccess(result, this);
                     this.clearAll();
                 })
                 .catch(error => {

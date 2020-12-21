@@ -18,12 +18,30 @@ function dateIsTomorrow(d) {
     return tomorrow.toDateString() == d.toDateString();
 }
 
-function tellAxiosError(error, vueObject) {
-    console.log(error);
-    var mesg = error.message;
-    if (error.response && error.response.data && error.response.data.text)
-        mesg = error.response.data.text + (error.response.data.showStatus ? ("\r\n" + mesg) : "");
-    tellAxiosMsg(mesg, "FAILURE", 'danger', 10000, vueObject);
+function tellAxiosError(result, vueObject) {
+    tellAxiosControllerResult(result, false, vueObject);
+}
+
+function tellAxiosSuccess(result, vueObject) {
+    tellAxiosControllerResult(result, true, vueObject);
+}
+
+function tellAxiosControllerResult(result, success, vueObject) {
+    //Code is meant to support ControllerResult
+    var title = success ? "Success" : "Failure";
+    if (result.response && result.response.data && result.response.data.toastTitle)
+        title = result.response.data.toastTitle;
+
+    var text = result;
+    if (result.message)
+        text = result.message;
+    if (result.response && result.response.data && result.response.data.toastText)
+        text = result.response.data.toastText + (result.response.data.showStatus ? ("\r\n" + text) : "");
+
+    var variant = success ? 'success' : 'danger';
+    var autoHideDelay = success ? 3000 : 10000;
+
+    tellAxiosMsg(text, title, variant, autoHideDelay, vueObject);
 }
 
 function tellAxiosSuccess(mesg, title, vueObject) {

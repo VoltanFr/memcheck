@@ -35,19 +35,19 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> UploadImage([FromForm] UploadImageRequest request)
         {
             if (request.Name == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("NameNotSet", this);
             if (request.Description == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("DescriptionNotSet", this);
             if (request.Source == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("SourceNotSet", this);
             if (request.File == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["FileNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("FileNotSet", this);
 
             try
             {
                 var user = await userManager.GetUserAsync(HttpContext.User);
                 if (user == null)
-                    return BadRequest(UploadImageResultViewModel.Failure(localizer["NeedLogin"].Value, false, localizer));
+                    return ControllerResult.FailureWithResourceMesg("NeedLogin", this);
 
                 using (var stream = request.File.OpenReadStream())
                 using (var reader = new BinaryReader(stream))
@@ -57,12 +57,12 @@ namespace MemCheck.WebUI.Controllers
                     var id = await new StoreImage(dbContext, localizer).RunAsync(applicationRequest);
                     if (id == Guid.Empty)
                         throw new ApplicationException("Stored image with empty GUID as id");
-                    return Ok(UploadImageResultViewModel.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", localizer));
+                    return ControllerResult.Success(localizer["ImageSavedWithName"].Value + $" '{applicationRequest.Name}'", this);
                 }
             }
             catch (Exception e)
             {
-                return ControllerError.BadRequest(e, this);
+                return ControllerResult.Failure(e, this);
             }
         }
         public sealed class UploadImageRequest
@@ -71,28 +71,6 @@ namespace MemCheck.WebUI.Controllers
             public string? Description { get; set; }
             public string? Source { get; set; }
             public IFormFile? File { get; set; }
-        }
-        public sealed class UploadImageResultViewModel
-        {
-            #region Private methods
-            private UploadImageResultViewModel(string toastTitle, string toastText, bool showStatus)
-            {
-                ToastTitle = toastTitle;
-                ToastText = toastText;
-                ShowStatus = showStatus;
-            }
-            #endregion
-            public static UploadImageResultViewModel Failure(string toastText, bool showStatus, IStringLocalizer<MediaController> localizer)
-            {
-                return new UploadImageResultViewModel(localizer["Failure"].Value, toastText, showStatus);
-            }
-            public static UploadImageResultViewModel Success(string toastText, IStringLocalizer<MediaController> localizer)
-            {
-                return new UploadImageResultViewModel(localizer["Success"].Value, toastText, false);
-            }
-            public string ToastTitle { get; }
-            public string ToastText { get; }
-            public bool ShowStatus { get; }
         }
         #endregion
         #region GetImageList
@@ -197,13 +175,13 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
         {
             if (request.ImageName == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["NameNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("NameNotSet", this);
             if (request.Description == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["DescriptionNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("DescriptionNotSet", this);
             if (request.Source == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["SourceNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("SourceNotSet", this);
             if (request.VersionDescription == null)
-                return BadRequest(UploadImageResultViewModel.Failure(localizer["VersionDescriptionNotSet"].Value, false, localizer));
+                return ControllerResult.FailureWithResourceMesg("VersionDescriptionNotSet", this);
 
             try
             {
@@ -211,11 +189,11 @@ namespace MemCheck.WebUI.Controllers
                 var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
                 await new UpdateImageMetadata(dbContext, localizer).RunAsync(applicationRequest);
                 var toastText = $"{localizer["SuccessfullyUpdatedImage"]} '{request.ImageName}'";
-                return Ok(new { ToastText = toastText, ToastTitle = localizer["Success"] });
+                return ControllerResult.Success(toastText, this);
             }
             catch (Exception e)
             {
-                return ControllerError.BadRequest(e, this);
+                return ControllerResult.Failure(e, this);
             }
         }
         public sealed class UpdateRequestModel
@@ -240,7 +218,7 @@ namespace MemCheck.WebUI.Controllers
             try
             {
                 if (request.DeletionDescription == null)
-                    return BadRequest(UploadImageResultViewModel.Failure("DeletionDescriptionNotSet", false, localizer));
+                    return ControllerResult.FailureWithResourceMesg("DeletionDescriptionNotSet", this);
 
                 var user = await userManager.GetUserAsync(HttpContext.User);
                 var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
