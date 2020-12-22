@@ -77,7 +77,7 @@ namespace MemCheck.Application.CardChanging
         {
             this.dbContext = dbContext;
         }
-        public async Task RunAsync(Request request, IStringLocalizer localizer, DateTime? cardNewVersionUtcDate = null)
+        public async Task RunAsync(Request request, ILocalized localizer, DateTime? cardNewVersionUtcDate = null)
         {
             await request.CheckValidityAsync(localizer, dbContext);
 
@@ -132,7 +132,7 @@ namespace MemCheck.Application.CardChanging
             public IEnumerable<Guid> Tags { get; }
             public IEnumerable<Guid> UsersWithVisibility { get; }
             public string VersionDescription { get; }
-            public async Task CheckValidityAsync(IStringLocalizer localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
                 CardInputValidator.Run(this, localizer);
 
@@ -166,7 +166,7 @@ namespace MemCheck.Application.CardChanging
                     && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
                     && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
                     && SameImageLists(dataBeforeUpdate.Images))
-                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"].Value);
+                    throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
 
                 //to do: reducing UsersWithView must check that this will not break anybody's deck, nor prevent an author of a version of this card from viewing it
             }

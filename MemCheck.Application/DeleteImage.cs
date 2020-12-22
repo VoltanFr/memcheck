@@ -13,7 +13,7 @@ namespace MemCheck.Application
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         private ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
@@ -29,7 +29,7 @@ namespace MemCheck.Application
             }
         }
         #endregion
-        public DeleteImage(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public DeleteImage(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -103,12 +103,12 @@ namespace MemCheck.Application
             public MemCheckUser User { get; }
             public Guid ImageId { get; }
             public string DeletionDescription { get; }
-            public async Task CheckValidityAsync(IStringLocalizer localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
                 if (DeletionDescription != DeletionDescription.Trim())
                     throw new InvalidOperationException("Invalid name: not trimmed");
                 if (DeletionDescription.Length < minDescriptionLength || DeletionDescription.Length > maxDescriptionLength)
-                    throw new RequestInputException(localizer["InvalidDeletionDescriptionLength"] + $" {DeletionDescription.Length}" + localizer["MustBeBetween"] + $" {minDescriptionLength} " + localizer["And"] + $" {maxDescriptionLength}");
+                    throw new RequestInputException(localizer.Get("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + localizer.Get("MustBeBetween") + $" {minDescriptionLength} " + localizer.Get("And") + $" {maxDescriptionLength}");
 
                 if (QueryValidationHelper.IsReservedGuid(User.Id))
                     throw new RequestInputException("InvalidUserId");
@@ -117,11 +117,11 @@ namespace MemCheck.Application
 
                 var images = dbContext.Images.Where(img => img.Id == ImageId);
                 if (!await images.AnyAsync())
-                    throw new RequestInputException(localizer["UnknownImage"].Value);
+                    throw new RequestInputException(localizer.Get("UnknownImage"));
                 var cardCounts = images.Select(img => img.Cards.Count());
                 var cardCount = await cardCounts.SingleAsync();
                 if (cardCount != 0)
-                    throw new RequestInputException(localizer["ImageUsedInCardsPart1"] + ' ' + cardCount + ' ' + localizer["ImageUsedInCardsPart2"]);
+                    throw new RequestInputException(localizer.Get("ImageUsedInCardsPart1") + ' ' + cardCount + ' ' + localizer.Get("ImageUsedInCardsPart2"));
             }
         }
         #endregion

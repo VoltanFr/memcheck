@@ -71,9 +71,9 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var versionDescription = Localizer["InitialCardVersionCreation"].Value;
+            var versionDescription = Get("InitialCardVersionCreation");
             var request = new CreateCard.Request(user.Id, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
-            var cardId = await new CreateCard(dbContext).RunAsync(request, Localizer);
+            var cardId = await new CreateCard(dbContext).RunAsync(request, this);
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardInDeck(dbContext).RunAsync(card.AddToDeck, cardId);
             return Ok();
@@ -99,7 +99,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
-            await new UpdateCard(dbContext).RunAsync(request, Localizer);
+            await new UpdateCard(dbContext).RunAsync(request, this);
             return Ok();
         }
         public sealed class UpdateCardRequest
@@ -141,12 +141,12 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var result = new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
-            return Ok(new GetCardForEditViewModel(await result, Localizer));
+            return Ok(new GetCardForEditViewModel(await result, this));
         }
         #region Request and view model classes
         internal sealed class GetCardForEditViewModel
         {
-            public GetCardForEditViewModel(GetCardForEdit.ResultModel applicationResult, IStringLocalizer localizer)
+            public GetCardForEditViewModel(GetCardForEdit.ResultModel applicationResult, ILocalized localizer)
             {
                 FrontSide = applicationResult.FrontSide;
                 BackSide = applicationResult.BackSide;
@@ -156,8 +156,8 @@ namespace MemCheck.WebUI.Controllers
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
                 CreationUtcDate = applicationResult.CreationUtcDate;
                 LastChangeUtcDate = applicationResult.LastChangeUtcDate;
-                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer["AppearsInDecksOf"].Value + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer["NotIncludedInAnyDeck"].Value;
-                Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage, localizer));
+                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage));
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
                 CountOfUserRatings = applicationResult.CountOfUserRatings;
@@ -178,7 +178,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardForEditImageViewModel
         {
-            internal GetCardForEditImageViewModel(GetCardForEdit.ResultImageModel appResult, IStringLocalizer localizer)
+            internal GetCardForEditImageViewModel(GetCardForEdit.ResultImageModel appResult)
             {
                 ImageId = appResult.ImageId;
                 Name = appResult.Name;
@@ -197,12 +197,12 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetGuiMessages()
         {
             return Ok(new GetGuiMessagesViewModel(
-            Localize("Success"),
-            Localize("CardSavedOk"),
-            Localize("Failure"),
-            Localize("SureCreateWithoutTag"),
-            Localize("Saved"),
-            Localize("RatingSavedOk")
+            Get("Success"),
+            Get("CardSavedOk"),
+            Get("Failure"),
+            Get("SureCreateWithoutTag"),
+            Get("Saved"),
+            Get("RatingSavedOk")
             ));
         }
         public sealed class GetGuiMessagesViewModel
@@ -248,7 +248,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetImageInfo([FromBody] GetImageInfoRequest request)
         {
             CheckBodyParameter(request);
-            var appResult = await new GetImageInfo(dbContext, Localizer).RunAsync(request.ImageName);
+            var appResult = await new GetImageInfo(dbContext, this).RunAsync(request.ImageName);
             return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
         }
         #region Request and view model classes
@@ -275,18 +275,18 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> CardVersions(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var appResults = await new GetCardVersions(dbContext, Localizer).RunAsync(cardId, userId);
-            var result = appResults.Select(appResult => new CardVersion(appResult, Localizer));
+            var appResults = await new GetCardVersions(dbContext, this).RunAsync(cardId, userId);
+            var result = appResults.Select(appResult => new CardVersion(appResult, this));
             return Ok(result);
         }
         public sealed class CardVersion
         {
-            public CardVersion(GetCardVersions.ResultCardVersion appResult, IStringLocalizer localizer)
+            public CardVersion(GetCardVersions.ResultCardVersion appResult, ILocalized localizer)
             {
                 VersionUtcDate = appResult.VersionUtcDate;
                 VersionCreator = appResult.VersionCreator;
                 VersionDescription = appResult.VersionDescription;
-                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer[fieldName].Value);
+                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.Get(fieldName));
                 ChangedFieldList = string.Join(',', fieldsDisplayNames);
             }
             public DateTime VersionUtcDate { get; }

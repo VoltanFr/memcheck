@@ -23,7 +23,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetGuiMessages")]
         public IActionResult GetGuiMessages()
         {
-            return Ok(new GetGuiMessagesViewModel(Localize("AlreadyExistsErrMesg"), Localize("NameLengthErrMesg"), Localize("Saved"), Localize("LabelName")));
+            return Ok(new GetGuiMessagesViewModel(Get("AlreadyExistsErrMesg"), Get("NameLengthErrMesg"), Get("Saved"), Get("LabelName")));
         }
         public sealed class GetGuiMessagesViewModel
         {

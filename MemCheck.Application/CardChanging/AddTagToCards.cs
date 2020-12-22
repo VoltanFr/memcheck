@@ -2,7 +2,6 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +13,9 @@ namespace MemCheck.Application.CardChanging
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         #endregion
-        public AddTagToCards(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public AddTagToCards(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -29,7 +28,7 @@ namespace MemCheck.Application.CardChanging
             foreach (var cardId in request.CardIds)
                 if (!dbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, localizer["AddTag"].Value + $" '{tagName}'");
+                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, localizer.Get("AddTag") + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
                     dbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }

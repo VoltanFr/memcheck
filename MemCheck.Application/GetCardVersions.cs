@@ -2,7 +2,6 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,11 +23,11 @@ namespace MemCheck.Application
         private const string BackSideImages = nameof(BackSideImages);
         private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         #endregion
-        public GetCardVersions(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public GetCardVersions(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -43,7 +42,7 @@ namespace MemCheck.Application
 
             var cards = dbContext.Cards.Where(card => card.Id == cardId);
             if (!await cards.AnyAsync())
-                throw new RequestInputException(localizer["UnknownCard"].Value);
+                throw new RequestInputException(localizer.Get("UnknownCard"));
 
             var currentVersion = await cards.Include(card => card.PreviousVersion)
                 .Select(card => new CardVersionFromDb(

@@ -105,22 +105,22 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             public IEnumerable<Region> Regions { get; }
         }
-        private sealed class FakeStringLocalizer : IStringLocalizer
-        {
-            public LocalizedString this[string name] => new LocalizedString(name, "no translation");
+        //private sealed class FakeStringLocalizer
+        //{
+        //    public LocalizedString this[string name] => new LocalizedString(name, "no translation");
 
-            public LocalizedString this[string name, params object[] arguments] => this[name];
+        //    public LocalizedString this[string name, params object[] arguments] => this[name];
 
-            public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
-            {
-                return new LocalizedString[0];
-            }
+        //    public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
+        //    {
+        //        return new LocalizedString[0];
+        //    }
 
-            public IStringLocalizer WithCulture(CultureInfo culture)
-            {
-                return this;
-            }
-        }
+        //    public IStringLocalizer WithCulture(CultureInfo culture)
+        //    {
+        //        return this;
+        //    }
+        //}
         #endregion
         public ChangeOwner(IServiceProvider serviceProvider)
         {

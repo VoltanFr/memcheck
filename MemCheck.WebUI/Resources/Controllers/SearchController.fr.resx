@@ -336,6 +336,9 @@
   <data name="TagAdded" xml:space="preserve">
     <value>Label ajouté</value>
   </data>
+  <data name="UnknownCardsHeap" xml:space="preserve">
+    <value>Cartes non apprises</value>
+  </data>
   <data name="Unregistered" xml:space="preserve">
     <value>Vous êtes désabonné</value>
   </data>

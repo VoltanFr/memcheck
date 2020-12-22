@@ -13,19 +13,19 @@ namespace MemCheck.Application
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         private async Task<Result> ResultFromSearchAsync(IQueryable<Image> searchResult, string additionalInfoForNotFound)
         {
             if (!searchResult.Any())
-                throw new RequestInputException(localizer["ImageNotFound"] + ' ' + additionalInfoForNotFound);
+                throw new RequestInputException(localizer.Get("ImageNotFound") + ' ' + additionalInfoForNotFound);
 
             var results = searchResult.Select(img => new Result(img.Id, img.Owner, img.Name, img.Description, img.Source, img.Cards.Count(), img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription));
             return await results.SingleAsync();
         }
         #endregion
-        public GetImageInfo(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public GetImageInfo(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -34,7 +34,7 @@ namespace MemCheck.Application
         {
             imageName = imageName.Trim();
             if (imageName.Length == 0)
-                throw new RequestInputException(localizer["PleaseEnterAnImageName"].Value);
+                throw new RequestInputException(localizer.Get("PleaseEnterAnImageName"));
             var images = dbContext.Images.Include(img => img.Cards).Where(image => EF.Functions.Like(image.Name, $"{imageName}"));
             return await ResultFromSearchAsync(images, imageName);
         }

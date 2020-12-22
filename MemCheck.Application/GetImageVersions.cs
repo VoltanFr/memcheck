@@ -19,11 +19,11 @@ namespace MemCheck.Application
         private const string ImageDescriptionFieldName = "ImageDescription";
         private const string ImageSourceFieldName = "ImageSource";
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         #endregion
-        public GetImageVersions(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public GetImageVersions(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -34,7 +34,7 @@ namespace MemCheck.Application
                 throw new RequestInputException("Invalid image id");
             var images = dbContext.Images.Where(img => img.Id == imageId);
             if (!await images.AnyAsync())
-                throw new RequestInputException(localizer["UnknownImage"].Value);
+                throw new RequestInputException(localizer.Get("UnknownImage"));
 
             var currentVersion = await images.Include(img => img.PreviousVersion)
                 .Select(img => new ImageVersionFromDb(

@@ -22,15 +22,13 @@ namespace MemCheck.WebUI.Controllers
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
-        private readonly IStringLocalizer<DecksController> decksControllerLocalizer;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
         private static readonly Guid allTagsFakeGuid = new Guid("11111111-1111-1111-1111-111111111111");
         #endregion
-        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer) : base(localizer)
+        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
-            this.decksControllerLocalizer = decksControllerLocalizer;
         }
         #region GetAllStaticData
         [HttpGet("GetAllStaticData")]
@@ -44,29 +42,29 @@ namespace MemCheck.WebUI.Controllers
                 decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(user.Id);
             var allTags = new GetAllAvailableTags(dbContext).Run();
             var allUsers = new GetUsers(dbContext).Run();
-            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags, allUsers, Localizer, decksControllerLocalizer, user);
+            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags, allUsers, this, user);
             return base.Ok(value);
         }
         #region View model classes
         public sealed class GetAllStaticDataViewModel
         {
-            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, IStringLocalizer localizer, IStringLocalizer<DecksController> decksControllerLocalizer, MemCheckUser? currentUser)
+            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
             {
-                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer["Ignore"].Value) }
-                    .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer, decksControllerLocalizer)));
+                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer.Get("Ignore")) }
+                    .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer)));
                 AllDecksForAddingCards = userDecks.Select(applicationResult => new GetAllStaticDataDeckForAddViewModel(applicationResult.DeckId, applicationResult.Description));
                 AllApplicableTags = allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name));
-                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value) }
+                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")) }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
                 AllExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"].Value)
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.Get("All"))
                     }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
-                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer["Any"].Value) }
+                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer.Get("Any")) }
                     .Concat(allUsers.Select(user => new GetAllStaticDataUserViewModel(user.UserId, user.UserName)));
                 LocalizedText = new GetAllStaticDataLocalizedTextViewModel(localizer);
-                PossibleHeapsForMove = Enumerable.Range(0, CardInDeck.MaxHeapValue).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, decksControllerLocalizer)));
+                PossibleHeapsForMove = Enumerable.Range(0, CardInDeck.MaxHeapValue).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, localizer)));
                 CurrentUserId = currentUser == null ? Guid.Empty : currentUser.Id;
                 ShowDebugInfo = DisplayServices.ShowDebugInfo(currentUser);
             }
@@ -83,17 +81,17 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllStaticDataDeckViewModel
         {
-            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.ResultModel applicationResult, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
+            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.ResultModel applicationResult, ILocalized localizer)
             {
                 DeckId = applicationResult.DeckId;
                 DeckName = applicationResult.Description;
-                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer["Any"].Value) }
-                    .Concat(applicationResult.Heaps.OrderBy(heap => heap).Select(heap => new GetAllStaticDataHeapViewModel(heap, DisplayServices.HeapName(heap, decksControllerLocalizer))));
-                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value) }
+                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer.Get("Any")) }
+                    .Concat(applicationResult.Heaps.OrderBy(heap => heap).Select(heap => new GetAllStaticDataHeapViewModel(heap, DisplayServices.HeapName(heap, localizer))));
+                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")) }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 ExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer["None"].Value),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer["All"].Value)
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.Get("All"))
                     }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
             }
@@ -154,73 +152,73 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllStaticDataLocalizedTextViewModel
         {
-            public GetAllStaticDataLocalizedTextViewModel(IStringLocalizer localizer)
+            public GetAllStaticDataLocalizedTextViewModel(ILocalized localizer)
             {
-                Any = localizer["Any"].Value;
-                Ignore = localizer["Ignore"].Value;
-                Before = localizer["Before"].Value;
-                ThatDay = localizer["On"].Value;
-                After = localizer["After"].Value;
-                CardVisibleToMoreThanOwner = localizer["CardVisibleToMoreThanOwner"].Value;
-                CardVisibleToOwnerOnly = localizer["CardVisibleToOwnerOnly"].Value;
-                IncludeCards = localizer["IncludeCards"].Value;
-                ExcludeCards = localizer["ExcludeCards"].Value;
-                OperationIsForSelectedCards = localizer["OperationIsForSelectedCards"].Value;
-                AlertAddTagToCardsPart1 = localizer["AlertAddTagToCardsPart1"].Value;
-                AlertAddTagToCardsPart2 = localizer["AlertAddTagToCardsPart2"].Value;
-                AlertAddTagToCardsPart3Single = localizer["AlertAddTagToCardsPart3Single"].Value;
-                AlertAddTagToCardsPart3Plural = localizer["AlertAddTagToCardsPart3Plural"].Value;
-                TagAdded = localizer["TagAdded"].Value;
-                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer["CantAddToDeckBecauseSomeCardsAlreadyIn"].Value;
-                AlertAddCardsToDeckPart1 = localizer["AlertAddCardsToDeckPart1"].Value;
-                AlertAddCardToDeckPart1 = localizer["AlertAddCardToDeckPart1"].Value;
-                AlertAddCardsToDeckPart2 = localizer["AlertAddCardsToDeckPart2"].Value;
-                AlertAddCardsToDeckPart3 = localizer["AlertAddCardsToDeckPart3"].Value;
-                AlertAddCardToDeckPart3 = localizer["AlertAddCardToDeckPart3"].Value;
-                AlertAddOneCardToDeck = localizer["AlertAddOneCardToDeck"].Value;
-                CardsAdded = localizer["CardsAdded"].Value;
-                CardAdded = localizer["CardAdded"].Value;
-                CardAlreadyInDeck = localizer["CardAlreadyInDeck"].Value;
-                CardsAlreadyInDeck = localizer["CardsAlreadyInDeck"].Value;
+                Any = localizer.Get("Any");
+                Ignore = localizer.Get("Ignore");
+                Before = localizer.Get("Before");
+                ThatDay = localizer.Get("On");
+                After = localizer.Get("After");
+                CardVisibleToMoreThanOwner = localizer.Get("CardVisibleToMoreThanOwner");
+                CardVisibleToOwnerOnly = localizer.Get("CardVisibleToOwnerOnly");
+                IncludeCards = localizer.Get("IncludeCards");
+                ExcludeCards = localizer.Get("ExcludeCards");
+                OperationIsForSelectedCards = localizer.Get("OperationIsForSelectedCards");
+                AlertAddTagToCardsPart1 = localizer.Get("AlertAddTagToCardsPart1");
+                AlertAddTagToCardsPart2 = localizer.Get("AlertAddTagToCardsPart2");
+                AlertAddTagToCardsPart3Single = localizer.Get("AlertAddTagToCardsPart3Single");
+                AlertAddTagToCardsPart3Plural = localizer.Get("AlertAddTagToCardsPart3Plural");
+                TagAdded = localizer.Get("TagAdded");
+                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer.Get("CantAddToDeckBecauseSomeCardsAlreadyIn");
+                AlertAddCardsToDeckPart1 = localizer.Get("AlertAddCardsToDeckPart1");
+                AlertAddCardToDeckPart1 = localizer.Get("AlertAddCardToDeckPart1");
+                AlertAddCardsToDeckPart2 = localizer.Get("AlertAddCardsToDeckPart2");
+                AlertAddCardsToDeckPart3 = localizer.Get("AlertAddCardsToDeckPart3");
+                AlertAddCardToDeckPart3 = localizer.Get("AlertAddCardToDeckPart3");
+                AlertAddOneCardToDeck = localizer.Get("AlertAddOneCardToDeck");
+                CardsAdded = localizer.Get("CardsAdded");
+                CardAdded = localizer.Get("CardAdded");
+                CardAlreadyInDeck = localizer.Get("CardAlreadyInDeck");
+                CardsAlreadyInDeck = localizer.Get("CardsAlreadyInDeck");
 
-                CardAlreadyNotInDeck = localizer["CardAlreadyNotInDeck"].Value;
-                CardsAlreadyNotInDeck = localizer["CardsAlreadyNotInDeck"].Value;
-                AlertRemoveOneCardFromDeck = localizer["AlertRemoveOneCardFromDeck"].Value;
-                AlertRemoveCardFromDeckPart1 = localizer["AlertRemoveCardFromDeckPart1"].Value;
-                AlertRemoveCardsFromDeckPart1 = localizer["AlertRemoveCardsFromDeckPart1"].Value;
-                AlertRemoveCardsFromDeckPart2 = localizer["AlertRemoveCardsFromDeckPart2"].Value;
-                AlertRemoveCardsFromDeckPart3 = localizer["AlertRemoveCardsFromDeckPart3"].Value;
-                AlertRemoveCardFromDeckPart3 = localizer["AlertRemoveCardFromDeckPart3"].Value;
-                CardRemoved = localizer["CardRemoved"].Value;
-                CardsRemoved = localizer["CardsRemoved"].Value;
+                CardAlreadyNotInDeck = localizer.Get("CardAlreadyNotInDeck");
+                CardsAlreadyNotInDeck = localizer.Get("CardsAlreadyNotInDeck");
+                AlertRemoveOneCardFromDeck = localizer.Get("AlertRemoveOneCardFromDeck");
+                AlertRemoveCardFromDeckPart1 = localizer.Get("AlertRemoveCardFromDeckPart1");
+                AlertRemoveCardsFromDeckPart1 = localizer.Get("AlertRemoveCardsFromDeckPart1");
+                AlertRemoveCardsFromDeckPart2 = localizer.Get("AlertRemoveCardsFromDeckPart2");
+                AlertRemoveCardsFromDeckPart3 = localizer.Get("AlertRemoveCardsFromDeckPart3");
+                AlertRemoveCardFromDeckPart3 = localizer.Get("AlertRemoveCardFromDeckPart3");
+                CardRemoved = localizer.Get("CardRemoved");
+                CardsRemoved = localizer.Get("CardsRemoved");
 
-                OperationIsForFilteringOnDeckInclusive = localizer["OperationIsForFilteringOnDeckInclusive"].Value;
-                CardAlreadyInTargetHeap = localizer["CardAlreadyInTargetHeap"].Value;
-                CardsAlreadyInTargetHeap = localizer["CardsAlreadyInTargetHeap"].Value;
-                AlertMoveOneCardToHeap = localizer["AlertMoveOneCardToHeap"].Value;
-                AlertMoveCardsToHeapPart1 = localizer["AlertMoveCardsToHeapPart1"].Value;
-                AlertMoveCardsToHeapPart2 = localizer["AlertMoveCardsToHeapPart2"].Value;
-                AlertMoveCardToHeapPart3 = localizer["AlertMoveCardToHeapPart3"].Value;
-                AlertMoveCardsToHeapPart3 = localizer["AlertMoveCardsToHeapPart3"].Value;
-                CardMoved = localizer["CardMoved"].Value;
-                CardsMoved = localizer["CardsMoved"].Value;
+                OperationIsForFilteringOnDeckInclusive = localizer.Get("OperationIsForFilteringOnDeckInclusive");
+                CardAlreadyInTargetHeap = localizer.Get("CardAlreadyInTargetHeap");
+                CardsAlreadyInTargetHeap = localizer.Get("CardsAlreadyInTargetHeap");
+                AlertMoveOneCardToHeap = localizer.Get("AlertMoveOneCardToHeap");
+                AlertMoveCardsToHeapPart1 = localizer.Get("AlertMoveCardsToHeapPart1");
+                AlertMoveCardsToHeapPart2 = localizer.Get("AlertMoveCardsToHeapPart2");
+                AlertMoveCardToHeapPart3 = localizer.Get("AlertMoveCardToHeapPart3");
+                AlertMoveCardsToHeapPart3 = localizer.Get("AlertMoveCardsToHeapPart3");
+                CardMoved = localizer.Get("CardMoved");
+                CardsMoved = localizer.Get("CardsMoved");
 
-                AlertDeleteCardsPart1 = localizer["AlertDeleteCardsPart1"].Value;
-                AlertDeleteCardsPart2Single = localizer["AlertDeleteCardsPart2Single"].Value;
-                AlertDeleteCardsPart2Plural = localizer["AlertDeleteCardsPart2Plural"].Value;
-                CardDeleted = localizer["CardDeleted"].Value;
-                CardsDeleted = localizer["CardsDeleted"].Value;
+                AlertDeleteCardsPart1 = localizer.Get("AlertDeleteCardsPart1");
+                AlertDeleteCardsPart2Single = localizer.Get("AlertDeleteCardsPart2Single");
+                AlertDeleteCardsPart2Plural = localizer.Get("AlertDeleteCardsPart2Plural");
+                CardDeleted = localizer.Get("CardDeleted");
+                CardsDeleted = localizer.Get("CardsDeleted");
 
-                SelectedRatingAndAbove = localizer["SelectedRatingAndAbove"].Value;
-                SelectedRatingAndBelow = localizer["SelectedRatingAndBelow"].Value;
-                NoRating = localizer["NoRating"].Value;
+                SelectedRatingAndAbove = localizer.Get("SelectedRatingAndAbove");
+                SelectedRatingAndBelow = localizer.Get("SelectedRatingAndBelow");
+                NoRating = localizer.Get("NoRating");
 
-                CardsRegisteredForNotif = localizer["CardsRegisteredForNotif"].Value;
-                CardsNotRegisteredForNotif = localizer["CardsNotRegisteredForNotif"].Value;
-                Registered = localizer["Registered"].Value;
-                Unregistered = localizer["Unregistered"].Value;
+                CardsRegisteredForNotif = localizer.Get("CardsRegisteredForNotif");
+                CardsNotRegisteredForNotif = localizer.Get("CardsNotRegisteredForNotif");
+                Registered = localizer.Get("Registered");
+                Unregistered = localizer.Get("Unregistered");
 
-                ConfirmSubscription = localizer["ConfirmSubscription"].Value;
+                ConfirmSubscription = localizer.Get("ConfirmSubscription");
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -361,7 +359,7 @@ namespace MemCheck.WebUI.Controllers
 
             var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
 
-            var result = new RunQueryViewModel(applicationResult, userName, Localizer, decksControllerLocalizer);
+            var result = new RunQueryViewModel(applicationResult, userName, this);
 
             return base.Ok(result);
         }
@@ -383,11 +381,11 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryViewModel
         {
-            public RunQueryViewModel(SearchCards.Result applicationResult, string? currentUser, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
+            public RunQueryViewModel(SearchCards.Result applicationResult, string? currentUser, ILocalized localizer)
             {
                 TotalNbCards = applicationResult.TotalNbCards;
                 PageCount = applicationResult.PageCount;
-                Cards = applicationResult.Cards.Select(card => new RunQueryCardViewModel(card, currentUser, localizer, decksControllerLocalizer));
+                Cards = applicationResult.Cards.Select(card => new RunQueryCardViewModel(card, currentUser, localizer));
             }
             public int TotalNbCards { get; }
             public int PageCount { get; }
@@ -395,7 +393,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryCardViewModel
         {
-            public RunQueryCardViewModel(SearchCards.ResultCard card, string? currentUser, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
+            public RunQueryCardViewModel(SearchCards.ResultCard card, string? currentUser, ILocalized localizer)
             {
                 CardId = card.CardId;
                 FrontSide = card.FrontSide;
@@ -404,13 +402,13 @@ namespace MemCheck.WebUI.Controllers
                 AverageRating = card.AverageRating;
                 CurrentUserRating = card.CurrentUserRating;
                 CountOfUserRatings = card.CountOfUserRatings;
-                PopoverVisibility = localizer["Visibility"].Value;
+                PopoverVisibility = localizer.Get("Visibility");
                 if (VisibleToCount == 1)
-                    PopoverVisibility = localizer["YouOnly"].ToString();
+                    PopoverVisibility = localizer.Get("YouOnly");
                 else
                 {
                     if (VisibleToCount == 0)
-                        PopoverVisibility = localizer["AllUsers"].ToString();
+                        PopoverVisibility = localizer.Get("AllUsers");
                     else
                         PopoverVisibility = string.Join(',', card.VisibleTo);
                 }
@@ -420,9 +418,9 @@ namespace MemCheck.WebUI.Controllers
                         deckInfo.DeckId,
                         deckInfo.DeckName,
                         deckInfo.CurrentHeap,
-                        DisplayServices.HeapName(deckInfo.CurrentHeap, decksControllerLocalizer),
+                        DisplayServices.HeapName(deckInfo.CurrentHeap, localizer),
                         deckInfo.NbTimesInNotLearnedHeap,
-                        DisplayServices.HeapName(deckInfo.BiggestHeapReached, decksControllerLocalizer),
+                        DisplayServices.HeapName(deckInfo.BiggestHeapReached, localizer),
                         deckInfo.AddToDeckUtcTime,
                         deckInfo.LastLearnUtcTime,
                         deckInfo.Expired,
@@ -473,7 +471,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
-            await new AddTagToCards(dbContext, Localizer).RunAsync(appRequest);
+            await new AddTagToCards(dbContext, this).RunAsync(appRequest);
             return Ok();
         }
         public sealed class AddTagToCardsRequest
@@ -529,7 +527,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
-            await new DeleteCards(dbContext, Localizer).RunAsync(appRequest);
+            await new DeleteCards(dbContext, this).RunAsync(appRequest);
             return Ok();
         }
         public sealed class DeleteCardsRequest
@@ -580,11 +578,11 @@ namespace MemCheck.WebUI.Controllers
             if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
                 throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
             if (request.Deck != Guid.Empty && request.DeckIsInclusive)
-                throw new RequestInputException(Localize("CanNotSubscribeToSearchInDeck"));
+                throw new RequestInputException(Get("CanNotSubscribeToSearchInDeck"));
             if (request.Visibility != 1)
-                throw new RequestInputException(Localize("CanNotSubscribeToSearchWithVisibilityCriteria"));
+                throw new RequestInputException(Get("CanNotSubscribeToSearchWithVisibilityCriteria"));
             if (request.RatingFilteringMode != 1)
-                throw new RequestInputException(Localize("CanNotSubscribeToSearchWithRatingCriteria"));
+                throw new RequestInputException(Get("CanNotSubscribeToSearchWithRatingCriteria"));
         }
         [HttpPost("SubscribeToSearch")]
         public async Task<IActionResult> SubscribeToSearch([FromBody] RunQueryRequest request)
@@ -592,9 +590,9 @@ namespace MemCheck.WebUI.Controllers
             ChecSubscribeToSearchRequestValidity(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
-            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Localize("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
+            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Get("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
             await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
-            var result = new SubscribeToSearchViewModel(Localize("Success"), Localize("SubscriptionRecorded"));
+            var result = new SubscribeToSearchViewModel(Get("Success"), Get("SubscriptionRecorded"));
             return base.Ok(result);
         }
         public sealed class SubscribeToSearchViewModel

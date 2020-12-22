@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -23,11 +24,11 @@ namespace MemCheck.WebUI.Controllers
         #region Private methods
         private string HeapingAlgoNameFromId(int id)
         {
-            return Localize("HeapingAlgoNameForId" + id);
+            return Get("HeapingAlgoNameForId" + id);
         }
         private string HeapingAlgoDescriptionFromId(int id)
         {
-            return Localize("HeapingAlgoDescriptionForId" + id);
+            return Get("HeapingAlgoDescriptionForId" + id);
         }
         #endregion
         public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer) : base(localizer)
@@ -70,8 +71,8 @@ namespace MemCheck.WebUI.Controllers
             var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
             var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
             var frontSide = $" '{applicationResult.FrontSideText.Truncate(30, true)}'";
-            var mesgBody = Localize("CardWithFrontSideHead") + frontSide + ' ' + Localize("RemovedFromDeck") + ' ' + applicationResult.DeckName;
-            var result = new { MessageTitle = Localize("Success"), MessageBody = mesgBody };
+            var mesgBody = Get("CardWithFrontSideHead") + frontSide + ' ' + Get("RemovedFromDeck") + ' ' + applicationResult.DeckName;
+            var result = new { MessageTitle = Get("Success"), MessageBody = mesgBody };
             return base.Ok(result);
         }
         #endregion
@@ -225,14 +226,14 @@ namespace MemCheck.WebUI.Controllers
                     HeapingAlgoDescriptionFromId(deck.HeapingAlgorithmId),
                     deck.CardCount,
                     deck.Heaps.OrderBy(heap => heap.HeapId),
-                    Localizer
+                    this
                     )
             );
             return base.Ok(result);
         }
         public sealed class GetUserDecksWithHeapsViewModel
         {
-            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeapModel> heaps, IStringLocalizer localizer)
+            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeapModel> heaps, ILocalized localizer)
             {
                 DeckId = deckId;
                 Description = description;
@@ -272,7 +273,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var decks = new GetUserDecks(dbContext).Run(userId);
             var result = decks.Select(deck => new GetUserDecksForDeletionViewModel(deck.DeckId, deck.Description, deck.CardCount,
-                Localize("SureYouWantToDelete") + " " + deck.Description + " " + Localize("AndLose") + " " + deck.CardCount + " " + Localize("CardLearningInfo") + " " + Localize("NoUndo")));
+                Get("SureYouWantToDelete") + " " + deck.Description + " " + Get("AndLose") + " " + deck.CardCount + " " + Get("CardLearningInfo") + " " + Get("NoUndo")));
             return base.Ok(result);
         }
         public sealed class GetUserDecksForDeletionViewModel
@@ -316,7 +317,7 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetHeapsOfDeck(Guid deckId)
         {
             var applicationResult = new GetHeapsOfDeck(dbContext).Run(deckId);
-            return base.Ok(applicationResult.OrderBy(heapId => heapId).Select(heapId => new GetHeapsOfDeckViewModel(heapId, DisplayServices.HeapName(heapId, Localizer))));
+            return base.Ok(applicationResult.OrderBy(heapId => heapId).Select(heapId => new GetHeapsOfDeckViewModel(heapId, DisplayServices.HeapName(heapId, this))));
         }
         public sealed class GetHeapsOfDeckViewModel
         {

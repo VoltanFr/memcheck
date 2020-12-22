@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -106,15 +107,22 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             public IEnumerable<Region> Regions { get; }
         }
-        private sealed class FakeStringLocalizer : IStringLocalizer
+        private sealed class FakeStringLocalizer : IStringLocalizer, ILocalized
         {
             public LocalizedString this[string name] => new LocalizedString(name, "no translation");
 
             public LocalizedString this[string name, params object[] arguments] => this[name];
 
+            public IStringLocalizer Localizer => throw new NotImplementedException();
+
             public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
             {
                 return new LocalizedString[0];
+            }
+
+            public string Get(string resourceName)
+            {
+                throw new NotImplementedException();
             }
 
             public IStringLocalizer WithCulture(CultureInfo culture)

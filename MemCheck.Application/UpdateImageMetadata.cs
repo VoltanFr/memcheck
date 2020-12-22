@@ -19,7 +19,7 @@ namespace MemCheck.Application
         #region Fields
         private const string svgImageContentType = "image/svg+xml";
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         private const int minDescriptionLength = 3;
         private const int maxDescriptionLength = 1000;
         #endregion
@@ -67,7 +67,7 @@ namespace MemCheck.Application
             }
         }
         #endregion
-        public UpdateImageMetadata(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public UpdateImageMetadata(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -125,7 +125,7 @@ namespace MemCheck.Application
             public string Source { get; }
             public string Description { get; }
             public string VersionDescription { get; }
-            public async Task CheckValidityAsync(IStringLocalizer localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(User.Id))
                     throw new RequestInputException("Invalid user id");
@@ -137,7 +137,7 @@ namespace MemCheck.Application
                 if (VersionDescription != VersionDescription.Trim())
                     throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
                 if (VersionDescription.Length < minDescriptionLength || VersionDescription.Length > maxDescriptionLength)
-                    throw new RequestInputException(localizer["InvalidVersionDescriptionLength"].Value + $" {VersionDescription.Length}" + localizer["MustBeBetween"].Value + $" {minDescriptionLength} " + localizer["And"] + $" {maxDescriptionLength}");
+                    throw new RequestInputException(localizer.Get("InvalidVersionDescriptionLength") + $" {VersionDescription.Length}" + localizer.Get("MustBeBetween") + $" {minDescriptionLength} " + localizer.Get("And") + $" {maxDescriptionLength}");
 
                 var images = dbContext.Images.Where(img => img.Id == ImageId);
 
@@ -147,7 +147,7 @@ namespace MemCheck.Application
                 var imageDataBeforeUpdate = await images.Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description }).SingleAsync();
 
                 if ((imageDataBeforeUpdate.nameBeforeUpdate == Name) && (imageDataBeforeUpdate.sourceBeforeUpdate == Source) && (imageDataBeforeUpdate.descriptionBeforeUpdate == Description))
-                    throw new RequestInputException(localizer["CanNotUpdateMetadataBecauseSameAsOriginal"].Value);
+                    throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
             }
         }
         #endregion

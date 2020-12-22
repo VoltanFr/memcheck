@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MemCheck.Application.QueryValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Runtime.CompilerServices;
@@ -24,7 +25,7 @@ namespace MemCheck.WebUI.Controllers
                 if (property.GetValue(bodyParameter) == null)
                     throw new InvalidProgramException($"Property '{property.Name}' is null in body parameter of {GetType().Name}.{memberName}");
         }
-        protected string Localize(string resourceName)
+        public string Get(string resourceName)
         {
             var result = localizer[resourceName];
             if (result.ResourceNotFound)

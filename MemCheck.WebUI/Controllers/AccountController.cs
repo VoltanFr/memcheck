@@ -31,37 +31,37 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
             var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
-            return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, Localizer)));
+            return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, this)));
         }
         public sealed class SearchSubscriptionViewModel
         {
-            public SearchSubscriptionViewModel(GetSearchSubscriptions.Result searchSubscription, IStringLocalizer localizer)
+            public SearchSubscriptionViewModel(GetSearchSubscriptions.Result searchSubscription, ILocalized localizer)
             {
                 Id = searchSubscription.Id;
                 Name = searchSubscription.Name;
                 var details = new StringBuilder();
                 if (searchSubscription.ExcludedDeck != null)
-                    details.Append(localizer["ExcludedDeck"].Value + ' ' + searchSubscription.ExcludedDeck + ", ");
+                    details.Append(localizer.Get("ExcludedDeck") + ' ' + searchSubscription.ExcludedDeck + ", ");
                 if (searchSubscription.RequiredText.Length > 0)
-                    details.Append(localizer["RequiredText"].Value + " '" + searchSubscription.RequiredText + "', ");
+                    details.Append(localizer.Get("RequiredText") + " '" + searchSubscription.RequiredText + "', ");
                 if (searchSubscription.RequiredTags.Count() == 1)
-                    details.Append(localizer["RequiredTag"].Value + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
+                    details.Append(localizer.Get("RequiredTag") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
                 if (searchSubscription.RequiredTags.Count() > 1)
-                    details.Append(localizer["RequiredTags"].Value + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
+                    details.Append(localizer.Get("RequiredTags") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
                 if (searchSubscription.ExcludeAllTags)
-                    details.Append(localizer["OnlyCardsWithNoTag"].Value + ", ");
+                    details.Append(localizer.Get("OnlyCardsWithNoTag") + ", ");
                 else
                 if (searchSubscription.ExcludedTags.Count() == 1)
-                    details.Append(localizer["ExcludedTag"].Value + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+                    details.Append(localizer.Get("ExcludedTag") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
                 if (searchSubscription.ExcludedTags.Count() > 1)
-                    details.Append(localizer["ExcludedTags"].Value + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+                    details.Append(localizer.Get("ExcludedTags") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
                 if (details.Length == 0)
-                    details.Append(localizer["AllCards"].Value);
+                    details.Append(localizer.Get("AllCards"));
                 Details = details.ToString();
                 CardCountOnLastRun = searchSubscription.CardCountOnLastRun;
                 RegistrationUtcDate = searchSubscription.RegistrationUtcDate;
                 LastRunUtcDate = searchSubscription.LastRunUtcDate;
-                DeleteConfirmMessage = localizer["AreYouSureYouWantToDeleteTheSearch"].Value + " '" + Name + "'";
+                DeleteConfirmMessage = localizer.Get("AreYouSureYouWantToDeleteTheSearch") + " '" + Name + "'";
             }
             public Guid Id { get; }
             public string Name { get; } = null!;
@@ -80,7 +80,7 @@ namespace MemCheck.WebUI.Controllers
             var appRequest = new GetSearchSubscriptions.Request(userId);
             var results = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
             var result = results.Where(r => r.Id == id).Single();
-            return Ok(new SearchSubscriptionViewModel(result, Localizer));
+            return Ok(new SearchSubscriptionViewModel(result, this));
         }
         #endregion
         #region SetSearchSubscriptionName
@@ -105,7 +105,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteSearchSubscription.Request(userId, id);
             await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
-            return base.Ok(Localize("Deleted"));
+            return base.Ok(Get("Deleted"));
         }
         #endregion
     }

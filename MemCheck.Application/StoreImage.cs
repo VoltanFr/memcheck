@@ -26,7 +26,7 @@ namespace MemCheck.Application
         #region Fields
         private const string svgImageContentType = "image/svg+xml";
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer localizer;
+        private readonly ILocalized localizer;
         private static readonly ImmutableHashSet<string> supportedContentTypes = GetSupportedContentTypes();
         private const int bigImageWidth = 1600;
         #endregion
@@ -67,7 +67,7 @@ namespace MemCheck.Application
             }
             catch
             {
-                throw new RequestInputException(localizer["SvgImageCanNotBeLoaded"].Value);
+                throw new RequestInputException(localizer.Get("SvgImageCanNotBeLoaded"));
             }
         }
         private Bitmap GetBitmap(Stream sourceStream, string contentType)
@@ -80,7 +80,7 @@ namespace MemCheck.Application
             return new Bitmap(sourceStream);
         }
         #endregion
-        public StoreImage(MemCheckDbContext dbContext, IStringLocalizer localizer)
+        public StoreImage(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
@@ -90,14 +90,14 @@ namespace MemCheck.Application
             request.CheckValidity(localizer);
 
             if (dbContext.Images.Where(image => EF.Functions.Like(image.Name, request.Name)).Any())
-                throw new RequestInputException(localizer["ImageAlreadyExists"] + $" '{request.Name}'");
+                throw new RequestInputException(localizer.Get("ImageAlreadyExists") + $" '{request.Name}'");
 
             var image = new Domain.Image();
             image.Name = request.Name;
             image.Description = request.Description;
             image.Source = request.Source;
             image.Owner = request.Owner;
-            image.VersionDescription = localizer["InitialImageVersionCreation"].Value;
+            image.VersionDescription = localizer.Get("InitialImageVersionCreation");
             image.VersionType = ImageVersionType.Creation;
             image.InitialUploadUtcDate = DateTime.UtcNow;
             image.LastChangeUtcDate = image.InitialUploadUtcDate;
@@ -144,13 +144,13 @@ namespace MemCheck.Application
             public string Source { get; }
             public string ContentType { get; }
             public byte[] Blob { get; }
-            public void CheckValidity(IStringLocalizer localizer)
+            public void CheckValidity(ILocalized localizer)
             {
                 ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
-                    throw new RequestInputException(localizer["InvalidImageContentType"] + $" '{ContentType}'");
+                    throw new RequestInputException(localizer.Get("InvalidImageContentType") + $" '{ContentType}'");
                 if (Blob.Length < minBlobLength || Blob.Length > maxBlobLength)
-                    throw new RequestInputException(localizer["InvalidBlobLength"] + $" {Blob.Length}" + localizer["MustBeBetween"] + $" {minBlobLength} " + localizer["And"] + $" {maxBlobLength}");
+                    throw new RequestInputException(localizer.Get("InvalidBlobLength") + $" {Blob.Length}" + localizer.Get("MustBeBetween") + $" {minBlobLength} " + localizer.Get("And") + $" {maxBlobLength}");
             }
         }
         #endregion

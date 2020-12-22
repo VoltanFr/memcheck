@@ -1,13 +1,6 @@
-﻿using MemCheck.Application;
-using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
@@ -17,9 +10,9 @@ namespace MemCheck.WebUI.Controllers
         {
             return dt.ToLocalTime().ToString("d");    //With time for developping and debugging. When we are ok with expiration algorithms, display only the date
         }
-        public static string HeapName(int heap, IStringLocalizer localizer)
+        public static string HeapName(int heap, ILocalized localizer)
         {
-            return heap == 0 ? localizer["UnknownCardsHeap"].Value : heap.ToString();
+            return heap == 0 ? localizer.Get("UnknownCardsHeap") : heap.ToString();
         }
         public static bool ShowDebugInfo(MemCheckUser? user)
         {

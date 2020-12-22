@@ -29,7 +29,7 @@ namespace MemCheck.Application.CardChanging
         {
             this.dbContext = dbContext;
         }
-        public async Task<Guid> RunAsync(Request request, IStringLocalizer localizer)
+        public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
             CardInputValidator.Run(request, localizer);
 

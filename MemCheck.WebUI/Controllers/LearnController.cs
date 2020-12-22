@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Notifying;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -56,7 +57,7 @@ namespace MemCheck.WebUI.Controllers
             var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
             var applicationResult = await new GetCardsToLearn(dbContext).RunAsync(applicationRequest);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var result = new GetCardsViewModel(applicationResult, Localizer, user.UserName);
+            var result = new GetCardsViewModel(applicationResult, this, user.UserName);
             return Ok(result);
         }
         #region Request and result classes
@@ -70,7 +71,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsViewModel
         {
-            public GetCardsViewModel(IEnumerable<GetCardsToLearn.ResultCard> applicationResultCards, IStringLocalizer localizer, string currentUser)
+            public GetCardsViewModel(IEnumerable<GetCardsToLearn.ResultCard> applicationResultCards, ILocalized localizer, string currentUser)
             {
                 Cards = applicationResultCards.Select(card => new GetCardsCardViewModel(card, localizer, currentUser));
             }
@@ -107,7 +108,7 @@ namespace MemCheck.WebUI.Controllers
                 //}
             }
             #endregion
-            public GetCardsCardViewModel(GetCardsToLearn.ResultCard applicationResult, IStringLocalizer localizer, string currentUser)
+            public GetCardsCardViewModel(GetCardsToLearn.ResultCard applicationResult, ILocalized localizer, string currentUser)
             {
                 CardId = applicationResult.CardId;
                 HeapId = applicationResult.Heap;
@@ -121,7 +122,7 @@ namespace MemCheck.WebUI.Controllers
                 AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
-                RemoveAlertMessage = localizer["RemoveAlertMessage"] + " " + Heap + "\n" + localizer["DateAddedToDeck"] + " ";
+                RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
                 VisibleToCount = applicationResult.VisibleTo.Count();
                 AddToDeckUtcTime = applicationResult.AddToDeckUtcTime;
                 CurrentUserRating = applicationResult.UserRating;
@@ -132,16 +133,16 @@ namespace MemCheck.WebUI.Controllers
                     var visibleToUser = applicationResult.VisibleTo.First();
                     if (visibleToUser != currentUser)
                         throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
-                    VisibleTo = localizer["YouOnly"].ToString();
+                    VisibleTo = localizer.Get("YouOnly");
                 }
                 else
                 {
                     if (VisibleToCount == 0)
-                        VisibleTo = localizer["AllUsers"].ToString();
+                        VisibleTo = localizer.Get("AllUsers");
                     else
                         VisibleTo = string.Join(',', applicationResult.VisibleTo);
                 }
-                Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage, localizer));
+                Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
                 MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                         new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                     ).OrderBy(heapModel => heapModel.HeapId);
@@ -172,7 +173,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsImageViewModel
         {
-            public GetCardsImageViewModel(GetCardsToLearn.ResultImageModel appResult, IStringLocalizer localizer)
+            public GetCardsImageViewModel(GetCardsToLearn.ResultImageModel appResult)
             {
                 ImageId = appResult.ImageId;
                 Name = appResult.Name;
@@ -184,26 +185,26 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsHeapModel
         {
-            public GetCardsHeapModel(int heapId, string heapName, DateTime expiryUtcDate, IStringLocalizer localizer)
+            public GetCardsHeapModel(int heapId, string heapName, DateTime expiryUtcDate, ILocalized localizer)
             {
                 HeapId = heapId;
                 HeapName = heapName;
                 if (heapId == 0)
                 {
                     ExpiryUtcDate = DateTime.MinValue.ToUniversalTime();
-                    MoveToAlertMessage = localizer["MoveThisCardToHeap"] + ' ' + heapName + " ?";
+                    MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ?";
                 }
                 else
                 {
                     if (expiryUtcDate < DateTime.UtcNow)
                     {
                         ExpiryUtcDate = DateTime.MinValue.ToUniversalTime();
-                        MoveToAlertMessage = localizer["MoveThisCardToHeap"] + ' ' + heapName + " ? " + localizer["ItWillBeExpired"];
+                        MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.Get("ItWillBeExpired");
                     }
                     else
                     {
                         ExpiryUtcDate = expiryUtcDate;
-                        MoveToAlertMessage = localizer["MoveThisCardToHeap"] + ' ' + heapName + " ? " + localizer["ItWillExpireOn"];
+                        MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.Get("ItWillExpireOn");
                     }
                 }
             }
@@ -221,18 +222,17 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = (user == null) ? Guid.Empty : user.Id;
             var decks = new GetUserDecksWithTags(dbContext).Run(userId);
-            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, Localizer));
+            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
             return base.Ok(result);
         }
         public sealed class UserDecksViewModel
         {
-            public UserDecksViewModel(Guid deckId, string description, bool showDebugInfo, IEnumerable<GetUserDecksWithTags.ResultTagModel> tags, IStringLocalizer localizer)
+            public UserDecksViewModel(Guid deckId, string description, bool showDebugInfo, IEnumerable<GetUserDecksWithTags.ResultTagModel> tags, ILocalized localizer)
             {
                 DeckId = deckId;
                 Description = description;
                 ShowDebugInfo = showDebugInfo;
-                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer["None"].Value) }
-                    .Concat(tags.Select(tag => new UserDecksTagViewModel(tag.TagId, tag.TagName)));
+                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer.Get("None")) }.Concat(tags.Select(tag => new UserDecksTagViewModel(tag.TagId, tag.TagName)));
             }
             public Guid DeckId { get; }
             public string Description { get; }
