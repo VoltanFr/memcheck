@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -11,26 +10,20 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class TagsController : Controller
+    public class TagsController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer<TagsController> localizer;
         #endregion
-        public TagsController(MemCheckDbContext dbContext, IStringLocalizer<TagsController> localizer) : base()
+        public TagsController(MemCheckDbContext dbContext, IStringLocalizer<TagsController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
         }
         #region GetGuiMessages
         [HttpGet("GetGuiMessages")]
         public IActionResult GetGuiMessages()
         {
-            return Ok(new GetGuiMessagesViewModel(
-                localizer["AlreadyExistsErrMesg"].Value,
-                localizer["NameLengthErrMesg"].Value,
-                localizer["Saved"].Value,
-                localizer["LabelName"].Value));
+            return Ok(new GetGuiMessagesViewModel(Localize("AlreadyExistsErrMesg"), Localize("NameLengthErrMesg"), Localize("Saved"), Localize("LabelName")));
         }
         public sealed class GetGuiMessagesViewModel
         {

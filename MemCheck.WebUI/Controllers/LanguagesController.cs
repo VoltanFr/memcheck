@@ -2,17 +2,18 @@
 using MemCheck.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]"), Authorize(Roles = "Admin")]
-    public class LanguagesController : Controller
+    public class LanguagesController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         #endregion
-        public LanguagesController(MemCheckDbContext dbContext) : base()
+        public LanguagesController(MemCheckDbContext dbContext, IStringLocalizer<LanguagesController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
         }

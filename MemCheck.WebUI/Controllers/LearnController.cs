@@ -1,12 +1,4 @@
-﻿using Ganss.XSS;
-using Markdig;
-using Markdig.Extensions.AutoLinks;
-using Markdig.Renderers;
-using Markdig.Renderers.Html;
-using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
-using MemCheck.Application;
-using MemCheck.Application.Heaping;
+﻿using MemCheck.Application;
 using MemCheck.Application.Notifying;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -18,27 +10,23 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]"), Authorize]
-    public class LearnController : Controller, ILocalized
+    public class LearnController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly IStringLocalizer<DecksController> localizer;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
         #endregion
-        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager) : base()
+        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager) : base(localizer)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
             this.userManager = userManager;
         }
-        public IStringLocalizer Localizer => localizer;
         #region GetImage
         [HttpGet("GetImage/{imageId}/{size}")]
         public IActionResult GetImage(Guid imageId, int size)
@@ -67,7 +55,7 @@ namespace MemCheck.WebUI.Controllers
             var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
             var applicationResult = await new GetCardsToLearn(dbContext).RunAsync(applicationRequest);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var result = new GetCardsViewModel(applicationResult, localizer, user.UserName);
+            var result = new GetCardsViewModel(applicationResult, Localizer, user.UserName);
             return Ok(result);
         }
         #region Request and result classes
@@ -232,7 +220,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = (user == null) ? Guid.Empty : user.Id;
             var decks = new GetUserDecksWithTags(dbContext).Run(userId);
-            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, localizer));
+            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, Localizer));
             return base.Ok(result);
         }
         public sealed class UserDecksViewModel

@@ -15,20 +15,27 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]"), Authorize]
-    public class DecksController : Controller, ILocalized
+    public class DecksController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
-        private readonly IStringLocalizer<DecksController> localizer;
         #endregion
-        public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer) : base()
+        #region Private methods
+        private string HeapingAlgoNameFromId(int id)
+        {
+            return Localize("HeapingAlgoNameForId" + id);
+        }
+        private string HeapingAlgoDescriptionFromId(int id)
+        {
+            return Localize("HeapingAlgoDescriptionForId" + id);
+        }
+        #endregion
+        public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
-            this.localizer = localizer;
         }
-        public IStringLocalizer Localizer => localizer;
         #region GetUserDecks
         [HttpGet("GetUserDecks")]
         public async Task<IActionResult> GetUserDecks()
@@ -64,8 +71,8 @@ namespace MemCheck.WebUI.Controllers
             var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
             var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
             var frontSide = $" '{applicationResult.FrontSideText.Truncate(30, true)}'";
-            var mesgBody = localizer["CardWithFrontSideHead"] + frontSide + ' ' + localizer["RemovedFromDeck"] + ' ' + applicationResult.DeckName;
-            var result = new { MessageTitle = localizer["Success"].Value, MessageBody = mesgBody };
+            var mesgBody = Localize("CardWithFrontSideHead") + frontSide + ' ' + Localize("RemovedFromDeck") + ' ' + applicationResult.DeckName;
+            var result = new { MessageTitle = Localize("Success"), MessageBody = mesgBody };
             return base.Ok(result);
         }
         #endregion
@@ -74,9 +81,7 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetHeapingAlgorithms()
         {
             var ids = HeapingAlgorithms.Instance.Ids;
-            var result = ids.Select(id =>
-            new HeapingAlgorithmViewModel(id, HeapingAlgo.NameFromId(id, localizer), HeapingAlgo.DescriptionFromId(id, localizer))
-            );
+            var result = ids.Select(id => new HeapingAlgorithmViewModel(id, HeapingAlgoNameFromId(id), HeapingAlgoDescriptionFromId(id)));
             return base.Ok(result);
         }
         public class HeapingAlgorithmViewModel
@@ -133,7 +138,7 @@ namespace MemCheck.WebUI.Controllers
                 request.pageNo,
                 request.pageSize);
             var applicationResult = new SearchDeckCards(dbContext).Run(applicationRequest);
-            return base.Ok(new GetCardsViewModel(applicationResult, localizer, user.UserName));
+            return base.Ok(new GetCardsViewModel(applicationResult, Localizer, user.UserName));
         }
         public sealed class GetCardsRequest
         {
@@ -146,7 +151,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsViewModel
         {
-            public GetCardsViewModel(SearchDeckCards.SearchResult applicationResult, IStringLocalizer<DecksController> localizer, string currentUser)
+            public GetCardsViewModel(SearchDeckCards.SearchResult applicationResult, IStringLocalizer localizer, string currentUser)
             {
                 TotalNbCards = applicationResult.TotalNbCards;
                 PageCount = applicationResult.PageCount;
@@ -157,7 +162,7 @@ namespace MemCheck.WebUI.Controllers
             public IEnumerable<Card> Cards { get; }
             public sealed class Card
             {
-                public Card(SearchDeckCards.SearchResultCard card, IStringLocalizer<DecksController> localizer, string currentUser)
+                public Card(SearchDeckCards.SearchResultCard card, IStringLocalizer localizer, string currentUser)
                 {
                     CardId = card.CardId;
                     FrontSide = card.FrontSide;
@@ -212,18 +217,18 @@ namespace MemCheck.WebUI.Controllers
                 new GetUserDecksWithHeapsViewModel(
                     deck.DeckId,
                     deck.Description,
-                    HeapingAlgo.NameFromId(deck.HeapingAlgorithmId, localizer),
-                    HeapingAlgo.DescriptionFromId(deck.HeapingAlgorithmId, localizer),
+                    HeapingAlgoNameFromId(deck.HeapingAlgorithmId),
+                    HeapingAlgoDescriptionFromId(deck.HeapingAlgorithmId),
                     deck.CardCount,
                     deck.Heaps.OrderBy(heap => heap.HeapId),
-                    localizer
+                    Localizer
                     )
             );
             return base.Ok(result);
         }
         public sealed class GetUserDecksWithHeapsViewModel
         {
-            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeapModel> heaps, IStringLocalizer<DecksController> localizer)
+            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeapModel> heaps, IStringLocalizer localizer)
             {
                 DeckId = deckId;
                 Description = description;
@@ -263,8 +268,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var decks = new GetUserDecks(dbContext).Run(userId);
             var result = decks.Select(deck => new GetUserDecksForDeletionViewModel(deck.DeckId, deck.Description, deck.CardCount,
-                localizer["SureYouWantToDelete"] + " " + deck.Description + " " + localizer["AndLose"] + " " + deck.CardCount + " " + localizer["CardLearningInfo"] + " " + localizer["NoUndo"]
-                ));
+                Localize("SureYouWantToDelete") + " " + deck.Description + " " + Localize("AndLose") + " " + deck.CardCount + " " + Localize("CardLearningInfo") + " " + Localize("NoUndo")));
             return base.Ok(result);
         }
         public sealed class GetUserDecksForDeletionViewModel
@@ -308,7 +312,7 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetHeapsOfDeck(Guid deckId)
         {
             var applicationResult = new GetHeapsOfDeck(dbContext).Run(deckId);
-            return base.Ok(applicationResult.OrderBy(heapId => heapId).Select(heapId => new GetHeapsOfDeckViewModel(heapId, DisplayServices.HeapName(heapId, localizer))));
+            return base.Ok(applicationResult.OrderBy(heapId => heapId).Select(heapId => new GetHeapsOfDeckViewModel(heapId, DisplayServices.HeapName(heapId, Localizer))));
         }
         public sealed class GetHeapsOfDeckViewModel
         {

@@ -3,7 +3,6 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,19 +11,17 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class HomeController : Controller, ILocalized
+    public class HomeController : Controller
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer) : base()
+        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
-            this.Localizer = localizer;
         }
-        public IStringLocalizer Localizer { get; }
         #region GetAll
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllAsync()

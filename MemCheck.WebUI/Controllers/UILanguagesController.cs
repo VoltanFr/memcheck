@@ -1,12 +1,10 @@
 ﻿using MemCheck.Application;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,15 +57,3 @@ namespace MemCheck.WebUI.Controllers
         }
     }
 }
-
-
-
-//@inject IOptions < RequestLocalizationOptions > LocOptions
-
-//@{
-//    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
-//    var cultureItems = LocOptions.Value.SupportedUICultures
-//        .Select(c => new SelectListItem { Value = c.Name, Text = c.DisplayName })
-//        .ToList();
-//    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}";
-//}

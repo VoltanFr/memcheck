@@ -11,31 +11,27 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class SearchController : Controller, ILocalized
+    public class SearchController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
-        private readonly IStringLocalizer<SearchController> localizer;
         private readonly IStringLocalizer<DecksController> decksControllerLocalizer;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
         private static readonly Guid allTagsFakeGuid = new Guid("11111111-1111-1111-1111-111111111111");
         #endregion
-        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer) : base()
+        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
-            this.localizer = localizer;
             this.decksControllerLocalizer = decksControllerLocalizer;
         }
-        public IStringLocalizer Localizer => localizer;
         #region GetAllStaticData
         [HttpGet("GetAllStaticData")]
         public async Task<IActionResult> GetAllStaticData()
@@ -48,13 +44,13 @@ namespace MemCheck.WebUI.Controllers
                 decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(user.Id);
             var allTags = new GetAllAvailableTags(dbContext).Run();
             var allUsers = new GetUsers(dbContext).Run();
-            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags, allUsers, localizer, decksControllerLocalizer, user);
+            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags, allUsers, Localizer, decksControllerLocalizer, user);
             return base.Ok(value);
         }
         #region View model classes
         public sealed class GetAllStaticDataViewModel
         {
-            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer, MemCheckUser? currentUser)
+            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, IStringLocalizer localizer, IStringLocalizer<DecksController> decksControllerLocalizer, MemCheckUser? currentUser)
             {
                 UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer["Ignore"].Value) }
                     .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer, decksControllerLocalizer)));
@@ -87,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllStaticDataDeckViewModel
         {
-            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.ResultModel applicationResult, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer)
+            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.ResultModel applicationResult, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
             {
                 DeckId = applicationResult.DeckId;
                 DeckName = applicationResult.Description;
@@ -158,7 +154,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllStaticDataLocalizedTextViewModel
         {
-            public GetAllStaticDataLocalizedTextViewModel(IStringLocalizer<SearchController> localizer)
+            public GetAllStaticDataLocalizedTextViewModel(IStringLocalizer localizer)
             {
                 Any = localizer["Any"].Value;
                 Ignore = localizer["Ignore"].Value;
@@ -366,7 +362,7 @@ namespace MemCheck.WebUI.Controllers
 
             var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
 
-            var result = new RunQueryViewModel(applicationResult, userName, localizer, decksControllerLocalizer);
+            var result = new RunQueryViewModel(applicationResult, userName, Localizer, decksControllerLocalizer);
 
             return base.Ok(result);
         }
@@ -388,7 +384,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryViewModel
         {
-            public RunQueryViewModel(SearchCards.Result applicationResult, string? currentUser, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer)
+            public RunQueryViewModel(SearchCards.Result applicationResult, string? currentUser, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
             {
                 TotalNbCards = applicationResult.TotalNbCards;
                 PageCount = applicationResult.PageCount;
@@ -400,7 +396,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryCardViewModel
         {
-            public RunQueryCardViewModel(SearchCards.ResultCard card, string? currentUser, IStringLocalizer<SearchController> localizer, IStringLocalizer<DecksController> decksControllerLocalizer)
+            public RunQueryCardViewModel(SearchCards.ResultCard card, string? currentUser, IStringLocalizer localizer, IStringLocalizer decksControllerLocalizer)
             {
                 CardId = card.CardId;
                 FrontSide = card.FrontSide;
@@ -477,7 +473,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
-            await new AddTagToCards(dbContext, localizer).RunAsync(appRequest);
+            await new AddTagToCards(dbContext, Localizer).RunAsync(appRequest);
 
             return Ok();
         }
@@ -530,7 +526,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
-            await new DeleteCards(dbContext, localizer).RunAsync(appRequest);
+            await new DeleteCards(dbContext, Localizer).RunAsync(appRequest);
             return Ok();
         }
         public sealed class DeleteCardsRequest
@@ -580,11 +576,11 @@ namespace MemCheck.WebUI.Controllers
             if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
                 throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
             if (request.Deck != Guid.Empty && request.DeckIsInclusive)
-                throw new RequestInputException(localizer["CanNotSubscribeToSearchInDeck"].Value);
+                throw new RequestInputException(Localize("CanNotSubscribeToSearchInDeck"));
             if (request.Visibility != 1)
-                throw new RequestInputException(localizer["CanNotSubscribeToSearchWithVisibilityCriteria"].Value);
+                throw new RequestInputException(Localize("CanNotSubscribeToSearchWithVisibilityCriteria"));
             if (request.RatingFilteringMode != 1)
-                throw new RequestInputException(localizer["CanNotSubscribeToSearchWithRatingCriteria"].Value);
+                throw new RequestInputException(Localize("CanNotSubscribeToSearchWithRatingCriteria"));
         }
         [HttpPost("SubscribeToSearch")]
         public async Task<IActionResult> SubscribeToSearch([FromBody] RunQueryRequest request)
@@ -592,9 +588,9 @@ namespace MemCheck.WebUI.Controllers
             ChecSubscribeToSearchRequestValidity(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
-            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, localizer["NoName"].Value, request.RequiredText, request.RequiredTags, excludedTags);
+            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Localize("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
             await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
-            var result = new SubscribeToSearchViewModel(localizer["Success"].Value, localizer["SubscriptionRecorded"].Value);
+            var result = new SubscribeToSearchViewModel(Localize("Success"), Localize("SubscriptionRecorded"));
             return base.Ok(result);
         }
         public sealed class SubscribeToSearchViewModel
