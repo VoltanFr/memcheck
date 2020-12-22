@@ -7,6 +7,12 @@ using Microsoft.Extensions.Localization;
 
 namespace MemCheck.Application.QueryValidation
 {
+    public interface ILocalized
+    {
+        public IStringLocalizer Localizer { get; }
+        public string Localize(string resourceName);
+    }
+
     internal static class CardInputValidator
     {
         #region Fields

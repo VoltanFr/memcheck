@@ -1,5 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -107,7 +105,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteSearchSubscription.Request(userId, id);
             await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
-            return base.Ok(Localizer["Deleted"].Value);
+            return base.Ok(Localize("Deleted"));
         }
         #endregion
     }
