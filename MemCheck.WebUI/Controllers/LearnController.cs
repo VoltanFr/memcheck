@@ -50,6 +50,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetCards")]
         public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
         {
+            CheckBodyParameter(request);
             var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var cardsToDownload = request.CurrentCardCount == 0 ? 1 : (request.LearnModeIsUnknown ? 30 : 5);   //loading cards to repeat is much more time consuming
             var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);

@@ -66,6 +66,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetImageList")]
         public IActionResult GetImageList([FromBody] GetImageListRequest request)
         {
+            CheckBodyParameter(request);
             var result = new GetImageList(dbContext).Run(request.PageSize, request.PageNo, request.Filter ?? "");
             return Ok(new GetImageListViewModel(result, Localizer));
         }
@@ -149,15 +150,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Update/{imageId}")]
         public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
         {
-            if (request.ImageName == null)
-                return ControllerResultWithToast.FailureWithResourceMesg("NameNotSet", this);
-            if (request.Description == null)
-                return ControllerResultWithToast.FailureWithResourceMesg("DescriptionNotSet", this);
-            if (request.Source == null)
-                return ControllerResultWithToast.FailureWithResourceMesg("SourceNotSet", this);
-            if (request.VersionDescription == null)
-                return ControllerResultWithToast.FailureWithResourceMesg("VersionDescriptionNotSet", this);
-
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
             await new UpdateImageMetadata(dbContext, Localizer).RunAsync(applicationRequest);
@@ -166,10 +159,10 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class UpdateRequestModel
         {
-            public string? ImageName { get; set; } = null;
-            public string? Source { get; set; } = null;
-            public string? Description { get; set; } = null;
-            public string? VersionDescription { get; set; } = null;
+            public string ImageName { get; set; } = null!;
+            public string Source { get; set; } = null!;
+            public string Description { get; set; } = null!;
+            public string VersionDescription { get; set; } = null!;
         }
         #endregion
         #region GetStaticText
@@ -183,6 +176,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Delete/{imageId}")]
         public async Task<IActionResult> Delete(Guid imageId, [FromBody] DeleteRequest request)
         {
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
             var imageName = await new DeleteImage(dbContext, Localizer).RunAsync(applicationRequest);

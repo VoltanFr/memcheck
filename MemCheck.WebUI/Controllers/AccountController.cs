@@ -89,6 +89,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPut("SetSearchSubscriptionName/{Id}")]
         public async Task<IActionResult> SetSearchSubscriptionName(Guid id, [FromBody] SetSearchSubscriptionNameRequestModel request)
         {
+            CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
             await new SetSearchSubscriptionName(dbContext).RunAsync(appRequest);

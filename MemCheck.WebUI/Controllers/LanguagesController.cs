@@ -18,6 +18,11 @@ namespace MemCheck.WebUI.Controllers
             this.dbContext = dbContext;
         }
         [HttpGet("GetAllLanguages")] public IActionResult GetAllLanguagesController() => Ok(new GetAllLanguages(dbContext).Run());
-        [HttpPost("Create")] public async Task<IActionResult> Create([FromBody] CreateLanguage.Request language) => Ok(await new CreateLanguage(dbContext).RunAsync(language));
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create([FromBody] CreateLanguage.Request language)
+        {
+            CheckBodyParameter(language);
+            return Ok(await new CreateLanguage(dbContext).RunAsync(language));
+        }
     }
 }

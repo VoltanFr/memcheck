@@ -16,6 +16,7 @@ namespace MemCheck.WebUI.Controllers
         }
         protected void CheckBodyParameter(object? bodyParameter, [CallerMemberName] string memberName = "")
         {
+            //Getting a null is generally a bug related to failure to marshall parameters from Javascript to asp net core, so should not happen IRL, but checking helps when coding
             if (bodyParameter == null)
                 throw new InvalidProgramException($"Received null body parameter in {GetType().Name}.{memberName}");
             var properties = bodyParameter.GetType().GetProperties();

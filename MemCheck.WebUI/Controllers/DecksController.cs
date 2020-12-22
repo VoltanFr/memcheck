@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Heaping;
-using MemCheck.Application.Searching;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -102,6 +101,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Create")]
         async public Task<IActionResult> Create([FromBody] CreateRequest request)
         {
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new CreateDeck.Request(user, request.Description == null ? "" : request.Description, request.HeapingAlgorithmId);
             return Ok(await new CreateDeck(dbContext).RunAsync(appRequest));
@@ -116,14 +116,17 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Update")]
         async public Task<IActionResult> Update([FromBody] UpdateDeck.Request deck)
         {
+            CheckBodyParameter(deck);
             return Ok(await new UpdateDeck(dbContext).RunAsync(deck));
         }
         #endregion
         #region GetCards
+        /* I think this method is useless. Commented out on 22 Dec 2020
         [HttpPost("GetCards")]
         public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
         {
             //I wish this method was a Get instead of a Post, but I did not manager to have it work (with [FromQuery] parameter)
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var requiredTags = request.RequiredTags.Select(tag => tag.TagId);
             bool requireCardsHaveNoTag = requiredTags.Count() == 1 && requiredTags.First() == Guid.Empty;
@@ -206,6 +209,7 @@ namespace MemCheck.WebUI.Controllers
                 public string VisibleTo { get; }
             }
         }
+        */
         #endregion
         #region GetUserDecksWithHeaps
         [HttpGet("GetUserDecksWithHeaps")]

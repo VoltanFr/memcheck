@@ -64,6 +64,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetTags")]
         public IActionResult GetTags([FromBody] GetTagsRequest request)
         {
+            CheckBodyParameter(request);
             var result = new GetAllTags(dbContext).Run(request.PageSize, request.PageNo, request.Filter);
             return Ok(new GetTagsViewModel(result));
         }
@@ -110,6 +111,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
         {
+            CheckBodyParameter(request);
             return Ok(await new CreateTag(dbContext).RunAsync(request.NewName));
         }
         public sealed class CreateRequestModel
@@ -121,6 +123,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPut("Update/{tagId}")]
         public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
         {
+            CheckBodyParameter(request);
             return Ok(await new UpdateTag(dbContext).RunAsync(tagId, request.NewName));
         }
         public sealed class UpdateRequestModel

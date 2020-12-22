@@ -39,6 +39,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("GetUsers")]
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
             var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);

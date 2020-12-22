@@ -287,8 +287,7 @@ namespace MemCheck.WebUI.Controllers
         #region RunQuery
         private void CheckRunQueryRequestValidity(RunQueryRequest request)
         {
-            if (request == null)
-                throw new ArgumentException("Request not received, probably a serialization problem");
+            CheckBodyParameter(request);
             if (request.RequiredTags.Contains(noTagFakeGuid))
                 throw new ArgumentException("The noTagFakeGuid is not meant to be received in a request, it is just a tool for the javascript code, meaning 'remove all tags'");
             if (request.RequiredTags.Contains(allTagsFakeGuid))
@@ -471,10 +470,10 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("AddTagToCards/{tagId}"), Authorize]
         public async Task<IActionResult> AddTagToCards(Guid tagId, [FromBody] AddTagToCardsRequest request)
         {
+            CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
             await new AddTagToCards(dbContext, Localizer).RunAsync(appRequest);
-
             return Ok();
         }
         public sealed class AddTagToCardsRequest
@@ -486,6 +485,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("AddCardsToDeck/{deckId}"), Authorize]
         public IActionResult AddCardsToDeck(Guid deckId, [FromBody] AddCardsToDeckRequest request)
         {
+            CheckBodyParameter(request);
             new AddCardsInDeck(dbContext).Run(deckId, request.CardIds);
             return Ok();
         }
@@ -498,6 +498,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("RemoveCardsFromDeck/{deckId}"), Authorize]
         public IActionResult RemoveCardsFromDeck(Guid deckId, [FromBody] RemoveCardsFromDeckRequest request)
         {
+            CheckBodyParameter(request);
             new RemoveCardsFromDeck(dbContext).Run(deckId, request.CardIds);
             return Ok();
         }
@@ -510,6 +511,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("MoveCardsToHeap/{deckId}/{heapId}"), Authorize]
         public async Task<IActionResult> MoveCardsToHeap(Guid deckId, int heapId, [FromBody] MoveCardsToHeapRequest request)
         {
+            CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new MoveCardsToHeap.Request(userId, deckId, heapId, request.CardIds);
             await new MoveCardsToHeap(dbContext).RunAsync(appRequest);
@@ -524,6 +526,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("DeleteCards"), Authorize]
         public async Task<IActionResult> DeleteCards([FromBody] DeleteCardsRequest request)
         {
+            CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
             await new DeleteCards(dbContext, Localizer).RunAsync(appRequest);
@@ -538,6 +541,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("RegisterForNotifications"), Authorize]
         public async Task<IActionResult> RegisterForNotifications([FromBody] RegisterForNotificationsRequest request)
         {
+            CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
             await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
@@ -552,6 +556,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpPost("UnregisterForNotifications"), Authorize]
         public async Task<IActionResult> UnregisterForNotifications([FromBody] UnregisterForNotificationsRequest request)
         {
+            CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
             await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
@@ -565,8 +570,7 @@ namespace MemCheck.WebUI.Controllers
         #region Subscribe
         private void ChecSubscribeToSearchRequestValidity(RunQueryRequest request)
         {
-            if (request == null)
-                throw new ArgumentException("Request not received, probably a serialization problem");
+            CheckBodyParameter(request);
             if (request.RequiredTags.Contains(noTagFakeGuid))
                 throw new ArgumentException("The noTagFakeGuid is not meant to be received in a request, it is just a tool for the javascript code, meaning 'remove all tags'");
             if (request.RequiredTags.Contains(allTagsFakeGuid))
