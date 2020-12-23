@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using MemCheck.Application.QueryValidation;
-using Microsoft.Extensions.Localization;
 
 namespace MemCheck.Application.Tests.BasicHelpers
 {
@@ -14,19 +13,9 @@ namespace MemCheck.Application.Tests.BasicHelpers
         {
             values = ImmutableDictionary.CreateRange(items ?? new KeyValuePair<string, string>[0]);
         }
-        public LocalizedString this[string name] => values.ContainsKey(name) ? new LocalizedString(name, values[name]) : new LocalizedString(name, "");
-        public LocalizedString this[string name, params object[] arguments] => new LocalizedString(name, "");
-
-        public IStringLocalizer Localizer => throw new System.NotImplementedException();
-
-        public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
-        {
-            return new LocalizedString[0];
-        }
-
         public string Get(string resourceName)
         {
-            return this[resourceName].Value;
+            return values.ContainsKey(resourceName) ? values[resourceName] : "";
         }
     }
 }
