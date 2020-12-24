@@ -30,7 +30,7 @@
                 </tr>
                 <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:lightgray">
                     <td id="Select all checkbox" class="search-page-widget-td" style="text-align:left">
-                        <a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-toggle="dropdown"><input type="checkbox" /></a>
+                        <input type="checkbox" id="selectAllCheckBox" @@change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-toggle="dropdown"></a>
                         <span class="dropdown-menu" role="menu">
                             <a class="dropdown-item" @@click="selectAll()">@Localizer["SelectAll"]</a>
                             <a class="dropdown-item" @@click="unselectAll()">@Localizer["SelectNone"]</a>

@@ -349,6 +349,13 @@ var app = new Vue({
             for (let i = 0; i < this.runResult.cardsWithSelectionInfo.length; i++)
                 this.runResult.cardsWithSelectionInfo[i].selected = false;
         },
+        onSelectAllCheckBoxClick() {
+            check = document.getElementById("selectAllCheckBox").checked;
+            if (check)
+                this.selectAll();
+            else
+                this.unselectAll();
+        },
         dt(utcFromDotNet) {
             return dateTime(utcFromDotNet);
         },

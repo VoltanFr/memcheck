@@ -60,7 +60,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 # To do at medium cost
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).
 - De même que j'ai optimisé GetCardsToLearn qui faisait trop de Include, voir si on peut faire pareil pour ce qu'affiche la page de démarrage.
-- Search page: Improve the select all check box: should be able to select all in one click, not two (by clicking in the box)
 - Implémenter le diff de versions d'images (metadata)
 - Implémenter le restore de versions d'images (metadata)
 - Revoir le critère de recherche de cartes "Propriétaire". On peut imaginer un critère "Utilisateur contributeur", au sens utilisateur créateur d'au moins une version de la carte. Voir s'il faut mentionner dans la GUI un coût en perf.
