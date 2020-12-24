@@ -103,9 +103,9 @@
                         <button class="btn-nav-pages" id="MoveTenPagesForward" @@click="movePage(+10)" v-if="canMovePage(+10)">{{pageNo + 10}}</button>
                         <button class="btn-nav-pages" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{runResult.pageCount}}</button>
                         <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard == 0">@Localizer["NoCard"]</span>
-                        <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard > 0">{{runResult.totalNbCard}} @Localizer["Cards"]</span>
-                        <span class="label" style="white-space:nowrap" v-if="selectionCount() == 1">, {{selectionCount()}} @Localizer["Selected"]</span>
-                        <span class="label" style="white-space:nowrap" v-if="selectionCount() > 1">, {{selectionCount()}} @Localizer["Selecteds"]</span>
+                        <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard > 0">{{runResult.totalNbCard}} <span class="small-screen-text">@Localizer["Cards_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Cards_MediumScreen"]</span><span class="big-screen-text">@Localizer["Cards_BigScreen"]</span></span>
+                        <span class="label" style="white-space:nowrap" v-if="selectionCount() == 1">, {{selectionCount()}} <span class="small-screen-text">@Localizer["Selected_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Selected_MediumScreen"]</span><span class="big-screen-text">@Localizer["Selected_BigScreen"]</span></span>
+                        <span class="label" style="white-space:nowrap" v-if="selectionCount() > 1">, {{selectionCount()}} <span class="small-screen-text">@Localizer["Selecteds_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Selecteds_MediumScreen"]</span><span class="big-screen-text">@Localizer["Selecteds_BigScreen"]</span></span>
                         <span v-if="addTagDropDownButtonEnabled()" class="search-page-tag-button-column">
                             <a class="dropdown-toggle" href="#" id="TagDropdown" role="button" data-toggle="dropdown"><i class="fas fa-tags"></i></a>
                             <span class="dropdown-menu pre-scrollable" role="menu" v-if="addTagDropDownButtonEnabled()">

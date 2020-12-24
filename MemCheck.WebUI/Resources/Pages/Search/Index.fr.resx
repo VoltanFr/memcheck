@@ -138,8 +138,14 @@
   <data name="BiggestHeapReached" xml:space="preserve">
     <value>Tas maxi atteint dans ce paquet :</value>
   </data>
-  <data name="Cards" xml:space="preserve">
-    <value>cartes</value>
+  <data name="Cards_BigScreen" xml:space="preserve">
+    <value>Cartes</value>
+  </data>
+  <data name="Cards_MediumScreen" xml:space="preserve">
+    <value>Cartes</value>
+  </data>
+  <data name="Cards_SmallScreen" xml:space="preserve">
+    <value />
   </data>
   <data name="Deck" xml:space="preserve">
     <value>Paquet</value>
@@ -222,11 +228,23 @@
   <data name="SelectAll" xml:space="preserve">
     <value>Toutes les cartes</value>
   </data>
-  <data name="Selected" xml:space="preserve">
-    <value>cochée</value>
+  <data name="Selecteds_BigScreen" xml:space="preserve">
+    <value>Cochées</value>
   </data>
-  <data name="Selecteds" xml:space="preserve">
-    <value>cochées</value>
+  <data name="Selecteds_MediumScreen" xml:space="preserve">
+    <value>Cochées</value>
+  </data>
+  <data name="Selecteds_SmallScreen" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Selected_BigScreen" xml:space="preserve">
+    <value>Cochée</value>
+  </data>
+  <data name="Selected_MediumScreen" xml:space="preserve">
+    <value>Cochée</value>
+  </data>
+  <data name="Selected_SmallScreen" xml:space="preserve">
+    <value />
   </data>
   <data name="SelectNone" xml:space="preserve">
     <value>Aucune</value>
