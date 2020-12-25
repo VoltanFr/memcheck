@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using MemCheck.Application.QueryValidation;
 
-namespace MemCheck.Application.Tests.BasicHelpers
+namespace MemCheck.Application.Tests.Helpers
 {
     internal sealed class TestLocalizer : ILocalized
     {

@@ -1,15 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
-using MemCheck.Application.Tests.Notifying;
 using MemCheck.Database;
 using MemCheck.Application.Tests;
-using MemCheck.Application.Tests.BasicHelpers;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using MemCheck.Application.Tests.Helpers;
-using MemCheck.Domain;
 using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.Searching

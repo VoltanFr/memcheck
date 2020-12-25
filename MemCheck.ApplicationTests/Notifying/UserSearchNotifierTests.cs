@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using MemCheck.Application.Tests.Helpers;
 using System;
 using MemCheck.Application.CardChanging;
-using MemCheck.Application.Tests.BasicHelpers;
-using System.Collections.Generic;
 using MemCheck.Application.Searching;
 
 namespace MemCheck.Application.Tests.Notifying

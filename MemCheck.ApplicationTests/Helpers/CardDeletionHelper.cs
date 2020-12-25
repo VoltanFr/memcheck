@@ -3,7 +3,6 @@ using MemCheck.Database;
 using System;
 using System.Threading.Tasks;
 using MemCheck.Application.CardChanging;
-using MemCheck.Application.Tests.BasicHelpers;
 
 namespace MemCheck.Application.Tests.Helpers
 {
