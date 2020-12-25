@@ -5,11 +5,10 @@ using System.Linq;
 using System;
 using MemCheck.Domain;
 using System.Threading.Tasks;
-using MemCheck.Application.CardChanging;
 using MemCheck.Application.Tests.BasicHelpers;
 using MemCheck.Application.Tests.Helpers;
 
-namespace MemCheck.Application.Tests
+namespace MemCheck.Application.CardChanging
 {
     [TestClass()]
     public class DeleteCardTests
