@@ -8,7 +8,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class CardDeletionHelper
     {
-        public static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime deletionDate)
+        public static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime? deletionDate = null)
         {
             using var dbContext = new MemCheckDbContext(db);
             var deleter = new DeleteCards(dbContext, new TestLocalizer());
