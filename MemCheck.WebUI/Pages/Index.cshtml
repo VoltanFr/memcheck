@@ -13,77 +13,11 @@
         <div id="UserLoggedIn" v-if="allData.userName">
             <p>@Localizer["Welcome"] {{allData.userName}}</p>
             <div id="User has decks" v-if="allData.userDecks.length > 0">
-                <div id="User has work" v-if="allData.anythingToLearn">
-                    <div id="Multi deck display" v-if="allData.userDecks.length > 1">
-                        <p>@Localizer["YouHave"]...</p>
-                        <ul>
-                            <li v-for="deck in allData.userDecks">
-                                @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
-                                <ul>
-                                    <li id="UnknownCardsInfoMultiDeck">
-                                        <span v-if="deck.unknownCardCount == 0">@Localizer["No"] @Localizer["UnknownCard"]</span>
-                                        <span v-else>
-                                            <a asp-page="/Learn/Index" asp-route-LearnMode="Unknown">{{deck.unknownCardCount}} <span v-if="deck.unknownCardCount > 1">@Localizer["UnknownCards"]</span><span v-else>@Localizer["UnknownCard"]</span></a>.
-                                        </span>
-                                    </li>
-                                    <li id="ExpiredCardsInfoMultiDeck">
-                                        <span v-if="deck.expiredCardCount == 0">
-                                            @Localizer["No"] @Localizer["ExpiredCard"] (@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}).
-                                        </span>
-                                        <span v-else>
-                                            <a asp-page="/Learn/Index" asp-route-LearnMode="Expired">{{deck.expiredCardCount}} <span v-if="deck.expiredCardCount > 1">@Localizer["ExpiredCards"]</span><span v-else>@Localizer["ExpiredCard"]</span></a>
-                                        </span>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="Single deck screen optimization" v-else>
-                        <p>@Localizer["YouHaveIn"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">@Localizer["YourDeck"]</a>...</p>
-                        <ul>
-                            <li id="UnknownCardsInfoSingleDeck">
-                                <span v-if="allData.userDecks[0].unknownCardCount == 0">@Localizer["No"] @Localizer["UnknownCard"]</span>
-                                <span v-else>
-                                    <a asp-page="/Learn/Index" asp-route-LearnMode="Unknown">{{allData.userDecks[0].unknownCardCount}} <span v-if="allData.userDecks[0].unknownCardCount > 1">@Localizer["UnknownCards"]</span><span v-else>@Localizer["UnknownCard"]</span></a>.
-                                </span>
-                            </li>
-                            <li id="ExpiredCardsInfoSingleDeck">
-                                <span v-if="allData.userDecks[0].expiredCardCount == 0">
-                                    @Localizer["No"] @Localizer["ExpiredCard"]<span v-if="allData.userDecks[0].nextExpiryUTCDate != dateTimeMinValue"> (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}})</span>.
-                                </span>
-                                <span v-else>
-                                    <a asp-page="/Learn/Index" asp-route-LearnMode="Expired">{{allData.userDecks[0].expiredCardCount}} <span v-if="allData.userDecks[0].expiredCardCount > 1">@Localizer["ExpiredCards"]</span><span v-else>@Localizer["ExpiredCard"]</span></a>.
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div id="Nothing to do" v-else>
-                    <div id="User has no card" v-if="allData.totalCardCountInDecksOfUser == 0">
-                        <p>
-                            @Localizer["ThereIsNoCardIn"] <span v-if="allData.userDecks.length > 1">{{allData.userDecks.length}} @Localizer["YourDecks"]</span><span v-else>@Localizer["YourDeck"]</span>.
-                            @Localizer["YouShouldAddCardsEitherFrom"] <a href="/Search/Index">@Localizer["TheSearchPage"]</a> @Localizer["OrBy"] <a href="/Authoring/Index">@Localizer["CreatingSome"]</a>.
-                        </p>
-                    </div>
-                    <div id="User has cards" v-else>
-                        <p>@Localizer["PerfectMemory"]</p>
-                        <p>
-                            @Localizer["NoUnkownOrExpiredCardAmongThe"] {{allData.totalCardCountInDecksOfUser}}
-                            <span id="SingleDeck" v-if="allData.userDecks.length == 1">
-                                @Localizer["CardsOfYourSingleDeck"] <a v-bind:href="'/Decks/Index?DeckId='+allData.userDecks[0].deckId">{{allData.userDecks[0].description}}</a>
-                                (@Localizer["NextExpiry"] {{dt(allData.userDecks[0].nextExpiryUTCDate)}}).
-                            </span>
-                            <div id="MultipleDeck" v-if="allData.userDecks.length > 1">
-                                @Localizer["CardsOfYourMultipleDecks"] {{allData.userDecks.length}} @Localizer["Decks"]
-                                <ul>
-                                    <li v-for="deck in allData.userDecks">
-                                        @Localizer["InTheDeck"] <a v-bind:href="'/Decks/Index?DeckId='+deck.deckId">{{deck.description}}</a>
-                                        <span>(@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}})</span>.
-                                    </li>
-                                </ul>
-                            </div>
-                        </p>
-                    </div>
+                <div v-for="deck in allData.userDecks">
+                    <p v-html="deck.headLine" />
+                    <ul>
+                        <li v-for="line in deck.lines"><span v-html="line" /></li>
+                    </ul>
                 </div>
             </div>
             <div id="No deck" v-else>

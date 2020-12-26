@@ -117,7 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ClickHereToCreateCards" xml:space="preserve">
+    <value>Suivez ce lien pour créer des cartes.</value>
+  </data>
+  <data name="ClickHereToSearchAndAddCards" xml:space="preserve">
+    <value>Cliquez ici pour rechercher et ajouter des cartes.</value>
+  </data>
+  <data name="ExpiredCards" xml:space="preserve">
+    <value>cartes expirées.</value>
+  </data>
   <data name="Failure" xml:space="preserve">
     <value>Échec</value>
+  </data>
+  <data name="InYourDeck" xml:space="preserve">
+    <value>Dans votre paquet</value>
+  </data>
+  <data name="NoExpiredCard" xml:space="preserve">
+    <value>Aucune carte expirée.</value>
+  </data>
+  <data name="NoUnknownCard" xml:space="preserve">
+    <value>Aucune carte non apprise.</value>
+  </data>
+  <data name="OneExpiredCard" xml:space="preserve">
+    <value>Une carte expirée.</value>
+  </data>
+  <data name="OneUnknownCard" xml:space="preserve">
+    <value>Une carte non apprise.</value>
+  </data>
+  <data name="ThereIsNoCard" xml:space="preserve">
+    <value>Il n'y a aucune carte.</value>
+  </data>
+  <data name="UnknownCards" xml:space="preserve">
+    <value>cartes non apprises.</value>
   </data>
 </root>

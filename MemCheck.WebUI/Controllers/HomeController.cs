@@ -1,8 +1,10 @@
 ﻿using MemCheck.Application;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,13 +13,13 @@ using System.Threading.Tasks;
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class HomeController : Controller
+    public class HomeController : MemCheckController
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager)
+        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<HomeController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
@@ -34,7 +36,7 @@ namespace MemCheck.WebUI.Controllers
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
             var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck)), DateTime.UtcNow));
+            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, this)), DateTime.UtcNow));
         }
         #region Result classes
         public sealed class GetAllViewModel
@@ -70,19 +72,45 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllDeckViewModel
         {
-            public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck)
+            public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, ILocalized localizer)
             {
-                DeckId = applicationDeck.Id;
-                UnknownCardCount = applicationDeck.UnknownCardCount;
-                ExpiredCardCount = applicationDeck.ExpiredCardCount;
-                Description = applicationDeck.Description;
+                var DeckId = applicationDeck.Id;
+                var UnknownCardCount = applicationDeck.UnknownCardCount;
+                var ExpiredCardCount = applicationDeck.ExpiredCardCount;
+                var Description = applicationDeck.Description;
                 NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
+
+                HeadLine = localizer.Get("InYourDeck") + $" <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>...";
+                var lines = new List<string>();
+                if (applicationDeck.IsEmpty)
+                {
+                    lines.Add(localizer.Get("ThereIsNoCard"));
+                    lines.Add($"<a href=\"/Search/Index\" >{localizer.Get("ClickHereToSearchAndAddCards")}</a>...");
+                    lines.Add($"<a href=\"/Authoring/Index\">{localizer.Get("ClickHereToCreateCards")}</a>...");
+                }
+                else
+                {
+                    if (UnknownCardCount == 0)
+                        lines.Add(localizer.Get("NoUnknownCard") + '.');
+                    else
+                    {
+                        var linkText = UnknownCardCount == 1 ? localizer.Get("OneUnknownCard") : $"{UnknownCardCount} {localizer.Get("UnknownCards")}";
+                        lines.Add($"<a href=\"/Learn/Index?LearnMode=Unknown\">{linkText}</a>");
+                    }
+                    if (ExpiredCardCount == 0)
+                        lines.Add(localizer.Get("NoExpiredCard") + '.');
+                    else
+                    {
+                        var linkText = ExpiredCardCount == 1 ? localizer.Get("OneExpiredCard") : $"{ExpiredCardCount} {localizer.Get("ExpiredCards")}";
+                        lines.Add($"<a href=\"/Learn/Index?LearnMode=Expired\">{linkText}</a>");
+                    }
+                }
+                Lines = lines;
             }
-            public Guid DeckId { get; }
-            public int UnknownCardCount { get; }
-            public int ExpiredCardCount { get; }
-            public string Description { get; }
-            public DateTime NextExpiryUTCDate { get; }  //meaningless if ExpiredCardCount > 0
+            internal int ExpiredCardCount { get; }
+            internal DateTime NextExpiryUTCDate { get; }  //meaningless if ExpiredCardCount > 0
+            public string HeadLine { get; }
+            public IEnumerable<string> Lines { get; }
         }
         #endregion
         #endregion
