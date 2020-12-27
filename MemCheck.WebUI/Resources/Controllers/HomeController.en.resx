@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AmongThe" xml:space="preserve">
+    <value>Among the</value>
+  </data>
+  <data name="CardsOfYourDeck" xml:space="preserve">
+    <value>cards of your deck</value>
+  </data>
   <data name="ClickHereToCreateCards" xml:space="preserve">
     <value>Click here to create cards.</value>
   </data>
@@ -144,8 +150,8 @@
   <data name="OneUnknownCard" xml:space="preserve">
     <value>One unknown card.</value>
   </data>
-  <data name="ThereIsNoCard" xml:space="preserve">
-    <value>There is no card.</value>
+  <data name="ThereIsNoCardInYourDeck" xml:space="preserve">
+    <value>There is no card in your deck</value>
   </data>
   <data name="UnknownCards" xml:space="preserve">
     <value>unknown cards.</value>

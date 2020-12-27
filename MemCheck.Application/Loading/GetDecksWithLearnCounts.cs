@@ -1,10 +1,9 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
-using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,7 +33,7 @@ namespace MemCheck.Application.Loading
                     if (expiryDate < nextExpiryUTCDate)
                     nextExpiryUTCDate = expiryDate;
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, false, nextExpiryUTCDate);
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, nextExpiryUTCDate);
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
@@ -43,7 +42,7 @@ namespace MemCheck.Application.Loading
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(dbContext);
 
             var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
             return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description)).ToList();
@@ -51,15 +50,16 @@ namespace MemCheck.Application.Loading
         #region Request & Result
         public sealed record Request(Guid UserId)
         {
-            public void CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
 
-                if (!dbContext.Users.Any(u => u.Id == UserId))
+                if (!await dbContext.Users.AnyAsync(u => u.Id == UserId))
                     throw new RequestInputException("Bad user");
             }
         }
-        public sealed record Result(Guid Id, string Description, int UnknownCardCount, int ExpiredCardCount, int CardCount, bool IsEmpty, DateTime NextExpiryUTCDate);
+        public sealed record Result(Guid Id, string Description, int UnknownCardCount, int ExpiredCardCount, int CardCount, DateTime NextExpiryUTCDate);
+        //NextExpiryUTCDate does not make sense if ExpiredCardCount == 0
         #endregion
     }
 }

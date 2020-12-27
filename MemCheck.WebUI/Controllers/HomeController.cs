@@ -80,16 +80,16 @@ namespace MemCheck.WebUI.Controllers
                 var Description = applicationDeck.Description;
                 NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
 
-                HeadLine = localizer.Get("InYourDeck") + $" <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>...";
                 var lines = new List<string>();
-                if (applicationDeck.IsEmpty)
+                if (applicationDeck.CardCount == 0)
                 {
-                    lines.Add(localizer.Get("ThereIsNoCard"));
+                    HeadLine = localizer.Get("ThereIsNoCardInYourDeck") + $" <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>.";
                     lines.Add($"<a href=\"/Search/Index\" >{localizer.Get("ClickHereToSearchAndAddCards")}</a>...");
                     lines.Add($"<a href=\"/Authoring/Index\">{localizer.Get("ClickHereToCreateCards")}</a>...");
                 }
                 else
                 {
+                    HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOfYourDeck")} <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>...";
                     if (UnknownCardCount == 0)
                         lines.Add(localizer.Get("NoUnknownCard") + '.');
                     else
