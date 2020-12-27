@@ -17,7 +17,7 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task RunAsync(Request request)
+        public async Task RunAsync(Request request, DateTime? lastLearnUtcTime = null)
         {
             await request.CheckValidityAsync(dbContext);
 
@@ -32,7 +32,7 @@ namespace MemCheck.Application
             }
 
             if (!request.ManualMove)
-                card.LastLearnUtcTime = DateTime.UtcNow;
+                card.LastLearnUtcTime = lastLearnUtcTime ?? DateTime.UtcNow;
 
             card.CurrentHeap = request.TargetHeap;
             if (request.TargetHeap == 0)

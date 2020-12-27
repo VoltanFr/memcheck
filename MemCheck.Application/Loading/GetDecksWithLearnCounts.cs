@@ -15,7 +15,7 @@ namespace MemCheck.Application.Loading
         private readonly MemCheckDbContext dbContext;
         #endregion
         #region Private methods
-        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description)
+        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime? now = null)
         {
             var allCards = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId })
@@ -27,7 +27,7 @@ namespace MemCheck.Application.Loading
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
-                if (expiryDate <= DateTime.UtcNow)
+                if (expiryDate <= (now == null ? DateTime.UtcNow : now.Value))
                     expiredCardCount++;
                 else
                     if (expiryDate < nextExpiryUTCDate)
@@ -40,12 +40,12 @@ namespace MemCheck.Application.Loading
         {
             this.dbContext = dbContext;
         }
-        public async Task<IEnumerable<Result>> RunAsync(Request request)
+        public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? now = null)
         {
             await request.CheckValidityAsync(dbContext);
 
             var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description)).ToList();
+            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, now)).ToList();
         }
         #region Request & Result
         public sealed record Request(Guid UserId)

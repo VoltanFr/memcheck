@@ -20,5 +20,14 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result.Id;
         }
+        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid user, Guid deck, Guid card, int heap, DateTime? lastLearnUtcTime = null)
+        {
+            using var dbContext = new MemCheckDbContext(testDB);
+            await new AddCardInDeck(dbContext).RunAsync(deck, card);
+
+            //We can't move a card up more than one heap at a time, by security in MoveCardToHeap
+            for (int i = 1; i <= heap; i++)
+                await new MoveCardToHeap(dbContext).RunAsync(new MoveCardToHeap.Request(user, deck, card, i, false), lastLearnUtcTime);
+        }
     }
 }
