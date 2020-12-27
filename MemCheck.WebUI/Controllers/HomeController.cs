@@ -103,12 +103,35 @@ namespace MemCheck.WebUI.Controllers
                     if (applicationDeck.ExpiringTodayCount == 0)
                         lines.Add(localizer.Get("NoCardToExpireToday"));
                     else
-                        lines.Add($"{applicationDeck.ExpiringTodayCount} {localizer.Get("CardsWillExpireToday")}");
+                    {
+                        if (applicationDeck.ExpiringTodayCount == 1)
+                            lines.Add(localizer.Get("OneCardWillExpireToday"));
+                        else
+                            lines.Add($"{applicationDeck.ExpiringTodayCount} {localizer.Get("CardsWillExpireToday")}");
+                    }
+                    if (applicationDeck.ExpiringTomorrowCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireTomorrow"));
+                    else
+                    {
+                        if (applicationDeck.ExpiringTomorrowCount == 0)
+                            lines.Add(localizer.Get("OneCardWillExpireTomorrow"));
+                        else
+                            lines.Add($"{applicationDeck.ExpiringTomorrowCount} {localizer.Get("CardsWillExpireTomorrow")}");
+                    }
+                    if (applicationDeck.Expiring5NextDaysCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireInThe5NextDays"));
+                    else
+                    {
+                        if (applicationDeck.Expiring5NextDaysCount == 0)
+                            lines.Add(localizer.Get("OneCardWillExpireInThe5NextDays"));
+                        else
+                            lines.Add($"{applicationDeck.Expiring5NextDaysCount} {localizer.Get("CardsWillExpireInThe5NextDays")}");
+                    }
                 }
                 Lines = lines;
             }
             internal int ExpiredCardCount { get; }
-            internal DateTime NextExpiryUTCDate { get; }  //meaningless if ExpiredCardCount > 0
+            public DateTime NextExpiryUTCDate { get; }
             public string HeadLine { get; }
             public IEnumerable<string> Lines { get; }
         }

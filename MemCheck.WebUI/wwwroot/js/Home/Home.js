@@ -36,6 +36,9 @@ var app = new Vue({
         dt(utcFromDotNet) {
             return dateTime(utcFromDotNet);
         },
+        isValidDt(utcFromDotNet) {
+            return isValidDateTime(utcFromDotNet);
+        },
         showDebugInfo() {
             return (this.allData) && ((this.allData.userName == "Voltan") || (this.allData.userName == "Toto1"));
         },

@@ -123,8 +123,14 @@
   <data name="CardsOfYourDeck" xml:space="preserve">
     <value>cards of your deck</value>
   </data>
+  <data name="CardsWillExpireInThe5NextDays" xml:space="preserve">
+    <value>cards will expire in the 5 following days.</value>
+  </data>
   <data name="CardsWillExpireToday" xml:space="preserve">
     <value>cards will expire today.</value>
+  </data>
+  <data name="CardsWillExpireTomorrow" xml:space="preserve">
+    <value>cards will expire tomorrow.</value>
   </data>
   <data name="ClickHereToCreateCards" xml:space="preserve">
     <value>Click here to create cards.</value>
@@ -141,14 +147,29 @@
   <data name="InYourDeck" xml:space="preserve">
     <value>In your deck</value>
   </data>
+  <data name="NoCardToExpireInThe5NextDays" xml:space="preserve">
+    <value>No card will expire in the 5 following days.</value>
+  </data>
   <data name="NoCardToExpireToday" xml:space="preserve">
     <value>No card will expire today.</value>
+  </data>
+  <data name="NoCardToExpireTomorrow" xml:space="preserve">
+    <value>No card will expire tomorrow.</value>
   </data>
   <data name="NoExpiredCard" xml:space="preserve">
     <value>No expired card.</value>
   </data>
   <data name="NoUnknownCard" xml:space="preserve">
     <value>No unknown card.</value>
+  </data>
+  <data name="OneCardWillExpireInThe5NextDays" xml:space="preserve">
+    <value>A card will expire in the 5 following days.</value>
+  </data>
+  <data name="OneCardWillExpireToday" xml:space="preserve">
+    <value>A card will expire today.</value>
+  </data>
+  <data name="OneCardWillExpireTomorrow" xml:space="preserve">
+    <value>A card will expire tomorrow.</value>
   </data>
   <data name="OneExpiredCard" xml:space="preserve">
     <value>One expired card.</value>

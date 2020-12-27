@@ -211,7 +211,7 @@
     <value>Please wait, initializing data...</value>
   </data>
   <data name="NextExpiry" xml:space="preserve">
-    <value>next expiry:</value>
+    <value>Next expiry:</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>

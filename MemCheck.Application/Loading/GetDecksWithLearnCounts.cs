@@ -27,6 +27,9 @@ namespace MemCheck.Application.Loading
             var expiredCardCount = 0;
             var nextExpiryUTCDate = DateTime.MaxValue;
             var expiringTodayCount = 0;
+            var expiringTomorrowCount = 0;
+            var expiring5NextDaysCount = 0;
+            var tomorrowDate = now.Value.AddDays(1).Date;
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
@@ -36,11 +39,17 @@ namespace MemCheck.Application.Loading
                 {
                     if (expiryDate.Date == now.Value.Date)
                         expiringTodayCount++;
+                    else
+                    if (expiryDate.Date == tomorrowDate)
+                        expiringTomorrowCount++;
+                    else
+                    if (expiryDate.Date - now.Value.Date <= TimeSpan.FromDays(6))
+                        expiring5NextDaysCount++;
                     if (expiryDate < nextExpiryUTCDate)
                         nextExpiryUTCDate = expiryDate;
                 }
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, nextExpiryUTCDate);
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, expiringTomorrowCount, expiring5NextDaysCount, nextExpiryUTCDate);
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
@@ -65,8 +74,18 @@ namespace MemCheck.Application.Loading
                     throw new RequestInputException("Bad user");
             }
         }
-        public sealed record Result(Guid Id, string Description, int UnknownCardCount, int ExpiredCardCount, int CardCount, int ExpiringTodayCount, DateTime NextExpiryUTCDate);
-        //NextExpiryUTCDate does not make sense if ExpiredCardCount == 0
+        public sealed record Result(
+            Guid Id,
+            string Description,
+            int UnknownCardCount,
+            int ExpiredCardCount,
+            int CardCount,
+            int ExpiringTodayCount,
+            int ExpiringTomorrowCount,
+            int Expiring5NextDaysCount,
+            DateTime NextExpiryUTCDate);
+        //NextExpiryUTCDate is DateTime.MaxValue if all cards are unknown
+        //Expiring5NextDaysCount means among the 5 days after tomorrow
         #endregion
     }
 }

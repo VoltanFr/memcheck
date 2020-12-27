@@ -211,7 +211,7 @@
     <value>Chargement des données...</value>
   </data>
   <data name="NextExpiry" xml:space="preserve">
-    <value>prochaine expiration :</value>
+    <value>Prochaine expiration :</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>Aucune</value>

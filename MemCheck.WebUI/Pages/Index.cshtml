@@ -17,6 +17,7 @@
                     <p v-html="deck.headLine" />
                     <ul>
                         <li v-for="line in deck.lines"><span v-html="line" /></li>
+                        <li v-if="isValidDt(deck.nextExpiryUTCDate)">@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}</li>
                     </ul>
                 </div>
             </div>

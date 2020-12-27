@@ -1,5 +1,9 @@
-﻿function dateTime(utcFromDotNet) {
-    if (!utcFromDotNet || utcFromDotNet == "0001-01-01T00:00:00Z" || utcFromDotNet == "9999-12-31T23:59:59.9999999")  //matches DateTime.MinValue
+﻿function isValidDateTime(utcFromDotNet) {
+    return utcFromDotNet && (utcFromDotNet != "0001-01-01T00:00:00Z") && (utcFromDotNet != "9999-12-31T23:59:59.9999999");  //matches DateTime.MinValue and Max
+}
+
+function dateTime(utcFromDotNet) {
+    if (!isValidDateTime(utcFromDotNet))
         return "!";
     const d = new Date(utcFromDotNet);
     if (dateIsToday(d))
