@@ -7,7 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Loading
 {
     public sealed class GetDecksWithLearnCounts
     {
@@ -62,6 +62,7 @@ namespace MemCheck.Application
             public int UnknownCardCount { get; }
             public int ExpiredCardCount { get; }
             public int CardCount { get; }
+            public bool IsEmpty { get; }
             public DateTime NextExpiryUTCDate { get; }
         }
         #endregion
