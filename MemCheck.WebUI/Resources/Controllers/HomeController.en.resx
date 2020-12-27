@@ -123,6 +123,9 @@
   <data name="CardsOfYourDeck" xml:space="preserve">
     <value>cards of your deck</value>
   </data>
+  <data name="CardsWillExpireToday" xml:space="preserve">
+    <value>cards will expire today.</value>
+  </data>
   <data name="ClickHereToCreateCards" xml:space="preserve">
     <value>Click here to create cards.</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="InYourDeck" xml:space="preserve">
     <value>In your deck</value>
+  </data>
+  <data name="NoCardToExpireToday" xml:space="preserve">
+    <value>No card will expire today.</value>
   </data>
   <data name="NoExpiredCard" xml:space="preserve">
     <value>No expired card.</value>

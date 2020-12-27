@@ -74,36 +74,36 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, ILocalized localizer)
             {
-                var DeckId = applicationDeck.Id;
-                var UnknownCardCount = applicationDeck.UnknownCardCount;
-                var ExpiredCardCount = applicationDeck.ExpiredCardCount;
-                var Description = applicationDeck.Description;
                 NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
 
                 var lines = new List<string>();
                 if (applicationDeck.CardCount == 0)
                 {
-                    HeadLine = localizer.Get("ThereIsNoCardInYourDeck") + $" <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>.";
+                    HeadLine = localizer.Get("ThereIsNoCardInYourDeck") + $" <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>.";
                     lines.Add($"<a href=\"/Search/Index\" >{localizer.Get("ClickHereToSearchAndAddCards")}</a>...");
                     lines.Add($"<a href=\"/Authoring/Index\">{localizer.Get("ClickHereToCreateCards")}</a>...");
                 }
                 else
                 {
-                    HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOfYourDeck")} <a href=\"/Decks/Index?DeckId={DeckId}\">{Description}</a>...";
-                    if (UnknownCardCount == 0)
-                        lines.Add(localizer.Get("NoUnknownCard") + '.');
+                    HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOfYourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
+                    if (applicationDeck.UnknownCardCount == 0)
+                        lines.Add(localizer.Get("NoUnknownCard"));
                     else
                     {
-                        var linkText = UnknownCardCount == 1 ? localizer.Get("OneUnknownCard") : $"{UnknownCardCount} {localizer.Get("UnknownCards")}";
+                        var linkText = applicationDeck.UnknownCardCount == 1 ? localizer.Get("OneUnknownCard") : $"{applicationDeck.UnknownCardCount} {localizer.Get("UnknownCards")}";
                         lines.Add($"<a href=\"/Learn/Index?LearnMode=Unknown\">{linkText}</a>");
                     }
-                    if (ExpiredCardCount == 0)
-                        lines.Add(localizer.Get("NoExpiredCard") + '.');
+                    if (applicationDeck.ExpiredCardCount == 0)
+                        lines.Add(localizer.Get("NoExpiredCard"));
                     else
                     {
-                        var linkText = ExpiredCardCount == 1 ? localizer.Get("OneExpiredCard") : $"{ExpiredCardCount} {localizer.Get("ExpiredCards")}";
+                        var linkText = applicationDeck.ExpiredCardCount == 1 ? localizer.Get("OneExpiredCard") : $"{applicationDeck.ExpiredCardCount} {localizer.Get("ExpiredCards")}";
                         lines.Add($"<a href=\"/Learn/Index?LearnMode=Expired\">{linkText}</a>");
                     }
+                    if (applicationDeck.ExpiringTodayCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireToday"));
+                    else
+                        lines.Add($"{applicationDeck.ExpiringTodayCount} {localizer.Get("CardsWillExpireToday")}");
                 }
                 Lines = lines;
             }

@@ -46,6 +46,23 @@ namespace MemCheck.Application.Loading
             }
         }
         [TestMethod()]
+        public async Task OneCardToExpireToday()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringServices.RandomString());
+
+            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 30, 0, 0, 0));
+            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 30, 12, 0, 0));
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var resultDeck = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2030, 02, 01, 0, 0, 0))).First();
+                Assert.AreEqual(1, resultDeck.ExpiredCardCount);
+                Assert.AreEqual(1, resultDeck.ExpiringTodayCount);
+            }
+        }
+        [TestMethod()]
         public async Task FullTest()
         {
             var testDB = DbHelper.GetEmptyTestDB();
@@ -58,14 +75,16 @@ namespace MemCheck.Application.Loading
             var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description);
 
             var jan01 = new DateTime(2030, 01, 01);
-            var jan29 = new DateTime(2030, 01, 29);
+            var jan30_00h00 = new DateTime(2030, 01, 30, 0, 0, 0);
             var jan31 = new DateTime(2030, 01, 31);
+            var jan30_12h00 = new DateTime(2030, 01, 30, 12, 0, 0);
 
             //Fill deck1
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan29);
+            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30_00h00);
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan29);
+            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_00h00);
+            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_12h00);
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 5, jan01);
@@ -77,19 +96,21 @@ namespace MemCheck.Application.Loading
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetDecksWithLearnCounts.Request(userId);
-                var result = await new GetDecksWithLearnCounts(dbContext).RunAsync(request, new DateTime(2030, 02, 01));
+                var result = await new GetDecksWithLearnCounts(dbContext).RunAsync(request, new DateTime(2030, 02, 01, 0, 0, 0));
                 Assert.AreEqual(2, result.Count());
 
                 var loadedDeck1 = result.Single(d => d.Id == deck1);
                 Assert.AreEqual(deck1Description, loadedDeck1.Description);
                 Assert.AreEqual(2, loadedDeck1.UnknownCardCount);
                 Assert.AreEqual(3, loadedDeck1.ExpiredCardCount);
-                Assert.AreEqual(7, loadedDeck1.CardCount);
+                Assert.AreEqual(1, loadedDeck1.ExpiringTodayCount);
+                Assert.AreEqual(8, loadedDeck1.CardCount);
 
                 var loadedDeck2 = result.Single(d => d.Id == deck2);
                 Assert.AreEqual(deck2Description, loadedDeck2.Description);
                 Assert.AreEqual(1, loadedDeck2.UnknownCardCount);
                 Assert.AreEqual(0, loadedDeck2.ExpiredCardCount);
+                Assert.AreEqual(0, loadedDeck2.ExpiringTodayCount);
                 Assert.AreEqual(2, loadedDeck2.CardCount);
             }
         }

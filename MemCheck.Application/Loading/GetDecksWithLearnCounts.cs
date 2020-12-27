@@ -17,23 +17,30 @@ namespace MemCheck.Application.Loading
         #region Private methods
         private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime? now = null)
         {
+            if (now == null)
+                now = DateTime.UtcNow;
             var allCards = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId })
                 .ToList();
             var groups = allCards.ToLookup(card => card.CurrentHeap == 0);
-            HeapingAlgorithm heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
+            var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
             var expiredCardCount = 0;
             var nextExpiryUTCDate = DateTime.MaxValue;
+            var expiringTodayCount = 0;
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
-                if (expiryDate <= (now == null ? DateTime.UtcNow : now.Value))
+                if (expiryDate <= now)
                     expiredCardCount++;
                 else
+                {
+                    if (expiryDate.Date == now.Value.Date)
+                        expiringTodayCount++;
                     if (expiryDate < nextExpiryUTCDate)
-                    nextExpiryUTCDate = expiryDate;
+                        nextExpiryUTCDate = expiryDate;
+                }
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, nextExpiryUTCDate);
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, nextExpiryUTCDate);
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
@@ -58,7 +65,7 @@ namespace MemCheck.Application.Loading
                     throw new RequestInputException("Bad user");
             }
         }
-        public sealed record Result(Guid Id, string Description, int UnknownCardCount, int ExpiredCardCount, int CardCount, DateTime NextExpiryUTCDate);
+        public sealed record Result(Guid Id, string Description, int UnknownCardCount, int ExpiredCardCount, int CardCount, int ExpiringTodayCount, DateTime NextExpiryUTCDate);
         //NextExpiryUTCDate does not make sense if ExpiredCardCount == 0
         #endregion
     }
