@@ -98,13 +98,6 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             public IEnumerable<Region> Regions { get; }
         }
-        private sealed class FakeStringLocalizer : ILocalized
-        {
-            public string Get(string resourceName)
-            {
-                return "no translation";
-            }
-        }
         #endregion
         #region Private methods
         private async Task InsertImageInDbAsync(Region region, MemCheckUser user)

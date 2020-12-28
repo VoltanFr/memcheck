@@ -51,7 +51,7 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new GetCards(serviceProvider);
+            IMemCheckTest test = new BeaufortCardCreator(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
