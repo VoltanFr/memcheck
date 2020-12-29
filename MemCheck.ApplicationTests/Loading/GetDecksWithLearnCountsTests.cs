@@ -29,7 +29,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var description = StringServices.RandomString();
+            var description = StringHelper.RandomString();
             var deck = await DeckHelper.CreateAsync(testDB, userId, description);
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -50,7 +50,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringServices.RandomString());
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
 
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 30, 0, 0, 0));
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 30, 12, 0, 0));
@@ -67,7 +67,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringServices.RandomString());
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
 
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 10, 12, 0, 0)); //Expires on 2020, 01, 12 at 12:00
 
@@ -99,7 +99,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringServices.RandomString());
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
 
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, new DateTime(2020, 12, 11, 1, 0, 0)); //Expires on 2020, 12, 27
 
@@ -152,10 +152,10 @@ namespace MemCheck.Application.Loading
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            var deck1Description = StringServices.RandomString();
+            var deck1Description = StringHelper.RandomString();
             var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description);
 
-            var deck2Description = StringServices.RandomString();
+            var deck2Description = StringHelper.RandomString();
             var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description);
 
             var jan01 = new DateTime(2030, 01, 01);

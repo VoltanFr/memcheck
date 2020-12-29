@@ -13,7 +13,7 @@ namespace MemCheck.Application.Tests.Helpers
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new Deck();
             result.Owner = await dbContext.Users.SingleAsync(u => u.Id == ownerId);
-            result.Description = description ?? StringServices.RandomString();
+            result.Description = description ?? StringHelper.RandomString();
             result.CardInDecks = new CardInDeck[0];
             result.HeapingAlgorithmId = Deck.DefaultHeapingAlgorithmId;
             dbContext.Decks.Add(result);

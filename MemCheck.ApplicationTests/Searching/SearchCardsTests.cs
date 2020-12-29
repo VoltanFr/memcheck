@@ -44,9 +44,9 @@ namespace MemCheck.Application.Searching
             var testDB = DbHelper.GetEmptyTestDB();
 
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var tag1Name = StringServices.RandomString();
+            var tag1Name = StringHelper.RandomString();
             var tag1 = await TagHelper.CreateAsync(testDB, tag1Name);
-            var tag2Name = StringServices.RandomString();
+            var tag2Name = StringHelper.RandomString();
             var tag2 = await TagHelper.CreateAsync(testDB, tag2Name);
             var card = await CardHelper.CreateAsync(testDB, userId, tagIds: new[] { tag1, tag2 });
 

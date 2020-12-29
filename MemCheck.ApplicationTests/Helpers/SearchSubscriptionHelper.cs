@@ -13,7 +13,7 @@ namespace MemCheck.Application.Tests.Helpers
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new SearchSubscription();
             result.UserId = subscriberId;
-            result.Name = name ?? StringServices.RandomString();
+            result.Name = name ?? StringHelper.RandomString();
             result.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
             result.RequiredText = requiredText;
             result.RequiredTags = new RequiredTagInSearchSubscription[0];

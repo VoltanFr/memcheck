@@ -88,7 +88,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card2.Id, user, StringServices.RandomString(), new Guid[0], StringServices.RandomString(), new Guid[0], StringServices.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringServices.RandomString());
+                var updateRequest = new UpdateCard.Request(card2.Id, user, StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -137,7 +137,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card1.Id, user, StringServices.RandomString(), new Guid[0], StringServices.RandomString(), new Guid[0], StringServices.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringServices.RandomString());
+                var updateRequest = new UpdateCard.Request(card1.Id, user, StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -172,8 +172,8 @@ namespace MemCheck.Application.Tests.Notifying
             var card1 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), language: language);
             var card2 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 04, 02), language: language);
 
-            var someText = StringServices.RandomString();
-            var subscriptionName = StringServices.RandomString();
+            var someText = StringHelper.RandomString();
+            var subscriptionName = StringHelper.RandomString();
             var subscription = await SearchSubscriptionHelper.CreateAsync(db, user, subscriptionName, someText);
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -192,7 +192,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card1.Id, user, someText, new Guid[0], StringServices.RandomString(), new Guid[0], StringServices.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringServices.RandomString());
+                var updateRequest = new UpdateCard.Request(card1.Id, user, someText, new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -234,7 +234,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new[] { requiredTag }, new[] { excludedTag });
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringHelper.RandomString(), "", new[] { requiredTag }, new[] { excludedTag });
                 var subscriber = new SubscribeToSearch(dbContext);
                 subscriptionId = await subscriber.RunAsync(subscriberRequest);
             }
@@ -298,7 +298,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringHelper.RandomString(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
                 subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
             }
 
@@ -352,7 +352,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var db = DbHelper.GetEmptyTestDB();
 
-            var userName = StringServices.RandomString();
+            var userName = StringHelper.RandomString();
             var user = await UserHelper.CreateInDbAsync(db, userName: userName);
             var language = await CardLanguagHelper.CreateAsync(db);
 
@@ -363,7 +363,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[0]);
                 subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
             }
 
@@ -431,7 +431,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringServices.RandomString());
+                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -502,7 +502,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var db = DbHelper.GetEmptyTestDB();
 
-            var cardCreatorUserName = StringServices.RandomString();
+            var cardCreatorUserName = StringHelper.RandomString();
             var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorUserName);
             var language = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
@@ -565,7 +565,7 @@ namespace MemCheck.Application.Tests.Notifying
             //Create a previous version on which subscriber can see the card
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringServices.RandomString());
+                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 

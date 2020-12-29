@@ -12,7 +12,7 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new Tag();
-            result.Name = name ?? StringServices.RandomString();
+            result.Name = name ?? StringHelper.RandomString();
             dbContext.Tags.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

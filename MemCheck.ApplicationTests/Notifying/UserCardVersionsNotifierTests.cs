@@ -24,10 +24,10 @@ namespace MemCheck.Application.Tests.Notifying
             result.VersionCreator = creator;
             result.VersionUtcDate = versionDate;
             result.VersionType = CardPreviousVersionType.Creation;
-            result.FrontSide = StringServices.RandomString();
-            result.BackSide = StringServices.RandomString();
-            result.AdditionalInfo = StringServices.RandomString();
-            result.VersionDescription = StringServices.RandomString();
+            result.FrontSide = StringHelper.RandomString();
+            result.BackSide = StringHelper.RandomString();
+            result.AdditionalInfo = StringHelper.RandomString();
+            result.VersionDescription = StringHelper.RandomString();
             dbContext.CardPreviousVersions.Add(result);
 
             var card = await dbContext.Cards.Where(c => c.Id == cardId).SingleAsync();
@@ -47,10 +47,10 @@ namespace MemCheck.Application.Tests.Notifying
             result.VersionCreator = creator;
             result.VersionUtcDate = versionDate;
             result.VersionType = CardPreviousVersionType.Creation;
-            result.FrontSide = StringServices.RandomString();
-            result.BackSide = StringServices.RandomString();
-            result.AdditionalInfo = StringServices.RandomString();
-            result.VersionDescription = StringServices.RandomString();
+            result.FrontSide = StringHelper.RandomString();
+            result.BackSide = StringHelper.RandomString();
+            result.AdditionalInfo = StringHelper.RandomString();
+            result.VersionDescription = StringHelper.RandomString();
             dbContext.CardPreviousVersions.Add(result);
 
             previousVersion.PreviousVersion = result;

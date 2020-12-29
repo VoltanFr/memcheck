@@ -12,7 +12,7 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new CardLanguage();
-            result.Name = StringServices.RandomString();
+            result.Name = StringHelper.RandomString();
             dbContext.CardLanguages.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

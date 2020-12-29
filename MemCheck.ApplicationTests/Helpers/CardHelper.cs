@@ -20,10 +20,10 @@ namespace MemCheck.Application.Tests.Helpers
 
             var result = new Card();
             result.VersionCreator = creator;
-            result.FrontSide = StringServices.RandomString();
-            result.BackSide = StringServices.RandomString();
-            result.AdditionalInfo = StringServices.RandomString();
-            result.VersionDescription = StringServices.RandomString();
+            result.FrontSide = StringHelper.RandomString();
+            result.BackSide = StringHelper.RandomString();
+            result.AdditionalInfo = StringHelper.RandomString();
+            result.VersionDescription = StringHelper.RandomString();
             result.VersionType = CardVersionType.Creation;
             if (language != null)
                 result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);

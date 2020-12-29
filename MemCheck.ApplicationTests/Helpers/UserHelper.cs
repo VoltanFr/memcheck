@@ -22,7 +22,7 @@ namespace MemCheck.Application.Tests.Helpers
             result.MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs;
             result.LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue;
             result.SubscribeToCardOnEdit = subscribeToCardOnEdit;
-            result.UserName = userName ?? StringServices.RandomString();
+            result.UserName = userName ?? StringHelper.RandomString();
             return result;
         }
     }

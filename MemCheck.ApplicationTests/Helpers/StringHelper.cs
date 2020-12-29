@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace MemCheck.Application.Tests
+namespace MemCheck.Application.Tests.Helpers
 {
-    public static class StringServices
+    internal static class StringHelper
     {
         public static string RandomString()
         {

@@ -21,7 +21,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SetSearchSubscriptionName.Request(Guid.Empty, subscription.Id, StringServices.RandomString());
+                var request = new SetSearchSubscriptionName.Request(Guid.Empty, subscription.Id, StringHelper.RandomString());
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
             }
         }
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SetSearchSubscriptionName.Request(userId, Guid.Empty, StringServices.RandomString());
+                var request = new SetSearchSubscriptionName.Request(userId, Guid.Empty, StringHelper.RandomString());
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
             }
         }
@@ -47,7 +47,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, StringServices.RandomString());
+                var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, StringHelper.RandomString());
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
             }
         }
@@ -96,7 +96,7 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
-            var newName = StringServices.RandomString();
+            var newName = StringHelper.RandomString();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

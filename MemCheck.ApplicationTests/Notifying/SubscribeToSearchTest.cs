@@ -19,7 +19,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var subscriptionName = StringServices.RandomString();
+            var subscriptionName = StringHelper.RandomString();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -52,12 +52,12 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                deckId = await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, StringServices.RandomString(), HeapingAlgorithms.DefaultAlgoId));
+                deckId = await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, StringHelper.RandomString(), HeapingAlgorithms.DefaultAlgoId));
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, deckId, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, deckId, StringHelper.RandomString(), "", new Guid[0], new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -80,8 +80,8 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var text = StringServices.RandomString();
-            var subscriptionName = StringServices.RandomString();
+            var text = StringHelper.RandomString();
+            var subscriptionName = StringHelper.RandomString();
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -112,11 +112,11 @@ namespace MemCheck.Application.Tests.Notifying
             Guid tagId;
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                tagId = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                tagId = await new CreateTag(dbContext).RunAsync(StringHelper.RandomString());
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { tagId }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[] { tagId }, new Guid[0]);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -144,12 +144,12 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                tagId = await new CreateTag(dbContext).RunAsync(StringHelper.RandomString());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { tagId });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[] { tagId });
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -175,7 +175,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], null);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], null);
                 await new SubscribeToSearch(dbContext).RunAsync(request);
             }
 
@@ -200,7 +200,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), StringServices.RandomString(), "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), StringHelper.RandomString(), "", new Guid[0], new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -212,7 +212,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { Guid.NewGuid() }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[] { Guid.NewGuid() }, new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -224,7 +224,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { Guid.NewGuid() });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[] { Guid.NewGuid() });
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -238,12 +238,12 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                tagId = await new CreateTag(dbContext).RunAsync(StringHelper.RandomString());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[] { tagId, tagId }, new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[] { tagId, tagId }, new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -257,12 +257,12 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(StringServices.RandomString());
+                tagId = await new CreateTag(dbContext).RunAsync(StringHelper.RandomString());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[] { tagId, tagId });
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[] { tagId, tagId });
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }
@@ -273,11 +273,11 @@ namespace MemCheck.Application.Tests.Notifying
             var userId = await UserHelper.CreateInDbAsync(testDB);
             using (var dbContext = new MemCheckDbContext(testDB))
                 for (int i = 0; i < SubscribeToSearch.Request.MaxSubscriptionCount; i++)
-                    await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]));
+                    await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[0]));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringServices.RandomString(), "", new Guid[0], new Guid[0]);
+                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[0]);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
             }
         }

@@ -12,11 +12,11 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new Image();
-            result.Name = StringServices.RandomString();
-            result.Description = StringServices.RandomString();
-            result.OriginalContentType = StringServices.RandomString();
-            result.Source = StringServices.RandomString();
-            result.VersionDescription = StringServices.RandomString();
+            result.Name = StringHelper.RandomString();
+            result.Description = StringHelper.RandomString();
+            result.OriginalContentType = StringHelper.RandomString();
+            result.Source = StringHelper.RandomString();
+            result.VersionDescription = StringHelper.RandomString();
             result.SmallBlob = new[] { (byte)1 };
             result.MediumBlob = new[] { (byte)1 };
             result.BigBlob = new[] { (byte)1 };

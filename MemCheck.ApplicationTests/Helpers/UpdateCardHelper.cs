@@ -22,7 +22,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 tagIds,
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                StringServices.RandomString()
+                StringHelper.RandomString()
                 );
         }
         public static UpdateCard.Request RequestForVisibilityChanges(Card card, IEnumerable<Guid> userWithViewIds)
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 userWithViewIds,
-                StringServices.RandomString()
+                StringHelper.RandomString()
                 );
         }
         public static UpdateCard.Request RequestForFrontSideChanges(Card card, string frontSide)
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                StringServices.RandomString()
+                StringHelper.RandomString()
                 );
         }
     }

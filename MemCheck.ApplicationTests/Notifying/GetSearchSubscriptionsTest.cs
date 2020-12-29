@@ -68,10 +68,10 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deckDescription = StringServices.RandomString();
+            var deckDescription = StringHelper.RandomString();
             var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription);
-            var name = StringServices.RandomString();
-            var requiredText = StringServices.RandomString();
+            var name = StringHelper.RandomString();
+            var requiredText = StringHelper.RandomString();
             var lastNotifDate = new DateTime(2032, 1, 8);
             var savedSubscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId, name: name, requiredText: requiredText, excludedDeckId: deck, lastNotificationDate: lastNotifDate);
 
