@@ -120,13 +120,19 @@
   <data name="AlreadyExistsErrMesg" xml:space="preserve">
     <value>Un label existe déjà avec ce nom.</value>
   </data>
-  <data name="LabelName" xml:space="preserve">
-    <value>Nom :</value>
+  <data name="Failure" xml:space="preserve">
+    <value>Échec</value>
   </data>
   <data name="NameLengthErrMesg" xml:space="preserve">
     <value>Longueur incorrecte (doit être entre 3 et 50 caractères).</value>
   </data>
   <data name="Saved" xml:space="preserve">
     <value>Enregistré</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="TagRecorded" xml:space="preserve">
+    <value>Label enregistré :</value>
   </data>
 </root>

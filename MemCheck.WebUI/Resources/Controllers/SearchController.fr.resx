@@ -291,6 +291,9 @@
   <data name="IncludeCards" xml:space="preserve">
     <value>Inclure les cartes</value>
   </data>
+  <data name="NoName" xml:space="preserve">
+    <value>Non nommée</value>
+  </data>
   <data name="None" xml:space="preserve">
     <value>&lt;Aucun&gt;</value>
   </data>

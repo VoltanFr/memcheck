@@ -168,7 +168,6 @@ namespace MemCheck.WebUI.Controllers
                 AlertAddTagToCardsPart2 = localizer.Get("AlertAddTagToCardsPart2");
                 AlertAddTagToCardsPart3Single = localizer.Get("AlertAddTagToCardsPart3Single");
                 AlertAddTagToCardsPart3Plural = localizer.Get("AlertAddTagToCardsPart3Plural");
-                TagAdded = localizer.Get("TagAdded");
                 CantAddToDeckBecauseSomeCardsAlreadyIn = localizer.Get("CantAddToDeckBecauseSomeCardsAlreadyIn");
                 AlertAddCardsToDeckPart1 = localizer.Get("AlertAddCardsToDeckPart1");
                 AlertAddCardToDeckPart1 = localizer.Get("AlertAddCardToDeckPart1");
@@ -176,8 +175,6 @@ namespace MemCheck.WebUI.Controllers
                 AlertAddCardsToDeckPart3 = localizer.Get("AlertAddCardsToDeckPart3");
                 AlertAddCardToDeckPart3 = localizer.Get("AlertAddCardToDeckPart3");
                 AlertAddOneCardToDeck = localizer.Get("AlertAddOneCardToDeck");
-                CardsAdded = localizer.Get("CardsAdded");
-                CardAdded = localizer.Get("CardAdded");
                 CardAlreadyInDeck = localizer.Get("CardAlreadyInDeck");
                 CardsAlreadyInDeck = localizer.Get("CardsAlreadyInDeck");
 
@@ -189,8 +186,6 @@ namespace MemCheck.WebUI.Controllers
                 AlertRemoveCardsFromDeckPart2 = localizer.Get("AlertRemoveCardsFromDeckPart2");
                 AlertRemoveCardsFromDeckPart3 = localizer.Get("AlertRemoveCardsFromDeckPart3");
                 AlertRemoveCardFromDeckPart3 = localizer.Get("AlertRemoveCardFromDeckPart3");
-                CardRemoved = localizer.Get("CardRemoved");
-                CardsRemoved = localizer.Get("CardsRemoved");
 
                 OperationIsForFilteringOnDeckInclusive = localizer.Get("OperationIsForFilteringOnDeckInclusive");
                 CardAlreadyInTargetHeap = localizer.Get("CardAlreadyInTargetHeap");
@@ -200,14 +195,10 @@ namespace MemCheck.WebUI.Controllers
                 AlertMoveCardsToHeapPart2 = localizer.Get("AlertMoveCardsToHeapPart2");
                 AlertMoveCardToHeapPart3 = localizer.Get("AlertMoveCardToHeapPart3");
                 AlertMoveCardsToHeapPart3 = localizer.Get("AlertMoveCardsToHeapPart3");
-                CardMoved = localizer.Get("CardMoved");
-                CardsMoved = localizer.Get("CardsMoved");
 
                 AlertDeleteCardsPart1 = localizer.Get("AlertDeleteCardsPart1");
                 AlertDeleteCardsPart2Single = localizer.Get("AlertDeleteCardsPart2Single");
                 AlertDeleteCardsPart2Plural = localizer.Get("AlertDeleteCardsPart2Plural");
-                CardDeleted = localizer.Get("CardDeleted");
-                CardsDeleted = localizer.Get("CardsDeleted");
 
                 SelectedRatingAndAbove = localizer.Get("SelectedRatingAndAbove");
                 SelectedRatingAndBelow = localizer.Get("SelectedRatingAndBelow");
@@ -215,8 +206,6 @@ namespace MemCheck.WebUI.Controllers
 
                 CardsRegisteredForNotif = localizer.Get("CardsRegisteredForNotif");
                 CardsNotRegisteredForNotif = localizer.Get("CardsNotRegisteredForNotif");
-                Registered = localizer.Get("Registered");
-                Unregistered = localizer.Get("Unregistered");
 
                 ConfirmSubscription = localizer.Get("ConfirmSubscription");
             }
@@ -234,7 +223,6 @@ namespace MemCheck.WebUI.Controllers
             public string AlertAddTagToCardsPart2 { get; }
             public string AlertAddTagToCardsPart3Single { get; }
             public string AlertAddTagToCardsPart3Plural { get; }
-            public string TagAdded { get; }
             public string CantAddToDeckBecauseSomeCardsAlreadyIn { get; }
             public string AlertAddCardsToDeckPart1 { get; }
             public string AlertAddCardToDeckPart1 { get; }
@@ -242,8 +230,6 @@ namespace MemCheck.WebUI.Controllers
             public string AlertAddCardsToDeckPart3 { get; }
             public string AlertAddCardToDeckPart3 { get; }
             public string AlertAddOneCardToDeck { get; }
-            public string CardsAdded { get; }
-            public string CardAdded { get; }
             public string CardAlreadyInDeck { get; }
             public string CardsAlreadyInDeck { get; }
             public string CardAlreadyNotInDeck { get; }
@@ -254,8 +240,6 @@ namespace MemCheck.WebUI.Controllers
             public string AlertRemoveCardsFromDeckPart2 { get; }
             public string AlertRemoveCardsFromDeckPart3 { get; }
             public string AlertRemoveCardFromDeckPart3 { get; }
-            public string CardRemoved { get; }
-            public string CardsRemoved { get; }
             public string OperationIsForFilteringOnDeckInclusive { get; }
             public string CardAlreadyInTargetHeap { get; }
             public string CardsAlreadyInTargetHeap { get; }
@@ -264,20 +248,14 @@ namespace MemCheck.WebUI.Controllers
             public string AlertMoveCardsToHeapPart2 { get; }
             public string AlertMoveCardToHeapPart3 { get; }
             public string AlertMoveCardsToHeapPart3 { get; }
-            public string CardMoved { get; }
-            public string CardsMoved { get; }
             public string AlertDeleteCardsPart1 { get; }
             public string AlertDeleteCardsPart2Single { get; }
             public string AlertDeleteCardsPart2Plural { get; }
-            public string CardDeleted { get; }
-            public string CardsDeleted { get; }
             public string SelectedRatingAndAbove { get; }
             public string SelectedRatingAndBelow { get; }
             public string NoRating { get; }
             public string CardsRegisteredForNotif { get; }
             public string CardsNotRegisteredForNotif { get; }
-            public string Registered { get; }
-            public string Unregistered { get; }
             public string ConfirmSubscription { get; }
         }
         #endregion
@@ -472,7 +450,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
             await new AddTagToCards(dbContext, this).RunAsync(appRequest);
-            return Ok();
+            return ControllerResultWithToast.Success(Get("TagAdded"), this);
         }
         public sealed class AddTagToCardsRequest
         {
@@ -485,7 +463,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             new AddCardsInDeck(dbContext).Run(deckId, request.CardIds);
-            return Ok();
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardAdded") : Get("CardsAdded"), this);
         }
         public sealed class AddCardsToDeckRequest
         {
@@ -498,7 +476,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             new RemoveCardsFromDeck(dbContext).Run(deckId, request.CardIds);
-            return Ok();
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardRemoved") : Get("CardsRemoved"), this);
         }
         public sealed class RemoveCardsFromDeckRequest
         {
@@ -513,7 +491,8 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new MoveCardsToHeap.Request(userId, deckId, heapId, request.CardIds);
             await new MoveCardsToHeap(dbContext).RunAsync(appRequest);
-            return Ok();
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardMoved") : Get("CardsMoved"), this);
+
         }
         public sealed class MoveCardsToHeapRequest
         {
@@ -528,7 +507,8 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
             await new DeleteCards(dbContext, this).RunAsync(appRequest);
-            return Ok();
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardDeleted") : Get("CardsDeleted"), this);
+
         }
         public sealed class DeleteCardsRequest
         {
@@ -543,7 +523,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
             await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
-            return Ok();
+            return ControllerResultWithToast.Success(Get("Registered"), this);
         }
         public sealed class RegisterForNotificationsRequest
         {
@@ -558,7 +538,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
             await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
-            return Ok();
+            return ControllerResultWithToast.Success(Get("Unregistered"), this);
         }
         public sealed class UnregisterForNotificationsRequest
         {
@@ -592,8 +572,7 @@ namespace MemCheck.WebUI.Controllers
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
             var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Get("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
             await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
-            var result = new SubscribeToSearchViewModel(Get("Success"), Get("SubscriptionRecorded"));
-            return base.Ok(result);
+            return ControllerResultWithToast.Success(Get("SubscriptionRecorded"), this);
         }
         public sealed class SubscribeToSearchViewModel
         {

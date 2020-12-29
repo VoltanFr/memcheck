@@ -36,11 +36,8 @@ var app = new Vue({
         mountFinished: false,
         guiMessages: {
             success: "",
-            cardSavedOk: "",
             failure: "",
             sureCreateWithoutTag: "",
-            ratingSavedOk: "",
-            saved: ""
         },
         addToDeck: "",  //AuthoringController.DecksOfUserViewModel
         decksOfUser: [],    //AuthoringController.DecksOfUserViewModel
@@ -149,9 +146,9 @@ var app = new Vue({
                     : axios.put('/Authoring/UpdateCard/' + this.editingCardId, postCard);
 
                 await task
-                    .then(response => {
+                    .then(result => {
                         this.clearAll();
-                        tellAxiosSuccess(this.guiMessages.cardSavedOk, this.guiMessages.saved, this);
+                        tellControllerSuccess(result, this);
                         if (this.returnUrl)
                             window.location = this.returnUrl;
                     })
@@ -448,7 +445,7 @@ var app = new Vue({
         async updateRating() {
             await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + this.card.currentUserRating)
                 .then(response => {
-                    tellAxiosSuccess(this.guiMessages.ratingSavedOk, this.guiMessages.saved, this);
+                    tellControllerSuccess(response, this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);

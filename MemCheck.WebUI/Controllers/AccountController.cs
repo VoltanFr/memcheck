@@ -105,7 +105,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteSearchSubscription.Request(userId, id);
             await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
-            return base.Ok(Get("Deleted"));
+            return ControllerResultWithToast.Success(Get("Deleted"), this);
         }
         #endregion
     }

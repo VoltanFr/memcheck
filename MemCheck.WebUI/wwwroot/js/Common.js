@@ -23,37 +23,30 @@ function dateIsTomorrow(d) {
 }
 
 function tellAxiosError(result, vueObject) {
-    tellAxiosControllerResult(result, false, vueObject);
+    toastAxiosResult(result.response, false, vueObject);
 }
 
-function tellAxiosSuccess(result, vueObject) {
-    tellAxiosControllerResult(result, true, vueObject);
+function tellControllerSuccess(result, vueObject) {
+    toastAxiosResult(result, true, vueObject);
 }
 
-function tellAxiosControllerResult(result, success, vueObject) {
+function toastAxiosResult(controllerResultWithToast, success, vueObject) {
     //Code is meant to support ControllerResult
     var title = success ? "Success" : "Failure";
-    if (result.response && result.response.data && result.response.data.toastTitle)
-        title = result.response.data.toastTitle;
+    if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastTitle)
+        title = controllerResultWithToast.data.toastTitle;
 
-    var text = result;
-    if (result.message)
-        text = result.message;
-    if (result.response && result.response.data && result.response.data.toastText)
-        text = result.response.data.toastText + (result.response.data.showStatus ? ("\r\n" + text) : "");
+    var text = controllerResultWithToast;
+    if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastText)
+        text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? ("\r\n" + text) : "");
 
     var variant = success ? 'success' : 'danger';
     var autoHideDelay = success ? 3000 : 10000;
 
-    tellAxiosMsg(text, title, variant, autoHideDelay, vueObject);
+    toast(text, title, variant, autoHideDelay, vueObject);
 }
 
-function tellAxiosSuccess(mesg, title, vueObject) {
-    tellAxiosMsg(mesg, title, 'success', 3000, vueObject);
-}
-
-function tellAxiosMsg(mesg, title, variant, autoHideDelay, vueObject) {
-    //variant: 'danger', 'success'
+function toast(mesg, title, variant, autoHideDelay, vueObject) {
     vueObject.$bvToast.toast(mesg, {
         title: title,
         variant: variant,
@@ -82,9 +75,9 @@ function sleep(milliseconds) {
 
 function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure, vueObject) {
     navigator.clipboard.writeText(text).then(function () {
-        tellAxiosSuccess(text, toastTitleOnSuccess, vueObject);
+        toast(text, toastTitleOnSuccess, 'success', 3000, vueObject);
     }, function (err) {
-        tellAxiosMsg(err, toastTitleOnFailure, 'danger', 10000, vueObject);
+        toast(err, toastTitleOnFailure, 'danger', 10000, vueObject);
     });
 }
 

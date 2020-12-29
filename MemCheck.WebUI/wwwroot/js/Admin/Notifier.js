@@ -16,7 +16,7 @@ var app = new Vue({
             this.running = true;
             axios.post('/Admin/LaunchNotifier')
                 .then(result => {
-                    tellAxiosSuccess("Notifier terminated", "ok", this);
+                    tellControllerSuccess(result, this);
                     this.running = false;
                 })
                 .catch(error => {

@@ -76,7 +76,7 @@ namespace MemCheck.WebUI.Controllers
             var cardId = await new CreateCard(dbContext).RunAsync(request, this);
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardInDeck(dbContext).RunAsync(card.AddToDeck, cardId);
-            return Ok();
+            return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class PostCardOfUserRequest
         {
@@ -100,7 +100,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
             await new UpdateCard(dbContext).RunAsync(request, this);
-            return Ok();
+            return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class UpdateCardRequest
         {
@@ -198,30 +198,21 @@ namespace MemCheck.WebUI.Controllers
         {
             return Ok(new GetGuiMessagesViewModel(
             Get("Success"),
-            Get("CardSavedOk"),
             Get("Failure"),
-            Get("SureCreateWithoutTag"),
-            Get("Saved"),
-            Get("RatingSavedOk")
+            Get("SureCreateWithoutTag")
             ));
         }
         public sealed class GetGuiMessagesViewModel
         {
-            public GetGuiMessagesViewModel(string success, string cardSavedOk, string failure, string sureCreateWithoutTag, string saved, string ratingSavedOk)
+            public GetGuiMessagesViewModel(string success, string failure, string sureCreateWithoutTag)
             {
                 Success = success;
-                CardSavedOk = cardSavedOk;
                 Failure = failure;
                 SureCreateWithoutTag = sureCreateWithoutTag;
-                Saved = saved;
-                RatingSavedOk = ratingSavedOk;
             }
             public string Success { get; } = null!;
-            public string CardSavedOk { get; } = null!;
             public string Failure { get; } = null!;
             public string SureCreateWithoutTag { get; } = null!;
-            public string Saved { get; } = null!;
-            public string RatingSavedOk { get; } = null!;
         }
         #endregion
         #region DecksOfUser, returns IEnumerable<GetUsersViewModel>
@@ -302,7 +293,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new SetCardRating.Request(user, cardId, rating);
             await new SetCardRating(dbContext).RunAsync(request);
-            return Ok();
+            return ControllerResultWithToast.Success($"{Get("RatingSavedOk")} {rating}\u2605", this);
         }
         #endregion
     }

@@ -23,21 +23,17 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetGuiMessages")]
         public IActionResult GetGuiMessages()
         {
-            return Ok(new GetGuiMessagesViewModel(Get("AlreadyExistsErrMesg"), Get("NameLengthErrMesg"), Get("Saved"), Get("LabelName")));
+            return Ok(new GetGuiMessagesViewModel(Get("AlreadyExistsErrMesg"), Get("NameLengthErrMesg")));
         }
         public sealed class GetGuiMessagesViewModel
         {
-            public GetGuiMessagesViewModel(string alreadyExistsErr, string nameLengthErr, string saved, string labelName)
+            public GetGuiMessagesViewModel(string alreadyExistsErr, string nameLengthErr)
             {
                 this.alreadyExistsErr = alreadyExistsErr;
                 this.nameLengthErr = nameLengthErr;
-                this.saved = saved;
-                this.labelName = labelName;
             }
             public string alreadyExistsErr { get; } = null!;
             public string nameLengthErr { get; } = null!;
-            public string saved { get; } = null!;
-            public string labelName { get; } = null!;
         }
         #endregion
         #region GetTag
@@ -112,7 +108,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
         {
             CheckBodyParameter(request);
-            return Ok(await new CreateTag(dbContext).RunAsync(request.NewName));
+            await new CreateTag(dbContext).RunAsync(request.NewName);
+            return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
+
         }
         public sealed class CreateRequestModel
         {
@@ -124,7 +122,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
         {
             CheckBodyParameter(request);
-            return Ok(await new UpdateTag(dbContext).RunAsync(tagId, request.NewName));
+            await new UpdateTag(dbContext).RunAsync(tagId, request.NewName);
+            return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
+
         }
         public sealed class UpdateRequestModel
         {

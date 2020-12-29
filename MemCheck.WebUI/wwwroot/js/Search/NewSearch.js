@@ -331,7 +331,7 @@ var app = new Vue({
 
                 await axios.post('/Search/AddTagToCards/' + tag.tagId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellAxiosSuccess(this.allStaticData.localizedText.tagAdded, '', this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -403,7 +403,7 @@ var app = new Vue({
 
                 await axios.post('/Search/AddCardsToDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAdded : this.allStaticData.localizedText.cardsAdded, '', this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         alert(error.response.data.detail);
@@ -464,7 +464,7 @@ var app = new Vue({
 
                 await axios.post('/Search/RemoveCardsFromDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardRemoved : this.allStaticData.localizedText.cardsRemoved, '', this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -535,7 +535,7 @@ var app = new Vue({
 
                 await axios.post('/Search/MoveCardsToHeap/' + this.selectedDeck.deckId + '/' + targetHeap.heapId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardMoved : this.allStaticData.localizedText.cardsMoved, '', this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -575,7 +575,7 @@ var app = new Vue({
 
                 await axios.post('/Search/DeleteCards', { cardIds: selectedCardIds })
                     .then(result => {
-                        tellAxiosSuccess(selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardDeleted : this.allStaticData.localizedText.cardsDeleted, '', this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);
@@ -600,7 +600,7 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/RegisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    tellAxiosSuccess(this.allStaticData.localizedText.registered, '', this);
+                    tellControllerSuccess(result, this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
@@ -622,7 +622,7 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/UnregisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    tellAxiosSuccess(this.allStaticData.localizedText.unRegistered, '', this);
+                    tellControllerSuccess(result, this);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
@@ -638,7 +638,7 @@ var app = new Vue({
 
                 await axios.post('/Search/SubscribeToSearch/', request)
                     .then(result => {
-                        tellAxiosSuccess(result.data.toastMesg, result.data.toastTitle, this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);

@@ -52,7 +52,7 @@ namespace MemCheck.WebUI.Controllers
                 var id = await new StoreImage(dbContext, this).RunAsync(applicationRequest);
                 if (id == Guid.Empty)
                     throw new ApplicationException("Stored image with empty GUID as id");
-                return ControllerResultWithToast.Success(Get("ImageSavedWithName") + $" '{applicationRequest.Name}'", this);
+                return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name}'", this);
             }
         }
         public sealed class UploadImageRequest
@@ -182,7 +182,7 @@ namespace MemCheck.WebUI.Controllers
             var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
             var imageName = await new DeleteImage(dbContext, this).RunAsync(applicationRequest);
             var toastText = $"{Get("SuccessfullyDeletedImage")} '{imageName}'";
-            return Ok(new { ToastText = toastText, ToastTitle = Get("Success") });
+            return ControllerResultWithToast.Success(toastText, this);
         }
         public sealed class DeleteRequest
         {

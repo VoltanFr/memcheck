@@ -147,4 +147,7 @@
   <data name="RequiredText" xml:space="preserve">
     <value>Texte requis</value>
   </data>
+  <data name="Success" xml:space="preserve">
+    <value>Ok</value>
+  </data>
 </root>

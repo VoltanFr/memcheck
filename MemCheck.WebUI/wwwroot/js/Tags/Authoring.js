@@ -10,8 +10,6 @@ var app = new Vue({
         guiMessages: {
             alreadyExistsErr: "",
             nameLengthErr: "",
-            saved: "",
-            labelName: "",
         },
         toastVisible: false,
     },
@@ -50,11 +48,12 @@ var app = new Vue({
         },
         async postNewTag() {
             await axios.post('/Tags/Create/', { NewName: this.newName })
-                .then(() => {
-                    this.afterSave();
+                .then(result => {
+                    this.afterSave(result);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
+                    return;
                 });
         },
         async save() {
@@ -72,14 +71,15 @@ var app = new Vue({
         async updateTagName() {
             await axios.put('/Tags/Update/' + this.editedTag.tagId, { NewName: this.newName })
                 .then(result => {
-                    this.afterSave();
+                    this.afterSave(result);
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
+                    return;
                 });
         },
-        async afterSave() {
-            tellAxiosSuccess(this.guiMessages.labelName + ' ' + this.newName, this.guiMessages.saved, this);
+        async afterSave(axiosResult) {
+            tellControllerSuccess(axiosResult, this);
             this.toastVisible = true;
             this.editedTag = "";
             this.newName = "";

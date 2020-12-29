@@ -28,7 +28,7 @@ namespace MemCheck.WebUI.Controllers
         private readonly UserManager<MemCheckUser> userManager;
         private readonly string authoringPageLink;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base(localizer)
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base(localizer)
         {
             this.dbContext = dbContext;
             this.emailSender = emailSender;
@@ -292,10 +292,9 @@ namespace MemCheck.WebUI.Controllers
                         sentEmailCount++;
                     }
 
-
                 mailSendingsToWaitFor.Add(emailSender.SendEmailAsync(launchingUser.Email, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
                 Task.WaitAll(mailSendingsToWaitFor.ToArray());
-                return Ok();
+                return ControllerResultWithToast.Success("Notifications sent", this);
             }
             catch (Exception e)
             {

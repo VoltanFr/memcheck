@@ -36,7 +36,7 @@ var app = new Vue({
 
                 await axios.delete('/Account/DeleteSearchSubscription/' + subscription.id)
                     .then(result => {
-                        tellAxiosSuccess(result.data, "", this);
+                        tellControllerSuccess(result, this);
                     })
                     .catch(error => {
                         tellAxiosError(error, this);

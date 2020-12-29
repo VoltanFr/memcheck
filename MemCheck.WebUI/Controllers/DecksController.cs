@@ -72,8 +72,7 @@ namespace MemCheck.WebUI.Controllers
             var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
             var frontSide = $" '{applicationResult.FrontSideText.Truncate(30, true)}'";
             var mesgBody = Get("CardWithFrontSideHead") + frontSide + ' ' + Get("RemovedFromDeck") + ' ' + applicationResult.DeckName;
-            var result = new { MessageTitle = Get("Success"), MessageBody = mesgBody };
-            return base.Ok(result);
+            return ControllerResultWithToast.Success(mesgBody, this);
         }
         #endregion
         #region GetHeapingAlgorithms

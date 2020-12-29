@@ -196,13 +196,10 @@
     <value>Please enter an image name</value>
   </data>
   <data name="RatingSavedOk" xml:space="preserve">
-    <value>Rating saved successfully.</value>
+    <value>Rating saved successfully:</value>
   </data>
   <data name="RequestStatus" xml:space="preserve">
     <value>Request status</value>
-  </data>
-  <data name="Saved" xml:space="preserve">
-    <value>Saved</value>
   </data>
   <data name="Size" xml:space="preserve">
     <value>Size:</value>
