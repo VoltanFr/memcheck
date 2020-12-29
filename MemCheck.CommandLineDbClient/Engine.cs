@@ -1,5 +1,6 @@
 ﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
 using MemCheck.CommandLineDbClient.Pauker;
+using MemCheck.CommandLineDbClient.Ratings;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
@@ -51,7 +52,7 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new BeaufortCardCreator(serviceProvider);
+            IMemCheckTest test = new RateAllBotCards(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
