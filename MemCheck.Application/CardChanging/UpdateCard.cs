@@ -147,6 +147,9 @@ namespace MemCheck.Application.CardChanging
 
                 if (!await cards.AnyAsync())
                     throw new RequestInputException("Unknown card id");
+
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, VersionCreatorId, CardId);
+
                 var card = cards.Single();
                 var dataBeforeUpdate = new
                 {

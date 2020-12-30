@@ -42,11 +42,11 @@ namespace MemCheck.Application.Tests.Helpers
                 StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForFrontSideChanges(Card card, string frontSide)
+        public static UpdateCard.Request RequestForFrontSideChanges(Card card, string frontSide, Guid? versionCreator = null)
         {
             return new UpdateCard.Request(
                 card.Id,
-                card.VersionCreator.Id,
+                versionCreator ?? card.VersionCreator.Id,
                 frontSide,
                 card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
                 card.BackSide,

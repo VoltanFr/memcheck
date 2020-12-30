@@ -59,7 +59,7 @@ namespace MemCheck.Application.Notifying
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
                 foreach (var cardId in CardIds)
-                    await QueryValidationHelper.CheckUserIsAllowedToViewCardAsync(dbContext, UserId, cardId);
+                    await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, UserId, cardId);
             }
         }
         #endregion

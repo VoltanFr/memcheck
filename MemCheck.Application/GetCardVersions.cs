@@ -38,7 +38,7 @@ namespace MemCheck.Application
                 throw new RequestInputException("Invalid card id");
             if (QueryValidationHelper.IsReservedGuid(userId))
                 throw new RequestInputException("Invalid user id");
-            await QueryValidationHelper.CheckUserIsAllowedToViewCardAsync(dbContext, userId, cardId);
+            await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, userId, cardId);
 
             var cards = dbContext.Cards.Where(card => card.Id == cardId);
             if (!await cards.AnyAsync())

@@ -63,7 +63,7 @@ namespace MemCheck.Application.QueryValidation
                 throw new RequestInputException(localizer.Get("InvalidUserWithVisibility"));
 
             if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
-                //To be reviewed when we support card versions: I suspect we want visibility for all past owners
+                //To do: review when we support card versions: I suspect we want visibility for all past owners
                 throw new RequestInputException(localizer.Get("OwnerMustHaveVisibility"));
         }
     }

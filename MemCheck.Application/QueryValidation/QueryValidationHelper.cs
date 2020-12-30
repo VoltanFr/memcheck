@@ -48,18 +48,5 @@ namespace MemCheck.Application.QueryValidation
             if (deckOwnerId != userId)
                 throw new RequestInputException("Current user not owner of deck");
         }
-        public static async Task CheckUserIsAllowedToViewCardAsync(MemCheckDbContext dbContext, Guid userId, Guid cardId)
-        {
-            if (IsReservedGuid(userId))
-                throw new ApplicationException("Invalid user id");
-            var card = await dbContext.Cards
-                .AsNoTracking()
-                .Include(card => card.UsersWithView)
-                .Include(card => card.VersionCreator)
-                .Where(card => card.Id == cardId)
-                .SingleAsync();
-            if (!CardVisibilityHelper.CardIsVisibleToUser(userId, card.UsersWithView))
-                throw new ApplicationException("Current user not allowed to view card");
-        }
     }
 }

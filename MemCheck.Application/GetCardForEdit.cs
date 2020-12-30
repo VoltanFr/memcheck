@@ -77,7 +77,7 @@ namespace MemCheck.Application
                     throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
                 if (QueryValidationHelper.IsReservedGuid(CardId))
                     throw new RequestInputException($"Invalid card id '{CardId}'");
-                await QueryValidationHelper.CheckUserIsAllowedToViewCardAsync(dbContext, CurrentUserId, CardId);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, CurrentUserId, CardId);
             }
         }
         public sealed class ResultModel

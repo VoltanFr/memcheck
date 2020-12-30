@@ -50,8 +50,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
 - Upon creating a new version of a card, warn that this will impact n users who have it in a deck.
 - Reducing the visibility of a card should not permit to make it invisible to a user who has it in a deck, or to the owner of a version. Introduce function card visibility can be reduced : true if no other user has the card in a deck or has another version of the card. See comment in UpdateCard.Request.CheckValidityAsync. Review the code of UpdateCard: it must not be possible to lower a card's visibility so that an author of a version can't see it.
-- Vérifier si getcards dans learn affiche l'info si le chargement échoue
-- Afficher des stats sur la page d'accueil : xxx cartes de votre paquet vont expirer aujourd'hui
 - Offer a diff view from the card history page
 - The mail sent by notifier should include an history link and a diff link
 - Fix the hyperlinks in the doc pages
