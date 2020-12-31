@@ -95,7 +95,7 @@ namespace MemCheck.Application.CardChanging
             await dbContext.SaveChangesAsync();
         }
         #region Request class
-        public sealed class Request : ICardInput
+        public sealed record Request : ICardInput
         {
             #region Private methods
             private bool SameImageLists(IEnumerable<ImageInCard> originalImages)
@@ -121,7 +121,7 @@ namespace MemCheck.Application.CardChanging
                 VersionDescription = versionDescription.Trim();
             }
             public Guid CardId { get; }
-            public Guid VersionCreatorId { get; }
+            public Guid VersionCreatorId { get; set; }
             public string FrontSide { get; }
             public IEnumerable<Guid> FrontSideImageList { get; }
             public string BackSide { get; }
@@ -146,7 +146,7 @@ namespace MemCheck.Application.CardChanging
                     .Where(card => card.Id == CardId);
 
                 if (!await cards.AnyAsync())
-                    throw new RequestInputException("Unknown card id");
+                    throw new ApplicationException("Unknown card id");
 
                 await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, VersionCreatorId, CardId);
 

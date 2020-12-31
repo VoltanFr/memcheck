@@ -35,7 +35,7 @@ namespace MemCheck.Application.Tests.Helpers
             dbContext.Cards.Add(result);
 
             var usersWithView = new List<UserWithViewOnCard>();
-            if (userWithViewIds != null)
+            if (userWithViewIds != null && userWithViewIds.Any())
             {
                 Assert.IsTrue(userWithViewIds.Any(id => id == versionCreatorId), "Version creator must be allowed to view");
                 foreach (var userWithViewId in userWithViewIds)

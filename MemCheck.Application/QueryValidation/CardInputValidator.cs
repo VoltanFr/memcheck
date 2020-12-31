@@ -20,7 +20,7 @@ namespace MemCheck.Application.QueryValidation
         public static void Run(ICardInput input, ILocalized localizer)
         {
             if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
-                throw new RequestInputException(localizer.Get("InvalidOwner"));
+                throw new InvalidOperationException(localizer.Get("InvalidOwner"));
 
             if (input.FrontSide != input.FrontSide.Trim())
                 throw new InvalidOperationException("Invalid front side: not trimmed");
@@ -64,7 +64,7 @@ namespace MemCheck.Application.QueryValidation
 
             if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
                 //To do: review when we support card versions: I suspect we want visibility for all past owners
-                throw new RequestInputException(localizer.Get("OwnerMustHaveVisibility"));
+                throw new InvalidOperationException(localizer.Get("OwnerMustHaveVisibility"));
         }
     }
 }

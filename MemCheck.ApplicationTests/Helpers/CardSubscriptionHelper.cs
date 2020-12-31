@@ -19,5 +19,10 @@ namespace MemCheck.Application.Tests.Helpers
             dbContext.CardNotifications.Add(notif);
             await dbContext.SaveChangesAsync();
         }
+        public static async Task<bool> UserIsSubscribedToCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId)
+        {
+            using var dbContext = new MemCheckDbContext(db);
+            return await dbContext.CardNotifications.AnyAsync(cardSubscription => cardSubscription.CardId == cardId && cardSubscription.UserId == userId);
+        }
     }
 }

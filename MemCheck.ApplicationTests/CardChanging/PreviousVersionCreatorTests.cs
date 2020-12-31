@@ -54,8 +54,8 @@ namespace MemCheck.Application.CardChanging
             {
                 var previousVersion = await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
                 Assert.AreNotEqual(card.Id, previousVersion.Id);
-                Assert.IsTrue(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == card.Id && cardSubscription.UserId == newVersionCreatorId));
             }
+            Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, newVersionCreatorId, card.Id));
         }
     }
 }

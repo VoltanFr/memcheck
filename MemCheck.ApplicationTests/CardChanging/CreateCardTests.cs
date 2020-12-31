@@ -76,8 +76,8 @@ namespace MemCheck.Application.CardChanging
                 Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
                 Assert.AreEqual(ImageInCard.AdditionalInfo, card.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
                 Assert.IsTrue(card.TagsInCards.Any(t => t.TagId == tagId));
-                Assert.IsFalse(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
             }
+            Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
         }
         [TestMethod()]
         public async Task TestCreationWithUserSubscribingToCardOnEdit()
@@ -105,8 +105,7 @@ namespace MemCheck.Application.CardChanging
                 cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
             }
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-                Assert.IsTrue(dbContext.CardNotifications.Any(cardSubscription => cardSubscription.CardId == cardGuid && cardSubscription.UserId == ownerId));
+            Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
         }
         [TestMethod()]
         public async Task TestCreatioFailsIfCreatorNotInVisibilityList()
@@ -134,7 +133,7 @@ namespace MemCheck.Application.CardChanging
                     StringHelper.RandomString());
                 var ownerMustHaveVisibility = StringHelper.RandomString();
                 var localizer = new TestLocalizer(new[] { new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility) });
-                var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
+                var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
                 Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
             }
         }
