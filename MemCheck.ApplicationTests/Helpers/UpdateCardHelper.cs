@@ -25,11 +25,11 @@ namespace MemCheck.Application.Tests.Helpers
                 StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForVisibilityChanges(Card card, IEnumerable<Guid> userWithViewIds)
+        public static UpdateCard.Request RequestForVisibilityChanges(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null)
         {
             return new UpdateCard.Request(
                 card.Id,
-                card.VersionCreator.Id,
+                 versionCreator ?? card.VersionCreator.Id,
                 card.FrontSide,
                 card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
                 card.BackSide,

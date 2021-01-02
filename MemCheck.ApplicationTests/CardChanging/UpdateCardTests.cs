@@ -151,7 +151,7 @@ namespace MemCheck.Application.CardChanging
                     new Guid[] { imageOnAdditionalInfoId },
                     languageId,
                     new Guid[] { tagId },
-                    new Guid[] { newVersionCreator },
+                    new Guid[] { cardCreator, newVersionCreator },
                     versionDescription);
                 await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer());
             }
@@ -171,12 +171,43 @@ namespace MemCheck.Application.CardChanging
                 Assert.AreEqual(additionalInfo, updatedCard.AdditionalInfo);
                 Assert.AreEqual(versionDescription, updatedCard.VersionDescription);
                 Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
-                Assert.AreEqual(newVersionCreator, updatedCard.UsersWithView.Single().UserId);
                 Assert.AreEqual(ImageInCard.FrontSide, updatedCard.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
                 Assert.AreEqual(ImageInCard.BackSide, updatedCard.Images.Single(i => i.ImageId == imageOnBackSide1Id).CardSide);
                 Assert.AreEqual(ImageInCard.BackSide, updatedCard.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
                 Assert.AreEqual(ImageInCard.AdditionalInfo, updatedCard.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
                 Assert.IsTrue(updatedCard.TagsInCards.Any(t => t.TagId == tagId));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, originalCard.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, newVersionCreator, originalCard.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task UpdateNothing()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new UpdateCard.Request(
+                    card.Id,
+                    card.VersionCreator.Id,
+                    card.FrontSide,
+                    card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
+                    card.BackSide,
+                    card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
+                    card.AdditionalInfo,
+                    card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
+                    card.CardLanguage.Id,
+                    card.TagsInCards.Select(t => t.TagId),
+                    card.UsersWithView.Select(uwv => uwv.UserId),
+                    StringHelper.RandomString());
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
             }
         }
         [TestMethod()]
@@ -217,6 +248,195 @@ namespace MemCheck.Application.CardChanging
 
             Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(db, newVersionCreator, card.Id));
         }
+        [TestMethod()]
+        public async Task ReduceVisibility_OnlyUserWithView_NoOtherUserHasInDeck_OnlyAuthor()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
+            var deck = await DeckHelper.CreateAsync(db, cardCreator);
+            await DeckHelper.AddCardAsync(db, cardCreator, deck, card.Id, 0);
 
+            var otherUser = await UserHelper.CreateInDbAsync(db);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id));
+            }
+        }
+        [TestMethod()]
+        public async Task ReduceVisibility_OtherUserHasView_NoUserHasInDeck_OnlyAuthor()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var otherUser = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new[] { cardCreator, otherUser });
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id));
+            }
+        }
+        [TestMethod()]
+        public async Task ReduceVisibility_OtherUserHasInDeck_OnlyAuthor()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreatorName = StringHelper.RandomString();
+            var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorName);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
+
+            var otherUserName = StringHelper.RandomString();
+            var otherUser = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
+            var otherUserDeck = await DeckHelper.CreateAsync(db, otherUser);
+            await DeckHelper.AddCardAsync(db, otherUser, otherUserDeck, card.Id, 0);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+                Assert.IsTrue(e.Message.Contains(otherUserName));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { otherUser }, otherUser);
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+                Assert.IsTrue(e.Message.Contains(cardCreatorName));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, otherUser });
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task ReduceVisibility_NoUserHasInDeck_OtherAuthor()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreatorName = StringHelper.RandomString();
+            var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorName);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
+
+            var newVersionCreatorName = StringHelper.RandomString();
+            var newVersionCreator = await UserHelper.CreateInDbAsync(db, userName: newVersionCreatorName);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), newVersionCreator);
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator }, cardCreator);
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+                Assert.IsTrue(e.Message.Contains(newVersionCreatorName));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { newVersionCreator }, newVersionCreator);
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+                Assert.IsTrue(e.Message.Contains(cardCreatorName));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, newVersionCreator });
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, newVersionCreator, card.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task ReduceVisibility_OtherUserHasInDeck_OtherAuthor()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
+
+            var userWithCardInDeck = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, userWithCardInDeck);
+            await DeckHelper.AddCardAsync(db, userWithCardInDeck, deck, card.Id, 0);
+
+            var otherUser = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), otherUser);
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { otherUser }, otherUser);
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { userWithCardInDeck }, userWithCardInDeck);
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, otherUser, userWithCardInDeck });
+                await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, userWithCardInDeck, card.Id);
+            }
+        }
     }
 }

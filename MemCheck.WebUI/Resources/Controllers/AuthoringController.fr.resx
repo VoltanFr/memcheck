@@ -135,7 +135,7 @@
   <data name="BackSideImages" xml:space="preserve">
     <value>Images arrière</value>
   </data>
-  <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
+  <data name="CanNotUpdateBecauseNoDifference" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>
   </data>
   <data name="Cards" xml:space="preserve">
@@ -155,6 +155,12 @@
   </data>
   <data name="FrontSideImages" xml:space="preserve">
     <value>Images avant</value>
+  </data>
+  <data name="HeCreatedAVersionOfThisCard" xml:space="preserve">
+    <value>il a créé une version.</value>
+  </data>
+  <data name="HeHasThisCardInADeck" xml:space="preserve">
+    <value>il a cette carte dans un paquet.</value>
   </data>
   <data name="ImageName" xml:space="preserve">
     <value>Nom de l'image :</value>
@@ -189,6 +195,9 @@
   <data name="MustBeBetween" xml:space="preserve">
     <value>, doit être entre</value>
   </data>
+  <data name="MustHaveVisibilityBecause" xml:space="preserve">
+    <value>doit avoir accès car</value>
+  </data>
   <data name="NotIncludedInAnyDeck" xml:space="preserve">
     <value>N'apparaît dans aucun paquet</value>
   </data>
@@ -221,6 +230,9 @@
   </data>
   <data name="UsedIn" xml:space="preserve">
     <value>Utilisée dans</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>L'utilisateur</value>
   </data>
   <data name="UsersWithView" xml:space="preserve">
     <value>Visibilité</value>

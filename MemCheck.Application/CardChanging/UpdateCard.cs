@@ -104,6 +104,60 @@ namespace MemCheck.Application.CardChanging
                     && BackSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.BackSide).Select(img => img.ImageId))
                     && AdditionalInfoImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.AdditionalInfo).Select(img => img.ImageId));
             }
+            private void CheckAtLeastOneFieldDifferent(Card card, ILocalized localizer)
+            {
+                var dataBeforeUpdate = new
+                {
+                    CardLanguageId = card.CardLanguage.Id,
+                    card.FrontSide,
+                    card.BackSide,
+                    card.AdditionalInfo,
+                    TagIds = card.TagsInCards.Select(tag => tag.TagId),
+                    UserWithVisibilityIds = card.UsersWithView.Select(u => u.UserId),
+                    card.Images
+                };
+
+                if ((dataBeforeUpdate.CardLanguageId == LanguageId)
+                    && (dataBeforeUpdate.FrontSide == FrontSide)
+                    && (dataBeforeUpdate.BackSide == BackSide)
+                    && (dataBeforeUpdate.AdditionalInfo == AdditionalInfo)
+                    && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
+                    && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
+                    && SameImageLists(dataBeforeUpdate.Images))
+                    throw new RequestInputException(localizer.Get("CanNotUpdateBecauseNoDifference"));
+            }
+            private async Task<IEnumerable<Guid>> GetAllAuthorsAsync(Card card, MemCheckDbContext dbContext)
+            {
+                var result = await dbContext.CardPreviousVersions.Where(previousVersion => previousVersion.Card == CardId).Select(previousVersion => previousVersion.VersionCreator.Id).ToListAsync();
+                result.Add(card.VersionCreator.Id);
+                return result;
+            }
+            private async Task<IEnumerable<Guid>> GetAllUsersWithCardInADeckAsync(MemCheckDbContext dbContext)
+            {
+                return await dbContext.Decks.Join(
+                    dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.CardId == CardId),
+                    deck => deck.Id,
+                    cardInDeck => cardInDeck.DeckId,
+                    (deck, cardInDeck) => deck.Owner.Id)
+                    .ToListAsync();
+            }
+            private async Task CheckVisibilityForUsersAsync(IEnumerable<Guid> userIds, ILocalized localizer, string messageSuffixId, MemCheckDbContext dbContext)
+            {
+                foreach (var userId in userIds)
+                    if (!UsersWithVisibility.Any(u => u == userId))
+                    {
+                        var user = await dbContext.Users.SingleAsync(u => u.Id == userId);
+                        throw new RequestInputException($"{localizer.Get("User")} {user.UserName} {localizer.Get("MustHaveVisibilityBecause")} {localizer.Get(messageSuffixId)}");
+                    }
+            }
+            private async Task CheckNewVisibilityAsync(Card card, ILocalized localizer, MemCheckDbContext dbContext)
+            {
+                if (!UsersWithVisibility.Any())
+                    return;
+                await CheckVisibilityForUsersAsync(await GetAllAuthorsAsync(card, dbContext), localizer, "HeCreatedAVersionOfThisCard", dbContext);
+                IEnumerable<Guid> userIds = await GetAllUsersWithCardInADeckAsync(dbContext);
+                await CheckVisibilityForUsersAsync(userIds, localizer, "HeHasThisCardInADeck", dbContext);
+            }
             #endregion
             public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
@@ -137,6 +191,7 @@ namespace MemCheck.Application.CardChanging
                 CardInputValidator.Run(this, localizer);
 
                 var cards = dbContext.Cards
+                    .Include(card => card.VersionCreator)
                     .Include(card => card.CardLanguage)
                     .Include(card => card.Images)
                     .Include(card => card.TagsInCards)
@@ -150,28 +205,11 @@ namespace MemCheck.Application.CardChanging
 
                 await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, VersionCreatorId, CardId);
 
-                var card = cards.Single();
-                var dataBeforeUpdate = new
-                {
-                    CardLanguageId = card.CardLanguage.Id,
-                    card.FrontSide,
-                    card.BackSide,
-                    card.AdditionalInfo,
-                    TagIds = card.TagsInCards.Select(tag => tag.TagId),
-                    UserWithVisibilityIds = card.UsersWithView.Select(u => u.UserId),
-                    card.Images
-                };
+                Card card = cards.Single();
 
-                if ((dataBeforeUpdate.CardLanguageId == LanguageId)
-                    && (dataBeforeUpdate.FrontSide == FrontSide)
-                    && (dataBeforeUpdate.BackSide == BackSide)
-                    && (dataBeforeUpdate.AdditionalInfo == AdditionalInfo)
-                    && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
-                    && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
-                    && SameImageLists(dataBeforeUpdate.Images))
-                    throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
+                CheckAtLeastOneFieldDifferent(card, localizer);
 
-                //to do: reducing UsersWithView must check that this will not break anybody's deck, nor prevent an author of a version of this card from viewing it
+                await CheckNewVisibilityAsync(card, localizer, dbContext);
             }
         }
         #endregion
