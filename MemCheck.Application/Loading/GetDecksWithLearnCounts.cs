@@ -15,10 +15,8 @@ namespace MemCheck.Application.Loading
         private readonly MemCheckDbContext dbContext;
         #endregion
         #region Private methods
-        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime? now = null)
+        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime todayOnClientSide, DateTime now)
         {
-            if (now == null)
-                now = DateTime.UtcNow;
             var allCards = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId })
                 .ToList();
@@ -29,7 +27,7 @@ namespace MemCheck.Application.Loading
             var expiringTodayCount = 0;
             var expiringTomorrowCount = 0;
             var expiring5NextDaysCount = 0;
-            var tomorrowDate = now.Value.AddDays(1).Date;
+            var tomorrowDate = todayOnClientSide.AddDays(1);
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
@@ -37,13 +35,13 @@ namespace MemCheck.Application.Loading
                     expiredCardCount++;
                 else
                 {
-                    if (expiryDate.Date == now.Value.Date)
+                    if (expiryDate.Date == todayOnClientSide)
                         expiringTodayCount++;
                     else
                     if (expiryDate.Date == tomorrowDate)
                         expiringTomorrowCount++;
                     else
-                    if (expiryDate.Date - now.Value.Date <= TimeSpan.FromDays(6))
+                    if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
                         expiring5NextDaysCount++;
                     if (expiryDate < nextExpiryUTCDate)
                         nextExpiryUTCDate = expiryDate;
@@ -59,12 +57,14 @@ namespace MemCheck.Application.Loading
         public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? now = null)
         {
             await request.CheckValidityAsync(dbContext);
-
+            if (now == null)
+                now = DateTime.UtcNow;
+            var todayOnClientSide = now.Value.AddMinutes(request.ClientSideTimezoneOffset).Date;
             var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, now)).ToList();
+            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, todayOnClientSide, now.Value)).ToList();
         }
         #region Request & Result
-        public sealed record Request(Guid UserId)
+        public sealed record Request(Guid UserId, int ClientSideTimezoneOffset)
         {
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {

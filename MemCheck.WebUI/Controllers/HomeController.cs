@@ -25,14 +25,14 @@ namespace MemCheck.WebUI.Controllers
             this.userManager = userManager;
         }
         #region GetAll
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllAsync()
+        [HttpGet("GetAll/{clientSideTimezoneOffset}")]
+        public async Task<IActionResult> GetAllAsync(int clientSideTimezoneOffset)
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
                 return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow));
 
-            var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
+            var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id, clientSideTimezoneOffset));
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
             var cardCount = userDecks.Sum(deck => deck.CardCount);
 

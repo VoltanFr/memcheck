@@ -11,7 +11,7 @@ var app = new Vue({
     methods: {
         async getAll() {
             this.reload = false;
-            await axios.get('/Home/GetAll')
+            await axios.get('/Home/GetAll/' + new Date().getTimezoneOffset())
                 .then(result => {
                     this.allData = result.data;
 
