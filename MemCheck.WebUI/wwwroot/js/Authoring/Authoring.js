@@ -69,7 +69,7 @@ var app = new Vue({
             this.GetReturnUrlFromPageParameter();
             await Promise.all([task1, task2, task3, task4, task5, task6, task7]);
             if (this.creatingNewCard)
-                this.makePublic();
+                this.makePrivate();
             this.CopyAllInfoToOriginalCard();
         }
         finally {
@@ -168,7 +168,7 @@ var app = new Vue({
             this.frontSideImageList = [];
             this.backSideImageList = [];
             this.additionalInfoImageList = [];
-            this.makePublic();
+            this.makePrivate();
             this.creatingNewCard = true;
             this.CopyAllInfoToOriginalCard();
         },
