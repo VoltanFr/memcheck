@@ -30,13 +30,14 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
-                return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow));
+                return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow, ""));
 
             var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id, clientSideTimezoneOffset));
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
             var cardCount = userDecks.Sum(deck => deck.CardCount);
+            var debugInfo = string.Join("<br/>", userDecks.Select(deck => deck.DebugInfo));
 
-            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, this)), DateTime.UtcNow));
+            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, this)), DateTime.UtcNow, debugInfo));
         }
         #region Result classes
         public sealed class GetAllViewModel
@@ -53,7 +54,7 @@ namespace MemCheck.WebUI.Controllers
                 var sleepTimeForDecks = userDecks.Select(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow).Min();
                 return new[] { TimeSpan.FromMinutes(1), sleepTimeForDecks }.Max().Add(TimeSpan.FromMinutes(1));    //Not less than 2'
             }
-            public GetAllViewModel(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllDeckViewModel> userDecks, DateTime dataUTCDate)
+            public GetAllViewModel(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllDeckViewModel> userDecks, DateTime dataUTCDate, string debugInfo)
             {
                 UserName = userName;
                 AnythingToLearn = anythingToLearn;
@@ -62,11 +63,13 @@ namespace MemCheck.WebUI.Controllers
                 ReloadWaitTime = (int)GetReloadWaitTime(userDecks).TotalMilliseconds;
                 UserDecks = userDecks;
                 DataUTCDate = dataUTCDate;
+                DebugInfo = debugInfo;
             }
             public string? UserName { get; }    //null if no user
             public bool AnythingToLearn { get; }
             public int TotalCardCountInDecksOfUser { get; }
             public int ReloadWaitTime { get; }  //milliseconds
+            public string DebugInfo { get; }
             public IEnumerable<GetAllDeckViewModel> UserDecks { get; }
             public DateTime DataUTCDate { get; }
         }

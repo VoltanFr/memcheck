@@ -7,7 +7,7 @@ namespace MemCheck.Application.Heaping
         public override int Id => 2;
         protected override DateTime GetExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime)
         {
-            return lastLearnUtcTime.AddSeconds(30);
+            return lastLearnUtcTime.AddMinutes(3);
         }
     }
 }
