@@ -55,11 +55,13 @@ namespace MemCheck.Application.Loading
                             expiringTomorrowCount++;
                         }
                         else
-                        if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
-                            expiring5NextDaysCount++;
-                        if (expiryDate < nextExpiryUTCDate)
-                            nextExpiryUTCDate = expiryDate;
+                        {
+                            if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
+                                expiring5NextDaysCount++;
+                        }
                     }
+                    if (expiryDate < nextExpiryUTCDate)
+                        nextExpiryUTCDate = expiryDate;
                 }
             }
             return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, expiringTomorrowCount, expiring5NextDaysCount, nextExpiryUTCDate, debugInfo.ToString());
