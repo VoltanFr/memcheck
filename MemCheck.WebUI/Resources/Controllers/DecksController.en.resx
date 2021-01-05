@@ -139,7 +139,7 @@
     <value>Escalates cards with an exponentiation formula (based on power of 2).</value>
   </data>
   <data name="HeapingAlgoDescriptionForId2" xml:space="preserve">
-    <value>Escalates cards using a constant formula, making it expire after 30 seconds. Use only for tests!</value>
+    <value>Escalates cards using a constant formula, making it expire after 3 minutes. Use only for tests!</value>
   </data>
   <data name="HeapingAlgoNameForId1" xml:space="preserve">
     <value>Default</value>

@@ -123,14 +123,14 @@
   <data name="CardsOfYourDeck" xml:space="preserve">
     <value>cartes de votre paquet</value>
   </data>
-  <data name="CardsWillExpireInThe5NextDays" xml:space="preserve">
-    <value>cartes expireront dans les 5 jours suivants.</value>
+  <data name="CardsWillExpireInTheFollowing24h" xml:space="preserve">
+    <value>cartes vont expirer dans les 24 h suivantes.</value>
   </data>
-  <data name="CardsWillExpireToday" xml:space="preserve">
-    <value>cartes vont expirer aujourd'hui.</value>
+  <data name="CardsWillExpireInTheFollowing3Days" xml:space="preserve">
+    <value>cartes expireront dans les 3 jours suivants.</value>
   </data>
-  <data name="CardsWillExpireTomorrow" xml:space="preserve">
-    <value>cartes vont expirer demain.</value>
+  <data name="CardsWillExpireInTheNextHour" xml:space="preserve">
+    <value>cartes vont expirer dans l'heure à venir.</value>
   </data>
   <data name="ClickHereToCreateCards" xml:space="preserve">
     <value>Suivez ce lien pour créer des cartes.</value>
@@ -147,14 +147,14 @@
   <data name="InYourDeck" xml:space="preserve">
     <value>Dans votre paquet</value>
   </data>
-  <data name="NoCardToExpireInThe5NextDays" xml:space="preserve">
-    <value>Aucune carte n'expirera dans les 5 jours suivants.</value>
+  <data name="NoCardToExpireInTheFollowing24h" xml:space="preserve">
+    <value>Aucune carte n'expirera dans les 24 h suivantes.</value>
   </data>
-  <data name="NoCardToExpireToday" xml:space="preserve">
-    <value>Aucune carte n'expirera aujourd'hui.</value>
+  <data name="NoCardToExpireInTheFollowing3Days" xml:space="preserve">
+    <value>Aucune carte n'expirera dans les 3 jours suivants.</value>
   </data>
-  <data name="NoCardToExpireTomorrow" xml:space="preserve">
-    <value>Aucune carte n'expirera demain.</value>
+  <data name="NoCardToExpireInTheNextHour" xml:space="preserve">
+    <value>Aucune carte n'expirera dans l'heure à venir.</value>
   </data>
   <data name="NoExpiredCard" xml:space="preserve">
     <value>Aucune carte expirée.</value>
@@ -162,14 +162,14 @@
   <data name="NoUnknownCard" xml:space="preserve">
     <value>Aucune carte non apprise.</value>
   </data>
-  <data name="OneCardWillExpireInThe5NextDays" xml:space="preserve">
-    <value>Une carte expirera dans les 5 jours suivants.</value>
+  <data name="OneCardWillExpireInTheFollowing24h" xml:space="preserve">
+    <value>Une carte va expirer dans les 24 h suivantes.</value>
   </data>
-  <data name="OneCardWillExpireToday" xml:space="preserve">
-    <value>Une carte va expirer aujourd'hui.</value>
+  <data name="OneCardWillExpireInTheFollowing3Days" xml:space="preserve">
+    <value>Une carte expirera dans les 3 jours suivants.</value>
   </data>
-  <data name="OneCardWillExpireTomorrow" xml:space="preserve">
-    <value>Une carte va expirer demain.</value>
+  <data name="OneCardWillExpireInTheNextHour" xml:space="preserve">
+    <value>Une carte va expirer dans l'heure à venir.</value>
   </data>
   <data name="OneExpiredCard" xml:space="preserve">
     <value>Une carte expirée.</value>

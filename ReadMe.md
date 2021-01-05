@@ -48,7 +48,6 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 # To do, at little cost
 - Effacement image si pas utilisée. Nécessite d'abord recherche avec une image donnée pour pouvoir remplacer, et affichage "Utilisée dans n pages" avec lien
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
-- Upon creating a new version of a card, warn that this will impact n users who have it in a deck.
 - The mail sent by notifier should include an history link and a diff link
 - Fix the hyperlinks in the doc pages
 

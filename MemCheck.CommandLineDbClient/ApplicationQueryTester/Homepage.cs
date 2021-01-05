@@ -37,7 +37,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 for (int i = 0; i < 5; i++)
                 {
                     var realCodeChrono = Stopwatch.StartNew();
-                    var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id, -60));
+                    var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
                     logger.LogInformation($"{userDecks.First().CardCount} cards");
                     logger.LogInformation($"{userDecks.First().Description}");
                     logger.LogInformation($"{userDecks.First().ExpiredCardCount} expired");

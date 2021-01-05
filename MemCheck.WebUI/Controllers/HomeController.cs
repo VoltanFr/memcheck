@@ -25,14 +25,14 @@ namespace MemCheck.WebUI.Controllers
             this.userManager = userManager;
         }
         #region GetAll
-        [HttpGet("GetAll/{clientSideTimezoneOffset}")]
-        public async Task<IActionResult> GetAllAsync(int clientSideTimezoneOffset)
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAllAsync()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
                 return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow, ""));
 
-            var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id, clientSideTimezoneOffset));
+            var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
             var cardCount = userDecks.Sum(deck => deck.CardCount);
             var debugInfo = string.Join("<br/>", userDecks.Select(deck => deck.DebugInfo));
@@ -103,32 +103,32 @@ namespace MemCheck.WebUI.Controllers
                         var linkText = applicationDeck.ExpiredCardCount == 1 ? localizer.Get("OneExpiredCard") : $"{applicationDeck.ExpiredCardCount} {localizer.Get("ExpiredCards")}";
                         lines.Add($"<a href=\"/Learn/Index?LearnMode=Expired\">{linkText}</a>");
                     }
-                    if (applicationDeck.ExpiringTodayCount == 0)
-                        lines.Add(localizer.Get("NoCardToExpireToday"));
+                    if (applicationDeck.ExpiringNextHourCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireInTheNextHour"));
                     else
                     {
-                        if (applicationDeck.ExpiringTodayCount == 1)
-                            lines.Add(localizer.Get("OneCardWillExpireToday"));
+                        if (applicationDeck.ExpiringNextHourCount == 1)
+                            lines.Add(localizer.Get("OneCardWillExpireInTheNextHour"));
                         else
-                            lines.Add($"{applicationDeck.ExpiringTodayCount} {localizer.Get("CardsWillExpireToday")}");
+                            lines.Add($"{applicationDeck.ExpiringNextHourCount} {localizer.Get("CardsWillExpireInTheNextHour")}");
                     }
-                    if (applicationDeck.ExpiringTomorrowCount == 0)
-                        lines.Add(localizer.Get("NoCardToExpireTomorrow"));
+                    if (applicationDeck.ExpiringFollowing24hCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireInTheFollowing24h"));
                     else
                     {
-                        if (applicationDeck.ExpiringTomorrowCount == 0)
-                            lines.Add(localizer.Get("OneCardWillExpireTomorrow"));
+                        if (applicationDeck.ExpiringFollowing24hCount == 1)
+                            lines.Add(localizer.Get("OneCardWillExpireInTheFollowing24h"));
                         else
-                            lines.Add($"{applicationDeck.ExpiringTomorrowCount} {localizer.Get("CardsWillExpireTomorrow")}");
+                            lines.Add($"{applicationDeck.ExpiringFollowing24hCount} {localizer.Get("CardsWillExpireInTheFollowing24h")}");
                     }
-                    if (applicationDeck.Expiring5NextDaysCount == 0)
-                        lines.Add(localizer.Get("NoCardToExpireInThe5NextDays"));
+                    if (applicationDeck.ExpiringFollowing3DaysCount == 0)
+                        lines.Add(localizer.Get("NoCardToExpireInTheFollowing3Days"));
                     else
                     {
-                        if (applicationDeck.Expiring5NextDaysCount == 0)
-                            lines.Add(localizer.Get("OneCardWillExpireInThe5NextDays"));
+                        if (applicationDeck.ExpiringFollowing3DaysCount == 1)
+                            lines.Add(localizer.Get("OneCardWillExpireInTheFollowing3Days"));
                         else
-                            lines.Add($"{applicationDeck.Expiring5NextDaysCount} {localizer.Get("CardsWillExpireInThe5NextDays")}");
+                            lines.Add($"{applicationDeck.ExpiringFollowing3DaysCount} {localizer.Get("CardsWillExpireInTheFollowing3Days")}");
                     }
                 }
                 Lines = lines;

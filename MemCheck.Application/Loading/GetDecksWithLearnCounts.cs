@@ -14,9 +14,12 @@ namespace MemCheck.Application.Loading
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly TimeSpan oneHour = TimeSpan.FromHours(1);
+        private readonly TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
+        private readonly TimeSpan fourDays = TimeSpan.FromDays(4);
         #endregion
         #region Private methods
-        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime todayOnClientSide, DateTime now)
+        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime now)
         {
             var allCards = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId })
@@ -25,13 +28,10 @@ namespace MemCheck.Application.Loading
             var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
             var expiredCardCount = 0;
             var nextExpiryUTCDate = DateTime.MaxValue;
-            var expiringTodayCount = 0;
-            var expiringTomorrowCount = 0;
-            var expiring5NextDaysCount = 0;
-            var tomorrowDate = todayOnClientSide.AddDays(1);
+            var expiringNextHourCount = 0;
+            var expiringFollowing24hCount = 0;
+            var expiringFollowing3DaysCount = 0;
             var debugInfo = new StringBuilder();
-            debugInfo.Append($"now: {now}<br/>");
-            debugInfo.Append($"todayOnClientSide: {todayOnClientSide}<br/>");
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
@@ -42,29 +42,30 @@ namespace MemCheck.Application.Loading
                 }
                 else
                 {
-                    if (expiryDate.Date == todayOnClientSide)
+                    var distanceToNow = expiryDate - now;
+                    if (distanceToNow <= oneHour)
                     {
-                        debugInfo.Append($"Expiring today {expiryDate}<br/>");
-                        expiringTodayCount++;
+                        debugInfo.Append($"Expiring in the next hour {expiryDate}<br/>");
+                        expiringNextHourCount++;
                     }
                     else
                     {
-                        if (expiryDate.Date == tomorrowDate)
+                        if (distanceToNow <= twentyFiveHours)
                         {
-                            debugInfo.Append($"Expiring tomorrow {expiryDate}<br/>");
-                            expiringTomorrowCount++;
+                            debugInfo.Append($"Expiring in the following 24h {expiryDate}<br/>");
+                            expiringFollowing24hCount++;
                         }
                         else
                         {
-                            if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
-                                expiring5NextDaysCount++;
+                            if (distanceToNow <= fourDays)
+                                expiringFollowing3DaysCount++;
                         }
                     }
                     if (expiryDate < nextExpiryUTCDate)
                         nextExpiryUTCDate = expiryDate;
                 }
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, expiringTomorrowCount, expiring5NextDaysCount, nextExpiryUTCDate, debugInfo.ToString());
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate, debugInfo.ToString());
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
@@ -76,12 +77,11 @@ namespace MemCheck.Application.Loading
             await request.CheckValidityAsync(dbContext);
             if (now == null)
                 now = DateTime.UtcNow;
-            var todayOnClientSide = now.Value.Date;//.AddMinutes(-request.ClientSideTimezoneOffset).Date;
             var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, todayOnClientSide, now.Value)).ToList();
+            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, now.Value)).ToList();
         }
         #region Request & Result
-        public sealed record Request(Guid UserId, int ClientSideTimezoneOffset)
+        public sealed record Request(Guid UserId)
         {
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
@@ -97,13 +97,12 @@ namespace MemCheck.Application.Loading
             int UnknownCardCount,
             int ExpiredCardCount,
             int CardCount,
-            int ExpiringTodayCount,
-            int ExpiringTomorrowCount,
-            int Expiring5NextDaysCount,
+            int ExpiringNextHourCount,
+            int ExpiringFollowing24hCount,
+            int ExpiringFollowing3DaysCount,
             DateTime NextExpiryUTCDate,
             string DebugInfo);
         //NextExpiryUTCDate is DateTime.MaxValue if all cards are unknown
-        //Expiring5NextDaysCount means among the 5 days after tomorrow
         #endregion
     }
 }

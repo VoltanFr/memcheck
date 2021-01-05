@@ -139,7 +139,7 @@
     <value>Les cartes progressent dans les tas exponentiellement (fonction carrée).</value>
   </data>
   <data name="HeapingAlgoDescriptionForId2" xml:space="preserve">
-    <value>Les cartes progressent dans les tas de façon constante (elles expirent toujours après 30 secondes). À n'utiliser que pour des tests !</value>
+    <value>Les cartes progressent dans les tas de façon constante (elles expirent toujours après 3 minutes). À n'utiliser que pour des tests !</value>
   </data>
   <data name="HeapingAlgoNameForId1" xml:space="preserve">
     <value>Algorithme par défaut</value>
