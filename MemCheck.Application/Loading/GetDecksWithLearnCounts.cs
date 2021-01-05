@@ -30,27 +30,36 @@ namespace MemCheck.Application.Loading
             var expiring5NextDaysCount = 0;
             var tomorrowDate = todayOnClientSide.AddDays(1);
             var debugInfo = new StringBuilder();
+            debugInfo.Append($"now: {now}<br/>");
             debugInfo.Append($"todayOnClientSide: {todayOnClientSide}<br/>");
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
                 if (expiryDate <= now)
+                {
+                    debugInfo.Append($"Expired {expiryDate}<br/>");
                     expiredCardCount++;
+                }
                 else
                 {
                     if (expiryDate.Date == todayOnClientSide)
                     {
-                        debugInfo.Append($"Expiring {expiryDate}<br/>");
+                        debugInfo.Append($"Expiring today {expiryDate}<br/>");
                         expiringTodayCount++;
                     }
                     else
-                    if (expiryDate.Date == tomorrowDate)
-                        expiringTomorrowCount++;
-                    else
-                    if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
-                        expiring5NextDaysCount++;
-                    if (expiryDate < nextExpiryUTCDate)
-                        nextExpiryUTCDate = expiryDate;
+                    {
+                        if (expiryDate.Date == tomorrowDate)
+                        {
+                            debugInfo.Append($"Expiring tomorrow {expiryDate}<br/>");
+                            expiringTomorrowCount++;
+                        }
+                        else
+                        if (expiryDate.Date - now.Date <= TimeSpan.FromDays(6))
+                            expiring5NextDaysCount++;
+                        if (expiryDate < nextExpiryUTCDate)
+                            nextExpiryUTCDate = expiryDate;
+                    }
                 }
             }
             return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringTodayCount, expiringTomorrowCount, expiring5NextDaysCount, nextExpiryUTCDate, debugInfo.ToString());

@@ -204,33 +204,33 @@ namespace MemCheck.Application.Loading
                 Assert.AreEqual(2, loadedDeck2.CardCount);
             }
         }
-        [TestMethod()]
-        public async Task ClientOnParisWinterTime()
-        {
-            //Today, tomorrow, and other day considerations need to take care of the time offset on the client side
-            //We don't have this need foe expiration since we store and use UTC for that
-            //In this test method, Paris winter time is UTC-1
+        //[TestMethod()]
+        //public async Task ClientOnParisWinterTime()
+        //{
+        //    //Today, tomorrow, and other day considerations need to take care of the time offset on the client side
+        //    //We don't have this need foe expiration since we store and use UTC for that
+        //    //In this test method, Paris winter time is UTC-1
 
-            var testDB = DbHelper.GetEmptyTestDB();
-            var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
+        //    var testDB = DbHelper.GetEmptyTestDB();
+        //    var userId = await UserHelper.CreateInDbAsync(testDB);
+        //    var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
 
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 20, 12, 0, 0)); //Expires on 2020/01/22 at 12:00
+        //    await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 20, 12, 0, 0)); //Expires on 2020/01/22 at 12:00
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var clientIsOn_21_2259 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 21, 23, 59, 00))).First();
-                Assert.AreEqual(0, clientIsOn_21_2259.ExpiringTodayCount);
-                Assert.AreEqual(1, clientIsOn_21_2259.ExpiringTomorrowCount);
+        //    using (var dbContext = new MemCheckDbContext(testDB))
+        //    {
+        //        var clientIsOn_21_2259 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 21, 23, 59, 00))).First();
+        //        Assert.AreEqual(0, clientIsOn_21_2259.ExpiringTodayCount);
+        //        Assert.AreEqual(1, clientIsOn_21_2259.ExpiringTomorrowCount);
 
-                var clientIsOn_21_2359 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 22, 0, 59, 00))).First();
-                Assert.AreEqual(0, clientIsOn_21_2359.ExpiringTodayCount);
-                Assert.AreEqual(1, clientIsOn_21_2359.ExpiringTomorrowCount);
+        //        var clientIsOn_21_2359 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 22, 0, 59, 00))).First();
+        //        Assert.AreEqual(0, clientIsOn_21_2359.ExpiringTodayCount);
+        //        Assert.AreEqual(1, clientIsOn_21_2359.ExpiringTomorrowCount);
 
-                var clientIsOn_22_0001 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 22, 1, 1, 00))).First();
-                Assert.AreEqual(1, clientIsOn_22_0001.ExpiringTodayCount);
-                Assert.AreEqual(0, clientIsOn_22_0001.ExpiringTomorrowCount);
-            }
-        }
+        //        var clientIsOn_22_0001 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId, -60), new DateTime(2030, 01, 22, 1, 1, 00))).First();
+        //        Assert.AreEqual(1, clientIsOn_22_0001.ExpiringTodayCount);
+        //        Assert.AreEqual(0, clientIsOn_22_0001.ExpiringTomorrowCount);
+        //    }
+        //}
     }
 }
