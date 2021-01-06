@@ -31,30 +31,20 @@ namespace MemCheck.Application.Loading
             var expiringNextHourCount = 0;
             var expiringFollowing24hCount = 0;
             var expiringFollowing3DaysCount = 0;
-            var debugInfo = new StringBuilder();
             foreach (var card in groups[false])
             {
                 var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
                 if (expiryDate <= now)
-                {
-                    debugInfo.Append($"Expired {expiryDate}<br/>");
                     expiredCardCount++;
-                }
                 else
                 {
                     var distanceToNow = expiryDate - now;
                     if (distanceToNow <= oneHour)
-                    {
-                        debugInfo.Append($"Expiring in the next hour {expiryDate}<br/>");
                         expiringNextHourCount++;
-                    }
                     else
                     {
                         if (distanceToNow <= twentyFiveHours)
-                        {
-                            debugInfo.Append($"Expiring in the following 24h {expiryDate}<br/>");
                             expiringFollowing24hCount++;
-                        }
                         else
                         {
                             if (distanceToNow <= fourDays)
@@ -65,7 +55,7 @@ namespace MemCheck.Application.Loading
                         nextExpiryUTCDate = expiryDate;
                 }
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate, debugInfo.ToString());
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
@@ -100,8 +90,7 @@ namespace MemCheck.Application.Loading
             int ExpiringNextHourCount,
             int ExpiringFollowing24hCount,
             int ExpiringFollowing3DaysCount,
-            DateTime NextExpiryUTCDate,
-            string DebugInfo);
+            DateTime NextExpiryUTCDate);
         //NextExpiryUTCDate is DateTime.MaxValue if all cards are unknown
         #endregion
     }
