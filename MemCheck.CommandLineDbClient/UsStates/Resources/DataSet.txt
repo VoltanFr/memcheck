@@ -1,0 +1,3 @@
+﻿Alabama;l';Alabama;Yellowhammer State;AL;22e;131 171;4 903 185;37;Montgomery;Birmingham
+Hawaï;;Hawaii;Aloha State;HI;50e;16 635;1 415 872;85;Honolulu;Honolulu
+Virginie;la ;Virginia;Old Dominion;VA;10e;102 279;8 535 519;83;Richmond;Virginia Beach
