@@ -33,14 +33,15 @@ namespace MemCheck.CommandLineDbClient.Ratings
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {
-            var user = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
-            var cardIds = await dbContext.Cards.Where(card => card.VersionCreator.Id == user.Id).Select(card => card.Id).ToListAsync();
+            var author = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
+            var ratingUser = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
+            var cardIds = await dbContext.Cards.Where(card => card.VersionCreator.Id == author.Id).Select(card => card.Id).ToListAsync();
 
             var rater = new SetCardRating(dbContext);
 
             foreach (var cardId in cardIds)
             {
-                var request = new SetCardRating.Request(user, cardId, 5);
+                var request = new SetCardRating.Request(ratingUser, cardId, 5);
                 await rater.RunAsync(request);
             }
 

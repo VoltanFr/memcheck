@@ -87,7 +87,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
                     var result = new StringBuilder();
                     var englishInfo = EnglishName == FrenchName ? "" : $" (en anglais {EnglishName})";
                     result.AppendLine($"{ArticleWithFirstCharUpper}{FrenchName}{englishInfo} est le {Index} des 50 États.");
-                    result.AppendLine($"En 2019, cet État avait une population de {Population} habitants, pour une surface de {Surface}km², soit une densité de {Density}h/km² (la moyenne étant de 33h/km²).");
+                    result.AppendLine($"En 2019, cet État avait une population de {Population} habitants, pour une surface de {Surface} km², soit une densité de {Density} h/km² (la moyenne étant de 33 h/km²).");
                     result.AppendLine($"Le surnom de l'État est _{NickName}_, son code est _{Code}_.");
                     if (Capitale == MainCity)
                         result.AppendLine($"Sa capitale et ville la plus peuplée est {Capitale}.");
@@ -96,15 +96,19 @@ namespace MemCheck.CommandLineDbClient.UsStates
                     return result.ToString();
                 }
             }
-            //public string ImageDbName => $"Situation {FrenchName}";
             public Guid GetImageDbId(MemCheckDbContext dbContext)
             {
                 if (imageDbId != Guid.Empty)
                     return imageDbId;
 
-                imageDbId = dbContext.Images.Where(img => img.Name == $"Situation {FrenchName}").Select(img => img.Id).Single();
-
-                return imageDbId;
+                try
+                {
+                    return dbContext.Images.Where(img => img.Name == $"Situation {FrenchName}").Select(img => img.Id).Single();
+                }
+                catch
+                {
+                    throw new IOException($"Image not found: 'Situation {FrenchName}'");
+                }
             }
         }
         private sealed class InfoFileContents
@@ -140,6 +144,66 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, new Guid[0], CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
+        private async Task CreateCard_WhereIsThisStateAsync(State state, MemCheckUser user, Guid statesWithoutNamesImageId, Guid frenchLanguageId, Guid tagId)
+        {
+            var frontSide = $"Où est {state.Article}{state.FrenchName} sur cette carte ?";
+            var backSide = "";
+
+            if (dbContext.Cards.Where(card => card.VersionCreator.Id == user.Id && card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            {
+                logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
+                return;
+            }
+
+            var frontSideImages = new[] { statesWithoutNamesImageId };
+            var backSideImages = new[] { state.GetImageDbId(dbContext) };
+
+            var additionalInfo = state.AdditionalInfo;
+            var additionalInfoImages = new Guid[0];
+
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, new Guid[0], CardVersionDescription);
+            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+        }
+        private async Task CreateCard_WhatIsTheCapitalOfAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid tagId)
+        {
+            var frontSide = $"Comment s'appelle la capitale de {state.Article}{state.FrenchName} ?";
+            var backSide = state.Capitale;
+
+            if (dbContext.Cards.Where(card => card.VersionCreator.Id == user.Id && card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            {
+                logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
+                return;
+            }
+
+            var frontSideImages = new Guid[0];
+            var backSideImages = new Guid[0];
+
+            var additionalInfo = state.AdditionalInfo;
+            var additionalInfoImages = new[] { state.GetImageDbId(dbContext) };
+
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, new Guid[0], CardVersionDescription);
+            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+        }
+        private async Task CreateCard_WhatIsTheStateOfThisCapitalAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid tagId)
+        {
+            var frontSide = $"De quel État américain {state.Capitale} est-elle la capitale ?";
+            var backSide = $"{state.ArticleWithFirstCharUpper}{state.FrenchName}";
+
+            if (dbContext.Cards.Where(card => card.VersionCreator.Id == user.Id && card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            {
+                logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
+                return;
+            }
+
+            var frontSideImages = new Guid[0];
+            var backSideImages = new Guid[0];
+
+            var additionalInfo = state.AdditionalInfo;
+            var additionalInfoImages = new[] { state.GetImageDbId(dbContext) };
+
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, new Guid[0], CardVersionDescription);
+            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+        }
         #endregion
         public StatesCardCreator(IServiceProvider serviceProvider)
         {
@@ -155,16 +219,20 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var infoFileContents = new InfoFileContents();
             logger.LogInformation($"Loaded {infoFileContents.States.Count()} states");
 
-            var user = dbContext.Users.Where(u => u.UserName == "VoltanBot").Single();//Toto2
+            var user = dbContext.Users.Where(u => u.UserName == "VoltanBot").Single();//
             var frenchLanguageId = dbContext.CardLanguages.Where(lang => lang.Name == "Français").Select(lang => lang.Id).Single();
             var tagId = dbContext.Tags.Where(tag => tag.Name == "États américains").Select(tag => tag.Id).Single();
             var statesWithNamesImageId = dbContext.Images.Where(img => img.Name == "Carte.Amérique.USA.États").Select(img => img.Id).Single();
+            var statesWithoutNamesImageId = dbContext.Images.Where(img => img.Name == "États américains sans noms").Select(img => img.Id).Single();
 
             foreach (var state in infoFileContents.States)
             {
                 logger.LogDebug($"Working on state '{state.FrenchName}'");
 
                 await CreateCard_WhatIsTheNameOfThisStateAsync(state, user, statesWithNamesImageId, frenchLanguageId, tagId);
+                await CreateCard_WhereIsThisStateAsync(state, user, statesWithoutNamesImageId, frenchLanguageId, tagId);
+                await CreateCard_WhatIsTheCapitalOfAsync(state, user, frenchLanguageId, tagId);
+                await CreateCard_WhatIsTheStateOfThisCapitalAsync(state, user, frenchLanguageId, tagId);
             }
 
             logger.LogInformation($"Generation finished");

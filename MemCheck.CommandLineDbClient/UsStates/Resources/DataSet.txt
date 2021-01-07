@@ -1,3 +1,50 @@
 ﻿Alabama;l';Alabama;Yellowhammer State;AL;22e;131 171;4 903 185;37;Montgomery;Birmingham
+Alaska;l';Alaska;Last Frontier;AK;49e;1 481 305;731 545;1;Juneau;Anchorage
+Arizona;l';Arizona;Grand Canyon State;AZ;48e;294 207;7 278 717;24;Phoenix;Phoenix
+Arkansas;l';Arkansas;Natural State;AR;25e;134 771;3 017 804;22;Little Rock;Little Rock
+Californie;la ;California;Golden State;CA;31e;403 466;39 512 223;98;Sacramento;Los Angeles
+Caroline du Nord;la ;North Carolina;First in Flight;NC;12e;125 920;10 488 084;82;Raleigh;Charlotte
+Caroline du Sud;la ;South Carolina;Palmetto State;SC;8e;77 857;5 148 714;65;Columbia;Columbia
+Colorado;le ;Colorado;Centennial State;CO;38e;268 431;5 758 736;21;Denver;Denver
+Connecticut;le ;Connecticut;Constitution State;CT;5e;12 542;3 565 287;284;Hartford;Bridgeport
+Dakota du Nord;le ;North Dakota;Peace Garden State;ND;39e;169 752;762 062;4;Bismarck;Fargo
+Dakota du Sud;le ;South Dakota;Mount Rushmore State;SD;40e;196 350;884 659;4;Pierre;Sioux Falls
+Delaware;le ;Delaware;First State;DE;1er;5 047;973 764;191;Dover;Wilmington
+Floride;la ;Florida;Sunshine State;FL;27e;138 887;21 477 737;153;Tallahassee;Jacksonville
+Géorgie;la ;Georgia;Peach State;GA;4e;148 859;10 617 423;70;Atlanta;Atlanta
 Hawaï;;Hawaii;Aloha State;HI;50e;16 635;1 415 872;85;Honolulu;Honolulu
+Idaho;l';Idaho;Gem State;ID;43e;214 045;1 787 065;8;Boise;Boise
+Illinois;l';Illinois;Prairie State;IL;21e;143 793;12 671 821;88;Springfield;Chicago
+Indiana;l';Indiana;Hoosier State;IN;19e;92 789;6 732 219;72;Indianapolis;Indianapolis
+Iowa;l';Iowa;Hawkeye State;IA;29e;144 669;3 155 070;21;Des Moines;Des Moines
+Kansas;le ;Kansas;Sunflower State;KS;34e;211 754;2 913 314;13;Topeka;Wichita
+Kentucky;le ;Kentucky;Bluegrass State;KY;15e;102 269;4 467 673;43;Frankfort;Louisville
+Louisiane;la ;Louisiana;Pelican State;LA;18e;111 898;4 648 794;41;Bâton-Rouge;La Nouvelle-Orléans
+Maine;le ;Maine;Pine Tree State;ME;23e;79 883;1 344 212;16;Augusta;Portland
+Maryland;le ;Maryland;Old Line State;MD;7e;25 142;6 045 680;240;Annapolis;Baltimore
+Massachusetts;le ;Massachusetts;Bay State;MA;6e;20 202;6 892 503;341;Boston;Boston
+Michigan;le ;Michigan;Wolverine State;MI;26e;146 435;9 986 857;68;Lansing;Détroit
+Minnesota;le ;Minnesota;North Star State;MN;32e;206 232;5 639 632;27;Saint Paul;Minneapolis
+Mississippi;le ;Mississippi;Magnolia State;MS;20e;121 531;2 976 149;24;Jackson;Jackson
+Missouri;le ;Missouri;Show-Me State;MO;24e;178 040;6 137 428;34;Jefferson City;Kansas City
+Montana;le ;Montana;Treasure State;MT;41e;376 962;1 068 778;2;Helena;Billings
+Nebraska;le ;Nebraska;Cornhusker State;NE;37e;198 974;1 934 408;9;Lincoln;Omaha
+Nevada;le ;Nevada;Silver State;NV;36e;284 332;3 080 156;10;Carson City;Las Vegas
+New Hampshire;le ;New Hampshire;Granite State;NH;9e;23 187;1 359 711;58;Concord;Manchester
+New Jersey;le ;New Jersey;Garden State;NJ;3e;19 047;8 882 190;467;Trenton;Newark
+Nouveau-Mexique;le ;New Mexico;Land of Enchantment;NM;47e;314 161;2 096 829;6;Santa Fe;Albuquerque
+État de New York;l';State of New York;Empire State;NY;11e;122 057;19 453 561;160;Albany;New York
+Ohio;l';Ohio;Buckeye State;OH;17e;105 829;11 689 100;104;Columbus;Columbus
+Oklahoma;l';Oklahoma;Sooner State;OK;46e;177 660;3 956 971;22;Oklahoma City;Oklahoma City
+Oregon;l';Oregon;Beaver State;OR;33e;248 608;4 217 737;16;Salem;Portland
+Pennsylvanie;la ;Pennsylvania;Keystone State;PA;2e;115 883;12 801 989;110;Harrisburg;Philadelphie
+Rhode Island;;Rhode Island;Ocean State;RI;13e;2 678;1 059 361;394;Providence;Providence
+Tennessee;le ;Tennessee;Volunteer State;TN;16e;106 798;6 829 174;63;Nashville;Memphis
+Texas;le ;Texas;Lone Star State;TX;28e;676 587;28 995 881;42;Austin;Houston
+Utah;l';Utah;Beehive State;UT;45e;212 818;3 205 958;14;Salt Lake City;Salt Lake City
+Vermont;le ;Vermont;Green Mountain State;VT;14e;23 871;623 989;26;Montpelier;Burlington
 Virginie;la ;Virginia;Old Dominion;VA;10e;102 279;8 535 519;83;Richmond;Virginia Beach
+Virginie-Occidentale;la ;West Virginia;Mountain State;WV;35e;62 259;1 792 147;29;Charleston;Charleston
+État de Washington;l';State of Washington;Evergreen State;WA;42e;172 119;7 614 893;43;Olympia;Seattle
+Wisconsin;le ;Wisconsin;Badger State;WI;30e;140 268;5 822 434;41;Madison;Milwaukee
+Wyoming;le ;Wyoming;Equality State;WY;44e;251 470;578 759;2;Cheyenne;Cheyenne
