@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.History;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;

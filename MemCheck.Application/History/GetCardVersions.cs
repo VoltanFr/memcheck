@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.History
 {
     public sealed class GetCardVersions
     {
