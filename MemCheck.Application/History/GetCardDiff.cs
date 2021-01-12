@@ -23,9 +23,13 @@ namespace MemCheck.Application.History
             await request.CheckValidityAsync(dbContext);
             var current = await dbContext.Cards
                 .Include(c => c.CardLanguage)
+                .Include(c => c.TagsInCards)
+                .ThenInclude(t => t.Tag)
                 .SingleAsync(c => c.Id == request.CurrentCardId);
             var original = await dbContext.CardPreviousVersions
                 .Include(c => c.CardLanguage)
+                .Include(c => c.Tags)
+                .ThenInclude(t => t.Tag)
                 .SingleAsync(c => c.Id == request.OriginalVersionId);
 
             var result = new Result(current.VersionCreator.UserName, original.VersionCreator.UserName, current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);
@@ -37,6 +41,12 @@ namespace MemCheck.Application.History
                 result = result with { AdditionalInfo = new(current.AdditionalInfo, original.AdditionalInfo) };
             if (current.CardLanguage != original.CardLanguage)
                 result = result with { Language = new(current.CardLanguage.Name, original.CardLanguage.Name) };
+            if (!Enumerable.SequenceEqual(current.TagsInCards.Select(t => t.Tag.Name).OrderBy(tagName => tagName), original.Tags.Select(t => t.Tag.Name).OrderBy(tagName => tagName)))
+            {
+                var currentTags = string.Join(",", current.TagsInCards.Select(t => t.Tag.Name).OrderBy(tagName => tagName));
+                var originalTags = string.Join(",", original.Tags.Select(t => t.Tag.Name).OrderBy(tagName => tagName));
+                result = result with { Tags = new(currentTags, originalTags) };
+            }
             return result;
 
         }

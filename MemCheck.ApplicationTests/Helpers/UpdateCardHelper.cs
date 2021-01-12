@@ -8,7 +8,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class UpdateCardHelper
     {
-        public static UpdateCard.Request RequestForTagChange(Card card, IEnumerable<Guid> tagIds)
+        public static UpdateCard.Request RequestForTagChange(Card card, IEnumerable<Guid> tagIds, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -22,7 +22,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 tagIds,
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                StringHelper.RandomString()
+                versionDescription ?? StringHelper.RandomString()
                 );
         }
         public static UpdateCard.Request RequestForVisibilityChange(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null)
