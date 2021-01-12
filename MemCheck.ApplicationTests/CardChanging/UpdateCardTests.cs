@@ -22,7 +22,7 @@ namespace MemCheck.Application.CardChanging
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), Guid.Empty);
+            var request = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), Guid.Empty);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -34,7 +34,7 @@ namespace MemCheck.Application.CardChanging
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), Guid.NewGuid());
+            var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), Guid.NewGuid());
             await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
         }
         [TestMethod()]
@@ -57,7 +57,7 @@ namespace MemCheck.Application.CardChanging
             var otherUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), otherUser);
+            var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), otherUser);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
         }
         [TestMethod()]
@@ -72,7 +72,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, newFrontSide, otherUser);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, otherUser);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -91,7 +91,7 @@ namespace MemCheck.Application.CardChanging
             var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new Guid[0]);
             var newVersionCreator = await UserHelper.CreateInDbAsync(db);
 
-            var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator }) with { VersionCreatorId = newVersionCreator };
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator }) with { VersionCreatorId = newVersionCreator };
 
             using (var dbContext = new MemCheckDbContext(db))
                 await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
@@ -108,7 +108,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, newFrontSide, otherUser);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, otherUser);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -223,7 +223,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), newVersionCreator);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), newVersionCreator);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -242,7 +242,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), newVersionCreator);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), newVersionCreator);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -268,7 +268,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -295,7 +295,7 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -321,21 +321,21 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
                 Assert.IsTrue(e.Message.Contains(otherUserName));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { otherUser }, otherUser);
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { otherUser }, otherUser);
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
                 Assert.IsTrue(e.Message.Contains(cardCreatorName));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, otherUser });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator, otherUser });
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -358,27 +358,27 @@ namespace MemCheck.Application.CardChanging
             var newVersionCreator = await UserHelper.CreateInDbAsync(db, userName: newVersionCreatorName);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), newVersionCreator);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), newVersionCreator);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator }, cardCreator);
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator }, cardCreator);
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
                 Assert.IsTrue(e.Message.Contains(newVersionCreatorName));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { newVersionCreator }, newVersionCreator);
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { newVersionCreator }, newVersionCreator);
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
                 Assert.IsTrue(e.Message.Contains(cardCreatorName));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, newVersionCreator });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator, newVersionCreator });
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
@@ -403,31 +403,31 @@ namespace MemCheck.Application.CardChanging
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString(), otherUser);
+                var r = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), otherUser);
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { otherUser }, otherUser);
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { otherUser }, otherUser);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { userWithCardInDeck }, userWithCardInDeck);
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { userWithCardInDeck }, userWithCardInDeck);
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator, otherUser, userWithCardInDeck });
+                var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator, otherUser, userWithCardInDeck });
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 

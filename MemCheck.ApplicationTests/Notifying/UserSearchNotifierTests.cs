@@ -256,7 +256,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateDate = new DateTime(2050, 05, 02);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card1, new[] { requiredTag }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card1, new[] { requiredTag }), new TestLocalizer(), updateDate);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -319,11 +319,11 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateDate = new DateTime(2050, 05, 02);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card1, new[] { ignoredTag, requiredTag1, requiredTag2 }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card2, new[] { requiredTag1, requiredTag2, excludedTag }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card3, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card3, new[] { requiredTag1, requiredTag2 }), new TestLocalizer(), new DateTime(2050, 05, 03));
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChanges(card4, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card1, new[] { ignoredTag, requiredTag1, requiredTag2 }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card2, new[] { requiredTag1, requiredTag2, excludedTag }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1, requiredTag2 }), new TestLocalizer(), new DateTime(2050, 05, 03));
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card4, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
             }
 
             var runDate = new DateTime(2050, 05, 04);
@@ -431,7 +431,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString());
+                var updateRequest = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -475,7 +475,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -565,7 +565,7 @@ namespace MemCheck.Application.Tests.Notifying
             //Create a previous version on which subscriber can see the card
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForFrontSideChanges(card, StringHelper.RandomString());
+                var updateRequest = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -586,7 +586,7 @@ namespace MemCheck.Application.Tests.Notifying
             //Create a previous version which prevents subscriber from seing the card
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForVisibilityChanges(card, new[] { cardCreator });
+                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator });
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 

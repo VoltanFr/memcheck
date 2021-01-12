@@ -8,7 +8,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class UpdateCardHelper
     {
-        public static UpdateCard.Request RequestForTagChanges(Card card, IEnumerable<Guid> tagIds)
+        public static UpdateCard.Request RequestForTagChange(Card card, IEnumerable<Guid> tagIds)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -25,7 +25,7 @@ namespace MemCheck.Application.Tests.Helpers
                 StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForVisibilityChanges(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null)
+        public static UpdateCard.Request RequestForVisibilityChange(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Tests.Helpers
                 StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForFrontSideChanges(Card card, string frontSide, Guid? versionCreator = null, string? versionDescription = null)
+        public static UpdateCard.Request RequestForFrontSideChange(Card card, string frontSide, Guid? versionCreator = null, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForBackSideChanges(Card card, string backSide, Guid? versionCreator = null, string? versionDescription = null)
+        public static UpdateCard.Request RequestForBackSideChange(Card card, string backSide, Guid? versionCreator = null, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,
