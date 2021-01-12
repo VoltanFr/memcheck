@@ -186,12 +186,10 @@ namespace MemCheck.Application.History
             var userName = StringHelper.RandomString();
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = DateHelper.Random();
-            var originalBackSide = StringHelper.RandomString();
             var originalVersionDescription = StringHelper.RandomString();
             var originalLanguageName = StringHelper.RandomString();
             var originalLanguage = await CardLanguagHelper.CreateAsync(db, originalLanguageName);
-            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, backSide: originalBackSide, language: originalLanguage, versionDescription: originalVersionDescription);
-            var newBackSide = StringHelper.RandomString();
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: originalLanguage, versionDescription: originalVersionDescription);
             var newVersionDate = DateHelper.Random(originalVersionDate);
             var newVersionDescription = StringHelper.RandomString();
             var newLanguageName = StringHelper.RandomString();
