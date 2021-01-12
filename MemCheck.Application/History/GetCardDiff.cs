@@ -33,6 +33,8 @@ namespace MemCheck.Application.History
                 result = result with { FrontSide = new(current.FrontSide, original.FrontSide) };
             if (current.BackSide != original.BackSide)
                 result = result with { BackSide = new(current.BackSide, original.BackSide) };
+            if (current.AdditionalInfo != original.AdditionalInfo)
+                result = result with { AdditionalInfo = new(current.AdditionalInfo, original.AdditionalInfo) };
             if (current.CardLanguage != original.CardLanguage)
                 result = result with { Language = new(current.CardLanguage.Name, original.CardLanguage.Name) };
             return result;
