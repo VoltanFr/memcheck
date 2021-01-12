@@ -76,5 +76,22 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? StringHelper.RandomString()
                 );
         }
+        public static UpdateCard.Request RequestForLanguageChange(Card card, Guid newLanguageId, Guid? versionCreator = null, string? versionDescription = null)
+        {
+            return new UpdateCard.Request(
+                card.Id,
+                versionCreator ?? card.VersionCreator.Id,
+                card.FrontSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
+                card.BackSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
+                card.AdditionalInfo,
+                card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
+                newLanguageId,
+                card.TagsInCards.Select(t => t.TagId),
+                card.UsersWithView.Select(uwv => uwv.UserId),
+                versionDescription ?? StringHelper.RandomString()
+                );
+        }
     }
 }

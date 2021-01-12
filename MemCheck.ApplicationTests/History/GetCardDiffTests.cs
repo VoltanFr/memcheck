@@ -54,7 +54,53 @@ namespace MemCheck.Application.History
                 await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(userId, Guid.NewGuid(), originalVersionId)));
         }
         [TestMethod()]
-        public async Task FrontVersionDiff()
+        public async Task FailIfUserCanNotViewOriginalVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = StringHelper.RandomString();
+            var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+            var originalVersionDate = DateHelper.Random();
+            var originalFrontSide = StringHelper.RandomString();
+            var originalVersionDescription = StringHelper.RandomString();
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription, userWithViewIds: new[] { userId });
+            var newFrontSide = StringHelper.RandomString();
+            var newVersionDate = DateHelper.Random(originalVersionDate);
+            var newVersionDescription = StringHelper.RandomString();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForVisibilityChanges(card, new Guid[0]), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+            Guid previousVersionId;
+            using (var dbContext = new MemCheckDbContext(db))
+                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            var otherUserId = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+        }
+        [TestMethod()]
+        public async Task FailIfUserCanNotViewCurrentVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = StringHelper.RandomString();
+            var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+            var originalVersionDate = DateHelper.Random();
+            var originalFrontSide = StringHelper.RandomString();
+            var originalVersionDescription = StringHelper.RandomString();
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription);
+            var newFrontSide = StringHelper.RandomString();
+            var newVersionDate = DateHelper.Random(originalVersionDate);
+            var newVersionDescription = StringHelper.RandomString();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForVisibilityChanges(card, userWithViewIds: new[] { userId }), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+            Guid previousVersionId;
+            using (var dbContext = new MemCheckDbContext(db))
+                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            var otherUserId = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+        }
+        [TestMethod()]
+        public async Task FrontDiff()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userName = StringHelper.RandomString();
@@ -94,7 +140,7 @@ namespace MemCheck.Application.History
             }
         }
         [TestMethod()]
-        public async Task BackVersionDiff()
+        public async Task BackDiff()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userName = StringHelper.RandomString();
@@ -125,6 +171,49 @@ namespace MemCheck.Application.History
                 Assert.AreEqual(new(newBackSide, originalBackSide), result.BackSide);
                 Assert.IsNull(result.Language);
                 Assert.IsNull(result.FrontSide);
+                Assert.IsNull(result.AdditionalInfo);
+                Assert.IsNull(result.Tags);
+                Assert.IsNull(result.UsersWithView);
+                Assert.IsNull(result.ImagesOnFrontSide);
+                Assert.IsNull(result.ImagesOnBackSide);
+                Assert.IsNull(result.ImagesOnAdditionalSide);
+            }
+        }
+        [TestMethod()]
+        public async Task LanguageDiff()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = StringHelper.RandomString();
+            var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+            var originalVersionDate = DateHelper.Random();
+            var originalBackSide = StringHelper.RandomString();
+            var originalVersionDescription = StringHelper.RandomString();
+            var originalLanguageName = StringHelper.RandomString();
+            var originalLanguage = await CardLanguagHelper.CreateAsync(db, originalLanguageName);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, backSide: originalBackSide, language: originalLanguage, versionDescription: originalVersionDescription);
+            var newBackSide = StringHelper.RandomString();
+            var newVersionDate = DateHelper.Random(originalVersionDate);
+            var newVersionDescription = StringHelper.RandomString();
+            var newLanguageName = StringHelper.RandomString();
+            var newVersionLanguage = await CardLanguagHelper.CreateAsync(db, newLanguageName);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForLanguageChange(card, newVersionLanguage, versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+            Guid previousVersionId;
+            using (var dbContext = new MemCheckDbContext(db))
+                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
+                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                Assert.AreEqual(userName, result.CurrentVersionCreator);
+                Assert.AreEqual(userName, result.OriginalVersionCreator);
+                Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
+                Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
+                Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
+                Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
+                Assert.AreEqual(new(newLanguageName, originalLanguageName), result.Language);
+                Assert.IsNull(result.FrontSide);
+                Assert.IsNull(result.BackSide);
                 Assert.IsNull(result.AdditionalInfo);
                 Assert.IsNull(result.Tags);
                 Assert.IsNull(result.UsersWithView);

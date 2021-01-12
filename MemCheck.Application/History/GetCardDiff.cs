@@ -21,14 +21,20 @@ namespace MemCheck.Application.History
         public async Task<Result> RunAsync(Request request)
         {
             await request.CheckValidityAsync(dbContext);
-            var current = await dbContext.Cards.Where(c => c.Id == request.CurrentCardId).SingleAsync();
-            var original = await dbContext.CardPreviousVersions.Where(c => c.Id == request.OriginalVersionId).SingleAsync();
+            var current = await dbContext.Cards
+                .Include(c => c.CardLanguage)
+                .SingleAsync(c => c.Id == request.CurrentCardId);
+            var original = await dbContext.CardPreviousVersions
+                .Include(c => c.CardLanguage)
+                .SingleAsync(c => c.Id == request.OriginalVersionId);
 
             var result = new Result(current.VersionCreator.UserName, original.VersionCreator.UserName, current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);
             if (current.FrontSide != original.FrontSide)
                 result = result with { FrontSide = new(current.FrontSide, original.FrontSide) };
             if (current.BackSide != original.BackSide)
                 result = result with { BackSide = new(current.BackSide, original.BackSide) };
+            if (current.CardLanguage != original.CardLanguage)
+                result = result with { Language = new(current.CardLanguage.Name, original.CardLanguage.Name) };
             return result;
 
         }
@@ -39,7 +45,16 @@ namespace MemCheck.Application.History
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new InvalidOperationException("Invalid user ID");
-                var user = await dbContext.Users.Where(u => u.Id == UserId).SingleAsync();
+                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+
+                var currentCard = await dbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CurrentCardId);
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, currentCard.UsersWithView))
+                    throw new InvalidOperationException("Current not visible to user");
+
+                var originalCard = await dbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == OriginalVersionId);
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, originalCard.UsersWithView.Select(uwv => uwv.AllowedUserId)))
+                    throw new InvalidOperationException("Original not visible to user");
+
                 await Task.CompletedTask;
             }
         }
