@@ -47,6 +47,14 @@ namespace MemCheck.Application.History
                 var originalTags = string.Join(",", original.Tags.Select(t => t.Tag.Name).OrderBy(tagName => tagName));
                 result = result with { Tags = new(currentTags, originalTags) };
             }
+            if (!CardVisibilityHelper.CardsHaveSameUsersWithView(current.UsersWithView, original.UsersWithView))
+            {
+                var currentUsers = string.Join(",", current.UsersWithView.Select(u => u.User.UserName).OrderBy(userName => userName));
+                var originalUserIds = original.UsersWithView.Select(u => u.AllowedUserId).ToHashSet();
+                var originalUserNames = dbContext.Users.Where(u => originalUserIds.Contains(u.Id)).Select(u => u.UserName);
+                var originalUsers = string.Join(",", originalUserNames.OrderBy(userName => userName));
+                result = result with { UsersWithView = new(currentUsers, originalUsers) };
+            }
             return result;
 
         }

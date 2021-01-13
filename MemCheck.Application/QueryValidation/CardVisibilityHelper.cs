@@ -35,5 +35,11 @@ namespace MemCheck.Application.QueryValidation
             if (!CardIsVisibleToUser(userId, card.UsersWithView))
                 throw new ApplicationException("User not allowed to view card");
         }
+        public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
+        {
+            var cardUserSet = cardAllowedUsers.Select(u => u.UserId).ToHashSet();
+            var cardPreviousVersionUserSet = cardPreviousVersionAllowedUsers.Select(u => u.AllowedUserId).ToHashSet();
+            return cardUserSet.SetEquals(cardPreviousVersionUserSet);
+        }
     }
 }

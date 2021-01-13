@@ -303,5 +303,43 @@ namespace MemCheck.Application.History
                 Assert.IsNull(result.ImagesOnAdditionalSide);
             }
         }
+        [TestMethod()]
+        public async Task VisibilityDiff()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = StringHelper.RandomString();
+            var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+            var originalVersionDate = DateHelper.Random();
+            var originalVersionDescription = StringHelper.RandomString();
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, userWithViewIds: new[] { userId }, language: language, versionDescription: originalVersionDescription);
+            var newVersionDate = DateHelper.Random(originalVersionDate);
+            var newVersionDescription = StringHelper.RandomString();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, new Guid[0], versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+            Guid previousVersionId;
+            using (var dbContext = new MemCheckDbContext(db))
+                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
+                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                Assert.AreEqual(userName, result.CurrentVersionCreator);
+                Assert.AreEqual(userName, result.OriginalVersionCreator);
+                Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
+                Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
+                Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
+                Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
+                Assert.AreEqual(new("", userName), result.UsersWithView);
+                Assert.IsNull(result.FrontSide);
+                Assert.IsNull(result.BackSide);
+                Assert.IsNull(result.Language);
+                Assert.IsNull(result.AdditionalInfo);
+                Assert.IsNull(result.Tags);
+                Assert.IsNull(result.ImagesOnFrontSide);
+                Assert.IsNull(result.ImagesOnBackSide);
+                Assert.IsNull(result.ImagesOnAdditionalSide);
+            }
+        }
     }
 }

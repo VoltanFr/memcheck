@@ -1,4 +1,5 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,7 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static void AssertSameUserWithViewSet(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
         {
-            var cardUserSet = cardAllowedUsers.Select(u => u.UserId).ToHashSet();
-            var cardPreviousVersionUserSet = cardPreviousVersionAllowedUsers.Select(u => u.AllowedUserId).ToHashSet();
-            Assert.IsTrue(cardUserSet.SetEquals(cardPreviousVersionUserSet));
+            Assert.IsTrue(CardVisibilityHelper.CardsHaveSameUsersWithView(cardAllowedUsers, cardPreviousVersionAllowedUsers));
         }
         public static void AssertSameImageSet(IEnumerable<ImageInCard> cardImages, IEnumerable<ImageInCardPreviousVersion> cardPreviousVersionImages)
         {

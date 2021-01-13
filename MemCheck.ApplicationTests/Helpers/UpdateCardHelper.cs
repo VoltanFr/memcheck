@@ -25,7 +25,7 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? StringHelper.RandomString()
                 );
         }
-        public static UpdateCard.Request RequestForVisibilityChange(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null)
+        public static UpdateCard.Request RequestForVisibilityChange(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 userWithViewIds,
-                StringHelper.RandomString()
+                versionDescription ?? StringHelper.RandomString()
                 );
         }
         public static UpdateCard.Request RequestForFrontSideChange(Card card, string frontSide, Guid? versionCreator = null, string? versionDescription = null)
