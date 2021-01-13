@@ -25,14 +25,89 @@ namespace MemCheck.Application.History
         private readonly MemCheckDbContext dbContext;
         private readonly ILocalized localizer;
         #endregion
-        #region Private methods
+        #region Private classes
+        private sealed class CardVersionFromDb
+        {
+            public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
+            {
+                Id = id;
+                IsCurrent = isCurrent;
+                PreviousVersion = previousVersion;
+                VersionUtcDate = versionUtcDate;
+                VersionCreator = versionCreator;
+                VersionDescription = versionDescription;
+                LanguageId = languageId;
+                FrontSide = frontSide;
+                BackSide = backSide;
+                AdditionalInfo = additionalInfo;
+                TagIds = tagIds;
+                UserWithViewIds = userWithViewIds;
+                FrontSideImages = frontSideImages;
+                BackSideImages = backSideImages;
+                AdditionalInfoImages = additionalInfoImages;
+            }
+            public Guid Id { get; }
+            public bool IsCurrent { get; }  //True means that this is the card. False means this is a previous version of the card
+            public Guid? PreviousVersion { get; }
+            public DateTime VersionUtcDate { get; }
+            public MemCheckUser VersionCreator { get; }
+            public string VersionDescription { get; }
+            public Guid LanguageId { get; }
+            public string FrontSide { get; }
+            public string BackSide { get; }
+            public string AdditionalInfo { get; }
+            public IEnumerable<Guid> TagIds { get; }
+            public IEnumerable<Guid> UserWithViewIds { get; }
+            public IEnumerable<Guid> FrontSideImages { get; }
+            public IEnumerable<Guid> BackSideImages { get; }
+            public IEnumerable<Guid> AdditionalInfoImages { get; }
+        }
+        private sealed class ResultCardVersion : IResultCardVersion
+        {
+            public ResultCardVersion(CardVersionFromDb dbVersion, CardVersionFromDb? preceedingVersion)
+            {
+                VersionId = dbVersion.IsCurrent ? null : dbVersion.Id;
+                VersionUtcDate = dbVersion.VersionUtcDate;
+                VersionCreator = dbVersion.VersionCreator.UserName;
+                VersionDescription = dbVersion.VersionDescription;
+                var changedFieldNames = new List<string>();
+                if (preceedingVersion == null)
+                {
+                    changedFieldNames.AddRange(new[] { LanguageName, UsersWithView });
+                    if (!string.IsNullOrEmpty(dbVersion.FrontSide)) changedFieldNames.Add(FrontSide);
+                    if (!string.IsNullOrEmpty(dbVersion.BackSide)) changedFieldNames.Add(BackSide);
+                    if (!string.IsNullOrEmpty(dbVersion.AdditionalInfo)) changedFieldNames.Add(AdditionalInfo);
+                    if (dbVersion.TagIds.Any()) changedFieldNames.Add(Tags);
+                    if (dbVersion.BackSideImages.Any()) changedFieldNames.Add(BackSideImages);
+                    if (dbVersion.AdditionalInfoImages.Any()) changedFieldNames.Add(AdditionalInfoImages);
+                }
+                else
+                {
+                    if (dbVersion.LanguageId != preceedingVersion.LanguageId) changedFieldNames.Add(LanguageName);
+                    if (dbVersion.FrontSide != preceedingVersion.FrontSide) changedFieldNames.Add(FrontSide);
+                    if (dbVersion.BackSide != preceedingVersion.BackSide) changedFieldNames.Add(BackSide);
+                    if (dbVersion.AdditionalInfo != preceedingVersion.AdditionalInfo) changedFieldNames.Add(AdditionalInfo);
+                    if (!Enumerable.SequenceEqual(dbVersion.TagIds, preceedingVersion.TagIds)) changedFieldNames.Add(Tags);
+                    if (!Enumerable.SequenceEqual(dbVersion.UserWithViewIds, preceedingVersion.UserWithViewIds)) changedFieldNames.Add(UsersWithView);
+                    if (!Enumerable.SequenceEqual(dbVersion.FrontSideImages, preceedingVersion.FrontSideImages)) changedFieldNames.Add(FrontSideImages);
+                    if (!Enumerable.SequenceEqual(dbVersion.BackSideImages, preceedingVersion.BackSideImages)) changedFieldNames.Add(BackSideImages);
+                    if (!Enumerable.SequenceEqual(dbVersion.AdditionalInfoImages, preceedingVersion.AdditionalInfoImages)) changedFieldNames.Add(AdditionalInfoImages);
+                }
+                ChangedFieldNames = changedFieldNames;
+            }
+            public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
+            public DateTime VersionUtcDate { get; }
+            public string VersionCreator { get; }
+            public string VersionDescription { get; }
+            public IEnumerable<string> ChangedFieldNames { get; }
+        }
         #endregion
         public GetCardVersions(MemCheckDbContext dbContext, ILocalized localizer)
         {
             this.dbContext = dbContext;
             this.localizer = localizer;
         }
-        public async Task<IEnumerable<ResultCardVersion>> RunAsync(Guid cardId, Guid userId)
+        public async Task<IEnumerable<IResultCardVersion>> RunAsync(Guid cardId, Guid userId)
         {
             if (QueryValidationHelper.IsReservedGuid(cardId))
                 throw new RequestInputException("Invalid card id");
@@ -47,6 +122,7 @@ namespace MemCheck.Application.History
             var currentVersion = await cards.Include(card => card.PreviousVersion)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
+                    true,
                     card.PreviousVersion == null ? (Guid?)null : card.PreviousVersion.Id,
                     card.VersionUtcDate,
                     card.VersionCreator,
@@ -66,6 +142,7 @@ namespace MemCheck.Application.History
             var allPreviousVersions = dbContext.CardPreviousVersions.Where(card => card.Card == cardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
+                    false,
                     card.PreviousVersion == null ? (Guid?)null : card.PreviousVersion.Id,
                     card.VersionUtcDate,
                     card.VersionCreator,
@@ -96,72 +173,9 @@ namespace MemCheck.Application.History
             }
             return result;
         }
-        internal sealed class CardVersionFromDb
+        public interface IResultCardVersion
         {
-            public CardVersionFromDb(Guid id, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
-            {
-                Id = id;
-                PreviousVersion = previousVersion;
-                VersionUtcDate = versionUtcDate;
-                VersionCreator = versionCreator;
-                VersionDescription = versionDescription;
-                LanguageId = languageId;
-                FrontSide = frontSide;
-                BackSide = backSide;
-                AdditionalInfo = additionalInfo;
-                TagIds = tagIds;
-                UserWithViewIds = userWithViewIds;
-                FrontSideImages = frontSideImages;
-                BackSideImages = backSideImages;
-                AdditionalInfoImages = additionalInfoImages;
-            }
-            public Guid Id { get; }
-            public Guid? PreviousVersion { get; }
-            public DateTime VersionUtcDate { get; }
-            public MemCheckUser VersionCreator { get; }
-            public string VersionDescription { get; }
-            public Guid LanguageId { get; }
-            public string FrontSide { get; }
-            public string BackSide { get; }
-            public string AdditionalInfo { get; }
-            public IEnumerable<Guid> TagIds { get; }
-            public IEnumerable<Guid> UserWithViewIds { get; }
-            public IEnumerable<Guid> FrontSideImages { get; }
-            public IEnumerable<Guid> BackSideImages { get; }
-            public IEnumerable<Guid> AdditionalInfoImages { get; }
-        }
-        public sealed class ResultCardVersion
-        {
-            internal ResultCardVersion(CardVersionFromDb dbVersion, CardVersionFromDb? preceedingVersion)
-            {
-                VersionUtcDate = dbVersion.VersionUtcDate;
-                VersionCreator = dbVersion.VersionCreator.UserName;
-                VersionDescription = dbVersion.VersionDescription;
-                var changedFieldNames = new List<string>();
-                if (preceedingVersion == null)
-                {
-                    changedFieldNames.AddRange(new[] { LanguageName, UsersWithView });
-                    if (!string.IsNullOrEmpty(dbVersion.FrontSide)) changedFieldNames.Add(FrontSide);
-                    if (!string.IsNullOrEmpty(dbVersion.BackSide)) changedFieldNames.Add(BackSide);
-                    if (!string.IsNullOrEmpty(dbVersion.AdditionalInfo)) changedFieldNames.Add(AdditionalInfo);
-                    if (dbVersion.TagIds.Any()) changedFieldNames.Add(Tags);
-                    if (dbVersion.BackSideImages.Any()) changedFieldNames.Add(BackSideImages);
-                    if (dbVersion.AdditionalInfoImages.Any()) changedFieldNames.Add(AdditionalInfoImages);
-                }
-                else
-                {
-                    if (dbVersion.LanguageId != preceedingVersion.LanguageId) changedFieldNames.Add(LanguageName);
-                    if (dbVersion.FrontSide != preceedingVersion.FrontSide) changedFieldNames.Add(FrontSide);
-                    if (dbVersion.BackSide != preceedingVersion.BackSide) changedFieldNames.Add(BackSide);
-                    if (dbVersion.AdditionalInfo != preceedingVersion.AdditionalInfo) changedFieldNames.Add(AdditionalInfo);
-                    if (!Enumerable.SequenceEqual(dbVersion.TagIds, preceedingVersion.TagIds)) changedFieldNames.Add(Tags);
-                    if (!Enumerable.SequenceEqual(dbVersion.UserWithViewIds, preceedingVersion.UserWithViewIds)) changedFieldNames.Add(UsersWithView);
-                    if (!Enumerable.SequenceEqual(dbVersion.FrontSideImages, preceedingVersion.FrontSideImages)) changedFieldNames.Add(FrontSideImages);
-                    if (!Enumerable.SequenceEqual(dbVersion.BackSideImages, preceedingVersion.BackSideImages)) changedFieldNames.Add(BackSideImages);
-                    if (!Enumerable.SequenceEqual(dbVersion.AdditionalInfoImages, preceedingVersion.AdditionalInfoImages)) changedFieldNames.Add(AdditionalInfoImages);
-                }
-                ChangedFieldNames = changedFieldNames;
-            }
+            public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
             public DateTime VersionUtcDate { get; }
             public string VersionCreator { get; }
             public string VersionDescription { get; }

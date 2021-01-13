@@ -123,8 +123,14 @@
   <data name="CardNotFound" xml:space="preserve">
     <value>Carte non trouvée.</value>
   </data>
+  <data name="CompareWithCurrentVersion" xml:space="preserve">
+    <value>Comparer à la version actuelle</value>
+  </data>
   <data name="LoadingHistory" xml:space="preserve">
     <value>Chargement en cours...</value>
+  </data>
+  <data name="ModifiedFields" xml:space="preserve">
+    <value>Informations modifiées :</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Versions de carte</value>

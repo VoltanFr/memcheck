@@ -23,7 +23,14 @@
             <h1 class="title">@Localizer["VersionHistory"]</h1>
         </div>
         <ul class="card-history-ul">
-            <li v-for="version in versions"><span class="card-history-li">{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}" [{{version.changedFieldList}}]</span></li>
+            <li v-for="version in versions" class="card-history-li">
+                <strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong><br />
+                @Localizer["ModifiedFields"] {{version.changedFieldList}}
+                <span v-if="version.versionId">
+                    <br />
+                    <a v-bind:href="'/Authoring/Compare?CardId='+cardId+'&VersionId='+version.versionId">@Localizer["CompareWithCurrentVersion"]</a>
+                </span>
+            </li>
         </ul>
     </div>
 </div>

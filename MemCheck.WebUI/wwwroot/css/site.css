@@ -383,6 +383,8 @@
 .card-history-li {
     position: relative;
     left: 20px;
+    line-height: 1;
+    padding-bottom: 10px;
 }
 
 .image-history-li {

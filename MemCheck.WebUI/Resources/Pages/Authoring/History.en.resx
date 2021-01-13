@@ -123,8 +123,14 @@
   <data name="CardNotFound" xml:space="preserve">
     <value>Card not found.</value>
   </data>
+  <data name="CompareWithCurrentVersion" xml:space="preserve">
+    <value>Compare with current version</value>
+  </data>
   <data name="LoadingHistory" xml:space="preserve">
     <value>Please wait, loading versions...</value>
+  </data>
+  <data name="ModifiedFields" xml:space="preserve">
+    <value>Modified fields:</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Card versions</value>

@@ -273,14 +273,16 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class CardVersion
         {
-            public CardVersion(GetCardVersions.ResultCardVersion appResult, ILocalized localizer)
+            public CardVersion(GetCardVersions.IResultCardVersion appResult, ILocalized localizer)
             {
+                VersionId = appResult.VersionId;
                 VersionUtcDate = appResult.VersionUtcDate;
                 VersionCreator = appResult.VersionCreator;
                 VersionDescription = appResult.VersionDescription;
                 var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.Get(fieldName));
                 ChangedFieldList = string.Join(',', fieldsDisplayNames);
             }
+            public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
             public DateTime VersionUtcDate { get; }
             public string VersionCreator { get; }
             public string VersionDescription { get; }
