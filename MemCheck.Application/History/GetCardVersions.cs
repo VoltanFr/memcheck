@@ -107,19 +107,12 @@ namespace MemCheck.Application.History
             this.dbContext = dbContext;
             this.localizer = localizer;
         }
-        public async Task<IEnumerable<IResultCardVersion>> RunAsync(Guid cardId, Guid userId)
+        public async Task<IEnumerable<IResultCardVersion>> RunAsync(Request request)
         {
-            if (QueryValidationHelper.IsReservedGuid(cardId))
-                throw new RequestInputException("Invalid card id");
-            if (QueryValidationHelper.IsReservedGuid(userId))
-                throw new RequestInputException("Invalid user id");
-            await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, userId, cardId);
+            await request.CheckValidityAsync(dbContext);
 
-            var cards = dbContext.Cards.Where(card => card.Id == cardId);
-            if (!await cards.AnyAsync())
-                throw new RequestInputException(localizer.Get("UnknownCard"));
-
-            var currentVersion = await cards.Include(card => card.PreviousVersion)
+            var currentVersion = await dbContext.Cards.Include(card => card.PreviousVersion)
+                .Where(card => card.Id == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
                     true,
@@ -139,7 +132,8 @@ namespace MemCheck.Application.History
                     )
                 ).SingleAsync();
 
-            var allPreviousVersions = dbContext.CardPreviousVersions.Where(card => card.Card == cardId)
+            var allPreviousVersions = dbContext.CardPreviousVersions
+                .Where(card => card.Card == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
                     false,
@@ -173,6 +167,23 @@ namespace MemCheck.Application.History
             }
             return result;
         }
+        #region Request and result types
+        public sealed record Request(Guid UserId, Guid CardId)
+        {
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            {
+                //We allow viewing the history of a card as soon as the user can access the current version of the card. Of course the differ will refuse to give details to a user not allowed
+
+                QueryValidationHelper.CheckNotReservedGuid(UserId);
+                QueryValidationHelper.CheckNotReservedGuid(CardId);
+
+                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+
+                var card = await dbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CardId);
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, card.UsersWithView))
+                    throw new InvalidOperationException("Current not visible to user");
+            }
+        }
         public interface IResultCardVersion
         {
             public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
@@ -181,5 +192,6 @@ namespace MemCheck.Application.History
             public string VersionDescription { get; }
             public IEnumerable<string> ChangedFieldNames { get; }
         }
+        #endregion
     }
 }
