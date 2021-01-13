@@ -96,8 +96,6 @@ namespace MemCheck.Application.History
                 var originalCard = await dbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == OriginalVersionId);
                 if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, originalCard.UsersWithView.Select(uwv => uwv.AllowedUserId)))
                     throw new InvalidOperationException("Original not visible to user");
-
-                await Task.CompletedTask;
             }
         }
         public sealed record Result
