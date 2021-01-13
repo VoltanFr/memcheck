@@ -29,10 +29,10 @@ namespace MemCheck.Application.CardChanging
             var versionDescription = StringHelper.RandomString();
 
             var languageId = await CardLanguagHelper.CreateAsync(testDB);
-            var imageOnFrontSideId = await ImageHelper.CreateAsync(testDB);
-            var imageOnBackSide1Id = await ImageHelper.CreateAsync(testDB);
-            var imageOnBackSide2Id = await ImageHelper.CreateAsync(testDB);
-            var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(testDB);
+            var imageOnFrontSideId = await ImageHelper.CreateAsync(testDB, ownerId);
+            var imageOnBackSide1Id = await ImageHelper.CreateAsync(testDB, ownerId);
+            var imageOnBackSide2Id = await ImageHelper.CreateAsync(testDB, ownerId);
+            var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(testDB, ownerId);
             var tagId = await TagHelper.CreateAsync(testDB);
 
             Guid cardGuid = Guid.Empty;

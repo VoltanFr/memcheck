@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -25,11 +26,15 @@ namespace MemCheck.Application.History
                 .Include(c => c.CardLanguage)
                 .Include(c => c.TagsInCards)
                 .ThenInclude(t => t.Tag)
+                .Include(c => c.Images)
+                .ThenInclude(i => i.Image)
                 .SingleAsync(c => c.Id == request.CurrentCardId);
             var original = await dbContext.CardPreviousVersions
                 .Include(c => c.CardLanguage)
                 .Include(c => c.Tags)
                 .ThenInclude(t => t.Tag)
+                .Include(c => c.Images)
+                .ThenInclude(i => i.Image)
                 .SingleAsync(c => c.Id == request.OriginalVersionId);
 
             var result = new Result(current.VersionCreator.UserName, original.VersionCreator.UserName, current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);
@@ -55,8 +60,13 @@ namespace MemCheck.Application.History
                 var originalUsers = string.Join(",", originalUserNames.OrderBy(userName => userName));
                 result = result with { UsersWithView = new(currentUsers, originalUsers) };
             }
+            if (!ComparisonHelper.SameSetOfGuid(current.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId), original.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId)))
+            {
+                var currentImages = string.Join(",", current.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                result = result with { ImagesOnFrontSide = new(currentImages, originalImages) };
+            }
             return result;
-
         }
         #region Request and result types
         public sealed record Request(Guid UserId, Guid CurrentCardId, Guid OriginalVersionId)

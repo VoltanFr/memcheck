@@ -37,9 +37,7 @@ namespace MemCheck.Application.QueryValidation
         }
         public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
         {
-            var cardUserSet = cardAllowedUsers.Select(u => u.UserId).ToHashSet();
-            var cardPreviousVersionUserSet = cardPreviousVersionAllowedUsers.Select(u => u.AllowedUserId).ToHashSet();
-            return cardUserSet.SetEquals(cardPreviousVersionUserSet);
+            return ComparisonHelper.SameSetOfGuid(cardAllowedUsers.Select(u => u.UserId), cardPreviousVersionAllowedUsers.Select(u => u.AllowedUserId));
         }
     }
 }

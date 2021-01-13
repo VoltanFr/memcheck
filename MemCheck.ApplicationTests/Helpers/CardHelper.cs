@@ -13,7 +13,9 @@ namespace MemCheck.Application.Tests.Helpers
     {
         public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB,
             Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
-            string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? versionDescription = null)
+            string? frontSide = null, string? backSide = null, string? additionalInfo = null,
+            IEnumerable<Guid>? frontSideImages = null,
+            string? versionDescription = null)
         {
             //userWithViewIds null means public card
 
@@ -63,7 +65,15 @@ namespace MemCheck.Application.Tests.Helpers
                 }
             result.TagsInCards = tags;
 
-            result.Images = new ImageInCard[0];
+            var images = new List<ImageInCard>();
+            if (frontSideImages != null)
+                foreach (var frontSideImage in frontSideImages)
+                {
+                    var img = new ImageInCard() { ImageId = frontSideImage, CardId = result.Id, CardSide = ImageInCard.FrontSide };
+                    dbContext.ImagesInCards.Add(img);
+                    images.Add(img);
+                }
+            result.Images = images;
 
             await dbContext.SaveChangesAsync();
             return result;

@@ -132,10 +132,10 @@ namespace MemCheck.Application.CardChanging
             var additionalInfo = StringHelper.RandomString();
             var versionDescription = StringHelper.RandomString();
             var newLanguageId = await CardLanguagHelper.CreateAsync(db);
-            var imageOnFrontSideId = await ImageHelper.CreateAsync(db);
-            var imageOnBackSide1Id = await ImageHelper.CreateAsync(db);
-            var imageOnBackSide2Id = await ImageHelper.CreateAsync(db);
-            var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(db);
+            var imageOnFrontSideId = await ImageHelper.CreateAsync(db, cardCreator);
+            var imageOnBackSide1Id = await ImageHelper.CreateAsync(db, cardCreator);
+            var imageOnBackSide2Id = await ImageHelper.CreateAsync(db, cardCreator);
+            var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(db, cardCreator);
             var tagId = await TagHelper.CreateAsync(db);
 
             using (var dbContext = new MemCheckDbContext(db))

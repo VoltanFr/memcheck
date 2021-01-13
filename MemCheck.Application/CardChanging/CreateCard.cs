@@ -19,7 +19,7 @@ namespace MemCheck.Application.CardChanging
         #region Private methods
         private void AddImage(Guid cardId, Guid imageId, int cardSide, List<ImageInCard> cardImageList)
         {
-            var imageFromDb = dbContext.Images.Where(img => img.Id == imageId).Single();    //To be reviewed: it sounds stupid that we have to load the whole image info, with the blob, while we only need an id???
+            var imageFromDb = dbContext.Images.Where(img => img.Id == imageId).Single();
             var img = new ImageInCard() { ImageId = imageId, Image = imageFromDb, CardId = cardId, CardSide = cardSide };
             dbContext.ImagesInCards.Add(img);
             cardImageList.Add(img);
