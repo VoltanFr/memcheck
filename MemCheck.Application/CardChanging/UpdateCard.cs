@@ -178,12 +178,12 @@ namespace MemCheck.Application.CardChanging
             public Guid VersionCreatorId { get; set; }
             public string FrontSide { get; }
             public IEnumerable<Guid> FrontSideImageList { get; }
-            public string BackSide { get; }
+            public string BackSide { get; init; }
             public IEnumerable<Guid> BackSideImageList { get; }
             public string AdditionalInfo { get; }
-            public IEnumerable<Guid> AdditionalInfoImageList { get; }
+            public IEnumerable<Guid> AdditionalInfoImageList { get; init; }
             public Guid LanguageId { get; }
-            public IEnumerable<Guid> Tags { get; }
+            public IEnumerable<Guid> Tags { get; init; }
             public IEnumerable<Guid> UsersWithVisibility { get; }
             public string VersionDescription { get; }
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
