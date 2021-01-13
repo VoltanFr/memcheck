@@ -66,6 +66,18 @@ namespace MemCheck.Application.History
                 var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name).OrderBy(imageName => imageName));
                 result = result with { ImagesOnFrontSide = new(currentImages, originalImages) };
             }
+            if (!ComparisonHelper.SameSetOfGuid(current.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId), original.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId)))
+            {
+                var currentImages = string.Join(",", current.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                result = result with { ImagesOnBackSide = new(currentImages, originalImages) };
+            }
+            if (!ComparisonHelper.SameSetOfGuid(current.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId), original.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId)))
+            {
+                var currentImages = string.Join(",", current.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name).OrderBy(imageName => imageName));
+                result = result with { ImagesOnAdditionalSide = new(currentImages, originalImages) };
+            }
             return result;
         }
         #region Request and result types
