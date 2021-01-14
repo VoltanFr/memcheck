@@ -180,7 +180,7 @@ namespace MemCheck.Application.CardChanging
             public IEnumerable<Guid> FrontSideImageList { get; }
             public string BackSide { get; init; }
             public IEnumerable<Guid> BackSideImageList { get; }
-            public string AdditionalInfo { get; }
+            public string AdditionalInfo { get; init; }
             public IEnumerable<Guid> AdditionalInfoImageList { get; init; }
             public Guid LanguageId { get; }
             public IEnumerable<Guid> Tags { get; init; }
