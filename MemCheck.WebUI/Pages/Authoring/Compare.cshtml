@@ -1,0 +1,31 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model CompareModel
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+}
+
+<input type="text" asp-for="CardId" id="CardIdInput" hidden="hidden" />
+<input type="text" asp-for="VersionId" id="VersionIdInput" hidden="hidden" />
+
+<div id="CompareMainDiv" v-cloak>
+    <div id="Waiting for mount" v-if="!mountFinished">
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Waiting for mount" v-if="mountFinished && loading">
+        <p class="wait-message">@Localizer["Loading"]</p>
+    </div>
+    <div id="Failure" v-if="error">
+        <p class="wait-message">{{error}}</p>
+    </div>
+    <div id="AfterMount" v-if="mountFinished && !error && !loading">
+        <div id="Title">
+            <h1 class="title">@Localizer["Comparison"]</h1>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/js/Authoring/Compare.js" asp-append-version="true"></script>
+}

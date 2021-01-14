@@ -1,0 +1,50 @@
+var app = new Vue({
+    el: '#CompareMainDiv',
+    data: {
+        mountFinished: false,
+        loading: false,
+        error: "",
+        cardId: null,
+        versionId: null,
+        card: null,
+        version: null,
+    },
+    async mounted() {
+        try {
+            await this.GeValuesFromPageParameter();
+        }
+        finally {
+            this.mountFinished = true;
+        }
+    },
+    methods: {
+        async GeValuesFromPageParameter() {
+            this.loading = true;
+            this.cardId = document.getElementById("CardIdInput").value;
+            this.versionId = document.getElementById("VersionIdInput").value;
+            if (!this.cardId || !this.versionId) {
+                this.error = "Expected values not found in page parameters)";
+                return;
+            }
+
+            await axios.get('/Authoring/CardAndVersion/' + this.cardId + '/' + this.versionId)
+                .then(result => {
+                    this.card = result.data.card;
+                    this.version = result.data.version;
+                    this.loading = false;
+                    this.error = null;
+                })
+                .catch(error => {
+                    tellAxiosError(error, this);
+                    this.cardId = null;
+                    this.versionId = null;
+                    this.error = "Failed to load data";
+                    this.loading = false;
+                    return;
+                });
+        },
+        dt(utcFromDotNet) {
+            return dateTime(utcFromDotNet);
+        },
+    },
+});
