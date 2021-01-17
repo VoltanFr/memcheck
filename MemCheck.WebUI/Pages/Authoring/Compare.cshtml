@@ -22,6 +22,25 @@
     <div id="AfterMount" v-if="mountFinished && !error && !loading">
         <div id="Title">
             <h1 class="title">@Localizer["Comparison"]</h1>
+            <p>
+                @Localizer["CardCreatedOn"] {{dt(diffResult.firstVersionUtcDate)}}<br />
+                @Localizer["SelectedVersionCreatedOn"] {{dtWithTime(diffResult.selectedVersionUtcDate)}} @Localizer["By"] {{diffResult.selectedVersionCreatorName}}, @Localizer["Description"] {{diffResult.selectedVersionDescription}}<br />
+                @Localizer["LastVersionCreatedOn"] {{dtWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
+                {{diffResult.infoAboutUsage}}<br />
+                @Localizer["AverageRating"] {{diffResult.averageRating}} @Localizer["By"] {{diffResult.countOfUserRatings}} @Localizer["Users"]
+            </p>
+            <p>
+                <strong>@Localizer["ChangedFields"]</strong>
+                <ul>
+                    <li v-for="changedField in diffResult.changedFields"><span v-html="changedField" /></li>
+                </ul>
+            </p>
+            <p>
+                <strong>@Localizer["UnhangedFields"]</strong>
+                <ul>
+                    <li v-for="unchangedField in diffResult.unchangedFields"><span v-html="unchangedField" /></li>
+                </ul>
+            </p>
         </div>
     </div>
 </div>

@@ -147,6 +147,9 @@
   <data name="Description" xml:space="preserve">
     <value>Description:</value>
   </data>
+  <data name="Empty" xml:space="preserve">
+    <value>(empty)</value>
+  </data>
   <data name="Failure" xml:space="preserve">
     <value>Failure</value>
   </data>
@@ -189,6 +192,9 @@
   <data name="LanguageName" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="LastVersion" xml:space="preserve">
+    <value>Last version:</value>
+  </data>
   <data name="LooksLikeABug" xml:space="preserve">
     <value>Ooops! Looks like there was a bug.</value>
   </data>
@@ -209,6 +215,9 @@
   </data>
   <data name="RequestStatus" xml:space="preserve">
     <value>Request status</value>
+  </data>
+  <data name="SelectedVersion" xml:space="preserve">
+    <value>Selected version:</value>
   </data>
   <data name="Size" xml:space="preserve">
     <value>Size:</value>

@@ -117,133 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AdditionalInfo" xml:space="preserve">
-    <value>Infos supplémentaires</value>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Comparaison</value>
   </data>
-  <data name="AdditionalInfoImages" xml:space="preserve">
-    <value>Images infos suppl</value>
+  <data name="PleaseWaitForMount" xml:space="preserve">
+    <value>Chargement des données...</value>
   </data>
-  <data name="And" xml:space="preserve">
-    <value>et</value>
+  <data name="AverageRating" xml:space="preserve">
+    <value>Éval. moyenne :</value>
   </data>
-  <data name="AppearsInDecksOf" xml:space="preserve">
-    <value>Figure dans les paquets de</value>
+  <data name="By" xml:space="preserve">
+    <value>par</value>
   </data>
-  <data name="BackSide" xml:space="preserve">
-    <value>Arrière</value>
+  <data name="CardCreatedOn" xml:space="preserve">
+    <value>Carte créée le :</value>
   </data>
-  <data name="BackSideImages" xml:space="preserve">
-    <value>Images arrière</value>
+  <data name="ChangedFields" xml:space="preserve">
+    <value>Champs modifiés</value>
   </data>
-  <data name="CanNotUpdateBecauseNoDifference" xml:space="preserve">
-    <value>Erreur : aucun changement détecté.</value>
-  </data>
-  <data name="Cards" xml:space="preserve">
-    <value>cartes</value>
-  </data>
-  <data name="CardSavedOk" xml:space="preserve">
-    <value>Carte enregistrée</value>
+  <data name="Comparison" xml:space="preserve">
+    <value>Comparaison de versions</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Description :</value>
+    <value>description :</value>
   </data>
-  <data name="Empty" xml:space="preserve">
-    <value>(vide)</value>
+  <data name="LastVersionCreatedOn" xml:space="preserve">
+    <value>Dernière version créée le :</value>
   </data>
-  <data name="Failure" xml:space="preserve">
-    <value>Échec</value>
+  <data name="Loading" xml:space="preserve">
+    <value>Chargement</value>
   </data>
-  <data name="FrontSide" xml:space="preserve">
-    <value>Avant</value>
+  <data name="SelectedVersionCreatedOn" xml:space="preserve">
+    <value>Version sélectionnée créée le :</value>
   </data>
-  <data name="FrontSideImages" xml:space="preserve">
-    <value>Images avant</value>
+  <data name="UnhangedFields" xml:space="preserve">
+    <value>Champs non modifiés</value>
   </data>
-  <data name="HeCreatedAVersionOfThisCard" xml:space="preserve">
-    <value>il a créé une version.</value>
-  </data>
-  <data name="HeHasThisCardInADeck" xml:space="preserve">
-    <value>il a cette carte dans un paquet.</value>
-  </data>
-  <data name="ImageName" xml:space="preserve">
-    <value>Nom de l'image :</value>
-  </data>
-  <data name="ImageNotFound" xml:space="preserve">
-    <value>Image non trouvée :</value>
-  </data>
-  <data name="ImageUploader" xml:space="preserve">
-    <value>Téléversée par :</value>
-  </data>
-  <data name="InitialCardVersionCreation" xml:space="preserve">
-    <value>Première version</value>
-  </data>
-  <data name="InvalidCardEmptyBackSide" xml:space="preserve">
-    <value>L'arrière ne peut pas être vide</value>
-  </data>
-  <data name="InvalidCardEmptyFrontSide" xml:space="preserve">
-    <value>L'avant ne peut pas être vide</value>
-  </data>
-  <data name="InvalidCardEmptyVersionDescription" xml:space="preserve">
-    <value>La description de version ne peut pas être vide</value>
-  </data>
-  <data name="InvalidVersionDescriptionLength" xml:space="preserve">
-    <value>Description de version invalide, longueur :</value>
-  </data>
-  <data name="LanguageName" xml:space="preserve">
-    <value>Langue</value>
-  </data>
-  <data name="LastVersion" xml:space="preserve">
-    <value>Dernière version :</value>
-  </data>
-  <data name="LooksLikeABug" xml:space="preserve">
-    <value>Aïe ! On dirait qu'il y a eu un bug.</value>
-  </data>
-  <data name="MustBeBetween" xml:space="preserve">
-    <value>, doit être entre</value>
-  </data>
-  <data name="MustHaveVisibilityBecause" xml:space="preserve">
-    <value>doit avoir accès car</value>
-  </data>
-  <data name="NotIncludedInAnyDeck" xml:space="preserve">
-    <value>N'apparaît dans aucun paquet</value>
-  </data>
-  <data name="PleaseEnterAnImageName" xml:space="preserve">
-    <value>Saisissez un nom d'image</value>
-  </data>
-  <data name="RatingSavedOk" xml:space="preserve">
-    <value>Évaluation enregistrée:</value>
-  </data>
-  <data name="RequestStatus" xml:space="preserve">
-    <value>Statut de la requête</value>
-  </data>
-  <data name="SelectedVersion" xml:space="preserve">
-    <value>Version sélectionnée :</value>
-  </data>
-  <data name="Size" xml:space="preserve">
-    <value>Volume :</value>
-  </data>
-  <data name="Source" xml:space="preserve">
-    <value>Information sur la source :</value>
-  </data>
-  <data name="Success" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="SureCreateWithoutTag" xml:space="preserve">
-    <value>Enregistrer sans label ?</value>
-  </data>
-  <data name="Tags" xml:space="preserve">
-    <value>Labels</value>
-  </data>
-  <data name="UnknownCard" xml:space="preserve">
-    <value>Carte inconnue</value>
-  </data>
-  <data name="UsedIn" xml:space="preserve">
-    <value>Utilisée dans</value>
-  </data>
-  <data name="User" xml:space="preserve">
-    <value>L'utilisateur</value>
-  </data>
-  <data name="UsersWithView" xml:space="preserve">
-    <value>Visibilité</value>
+  <data name="Users" xml:space="preserve">
+    <value>utilisateurs</value>
   </data>
 </root>

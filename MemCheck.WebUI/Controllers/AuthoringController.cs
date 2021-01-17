@@ -12,6 +12,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
@@ -300,5 +301,90 @@ namespace MemCheck.WebUI.Controllers
             return ControllerResultWithToast.Success($"{Get("RatingSavedOk")} {rating}\u2605", this);
         }
         #endregion
+        #region CardVersionDiffWithCurrent
+        [HttpGet("CardSelectedVersionDiffWithCurrent/{cardId}/{selectedVersionId}")]
+        public async Task<IActionResult> CardSelectedVersionDiffWithCurrent(Guid cardId, Guid selectedVersionId)
+        {
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var card = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            var selectedVersion = await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
+            var result = new CardSelectedVersionDiffWithCurrentResult(card, selectedVersion, this);
+            return Ok(result);
+        }
+        public sealed class CardSelectedVersionDiffWithCurrentResult
+        {
+            #region Private methods
+            private void AddField(List<string> changedFields, List<string> unChangedFields, string fieldNameResourceId, string fieldValueInCard, string fieldValueInSelectedVersion, ILocalized localizer)
+            {
+                if (fieldValueInCard == fieldValueInSelectedVersion)
+                    unChangedFields.Add($"<strong>{localizer.Get(fieldNameResourceId)}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.Get("Empty"))}");
+                else
+                {
+                    var html = new StringBuilder();
+                    html.Append($"<strong>{localizer.Get(fieldNameResourceId)}</strong>");
+                    html.Append("<ul>");
+                    html.Append($"<li><strong>{localizer.Get("SelectedVersion")}</strong> {(fieldValueInSelectedVersion.Length > 0 ? fieldValueInSelectedVersion : localizer.Get("Empty"))}</li>");
+                    html.Append($"<li><strong>{localizer.Get("LastVersion")}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.Get("Empty"))}</li>");
+                    html.Append("</ul>");
+                    changedFields.Add(html.ToString());
+                }
+            }
+            #endregion
+            public CardSelectedVersionDiffWithCurrentResult(GetCardForEdit.ResultModel card, GetCardVersion.Result selectedVersion, ILocalized localizer)
+            {
+                FirstVersionUtcDate = card.FirstVersionUtcDate;
+                LastVersionUtcDate = card.LastVersionUtcDate;
+                LastVersionCreatorName = card.LastVersionCreatorName;
+                LastVersionDescription = card.LastVersionDescription;
+                InfoAboutUsage = card.UsersOwningDeckIncluding.Count() > 0 ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', card.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                AverageRating = card.AverageRating;
+                CountOfUserRatings = card.CountOfUserRatings;
+                SelectedVersionUtcDate = selectedVersion.VersionUtcDate;
+                SelectedVersionDescription = selectedVersion.VersionDescription;
+                SelectedVersionCreatorName = selectedVersion.CreatorName;
+
+                var changedFields = new List<string>();
+                var unChangedFields = new List<string>();
+                AddField(changedFields, unChangedFields, "FrontSide", card.FrontSide, selectedVersion.FrontSide, localizer);
+                AddField(changedFields, unChangedFields, "BackSide", card.BackSide, selectedVersion.BackSide, localizer);
+                AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
+
+
+                ChangedFields = changedFields;
+                UnchangedFields = unChangedFields;
+            }
+            public DateTime FirstVersionUtcDate { get; }
+            public DateTime LastVersionUtcDate { get; }
+            public string LastVersionCreatorName { get; }
+            public string LastVersionDescription { get; }
+            public string InfoAboutUsage { get; }
+            public double AverageRating { get; }
+            public int CountOfUserRatings { get; }
+            public DateTime SelectedVersionUtcDate { get; }
+            public string SelectedVersionDescription { get; }
+            public string SelectedVersionCreatorName { get; }
+
+            public IEnumerable<string> ChangedFields { get; }
+            public IEnumerable<string> UnchangedFields { get; }
+        }
+        #endregion
     }
 }
+
+//GetCardForEdit.ResultModel :
+//public Guid LanguageId { get; }
+//public IEnumerable<ResultTagModel> Tags { get; }
+//public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
+//public IEnumerable<ResultImageModel> Images { get; }
+
+//GetCardVersion.Result:
+//string FrontSide, 
+//    Guid LanguageId, 
+//    IEnumerable<string> Tags, 
+//    IEnumerable<string> UsersWithVisibility, 
+//         IEnumerable<string> FrontSideImageNames, 
+//         IEnumerable<string> BackSideImageNames, 
+//         IEnumerable<string> AdditionalInfoImageNames, 
+
+
+//https://localhost:5001/Authoring/Compare?CardId=5af23337-df43-4c9b-54a3-08d878d61951&VersionId=16963318-9066-4976-6137-08d88952f270

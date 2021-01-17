@@ -13,6 +13,15 @@ function dateTime(utcFromDotNet) {
     return d.toLocaleDateString();
 }
 
+function dateTimeWithTime(utcFromDotNet) {
+    if (!isValidDateTime(utcFromDotNet))
+        return "!";
+    const d = new Date(utcFromDotNet);
+    if (dateIsToday(d))
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleString([], { year: "numeric", month: "numeric", day: "numeric", hour: '2-digit', minute: '2-digit' });
+}
+
 function dateIsToday(d) {
     return new Date().toDateString() == d.toDateString();
 }

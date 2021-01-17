@@ -5,9 +5,8 @@ var app = new Vue({
         loading: false,
         error: "",
         cardId: null,
-        versionId: null,
-        card: null,
-        version: null,
+        selectedVersionId: null,
+        diffResult: null,   //AuthoringController.CardSelectedVersionDiffWithCurrentResult
     },
     async mounted() {
         try {
@@ -27,10 +26,9 @@ var app = new Vue({
                 return;
             }
 
-            await axios.get('/Authoring/CardAndVersion/' + this.cardId + '/' + this.versionId)
+            await axios.get('/Authoring/CardSelectedVersionDiffWithCurrent/' + this.cardId + '/' + this.versionId)
                 .then(result => {
-                    this.card = result.data.card;
-                    this.version = result.data.version;
+                    this.diffResult = result.data;
                     this.loading = false;
                     this.error = null;
                 })
@@ -45,6 +43,9 @@ var app = new Vue({
         },
         dt(utcFromDotNet) {
             return dateTime(utcFromDotNet);
+        },
+        dtWithTime(utcFromDotNet) {
+            return dateTimeWithTime(utcFromDotNet);
         },
     },
 });
