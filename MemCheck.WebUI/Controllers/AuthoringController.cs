@@ -349,6 +349,7 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "BackSide", card.BackSide, selectedVersion.BackSide, localizer);
                 AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
                 AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
+                AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", card.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", card.Tags.Select(t => t.TagName)), selectedVersion.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", selectedVersion.Tags), localizer);
 
 
                 ChangedFields = changedFields;
@@ -373,13 +374,11 @@ namespace MemCheck.WebUI.Controllers
 }
 
 //GetCardForEdit.ResultModel :
-//public IEnumerable<ResultTagModel> Tags { get; }
 //public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
 //public IEnumerable<ResultImageModel> Images { get; }
 
 //GetCardVersion.Result:
 //string FrontSide, 
-//    IEnumerable<string> Tags, 
 //    IEnumerable<string> UsersWithVisibility, 
 //         IEnumerable<string> FrontSideImageNames, 
 //         IEnumerable<string> BackSideImageNames, 
