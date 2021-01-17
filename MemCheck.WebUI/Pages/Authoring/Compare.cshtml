@@ -25,7 +25,7 @@
             <p>
                 @Localizer["CardCreatedOn"] {{dt(diffResult.firstVersionUtcDate)}}<br />
                 @Localizer["SelectedVersionCreatedOn"] {{dtWithTime(diffResult.selectedVersionUtcDate)}} @Localizer["By"] {{diffResult.selectedVersionCreatorName}}, @Localizer["Description"] {{diffResult.selectedVersionDescription}}<br />
-                @Localizer["LastVersionCreatedOn"] {{dtWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
+                <a v-bind:href="'/Authoring/Index?CardId='+cardId">@Localizer["LastVersion"]</a> @Localizer["CreatedOn"] {{dtWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
                 {{diffResult.infoAboutUsage}}<br />
                 <span v-if="diffResult.averageRating>0">@Localizer["AverageRating"] {{diffResult.averageRating}}, @Localizer["By"] {{diffResult.countOfUserRatings}} <span v-if="diffResult.countOfUserRatings==1">@Localizer["User"]</span><span v-if="diffResult.countOfUserRatings>1">@Localizer["Users"]</span></span>
             </p>
