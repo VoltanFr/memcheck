@@ -78,7 +78,8 @@ namespace MemCheck.Application.Loading
         public async Task CheckAllFields()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var languageName = StringHelper.RandomString();
+            var language = await CardLanguagHelper.CreateAsync(db, languageName);
             var creatorName = StringHelper.RandomString();
             var creatorId = await UserHelper.CreateInDbAsync(db, userName: creatorName);
             var creationDate = DateHelper.Random();
@@ -103,6 +104,7 @@ namespace MemCheck.Application.Loading
                 Assert.AreEqual(backSide, loaded.BackSide);
                 Assert.AreEqual(additionalInfo, loaded.AdditionalInfo);
                 Assert.AreEqual(language, loaded.LanguageId);
+                Assert.AreEqual(languageName, loaded.LanguageName);
                 Assert.AreEqual(tag, loaded.Tags.Single().TagId);
                 Assert.AreEqual(tagName, loaded.Tags.Single().TagName);
                 Assert.AreEqual(2, loaded.UsersWithVisibility.Count());

@@ -52,6 +52,7 @@ namespace MemCheck.Application.Loading
                 card.BackSide,
                 card.AdditionalInfo,
                 card.CardLanguage.Id,
+                card.CardLanguage.Name,
                 card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
                 card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.UserName)),
                 card.InitialCreationUtcDate,
@@ -86,13 +87,14 @@ namespace MemCheck.Application.Loading
         }
         public sealed class ResultModel
         {
-            public ResultModel(string frontSide, string backSide, string additionalInfo, Guid languageId, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
+            public ResultModel(string frontSide, string backSide, string additionalInfo, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
                 DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings)
             {
                 FrontSide = frontSide;
                 BackSide = backSide;
                 AdditionalInfo = additionalInfo;
                 LanguageId = languageId;
+                LanguageName = languageName;
                 Tags = tags;
                 UsersWithVisibility = usersWithVisibility;
                 FirstVersionUtcDate = creationUtcDate;
@@ -109,6 +111,7 @@ namespace MemCheck.Application.Loading
             public string BackSide { get; }
             public string AdditionalInfo { get; }
             public Guid LanguageId { get; }
+            public string LanguageName { get; }
             public IEnumerable<ResultTagModel> Tags { get; }
             public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
             public DateTime FirstVersionUtcDate { get; }

@@ -348,6 +348,7 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "FrontSide", card.FrontSide, selectedVersion.FrontSide, localizer);
                 AddField(changedFields, unChangedFields, "BackSide", card.BackSide, selectedVersion.BackSide, localizer);
                 AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
+                AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
 
 
                 ChangedFields = changedFields;
@@ -372,14 +373,12 @@ namespace MemCheck.WebUI.Controllers
 }
 
 //GetCardForEdit.ResultModel :
-//public Guid LanguageId { get; }
 //public IEnumerable<ResultTagModel> Tags { get; }
 //public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
 //public IEnumerable<ResultImageModel> Images { get; }
 
 //GetCardVersion.Result:
 //string FrontSide, 
-//    Guid LanguageId, 
 //    IEnumerable<string> Tags, 
 //    IEnumerable<string> UsersWithVisibility, 
 //         IEnumerable<string> FrontSideImageNames, 
