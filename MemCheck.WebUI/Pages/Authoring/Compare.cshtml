@@ -27,7 +27,7 @@
                 @Localizer["SelectedVersionCreatedOn"] {{dtWithTime(diffResult.selectedVersionUtcDate)}} @Localizer["By"] {{diffResult.selectedVersionCreatorName}}, @Localizer["Description"] {{diffResult.selectedVersionDescription}}<br />
                 @Localizer["LastVersionCreatedOn"] {{dtWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
                 {{diffResult.infoAboutUsage}}<br />
-                @Localizer["AverageRating"] {{diffResult.averageRating}} @Localizer["By"] {{diffResult.countOfUserRatings}} @Localizer["Users"]
+                <span v-if="diffResult.averageRating>0">@Localizer["AverageRating"] {{diffResult.averageRating}}, @Localizer["By"] {{diffResult.countOfUserRatings}} <span v-if="diffResult.countOfUserRatings==1">@Localizer["User"]</span><span v-if="diffResult.countOfUserRatings>1">@Localizer["Users"]</span></span>
             </p>
             <p>
                 <strong>@Localizer["ChangedFields"]</strong>

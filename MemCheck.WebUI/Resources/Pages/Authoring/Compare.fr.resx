@@ -156,4 +156,7 @@
   <data name="Users" xml:space="preserve">
     <value>utilisateurs</value>
   </data>
+  <data name="User" xml:space="preserve">
+    <value>utilisateur</value>
+  </data>
 </root>
