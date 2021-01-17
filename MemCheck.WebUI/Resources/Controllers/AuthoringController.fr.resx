@@ -213,6 +213,9 @@
   <data name="PleaseEnterAnImageName" xml:space="preserve">
     <value>Saisissez un nom d'image</value>
   </data>
+  <data name="Public" xml:space="preserve">
+    <value>publique</value>
+  </data>
   <data name="RatingSavedOk" xml:space="preserve">
     <value>Évaluation enregistrée:</value>
   </data>
@@ -250,6 +253,9 @@
     <value>L'utilisateur</value>
   </data>
   <data name="UsersWithView" xml:space="preserve">
+    <value>Visibilité</value>
+  </data>
+  <data name="Visibility" xml:space="preserve">
     <value>Visibilité</value>
   </data>
 </root>

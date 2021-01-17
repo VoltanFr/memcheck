@@ -350,6 +350,7 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
                 AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
                 AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", card.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", card.Tags.Select(t => t.TagName)), selectedVersion.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", selectedVersion.Tags), localizer);
+                AddField(changedFields, unChangedFields, "Visibility", card.UsersWithVisibility.Count() == 0 ? localizer.Get("Public") : string.Join(",", card.UsersWithVisibility.Select(u => u.UserName)), selectedVersion.UsersWithVisibility.Count() == 0 ? localizer.Get("Public") : string.Join(",", selectedVersion.UsersWithVisibility), localizer);
 
 
                 ChangedFields = changedFields;
@@ -374,15 +375,13 @@ namespace MemCheck.WebUI.Controllers
 }
 
 //GetCardForEdit.ResultModel :
-//public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
 //public IEnumerable<ResultImageModel> Images { get; }
 
 //GetCardVersion.Result:
 //string FrontSide, 
-//    IEnumerable<string> UsersWithVisibility, 
 //         IEnumerable<string> FrontSideImageNames, 
 //         IEnumerable<string> BackSideImageNames, 
 //         IEnumerable<string> AdditionalInfoImageNames, 
 
 
-//https://localhost:5001/Authoring/Compare?CardId=5af23337-df43-4c9b-54a3-08d878d61951&VersionId=16963318-9066-4976-6137-08d88952f270
+//https://localhost:5001/Authoring/Compare?CardId=77b4cf08-0b47-479e-489e-08d81d2328e4&VersionId=e6945897-70e3-42d6-5eda-08d828e7f640
