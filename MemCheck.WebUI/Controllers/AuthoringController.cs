@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
 using MemCheck.Application.History;
+using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -155,8 +156,8 @@ namespace MemCheck.WebUI.Controllers
                 LanguageId = applicationResult.LanguageId;
                 Tags = applicationResult.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName));
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
-                CreationUtcDate = applicationResult.CreationUtcDate;
-                LastChangeUtcDate = applicationResult.LastChangeUtcDate;
+                CreationUtcDate = applicationResult.FirstVersionUtcDate;
+                LastChangeUtcDate = applicationResult.LastVersionUtcDate;
                 InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
                 Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage));
                 CurrentUserRating = applicationResult.UserRating;

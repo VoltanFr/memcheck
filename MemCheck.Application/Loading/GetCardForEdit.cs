@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Immutable;
 using MemCheck.Application.QueryValidation;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Loading
 {
     public sealed class GetCardForEdit
     {
@@ -25,12 +25,14 @@ namespace MemCheck.Application
             await request.CheckValidityAsync(dbContext);
 
             var card = await dbContext.Cards
+                .Include(card => card.VersionCreator)
                 .Include(card => card.Images)
                 .ThenInclude(img => img.Image)
                 .Include(card => card.CardLanguage)
                 .Include(card => card.TagsInCards)
                 .ThenInclude(tagInCard => tagInCard.Tag)
                 .Include(card => card.UsersWithView)
+                .ThenInclude(userWithView => userWithView.User)
                 .Where(card => card.Id == request.CardId)
                 .AsSingleQuery()
                 .SingleOrDefaultAsync();
@@ -54,6 +56,8 @@ namespace MemCheck.Application
                 card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.UserName)),
                 card.InitialCreationUtcDate,
                 card.VersionUtcDate,
+                card.VersionCreator.UserName,
+                card.VersionDescription,
                 ownersOfDecksWithThisCard,
                 card.Images.Select(img => new ResultImageModel(img)),
                 ratings.User(request.CardId),
@@ -83,7 +87,7 @@ namespace MemCheck.Application
         public sealed class ResultModel
         {
             public ResultModel(string frontSide, string backSide, string additionalInfo, Guid languageId, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
-                DateTime lastChangeUtcDate, IEnumerable<string> usersOwningDeckIncluding, IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings)
+                DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings)
             {
                 FrontSide = frontSide;
                 BackSide = backSide;
@@ -91,8 +95,10 @@ namespace MemCheck.Application
                 LanguageId = languageId;
                 Tags = tags;
                 UsersWithVisibility = usersWithVisibility;
-                CreationUtcDate = creationUtcDate;
-                LastChangeUtcDate = lastChangeUtcDate;
+                FirstVersionUtcDate = creationUtcDate;
+                LastVersionUtcDate = lastVersionCreationUtcDate;
+                LastVersionCreatorName = lastVersionCreator;
+                LastVersionDescription = lastVersionDescription;
                 UsersOwningDeckIncluding = usersOwningDeckIncluding;
                 Images = images;
                 UserRating = userRating;
@@ -105,8 +111,10 @@ namespace MemCheck.Application
             public Guid LanguageId { get; }
             public IEnumerable<ResultTagModel> Tags { get; }
             public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
-            public DateTime CreationUtcDate { get; }
-            public DateTime LastChangeUtcDate { get; }
+            public DateTime FirstVersionUtcDate { get; }
+            public DateTime LastVersionUtcDate { get; }
+            public string LastVersionCreatorName { get; }
+            public string LastVersionDescription { get; }
             public IEnumerable<string> UsersOwningDeckIncluding { get; }
             public IEnumerable<ResultImageModel> Images { get; }
             public int UserRating { get; }
