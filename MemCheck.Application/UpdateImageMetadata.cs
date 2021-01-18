@@ -24,11 +24,7 @@ namespace MemCheck.Application
         private const int maxDescriptionLength = 1000;
         #endregion
         #region Private methods
-        private static ImmutableHashSet<string> GetSupportedContentTypes()
-        {
-            return new HashSet<string>(new string[] { svgImageContentType, "image/jpeg", "image/png" }).ToImmutableHashSet();
-        }
-        public byte[] ResizeImage(Bitmap originalImage, int targetWidth)
+        public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
             int targetheight = originalImage.Height * targetWidth / originalImage.Width;
             using (var resultImage = new Bitmap(targetWidth, targetheight))
@@ -44,15 +40,6 @@ namespace MemCheck.Application
                     return targetStream.ToArray();
                 }
             }
-        }
-        private Bitmap GetBitmap(Stream sourceStream, string contentType)
-        {
-            if (contentType.Equals(svgImageContentType, StringComparison.OrdinalIgnoreCase))
-            {
-                var svgDocument = SvgDocument.Open<SvgDocument>(sourceStream);
-                return svgDocument.Draw();
-            }
-            return new Bitmap(sourceStream);
         }
         private ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
         {
