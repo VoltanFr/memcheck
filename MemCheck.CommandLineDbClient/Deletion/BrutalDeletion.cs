@@ -37,7 +37,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
 
             foreach (var card in cards)
                 logger.LogInformation($"\t {card.FrontSide.Substring(0, Math.Min(100, card.FrontSide.Length))}");
-            logger.LogInformation($"{cards.Count()} cards selected");
+            logger.LogInformation($"{cards.Count} cards selected");
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
             if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))

@@ -131,7 +131,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
 
             var frontSideImages = new[] { region.GetImageDbId(dbContext) };
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
-            var additionalInfo = $"Elle est constituée de ces {region.Departments.Count()} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
+            var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
@@ -148,7 +148,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSide = "";
             var frontSideImages = new[] { regionsWithoutNamesImageId };
             var backSideImages = new[] { region.GetImageDbId(dbContext) };
-            var additionalInfo = $"Elle est constituée de ces {region.Departments.Count()} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
+            var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
@@ -163,7 +163,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
 
-            var backSide = region.Departments.Count().ToString();
+            var backSide = region.Departments.Length.ToString();
             var frontSideImages = Array.Empty<Guid>();
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var additionalInfo = string.Join(Environment.NewLine, region.Departments);
@@ -184,7 +184,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSide = string.Join(Environment.NewLine, region.Departments);
             var frontSideImages = Array.Empty<Guid>();
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
-            var additionalInfo = $"La région {region.Name} est constituée de {region.Departments.Count()} départements.{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
+            var additionalInfo = $"La région {region.Name} est constituée de {region.Departments.Length} départements.{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = Array.Empty<Guid>();
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());

@@ -144,7 +144,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                     resultCards.AddRange(listed);
                 }
 
-            result.Add($"Result contains {resultCards.Count()} cards");
+            result.Add($"Result contains {resultCards.Count} cards");
             return result;
         }
         #region Request and result classes
