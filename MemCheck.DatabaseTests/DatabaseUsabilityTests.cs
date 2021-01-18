@@ -78,6 +78,7 @@ namespace MemCheck.DatabaseTests
         public void Dispose()
         {
             dbContext.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
