@@ -5,4 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Dead code accepted in this project since this is experimental code", Scope = "namespaceanddescendants", Target = "MemCheck.CommandLineDbClient")]
+[assembly: SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Dead code accepted in this project since this is experimental code", Scope = "namespaceanddescendants", Target = "~N:MemCheck.CommandLineDbClient")]
+[assembly: SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Dead code accepted in this project since this is experimental code", Scope = "namespaceanddescendants", Target = "~N:MemCheck.CommandLineDbClient")]
+[assembly: SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "Dead code accepted in this project since this is experimental code", Scope = "namespaceanddescendants", Target = "~N:MemCheck.CommandLineDbClient")]
+[assembly: SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Dead code accepted in this project since this is experimental code", Scope = "namespaceanddescendants", Target = "~N:MemCheck.CommandLineDbClient")]
