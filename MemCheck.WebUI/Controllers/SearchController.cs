@@ -275,34 +275,34 @@ namespace MemCheck.WebUI.Controllers
         }
         private static SearchCards.Request.VibilityFiltering AppVisibility(RunQueryRequest request)
         {
-            switch (request.Visibility)
+            return request.Visibility switch
             {
-                case 1: return SearchCards.Request.VibilityFiltering.Ignore;
-                case 2: return SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner;
-                case 3: return SearchCards.Request.VibilityFiltering.PrivateToOwner;
-                default: throw new RequestInputException($"Invalid Visibility {request.Visibility}");
-            }
+                1 => SearchCards.Request.VibilityFiltering.Ignore,
+                2 => SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner,
+                3 => SearchCards.Request.VibilityFiltering.PrivateToOwner,
+                _ => throw new RequestInputException($"Invalid Visibility {request.Visibility}"),
+            };
         }
         private static SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
         {
-            switch (request.RatingFilteringMode)
+            return request.RatingFilteringMode switch
             {
-                case 1: return SearchCards.Request.RatingFilteringMode.Ignore;
-                case 2: return SearchCards.Request.RatingFilteringMode.AtLeast;
-                case 3: return SearchCards.Request.RatingFilteringMode.AtMost;
-                case 4: return SearchCards.Request.RatingFilteringMode.NoRating;
-                default: throw new RequestInputException($"Invalid RatingFilteringMode {request.RatingFilteringMode}");
-            }
+                1 => SearchCards.Request.RatingFilteringMode.Ignore,
+                2 => SearchCards.Request.RatingFilteringMode.AtLeast,
+                3 => SearchCards.Request.RatingFilteringMode.AtMost,
+                4 => SearchCards.Request.RatingFilteringMode.NoRating,
+                _ => throw new RequestInputException($"Invalid RatingFilteringMode {request.RatingFilteringMode}"),
+            };
         }
         private static SearchCards.Request.NotificationFiltering AppNotificationFiltering(RunQueryRequest request)
         {
-            switch (request.NotificationFiltering)
+            return request.NotificationFiltering switch
             {
-                case 1: return SearchCards.Request.NotificationFiltering.Ignore;
-                case 2: return SearchCards.Request.NotificationFiltering.RegisteredCards;
-                case 3: return SearchCards.Request.NotificationFiltering.NotRegisteredCards;
-                default: throw new RequestInputException($"Invalid NotificationFiltering {request.NotificationFiltering}");
-            }
+                1 => SearchCards.Request.NotificationFiltering.Ignore,
+                2 => SearchCards.Request.NotificationFiltering.RegisteredCards,
+                3 => SearchCards.Request.NotificationFiltering.NotRegisteredCards,
+                _ => throw new RequestInputException($"Invalid NotificationFiltering {request.NotificationFiltering}"),
+            };
         }
         [HttpPost("RunQuery")]
         public async Task<IActionResult> RunQuery([FromBody] RunQueryRequest request)

@@ -34,15 +34,12 @@ namespace MemCheck.Application
         }
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
         {
-            switch (i.VersionType)
+            return i.VersionType switch
             {
-                case ImageVersionType.Creation:
-                    return ImagePreviousVersionType.Creation;
-                case ImageVersionType.Changes:
-                    return ImagePreviousVersionType.Changes;
-                default:
-                    throw new NotImplementedException();
-            }
+                ImageVersionType.Creation => ImagePreviousVersionType.Creation,
+                ImageVersionType.Changes => ImagePreviousVersionType.Changes,
+                _ => throw new NotImplementedException(),
+            };
         }
         #endregion
         public UpdateImageMetadata(MemCheckDbContext dbContext, ILocalized localizer)

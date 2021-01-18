@@ -50,15 +50,12 @@ namespace MemCheck.Application.CardChanging
         }
         private static CardPreviousVersionType CardPreviousVersionTypeFromCard(Card c)
         {
-            switch (c.VersionType)
+            return c.VersionType switch
             {
-                case CardVersionType.Creation:
-                    return CardPreviousVersionType.Creation;
-                case CardVersionType.Changes:
-                    return CardPreviousVersionType.Changes;
-                default:
-                    throw new NotImplementedException();
-            }
+                CardVersionType.Creation => CardPreviousVersionType.Creation,
+                CardVersionType.Changes => CardPreviousVersionType.Changes,
+                _ => throw new NotImplementedException(),
+            };
         }
         private async Task<CardPreviousVersion> CreatePreviousVersionAsync(Card card, DateTime? versionUtcDate = null)
         {
