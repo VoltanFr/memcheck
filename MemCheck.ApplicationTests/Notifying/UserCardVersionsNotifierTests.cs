@@ -118,7 +118,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitOnePreviousVersion_NotToBeNotifiedBecauseOfDate()
+        public async Task CardWithOnePreviousVersion_NotToBeNotifiedBecauseOfDate()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -141,7 +141,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitOnePreviousVersion_ToBeNotifiedWithoutAccessibility()
+        public async Task CardWithOnePreviousVersion_ToBeNotifiedWithoutAccessibility()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -175,7 +175,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitOnePreviousVersion_ToBeNotifiedWithAccessibility()
+        public async Task CardWithOnePreviousVersion_ToBeNotifiedWithAccessibility()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -202,7 +202,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifAfterInitialCreation()
+        public async Task CardWithOnePreviousVersion_ToBeNotified_LastNotifAfterInitialCreation()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -228,7 +228,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitOnePreviousVersion_ToBeNotified_LastNotifBeforeInitialCreation()
+        public async Task CardWithOnePreviousVersion_ToBeNotified_LastNotifBeforeInitialCreation()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -254,7 +254,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitPreviousVersions_NotToBeNotified()
+        public async Task CardWithPreviousVersions_NotToBeNotified_BecauseLastNotifAfterVersion()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -278,7 +278,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitPreviousVersions_ToBeNotified_LastNotifAfterPreviousVersionCreation()
+        public async Task CardWithPreviousVersions_ToBeNotified_LastNotifAfterPreviousVersionCreation()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
@@ -304,7 +304,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
         }
         [TestMethod()]
-        public async Task CardWitPreviousVersions_ToBeNotified_LastNotifBeforePreviousVersionCreation()
+        public async Task CardWithPreviousVersions_ToBeNotified_LastNotifBeforePreviousVersionCreation()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
