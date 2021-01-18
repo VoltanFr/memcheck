@@ -204,7 +204,10 @@
   <data name="MustHaveVisibilityBecause" xml:space="preserve">
     <value>must have visibility since</value>
   </data>
-  <data name="NoneMasc" xml:space="preserve">
+  <data name="NoneFeminine" xml:space="preserve">
+    <value>none</value>
+  </data>
+  <data name="NoneMasculine" xml:space="preserve">
     <value>none</value>
   </data>
   <data name="NotIncludedInAnyDeck" xml:space="preserve">

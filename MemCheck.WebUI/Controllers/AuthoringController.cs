@@ -358,6 +358,21 @@ namespace MemCheck.WebUI.Controllers
                 var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.Get("Public");
                 AddField(changedFields, unChangedFields, "Visibility", cardVisibility, versionVisibility, localizer);
 
+                var cardFrontSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Name).OrderBy(name => name);
+                var cardFrontSideImageNamesJoined = cardFrontSideImageNames.Any() ? string.Join(",", cardFrontSideImageNames) : localizer.Get("NoneFeminine");
+                var versionFrontSideImages = selectedVersion.FrontSideImageNames.Any() ? string.Join(",", selectedVersion.FrontSideImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                AddField(changedFields, unChangedFields, "FrontSideImages", cardFrontSideImageNamesJoined, versionFrontSideImages, localizer);
+
+                var cardBackSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Name).OrderBy(name => name);
+                var cardBackSideImageNamesJoined = cardBackSideImageNames.Any() ? string.Join(",", cardBackSideImageNames) : localizer.Get("NoneFeminine");
+                var versionBackSideImages = selectedVersion.BackSideImageNames.Any() ? string.Join(",", selectedVersion.BackSideImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                AddField(changedFields, unChangedFields, "BackSideImages", cardBackSideImageNamesJoined, versionBackSideImages, localizer);
+
+                var cardAdditionalImageNames = card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Name).OrderBy(name => name);
+                var cardAdditionalImageNamesJoined = cardAdditionalImageNames.Any() ? string.Join(",", cardAdditionalImageNames) : localizer.Get("NoneFeminine");
+                var versionAdditionalImages = selectedVersion.AdditionalInfoImageNames.Any() ? string.Join(",", selectedVersion.AdditionalInfoImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                AddField(changedFields, unChangedFields, "AdditionalInfoImages", cardAdditionalImageNamesJoined, versionAdditionalImages, localizer);
+
                 ChangedFields = changedFields;
                 UnchangedFields = unChangedFields;
             }
@@ -378,15 +393,3 @@ namespace MemCheck.WebUI.Controllers
         #endregion
     }
 }
-
-//GetCardForEdit.ResultModel :
-//public IEnumerable<ResultImageModel> Images { get; }
-
-//GetCardVersion.Result:
-//string FrontSide, 
-//         IEnumerable<string> FrontSideImageNames, 
-//         IEnumerable<string> BackSideImageNames, 
-//         IEnumerable<string> AdditionalInfoImageNames, 
-
-
-//https://localhost:5001/Authoring/Compare?CardId=77b4cf08-0b47-479e-489e-08d81d2328e4&VersionId=e6945897-70e3-42d6-5eda-08d828e7f640

@@ -204,7 +204,10 @@
   <data name="MustHaveVisibilityBecause" xml:space="preserve">
     <value>doit avoir accès car</value>
   </data>
-  <data name="NoneMasc" xml:space="preserve">
+  <data name="NoneFeminine" xml:space="preserve">
+    <value>aucune</value>
+  </data>
+  <data name="NoneMasculine" xml:space="preserve">
     <value>aucun</value>
   </data>
   <data name="NotIncludedInAnyDeck" xml:space="preserve">
