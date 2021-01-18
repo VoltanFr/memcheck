@@ -45,9 +45,9 @@ namespace MemCheck.Application.Searching
             var finalRequest = cardFilteredWithText;
 
             var totalNbCards = finalRequest.Count();
-            var totalPageCount = totalNbCards / request.pageSize + 1;
+            var totalPageCount = totalNbCards / request.PageSize + 1;
 
-            var pageCards = finalRequest.Skip((request.pageNo - 1) * request.pageSize).Take(request.pageSize);
+            var pageCards = finalRequest.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
 
             var deck = dbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
             var heapingAlgo = HeapingAlgorithms.Instance.FromId(deck.HeapingAlgorithmId);
@@ -80,16 +80,16 @@ namespace MemCheck.Application.Searching
                 RequireCardsHaveNoTag = requireCardsHaveNoTag;
                 HeapFilter = heapFilter;
                 TextFilter = textFilter;
-                this.pageNo = pageNo;
-                this.pageSize = pageSize;
+                this.PageNo = pageNo;
+                this.PageSize = pageSize;
             }
             public Guid DeckId { get; }
             public IEnumerable<Guid> RequiredTags { get; }
             public bool RequireCardsHaveNoTag { get; }
             public int? HeapFilter { get; }
             public string TextFilter { get; }
-            public int pageNo { get; }
-            public int pageSize { get; }
+            public int PageNo { get; }
+            public int PageSize { get; }
         }
         public sealed class SearchResult
         {

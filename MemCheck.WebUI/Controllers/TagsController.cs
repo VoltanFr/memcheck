@@ -29,11 +29,11 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetGuiMessagesViewModel(string alreadyExistsErr, string nameLengthErr)
             {
-                this.alreadyExistsErr = alreadyExistsErr;
-                this.nameLengthErr = nameLengthErr;
+                this.AlreadyExistsErr = alreadyExistsErr;
+                this.NameLengthErr = nameLengthErr;
             }
-            public string alreadyExistsErr { get; } = null!;
-            public string nameLengthErr { get; } = null!;
+            public string AlreadyExistsErr { get; } = null!;
+            public string NameLengthErr { get; } = null!;
         }
         #endregion
         #region GetTag

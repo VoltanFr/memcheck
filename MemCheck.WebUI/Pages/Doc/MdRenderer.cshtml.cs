@@ -16,14 +16,14 @@ namespace MemCheck.WebUI.Pages.Doc
         {
             this.environment = environment;
         }
-        [BindProperty(SupportsGet = true)] public string refererRoute { get; set; } = "";
+        [BindProperty(SupportsGet = true)] public string RefererRoute { get; set; } = "";
         [BindProperty(SupportsGet = true)] public string cultureName { get; set; } = "";
         public string PageContents
         {
             get
             {
                 var baseDir = Path.Combine(environment.ContentRootPath, "wwwroot", "mddoc");
-                var splittedRefererRoute = refererRoute.Split('/');
+                var splittedRefererRoute = RefererRoute.Split('/');
                 var refererPath = Path.Combine(splittedRefererRoute.SkipLast(1).ToArray());
                 var refererPage = splittedRefererRoute.Last();
                 var filePath = Path.Combine(baseDir, refererPath, $"{refererPage}-{cultureName}.md");

@@ -243,11 +243,11 @@ namespace MemCheck.WebUI.Controllers
         {
             public UserDecksTagViewModel(Guid tagId, string tagName)
             {
-                this.tagId = tagId;
-                this.tagName = tagName;
+                this.TagId = tagId;
+                this.TagName = tagName;
             }
-            public Guid tagId { get; }
-            public string tagName { get; }
+            public Guid TagId { get; }
+            public string TagName { get; }
         }
         #endregion
         #region SetCardRating
