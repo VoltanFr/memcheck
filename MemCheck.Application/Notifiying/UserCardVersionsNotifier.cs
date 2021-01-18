@@ -47,12 +47,6 @@ namespace MemCheck.Application.Notifying
                 .ToListAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's registered cards with new versions");
 
-            chrono.Restart();
-            foreach (var cardVersion in cardVersions)
-                cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
-            await dbContext.SaveChangesAsync();
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's registered cards last notif date");
-
             var result = cardVersions.Select(cardToReport =>
                                new CardVersion(
                                    cardToReport.card.Id,
@@ -63,6 +57,12 @@ namespace MemCheck.Application.Notifying
                                    CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView)
                                )
                         ).ToImmutableArray();
+
+            chrono.Restart();
+            foreach (var cardVersion in cardVersions)
+                cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
+            await dbContext.SaveChangesAsync();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's registered cards last notif date");
 
             return result;
         }
