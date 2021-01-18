@@ -1,15 +1,9 @@
-﻿using MemCheck.Application;
-using MemCheck.CommandLineDbClient.Geography;
+﻿using MemCheck.CommandLineDbClient.Geography;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 

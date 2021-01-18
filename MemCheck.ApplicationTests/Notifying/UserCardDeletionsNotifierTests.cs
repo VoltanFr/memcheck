@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.EntityFrameworkCore;
-using MemCheck.Database;
-using System.Linq;
-using System;
+﻿using MemCheck.Application.CardChanging;
 using MemCheck.Application.Notifying;
-using MemCheck.Domain;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using MemCheck.Application.CardChanging;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Notifying
 {

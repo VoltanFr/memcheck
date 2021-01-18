@@ -1,24 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Markdig;
+﻿using Markdig;
 using Markdig.Extensions.AutoLinks;
 using Markdig.Renderers;
-using Markdig.Renderers.Html;
-using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
-using MemCheck.Application;
-using MemCheck.Application.Heaping;
-using MemCheck.Database;
-using MemCheck.WebUI.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting.Internal;
-using Microsoft.Extensions.Localization;
+using System.IO;
+using System.Linq;
 
 namespace MemCheck.WebUI.Pages.Doc
 {

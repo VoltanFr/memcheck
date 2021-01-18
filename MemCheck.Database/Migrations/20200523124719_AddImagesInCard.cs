@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MemCheck.Database.Migrations
 {
@@ -29,7 +28,7 @@ namespace MemCheck.Database.Migrations
                 name: "SmallBlob",
                 table: "Images",
                 nullable: false,
-                defaultValue: new byte[] {  });
+                defaultValue: new byte[] { });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -51,7 +50,7 @@ namespace MemCheck.Database.Migrations
                 table: "Images",
                 type: "varbinary(max)",
                 nullable: false,
-                defaultValue: new byte[] {  });
+                defaultValue: new byte[] { });
 
             migrationBuilder.AddColumn<int>(
                 name: "Format",

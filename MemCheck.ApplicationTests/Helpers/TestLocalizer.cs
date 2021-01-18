@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using MemCheck.Application.QueryValidation;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using MemCheck.Application.QueryValidation;
 
 namespace MemCheck.Application.Tests.Helpers
 {

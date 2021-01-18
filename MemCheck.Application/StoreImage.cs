@@ -2,7 +2,6 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
 using Svg;
 using System;
 using System.Collections.Generic;

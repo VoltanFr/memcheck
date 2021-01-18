@@ -1,6 +1,6 @@
-﻿using System;
+﻿using MemCheck.Application.CardChanging;
+using System;
 using System.Linq;
-using MemCheck.Application.CardChanging;
 
 namespace MemCheck.Application.QueryValidation
 {

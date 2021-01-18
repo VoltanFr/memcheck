@@ -1,17 +1,9 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.CardChanging;
-using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Deletion

@@ -1,10 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
-using Svg;
 using System;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 
 namespace MemCheck.Application

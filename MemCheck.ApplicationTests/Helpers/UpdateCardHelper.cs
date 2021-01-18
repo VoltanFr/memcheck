@@ -1,7 +1,7 @@
-﻿using System;
+﻿using MemCheck.Application.CardChanging;
 using MemCheck.Domain;
+using System;
 using System.Collections.Generic;
-using MemCheck.Application.CardChanging;
 using System.Linq;
 
 namespace MemCheck.Application.Tests.Helpers

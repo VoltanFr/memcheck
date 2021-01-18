@@ -1,10 +1,9 @@
-﻿using System.Threading.Tasks;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {

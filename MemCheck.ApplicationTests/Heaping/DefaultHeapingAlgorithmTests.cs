@@ -1,8 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemCheck.Application.Heaping;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MemCheck.Application.Heaping.Tests
 {

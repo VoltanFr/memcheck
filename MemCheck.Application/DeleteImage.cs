@@ -1,11 +1,10 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
-using MemCheck.Application.QueryValidation;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {

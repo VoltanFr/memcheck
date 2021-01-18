@@ -2,8 +2,6 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

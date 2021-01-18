@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MemCheck.Database.Migrations
 {
@@ -35,7 +34,7 @@ namespace MemCheck.Database.Migrations
                 name: "OriginalBlob",
                 table: "Images",
                 nullable: false,
-                defaultValue: new byte[] {  });
+                defaultValue: new byte[] { });
 
             migrationBuilder.AddColumn<string>(
                 name: "OriginalContentType",

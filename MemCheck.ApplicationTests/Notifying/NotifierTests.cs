@@ -1,14 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemCheck.Database;
-using MemCheck.Application.Notifying;
-using System.Threading.Tasks;
-using System.Linq;
+﻿using MemCheck.Application.Notifying;
+using MemCheck.Application.Tests.Helpers;
+using MemCheck.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using MemCheck.Domain;
-using System.Collections.Immutable;
-using MemCheck.Application.Tests.Helpers;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Notifying
 {

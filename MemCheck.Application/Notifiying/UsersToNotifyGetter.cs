@@ -1,11 +1,11 @@
 ﻿using MemCheck.Database;
-using System.Linq;
-using System.Collections.Immutable;
 using MemCheck.Domain;
-using System;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MemCheck.Application.Notifying
 {

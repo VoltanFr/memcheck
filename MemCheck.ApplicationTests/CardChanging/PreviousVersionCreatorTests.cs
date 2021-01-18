@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
-using MemCheck.Application.Tests.Notifying;
+﻿using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
-using MemCheck.Application.Tests;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using MemCheck.Application.Tests.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.CardChanging
 {

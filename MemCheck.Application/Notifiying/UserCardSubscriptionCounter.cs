@@ -1,10 +1,10 @@
 ﻿using MemCheck.Database;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {

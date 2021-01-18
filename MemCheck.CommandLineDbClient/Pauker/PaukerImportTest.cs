@@ -1,12 +1,10 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.CardChanging;
+﻿using MemCheck.Application.CardChanging;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;

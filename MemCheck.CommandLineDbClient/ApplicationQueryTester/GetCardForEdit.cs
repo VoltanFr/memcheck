@@ -1,8 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Heaping;
-using MemCheck.Database;
-using MemCheck.Domain;
-using Microsoft.EntityFrameworkCore;
+﻿using MemCheck.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;

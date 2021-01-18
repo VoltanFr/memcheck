@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
+using System;
+using System.Collections.Generic;
 
 namespace MemCheck.Application
 {

@@ -1,14 +1,14 @@
-﻿using MemCheck.Database;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Searching;
+using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Threading.Tasks;
-using MemCheck.Application.Searching;
-using System.Linq;
-using MemCheck.Domain;
-using MemCheck.Application.QueryValidation;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {

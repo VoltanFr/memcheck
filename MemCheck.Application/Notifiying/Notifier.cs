@@ -1,11 +1,10 @@
 ﻿using MemCheck.Database;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Collections.Immutable;
 using MemCheck.Domain;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {

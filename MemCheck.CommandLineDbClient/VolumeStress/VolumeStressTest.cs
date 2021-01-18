@@ -1,13 +1,9 @@
 ﻿using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace MemCheck.CommandLineDbClient.VolumeStress
 {

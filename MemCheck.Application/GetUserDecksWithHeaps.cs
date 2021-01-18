@@ -1,11 +1,8 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Database;
-using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {

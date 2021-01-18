@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
 using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {

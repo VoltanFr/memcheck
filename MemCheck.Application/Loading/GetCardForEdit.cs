@@ -1,13 +1,12 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
-using System;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Collections.Immutable;
-using MemCheck.Application.QueryValidation;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Loading
 {

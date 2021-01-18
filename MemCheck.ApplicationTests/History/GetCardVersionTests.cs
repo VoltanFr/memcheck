@@ -1,11 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
-using MemCheck.Database;
-using System.Linq;
+﻿using MemCheck.Application.CardChanging;
 using MemCheck.Application.Tests.Helpers;
-using MemCheck.Application.CardChanging;
-using Microsoft.EntityFrameworkCore;
+using MemCheck.Database;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.History
 {

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MemCheck.Application.CardChanging;
 using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
-using MemCheck.Application.CardChanging;
 
 namespace MemCheck.Application.Tests.Helpers
 {

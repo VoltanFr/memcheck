@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System.Text;
-using System.Threading.Tasks;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 {

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-using System;
+﻿using System;
 
 namespace MemCheck.Application.QueryValidation
 {

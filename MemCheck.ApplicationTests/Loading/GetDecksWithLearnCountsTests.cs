@@ -1,11 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
-using MemCheck.Database;
-using MemCheck.Application.Tests;
-using System.Linq;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
-using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Loading
 {

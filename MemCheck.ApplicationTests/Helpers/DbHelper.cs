@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MemCheck.Database;
-using System.Runtime.CompilerServices;
+﻿using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace MemCheck.Application.Tests.Helpers
 {

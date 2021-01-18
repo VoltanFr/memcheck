@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
-using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;

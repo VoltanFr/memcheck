@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Helpers
 {

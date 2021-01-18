@@ -1,10 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemCheck.Database;
-using System.Linq;
-using System;
-using MemCheck.Application.Notifying;
-using System.Threading.Tasks;
+﻿using MemCheck.Application.Notifying;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Database;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Notifying
 {

@@ -1,16 +1,8 @@
-﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
-using MemCheck.CommandLineDbClient.Pauker;
-using MemCheck.CommandLineDbClient.Ratings;
-using MemCheck.CommandLineDbClient.UsStates;
+﻿using MemCheck.CommandLineDbClient.UsStates;
 using MemCheck.Database;
-using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

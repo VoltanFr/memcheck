@@ -1,12 +1,9 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {
