@@ -109,7 +109,7 @@ namespace MemCheck.WebUI.Controllers
                 mailBody.Append("</ul>");
             }
         }
-        private void AddCardDeletions(ImmutableArray<CardDeletion> deletedCards, StringBuilder mailBody)
+        private static void AddCardDeletions(ImmutableArray<CardDeletion> deletedCards, StringBuilder mailBody)
         {
             if (!deletedCards.Any())
                 mailBody.Append("<h1>No deleted card</h1>");
@@ -246,7 +246,7 @@ namespace MemCheck.WebUI.Controllers
 
             return mailBody.ToString();
         }
-        private string GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
+        private static string GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
         {
             var mailBody = new StringBuilder();
             mailBody.Append("<html>");
@@ -265,7 +265,7 @@ namespace MemCheck.WebUI.Controllers
             mailBody.Append("</html>");
             return mailBody.ToString();
         }
-        private bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
+        private static bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
         {
             if (userNotifications.CardVersions.Any())
                 return true;

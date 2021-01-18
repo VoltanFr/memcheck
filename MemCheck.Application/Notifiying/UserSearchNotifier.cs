@@ -33,7 +33,7 @@ namespace MemCheck.Application.Notifying
         private readonly List<string> performanceIndicators;
         #endregion
         #region Private methods
-        private SearchCards.Request GetRequest(SearchSubscription subscription)
+        private static SearchCards.Request GetRequest(SearchSubscription subscription)
         {
             var request = new SearchCards.Request
             {
