@@ -70,7 +70,7 @@ namespace MemCheck.Application
                 .ToList(); //Filtering in memory, not on DB, is major for perf
             var selectedCardsRatingsOfUser = allRatingsOfUser.Where(r => cardIds.Contains(r.cardId)).ToImmutableDictionary(item => item.cardId, item => item.rating);
 
-            var cardsWithoutEval = cardIds.Except(selectedCardsActualRatings.Keys).ToImmutableHashSet();
+            var cardsWithoutEval = cardIds.Except(selectedCardsActualRatings.Keys);
 
             return new CardRatings(selectedCardsActualRatings, selectedCardsRatingsOfUser, selectedCardsRatingCounts, cardsWithoutEval);
         }
