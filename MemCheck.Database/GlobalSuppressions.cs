@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Performance", "CA1825:Avoid zero-length array allocations", Justification = "Generated code", Scope = "namespaceanddescendants", Target = "MemCheck.Database.Migrations")]
+[assembly: SuppressMessage("Performance", "CA1825:Avoid zero-length array allocations", Justification = "Generated code", Scope = "namespaceanddescendants", Target = "~N:MemCheck.Database.Migrations")]
