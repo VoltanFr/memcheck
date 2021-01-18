@@ -20,7 +20,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #region Fields
         private readonly ILogger<GetCards> logger;
         private readonly MemCheckDbContext dbContext;
-        private bool realCode = true;
+        private readonly bool realCode = true;
         #endregion
         public GetUserDecksWithTags(IServiceProvider serviceProvider)
         {
