@@ -209,8 +209,8 @@ namespace MemCheck.Application.Searching
             public VibilityFiltering Visibility { get; init; } = VibilityFiltering.Ignore;
             public RatingFilteringMode RatingFiltering { get; init; } = RatingFilteringMode.Ignore;
             public int RatingFilteringValue { get; init; } = 1;
-            public IEnumerable<Guid> RequiredTags { get; init; } = new Guid[0];
-            public IEnumerable<Guid>? ExcludedTags { get; init; } = new Guid[0]; //null means that we return only cards which have no tag (we exclude all tags)
+            public IEnumerable<Guid> RequiredTags { get; init; } = Array.Empty<Guid>();
+            public IEnumerable<Guid>? ExcludedTags { get; init; } = Array.Empty<Guid>(); //null means that we return only cards which have no tag (we exclude all tags)
             public NotificationFiltering Notification { get; init; } = NotificationFiltering.Ignore;
             public DateTime? MinimumUtcDateOfCards { get; init; } = null;
 

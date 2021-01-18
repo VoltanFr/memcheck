@@ -30,7 +30,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
-                return Ok(new GetAllViewModel(null, false, 0, new GetAllDeckViewModel[0], DateTime.UtcNow));
+                return Ok(new GetAllViewModel(null, false, 0, Array.Empty<GetAllDeckViewModel>(), DateTime.UtcNow));
 
             var userDecks = await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);

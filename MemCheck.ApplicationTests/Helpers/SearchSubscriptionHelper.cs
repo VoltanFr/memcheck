@@ -16,9 +16,9 @@ namespace MemCheck.Application.Tests.Helpers
             result.Name = name ?? StringHelper.RandomString();
             result.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
             result.RequiredText = requiredText;
-            result.RequiredTags = new RequiredTagInSearchSubscription[0];
+            result.RequiredTags = Array.Empty<RequiredTagInSearchSubscription>();
             result.ExcludeAllTags = false;
-            result.ExcludedTags = new ExcludedTagInSearchSubscription[0];
+            result.ExcludedTags = Array.Empty<ExcludedTagInSearchSubscription>();
             result.LastRunUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
             result.RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
             dbContext.SearchSubscriptions.Add(result);

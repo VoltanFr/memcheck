@@ -52,7 +52,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             else
             {
                 var chrono = Stopwatch.StartNew();
-                //var logLines = await GetCardsToRepeatAsync(user.Id, deck.Id, new Guid[0], new Guid[0]);
+                //var logLines = await GetCardsToRepeatAsync(user.Id, deck.Id, Array.Empty<Guid>(), Array.Empty<Guid>());
                 //chrono.Stop();
                 //foreach (var logLine in logLines)
                 //    logger.LogInformation(logLine);
@@ -134,8 +134,8 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                     var resultCardIds = withDetailsListed.Select(cardInDeck => cardInDeck.CardId).ToHashSet();
                     //var (averageRatings, userRatings, countOfUserRatings) = await GetRatingsAsync(userId, resultCardIds);
 
-                    var emptyStringArray = new string[0];
-                    var emptyResultImageModelArray = new ResultImageModel[0];
+                    var emptyStringArray = Array.Empty<string>();
+                    var emptyResultImageModelArray = Array.Empty<ResultImageModel>();
 
 
                     var thisHeapResult = withDetailsListed.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,

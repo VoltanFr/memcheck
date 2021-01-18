@@ -131,7 +131,7 @@ namespace MemCheck.WebUI.Controllers
             var requiredTags = request.RequiredTags.Select(tag => tag.TagId);
             bool requireCardsHaveNoTag = requiredTags.Count() == 1 && requiredTags.First() == Guid.Empty;
             if (requireCardsHaveNoTag)
-                requiredTags = new Guid[0];
+                requiredTags =  Array.Empty<Guid>();
             var applicationRequest = new SearchDeckCards.SearchRequest(
                 request.DeckId,
                 requiredTags,

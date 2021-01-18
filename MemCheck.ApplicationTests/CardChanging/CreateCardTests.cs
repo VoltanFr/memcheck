@@ -93,14 +93,14 @@ namespace MemCheck.Application.CardChanging
                 var request = new CreateCard.Request(
                     ownerId,
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     languageId,
-                    new Guid[0],
-                    new Guid[0],
+                    Array.Empty<Guid>(),
+                    Array.Empty<Guid>(),
                     StringHelper.RandomString());
                 cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
             }
@@ -122,13 +122,13 @@ namespace MemCheck.Application.CardChanging
                 var request = new CreateCard.Request(
                     creatorId,
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     StringHelper.RandomString(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     languageId,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     new Guid[] { otherUser },
                     StringHelper.RandomString());
                 var ownerMustHaveVisibility = StringHelper.RandomString();

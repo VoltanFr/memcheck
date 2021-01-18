@@ -37,7 +37,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> decksWithHeapsAndTags;
             if (user == null)
-                decksWithHeapsAndTags = new GetUserDecksWithHeapsAndTags.ResultModel[0];
+                decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.ResultModel>();
             else
                 decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(user.Id);
             var allTags = new GetAllAvailableTags(dbContext).Run();
@@ -99,9 +99,9 @@ namespace MemCheck.WebUI.Controllers
             {
                 DeckId = deckId;
                 DeckName = deckName;
-                Heaps = new GetAllStaticDataHeapViewModel[0];
-                RequirableTags = new GetAllStaticDataTagViewModel[0];
-                ExcludableTags = new GetAllStaticDataTagViewModel[0];
+                Heaps = Array.Empty<GetAllStaticDataHeapViewModel>();
+                RequirableTags = Array.Empty<GetAllStaticDataTagViewModel>();
+                ExcludableTags = Array.Empty<GetAllStaticDataTagViewModel>();
             }
             public Guid DeckId { get; }
             public string DeckName { get; }

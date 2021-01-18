@@ -126,13 +126,13 @@ namespace MemCheck.CommandLineDbClient.Pauker
                     CreateCard.Request request = new CreateCard.Request(
                         user.Id,
                         paukerCard.Front.Text.Trim(),
-                        new Guid[0],
+                        Array.Empty<Guid>(),
                         paukerCard.Reverse.Text.Trim(),
-                        new Guid[0],
+                        Array.Empty<Guid>(),
                         "",
-                        new Guid[0],
+                        Array.Empty<Guid>(),
                         cardLanguage.Id,
-                        new Guid[0],
+                        Array.Empty<Guid>(),
                         new[] { user.Id },
                         CardVersionDescription);
 

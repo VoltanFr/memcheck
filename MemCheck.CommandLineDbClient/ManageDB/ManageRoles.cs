@@ -118,8 +118,8 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                     var resultCardIds = withDetailsListed.Select(cardInDeck => cardInDeck.CardId).ToHashSet();
                     //var (averageRatings, userRatings, countOfUserRatings) = await GetRatingsAsync(userId, resultCardIds);
 
-                    var emptyStringArray = new string[0];
-                    var emptyResultImageModelArray = new ResultImageModel[0];
+                    var emptyStringArray = Array.Empty<string>();
+                    var emptyResultImageModelArray = Array.Empty<ResultImageModel>();
 
 
                     var thisHeapResult = withDetailsListed.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,

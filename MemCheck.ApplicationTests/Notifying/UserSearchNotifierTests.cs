@@ -88,7 +88,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card2.Id, user, StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
+                var updateRequest = new UpdateCard.Request(card2.Id, user, StringHelper.RandomString(), Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -137,7 +137,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card1.Id, user, StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
+                var updateRequest = new UpdateCard.Request(card1.Id, user, StringHelper.RandomString(), Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -192,7 +192,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card1.Id, user, someText, new Guid[0], StringHelper.RandomString(), new Guid[0], StringHelper.RandomString(), new Guid[0], language, new Guid[0], new Guid[0], StringHelper.RandomString());
+                UpdateCard.Request? updateRequest = new UpdateCard.Request(card1.Id, user, someText, Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), StringHelper.RandomString(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), StringHelper.RandomString());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -363,7 +363,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringHelper.RandomString(), "", new Guid[0], new Guid[0]);
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, StringHelper.RandomString(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
                 subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
             }
 

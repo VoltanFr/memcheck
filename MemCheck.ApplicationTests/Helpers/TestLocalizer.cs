@@ -11,7 +11,7 @@ namespace MemCheck.Application.Tests.Helpers
         #endregion
         public TestLocalizer(IEnumerable<KeyValuePair<string, string>>? items = null)
         {
-            values = ImmutableDictionary.CreateRange(items ?? new KeyValuePair<string, string>[0]);
+            values = ImmutableDictionary.CreateRange(items ?? System.Array.Empty<KeyValuePair<string, string>>());
         }
         public string Get(string resourceName)
         {
