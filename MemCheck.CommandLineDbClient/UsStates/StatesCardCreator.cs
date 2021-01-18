@@ -78,7 +78,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
                 {
                     if (Article.Length == 0)
                         return "";
-                    return Article.First().ToString().ToUpper() + Article.Substring(1);
+                    return Article.First().ToString().ToUpper() + Article[1..];
                 }
             }
             private string EnglishName { get; }

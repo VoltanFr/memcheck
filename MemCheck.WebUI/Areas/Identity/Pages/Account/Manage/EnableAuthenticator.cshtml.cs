@@ -136,7 +136,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             }
             if (currentPosition < unformattedKey.Length)
             {
-                result.Append(unformattedKey.Substring(currentPosition));
+                result.Append(unformattedKey[currentPosition..]);
             }
 
             return result.ToString().ToLowerInvariant();

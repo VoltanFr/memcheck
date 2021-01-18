@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
+﻿using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
@@ -15,7 +14,7 @@ namespace MemCheck.WebUI.Controllers
             var hostIndex = previousPageUrl.IndexOf(Request.Host.Value);
             if (hostIndex == -1)
                 return null;
-            var result = previousPageUrl.Substring(hostIndex + Request.Host.Value.Length);
+            var result = previousPageUrl[(hostIndex + Request.Host.Value.Length)..];
             var parameterIndex = result.IndexOf('?');
             if (parameterIndex == -1)
                 return result;
