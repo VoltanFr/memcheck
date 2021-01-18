@@ -349,9 +349,14 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "BackSide", card.BackSide, selectedVersion.BackSide, localizer);
                 AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
                 AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
-                AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", card.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", card.Tags.Select(t => t.TagName)), selectedVersion.Tags.Count() == 0 ? localizer.Get("NoneMasc") : string.Join(",", selectedVersion.Tags), localizer);
-                AddField(changedFields, unChangedFields, "Visibility", card.UsersWithVisibility.Count() == 0 ? localizer.Get("Public") : string.Join(",", card.UsersWithVisibility.Select(u => u.UserName)), selectedVersion.UsersWithVisibility.Count() == 0 ? localizer.Get("Public") : string.Join(",", selectedVersion.UsersWithVisibility), localizer);
 
+                var cardTags = card.Tags.Any() ? string.Join(",", card.Tags.Select(t => t.TagName).OrderBy(name => name)) : localizer.Get("NoneMasc");
+                var versionTags = selectedVersion.Tags.Any() ? string.Join(",", selectedVersion.Tags.OrderBy(name => name)) : localizer.Get("NoneMasc");
+                AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", cardTags, versionTags, localizer);
+
+                var cardVisibility = card.UsersWithVisibility.Any() ? string.Join(",", card.UsersWithVisibility.Select(u => u.UserName).OrderBy(name => name)) : localizer.Get("Public");
+                var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.Get("Public");
+                AddField(changedFields, unChangedFields, "Visibility", cardVisibility, versionVisibility, localizer);
 
                 ChangedFields = changedFields;
                 UnchangedFields = unChangedFields;
