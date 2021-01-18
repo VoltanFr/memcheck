@@ -99,9 +99,9 @@ namespace MemCheck.WebUI.Controllers
                     mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
                     mailBody.Append($"By {card.VersionCreator}<br/>");
                     mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Version description: '{card.VersionDescription}'");
+                    mailBody.Append($"Version description: '{card.VersionDescription}'<br/>");
                     if (card.VersionIdOnLastNotification != null)
-                        mailBody.Append($"<a href={comparePageLink}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a><br/>");
+                        mailBody.Append($"<a href={comparePageLink}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
                     else
                         mailBody.Append("Did not exist on your previous notifications");
                     mailBody.Append("</li>");

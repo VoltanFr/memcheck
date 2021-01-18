@@ -47,7 +47,7 @@ MemCheck is a flashcard web site, a tool to help you know things by heart.
 
 # To do, at little cost
 - Prevent modification of a deck with no or too long description, or duplicated descriptions for the same user (reuse what was done in create deck, without forgetting to check ownership)
-- The mail sent by notifier should include an history link and a diff link
+- The mail sent by notifier should include an history link
 
 # To do at medium cost
 - Mettre l'envoi de mail dans une Azure function ? Permet de faire ça en asynchrone ? Et pourquoi pas tout faire en Azuere function ? Eg, le rating par un utilisateur. Par exemple en utilisant un blob trigger, et le blob est ce qu'il faut traiter. Il y a plein de triggers différents (un autre exemple est le queue trigger).
