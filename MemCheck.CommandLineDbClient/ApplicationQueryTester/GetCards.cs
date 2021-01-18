@@ -62,7 +62,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         {
             logger.LogInformation($"Will request cards to learn");
         }
-        private async Task<(Dictionary<Guid, double> averageRatings, Dictionary<Guid, int> userRatings, Dictionary<Guid, int> countOfUserRatings)> GetRatingsAsync(Guid userId, HashSet<Guid> cardIds)
+        private static async Task<(Dictionary<Guid, double> averageRatings, Dictionary<Guid, int> userRatings, Dictionary<Guid, int> countOfUserRatings)> GetRatingsAsync(Guid userId, HashSet<Guid> cardIds)
         {
             //var allUsersRatings = await dbContext.UserCardRatings
             //    .Where(rating => cardIds.Contains(rating.CardId))

@@ -273,7 +273,7 @@ namespace MemCheck.WebUI.Controllers
             if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
                 throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
         }
-        private SearchCards.Request.VibilityFiltering AppVisibility(RunQueryRequest request)
+        private static SearchCards.Request.VibilityFiltering AppVisibility(RunQueryRequest request)
         {
             switch (request.Visibility)
             {
@@ -283,7 +283,7 @@ namespace MemCheck.WebUI.Controllers
                 default: throw new RequestInputException($"Invalid Visibility {request.Visibility}");
             }
         }
-        private SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
+        private static SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
         {
             switch (request.RatingFilteringMode)
             {
@@ -294,7 +294,7 @@ namespace MemCheck.WebUI.Controllers
                 default: throw new RequestInputException($"Invalid RatingFilteringMode {request.RatingFilteringMode}");
             }
         }
-        private SearchCards.Request.NotificationFiltering AppNotificationFiltering(RunQueryRequest request)
+        private static SearchCards.Request.NotificationFiltering AppNotificationFiltering(RunQueryRequest request)
         {
             switch (request.NotificationFiltering)
             {

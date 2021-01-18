@@ -134,7 +134,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             doc.Save(outputFile.FullName);
         }
 
-        private void SaveStack(PaukerStack stack, XmlElement lessonElem)
+        private static void SaveStack(PaukerStack stack, XmlElement lessonElem)
         {
             var batchElem = lessonElem.OwnerDocument.CreateElement("Batch");
             lessonElem.AppendChild(batchElem);
@@ -143,7 +143,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 SaveCard(card, batchElem);
         }
 
-        private void SaveCard(PaukerCard card, XmlElement batchElem)
+        private static void SaveCard(PaukerCard card, XmlElement batchElem)
         {
             var cardElem = batchElem.OwnerDocument.CreateElement("Card");
             batchElem.AppendChild(cardElem);
@@ -157,7 +157,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             SaveCardSide(card.Reverse, reverseSideElem);
         }
 
-        private void SaveCardSide(PaukerCardSide side, XmlElement targetElem)
+        private static void SaveCardSide(PaukerCardSide side, XmlElement targetElem)
         {
             if (side.LearnedTimestamp.HasValue)
             {
@@ -180,7 +180,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
 
             SaveFont(targetElem);
         }
-        private void SaveFont(XmlElement targetElem)
+        private static void SaveFont(XmlElement targetElem)
         {
             var font = targetElem.OwnerDocument.CreateElement("Font");
             targetElem.AppendChild(font);

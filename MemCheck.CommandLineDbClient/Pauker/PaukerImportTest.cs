@@ -40,12 +40,12 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return encoding.GetString(allBytes.ToArray());
             }
         }
-        private DateTime PaukerExpiryDate(PaukerCard card, int stackIndex)
+        private static DateTime PaukerExpiryDate(PaukerCard card, int stackIndex)
         {
             var nbDaysForExpiration = Math.Exp(stackIndex - 1);
             return card.LearnedDate().AddDays(nbDaysForExpiration);
         }
-        private int GetBestMemCheckHeap(PaukerCard card, int stackIndex)
+        private static int GetBestMemCheckHeap(PaukerCard card, int stackIndex)
         {
             var learnedDate = card.LearnedDate();
             var paukerExpiry = PaukerExpiryDate(card, stackIndex);
@@ -78,7 +78,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             //return memCheckExpiry <= DateTime.Now;
             return result;
         }
-        private PaukerLesson GetPaukerLesson()
+        private static PaukerLesson GetPaukerLesson()
         {
             var paukerXml = StringFromGZipFile(filePath, Encoding.UTF8);
             var doc = new XmlDocument();

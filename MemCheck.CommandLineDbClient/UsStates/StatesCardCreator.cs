@@ -29,7 +29,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             private Guid imageDbId = Guid.Empty;
             #endregion
             #region Private methods
-            private ImmutableArray<string> GetFields(string dataSetFileLine)
+            private static ImmutableArray<string> GetFields(string dataSetFileLine)
             {
                 IEnumerable<string> fields = dataSetFileLine.Split(';');
                 if (fields.Count() != 11)

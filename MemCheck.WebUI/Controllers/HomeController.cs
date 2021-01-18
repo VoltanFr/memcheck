@@ -41,7 +41,7 @@ namespace MemCheck.WebUI.Controllers
         #region Result classes
         public sealed class GetAllViewModel
         {
-            private TimeSpan GetReloadWaitTime(IEnumerable<GetAllDeckViewModel> userDecks)
+            private static TimeSpan GetReloadWaitTime(IEnumerable<GetAllDeckViewModel> userDecks)
             {
                 if (!userDecks.Any())
                     //Refreshing is useless
