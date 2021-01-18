@@ -29,20 +29,22 @@ namespace MemCheck.CommandLineDbClient.Pauker
         private sealed record BeaufortForce(int Number, string Name, int MinWind, int MaxWind);
         private static ImmutableArray<BeaufortForce> GetForcesFromNumber()
         {
-            var result = new List<BeaufortForce>();
-            result.Add(new BeaufortForce(0, "Calme", 0, 0));
-            result.Add(new BeaufortForce(1, "Très légère brise", 1, 3));
-            result.Add(new BeaufortForce(2, "Légère brise", 4, 6));
-            result.Add(new BeaufortForce(3, "Petite brise", 7, 10));
-            result.Add(new BeaufortForce(4, "Jolie brise", 11, 16));
-            result.Add(new BeaufortForce(5, "Bonne brise", 17, 21));
-            result.Add(new BeaufortForce(6, "Vent frais", 22, 27));
-            result.Add(new BeaufortForce(7, "Grand frais", 28, 33));
-            result.Add(new BeaufortForce(8, "Coup de vent", 34, 40));
-            result.Add(new BeaufortForce(9, "Fort coup de vent", 41, 47));
-            result.Add(new BeaufortForce(10, "Tempête", 48, 55));
-            result.Add(new BeaufortForce(11, "Violente tempête", 56, 63));
-            result.Add(new BeaufortForce(12, "Ouragan", 64, 70));
+            var result = new List<BeaufortForce>
+            {
+                new BeaufortForce(0, "Calme", 0, 0),
+                new BeaufortForce(1, "Très légère brise", 1, 3),
+                new BeaufortForce(2, "Légère brise", 4, 6),
+                new BeaufortForce(3, "Petite brise", 7, 10),
+                new BeaufortForce(4, "Jolie brise", 11, 16),
+                new BeaufortForce(5, "Bonne brise", 17, 21),
+                new BeaufortForce(6, "Vent frais", 22, 27),
+                new BeaufortForce(7, "Grand frais", 28, 33),
+                new BeaufortForce(8, "Coup de vent", 34, 40),
+                new BeaufortForce(9, "Fort coup de vent", 41, 47),
+                new BeaufortForce(10, "Tempête", 48, 55),
+                new BeaufortForce(11, "Violente tempête", 56, 63),
+                new BeaufortForce(12, "Ouragan", 64, 70)
+            };
             return result.ToImmutableArray();
         }
         private static ImmutableArray<BeaufortForce> GetForcesFromWindSpeed(ImmutableArray<BeaufortForce> forceFromNumber)
