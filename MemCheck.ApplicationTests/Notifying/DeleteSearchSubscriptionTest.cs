@@ -19,11 +19,9 @@ namespace MemCheck.Application.Tests.Notifying
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new DeleteSearchSubscription.Request(Guid.Empty, subscription.Id);
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new DeleteSearchSubscription.Request(Guid.Empty, subscription.Id);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task InvalidSubscriptionId()
@@ -31,11 +29,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new DeleteSearchSubscription.Request(userId, Guid.Empty);
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new DeleteSearchSubscription.Request(userId, Guid.Empty);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfSubscription()
@@ -45,11 +41,9 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, subscriptionOwnerId);
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new DeleteSearchSubscription.Request(userId, subscription.Id);
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new DeleteSearchSubscription.Request(userId, subscription.Id);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task CorrectDeletion_OnlySubscription()

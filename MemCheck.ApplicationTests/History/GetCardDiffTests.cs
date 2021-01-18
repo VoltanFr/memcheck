@@ -15,14 +15,14 @@ namespace MemCheck.Application.History
         [TestMethod()]
         public async Task EmptyDB_UserNotLoggedIn()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task EmptyDB_UserDoesNotExist()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task EmptyDB_OriginalVersionDoesNotExist()

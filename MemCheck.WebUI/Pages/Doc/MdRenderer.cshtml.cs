@@ -37,26 +37,23 @@ namespace MemCheck.WebUI.Pages.Doc
 
 
 
-                using (var htmlWriter = new StringWriter())
-                {
+                using var htmlWriter = new StringWriter();
+                var pipeline = new MarkdownPipelineBuilder()
+                           .UseSoftlineBreakAsHardlineBreak()
+                           .UseAutoLinks(new AutoLinkOptions() { OpenInNewWindow = true });
 
-                    var pipeline = new MarkdownPipelineBuilder()
-                               .UseSoftlineBreakAsHardlineBreak()
-                               .UseAutoLinks(new AutoLinkOptions() { OpenInNewWindow = true });
+                var document = Markdown.Parse(markdown, pipeline.Build());
 
-                    var document = Markdown.Parse(markdown, pipeline.Build());
+                //foreach (var descendant in document.Descendants())
+                //    if (descendant is AutolinkInline || descendant is LinkInline)
+                //        descendant.GetAttributes().AddPropertyIfNotExist("target", "_blank");
 
-                    //foreach (var descendant in document.Descendants())
-                    //    if (descendant is AutolinkInline || descendant is LinkInline)
-                    //        descendant.GetAttributes().AddPropertyIfNotExist("target", "_blank");
+                var renderer = new HtmlRenderer(htmlWriter);
+                renderer.Render(document);
 
-                    var renderer = new HtmlRenderer(htmlWriter);
-                    renderer.Render(document);
-
-                    return htmlWriter.ToString();
-                    //var sanitized = new HtmlSanitizer().Sanitize(rendered);
-                    //return sanitized;
-                }
+                return htmlWriter.ToString();
+                //var sanitized = new HtmlSanitizer().Sanitize(rendered);
+                //return sanitized;
 
 
 

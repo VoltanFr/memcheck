@@ -26,17 +26,15 @@ namespace MemCheck.CommandLineDbClient.Pauker
         private static string StringFromGZipFile(string file, Encoding encoding)
         {
             //StringBuilder result = new StringBuilder();
-            using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
-            using (GZipStream gz = new GZipStream(fs, CompressionMode.Decompress))
-            {
-                List<byte> allBytes = new List<byte>();
-                byte[] buffer = new byte[4096];
-                int numRead;
-                while ((numRead = gz.Read(buffer, 0, buffer.Length)) != 0)
-                    for (int i = 0; i < numRead; i++)
-                        allBytes.Add(buffer[i]);
-                return encoding.GetString(allBytes.ToArray());
-            }
+            using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
+            using GZipStream gz = new GZipStream(fs, CompressionMode.Decompress);
+            List<byte> allBytes = new List<byte>();
+            byte[] buffer = new byte[4096];
+            int numRead;
+            while ((numRead = gz.Read(buffer, 0, buffer.Length)) != 0)
+                for (int i = 0; i < numRead; i++)
+                    allBytes.Add(buffer[i]);
+            return encoding.GetString(allBytes.ToArray());
         }
         private static DateTime PaukerExpiryDate(PaukerCard card, int stackIndex)
         {

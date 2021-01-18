@@ -198,11 +198,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), StringHelper.RandomString(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), StringHelper.RandomString(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestBadRequiredTag()
@@ -210,11 +208,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[] { Guid.NewGuid() }, Array.Empty<Guid>());
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", new Guid[] { Guid.NewGuid() }, Array.Empty<Guid>());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestBadExcludedTag()
@@ -222,11 +218,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", Array.Empty<Guid>(), new Guid[] { Guid.NewGuid() });
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SubscribeToSearch.Request(userId, Guid.Empty, StringHelper.RandomString(), "", Array.Empty<Guid>(), new Guid[] { Guid.NewGuid() });
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestSearchWithSameTagTwice()

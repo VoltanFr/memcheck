@@ -16,22 +16,22 @@ namespace MemCheck.Application.History
         [TestMethod()]
         public async Task UserNotLoggedIn()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotViewCurrentVersion()

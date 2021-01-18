@@ -109,13 +109,11 @@ namespace MemCheck.CommandLineDbClient.Pauker
 
             logger.LogDebug($"Inserting image in DB for region '{region.Name}'");
 
-            using (var stream = File.OpenRead(Path.Combine(sourceDir, region.ImageFileName)))
-            using (var reader = new BinaryReader(stream))
-            {
-                var blob = reader.ReadBytes((int)stream.Length);
-                var request = new StoreImage.Request(user, region.ImageDbName, $"Région {region.Name} dans la carte de France", region.ImageSource, "image/svg+xml", blob);
-                await new StoreImage(dbContext, new FakeStringLocalizer()).RunAsync(request);
-            }
+            using var stream = File.OpenRead(Path.Combine(sourceDir, region.ImageFileName));
+            using var reader = new BinaryReader(stream);
+            var blob = reader.ReadBytes((int)stream.Length);
+            var request = new StoreImage.Request(user, region.ImageDbName, $"Région {region.Name} dans la carte de France", region.ImageSource, "image/svg+xml", blob);
+            await new StoreImage(dbContext, new FakeStringLocalizer()).RunAsync(request);
         }
         private async Task CreateCard_WhatIsThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {

@@ -70,11 +70,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var versions = await new UserCardVersionsNotifier(dbContext, DateTime.UtcNow).RunAsync(user1);
-                Assert.AreEqual(0, versions.Length);
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var versions = await new UserCardVersionsNotifier(dbContext, DateTime.UtcNow).RunAsync(user1);
+            Assert.AreEqual(0, versions.Length);
         }
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_NotChangedSinceLastNotif()

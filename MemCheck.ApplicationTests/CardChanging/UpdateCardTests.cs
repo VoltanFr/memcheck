@@ -93,8 +93,8 @@ namespace MemCheck.Application.CardChanging
 
             var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator }) with { VersionCreatorId = newVersionCreator };
 
-            using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserInVisibilityList()
@@ -192,23 +192,21 @@ namespace MemCheck.Application.CardChanging
             var languageId = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var request = new UpdateCard.Request(
-                    card.Id,
-                    card.VersionCreator.Id,
-                    card.FrontSide,
-                    card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
-                    card.BackSide,
-                    card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
-                    card.AdditionalInfo,
-                    card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
-                    card.CardLanguage.Id,
-                    card.TagsInCards.Select(t => t.TagId),
-                    card.UsersWithView.Select(uwv => uwv.UserId),
-                    StringHelper.RandomString());
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
-            }
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new UpdateCard.Request(
+                card.Id,
+                card.VersionCreator.Id,
+                card.FrontSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
+                card.BackSide,
+                card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
+                card.AdditionalInfo,
+                card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
+                card.CardLanguage.Id,
+                card.TagsInCards.Select(t => t.TagId),
+                card.UsersWithView.Select(uwv => uwv.UserId),
+                StringHelper.RandomString());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserSubscribingToCardOnEdit()

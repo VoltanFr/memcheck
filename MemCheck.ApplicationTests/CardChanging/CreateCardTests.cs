@@ -115,25 +115,23 @@ namespace MemCheck.Application.CardChanging
             var languageId = await CardLanguagHelper.CreateAsync(testDB);
 
             Guid cardGuid = Guid.Empty;
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new CreateCard.Request(
-                    creatorId,
-                    StringHelper.RandomString(),
-                    Array.Empty<Guid>(),
-                    StringHelper.RandomString(),
-                    Array.Empty<Guid>(),
-                    StringHelper.RandomString(),
-                    Array.Empty<Guid>(),
-                    languageId,
-                    Array.Empty<Guid>(),
-                    new Guid[] { otherUser },
-                    StringHelper.RandomString());
-                var ownerMustHaveVisibility = StringHelper.RandomString();
-                var localizer = new TestLocalizer(new[] { new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility) });
-                var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
-                Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new CreateCard.Request(
+                creatorId,
+                StringHelper.RandomString(),
+                Array.Empty<Guid>(),
+                StringHelper.RandomString(),
+                Array.Empty<Guid>(),
+                StringHelper.RandomString(),
+                Array.Empty<Guid>(),
+                languageId,
+                Array.Empty<Guid>(),
+                new Guid[] { otherUser },
+                StringHelper.RandomString());
+            var ownerMustHaveVisibility = StringHelper.RandomString();
+            var localizer = new TestLocalizer(new[] { new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility) });
+            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
+            Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
         }
     }
 }

@@ -37,26 +37,20 @@ namespace MemCheck.Application
         public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
             int targetheight = originalImage.Height * targetWidth / originalImage.Width;
-            using (var resultImage = new Bitmap(targetWidth, targetheight))
-            using (var resultImageGraphics = Graphics.FromImage(resultImage))
-            {
-                resultImageGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                resultImageGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                resultImageGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                resultImageGraphics.Clear(Color.White);
-                resultImageGraphics.DrawImage(originalImage, 0, 0, targetWidth, targetheight);
-                using (var targetStream = new MemoryStream())
-                {
-                    using (EncoderParameters encoderParameters = new EncoderParameters(1))
-                    using (EncoderParameter encoderParameter = new EncoderParameter(Encoder.Quality, 80L))
-                    {
-                        encoderParameters.Param[0] = encoderParameter;
-                        var jpegCodec = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
-                        resultImage.Save(targetStream, jpegCodec, encoderParameters);
-                    }
-                    return targetStream.ToArray();
-                }
-            }
+            using var resultImage = new Bitmap(targetWidth, targetheight);
+            using var resultImageGraphics = Graphics.FromImage(resultImage);
+            resultImageGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            resultImageGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            resultImageGraphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            resultImageGraphics.Clear(Color.White);
+            resultImageGraphics.DrawImage(originalImage, 0, 0, targetWidth, targetheight);
+            using var targetStream = new MemoryStream();
+            using EncoderParameters encoderParameters = new EncoderParameters(1);
+            using EncoderParameter encoderParameter = new EncoderParameter(Encoder.Quality, 80L);
+            encoderParameters.Param[0] = encoderParameter;
+            var jpegCodec = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
+            resultImage.Save(targetStream, jpegCodec, encoderParameters);
+            return targetStream.ToArray();
         }
         private SvgDocument LoadSvg(Stream sourceStream)
         {
@@ -107,21 +101,17 @@ namespace MemCheck.Application
             image.OriginalSize = request.Blob.Length;
             image.OriginalBlob = request.Blob;
 
-            using (var sourceStream = new MemoryStream(request.Blob))
-            {
-                using (var originalImage = GetBitmap(sourceStream, request.ContentType))
-                {
-                    image.SmallBlob = ResizeImage(originalImage, 100);
-                    image.SmallBlobSize = image.SmallBlob.Length;
-                    image.MediumBlob = ResizeImage(originalImage, 600);
-                    image.MediumBlobSize = image.MediumBlob.Length;
-                    image.BigBlob = ResizeImage(originalImage, bigImageWidth);
-                    image.BigBlobSize = image.BigBlob.Length;
-                    dbContext.Images.Add(image);
-                    await dbContext.SaveChangesAsync();
-                    return image.Id;
-                }
-            }
+            using var sourceStream = new MemoryStream(request.Blob);
+            using var originalImage = GetBitmap(sourceStream, request.ContentType);
+            image.SmallBlob = ResizeImage(originalImage, 100);
+            image.SmallBlobSize = image.SmallBlob.Length;
+            image.MediumBlob = ResizeImage(originalImage, 600);
+            image.MediumBlobSize = image.MediumBlob.Length;
+            image.BigBlob = ResizeImage(originalImage, bigImageWidth);
+            image.BigBlobSize = image.BigBlob.Length;
+            dbContext.Images.Add(image);
+            await dbContext.SaveChangesAsync();
+            return image.Id;
         }
         #region Request class
         public sealed class Request : IImageMetadata

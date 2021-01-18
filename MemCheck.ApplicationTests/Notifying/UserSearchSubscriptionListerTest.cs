@@ -13,11 +13,9 @@ namespace MemCheck.Application.Tests.Notifying
         [TestMethod()]
         public async Task TestWithoutUser()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-            {
-                var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(Guid.Empty);
-                Assert.AreEqual(0, subscriptions.Length);
-            }
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(Guid.Empty);
+            Assert.AreEqual(0, subscriptions.Length);
         }
         [TestMethod()]
         public async Task TestUserWithoutSubscription()
@@ -26,11 +24,9 @@ namespace MemCheck.Application.Tests.Notifying
 
             var user = await UserHelper.CreateInDbAsync(testDB);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(user);
-                Assert.AreEqual(0, subscriptions.Length);
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(user);
+            Assert.AreEqual(0, subscriptions.Length);
         }
         [TestMethod()]
         public async Task TestUsersWithSubscriptions()
@@ -47,19 +43,17 @@ namespace MemCheck.Application.Tests.Notifying
             await SearchSubscriptionHelper.CreateAsync(testDB, user3);
             await SearchSubscriptionHelper.CreateAsync(testDB, user3);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var counter = new UserSearchSubscriptionLister(dbContext);
+            using var dbContext = new MemCheckDbContext(testDB);
+            var counter = new UserSearchSubscriptionLister(dbContext);
 
-                var user1Subscriptions = await counter.RunAsync(user1);
-                Assert.AreEqual(0, user1Subscriptions.Length);
+            var user1Subscriptions = await counter.RunAsync(user1);
+            Assert.AreEqual(0, user1Subscriptions.Length);
 
-                var user2Subscriptions = await counter.RunAsync(user2);
-                Assert.AreEqual(1, user2Subscriptions.Length);
+            var user2Subscriptions = await counter.RunAsync(user2);
+            Assert.AreEqual(1, user2Subscriptions.Length);
 
-                var user3Subscriptions = await counter.RunAsync(user3);
-                Assert.AreEqual(3, user3Subscriptions.Length);
-            }
+            var user3Subscriptions = await counter.RunAsync(user3);
+            Assert.AreEqual(3, user3Subscriptions.Length);
         }
     }
 }

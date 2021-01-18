@@ -15,22 +15,22 @@ namespace MemCheck.Application.Loading
         [TestMethod()]
         public async Task UserNotLoggedIn()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotView()
@@ -40,8 +40,8 @@ namespace MemCheck.Application.Loading
             var language = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: new[] { userId });
             var otherUserId = await UserHelper.CreateInDbAsync(db);
-            using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
         }
         [TestMethod()]
         public async Task CardWithPreviousVersion()
@@ -96,33 +96,31 @@ namespace MemCheck.Application.Loading
             var deck = await DeckHelper.CreateAsync(db, otherUserId);
             await DeckHelper.AddCardAsync(db, otherUserId, deck, card.Id, 0);
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var loaded = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
+            using var dbContext = new MemCheckDbContext(db);
+            var loaded = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
 
-                Assert.AreEqual(frontSide, loaded.FrontSide);
-                Assert.AreEqual(backSide, loaded.BackSide);
-                Assert.AreEqual(additionalInfo, loaded.AdditionalInfo);
-                Assert.AreEqual(language, loaded.LanguageId);
-                Assert.AreEqual(languageName, loaded.LanguageName);
-                Assert.AreEqual(tag, loaded.Tags.Single().TagId);
-                Assert.AreEqual(tagName, loaded.Tags.Single().TagName);
-                Assert.AreEqual(2, loaded.UsersWithVisibility.Count());
-                Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creatorId) == 1);
-                Assert.AreEqual(creatorName, loaded.UsersWithVisibility.Single(u => u.UserId == creatorId).UserName);
-                Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUserId) == 1);
-                Assert.AreEqual(otherUserName, loaded.UsersWithVisibility.Single(u => u.UserId == otherUserId).UserName);
-                Assert.AreEqual(creationDate, loaded.FirstVersionUtcDate);
-                Assert.AreEqual(creationDate, loaded.LastVersionUtcDate);
-                Assert.AreEqual(creatorName, loaded.LastVersionCreatorName);
-                Assert.AreEqual(versionDescription, loaded.LastVersionDescription);
-                Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Count());
-                Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUserName);
-                Assert.AreEqual(0, loaded.Images.Count());
-                Assert.AreEqual(0, loaded.UserRating);
-                Assert.AreEqual(0, loaded.AverageRating);
-                Assert.AreEqual(0, loaded.CountOfUserRatings);
-            }
+            Assert.AreEqual(frontSide, loaded.FrontSide);
+            Assert.AreEqual(backSide, loaded.BackSide);
+            Assert.AreEqual(additionalInfo, loaded.AdditionalInfo);
+            Assert.AreEqual(language, loaded.LanguageId);
+            Assert.AreEqual(languageName, loaded.LanguageName);
+            Assert.AreEqual(tag, loaded.Tags.Single().TagId);
+            Assert.AreEqual(tagName, loaded.Tags.Single().TagName);
+            Assert.AreEqual(2, loaded.UsersWithVisibility.Count());
+            Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creatorId) == 1);
+            Assert.AreEqual(creatorName, loaded.UsersWithVisibility.Single(u => u.UserId == creatorId).UserName);
+            Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUserId) == 1);
+            Assert.AreEqual(otherUserName, loaded.UsersWithVisibility.Single(u => u.UserId == otherUserId).UserName);
+            Assert.AreEqual(creationDate, loaded.FirstVersionUtcDate);
+            Assert.AreEqual(creationDate, loaded.LastVersionUtcDate);
+            Assert.AreEqual(creatorName, loaded.LastVersionCreatorName);
+            Assert.AreEqual(versionDescription, loaded.LastVersionDescription);
+            Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Count());
+            Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUserName);
+            Assert.AreEqual(0, loaded.Images.Count());
+            Assert.AreEqual(0, loaded.UserRating);
+            Assert.AreEqual(0, loaded.AverageRating);
+            Assert.AreEqual(0, loaded.CountOfUserRatings);
         }
     }
 }

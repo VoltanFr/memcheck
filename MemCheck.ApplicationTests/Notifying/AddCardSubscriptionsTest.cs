@@ -40,11 +40,9 @@ namespace MemCheck.Application.Tests.Notifying
             var cardCreatorId = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, cardCreatorId, userWithViewIds: new Guid[] { cardCreatorId });
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
-                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardSubscriptions(dbContext).RunAsync(request));
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
+            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardSubscriptions(dbContext).RunAsync(request));
         }
     }
 }

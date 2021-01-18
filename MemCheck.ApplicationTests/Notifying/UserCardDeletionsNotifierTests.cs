@@ -61,12 +61,10 @@ namespace MemCheck.Application.Tests.Notifying
         }
         private static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer(new[] { new KeyValuePair<string, string>("Deletion", DeletionDescription) }));
-                var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
-                await deleter.RunAsync(deletionRequest, deletionDate);
-            }
+            using var dbContext = new MemCheckDbContext(testDB);
+            var deleter = new DeleteCards(dbContext, new TestLocalizer(new[] { new KeyValuePair<string, string>("Deletion", DeletionDescription) }));
+            var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
+            await deleter.RunAsync(deletionRequest, deletionDate);
         }
         #endregion
         [TestMethod()]
@@ -75,12 +73,10 @@ namespace MemCheck.Application.Tests.Notifying
             var db = GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var notifier = new UserCardDeletionsNotifier(dbContext, DateTime.UtcNow);
-                var versions = await notifier.RunAsync(user);
-                Assert.AreEqual(0, versions.Length);
-            }
+            using var dbContext = new MemCheckDbContext(db);
+            var notifier = new UserCardDeletionsNotifier(dbContext, DateTime.UtcNow);
+            var versions = await notifier.RunAsync(user);
+            Assert.AreEqual(0, versions.Length);
         }
         [TestMethod()]
         public async Task CardWithoutPreviousVersion_NotToBeNotified()

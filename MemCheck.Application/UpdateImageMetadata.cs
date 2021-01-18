@@ -22,19 +22,15 @@ namespace MemCheck.Application
         public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
             int targetheight = originalImage.Height * targetWidth / originalImage.Width;
-            using (var resultImage = new Bitmap(targetWidth, targetheight))
-            using (var resultImageGraphics = Graphics.FromImage(resultImage))
-            {
-                resultImageGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
-                resultImageGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                resultImageGraphics.Clear(Color.White);
-                resultImageGraphics.DrawImage(originalImage, new Rectangle(0, 0, targetWidth, targetheight), new Rectangle(0, 0, originalImage.Width, originalImage.Height), GraphicsUnit.Pixel);
-                using (var targetStream = new MemoryStream())
-                {
-                    resultImage.Save(targetStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    return targetStream.ToArray();
-                }
-            }
+            using var resultImage = new Bitmap(targetWidth, targetheight);
+            using var resultImageGraphics = Graphics.FromImage(resultImage);
+            resultImageGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+            resultImageGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            resultImageGraphics.Clear(Color.White);
+            resultImageGraphics.DrawImage(originalImage, new Rectangle(0, 0, targetWidth, targetheight), new Rectangle(0, 0, originalImage.Width, originalImage.Height), GraphicsUnit.Pixel);
+            using var targetStream = new MemoryStream();
+            resultImage.Save(targetStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+            return targetStream.ToArray();
         }
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
         {
