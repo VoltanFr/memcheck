@@ -17,13 +17,13 @@ namespace MemCheck.Application.History
         public async Task UserNotLoggedIn()
         {
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
@@ -31,7 +31,7 @@ namespace MemCheck.Application.History
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotViewCurrentVersion()
@@ -45,9 +45,9 @@ namespace MemCheck.Application.History
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versions = await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(userId, card.Id));
+                var versions = await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(userId, card.Id));
                 Assert.AreEqual(2, versions.Count());
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id)));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(otherUserId, card.Id)));
             }
         }
         [TestMethod()]
@@ -89,7 +89,7 @@ namespace MemCheck.Application.History
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versions = (await new GetCardVersions(dbContext, new TestLocalizer()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).ToList();
+                var versions = (await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).ToList();
 
                 Assert.AreEqual((await dbContext.CardPreviousVersions.SingleAsync(c => c.VersionUtcDate == oldestDate)).Id, versions[2].VersionId);
                 Assert.AreEqual(oldestDate, versions[2].VersionUtcDate);

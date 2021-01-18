@@ -13,7 +13,6 @@ namespace MemCheck.Application
     public sealed class UpdateImageMetadata
     {
         #region Fields
-        private const string svgImageContentType = "image/svg+xml";
         private readonly MemCheckDbContext dbContext;
         private readonly ILocalized localizer;
         private const int minDescriptionLength = 3;

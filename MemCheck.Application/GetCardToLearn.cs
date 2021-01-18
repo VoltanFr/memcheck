@@ -28,10 +28,6 @@ namespace MemCheck.Application
         }
         #endregion
         #region Private methods
-        private IQueryable<CardInDeck> GetDeckCardsQuery(Guid deckId)
-        {
-            return dbContext.CardsInDecks.Where(card => card.DeckId.Equals(deckId)).Include(cardInDeck => cardInDeck.Card.TagsInCards).Include(cardInDeck => cardInDeck.Card.UsersWithView);
-        }
         private ResultModel? GetUnknownCard(Guid deckId, Guid cardIdToExclude1, Guid cardIdToExclude2)
         {
             var cardsOfDeck = dbContext.CardsInDecks.Where(card => card.DeckId.Equals(deckId) && card.CardId != cardIdToExclude1 && card.CardId != cardIdToExclude2)

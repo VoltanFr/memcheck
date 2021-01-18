@@ -23,7 +23,6 @@ namespace MemCheck.Application.History
         private const string BackSideImages = nameof(BackSideImages);
         private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
         private readonly MemCheckDbContext dbContext;
-        private readonly ILocalized localizer;
         #endregion
         #region Private classes
         private sealed class CardVersionFromDb
@@ -102,10 +101,9 @@ namespace MemCheck.Application.History
             public IEnumerable<string> ChangedFieldNames { get; }
         }
         #endregion
-        public GetCardVersions(MemCheckDbContext dbContext, ILocalized localizer)
+        public GetCardVersions(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
         }
         public async Task<IEnumerable<IResultCardVersion>> RunAsync(Request request)
         {
