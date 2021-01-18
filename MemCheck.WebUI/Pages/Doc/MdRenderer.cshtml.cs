@@ -11,7 +11,7 @@ namespace MemCheck.WebUI.Pages.Doc
 {
     public sealed class MdRendererModel : PageModel
     {
-        private IWebHostEnvironment environment;
+        private readonly IWebHostEnvironment environment;
         public MdRendererModel(IWebHostEnvironment environment)
         {
             this.environment = environment;
