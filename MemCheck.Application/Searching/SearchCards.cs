@@ -57,7 +57,7 @@ namespace MemCheck.Application.Searching
                 cardInDeck.NbTimesInNotLearnedHeap,
                 cardInDeck.AddToDeckUtcTime,
                 cardInDeck.LastLearnUtcTime,
-                cardInDeck.CurrentHeap == 0 ? true : heapingAlgo.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime),
+                cardInDeck.CurrentHeap == 0 || heapingAlgo.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime),
                 cardInDeck.CurrentHeap == 0 ? DateTime.MinValue : heapingAlgo.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime));
         }
         private IEnumerable<ResultCardDeckInfo> GetCardDeckInfo(ResultCardBeforeDeckInfo card, Guid userId, Dictionary<Guid, HeapingAlgorithm> heapingAlgoCache)
