@@ -26,7 +26,7 @@ namespace MemCheck.Application
             var images = dbContext.Images.AsNoTracking().Where(image => image.Id == request.ImageId).ToList();
 
             if (images.Count != 1)
-                throw new RequestInputException($"Unknown image (dbcount={images.Count()})");
+                throw new RequestInputException($"Unknown image (dbcount={images.Count})");
 
             var image = images[0];
 
