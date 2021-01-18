@@ -311,7 +311,6 @@ namespace MemCheck.WebUI.Controllers
 
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = user == null ? Guid.Empty : user.Id;
-            var userName = user?.UserName;
 
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
@@ -337,7 +336,7 @@ namespace MemCheck.WebUI.Controllers
 
             var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
 
-            var result = new RunQueryViewModel(applicationResult, userName, this);
+            var result = new RunQueryViewModel(applicationResult, this);
 
             return base.Ok(result);
         }
@@ -359,7 +358,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryViewModel
         {
-            public RunQueryViewModel(SearchCards.Result applicationResult, string? currentUser, ILocalized localizer)
+            public RunQueryViewModel(SearchCards.Result applicationResult, ILocalized localizer)
             {
                 TotalNbCards = applicationResult.TotalNbCards;
                 PageCount = applicationResult.PageCount;
