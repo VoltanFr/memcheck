@@ -18,4 +18,9 @@
     <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningLevel>5</WarningLevel>
+  </PropertyGroup>
+
 </Project>
