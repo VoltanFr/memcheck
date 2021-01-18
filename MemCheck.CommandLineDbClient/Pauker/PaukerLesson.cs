@@ -29,11 +29,8 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var cardNodes = n.SelectNodes("Card");
             if (cardNodes != null)
                 for (int i = 0; i < cardNodes.Count; i++)
-                {
-                    var cardNode = cardNodes[i] as XmlElement;
-                    if (cardNode != null)
+                    if (cardNodes[i] is XmlElement cardNode)
                         cards.Add(ReadCard(cardNode));
-                }
             return new PaukerStack(name, cards);
         }
         private static XmlElement FirstElem(XmlElement parent, string tagName)
@@ -41,8 +38,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             XmlNodeList xmlNodeList = parent.GetElementsByTagName(tagName);
             if (xmlNodeList == null)
                 throw new IOException();
-            var result = xmlNodeList[0] as XmlElement;
-            if (result == null)
+            if (xmlNodeList[0] is not XmlElement result)
                 throw new IOException();
             return result;
 
