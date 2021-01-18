@@ -11,11 +11,13 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid ownerId, string? description = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var result = new Deck();
-            result.Owner = await dbContext.Users.SingleAsync(u => u.Id == ownerId);
-            result.Description = description ?? StringHelper.RandomString();
-            result.CardInDecks = Array.Empty<CardInDeck>();
-            result.HeapingAlgorithmId = Deck.DefaultHeapingAlgorithmId;
+            var result = new Deck
+            {
+                Owner = await dbContext.Users.SingleAsync(u => u.Id == ownerId),
+                Description = description ?? StringHelper.RandomString(),
+                CardInDecks = Array.Empty<CardInDeck>(),
+                HeapingAlgorithmId = Deck.DefaultHeapingAlgorithmId
+            };
             dbContext.Decks.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

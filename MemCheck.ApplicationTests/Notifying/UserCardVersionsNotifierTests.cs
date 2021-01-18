@@ -19,15 +19,17 @@ namespace MemCheck.Application.Tests.Notifying
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
-            var result = new CardPreviousVersion();
-            result.Card = cardId;
-            result.VersionCreator = creator;
-            result.VersionUtcDate = versionDate;
-            result.VersionType = CardPreviousVersionType.Creation;
-            result.FrontSide = StringHelper.RandomString();
-            result.BackSide = StringHelper.RandomString();
-            result.AdditionalInfo = StringHelper.RandomString();
-            result.VersionDescription = StringHelper.RandomString();
+            var result = new CardPreviousVersion
+            {
+                Card = cardId,
+                VersionCreator = creator,
+                VersionUtcDate = versionDate,
+                VersionType = CardPreviousVersionType.Creation,
+                FrontSide = StringHelper.RandomString(),
+                BackSide = StringHelper.RandomString(),
+                AdditionalInfo = StringHelper.RandomString(),
+                VersionDescription = StringHelper.RandomString()
+            };
             dbContext.CardPreviousVersions.Add(result);
 
             var card = await dbContext.Cards.Where(c => c.Id == cardId).SingleAsync();
@@ -42,15 +44,17 @@ namespace MemCheck.Application.Tests.Notifying
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
-            var result = new CardPreviousVersion();
-            result.Card = previousVersion.Card;
-            result.VersionCreator = creator;
-            result.VersionUtcDate = versionDate;
-            result.VersionType = CardPreviousVersionType.Creation;
-            result.FrontSide = StringHelper.RandomString();
-            result.BackSide = StringHelper.RandomString();
-            result.AdditionalInfo = StringHelper.RandomString();
-            result.VersionDescription = StringHelper.RandomString();
+            var result = new CardPreviousVersion
+            {
+                Card = previousVersion.Card,
+                VersionCreator = creator,
+                VersionUtcDate = versionDate,
+                VersionType = CardPreviousVersionType.Creation,
+                FrontSide = StringHelper.RandomString(),
+                BackSide = StringHelper.RandomString(),
+                AdditionalInfo = StringHelper.RandomString(),
+                VersionDescription = StringHelper.RandomString()
+            };
             dbContext.CardPreviousVersions.Add(result);
 
             previousVersion.PreviousVersion = result;

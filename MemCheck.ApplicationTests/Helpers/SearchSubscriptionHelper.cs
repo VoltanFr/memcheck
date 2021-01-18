@@ -11,16 +11,18 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task<SearchSubscription> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, string? name = null, string requiredText = "", Guid? excludedDeckId = null, DateTime? lastNotificationDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var result = new SearchSubscription();
-            result.UserId = subscriberId;
-            result.Name = name ?? StringHelper.RandomString();
-            result.ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value;
-            result.RequiredText = requiredText;
-            result.RequiredTags = Array.Empty<RequiredTagInSearchSubscription>();
-            result.ExcludeAllTags = false;
-            result.ExcludedTags = Array.Empty<ExcludedTagInSearchSubscription>();
-            result.LastRunUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
-            result.RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue;
+            var result = new SearchSubscription
+            {
+                UserId = subscriberId,
+                Name = name ?? StringHelper.RandomString(),
+                ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value,
+                RequiredText = requiredText,
+                RequiredTags = Array.Empty<RequiredTagInSearchSubscription>(),
+                ExcludeAllTags = false,
+                ExcludedTags = Array.Empty<ExcludedTagInSearchSubscription>(),
+                LastRunUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue,
+                RegistrationUtcDate = lastNotificationDate != null ? lastNotificationDate.Value : DateTime.MinValue
+            };
             dbContext.SearchSubscriptions.Add(result);
             await dbContext.SaveChangesAsync();
             return result;
