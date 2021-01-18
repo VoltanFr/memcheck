@@ -32,7 +32,7 @@ namespace MemCheck.Application.Searching
                 cardsFilteredWithTags = cardsFilteredWithTags.Where(card => !card.Card.TagsInCards.Any());
             else
                 foreach (var tagId in request.RequiredTags)   //I tried to do better with an intersect between the two sets, but that failed
-                    cardsFilteredWithTags = cardsFilteredWithTags.Where(card => card.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tagId).Count() > 0);
+                    cardsFilteredWithTags = cardsFilteredWithTags.Where(card => card.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tagId).Any());
 
             var cardFilteredWithText = request.TextFilter.Length == 0 ? cardsFilteredWithTags :
                 cardsFilteredWithTags.Where(

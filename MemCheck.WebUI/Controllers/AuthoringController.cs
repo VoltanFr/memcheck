@@ -159,7 +159,7 @@ namespace MemCheck.WebUI.Controllers
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
                 CreationUtcDate = applicationResult.FirstVersionUtcDate;
                 LastChangeUtcDate = applicationResult.LastVersionUtcDate;
-                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Count() > 0 ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Any() ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
                 Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage));
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
