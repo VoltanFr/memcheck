@@ -336,7 +336,7 @@ namespace MemCheck.WebUI.Controllers
                 LastVersionUtcDate = card.LastVersionUtcDate;
                 LastVersionCreatorName = card.LastVersionCreatorName;
                 LastVersionDescription = card.LastVersionDescription;
-                InfoAboutUsage = card.UsersOwningDeckIncluding.Count() > 0 ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', card.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                InfoAboutUsage = card.UsersOwningDeckIncluding.Any() ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', card.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
                 AverageRating = card.AverageRating;
                 CountOfUserRatings = card.CountOfUserRatings;
                 SelectedVersionUtcDate = selectedVersion.VersionUtcDate;
