@@ -1,7 +1,6 @@
 ﻿using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
@@ -12,12 +11,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     public class RegisterConfirmationModel : PageModel
     {
         private readonly UserManager<MemCheckUser> _userManager;
-        private readonly IEmailSender _sender;
 
-        public RegisterConfirmationModel(UserManager<MemCheckUser> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(UserManager<MemCheckUser> userManager)
         {
             _userManager = userManager;
-            _sender = sender;
         }
 
         public string UserName { get; set; } = null!;

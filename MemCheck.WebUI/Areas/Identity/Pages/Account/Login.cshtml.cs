@@ -17,7 +17,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         #region Fields
-        private readonly UserManager<MemCheckUser> _userManager;
         private readonly IStringLocalizer<LoginModel> localizer;
         private readonly SignInManager<MemCheckUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
@@ -25,10 +24,8 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public LoginModel(SignInManager<MemCheckUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<MemCheckUser> userManager,
             IStringLocalizer<LoginModel> localizer)
         {
-            _userManager = userManager;
             this.localizer = localizer;
             _signInManager = signInManager;
             _logger = logger;

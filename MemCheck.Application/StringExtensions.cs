@@ -2,7 +2,7 @@
 {
     public static class StringExtensions
     {
-        public static string Truncate(this string str, int maxLength, bool withEllipsisIfTruncated = false)
+        public static string Truncate(this string str, int maxLength)
         {
             if (string.IsNullOrEmpty(str))
                 return "";

@@ -27,7 +27,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
 
-            var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2020, 11, 29, 20, 00, 00));
+            await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2020, 11, 29, 20, 00, 00));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

@@ -70,7 +70,7 @@ namespace MemCheck.WebUI.Controllers
             var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
             var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
-            var frontSide = $" '{applicationResult.FrontSideText.Truncate(30, true)}'";
+            var frontSide = $" '{applicationResult.FrontSideText.Truncate(30)}'";
             var mesgBody = Get("CardWithFrontSideHead") + frontSide + ' ' + Get("RemovedFromDeck") + ' ' + applicationResult.DeckName;
             return ControllerResultWithToast.Success(mesgBody, this);
         }

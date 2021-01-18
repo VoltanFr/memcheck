@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
@@ -10,14 +9,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
     public class PersonalDataModel : PageModel
     {
         private readonly UserManager<MemCheckUser> _userManager;
-        private readonly ILogger<PersonalDataModel> _logger;
 
-        public PersonalDataModel(
-            UserManager<MemCheckUser> userManager,
-            ILogger<PersonalDataModel> logger)
+        public PersonalDataModel(UserManager<MemCheckUser> userManager)
         {
             _userManager = userManager;
-            _logger = logger;
         }
 
         public async Task<IActionResult> OnGet()

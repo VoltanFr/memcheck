@@ -8,9 +8,6 @@ namespace MemCheck.WebUI.Controllers
     [Route("[controller]")]
     public class DocController : Controller
     {
-        #region Fields
-        private readonly IHttpContextFactory httpContextFactory;
-        #endregion
         #region Private methods
         private string? GetRefererRoute()
         {
@@ -25,10 +22,6 @@ namespace MemCheck.WebUI.Controllers
             return result.Substring(0, parameterIndex);
         }
         #endregion
-        public DocController(IHttpContextFactory httpContextFactory)
-        {
-            this.httpContextFactory = httpContextFactory;
-        }
         [HttpGet("")]
         public IActionResult Default()
         {

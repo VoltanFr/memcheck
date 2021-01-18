@@ -15,20 +15,14 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     public class ExternalLoginModel : PageModel
     {
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly UserManager<MemCheckUser> _userManager;
-        private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
             SignInManager<MemCheckUser> signInManager,
-            UserManager<MemCheckUser> userManager,
-            ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            ILogger<ExternalLoginModel> logger)
         {
             _signInManager = signInManager;
-            _userManager = userManager;
             _logger = logger;
-            _emailSender = emailSender;
         }
 
         [BindProperty]

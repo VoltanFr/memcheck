@@ -15,18 +15,15 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
     public partial class EmailModel : PageModel
     {
         private readonly UserManager<MemCheckUser> _userManager;
-        private readonly SignInManager<MemCheckUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly IStringLocalizer<EmailModel> localizer;
 
         public EmailModel(
             UserManager<MemCheckUser> userManager,
-            SignInManager<MemCheckUser> signInManager,
             IEmailSender emailSender,
             IStringLocalizer<EmailModel> localizer)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _emailSender = emailSender;
             this.localizer = localizer;
         }

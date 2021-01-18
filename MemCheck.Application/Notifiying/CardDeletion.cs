@@ -6,10 +6,10 @@ namespace MemCheck.Application.Notifying
     {
         public CardDeletion(string frontSide, string deletionAuthor, DateTime deletionUtcDate, string deletionDescription, bool cardIsViewable)
         {
-            FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields, true) : null;
+            FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields) : null;
             DeletionAuthor = deletionAuthor;
             DeletionUtcDate = deletionUtcDate;
-            DeletionDescription = cardIsViewable ? deletionDescription.Truncate(Notifier.MaxLengthForTextFields, true) : null;
+            DeletionDescription = cardIsViewable ? deletionDescription.Truncate(Notifier.MaxLengthForTextFields) : null;
             CardIsViewable = cardIsViewable;
         }
         public string? FrontSide { get; }

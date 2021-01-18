@@ -251,7 +251,7 @@ namespace MemCheck.Application.Searching
             public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
             {
                 CardId = cardId;
-                FrontSide = frontSide.Truncate(150, true);
+                FrontSide = frontSide.Truncate(150);
                 Tags = tags;
                 VisibleTo = visibleTo;
                 DeckInfo = deckInfo;

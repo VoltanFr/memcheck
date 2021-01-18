@@ -55,11 +55,10 @@ namespace MemCheck.Application.Notifying
                   new UserLastNotifDateUpdater(dbContext, performanceIndicators, DateTime.UtcNow),
                   new UserSearchSubscriptionLister(dbContext, performanceIndicators),
                   new UserSearchNotifier(dbContext, MaxCardsToReportPerSearch, performanceIndicators),
-                  performanceIndicators,
-                  DateTime.UtcNow)
+                  performanceIndicators)
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators, DateTime? runningUtcDate = null)
+        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;

@@ -7,10 +7,10 @@ namespace MemCheck.Application.Notifying
         public CardVersion(Guid cardId, string frontSide, string versionCreator, DateTime versionUtcDate, string versionDescription, bool cardIsViewable, Guid? versionIdOnLastNotification)
         {
             CardId = cardId;
-            FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields, true) : null;
+            FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields) : null;
             VersionCreator = versionCreator;
             VersionUtcDate = versionUtcDate;
-            VersionDescription = cardIsViewable ? versionDescription.Truncate(Notifier.MaxLengthForTextFields, true) : null;
+            VersionDescription = cardIsViewable ? versionDescription.Truncate(Notifier.MaxLengthForTextFields) : null;
             CardIsViewable = cardIsViewable;
             VersionIdOnLastNotification = versionIdOnLastNotification;
         }
