@@ -10,14 +10,12 @@ namespace MemCheck.CommandLineDbClient.Pauker
         private readonly string text;
         public PaukerCardSide(long? learnedTimestamp, string orientation, string repeatByTyping, string text)
         {
-            if (orientation == null) throw new ArgumentNullException(nameof(orientation));
-            if (repeatByTyping == null) throw new ArgumentNullException(nameof(repeatByTyping));
             if (text == null) throw new ArgumentNullException(nameof(text));
 
             this.learnedTimestamp = learnedTimestamp;
             this.text = text.Trim();
-            this.orientation = orientation;
-            this.repeatByTyping = repeatByTyping;
+            this.orientation = orientation ?? throw new ArgumentNullException(nameof(orientation));
+            this.repeatByTyping = repeatByTyping ?? throw new ArgumentNullException(nameof(repeatByTyping));
         }
         public string Text
         {
