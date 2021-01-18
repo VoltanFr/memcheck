@@ -109,6 +109,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.IsTrue(versions[0].CardIsViewable);
                 Assert.AreEqual(card.FrontSide, versions[0].FrontSide);
                 Assert.AreEqual(card.VersionDescription, versions[0].VersionDescription);
+                Assert.IsNull(versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -147,7 +148,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2), new[] { user1 });
-            await CreateCardPreviousVersionAsync(testDB, user1, card.Id, new DateTime(2020, 11, 1));
+            var previousVersion = await CreateCardPreviousVersionAsync(testDB, user1, card.Id, new DateTime(2020, 11, 1));
 
             var user2 = await UserHelper.CreateInDbAsync(testDB);
             await CardSubscriptionHelper.CreateAsync(testDB, user2, card.Id, new DateTime(2020, 11, 1));
@@ -166,6 +167,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.IsFalse(user2versions[0].CardIsViewable);
                 Assert.IsNull(user2versions[0].VersionDescription);
                 Assert.IsNull(user2versions[0].FrontSide);
+                Assert.AreEqual(previousVersion.Id, user2versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -182,7 +184,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user2 = await UserHelper.CreateInDbAsync(testDB);
 
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2), new Guid[] { user1, user2 });
-            await CreateCardPreviousVersionAsync(testDB, user1, card.Id, new DateTime(2020, 11, 1));
+            var previousVersion = await CreateCardPreviousVersionAsync(testDB, user1, card.Id, new DateTime(2020, 11, 1));
 
             await CardSubscriptionHelper.CreateAsync(testDB, user2, card.Id, new DateTime(2020, 11, 1));
             var now = new DateTime(2020, 11, 3);
@@ -193,6 +195,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                Assert.AreEqual(previousVersion.Id, versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -208,7 +211,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user1 = await UserHelper.CreateInDbAsync(testDB);
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 3));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
-            await CreateCardPreviousVersionAsync(testDB, user2, card.Id, new DateTime(2020, 11, 1));
+            var previousVersion = await CreateCardPreviousVersionAsync(testDB, user2, card.Id, new DateTime(2020, 11, 1));
             await CardSubscriptionHelper.CreateAsync(testDB, user1, card.Id, new DateTime(2020, 11, 2));
             var now = new DateTime(2020, 11, 4);
 
@@ -219,6 +222,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                Assert.AreEqual(previousVersion.Id, versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -245,6 +249,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                Assert.IsNull(versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -295,6 +300,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                Assert.AreEqual(previousVersion1.Id, versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -311,7 +317,7 @@ namespace MemCheck.Application.Tests.Notifying
             var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 5));
             var user2 = await UserHelper.CreateInDbAsync(testDB);
             var previousVersion1 = await CreateCardPreviousVersionAsync(testDB, user2, card.Id, new DateTime(2020, 11, 3));
-            await CreatePreviousVersionPreviousVersionAsync(testDB, user2, previousVersion1, new DateTime(2020, 11, 1));
+            var oldestVersion = await CreatePreviousVersionPreviousVersionAsync(testDB, user2, previousVersion1, new DateTime(2020, 11, 1));
             await CardSubscriptionHelper.CreateAsync(testDB, user1, card.Id, new DateTime(2020, 11, 2));
             var now = new DateTime(2020, 11, 5);
 
@@ -321,6 +327,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, versions.Length);
                 Assert.AreEqual(card.Id, versions[0].CardId);
                 Assert.IsTrue(versions[0].CardIsViewable);
+                Assert.AreEqual(oldestVersion.Id, versions[0].VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -338,12 +345,13 @@ namespace MemCheck.Application.Tests.Notifying
 
             var card1 = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 10));
             var card1PV1 = await CreateCardPreviousVersionAsync(testDB, user2, card1.Id, new DateTime(2020, 11, 5));
-            await CreatePreviousVersionPreviousVersionAsync(testDB, user2, card1PV1, new DateTime(2020, 11, 1));
+            var card1PV2 = await CreatePreviousVersionPreviousVersionAsync(testDB, user2, card1PV1, new DateTime(2020, 11, 1));
+            var card1Oldest = await CreatePreviousVersionPreviousVersionAsync(testDB, user2, card1PV2, new DateTime(2020, 10, 15));
             await CardSubscriptionHelper.CreateAsync(testDB, user1, card1.Id, new DateTime(2020, 11, 2));
 
             var card2 = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 10));
             var card2PV1 = await CreateCardPreviousVersionAsync(testDB, user2, card2.Id, new DateTime(2020, 11, 5));
-            await CreatePreviousVersionPreviousVersionAsync(testDB, user2, card2PV1, new DateTime(2020, 11, 2));
+            var card2Oldest = await CreatePreviousVersionPreviousVersionAsync(testDB, user2, card2PV1, new DateTime(2020, 11, 2));
             await CardSubscriptionHelper.CreateAsync(testDB, user1, card2.Id, new DateTime(2020, 11, 1));
 
             var card3 = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 10));
@@ -369,17 +377,21 @@ namespace MemCheck.Application.Tests.Notifying
 
                 var notifForCard1 = user1Versions.Where(v => v.CardId == card1.Id).Single();
                 Assert.IsTrue(notifForCard1.CardIsViewable);
+                Assert.AreEqual(card1PV2.Id, notifForCard1.VersionIdOnLastNotification);
 
                 var notifForCard2 = user1Versions.Where(v => v.CardId == card2.Id).Single();
                 Assert.IsTrue(notifForCard2.CardIsViewable);
+                Assert.IsNull(notifForCard2.VersionIdOnLastNotification);
 
                 Assert.IsFalse(user1Versions.Any(v => v.CardId == card3.Id));
 
                 var notifForCard4 = user1Versions.Where(v => v.CardId == card4.Id).Single();
                 Assert.IsFalse(notifForCard4.CardIsViewable);
+                Assert.IsNull(notifForCard4.VersionIdOnLastNotification);
 
                 var notifForCard5 = user1Versions.Where(v => v.CardId == card5.Id).Single();
                 Assert.IsTrue(notifForCard5.CardIsViewable);
+                Assert.IsNull(notifForCard5.VersionIdOnLastNotification);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))

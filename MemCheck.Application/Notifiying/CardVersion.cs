@@ -4,7 +4,7 @@ namespace MemCheck.Application.Notifying
 {
     public class CardVersion
     {
-        public CardVersion(Guid cardId, string frontSide, string versionCreator, DateTime versionUtcDate, string versionDescription, bool cardIsViewable)
+        public CardVersion(Guid cardId, string frontSide, string versionCreator, DateTime versionUtcDate, string versionDescription, bool cardIsViewable, Guid? versionIdOnLastNotification)
         {
             CardId = cardId;
             FrontSide = cardIsViewable ? frontSide.Truncate(Notifier.MaxLengthForTextFields, true) : null;
@@ -12,6 +12,7 @@ namespace MemCheck.Application.Notifying
             VersionUtcDate = versionUtcDate;
             VersionDescription = cardIsViewable ? versionDescription.Truncate(Notifier.MaxLengthForTextFields, true) : null;
             CardIsViewable = cardIsViewable;
+            VersionIdOnLastNotification = versionIdOnLastNotification;
         }
         public Guid CardId { get; }
         public string? FrontSide { get; }
@@ -19,5 +20,6 @@ namespace MemCheck.Application.Notifying
         public DateTime VersionUtcDate { get; }
         public string? VersionDescription { get; }
         public bool CardIsViewable { get; }
+        public Guid? VersionIdOnLastNotification { get; }
     }
 }

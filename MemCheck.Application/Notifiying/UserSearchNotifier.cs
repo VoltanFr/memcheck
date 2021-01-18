@@ -93,7 +93,7 @@ namespace MemCheck.Application.Notifying
                 request = request with { PageNo = request.PageNo + 1 };
                 var searcher = new SearchCards(dbContext);
                 searchResult = await searcher.RunAsync(request);
-                allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId))));
+                allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId), null)));
             }
             while (searchResult.TotalNbCards > allCardsFromSearchHashSet.Count);
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {allCardsFromSearchHashSet.Count} card versions from search (in {searchResult.PageCount} pages)");
@@ -136,7 +136,7 @@ namespace MemCheck.Application.Notifying
                     if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView))
                     {
                         countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
-                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView)));
+                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView), null));
                     }
                     else
                         countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;

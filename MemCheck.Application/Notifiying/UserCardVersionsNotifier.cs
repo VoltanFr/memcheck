@@ -22,6 +22,16 @@ namespace MemCheck.Application.Notifying
         private readonly List<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
+        #region Private methods
+        private Guid? GetCardVersionOn(Guid cardId, DateTime utc)
+        {
+            var resultVersion = dbContext.CardPreviousVersions.AsNoTracking()
+                .Where(cardVersion => cardVersion.Card == cardId && cardVersion.VersionUtcDate <= utc)
+                .OrderByDescending(cardVersion => cardVersion.VersionUtcDate)
+                .FirstOrDefault();
+            return resultVersion?.Id;
+        }
+        #endregion
         public UserCardVersionsNotifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
         {
             //Prod constructor
@@ -47,16 +57,19 @@ namespace MemCheck.Application.Notifying
                 .ToListAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's registered cards with new versions");
 
+            chrono.Restart();
             var result = cardVersions.Select(cardToReport =>
-                               new CardVersion(
-                                   cardToReport.card.Id,
-                                   cardToReport.card.FrontSide,
-                                   cardToReport.card.VersionCreator.UserName,
-                                   cardToReport.card.VersionUtcDate,
-                                   cardToReport.card.VersionDescription,
-                                   CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView)
-                               )
+                              new CardVersion(
+                                  cardToReport.card.Id,
+                                  cardToReport.card.FrontSide,
+                                  cardToReport.card.VersionCreator.UserName,
+                                  cardToReport.card.VersionUtcDate,
+                                  cardToReport.card.VersionDescription,
+                                  CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView),
+                                  GetCardVersionOn(cardToReport.card.Id, cardToReport.cardNotif.LastNotificationUtcDate)
+                              )
                         ).ToImmutableArray();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to create the result list with getting card version on last notif");
 
             chrono.Restart();
             foreach (var cardVersion in cardVersions)
