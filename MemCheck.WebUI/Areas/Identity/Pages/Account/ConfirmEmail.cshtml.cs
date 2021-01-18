@@ -26,7 +26,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             var welcome = localizer["Welcome"];
             var docLine = localizer["DocLine"];
             var url = Url.Page(pageName: $"/Doc/MdRenderer", pageHandler: null, values: null, protocol: Request.Scheme);
-            url = url + $"?cultureName={CultureInfo.CurrentCulture.TwoLetterISOLanguageName}";
+            url += $"?cultureName={CultureInfo.CurrentCulture.TwoLetterISOLanguageName}";
             var docLinkText = localizer["DocLinkText"];
             var appLine = localizer["AppLine"];
             var appUrl = HtmlEncoder.Default.Encode(Url.Page(pageName: "/Index", pageHandler: null, values: null, protocol: Request.Scheme));

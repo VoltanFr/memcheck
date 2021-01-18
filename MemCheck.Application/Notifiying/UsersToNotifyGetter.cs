@@ -28,7 +28,7 @@ namespace MemCheck.Application.Notifying
         }
         public ImmutableArray<MemCheckUser> Run(DateTime? now = null)
         {
-            now = now ?? DateTime.UtcNow;
+            now ??= DateTime.UtcNow;
             var chrono = Stopwatch.StartNew();
             var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
             //var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0;

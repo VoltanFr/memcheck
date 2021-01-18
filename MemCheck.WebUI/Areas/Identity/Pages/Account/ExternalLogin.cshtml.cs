@@ -57,7 +57,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = "/", string remoteError = "")
         {
-            returnUrl = returnUrl ?? Url.Content("~/") ?? "/";
+            returnUrl ??= Url.Content("~/") ?? "/";
             if (!string.IsNullOrEmpty(remoteError))
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";

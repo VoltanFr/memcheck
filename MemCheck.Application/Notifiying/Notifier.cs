@@ -72,7 +72,7 @@ namespace MemCheck.Application.Notifying
         public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
         {
             var chrono = Stopwatch.StartNew();
-            now = now ?? DateTime.UtcNow;
+            now ??= DateTime.UtcNow;
             var users = usersToNotifyGetter.Run(now);
             var userNotifications = new List<UserNotifications>();
             foreach (var user in users)
