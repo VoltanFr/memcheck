@@ -41,7 +41,7 @@ namespace MemCheck.Application
                 }
             }
         }
-        private ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
+        private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
         {
             switch (i.VersionType)
             {

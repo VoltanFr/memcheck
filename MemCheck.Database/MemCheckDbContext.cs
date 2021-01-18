@@ -50,7 +50,7 @@ namespace MemCheck.Database
             AddIndexesRecomendedByAzureWebSite(builder);
             EnforceAllDatesUtc(builder);
         }
-        private void CreateCompositePrimaryKeys(ModelBuilder builder)
+        private static void CreateCompositePrimaryKeys(ModelBuilder builder)
         {
             builder.Entity<CardInDeck>().HasKey(cardInDeck => new { cardInDeck.CardId, cardInDeck.DeckId });
             builder.Entity<TagInCard>().HasKey(tagInCard => new { tagInCard.CardId, tagInCard.TagId });
@@ -66,7 +66,7 @@ namespace MemCheck.Database
             builder.Entity<ExcludedTagInSearchSubscription>().HasKey(requiredTag => new { requiredTag.SearchSubscriptionId, requiredTag.TagId });
             builder.Entity<CardInSearchResult>().HasKey(cardInSearchResult => new { cardInSearchResult.SearchSubscriptionId, cardInSearchResult.CardId });
         }
-        private void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
+        private static void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
         {
             builder.Entity<CardInDeck>().HasIndex(cardInDeck => cardInDeck.CurrentHeap);
 

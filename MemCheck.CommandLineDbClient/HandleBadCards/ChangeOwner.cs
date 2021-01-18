@@ -24,21 +24,21 @@ namespace MemCheck.CommandLineDbClient.Pauker
             private Guid imageDbId = Guid.Empty;
             #endregion
             #region Private methods
-            private ImmutableArray<string> GetFields(string dataSetFileLine)
+            private static ImmutableArray<string> GetFields(string dataSetFileLine)
             {
                 IEnumerable<string> fields = dataSetFileLine.Split(';');
                 if (fields.Count() != 7)
                     throw new Exception($"Invalid line '{dataSetFileLine}'");
                 return fields.Select(field => field.Trim()).ToImmutableArray();
             }
-            private ImmutableArray<string> GetDepartments(string field, int expectedCount)
+            private static ImmutableArray<string> GetDepartments(string field, int expectedCount)
             {
                 IEnumerable<string> fields = field.Split(',');
                 if (fields.Count() != expectedCount)
                     throw new Exception($"Invalid department list '{field}'");
                 return fields.Select(field => field.Trim()).ToImmutableArray();
             }
-            private int GetDensity(string field)
+            private static int GetDensity(string field)
             {
                 var withoutBlanks = field.RemoveBlanks();
                 int commaIndec = withoutBlanks.IndexOf(',');

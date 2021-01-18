@@ -19,11 +19,11 @@ namespace MemCheck.Application.Tests.Notifying
         private static readonly string DeletionDescription = Guid.NewGuid().ToString();
         #endregion
         #region Private methods
-        private DbContextOptions<MemCheckDbContext> GetEmptyTestDB()
+        private static DbContextOptions<MemCheckDbContext> GetEmptyTestDB()
         {
             return DbHelper.GetEmptyTestDB();
         }
-        private async Task<CardPreviousVersion> CreateDeletedCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
+        private static async Task<CardPreviousVersion> CreateDeletedCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
 
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Tests.Notifying
             await dbContext.SaveChangesAsync();
             return result;
         }
-        private async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
+        private static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using (var dbContext = new MemCheckDbContext(testDB))
             {

@@ -314,7 +314,7 @@ namespace MemCheck.WebUI.Controllers
         public sealed class CardSelectedVersionDiffWithCurrentResult
         {
             #region Private methods
-            private void AddField(List<string> changedFields, List<string> unChangedFields, string fieldNameResourceId, string fieldValueInCard, string fieldValueInSelectedVersion, ILocalized localizer)
+            private static void AddField(List<string> changedFields, List<string> unChangedFields, string fieldNameResourceId, string fieldValueInCard, string fieldValueInSelectedVersion, ILocalized localizer)
             {
                 if (fieldValueInCard == fieldValueInSelectedVersion)
                     unChangedFields.Add($"<strong>{localizer.Get(fieldNameResourceId)}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.Get("Empty"))}");

@@ -16,7 +16,7 @@ namespace MemCheck.Application
         private readonly ILocalized localizer;
         #endregion
         #region Private methods
-        private ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
+        private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
         {
             switch (i.VersionType)
             {

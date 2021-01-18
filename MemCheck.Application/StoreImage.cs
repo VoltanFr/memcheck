@@ -35,7 +35,7 @@ namespace MemCheck.Application
         {
             return new HashSet<string>(new string[] { svgImageContentType, "image/jpeg", "image/png", "image/gif" }).ToImmutableHashSet();
         }
-        public byte[] ResizeImage(Bitmap originalImage, int targetWidth)
+        public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
             int targetheight = originalImage.Height * targetWidth / originalImage.Width;
             using (var resultImage = new Bitmap(targetWidth, targetheight))

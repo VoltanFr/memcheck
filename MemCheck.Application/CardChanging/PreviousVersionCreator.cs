@@ -48,7 +48,7 @@ namespace MemCheck.Application.CardChanging
             }
             cardPreviousVersion.Images = imagesInCards;
         }
-        private CardPreviousVersionType CardPreviousVersionTypeFromCard(Card c)
+        private static CardPreviousVersionType CardPreviousVersionTypeFromCard(Card c)
         {
             switch (c.VersionType)
             {

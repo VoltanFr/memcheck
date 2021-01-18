@@ -24,7 +24,7 @@ namespace MemCheck.WebUI.Pages.Admin
         {
             this.currentEnvironment = currentEnvironment;
         }
-        private string GetDisplayInfoForAssembly(Assembly? a)
+        private static string GetDisplayInfoForAssembly(Assembly? a)
         {
             if (a == null)
                 return "Unknown";

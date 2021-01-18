@@ -80,7 +80,7 @@ namespace MemCheck.WebUI.Controllers
         public sealed class GetCardsCardViewModel
         {
             #region Private methods
-            private string RenderMarkdown(string markdown)
+            private static string RenderMarkdown(string markdown)
             {
                 return markdown;
                 //if (string.IsNullOrEmpty(markdown))
