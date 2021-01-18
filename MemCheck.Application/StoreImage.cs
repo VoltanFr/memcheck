@@ -92,14 +92,16 @@ namespace MemCheck.Application
             if (dbContext.Images.Where(image => EF.Functions.Like(image.Name, request.Name)).Any())
                 throw new RequestInputException(localizer.Get("ImageAlreadyExists") + $" '{request.Name}'");
 
-            var image = new Domain.Image();
-            image.Name = request.Name;
-            image.Description = request.Description;
-            image.Source = request.Source;
-            image.Owner = request.Owner;
-            image.VersionDescription = localizer.Get("InitialImageVersionCreation");
-            image.VersionType = ImageVersionType.Creation;
-            image.InitialUploadUtcDate = DateTime.UtcNow;
+            var image = new Domain.Image
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Source = request.Source,
+                Owner = request.Owner,
+                VersionDescription = localizer.Get("InitialImageVersionCreation"),
+                VersionType = ImageVersionType.Creation,
+                InitialUploadUtcDate = DateTime.UtcNow
+            };
             image.LastChangeUtcDate = image.InitialUploadUtcDate;
 
             image.OriginalContentType = request.ContentType;

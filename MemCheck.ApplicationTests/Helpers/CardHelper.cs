@@ -22,13 +22,15 @@ namespace MemCheck.Application.Tests.Helpers
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
-            var result = new Card();
-            result.VersionCreator = creator;
-            result.FrontSide = frontSide ?? StringHelper.RandomString();
-            result.BackSide = backSide ?? StringHelper.RandomString();
-            result.AdditionalInfo = additionalInfo ?? StringHelper.RandomString();
-            result.VersionDescription = versionDescription ?? StringHelper.RandomString();
-            result.VersionType = CardVersionType.Creation;
+            var result = new Card
+            {
+                VersionCreator = creator,
+                FrontSide = frontSide ?? StringHelper.RandomString(),
+                BackSide = backSide ?? StringHelper.RandomString(),
+                AdditionalInfo = additionalInfo ?? StringHelper.RandomString(),
+                VersionDescription = versionDescription ?? StringHelper.RandomString(),
+                VersionType = CardVersionType.Creation
+            };
             if (language != null)
                 result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);
             if (versionDate != null)
@@ -44,9 +46,7 @@ namespace MemCheck.Application.Tests.Helpers
                 Assert.IsTrue(userWithViewIds.Any(id => id == versionCreatorId), "Version creator must be allowed to view");
                 foreach (var userWithViewId in userWithViewIds)
                 {
-                    var userWithView = new UserWithViewOnCard();
-                    userWithView.CardId = result.Id;
-                    userWithView.UserId = userWithViewId;
+                    var userWithView = new UserWithViewOnCard { CardId = result.Id, UserId = userWithViewId };
                     dbContext.UsersWithViewOnCards.Add(userWithView);
                     usersWithView.Add(userWithView);
                 }
@@ -57,9 +57,11 @@ namespace MemCheck.Application.Tests.Helpers
             if (tagIds != null)
                 foreach (var tagId in tagIds)
                 {
-                    var tagInCard = new TagInCard();
-                    tagInCard.CardId = result.Id;
-                    tagInCard.TagId = tagId;
+                    var tagInCard = new TagInCard
+                    {
+                        CardId = result.Id,
+                        TagId = tagId
+                    };
                     dbContext.TagsInCards.Add(tagInCard);
                     tags.Add(tagInCard);
                 }

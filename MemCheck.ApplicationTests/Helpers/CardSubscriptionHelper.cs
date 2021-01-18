@@ -11,9 +11,7 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid subscriberId, Guid cardId, DateTime? lastNotificationDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var notif = new CardNotificationSubscription();
-            notif.CardId = cardId;
-            notif.UserId = subscriberId;
+            var notif = new CardNotificationSubscription { CardId = cardId, UserId = subscriberId };
             if (lastNotificationDate != null)
                 notif.LastNotificationUtcDate = lastNotificationDate.Value;
             dbContext.CardNotifications.Add(notif);

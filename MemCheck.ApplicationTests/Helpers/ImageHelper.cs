@@ -12,24 +12,26 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.SingleAsync(u => u.Id == creatorId);
-            var result = new Image();
-            result.Owner = creator;
-            result.Name = name ?? StringHelper.RandomString();
-            result.Description = StringHelper.RandomString();
-            result.Source = StringHelper.RandomString();
-            result.InitialUploadUtcDate = DateTime.UtcNow;
-            result.LastChangeUtcDate = DateTime.UtcNow;
-            result.VersionDescription = StringHelper.RandomString();
-            result.VersionType = ImageVersionType.Creation;
-            result.OriginalContentType = "InvalidForUnitTests";
-            result.OriginalSize = 1;
-            result.OriginalBlob = new[] { (byte)0 };
-            result.SmallBlobSize = 1;
-            result.SmallBlob = new[] { (byte)0 };
-            result.MediumBlobSize = 1;
-            result.MediumBlob = new[] { (byte)0 };
-            result.BigBlobSize = 1;
-            result.BigBlob = new[] { (byte)0 };
+            var result = new Image
+            {
+                Owner = creator,
+                Name = name ?? StringHelper.RandomString(),
+                Description = StringHelper.RandomString(),
+                Source = StringHelper.RandomString(),
+                InitialUploadUtcDate = DateTime.UtcNow,
+                LastChangeUtcDate = DateTime.UtcNow,
+                VersionDescription = StringHelper.RandomString(),
+                VersionType = ImageVersionType.Creation,
+                OriginalContentType = "InvalidForUnitTests",
+                OriginalSize = 1,
+                OriginalBlob = new[] { (byte)0 },
+                SmallBlobSize = 1,
+                SmallBlob = new[] { (byte)0 },
+                MediumBlobSize = 1,
+                MediumBlob = new[] { (byte)0 },
+                BigBlobSize = 1,
+                BigBlob = new[] { (byte)0 }
+            };
             dbContext.Images.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

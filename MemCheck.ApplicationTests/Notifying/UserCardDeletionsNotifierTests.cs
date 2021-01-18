@@ -30,15 +30,17 @@ namespace MemCheck.Application.Tests.Notifying
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
 
-            var result = new CardPreviousVersion();
-            result.Card = Guid.NewGuid();
-            result.VersionCreator = creator;
-            result.FrontSide = Guid.NewGuid().ToString();
-            result.BackSide = Guid.NewGuid().ToString();
-            result.AdditionalInfo = Guid.NewGuid().ToString();
-            result.VersionDescription = Guid.NewGuid().ToString();
-            result.VersionType = CardPreviousVersionType.Deletion;
-            result.VersionUtcDate = versionDate;
+            var result = new CardPreviousVersion
+            {
+                Card = Guid.NewGuid(),
+                VersionCreator = creator,
+                FrontSide = Guid.NewGuid().ToString(),
+                BackSide = Guid.NewGuid().ToString(),
+                AdditionalInfo = Guid.NewGuid().ToString(),
+                VersionDescription = Guid.NewGuid().ToString(),
+                VersionType = CardPreviousVersionType.Deletion,
+                VersionUtcDate = versionDate
+            };
             dbContext.CardPreviousVersions.Add(result);
 
             var usersWithView = new List<UserWithViewOnCardPreviousVersion>();
@@ -47,9 +49,7 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.IsTrue(userWithViewIds.Any(id => id == versionCreatorId), "Version creator must be allowed to view");
                 foreach (var userWithViewId in userWithViewIds)
                 {
-                    var userWithView = new UserWithViewOnCardPreviousVersion();
-                    userWithView.CardPreviousVersionId = result.Id;
-                    userWithView.AllowedUserId = userWithViewId;
+                    var userWithView = new UserWithViewOnCardPreviousVersion { CardPreviousVersionId = result.Id, AllowedUserId = userWithViewId };
                     dbContext.UsersWithViewOnCardPreviousVersions.Add(userWithView);
                     usersWithView.Add(userWithView);
                 }

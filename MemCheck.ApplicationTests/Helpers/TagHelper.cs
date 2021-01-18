@@ -11,8 +11,7 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, string? name = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var result = new Tag();
-            result.Name = name ?? StringHelper.RandomString();
+            var result = new Tag { Name = name ?? StringHelper.RandomString() };
             dbContext.Tags.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;

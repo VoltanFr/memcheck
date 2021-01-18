@@ -18,12 +18,13 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
         {
-            var result = new MemCheckUser();
-            result.MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs;
-            result.LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue;
-            result.SubscribeToCardOnEdit = subscribeToCardOnEdit;
-            result.UserName = userName ?? StringHelper.RandomString();
-            return result;
+            return new MemCheckUser
+            {
+                MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
+                LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
+                SubscribeToCardOnEdit = subscribeToCardOnEdit,
+                UserName = userName ?? StringHelper.RandomString()
+            };
         }
     }
 }
