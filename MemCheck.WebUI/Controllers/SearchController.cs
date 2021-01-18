@@ -363,7 +363,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 TotalNbCards = applicationResult.TotalNbCards;
                 PageCount = applicationResult.PageCount;
-                Cards = applicationResult.Cards.Select(card => new RunQueryCardViewModel(card, currentUser, localizer));
+                Cards = applicationResult.Cards.Select(card => new RunQueryCardViewModel(card, localizer));
             }
             public int TotalNbCards { get; }
             public int PageCount { get; }
@@ -371,7 +371,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class RunQueryCardViewModel
         {
-            public RunQueryCardViewModel(SearchCards.ResultCard card, string? currentUser, ILocalized localizer)
+            public RunQueryCardViewModel(SearchCards.ResultCard card, ILocalized localizer)
             {
                 CardId = card.CardId;
                 FrontSide = card.FrontSide;
