@@ -16,9 +16,7 @@ namespace MemCheck.Application.QueryValidation
         #region Private methods
         private static ImmutableHashSet<Guid> GetReservedGuids()
         {
-            var result = new HashSet<Guid>();
-            result.Add(Guid.Empty);
-            result.Add(new Guid("11111111-1111-1111-1111-111111111111"));
+            var result = new HashSet<Guid> { Guid.Empty, new Guid("11111111-1111-1111-1111-111111111111") };
             return result.ToImmutableHashSet();
         }
         #endregion
