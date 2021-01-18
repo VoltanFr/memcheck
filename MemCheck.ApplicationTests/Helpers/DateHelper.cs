@@ -5,7 +5,7 @@ namespace MemCheck.Application.Tests.Helpers
     public static class DateHelper
     {
         #region Private field random
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
         #endregion
         public static DateTime Random(DateTime? after = null)
         {
