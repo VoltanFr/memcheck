@@ -23,9 +23,8 @@ namespace MemCheck.WebUI.Controllers
         private IEnumerable<string> GetSupportedUILanguages()
         {
             var requestCulture = HttpContext.Features.Get<IRequestCultureFeature>();
-            var provider = requestCulture.Provider as RequestCultureProvider;
-            if (provider == null) throw new InvalidProgramException("requestCulture.Provider as RequestCultureProvider returns null");
-            return provider.Options.SupportedUICultures.Select<System.Globalization.CultureInfo, string>(c => c.Name);
+            if (requestCulture.Provider is not RequestCultureProvider provider) throw new InvalidProgramException("requestCulture.Provider as RequestCultureProvider returns null");
+            return provider.Options.SupportedUICultures.Select(c => c.Name);
         }
         #endregion
         public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager) : base()
