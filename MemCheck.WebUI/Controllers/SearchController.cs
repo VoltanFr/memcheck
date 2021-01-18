@@ -311,7 +311,7 @@ namespace MemCheck.WebUI.Controllers
 
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = user == null ? Guid.Empty : user.Id;
-            var userName = user == null ? null : user.UserName;
+            var userName = user?.UserName;
 
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
