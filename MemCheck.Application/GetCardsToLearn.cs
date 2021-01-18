@@ -170,8 +170,8 @@ namespace MemCheck.Application
             }
             private static IEnumerable<T> Shuffle<T>(IEnumerable<T> source, Random rng)
             {
-                if (source == null) throw new ArgumentNullException("source");
-                if (rng == null) throw new ArgumentNullException("rng");
+                if (source == null) throw new ArgumentNullException(nameof(source));
+                if (rng == null) throw new ArgumentNullException(nameof(rng));
 
                 return ShuffleIterator(source, rng);
             }
