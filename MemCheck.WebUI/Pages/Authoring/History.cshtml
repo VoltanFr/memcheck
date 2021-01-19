@@ -23,8 +23,9 @@
             <h1 class="title">@Localizer["VersionHistory"]</h1>
         </div>
         <ul class="card-history-ul">
-            <li v-for="version in versions" class="card-history-li">
-                <strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong><br />
+            <li v-for="(version, index) in versions" class="card-history-li">
+                <span v-if="index==0"><a v-bind:href="'/Authoring/Index?CardId='+cardId"><strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong></a><br /></span>
+                <span v-if="index!=0"><strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong><br /></span>
                 @Localizer["ModifiedFields"] {{version.changedFieldList}}
                 <span v-if="version.versionId">
                     <br />
