@@ -26,7 +26,7 @@ namespace MemCheck.Application.Tests.Helpers
                 result = random.Next();
             return result;
         }
-        public static int RandomHeap()
+        public static int Heap()
         {
             return random.Next(CardInDeck.MaxHeapValue);
         }
