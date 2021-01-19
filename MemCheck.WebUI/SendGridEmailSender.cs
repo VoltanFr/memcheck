@@ -15,37 +15,28 @@ namespace MemCheck.WebUI
 
     public class SendGridEmailSender : IEmailSender
     {
+        #region fields
+        private readonly AuthMessageSenderOptions options;
+        #endregion
         public SendGridEmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
         {
-            Options = optionsAccessor.Value;
+            options = optionsAccessor.Value;
         }
-
-        public AuthMessageSenderOptions Options { get; } //set only via Secret Manager
-
-        public Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string email, string subject, string message)
         {
-            return Execute(Options.SendGridKey, subject, message, email);
-        }
-
-        public Task Execute(string apiKey, string subject, string message, string email)
-        {
-            var client = new SendGridClient(apiKey);
-            var senderEmail = new EmailAddress(Options.SendGridSender, Options.SendGridUser);
+            var client = new SendGridClient(options.SendGridKey);
+            var senderEmail = new EmailAddress(options.SendGridSender, options.SendGridUser);
             var msg = new SendGridMessage()
             {
                 From = senderEmail,
                 Subject = subject,
                 PlainTextContent = message,
-                HtmlContent = message
+                HtmlContent = message,
             };
             msg.AddTo(new EmailAddress(email));
-            msg.AddBcc(new EmailAddress(Options.SendGridSender));
-
-            // Disable click tracking.
-            // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
+            msg.AddBcc(new EmailAddress(options.SendGridSender));
             msg.SetClickTracking(false, false);
-
-            return client.SendEmailAsync(msg);
+            await client.SendEmailAsync(msg);
         }
     }
 }
