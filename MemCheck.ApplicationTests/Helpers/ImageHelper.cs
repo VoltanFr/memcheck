@@ -15,12 +15,12 @@ namespace MemCheck.Application.Tests.Helpers
             var result = new Image
             {
                 Owner = creator,
-                Name = name ?? StringHelper.RandomString(),
-                Description = StringHelper.RandomString(),
-                Source = StringHelper.RandomString(),
+                Name = name ?? RandomHelper.String(),
+                Description = RandomHelper.String(),
+                Source = RandomHelper.String(),
                 InitialUploadUtcDate = DateTime.UtcNow,
                 LastChangeUtcDate = DateTime.UtcNow,
-                VersionDescription = StringHelper.RandomString(),
+                VersionDescription = RandomHelper.String(),
                 VersionType = ImageVersionType.Creation,
                 OriginalContentType = "InvalidForUnitTests",
                 OriginalSize = 1,

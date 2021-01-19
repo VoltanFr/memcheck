@@ -3,6 +3,7 @@ using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace MemCheck.Application.Tests.Helpers
 {
@@ -33,6 +34,18 @@ namespace MemCheck.Application.Tests.Helpers
         public static int HeapingAlgorithm()
         {
             return Entry(HeapingAlgorithms.Instance.Ids);
+        }
+        public static string String(int? length = null)
+        {
+            var result = new StringBuilder();
+            do
+            {
+                result.Append(Guid.NewGuid().ToString());
+            }
+            while (length != null && result.Length < length);
+            if (length != null)
+                result.Length = length.Value;
+            return result.ToString();
         }
     }
 }

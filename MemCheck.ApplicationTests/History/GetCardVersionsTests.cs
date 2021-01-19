@@ -54,26 +54,26 @@ namespace MemCheck.Application.History
         public async Task MultipleVersions()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var userName = StringHelper.RandomString();
+            var userName = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var language = await CardLanguagHelper.CreateAsync(db);
             var oldestDate = DateHelper.Random();
-            var oldestDescription = StringHelper.RandomString();
+            var oldestDescription = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, userId, language: language, versionDate: oldestDate, versionDescription: oldestDescription);
 
-            var otherUserName = StringHelper.RandomString();
+            var otherUserName = RandomHelper.String();
             var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
             var intermediaryDate = DateHelper.Random();
-            var intermediaryDescription = StringHelper.RandomString();
+            var intermediaryDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var request = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), versionCreator: otherUserId, versionDescription: intermediaryDescription);
-                request = request with { AdditionalInfo = StringHelper.RandomString() };
+                var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: otherUserId, versionDescription: intermediaryDescription);
+                request = request with { AdditionalInfo = RandomHelper.String() };
                 await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer(), intermediaryDate);
             }
 
             var newestDate = DateHelper.Random();
-            var newestDescription = StringHelper.RandomString();
+            var newestDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardFromDb = await dbContext.Cards
@@ -84,7 +84,7 @@ namespace MemCheck.Application.History
                     .Include(c => c.TagsInCards)
                     .Include(c => c.UsersWithView)
                     .SingleAsync(c => c.Id == card.Id);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, StringHelper.RandomString(), versionDescription: newestDescription, versionCreator: userId), new TestLocalizer(), newestDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, RandomHelper.String(), versionDescription: newestDescription, versionCreator: userId), new TestLocalizer(), newestDate);
             }
 
             using (var dbContext = new MemCheckDbContext(db))

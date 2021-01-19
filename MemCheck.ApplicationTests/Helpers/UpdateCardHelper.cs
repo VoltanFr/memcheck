@@ -22,7 +22,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 tagIds,
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForVisibilityChange(Card card, IEnumerable<Guid> userWithViewIds, Guid? versionCreator = null, string? versionDescription = null)
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 userWithViewIds,
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForFrontSideChange(Card card, string frontSide, Guid? versionCreator = null, string? versionDescription = null)
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForBackSideChange(Card card, string backSide, Guid? versionCreator = null, string? versionDescription = null)
@@ -73,7 +73,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForAdditionalInfoChange(Card card, string additionalInfo, Guid? versionCreator = null, string? versionDescription = null)
@@ -90,7 +90,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForLanguageChange(Card card, Guid newLanguageId, Guid? versionCreator = null, string? versionDescription = null)
@@ -107,7 +107,7 @@ namespace MemCheck.Application.Tests.Helpers
                 newLanguageId,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForFrontSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
@@ -124,7 +124,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForBackSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
@@ -141,7 +141,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
         public static UpdateCard.Request RequestForAdditionalSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
@@ -158,7 +158,7 @@ namespace MemCheck.Application.Tests.Helpers
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
-                versionDescription ?? StringHelper.RandomString()
+                versionDescription ?? RandomHelper.String()
                 );
         }
     }

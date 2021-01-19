@@ -25,10 +25,10 @@ namespace MemCheck.Application.Tests.Helpers
             var result = new Card
             {
                 VersionCreator = creator,
-                FrontSide = frontSide ?? StringHelper.RandomString(),
-                BackSide = backSide ?? StringHelper.RandomString(),
-                AdditionalInfo = additionalInfo ?? StringHelper.RandomString(),
-                VersionDescription = versionDescription ?? StringHelper.RandomString(),
+                FrontSide = frontSide ?? RandomHelper.String(),
+                BackSide = backSide ?? RandomHelper.String(),
+                AdditionalInfo = additionalInfo ?? RandomHelper.String(),
+                VersionDescription = versionDescription ?? RandomHelper.String(),
                 VersionType = CardVersionType.Creation
             };
             if (language != null)

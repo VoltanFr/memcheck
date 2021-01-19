@@ -24,7 +24,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(Guid.Empty, deck, StringHelper.RandomString(), 0);
+            var request = new UpdateDeck.Request(Guid.Empty, deck, RandomHelper.String(), 0);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -35,7 +35,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(Guid.NewGuid(), deck, StringHelper.RandomString(), 0);
+            var request = new UpdateDeck.Request(Guid.NewGuid(), deck, RandomHelper.String(), 0);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -45,7 +45,7 @@ namespace MemCheck.Application.DeckChanging
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, Guid.NewGuid(), StringHelper.RandomString(), 0);
+            var request = new UpdateDeck.Request(user, Guid.NewGuid(), RandomHelper.String(), 0);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -57,7 +57,7 @@ namespace MemCheck.Application.DeckChanging
             var otherUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(otherUser, deck, StringHelper.RandomString(), RandomHelper.HeapingAlgorithm());
+            var request = new UpdateDeck.Request(otherUser, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -68,7 +68,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, StringHelper.RandomString() + '\t', 0);
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String() + '\t', 0);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -79,7 +79,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, StringHelper.RandomString(UpdateDeck.Request.MinNameLength - 1), 0);
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(UpdateDeck.Request.MinNameLength - 1), 0);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -90,7 +90,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, StringHelper.RandomString(UpdateDeck.Request.MaxNameLength + 1), 0);
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(UpdateDeck.Request.MaxNameLength + 1), 0);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -99,7 +99,7 @@ namespace MemCheck.Application.DeckChanging
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
-            var otherDeckName = StringHelper.RandomString();
+            var otherDeckName = RandomHelper.String();
             await DeckHelper.CreateAsync(db, user, otherDeckName);
 
             using var dbContext = new MemCheckDbContext(db);
@@ -114,7 +114,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, StringHelper.RandomString(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids));
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids));
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -124,7 +124,7 @@ namespace MemCheck.Application.DeckChanging
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
 
-            var newName = StringHelper.RandomString();
+            var newName = RandomHelper.String();
             int newAlgo = RandomHelper.HeapingAlgorithm();
             var request = new UpdateDeck.Request(user, deck, newName, newAlgo);
 
@@ -147,7 +147,7 @@ namespace MemCheck.Application.DeckChanging
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddCardAsync(db, user, deck, card.Id, RandomHelper.Heap());
 
-            var request = new UpdateDeck.Request(user, deck, StringHelper.RandomString(), RandomHelper.HeapingAlgorithm());
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
 
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer());

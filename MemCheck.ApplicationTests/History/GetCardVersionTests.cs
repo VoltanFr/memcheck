@@ -56,24 +56,24 @@ namespace MemCheck.Application.History
             var db = DbHelper.GetEmptyTestDB();
             var language = await CardLanguagHelper.CreateAsync(db);
 
-            var initialVersionCreatorName = StringHelper.RandomString();
+            var initialVersionCreatorName = RandomHelper.String();
             var initialVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: initialVersionCreatorName);
             var initialVersionDate = DateHelper.Random();
-            var initialVersionDescription = StringHelper.RandomString();
-            var initialVersionFrontSide = StringHelper.RandomString();
+            var initialVersionDescription = RandomHelper.String();
+            var initialVersionFrontSide = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, initialVersionCreatorId, language: language, versionDate: initialVersionDate, versionDescription: initialVersionDescription, frontSide: initialVersionFrontSide);
 
-            var intermediaryVersionCreatorName = StringHelper.RandomString();
+            var intermediaryVersionCreatorName = RandomHelper.String();
             var intermediaryVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: intermediaryVersionCreatorName);
             var intermediaryVersionDate = DateHelper.Random();
-            var intermediaryVersionDescription = StringHelper.RandomString();
-            var intermediaryVersionFrontSide = StringHelper.RandomString();
+            var intermediaryVersionDescription = RandomHelper.String();
+            var intermediaryVersionFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryVersionFrontSide, versionCreator: intermediaryVersionCreatorId, versionDescription: intermediaryVersionDescription), new TestLocalizer(), intermediaryVersionDate);
 
             using (var dbContext = new MemCheckDbContext(db))
                 //We need a new version to exist but don't mind about its contents
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, StringHelper.RandomString(), versionDescription: StringHelper.RandomString(), versionCreator: initialVersionCreatorId), new TestLocalizer(), DateHelper.Random());
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(), versionCreator: initialVersionCreatorId), new TestLocalizer(), DateHelper.Random());
 
             using (var dbContext = new MemCheckDbContext(db))
             {

@@ -21,7 +21,7 @@ namespace MemCheck.Application.CardChanging
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new PreviousVersionCreator(dbContext);
-                await request.RunAsync(card.Id, ownerId, StringHelper.RandomString());
+                await request.RunAsync(card.Id, ownerId, RandomHelper.String());
                 await dbContext.SaveChangesAsync();
             }
 
@@ -43,7 +43,7 @@ namespace MemCheck.Application.CardChanging
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new PreviousVersionCreator(dbContext);
-                await request.RunAsync(card.Id, newVersionCreatorId, StringHelper.RandomString());
+                await request.RunAsync(card.Id, newVersionCreatorId, RandomHelper.String());
                 await dbContext.SaveChangesAsync();
             }
 

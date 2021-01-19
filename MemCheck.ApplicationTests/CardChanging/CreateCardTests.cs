@@ -21,10 +21,10 @@ namespace MemCheck.Application.CardChanging
             var userWithViewId = await UserHelper.CreateInDbAsync(testDB);
 
             var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: false);
-            var frontSide = StringHelper.RandomString();
-            var backSide = StringHelper.RandomString();
-            var additionalInfo = StringHelper.RandomString();
-            var versionDescription = StringHelper.RandomString();
+            var frontSide = RandomHelper.String();
+            var backSide = RandomHelper.String();
+            var additionalInfo = RandomHelper.String();
+            var versionDescription = RandomHelper.String();
 
             var languageId = await CardLanguagHelper.CreateAsync(testDB);
             var imageOnFrontSideId = await ImageHelper.CreateAsync(testDB, ownerId);
@@ -90,16 +90,16 @@ namespace MemCheck.Application.CardChanging
             {
                 var request = new CreateCard.Request(
                     ownerId,
-                    StringHelper.RandomString(),
+                    RandomHelper.String(),
                     Array.Empty<Guid>(),
-                    StringHelper.RandomString(),
+                    RandomHelper.String(),
                     Array.Empty<Guid>(),
-                    StringHelper.RandomString(),
+                    RandomHelper.String(),
                     Array.Empty<Guid>(),
                     languageId,
                     Array.Empty<Guid>(),
                     Array.Empty<Guid>(),
-                    StringHelper.RandomString());
+                    RandomHelper.String());
                 cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
             }
 
@@ -118,17 +118,17 @@ namespace MemCheck.Application.CardChanging
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new CreateCard.Request(
                 creatorId,
-                StringHelper.RandomString(),
+                RandomHelper.String(),
                 Array.Empty<Guid>(),
-                StringHelper.RandomString(),
+                RandomHelper.String(),
                 Array.Empty<Guid>(),
-                StringHelper.RandomString(),
+                RandomHelper.String(),
                 Array.Empty<Guid>(),
                 languageId,
                 Array.Empty<Guid>(),
                 new Guid[] { otherUser },
-                StringHelper.RandomString());
-            var ownerMustHaveVisibility = StringHelper.RandomString();
+                RandomHelper.String());
+            var ownerMustHaveVisibility = RandomHelper.String();
             var localizer = new TestLocalizer(new[] { new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility) });
             var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);

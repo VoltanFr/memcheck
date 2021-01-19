@@ -25,10 +25,10 @@ namespace MemCheck.Application.Tests.Notifying
                 VersionCreator = creator,
                 VersionUtcDate = versionDate,
                 VersionType = CardPreviousVersionType.Creation,
-                FrontSide = StringHelper.RandomString(),
-                BackSide = StringHelper.RandomString(),
-                AdditionalInfo = StringHelper.RandomString(),
-                VersionDescription = StringHelper.RandomString()
+                FrontSide = RandomHelper.String(),
+                BackSide = RandomHelper.String(),
+                AdditionalInfo = RandomHelper.String(),
+                VersionDescription = RandomHelper.String()
             };
             dbContext.CardPreviousVersions.Add(result);
 
@@ -50,10 +50,10 @@ namespace MemCheck.Application.Tests.Notifying
                 VersionCreator = creator,
                 VersionUtcDate = versionDate,
                 VersionType = CardPreviousVersionType.Creation,
-                FrontSide = StringHelper.RandomString(),
-                BackSide = StringHelper.RandomString(),
-                AdditionalInfo = StringHelper.RandomString(),
-                VersionDescription = StringHelper.RandomString()
+                FrontSide = RandomHelper.String(),
+                BackSide = RandomHelper.String(),
+                AdditionalInfo = RandomHelper.String(),
+                VersionDescription = RandomHelper.String()
             };
             dbContext.CardPreviousVersions.Add(result);
 

@@ -53,11 +53,11 @@ namespace MemCheck.Application.Loading
             var firstVersionDate = DateHelper.Random();
             var card = await CardHelper.CreateAsync(db, firstVersionCreatorId, language: language, versionDate: firstVersionDate);
 
-            var lastVersionCreatorName = StringHelper.RandomString();
+            var lastVersionCreatorName = RandomHelper.String();
             var lastVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: lastVersionCreatorName);
             var lastVersionDate = DateHelper.Random();
-            var lastVersionDescription = StringHelper.RandomString();
-            var lastVersionFrontSide = StringHelper.RandomString();
+            var lastVersionDescription = RandomHelper.String();
+            var lastVersionFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, lastVersionFrontSide, versionCreator: lastVersionCreatorId, versionDescription: lastVersionDescription), new TestLocalizer(), lastVersionDate);
 
@@ -78,19 +78,19 @@ namespace MemCheck.Application.Loading
         public async Task CheckAllFields()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var languageName = StringHelper.RandomString();
+            var languageName = RandomHelper.String();
             var language = await CardLanguagHelper.CreateAsync(db, languageName);
-            var creatorName = StringHelper.RandomString();
+            var creatorName = RandomHelper.String();
             var creatorId = await UserHelper.CreateInDbAsync(db, userName: creatorName);
             var creationDate = DateHelper.Random();
-            var frontSide = StringHelper.RandomString();
-            var backSide = StringHelper.RandomString();
-            var additionalInfo = StringHelper.RandomString();
-            var tagName = StringHelper.RandomString();
+            var frontSide = RandomHelper.String();
+            var backSide = RandomHelper.String();
+            var additionalInfo = RandomHelper.String();
+            var tagName = RandomHelper.String();
             var tag = await TagHelper.CreateAsync(db, tagName);
-            var otherUserName = StringHelper.RandomString();
+            var otherUserName = RandomHelper.String();
             var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
-            var versionDescription = StringHelper.RandomString();
+            var versionDescription = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, tagIds: new[] { tag }, userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
 
             var deck = await DeckHelper.CreateAsync(db, otherUserId);

@@ -45,7 +45,7 @@ namespace MemCheck.Application.Tests.Notifying
             userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(12);
 
             var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
-            var cardVersion = new CardVersion(Guid.NewGuid(), StringHelper.RandomString(), StringHelper.RandomString(), new DateTime(2029, 12, 15), StringHelper.RandomString(), true, null);
+            var cardVersion = new CardVersion(Guid.NewGuid(), RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true, null);
             userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray.Create(cardVersion));
 
             var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
@@ -91,7 +91,7 @@ namespace MemCheck.Application.Tests.Notifying
             userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray<CardVersion>.Empty);
 
             var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
-            var cardDeletion = new CardDeletion(StringHelper.RandomString(), StringHelper.RandomString(), new DateTime(2029, 12, 15), StringHelper.RandomString(), true);
+            var cardDeletion = new CardDeletion(RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true);
             userCardDeletionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray.Create(cardDeletion));
 
             var userLastNotifDateUpdater = new Mock<IUserLastNotifDateUpdater>(MockBehavior.Strict);

@@ -14,7 +14,7 @@ namespace MemCheck.Application.Tests.Helpers
             var result = new SearchSubscription
             {
                 UserId = subscriberId,
-                Name = name ?? StringHelper.RandomString(),
+                Name = name ?? RandomHelper.String(),
                 ExcludedDeck = excludedDeckId == null ? Guid.Empty : excludedDeckId.Value,
                 RequiredText = requiredText,
                 RequiredTags = Array.Empty<RequiredTagInSearchSubscription>(),
