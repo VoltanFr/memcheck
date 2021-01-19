@@ -17,7 +17,7 @@ namespace MemCheck.WebUI.Pages.Doc
             this.environment = environment;
         }
         [BindProperty(SupportsGet = true)] public string RefererRoute { get; set; } = "";
-        [BindProperty(SupportsGet = true)] public string cultureName { get; set; } = "";
+        [BindProperty(SupportsGet = true)] public string CultureName { get; set; } = "";
         public string PageContents
         {
             get
@@ -26,10 +26,10 @@ namespace MemCheck.WebUI.Pages.Doc
                 var splittedRefererRoute = RefererRoute.Split('/');
                 var refererPath = Path.Combine(splittedRefererRoute.SkipLast(1).ToArray());
                 var refererPage = splittedRefererRoute.Last();
-                var filePath = Path.Combine(baseDir, refererPath, $"{refererPage}-{cultureName}.md");
+                var filePath = Path.Combine(baseDir, refererPath, $"{refererPage}-{CultureName}.md");
                 if (!System.IO.File.Exists(filePath))
                 {
-                    filePath = Path.Combine(baseDir, $"index-{cultureName}.md");
+                    filePath = Path.Combine(baseDir, $"index-{CultureName}.md");
                     if (!System.IO.File.Exists(filePath))
                         filePath = Path.Combine(baseDir, "index-en.md");
                 }
