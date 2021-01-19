@@ -85,7 +85,7 @@ namespace MemCheck.Application.Loading
             ));
             return Shuffler.Shuffle(result).Take(cardCount);
         }
-        private IEnumerable<ResultCard> GetCardsToRepeat(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
+        private IEnumerable<ResultCard> GetCardsToRepeat(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
         {
             var result = new List<ResultCard>();
 
@@ -106,7 +106,7 @@ namespace MemCheck.Application.Loading
                     cardInDeck.LastLearnUtcTime,
                 }).ToList();
 
-                var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime)).Select(card => card.CardId).ToList();
+                var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime, now)).Select(card => card.CardId).ToList();
 
                 var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && expired.Contains(cardInDeck.CardId))
                     .Include(cardInDeck => cardInDeck.Card).AsSingleQuery()
@@ -206,7 +206,7 @@ namespace MemCheck.Application.Loading
         {
             this.dbContext = dbContext;
         }
-        public async Task<IEnumerable<ResultCard>> RunAsync(Request request)
+        public async Task<IEnumerable<ResultCard>> RunAsync(Request request, DateTime? now = null)
         {
             request.CheckValidity();
             QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, request.CurrentUserId, request.DeckId);
@@ -218,7 +218,7 @@ namespace MemCheck.Application.Loading
 
             if (request.LearnModeIsUnknown)
                 return await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload);
-            return GetCardsToRepeat(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload);
+            return GetCardsToRepeat(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
         }
         #region Request and result classes
         public sealed class Request

@@ -53,7 +53,7 @@ namespace MemCheck.Application
                     heapInfo.TotalCardCount++;
                     if (cardInDeck.CurrentHeap != 0)
                     {
-                        if (heapingAlgorithm.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime))
+                        if (heapingAlgorithm.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, DateTime.UtcNow))
                             heapInfo.ExpiredCardCount++;
                         var expiryDate = heapingAlgorithm.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime);
                         if (expiryDate < heapInfo.NextExpiryUtcDate)

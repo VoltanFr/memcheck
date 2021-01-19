@@ -6,16 +6,12 @@ namespace MemCheck.Application.Heaping
     {
         #region Protected method GetHasExpired
         protected abstract DateTime GetExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime);    //currentHeap is guaranteed to be > 0    //Please find a better name for this method
-        protected virtual DateTime GetNow()
-        {
-            return DateTime.UtcNow;
-        }
         #endregion
         public abstract int Id { get; }
-        public bool HasExpired(int currentHeap, DateTime lastLearnUtcTime)
+        public bool HasExpired(int currentHeap, DateTime lastLearnUtcTime, DateTime nowUtc)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
-            return ExpiryUtcDate(currentHeap, lastLearnUtcTime) <= GetNow();
+            return ExpiryUtcDate(currentHeap, lastLearnUtcTime) <= nowUtc;
         }
         public DateTime ExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime)
         {

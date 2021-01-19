@@ -59,7 +59,7 @@ namespace MemCheck.Application.Searching
                 card.CurrentHeap == Deck.UnknownDeckId ? null : (DateTime?)heapingAlgo.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime),
                 card.LastLearnUtcTime,
                 card.AddToDeckUtcTime,
-                card.CurrentHeap == Deck.UnknownDeckId || heapingAlgo.HasExpired(card.CurrentHeap, card.LastLearnUtcTime),
+                card.CurrentHeap == Deck.UnknownDeckId || heapingAlgo.HasExpired(card.CurrentHeap, card.LastLearnUtcTime, DateTime.UtcNow),
                 card.CurrentHeap,
                 card.NbTimesInNotLearnedHeap,
                 card.BiggestHeapReached,
