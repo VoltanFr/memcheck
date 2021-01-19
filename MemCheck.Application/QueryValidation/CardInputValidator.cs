@@ -13,10 +13,10 @@ namespace MemCheck.Application.QueryValidation
         private const int maxBackSideLength = 5000;
         private const int minAdditionalInfoLength = 0;
         private const int maxAdditionalInfoLength = 20000;
-        private const int minVersionDescriptionLength = 3;
-        private const int maxVersionDescriptionLength = 1000;
         private const int maxImageCountPerSide = 10;
         #endregion
+        public const int MinVersionDescriptionLength = 3;
+        public const int MaxVersionDescriptionLength = 1000;
         public static void Run(ICardInput input, ILocalized localizer)
         {
             if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
@@ -45,8 +45,8 @@ namespace MemCheck.Application.QueryValidation
 
             if (input.VersionDescription != input.VersionDescription.Trim())
                 throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
-            if (input.VersionDescription.Length < minVersionDescriptionLength || input.VersionDescription.Length > maxVersionDescriptionLength)
-                throw new RequestInputException(localizer.Get("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + localizer.Get("MustBeBetween") + $" {minVersionDescriptionLength} " + localizer.Get("And") + $" {maxVersionDescriptionLength}");
+            if (input.VersionDescription.Length < MinVersionDescriptionLength || input.VersionDescription.Length > MaxVersionDescriptionLength)
+                throw new RequestInputException(localizer.Get("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + localizer.Get("MustBeBetween") + $" {MinVersionDescriptionLength} " + localizer.Get("And") + $" {MaxVersionDescriptionLength}");
 
 
             var unionedImageLists = input.FrontSideImageList.Concat(input.BackSideImageList).Concat(input.AdditionalInfoImageList);

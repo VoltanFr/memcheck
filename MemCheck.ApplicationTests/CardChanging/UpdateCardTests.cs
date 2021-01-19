@@ -97,6 +97,28 @@ namespace MemCheck.Application.CardChanging
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
         }
         [TestMethod()]
+        public async Task DescriptionTooShort()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
+            var request = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), versionDescription: StringHelper.RandomString(CardInputValidator.MinVersionDescriptionLength - 1));
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
+        }
+        [TestMethod()]
+        public async Task DescriptionTooLong()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
+            var request = UpdateCardHelper.RequestForFrontSideChange(card, StringHelper.RandomString(), versionDescription: StringHelper.RandomString(CardInputValidator.MaxVersionDescriptionLength + 1));
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer()));
+        }
+        [TestMethod()]
         public async Task UserInVisibilityList()
         {
             var db = DbHelper.GetEmptyTestDB();
