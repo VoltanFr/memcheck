@@ -94,6 +94,19 @@ namespace MemCheck.Application.DeckChanging
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
+        public async Task DeckWithThisNameExists()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user);
+            var otherDeckName = StringHelper.RandomString();
+            await DeckHelper.CreateAsync(db, user, otherDeckName);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new UpdateDeck.Request(user, deck, otherDeckName, RandomHelper.HeapingAlgorithm());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+        }
+        [TestMethod()]
         public async Task InexistentAlgorithm()
         {
             var db = DbHelper.GetEmptyTestDB();

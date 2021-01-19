@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ADeckWithName" xml:space="preserve">
+    <value>Un paquet existe déjà avec le nom</value>
+  </data>
   <data name="AllUsers" xml:space="preserve">
     <value>Publique</value>
+  </data>
+  <data name="AlreadyExists" xml:space="preserve">
+    <value>(cette vérification n'est pas sensible à la casse).</value>
   </data>
   <data name="And" xml:space="preserve">
     <value>et</value>

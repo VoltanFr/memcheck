@@ -45,6 +45,7 @@ namespace MemCheck.Application.DeckChanging
                     throw new InvalidOperationException($"Invalid heaping algorithm: {HeapingAlgorithmId}");
 
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
+                await QueryValidationHelper.ChecUserDoesNotHaveDeckWithNameAsync(dbContext, UserId, Name, localizer);
             }
         }
         #endregion

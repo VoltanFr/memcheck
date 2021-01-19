@@ -18,9 +18,9 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public async Task<Guid> RunAsync(Request request)
+        public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
-            request.CheckValidity(dbContext);
+            await request.CheckValidityAsync(localizer, dbContext);
 
             var deck = new Deck() { Owner = request.User, Description = request.Description, HeapingAlgorithmId = request.HeapingAlgorithmId };
             dbContext.Decks.Add(deck);
@@ -42,7 +42,7 @@ namespace MemCheck.Application
             public MemCheckUser User { get; }
             public string Description { get; }
             public int HeapingAlgorithmId { get; }
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(User.Id))
                     throw new RequestInputException("Invalid user");
@@ -50,8 +50,7 @@ namespace MemCheck.Application
                     throw new RequestInputException($"Invalid algo id '{HeapingAlgorithmId}'");
                 if (Description.Length < minDescriptionLength || Description.Length > maxDescriptionLength)
                     throw new InvalidOperationException($"Invalid description '{Description}' (length must be between {minDescriptionLength} and {maxDescriptionLength}, is {Description.Length})");
-                if (dbContext.Decks.Where(deck => (deck.Owner.Id == User.Id) && EF.Functions.Like(deck.Description, $"{Description}")).Any())
-                    throw new InvalidOperationException($"A deck with description '{Description}' already exists (this is case insensitive)");
+                await QueryValidationHelper.ChecUserDoesNotHaveDeckWithNameAsync(dbContext, User.Id, Description, localizer);
             }
         }
 
