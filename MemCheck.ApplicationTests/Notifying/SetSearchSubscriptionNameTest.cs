@@ -53,7 +53,7 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + new string('x', SetSearchSubscriptionName.Request.MinNameLength - 1) + "\t\t");
+            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + StringHelper.RandomString(SetSearchSubscriptionName.Request.MinNameLength - 1) + "\t\t");
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
         }
         [TestMethod()]
@@ -64,7 +64,7 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, new string('x', SetSearchSubscriptionName.Request.MaxNameLength + 1));
+            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, StringHelper.RandomString(SetSearchSubscriptionName.Request.MaxNameLength + 1));
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
         }
         [TestMethod()]
@@ -75,7 +75,7 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + new string('x', SetSearchSubscriptionName.Request.MaxNameLength) + "\t\t");
+            var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + StringHelper.RandomString(SetSearchSubscriptionName.Request.MaxNameLength) + "\t\t");
             await new SetSearchSubscriptionName(dbContext).RunAsync(request);
         }
         [TestMethod()]
