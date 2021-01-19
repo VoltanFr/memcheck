@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString(), Deck.DefaultHeapingAlgorithmId);
 
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 10, 0, 0));
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 12, 0, 0));
@@ -64,7 +65,7 @@ namespace MemCheck.Application.Loading
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString());
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, StringHelper.RandomString(), Deck.DefaultHeapingAlgorithmId);
 
             await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, new DateTime(2020, 12, 11, 2, 0, 0)); //Expires on 2020, 12, 27 at 2:00
 
@@ -106,10 +107,10 @@ namespace MemCheck.Application.Loading
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
             var deck1Description = StringHelper.RandomString();
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description);
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description, Deck.DefaultHeapingAlgorithmId);
 
             var deck2Description = StringHelper.RandomString();
-            var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description);
+            var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description, Deck.DefaultHeapingAlgorithmId);
 
             var jan01 = new DateTime(2030, 01, 01);
             var jan28 = new DateTime(2030, 01, 28);
