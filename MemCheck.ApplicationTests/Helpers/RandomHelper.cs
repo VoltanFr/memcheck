@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MemCheck.Application.Heaping;
+using MemCheck.Domain;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -9,6 +11,13 @@ namespace MemCheck.Application.Tests.Helpers
         #region Private field random
         private static readonly Random random = new Random();
         #endregion
+        #region Private methods
+        private static T Entry<T>(IEnumerable<T> values)
+        {
+            var array = values.ToImmutableArray();
+            return array[random.Next(array.Length)];
+        }
+        #endregion
         public static int ValueNotInSet(IEnumerable<int> excludedPossibilities)
         {
             var excl = excludedPossibilities.ToImmutableHashSet();
@@ -17,10 +26,13 @@ namespace MemCheck.Application.Tests.Helpers
                 result = random.Next();
             return result;
         }
-        public static T Entry<T>(IEnumerable<T> values)
+        public static int RandomHeap()
         {
-            var array = values.ToImmutableArray();
-            return array[random.Next(array.Length)];
+            return random.Next(CardInDeck.MaxHeapValue);
+        }
+        public static int HeapingAlgorithm()
+        {
+            return Entry(HeapingAlgorithms.Instance.Ids);
         }
     }
 }

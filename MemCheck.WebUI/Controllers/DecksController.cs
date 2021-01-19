@@ -115,10 +115,18 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region Update
         [HttpPost("Update")]
-        async public Task<IActionResult> Update([FromBody] UpdateDeck.Request deck)
+        async public Task<IActionResult> Update([FromBody] UpdateRequest request)
         {
-            CheckBodyParameter(deck);
-            return Ok(await new UpdateDeck(dbContext).RunAsync(deck));
+            CheckBodyParameter(request);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new UpdateDeck.Request(userId, request.DeckId, request.Description.Trim(), request.HeapingAlgorithmId);
+            return Ok(await new UpdateDeck(dbContext).RunAsync(appRequest, this));
+        }
+        public sealed class UpdateRequest
+        {
+            public Guid DeckId { get; set; }
+            public string Description { get; set; } = null!;
+            public int HeapingAlgorithmId { get; set; }
         }
         #endregion
         #region GetUserDecksWithHeaps

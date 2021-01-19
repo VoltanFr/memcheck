@@ -120,6 +120,9 @@
   <data name="AllUsers" xml:space="preserve">
     <value>Public</value>
   </data>
+  <data name="And" xml:space="preserve">
+    <value>and</value>
+  </data>
   <data name="AndLose" xml:space="preserve">
     <value>and lose</value>
   </data>
@@ -147,6 +150,9 @@
   <data name="HeapingAlgoNameForId2" xml:space="preserve">
     <value>Development</value>
   </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Invalid name: length is</value>
+  </data>
   <data name="ItWillBeExpired" xml:space="preserve">
     <value>It will be expired.</value>
   </data>
@@ -155,6 +161,9 @@
   </data>
   <data name="MoveThisCardToHeap" xml:space="preserve">
     <value>Move this card to heap</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>, must be between</value>
   </data>
   <data name="None" xml:space="preserve">
     <value>&lt;None&gt;</value>

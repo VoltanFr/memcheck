@@ -120,6 +120,9 @@
   <data name="AllUsers" xml:space="preserve">
     <value>Publique</value>
   </data>
+  <data name="And" xml:space="preserve">
+    <value>et</value>
+  </data>
   <data name="AndLose" xml:space="preserve">
     <value>et perdre la sélection de</value>
   </data>
@@ -147,6 +150,9 @@
   <data name="HeapingAlgoNameForId2" xml:space="preserve">
     <value>Développement</value>
   </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Nom incorrect, longueur :</value>
+  </data>
   <data name="ItWillBeExpired" xml:space="preserve">
     <value>Elle sera expirée.</value>
   </data>
@@ -155,6 +161,9 @@
   </data>
   <data name="MoveThisCardToHeap" xml:space="preserve">
     <value>Déplacer cette carte vers le tas</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>, doit être entre</value>
   </data>
   <data name="None" xml:space="preserve">
     <value>&lt;Aucun&gt;</value>

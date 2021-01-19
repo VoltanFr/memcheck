@@ -17,7 +17,7 @@ namespace MemCheck.Application.Tests.Helpers
                 Owner = await dbContext.Users.SingleAsync(u => u.Id == ownerId),
                 Description = description ?? StringHelper.RandomString(),
                 CardInDecks = Array.Empty<CardInDeck>(),
-                HeapingAlgorithmId = algorithmId == null ? RandomHelper.Entry(HeapingAlgorithms.Instance.Ids) : algorithmId.Value
+                HeapingAlgorithmId = algorithmId == null ? RandomHelper.HeapingAlgorithm() : algorithmId.Value
             };
             dbContext.Decks.Add(result);
             await dbContext.SaveChangesAsync();
