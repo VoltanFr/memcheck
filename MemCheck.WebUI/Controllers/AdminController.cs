@@ -27,6 +27,7 @@ namespace MemCheck.WebUI.Controllers
         private readonly UserManager<MemCheckUser> userManager;
         private readonly string authoringPageLink;
         private readonly string comparePageLink;
+        private readonly string historyPageLink;
         #endregion
         public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base(localizer)
         {
@@ -35,6 +36,7 @@ namespace MemCheck.WebUI.Controllers
             this.userManager = userManager;
             authoringPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Index");
             comparePageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Compare");
+            historyPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/History");
         }
         #region GetUsers
         [HttpPost("GetUsers")]
@@ -99,6 +101,7 @@ namespace MemCheck.WebUI.Controllers
                     mailBody.Append($"By {card.VersionCreator}<br/>");
                     mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
                     mailBody.Append($"Version description: '{card.VersionDescription}'<br/>");
+                    mailBody.Append($"<a href={historyPageLink}?CardId={card.CardId}>History</a> - ");
                     if (card.VersionIdOnLastNotification != null)
                         mailBody.Append($"<a href={comparePageLink}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
                     else
