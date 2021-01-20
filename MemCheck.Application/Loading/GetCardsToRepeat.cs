@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Loading
 {
-    public sealed class GetCardsToLearn
+    public sealed class GetCardsToRepeat
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
@@ -29,63 +29,7 @@ namespace MemCheck.Application.Loading
             return heapingAlgorithm;
 
         }
-        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
-        {
-            var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking()
-                .Include(card => card.Card).AsSingleQuery()
-                .Where(card => card.DeckId.Equals(deckId) && !excludedCardIds.Contains(card.CardId));
-
-            var onUnknownHeap = cardsOfDeck.Where(cardInDeck => cardInDeck.CurrentHeap == 0);
-            var withoutExcludedCards = onUnknownHeap;
-            foreach (var tag in excludedTagIds)   //I tried to do better with an intersect between the two sets, but that failed
-                withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
-            var oldest = withoutExcludedCards.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(cardCount * 3);   //we take more cards for shuffling accross more
-
-            var withDetails = oldest.Select(cardInDeck => new
-            {
-                cardInDeck.CardId,
-                cardInDeck.LastLearnUtcTime,
-                cardInDeck.AddToDeckUtcTime,
-                cardInDeck.BiggestHeapReached,
-                cardInDeck.NbTimesInNotLearnedHeap,
-                cardInDeck.Card.FrontSide,
-                cardInDeck.Card.BackSide,
-                cardInDeck.Card.AdditionalInfo,
-                cardInDeck.Card.VersionUtcDate,
-                VersionCreator = cardInDeck.Card.VersionCreator.Id,
-                tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
-                userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
-            });
-
-            var listed = await withDetails.ToListAsync();
-            var cardIds = listed.Select(cardInDeck => cardInDeck.CardId).ToImmutableHashSet();
-            var ratings = CardRatings.Load(dbContext, userId, cardIds);
-            var notifications = GetNotifications(userId, cardIds);
-
-            var result = listed.Select(cardInDeck => new ResultCard(
-                cardInDeck.CardId,
-                0,
-                cardInDeck.LastLearnUtcTime,
-                cardInDeck.AddToDeckUtcTime,
-                cardInDeck.BiggestHeapReached, cardInDeck.NbTimesInNotLearnedHeap,
-                cardInDeck.FrontSide,
-                cardInDeck.BackSide,
-                cardInDeck.AdditionalInfo,
-                cardInDeck.VersionUtcDate,
-                userNames[cardInDeck.VersionCreator],
-                cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
-                cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
-                cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imagesDetails[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
-                heapingAlgorithm,
-                ratings.User(cardInDeck.CardId),
-                ratings.Average(cardInDeck.CardId),
-                ratings.Count(cardInDeck.CardId),
-                notifications[cardInDeck.CardId]
-            ));
-            return Shuffler.Shuffle(result).Take(cardCount);
-        }
-        private IEnumerable<ResultCard> GetCardsToRepeat(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
+        private IEnumerable<ResultCard> Run(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
         {
             var result = new List<ResultCard>();
 
@@ -160,31 +104,6 @@ namespace MemCheck.Application.Loading
         }
         #endregion
         #region private classes
-        private static class Shuffler
-        {
-            public static IEnumerable<T> Shuffle<T>(IEnumerable<T> source)
-            {
-                return Shuffle(source, new Random());
-            }
-            private static IEnumerable<T> Shuffle<T>(IEnumerable<T> source, Random rng)
-            {
-                if (source == null) throw new ArgumentNullException(nameof(source));
-                if (rng == null) throw new ArgumentNullException(nameof(rng));
-
-                return ShuffleIterator(source, rng);
-            }
-            private static IEnumerable<T> ShuffleIterator<T>(IEnumerable<T> source, Random rng)
-            {
-                var buffer = source.ToList();
-                for (int i = 0; i < buffer.Count; i++)
-                {
-                    int j = rng.Next(i, buffer.Count);
-                    yield return buffer[j];
-
-                    buffer[j] = buffer[i];
-                }
-            }
-        }
         public sealed class ImageDetails
         {
             public ImageDetails(Guid imageId, string name, string ownerName, string description, string source)
@@ -202,43 +121,38 @@ namespace MemCheck.Application.Loading
             public string Source { get; set; }
         }
         #endregion
-        public GetCardsToLearn(MemCheckDbContext dbContext)
+        public GetCardsToRepeat(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
         public async Task<IEnumerable<ResultCard>> RunAsync(Request request, DateTime? now = null)
         {
-            request.CheckValidity();
-            QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, request.CurrentUserId, request.DeckId);
+            request.CheckValidity(dbContext);
 
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
             var imagesDetails = GetAllImagesDetails();
             var tagNames = GetAllAvailableTags.Run(dbContext);
 
-            if (request.LearnModeIsUnknown)
-                return await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload);
-            return GetCardsToRepeat(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
+            return Run(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
         }
         #region Request and result classes
         public sealed class Request
         {
-            public Request(Guid currentUserId, Guid deckId, bool learnModeIsUnknown, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, int cardsToDownload)
+            public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, int cardsToDownload)
             {
                 CurrentUserId = currentUserId;
                 DeckId = deckId;
-                LearnModeIsUnknown = learnModeIsUnknown;
                 ExcludedCardIds = excludedCardIds;
                 ExcludedTagIds = excludedTagIds;
                 CardsToDownload = cardsToDownload;
             }
             public Guid CurrentUserId { get; }
             public Guid DeckId { get; }
-            public bool LearnModeIsUnknown { get; }
             public IEnumerable<Guid> ExcludedCardIds { get; }
             public IEnumerable<Guid> ExcludedTagIds { get; }
             public int CardsToDownload { get; }
-            public void CheckValidity()
+            public void CheckValidity(MemCheckDbContext dbContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
                     throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
@@ -250,6 +164,7 @@ namespace MemCheck.Application.Loading
                     throw new RequestInputException($"Invalid tag id");
                 if (CardsToDownload < 1 || CardsToDownload > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
+                QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, CurrentUserId, DeckId);
             }
         }
         public sealed class ResultCard

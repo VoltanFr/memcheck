@@ -38,8 +38,8 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 for (int i = 0; i < 5; i++)
                 {
                     var realCodeChrono = Stopwatch.StartNew();
-                    var request = new GetCardsToLearn.Request(user.Id, deck.Id, false, Array.Empty<Guid>(), Array.Empty<Guid>(), 30);
-                    var runner = new GetCardsToLearn(dbContext);
+                    var request = new GetCardsToRepeat.Request(user.Id, deck.Id, Array.Empty<Guid>(), Array.Empty<Guid>(), 30);
+                    var runner = new GetCardsToRepeat(dbContext);
                     var cards = await runner.RunAsync(request);
                     logger.LogInformation($"Got {cards.Count()} in {realCodeChrono.Elapsed}");
                     chronos.Add(realCodeChrono.Elapsed.TotalSeconds);

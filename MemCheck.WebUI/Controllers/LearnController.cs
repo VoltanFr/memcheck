@@ -53,13 +53,23 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
         {
             CheckBodyParameter(request);
-            var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var cardsToDownload = request.CurrentCardCount == 0 ? 1 : (request.LearnModeIsUnknown ? 30 : 5);   //loading cards to repeat is much more time consuming
-            var applicationRequest = new GetCardsToLearn.Request(currentUserId, request.DeckId, request.LearnModeIsUnknown, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-            var applicationResult = await new GetCardsToLearn(dbContext).RunAsync(applicationRequest);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var result = new GetCardsViewModel(applicationResult, this, user.UserName);
-            return Ok(result);
+            if (request.LearnModeIsUnknown)
+            {
+                var cardsToDownload = 30;
+                var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
+                var applicationResult = await new GetUnknownCardsToLearn(dbContext).RunAsync(applicationRequest);
+                var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                return Ok(result);
+            }
+            else
+            {
+                var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
+                var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
+                var applicationResult = await new GetCardsToRepeat(dbContext).RunAsync(applicationRequest);
+                var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                return Ok(result);
+            }
         }
         #region Request and result classes
         public sealed class GetCardsRequest
@@ -72,7 +82,11 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsViewModel
         {
-            public GetCardsViewModel(IEnumerable<GetCardsToLearn.ResultCard> applicationResultCards, ILocalized localizer, string currentUser)
+            public GetCardsViewModel(IEnumerable<GetUnknownCardsToLearn.ResultCard> applicationResultCards, ILocalized localizer, string currentUser)
+            {
+                Cards = applicationResultCards.Select(card => new GetCardsCardViewModel(card, localizer, currentUser));
+            }
+            public GetCardsViewModel(IEnumerable<GetCardsToRepeat.ResultCard> applicationResultCards, ILocalized localizer, string currentUser)
             {
                 Cards = applicationResultCards.Select(card => new GetCardsCardViewModel(card, localizer, currentUser));
             }
@@ -109,7 +123,47 @@ namespace MemCheck.WebUI.Controllers
                 //}
             }
             #endregion
-            public GetCardsCardViewModel(GetCardsToLearn.ResultCard applicationResult, ILocalized localizer, string currentUser)
+            public GetCardsCardViewModel(GetUnknownCardsToLearn.ResultCard applicationResult, ILocalized localizer, string currentUser)
+            {
+                CardId = applicationResult.CardId;
+                HeapId = 0;
+                Heap = DisplayServices.HeapName(0, localizer);
+                LastLearnUtcTime = applicationResult.LastLearnUtcTime;
+                LastChangeUtcTime = applicationResult.LastChangeUtcTime;
+                BiggestHeapReached = applicationResult.BiggestHeapReached;
+                NbTimesInNotLearnedHeap = applicationResult.NbTimesInNotLearnedHeap;
+                FrontSide = RenderMarkdown(applicationResult.FrontSide);
+                BackSide = RenderMarkdown(applicationResult.BackSide);
+                AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
+                Owner = applicationResult.Owner;
+                Tags = applicationResult.Tags.OrderBy(tag => tag);
+                RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
+                VisibleToCount = applicationResult.VisibleTo.Count();
+                AddToDeckUtcTime = applicationResult.AddToDeckUtcTime;
+                CurrentUserRating = applicationResult.UserRating;
+                AverageRating = Math.Round(applicationResult.AverageRating, 1);
+                CountOfUserRatings = applicationResult.CountOfUserRatings;
+                if (VisibleToCount == 1)
+                {
+                    var visibleToUser = applicationResult.VisibleTo.First();
+                    if (visibleToUser != currentUser)
+                        throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
+                    VisibleTo = localizer.Get("YouOnly");
+                }
+                else
+                {
+                    if (VisibleToCount == 0)
+                        VisibleTo = localizer.Get("AllUsers");
+                    else
+                        VisibleTo = string.Join(',', applicationResult.VisibleTo);
+                }
+                Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
+                MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
+                        new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
+                    ).OrderBy(heapModel => heapModel.HeapId);
+                RegisteredForNotifications = applicationResult.RegisteredForNotifications;
+            }
+            public GetCardsCardViewModel(GetCardsToRepeat.ResultCard applicationResult, ILocalized localizer, string currentUser)
             {
                 CardId = applicationResult.CardId;
                 HeapId = applicationResult.Heap;
@@ -174,7 +228,13 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsImageViewModel
         {
-            public GetCardsImageViewModel(GetCardsToLearn.ResultImageModel appResult)
+            public GetCardsImageViewModel(GetUnknownCardsToLearn.ResultImageModel appResult)
+            {
+                ImageId = appResult.ImageId;
+                Name = appResult.Name;
+                CardSide = appResult.CardSide;
+            }
+            public GetCardsImageViewModel(GetCardsToRepeat.ResultImageModel appResult)
             {
                 ImageId = appResult.ImageId;
                 Name = appResult.Name;

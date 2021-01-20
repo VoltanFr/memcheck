@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace MemCheck.Application.Loading
 {
     [TestClass()]
-    public class GetCardsToLearnTests
+    public class GetCardsToRepeatTests
     {
         [TestMethod()]
         public async Task UserNotLoggedIn()
@@ -21,8 +21,8 @@ namespace MemCheck.Application.Loading
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(Guid.Empty, deck, true, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToLearn(dbContext).RunAsync(request));
+            var request = new GetCardsToRepeat.Request(Guid.Empty, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -32,8 +32,8 @@ namespace MemCheck.Application.Loading
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(Guid.NewGuid(), deck, true, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToLearn(dbContext).RunAsync(request));
+            var request = new GetCardsToRepeat.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -42,8 +42,8 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(user, Guid.NewGuid(), true, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToLearn(dbContext).RunAsync(request));
+            var request = new GetCardsToRepeat.Request(user, Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -54,11 +54,11 @@ namespace MemCheck.Application.Loading
             var otherUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(otherUser, deck, true, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToLearn(dbContext).RunAsync(request));
+            var request = new GetCardsToRepeat.Request(otherUser, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
-        public async Task Repeat_DeckContainsOneCardNonExpired()
+        public async Task DeckContainsOneCardNonExpired()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -67,12 +67,12 @@ namespace MemCheck.Application.Loading
             await DeckHelper.AddCardAsync(db, user, deck, card.Id, 1, new DateTime(2000, 1, 1));
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToLearn(dbContext).RunAsync(request, new DateTime(2000, 1, 2));
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 2));
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
-        public async Task Repeat_DeckContainsOneCardExpired()
+        public async Task DeckContainsOneCardExpired()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -81,12 +81,12 @@ namespace MemCheck.Application.Loading
             await DeckHelper.AddCardAsync(db, user, deck, card.Id, 1, new DateTime(2000, 1, 1));
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToLearn(dbContext).RunAsync(request, new DateTime(2000, 1, 4));
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4));
             Assert.AreEqual(card.Id, cards.Single().CardId);
         }
         [TestMethod()]
-        public async Task Repeat_RequestedCount()
+        public async Task RequestedCount()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -99,20 +99,20 @@ namespace MemCheck.Application.Loading
                 await DeckHelper.AddCardAsync(db, user, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
             }
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount / 2);
-            var cards = await new GetCardsToLearn(dbContext).RunAsync(request, loadTime);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount / 2);
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
             Assert.AreEqual(request.CardsToDownload, cards.Count());
 
-            request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            cards = await new GetCardsToLearn(dbContext).RunAsync(request, loadTime);
+            request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
+            cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
             Assert.AreEqual(request.CardsToDownload, cards.Count());
 
-            request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);
-            cards = await new GetCardsToLearn(dbContext).RunAsync(request, loadTime);
+            request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);
+            cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
             Assert.AreEqual(cardCount, cards.Count());
         }
         [TestMethod()]
-        public async Task Repeat_CheckOrder()
+        public async Task CheckOrder()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -125,8 +125,8 @@ namespace MemCheck.Application.Loading
                 await DeckHelper.AddCardAsync(db, user, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
             }
             using var dbContext = new MemCheckDbContext(db);
-            var request = new GetCardsToLearn.Request(user, deck, false, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            var cards = (await new GetCardsToLearn(dbContext).RunAsync(request, loadTime)).ToImmutableArray();
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
+            var cards = (await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime)).ToImmutableArray();
             Assert.AreEqual(cardCount, cards.Length);
             for (int i = 1; i < cards.Length; i++)
             {
