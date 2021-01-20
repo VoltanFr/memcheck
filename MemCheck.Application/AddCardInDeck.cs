@@ -24,7 +24,7 @@ namespace MemCheck.Application
                 Card = card,
                 DeckId = deckId,
                 CurrentHeap = 0,
-                LastLearnUtcTime = DateTime.MinValue.ToUniversalTime(),
+                LastLearnUtcTime = CardInDeck.NeverLearntLastLearnTime,
                 AddToDeckUtcTime = DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,
                 BiggestHeapReached = 0

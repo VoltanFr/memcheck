@@ -252,14 +252,14 @@ namespace MemCheck.WebUI.Controllers
                 HeapName = heapName;
                 if (heapId == 0)
                 {
-                    ExpiryUtcDate = DateTime.MinValue.ToUniversalTime();
+                    ExpiryUtcDate = CardInDeck.NeverLearntLastLearnTime;
                     MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ?";
                 }
                 else
                 {
                     if (expiryUtcDate < DateTime.UtcNow)
                     {
-                        ExpiryUtcDate = DateTime.MinValue.ToUniversalTime();
+                        ExpiryUtcDate = CardInDeck.NeverLearntLastLearnTime;
                         MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.Get("ItWillBeExpired");
                     }
                     else
