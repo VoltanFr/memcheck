@@ -27,9 +27,9 @@ namespace MemCheck.Application.Tests.Helpers
                 result = random.Next();
             return result;
         }
-        public static int Heap()
+        public static int Heap(bool notUnknown = false)
         {
-            return random.Next(CardInDeck.MaxHeapValue);
+            return random.Next(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
         }
         public static int HeapingAlgorithm()
         {
@@ -46,6 +46,10 @@ namespace MemCheck.Application.Tests.Helpers
             if (length != null)
                 result.Length = length.Value;
             return result.ToString();
+        }
+        public static DateTime DateBefore(DateTime d)
+        {
+            return d.AddDays(-random.Next(1, 3650));
         }
     }
 }

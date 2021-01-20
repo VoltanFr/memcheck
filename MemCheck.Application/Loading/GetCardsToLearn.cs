@@ -97,7 +97,7 @@ namespace MemCheck.Application.Loading
                 withoutExcuded = withoutExcuded.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => excludedTagIds.Contains(tag.TagId)));
 
                 var ordered = withoutExcuded.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime);
-                var oldest = ordered.Take(cardCount);
+                var oldest = ordered.Take(cardCount - result.Count);
 
                 var withInfoToComputeExpiration = oldest.Select(cardInDeck => new
                 {
@@ -146,7 +146,7 @@ namespace MemCheck.Application.Loading
                     ratings.Count(oldestCard.CardId),
                     notifications[oldestCard.CardId]
                     )
-                );
+                ).OrderBy(r => r.LastLearnUtcTime);
 
                 result.AddRange(thisHeapResult);
             }
