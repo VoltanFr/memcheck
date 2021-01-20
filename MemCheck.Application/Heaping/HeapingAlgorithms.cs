@@ -37,6 +37,6 @@ namespace MemCheck.Application.Heaping
             return algorithms[heapingAlgorithmId];
         }
         public static HeapingAlgorithms Instance => instance;
-        public static int DefaultAlgoId => Deck.DefaultHeapingAlgorithmId;
+        public static int DefaultAlgoId => DefaultHeapingAlgorithm.ID;
     }
 }
