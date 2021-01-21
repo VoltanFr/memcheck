@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MemCheck.Basics;
+using System;
 
 namespace MemCheck.Application.Notifying
 {

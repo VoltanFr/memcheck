@@ -19,3 +19,7 @@
 /MemCheck.AzFunc.Notifier/obj/
 /MemCheck.DatabaseTests/obj/
 /MemCheck.DatabaseTests/bin/
+/MemCheck.Basics/obj/
+/MemCheck.Basics/bin/
+/MemCheck.BasicsTests/bin/
+/MemCheck.BasicsTests/obj/
