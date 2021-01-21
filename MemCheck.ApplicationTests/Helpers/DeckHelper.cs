@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.Heaping;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -23,14 +22,25 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result.Id;
         }
-        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid user, Guid deck, Guid card, int heap, DateTime? lastLearnUtcTime = null)
+        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int heap, DateTime? lastLearnUtcTime = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            await new AddCardInDeck(dbContext).RunAsync(deck, card);
-
-            //We can't move a card up more than one heap at a time, by security in MoveCardToHeap
-            for (int i = 1; i <= heap; i++)
-                await new MoveCardToHeap(dbContext).RunAsync(new MoveCardToHeap.Request(user, deck, card, i, false), lastLearnUtcTime);
+            var cardForUser = new CardInDeck()
+            {
+                CardId = card,
+                DeckId = deck,
+                CurrentHeap = heap,
+                LastLearnUtcTime = lastLearnUtcTime == null ? DateHelper.Random() : lastLearnUtcTime.Value,
+                AddToDeckUtcTime = DateTime.UtcNow,
+                NbTimesInNotLearnedHeap = 1,
+                BiggestHeapReached = 0
+            };
+            dbContext.CardsInDecks.Add(cardForUser);
+            await dbContext.SaveChangesAsync();
+        }
+        public static async Task AddNeverLearntCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card)
+        {
+            await AddCardAsync(testDB, deck, card, 0, CardInDeck.NeverLearntLastLearnTime);
         }
     }
 }

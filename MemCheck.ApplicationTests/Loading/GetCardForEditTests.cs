@@ -94,7 +94,7 @@ namespace MemCheck.Application.Loading
             var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, tagIds: new[] { tag }, userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
 
             var deck = await DeckHelper.CreateAsync(db, otherUserId);
-            await DeckHelper.AddCardAsync(db, otherUserId, deck, card.Id, 0);
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 0);
 
             using var dbContext = new MemCheckDbContext(db);
             var loaded = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));

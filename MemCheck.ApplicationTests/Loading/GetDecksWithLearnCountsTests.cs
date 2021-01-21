@@ -50,8 +50,8 @@ namespace MemCheck.Application.Loading
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String(), Deck.DefaultHeapingAlgorithmId);
 
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 10, 0, 0));
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 12, 0, 0));
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 10, 0, 0));
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 12, 0, 0));
 
             using var dbContext = new MemCheckDbContext(testDB);
             var resultDeck = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2030, 01, 03, 11, 30, 0))).First();
@@ -67,7 +67,7 @@ namespace MemCheck.Application.Loading
             var userId = await UserHelper.CreateInDbAsync(testDB);
             var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String(), Deck.DefaultHeapingAlgorithmId);
 
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, new DateTime(2020, 12, 11, 2, 0, 0)); //Expires on 2020, 12, 27 at 2:00
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, new DateTime(2020, 12, 11, 2, 0, 0)); //Expires on 2020, 12, 27 at 2:00
 
             using var dbContext = new MemCheckDbContext(testDB);
             var resultOn27_0030 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 27, 0, 30, 0))).First();
@@ -119,19 +119,19 @@ namespace MemCheck.Application.Loading
             var jan30_12h00 = new DateTime(2030, 01, 30, 12, 0, 0);
 
             //Fill deck1
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30_00h00);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_00h00);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_12h00);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan28);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
-            await DeckHelper.AddCardAsync(testDB, userId, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30_00h00);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_00h00);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_12h00);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan28);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan01);
 
             //Fill deck2
-            await DeckHelper.AddCardAsync(testDB, userId, deck2, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
-            await DeckHelper.AddCardAsync(testDB, userId, deck2, (await CardHelper.CreateAsync(testDB, userId)).Id, 8, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck2, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck2, (await CardHelper.CreateAsync(testDB, userId)).Id, 8, jan01);
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetDecksWithLearnCounts.Request(userId);

@@ -64,7 +64,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, user, deck, card.Id, 1, new DateTime(2000, 1, 1));
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, new DateTime(2000, 1, 1));
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, user, deck, card.Id, 1, new DateTime(2000, 1, 1));
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, new DateTime(2000, 1, 1));
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
@@ -96,7 +96,7 @@ namespace MemCheck.Application.Loading
             for (int i = 0; i < cardCount; i++)
             {
                 var card = await CardHelper.CreateAsync(db, user);
-                await DeckHelper.AddCardAsync(db, user, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
+                await DeckHelper.AddCardAsync(db, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount / 2);
@@ -122,7 +122,7 @@ namespace MemCheck.Application.Loading
             for (int i = 0; i < cardCount; i++)
             {
                 var card = await CardHelper.CreateAsync(db, user);
-                await DeckHelper.AddCardAsync(db, user, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
+                await DeckHelper.AddCardAsync(db, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
