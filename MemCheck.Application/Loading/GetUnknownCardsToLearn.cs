@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -100,31 +101,6 @@ namespace MemCheck.Application.Loading
         }
         #endregion
         #region private classes
-        private static class Shuffler
-        {
-            public static IEnumerable<T> Shuffle<T>(IEnumerable<T> source)
-            {
-                return Shuffle(source, new Random());
-            }
-            private static IEnumerable<T> Shuffle<T>(IEnumerable<T> source, Random rng)
-            {
-                if (source == null) throw new ArgumentNullException(nameof(source));
-                if (rng == null) throw new ArgumentNullException(nameof(rng));
-
-                return ShuffleIterator(source, rng);
-            }
-            private static IEnumerable<T> ShuffleIterator<T>(IEnumerable<T> source, Random rng)
-            {
-                var buffer = source.ToList();
-                for (int i = 0; i < buffer.Count; i++)
-                {
-                    int j = rng.Next(i, buffer.Count);
-                    yield return buffer[j];
-
-                    buffer[j] = buffer[i];
-                }
-            }
-        }
         public sealed class ImageDetails
         {
             public ImageDetails(Guid imageId, string name, string ownerName, string description, string source)
