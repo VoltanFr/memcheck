@@ -29,19 +29,25 @@ namespace MemCheck.Application.Loading
             return heapingAlgorithm;
 
         }
-        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
+        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
         {
             var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking()
                 .Include(card => card.Card).AsSingleQuery()
-                .Where(card => card.DeckId.Equals(deckId) && !excludedCardIds.Contains(card.CardId));
+                .Where(card => card.DeckId.Equals(deckId) && card.CurrentHeap == 0 && !excludedCardIds.Contains(card.CardId));
 
-            var onUnknownHeap = cardsOfDeck.Where(cardInDeck => cardInDeck.CurrentHeap == 0);
-            var withoutExcludedCards = onUnknownHeap;
+            var withoutExcludedCards = cardsOfDeck;
             foreach (var tag in excludedTagIds)   //I tried to do better with an intersect between the two sets, but that failed
                 withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
-            var oldest = withoutExcludedCards.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(cardCount * 3);   //we take more cards for shuffling accross more
 
-            var withDetails = oldest.Select(cardInDeck => new
+            var countToTake = neverLearnt ? cardCount * 3 : cardCount; //For cards never learnt, we take more cards for shuffling accross more
+
+            IQueryable<CardInDeck>? finalSelection;
+            if (neverLearnt)
+                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).Take(countToTake);
+            else
+                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
+
+            var withDetails = finalSelection.Select(cardInDeck => new
             {
                 cardInDeck.CardId,
                 cardInDeck.LastLearnUtcTime,
@@ -82,7 +88,10 @@ namespace MemCheck.Application.Loading
                 ratings.Count(cardInDeck.CardId),
                 notifications[cardInDeck.CardId]
             ));
-            return Shuffler.Shuffle(result).Take(cardCount);
+            if (neverLearnt)
+                return Shuffler.Shuffle(result).Take(cardCount);
+            else
+                return result;
         }
         private ImmutableDictionary<Guid, ImageDetails> GetAllImagesDetails()
         {
@@ -147,7 +156,10 @@ namespace MemCheck.Application.Loading
             var imagesDetails = GetAllImagesDetails();
             var tagNames = GetAllAvailableTags.Run(dbContext);
 
-            return await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload);
+            var result = new List<ResultCard>();
+            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, true));
+            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload - result.Count, false));
+            return result;
         }
         #region Request and result classes
         public sealed class Request
