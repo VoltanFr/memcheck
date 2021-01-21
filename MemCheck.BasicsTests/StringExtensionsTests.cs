@@ -1,7 +1,6 @@
-using MemCheck.Basics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MemCheck.Application.CardChanging
+namespace MemCheck.Basics.Tests
 {
     [TestClass()]
     public class StringExtensionsTests

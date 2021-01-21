@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MemCheck.Basics
+﻿namespace MemCheck.Basics
 {
     public static class StringExtensions
     {
