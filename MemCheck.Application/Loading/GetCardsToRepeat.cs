@@ -29,7 +29,7 @@ namespace MemCheck.Application.Loading
             return heapingAlgorithm;
 
         }
-        private IEnumerable<ResultCard> Run(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
+        private IEnumerable<ResultCard> Run(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
         {
             var result = new List<ResultCard>();
 
@@ -83,7 +83,7 @@ namespace MemCheck.Application.Loading
                     userNames[oldestCard.VersionCreator],
                     oldestCard.tagIds.Select(tagId => tagNames[tagId]),
                     oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
-                    oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imagesDetails[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
+                    oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
                     heapingAlgorithm,
                     ratings.User(oldestCard.CardId),
                     ratings.Average(oldestCard.CardId),
@@ -97,29 +97,6 @@ namespace MemCheck.Application.Loading
 
             return result;
         }
-        private ImmutableDictionary<Guid, ImageDetails> GetAllImagesDetails()
-        {
-            var imageInfos = dbContext.Images.AsNoTracking().Select(i => new ImageDetails(i.Id, i.Name, i.Owner.UserName, i.Description, i.Source));
-            return imageInfos.ToImmutableDictionary(img => img.ImageId, img => img);
-        }
-        #endregion
-        #region private classes
-        public sealed class ImageDetails
-        {
-            public ImageDetails(Guid imageId, string name, string ownerName, string description, string source)
-            {
-                Name = name;
-                OwnerName = ownerName;
-                Description = description;
-                Source = source;
-                ImageId = imageId;
-            }
-            public Guid ImageId { get; }
-            public string Name { get; set; }
-            public string OwnerName { get; set; }
-            public string Description { get; set; }
-            public string Source { get; set; }
-        }
         #endregion
         public GetCardsToRepeat(MemCheckDbContext dbContext)
         {
@@ -131,10 +108,10 @@ namespace MemCheck.Application.Loading
 
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-            var imagesDetails = GetAllImagesDetails();
+            var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
             var tagNames = GetAllAvailableTags.Run(dbContext);
 
-            return Run(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
+            return Run(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
         }
         #region Request and result classes
         public sealed class Request
@@ -219,10 +196,10 @@ namespace MemCheck.Application.Loading
         }
         public sealed class ResultImageModel
         {
-            public ResultImageModel(ImageDetails img, int cardSide)
+            public ResultImageModel(Guid id, string name, int cardSide)
             {
-                ImageId = img.ImageId;
-                Name = img.Name;
+                ImageId = id;
+                Name = name;
                 CardSide = cardSide;
             }
             public Guid ImageId { get; }

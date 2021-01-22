@@ -30,7 +30,7 @@ namespace MemCheck.Application.Loading
             return heapingAlgorithm;
 
         }
-        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imagesDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
+        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
         {
             var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking()
                 .Include(card => card.Card).AsSingleQuery()
@@ -82,7 +82,7 @@ namespace MemCheck.Application.Loading
                 userNames[cardInDeck.VersionCreator],
                 cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
                 cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
-                cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imagesDetails[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
+                cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
                 heapingAlgorithm,
                 ratings.User(cardInDeck.CardId),
                 ratings.Average(cardInDeck.CardId),
@@ -94,29 +94,6 @@ namespace MemCheck.Application.Loading
             else
                 return result;
         }
-        private ImmutableDictionary<Guid, ImageDetails> GetAllImagesDetails()
-        {
-            var imageInfos = dbContext.Images.AsNoTracking().Select(i => new ImageDetails(i.Id, i.Name, i.Owner.UserName, i.Description, i.Source));
-            return imageInfos.ToImmutableDictionary(img => img.ImageId, img => img);
-        }
-        #endregion
-        #region private classes
-        public sealed class ImageDetails
-        {
-            public ImageDetails(Guid imageId, string name, string ownerName, string description, string source)
-            {
-                Name = name;
-                OwnerName = ownerName;
-                Description = description;
-                Source = source;
-                ImageId = imageId;
-            }
-            public Guid ImageId { get; }
-            public string Name { get; set; }
-            public string OwnerName { get; set; }
-            public string Description { get; set; }
-            public string Source { get; set; }
-        }
         #endregion
         public GetUnknownCardsToLearn(MemCheckDbContext dbContext)
         {
@@ -124,17 +101,18 @@ namespace MemCheck.Application.Loading
         }
         public async Task<IEnumerable<ResultCard>> RunAsync(Request request)
         {
-            request.CheckValidity();
-            QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, request.CurrentUserId, request.DeckId);
+            request.CheckValidity(dbContext);
 
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-            var imagesDetails = GetAllImagesDetails();
+            var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
+
+
             var tagNames = GetAllAvailableTags.Run(dbContext);
 
             var result = new List<ResultCard>();
-            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload, true));
-            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imagesDetails, tagNames, request.CardsToDownload - result.Count, false));
+            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
+            result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
             return result;
         }
         #region Request and result classes
@@ -153,7 +131,7 @@ namespace MemCheck.Application.Loading
             public IEnumerable<Guid> ExcludedCardIds { get; }
             public IEnumerable<Guid> ExcludedTagIds { get; }
             public int CardsToDownload { get; }
-            public void CheckValidity()
+            public void CheckValidity(MemCheckDbContext dbContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
                     throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
@@ -165,6 +143,7 @@ namespace MemCheck.Application.Loading
                     throw new RequestInputException($"Invalid tag id");
                 if (CardsToDownload < 1 || CardsToDownload > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
+                QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, CurrentUserId, DeckId);
             }
         }
         public sealed class ResultCard
@@ -216,10 +195,10 @@ namespace MemCheck.Application.Loading
         }
         public sealed class ResultImageModel
         {
-            public ResultImageModel(ImageDetails img, int cardSide)
+            public ResultImageModel(Guid id, string name, int cardSide)
             {
-                ImageId = img.ImageId;
-                Name = img.Name;
+                ImageId = id;
+                Name = name;
                 CardSide = cardSide;
             }
             public Guid ImageId { get; }
