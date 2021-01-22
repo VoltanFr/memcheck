@@ -18,11 +18,6 @@ namespace MemCheck.Application.Loading
         private readonly MemCheckDbContext dbContext;
         #endregion
         #region Private methods
-        private ImmutableDictionary<Guid, bool> GetNotifications(Guid userId, ImmutableHashSet<Guid> cardIds)
-        {
-            var notifs = dbContext.CardNotifications.Where(notif => notif.UserId == userId && cardIds.Contains(notif.CardId)).Select(notif => notif.CardId).ToImmutableHashSet();
-            return cardIds.Select(cardId => new KeyValuePair<Guid, bool>(cardId, notifs.Contains(cardId))).ToImmutableDictionary();
-        }
         private async Task<HeapingAlgorithm> GetHeapingAlgorithmAsync(Guid deckId)
         {
             var heapingAlgorithmId = await dbContext.Decks.Where(deck => deck.Id == deckId).Select(deck => deck.HeapingAlgorithmId).SingleAsync();
@@ -68,7 +63,7 @@ namespace MemCheck.Application.Loading
             var listed = await withDetails.ToListAsync();
             var cardIds = listed.Select(cardInDeck => cardInDeck.CardId).ToImmutableHashSet();
             var ratings = CardRatings.Load(dbContext, userId, cardIds);
-            var notifications = GetNotifications(userId, cardIds);
+            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, cardIds);
 
             var result = listed.Select(cardInDeck => new ResultCard(
                 cardInDeck.CardId,
