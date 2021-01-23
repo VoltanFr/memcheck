@@ -1,4 +1,6 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Loading;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -15,7 +17,7 @@ namespace MemCheck.Application.CardChanging
     public class CreateCardTests
     {
         [TestMethod()]
-        public async Task TestCreationWithAllData()
+        public async Task WithAllData()
         {
             var testDB = DbHelper.GetEmptyTestDB();
 
@@ -79,7 +81,7 @@ namespace MemCheck.Application.CardChanging
             Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
         }
         [TestMethod()]
-        public async Task TestCreationWithUserSubscribingToCardOnEdit()
+        public async Task WithUserSubscribingToCardOnEdit()
         {
             var testDB = DbHelper.GetEmptyTestDB();
 
@@ -107,7 +109,7 @@ namespace MemCheck.Application.CardChanging
             Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
         }
         [TestMethod()]
-        public async Task TestCreatioFailsIfCreatorNotInVisibilityList()
+        public async Task CreatorNotInVisibilityList()
         {
             var testDB = DbHelper.GetEmptyTestDB();
 
@@ -133,6 +135,75 @@ namespace MemCheck.Application.CardChanging
             var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).ToEnumerable());
             var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
+        }
+        [TestMethod()]
+        public async Task MultipleImagesOnAdditionalSide()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var image1 = await ImageHelper.CreateAsync(db, user);
+            var image2 = await ImageHelper.CreateAsync(db, user);
+
+            Guid cardGuid;
+            var createRequest = new CreateCard.Request(
+                user,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                new Guid[] { image1, image2 },
+                language,
+                Array.Empty<Guid>(),
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+            using (var dbContext = new MemCheckDbContext(db))
+                cardGuid = await new CreateCard(dbContext).RunAsync(createRequest, new TestLocalizer());
+
+            var deck = await DeckHelper.CreateAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck, cardGuid, 1, new DateTime(2000, 1, 1));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+                var card = (await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4))).Single();
+
+                var images = card.Images;
+                Assert.AreEqual(2, images.Count());
+
+                var first = card.Images.First();
+                Assert.AreEqual(ImageInCard.AdditionalInfo, first.CardSide);
+                Assert.AreEqual(image1, first.ImageId);
+
+                var last = card.Images.Last();
+                Assert.AreEqual(ImageInCard.AdditionalInfo, last.CardSide);
+                Assert.AreEqual(image2, last.ImageId);
+            }
+        }
+        [TestMethod()]
+        public async Task SameImageUsedTwice()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var image = await ImageHelper.CreateAsync(db, user);
+
+            var request = new CreateCard.Request(
+                user,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                image.ToEnumerable(),
+                RandomHelper.String(),
+                image.ToEnumerable(),
+                language,
+                Array.Empty<Guid>(),
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext).RunAsync(request, new TestLocalizer()));
         }
     }
 }

@@ -135,5 +135,24 @@ namespace MemCheck.Application.Loading
                     Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
             }
         }
+        [TestMethod()]
+        public async Task OneCardWithImages()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user);
+            var image1 = await ImageHelper.CreateAsync(db, user);
+            var image2 = await ImageHelper.CreateAsync(db, user);
+            var createdCard = await CardHelper.CreateAsync(db, user, frontSideImages: new[] { image1, image2 });
+            await DeckHelper.AddCardAsync(db, deck, createdCard.Id, 1, new DateTime(2000, 1, 1));
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4));
+            var resultImages = cards.Single().Images;
+            Assert.AreEqual(2, resultImages.Count());
+            Assert.AreEqual(image1, resultImages.First().ImageId);
+            Assert.AreEqual(image2, resultImages.Last().ImageId);
+        }
     }
 }
