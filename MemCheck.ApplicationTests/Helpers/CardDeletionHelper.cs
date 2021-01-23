@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.CardChanging;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,7 +13,7 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(db);
             var deleter = new DeleteCards(dbContext, new TestLocalizer());
-            var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
+            var deletionRequest = new DeleteCards.Request(userId, cardId.ToEnumerable());
             await deleter.RunAsync(deletionRequest, deletionDate);
         }
     }

@@ -18,7 +18,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
             var cardId = Guid.NewGuid();
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, new[] { cardId });
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, cardId.ToEnumerable());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[cardId]);
         }
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, new[] { card.Id });
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.ToEnumerable());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[card.Id]);
         }
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Loading
             await CardSubscriptionHelper.CreateAsync(db, user, card.Id);
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(otherUser, new[] { card.Id });
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(otherUser, card.Id.ToEnumerable());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[card.Id]);
         }
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Loading
             var card = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, card.Id);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, new[] { card.Id });
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.ToEnumerable());
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result[card.Id]);
         }

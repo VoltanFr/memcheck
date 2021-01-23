@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.CardChanging;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -92,7 +93,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MinWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMaxSpeedForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -104,7 +105,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MaxWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMinSpeedForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -116,7 +117,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MinWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMaxSpeedForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -128,7 +129,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MaxWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedIntervalForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -140,7 +141,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MinWind} à {f.MaxWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedIntervalForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -152,7 +153,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{f.MinWind} à {f.MaxWind} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedMiddleForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -164,7 +165,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{(f.MinWind + f.MaxWind) / 2} nœuds";
-            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedMiddleForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -176,7 +177,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{(f.MinWind + f.MaxWind) / 2} nœuds";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameFromSpeedAsync(int windSpeed, BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -187,7 +188,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 logger.LogInformation($"Card already exists for {f.Name}: {frontSide}");
                 return;
             }
-            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberFromSpeedAsync(int windSpeed, BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -198,7 +199,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 logger.LogInformation($"Card already exists for {f.Name}: {frontSide}");
                 return;
             }
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"{f.Number}", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"{f.Number}", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameFromNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -209,7 +210,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 logger.LogInformation($"Card already exists for {f.Name}: {frontSide}");
                 return;
             }
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberFromNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -220,7 +221,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 logger.LogInformation($"Card already exists for {f.Name}: {frontSide}");
                 return;
             }
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Number}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Number}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceAboveNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -234,7 +235,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number + 1 >= forceFromNumber.Length)
                 return;
             var backSide = $"_{forceFromNumber[f.Number + 1].Name}_";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceBelowNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -248,7 +249,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number - 1 < 0)
                 return;
             var backSide = $"_{forceFromNumber[f.Number - 1].Name}_";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberOfForceAboveNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -262,7 +263,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number + 1 >= forceFromNumber.Length)
                 return;
             var backSide = $"{forceFromNumber[f.Number + 1].Number}";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberOfForceBelowNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -276,7 +277,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number - 1 < 0)
                 return;
             var backSide = $"{forceFromNumber[f.Number - 1].Number}";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceAboveNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -290,7 +291,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number + 1 >= forceFromNumber.Length)
                 return;
             var backSide = $"_{forceFromNumber[f.Number + 1].Name}_";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceBelowNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -304,7 +305,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             if (f.Number - 1 < 0)
                 return;
             var backSide = $"_{forceFromNumber[f.Number - 1].Name}_";
-            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         #endregion

@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.CardChanging;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -62,8 +63,8 @@ namespace MemCheck.Application.Tests.Notifying
         private static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var deleter = new DeleteCards(dbContext, new TestLocalizer(new[] { new KeyValuePair<string, string>("Deletion", DeletionDescription) }));
-            var deletionRequest = new DeleteCards.Request(userId, new[] { cardId });
+            var deleter = new DeleteCards(dbContext, new TestLocalizer(new KeyValuePair<string, string>("Deletion", DeletionDescription).ToEnumerable()));
+            var deletionRequest = new DeleteCards.Request(userId, cardId.ToEnumerable());
             await deleter.RunAsync(deletionRequest, deletionDate);
         }
         #endregion
@@ -103,7 +104,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var db = GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(db);
-            var deletedCard = await CreateDeletedCardAsync(db, user1, new DateTime(2020, 11, 2), new[] { user1 });
+            var deletedCard = await CreateDeletedCardAsync(db, user1, new DateTime(2020, 11, 2), user1.ToEnumerable());
 
             var user2 = await UserHelper.CreateInDbAsync(db);
             await CardSubscriptionHelper.CreateAsync(db, user2, deletedCard.Card, new DateTime(2020, 11, 1));

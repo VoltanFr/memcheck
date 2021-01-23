@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.Loading;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -207,7 +208,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
                     .Where(heapId => heapId != heap)
                     .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
-                    .Concat(new[] { new MoveToHeapExpiryInfo(0, CardInDeck.NeverLearntLastLearnTime) });
+                    .Concat(new MoveToHeapExpiryInfo(0, CardInDeck.NeverLearntLastLearnTime).ToEnumerable());
             }
             public Guid CardId { get; }
             public int Heap { get; }

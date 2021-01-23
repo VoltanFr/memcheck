@@ -127,7 +127,7 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? RandomHelper.String()
                 );
         }
-        public static UpdateCard.Request RequestForBackSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
+        public static UpdateCard.Request RequestForBackSideImageChange(Card card, IEnumerable<Guid> images, Guid? versionCreator = null, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,
@@ -144,7 +144,7 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? RandomHelper.String()
                 );
         }
-        public static UpdateCard.Request RequestForAdditionalSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
+        public static UpdateCard.Request RequestForAdditionalSideImageChange(Card card, IEnumerable<Guid> images, Guid? versionCreator = null, string? versionDescription = null)
         {
             return new UpdateCard.Request(
                 card.Id,

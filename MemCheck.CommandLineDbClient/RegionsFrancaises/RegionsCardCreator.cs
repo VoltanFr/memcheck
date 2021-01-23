@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -129,7 +130,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var frontSideImages = new[] { region.GetImageDbId(dbContext) };
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
-            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, Array.Empty<Guid>(), frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhereIsThisRegionAsync(Region region, MemCheckUser user, Guid regionsWithoutNamesImageId, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -147,7 +148,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSideImages = new[] { region.GetImageDbId(dbContext) };
             var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = new[] { regionsAndDepartmentsWithNamesImageId };
-            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_HowManyDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -165,7 +166,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var additionalInfo = string.Join(Environment.NewLine, region.Departments);
             var additionalInfoImages = Array.Empty<Guid>();
-            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatAreTheDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -183,7 +184,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var additionalInfo = $"La région {region.Name} est constituée de {region.Departments.Length} départements.{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = Array.Empty<Guid>();
-            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, new[] { tagId }, Array.Empty<Guid>(), CardVersionDescription);
+            var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.ToEnumerable(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         #endregion

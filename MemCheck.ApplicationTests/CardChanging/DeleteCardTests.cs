@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace MemCheck.Application.CardChanging
         {
             var db = DbHelper.GetEmptyTestDB();
             var userWithView = await UserHelper.CreateInDbAsync(db);
-            var card = await CardHelper.CreateAsync(db, userWithView, new DateTime(2020, 11, 1), userWithViewIds: new[] { userWithView });
+            var card = await CardHelper.CreateAsync(db, userWithView, new DateTime(2020, 11, 1), userWithViewIds: userWithView.ToEnumerable());
             var otherUser = await UserHelper.CreateInDbAsync(db);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await CardDeletionHelper.DeleteCardAsync(db, otherUser, card.Id));
         }

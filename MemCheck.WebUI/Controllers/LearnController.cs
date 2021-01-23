@@ -2,6 +2,7 @@
 using MemCheck.Application.Loading;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -328,12 +329,12 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             if (notif)
             {
-                var request = new AddCardSubscriptions.Request(userId, new[] { cardId });
+                var request = new AddCardSubscriptions.Request(userId, cardId.ToEnumerable());
                 await new AddCardSubscriptions(dbContext).RunAsync(request);
             }
             else
             {
-                var request = new RemoveCardSubscriptions.Request(userId, new[] { cardId });
+                var request = new RemoveCardSubscriptions.Request(userId, cardId.ToEnumerable());
                 await new RemoveCardSubscriptions(dbContext).RunAsync(request);
             }
             return Ok();

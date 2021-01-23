@@ -24,7 +24,7 @@ namespace MemCheck.Basics.Tests
         public void OneEntry()
         {
             var elem = Guid.NewGuid();
-            Assert.AreEqual(elem, Shuffler.Shuffle(new[] { elem }).Single());
+            Assert.AreEqual(elem, Shuffler.Shuffle(elem.ToEnumerable()).Single());
         }
         [TestMethod()]
         public void NoElementLost()
