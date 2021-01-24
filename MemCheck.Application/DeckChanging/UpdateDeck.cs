@@ -26,7 +26,7 @@ namespace MemCheck.Application.DeckChanging
             await dbContext.SaveChangesAsync();
             return true;
         }
-        #region Request and result types
+        #region Request type
         public sealed record Request(Guid UserId, Guid DeckId, string Name, int HeapingAlgorithmId)
         {
             public const int MinNameLength = 3;
