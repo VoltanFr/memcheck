@@ -316,8 +316,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpPatch("SetCardRating/{cardId}/{rating}")]
         public async Task<IActionResult> SetCardRating(Guid cardId, int rating)
         {
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var request = new SetCardRating.Request(user, cardId, rating);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var request = new SetCardRating.Request(userId, cardId, rating);
             await new SetCardRating(dbContext).RunAsync(request);
             return Ok();
         }

@@ -21,10 +21,10 @@ namespace MemCheck.Application
         {
             request.CheckValidity();
 
-            var existing = await dbContext.UserCardRatings.Where(rating => rating.UserId == request.User.Id && rating.CardId == request.CardId).SingleOrDefaultAsync();
+            var existing = await dbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();
 
             if (existing == null)
-                dbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.User.Id, CardId = request.CardId, Rating = request.Rating });
+                dbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = request.CardId, Rating = request.Rating });
             else
                 existing.Rating = request.Rating;
 
@@ -33,18 +33,18 @@ namespace MemCheck.Application
         #region Request class
         public sealed class Request
         {
-            public Request(MemCheckUser user, Guid cardId, int rating)
+            public Request(Guid userId, Guid cardId, int rating)
             {
-                User = user;
+                UserId = userId;
                 CardId = cardId;
                 Rating = rating;
             }
-            public MemCheckUser User { get; }
+            public Guid UserId { get; }
             public Guid CardId { get; }
             public int Rating { get; }
             public void CheckValidity()
             {
-                if (QueryValidationHelper.IsReservedGuid(User.Id))
+                if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new RequestInputException("Invalid user id");
                 if (QueryValidationHelper.IsReservedGuid(CardId))
                     throw new RequestInputException("Invalid card id");

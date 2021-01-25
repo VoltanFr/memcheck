@@ -34,7 +34,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
 
             foreach (var cardId in cardIds)
             {
-                var request = new SetCardRating.Request(ratingUser, cardId, 5);
+                var request = new SetCardRating.Request(ratingUser.Id, cardId, 5);
                 await rater.RunAsync(request);
             }
 
