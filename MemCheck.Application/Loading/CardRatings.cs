@@ -4,7 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Loading
 {
     internal sealed class CardRatings
     {
