@@ -30,8 +30,8 @@ namespace MemCheck.Application.Loading
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
+            using var dbContext = new MemCheckDbContext(db);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotView()
