@@ -2,6 +2,7 @@
 using MemCheck.Application.Loading;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Ratings;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;

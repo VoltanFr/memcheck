@@ -1,4 +1,4 @@
-﻿using MemCheck.Application;
+﻿using MemCheck.Application.Ratings;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
