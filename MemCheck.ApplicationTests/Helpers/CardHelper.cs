@@ -87,6 +87,14 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result;
         }
+        public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
+            Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
+            string? frontSide = null, string? backSide = null, string? additionalInfo = null,
+            IEnumerable<Guid>? frontSideImages = null, IEnumerable<Guid>? additionalSideImages = null,
+            string? versionDescription = null)
+        {
+            return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, frontSideImages, additionalSideImages, versionDescription)).Id;
+        }
         public static async Task AssertCardHasFrontSide(DbContextOptions<MemCheckDbContext> testDB, Guid cardId, string expected)
         {
             using var dbContext = new MemCheckDbContext(testDB);

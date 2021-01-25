@@ -195,8 +195,8 @@ namespace MemCheck.Application.Loading
             const int cardCount = 100;
             for (int i = 0; i < cardCount; i++)
             {
-                await DeckHelper.AddNeverLearntCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id);
-                await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 0);
+                await DeckHelper.AddNeverLearntCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user));
+                await DeckHelper.AddCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user), 0);
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
@@ -216,8 +216,8 @@ namespace MemCheck.Application.Loading
             const int cardCount = 10;
             for (int i = 0; i < cardCount / 2; i++)
             {
-                await DeckHelper.AddNeverLearntCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id);
-                await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 0);
+                await DeckHelper.AddNeverLearntCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user));
+                await DeckHelper.AddCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user), 0);
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);

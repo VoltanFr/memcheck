@@ -39,9 +39,9 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user, (await CardHelper.CreateAsync(testDB, user)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user, await CardHelper.CreateIdAsync(testDB, user));
+            await CardSubscriptionHelper.CreateAsync(testDB, user, await CardHelper.CreateIdAsync(testDB, user));
+            await CardSubscriptionHelper.CreateAsync(testDB, user, await CardHelper.CreateIdAsync(testDB, user));
 
             using var dbContext = new MemCheckDbContext(testDB);
             var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
@@ -55,12 +55,12 @@ namespace MemCheck.Application.Tests.Notifying
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
             var user2 = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user2, (await CardHelper.CreateAsync(testDB, user1)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user2, await CardHelper.CreateIdAsync(testDB, user1));
 
             var user3 = await UserHelper.CreateInDbAsync(testDB);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user1)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user2)).Id);
-            await CardSubscriptionHelper.CreateAsync(testDB, user3, (await CardHelper.CreateAsync(testDB, user3)).Id);
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, await CardHelper.CreateIdAsync(testDB, user1));
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, await CardHelper.CreateIdAsync(testDB, user2));
+            await CardSubscriptionHelper.CreateAsync(testDB, user3, await CardHelper.CreateIdAsync(testDB, user3));
 
             using var dbContext = new MemCheckDbContext(testDB);
             var counter = new UserCardSubscriptionCounter(dbContext);

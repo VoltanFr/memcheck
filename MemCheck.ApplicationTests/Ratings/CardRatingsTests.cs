@@ -80,10 +80,10 @@ namespace MemCheck.Application.Ratings
 
             var user1 = await UserHelper.CreateInDbAsync(db);
             var user2 = await UserHelper.CreateInDbAsync(db);
-            var card1 = (await CardHelper.CreateAsync(db, user1)).Id;
-            var card2 = (await CardHelper.CreateAsync(db, user1)).Id;
-            var card3 = (await CardHelper.CreateAsync(db, user1)).Id;
-            var card4 = (await CardHelper.CreateAsync(db, user1)).Id;
+            var card1 = await CardHelper.CreateIdAsync(db, user1);
+            var card2 = await CardHelper.CreateIdAsync(db, user1);
+            var card3 = await CardHelper.CreateIdAsync(db, user1);
+            var card4 = await CardHelper.CreateIdAsync(db, user1);
 
             using (var dbContext = new MemCheckDbContext(db))
             {
