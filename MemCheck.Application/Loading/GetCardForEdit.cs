@@ -21,7 +21,7 @@ namespace MemCheck.Application.Loading
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            request.CheckValidity(dbContext);
 
             var card = await dbContext.Cards
                 .Include(card => card.VersionCreator)
@@ -75,13 +75,11 @@ namespace MemCheck.Application.Loading
             }
             public Guid CurrentUserId { get; }
             public Guid CardId { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public void CheckValidity(MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
-                    throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
-                if (QueryValidationHelper.IsReservedGuid(CardId))
-                    throw new RequestInputException($"Invalid card id '{CardId}'");
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, CurrentUserId, CardId);
+                QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
+                QueryValidationHelper.CheckNotReservedGuid(CardId);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, CurrentUserId, CardId);
             }
         }
         public sealed class ResultModel

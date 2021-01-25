@@ -55,8 +55,8 @@ namespace MemCheck.Application.CardChanging
                 if (QueryValidationHelper.IsReservedGuid(TagId))
                     throw new RequestInputException("Reserved tag id");
                 foreach (var cardId in CardIds)
-                    await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, VersionCreator.Id, cardId);
-                if (!dbContext.Tags.Where(tag => tag.Id == TagId).Any())
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, VersionCreator.Id, cardId);
+                if (!await dbContext.Tags.Where(tag => tag.Id == TagId).AnyAsync())
                     throw new RequestInputException("Invalid tag id");
             }
         }

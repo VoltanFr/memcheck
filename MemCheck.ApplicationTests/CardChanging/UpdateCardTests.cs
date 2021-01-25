@@ -203,8 +203,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, originalCard.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, newVersionCreator, originalCard.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, originalCard.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, newVersionCreator, originalCard.Id);
             }
         }
         [TestMethod()]
@@ -283,8 +283,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -295,8 +295,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id));
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                Assert.ThrowsException<ApplicationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
             }
         }
         [TestMethod()]
@@ -310,8 +310,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -322,8 +322,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id));
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                Assert.ThrowsException<ApplicationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
             }
         }
         [TestMethod()]
@@ -362,8 +362,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id);
             }
         }
         [TestMethod()]
@@ -405,8 +405,8 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, newVersionCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, newVersionCreator, card.Id);
             }
         }
         [TestMethod()]
@@ -454,9 +454,9 @@ namespace MemCheck.Application.CardChanging
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, cardCreator, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, otherUser, card.Id);
-                await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, userWithCardInDeck, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, userWithCardInDeck, card.Id);
             }
         }
     }

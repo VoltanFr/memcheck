@@ -22,18 +22,16 @@ namespace MemCheck.Application.QueryValidation
                 throw new ApplicationException("Invalid user with view id");
             return !usersWithView.Any() || usersWithView.Any(userWithView => userWithView == userId);
         }
-        public static async Task CheckUserIsAllowedToViewCardAsync(MemCheckDbContext dbContext, Guid userId, Guid cardId)
+        public static void CheckUserIsAllowedToViewCards(MemCheckDbContext dbContext, Guid userId, params Guid[] cardIds)
         {
-            if (!await dbContext.Users.AnyAsync(u => u.Id == userId))
-                throw new ApplicationException("Invalid user");
-            var card = await dbContext.Cards
+            var cards = dbContext.Cards
                 .AsNoTracking()
                 .Include(card => card.UsersWithView)
                 .Include(card => card.VersionCreator)
-                .Where(card => card.Id == cardId)
-                .SingleAsync();
-            if (!CardIsVisibleToUser(userId, card.UsersWithView))
-                throw new ApplicationException("User not allowed to view card");
+                .Where(card => cardIds.Contains(card.Id));
+            foreach (var card in cards)
+                if (!CardIsVisibleToUser(userId, card.UsersWithView))
+                    throw new ApplicationException("User not allowed to view card");
         }
         public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
         {

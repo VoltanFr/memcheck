@@ -19,7 +19,7 @@ namespace MemCheck.Application.Notifying
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            request.CheckValidity(dbContext);
 
             var now = DateTime.UtcNow;
 
@@ -52,14 +52,13 @@ namespace MemCheck.Application.Notifying
             }
             public Guid UserId { get; }
             public IEnumerable<Guid> CardIds { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public void CheckValidity(MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(UserId))
-                    throw new RequestInputException("Invalid user id");
+                QueryValidationHelper.CheckNotReservedGuid(UserId);
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
                 foreach (var cardId in CardIds)
-                    await CardVisibilityHelper.CheckUserIsAllowedToViewCardAsync(dbContext, UserId, cardId);
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, UserId, cardId);
             }
         }
         #endregion
