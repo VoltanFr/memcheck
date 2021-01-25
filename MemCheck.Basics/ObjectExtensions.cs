@@ -4,7 +4,7 @@ namespace MemCheck.Basics
 {
     public static class ObjectExtensions
     {
-        public static IEnumerable<T> ToEnumerable<T>(this T t)
+        public static T[] ToEnumerable<T>(this T t)
         {
             return new[] { t };
         }

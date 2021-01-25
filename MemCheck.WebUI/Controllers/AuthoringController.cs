@@ -1,8 +1,10 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.DeckChanging;
 using MemCheck.Application.History;
 using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -73,12 +75,12 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> PostCardOfUser([FromBody] PostCardOfUserRequest card)
         {
             CheckBodyParameter(card);
-            var user = await userManager.GetUserAsync(HttpContext.User);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var versionDescription = Get("InitialCardVersionCreation");
-            var request = new CreateCard.Request(user.Id, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+            var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
             var cardId = await new CreateCard(dbContext).RunAsync(request, this);
             if (card.AddToDeck != Guid.Empty)
-                await new AddCardInDeck(dbContext).RunAsync(card.AddToDeck, cardId);
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.ToEnumerable()));
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class PostCardOfUserRequest

@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.DeckChanging;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -120,7 +121,7 @@ namespace MemCheck.Application.Searching
             var user1deck = await DeckHelper.CreateAsync(testDB, user1Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                new AddCardsInDeck(dbContext).Run(user1deck, new[] { card1.Id, card2.Id });
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -152,7 +153,7 @@ namespace MemCheck.Application.Searching
             var user1deck = await DeckHelper.CreateAsync(testDB, user1Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                new AddCardsInDeck(dbContext).Run(user1deck, new[] { card1.Id, card2.Id });
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

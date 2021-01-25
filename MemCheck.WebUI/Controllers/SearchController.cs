@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
+using MemCheck.Application.DeckChanging;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Searching;
@@ -458,10 +459,11 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region AddCardsToDeck
         [HttpPost("AddCardsToDeck/{deckId}"), Authorize]
-        public IActionResult AddCardsToDeck(Guid deckId, [FromBody] AddCardsToDeckRequest request)
+        public async Task<IActionResult> AddCardsToDeck(Guid deckId, [FromBody] AddCardsToDeckRequest request)
         {
             CheckBodyParameter(request);
-            new AddCardsInDeck(dbContext).Run(deckId, request.CardIds);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardAdded") : Get("CardsAdded"), this);
         }
         public sealed class AddCardsToDeckRequest

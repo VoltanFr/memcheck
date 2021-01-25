@@ -1,7 +1,9 @@
 ﻿using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Helpers
@@ -41,6 +43,12 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task AddNeverLearntCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card)
         {
             await AddCardAsync(testDB, deck, card, 0, CardInDeck.NeverLearntLastLearnTime);
+        }
+        public static async Task CheckDeckContainsCards(DbContextOptions<MemCheckDbContext> testDB, Guid deck, params Guid[] cards)
+        {
+            using var dbContext = new MemCheckDbContext(testDB);
+            var matchingCardsInDeckCount = await dbContext.CardsInDecks.AsNoTracking().CountAsync(cardInDeck => cardInDeck.DeckId == deck && cards.Contains(cardInDeck.CardId));
+            Assert.AreEqual(cards.Length, matchingCardsInDeckCount);
         }
     }
 }
