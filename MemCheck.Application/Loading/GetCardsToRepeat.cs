@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Ratings;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;

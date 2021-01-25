@@ -1,13 +1,11 @@
 ﻿using MemCheck.Application.Tests.Helpers;
-using MemCheck.Basics;
 using MemCheck.Database;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Ratings
 {
     [TestClass()]
     public class CardRatingsTests

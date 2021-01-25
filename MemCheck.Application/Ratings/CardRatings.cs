@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Ratings
 {
     internal sealed class CardRatings
     {
