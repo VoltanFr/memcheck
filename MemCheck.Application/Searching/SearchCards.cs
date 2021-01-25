@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -156,7 +157,7 @@ namespace MemCheck.Application.Searching
                 if (cardsFilteredWithVisibility.Count() > 20000)
                     throw new SearchResultTooBigForRatingException();
 
-                cardRatings = CardRatings.Load(dbContext, request.UserId, cardsFilteredWithVisibility.Select(card => card.Id).ToImmutableHashSet());
+                cardRatings = await CardRatings.LoadAsync(dbContext, request.UserId, cardsFilteredWithVisibility.Select(card => card.Id));
                 if (request.RatingFiltering == Request.RatingFilteringMode.NoRating)
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithoutEval.Contains(card.Id));
                 else
@@ -184,7 +185,7 @@ namespace MemCheck.Application.Searching
             var pageCards = await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
             if (cardRatings == null)
-                cardRatings = CardRatings.Load(dbContext, request.UserId, pageCards.Select(card => card.Id).ToImmutableHashSet());
+                cardRatings = await CardRatings.LoadAsync(dbContext, request.UserId, pageCards.Select(card => card.Id));
 
             var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(card.Id, card.FrontSide, card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name), card.UsersWithView, cardRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
 

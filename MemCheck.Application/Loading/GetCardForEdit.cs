@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace MemCheck.Application.Loading
             if (card == null)
                 throw new RequestInputException("Card not found in database");
 
-            var ratings = CardRatings.Load(dbContext, request.CurrentUserId, ImmutableHashSet.Create(request.CardId));
+            var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId.AsArray());
 
             var ownersOfDecksWithThisCard = dbContext.CardsInDecks
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId)

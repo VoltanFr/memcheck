@@ -61,8 +61,8 @@ namespace MemCheck.Application.Loading
             });
 
             var listed = await withDetails.ToListAsync();
-            var cardIds = listed.Select(cardInDeck => cardInDeck.CardId).ToImmutableHashSet();
-            var ratings = CardRatings.Load(dbContext, userId, cardIds);
+            var cardIds = listed.Select(cardInDeck => cardInDeck.CardId);
+            var ratings = await CardRatings.LoadAsync(dbContext, userId, cardIds);
             var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, cardIds);
 
             var result = listed.Select(cardInDeck => new ResultCard(

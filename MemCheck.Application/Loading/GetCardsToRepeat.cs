@@ -25,7 +25,7 @@ namespace MemCheck.Application.Loading
             return heapingAlgorithm;
 
         }
-        private IEnumerable<ResultCard> Run(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
+        private async Task<IEnumerable<ResultCard>> RunAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
         {
             var result = new List<ResultCard>();
 
@@ -68,9 +68,8 @@ namespace MemCheck.Application.Loading
                         imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
                     }).ToList();
 
-                var cardIds = expired.ToImmutableHashSet();
-                var ratings = CardRatings.Load(dbContext, userId, cardIds);
-                var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, cardIds);
+                var ratings = await CardRatings.LoadAsync(dbContext, userId, expired);
+                var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, expired);
 
                 var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
@@ -107,7 +106,7 @@ namespace MemCheck.Application.Loading
             var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
             var tagNames = GetAllAvailableTags.Run(dbContext);
 
-            return Run(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
+            return await RunAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
         }
         #region Request and result classes
         public sealed class Request
