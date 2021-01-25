@@ -64,7 +64,6 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         [HttpGet("GetCardsNotInDeck/{id}")] public IActionResult GetCardsNotInDeck(Guid id) => Ok(new GetCardsNotInDeck(dbContext).Run(id));
         [HttpGet("GetCardsInDeck/{id}")] public IActionResult GetCardsInDeck(Guid id) => Ok(new GetCardsInDeck(dbContext).Run(id));  //To be renamed to CardsInDeck
-        [HttpPost("AddCardInDeck/{deckId}/{cardId}")] public async Task<IActionResult> AddCardInDeck(Guid deckId, Guid cardId) => Ok(await new AddCardInDeck(dbContext).RunAsync(deckId, cardId));
         #region RemoveCardFromDeck
         [HttpDelete("RemoveCardFromDeck/{deckId}/{cardId}")]
         public async Task<IActionResult> RemoveCardFromDeck(Guid deckId, Guid cardId)
