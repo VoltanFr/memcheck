@@ -32,11 +32,13 @@ namespace MemCheck.Application.CardChanging
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var languageId = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, user, language: languageId);
+            var frontSide = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, user, language: languageId, frontSide: frontSide);
 
             using var dbContext = new MemCheckDbContext(db);
             var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), Guid.NewGuid());
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            await CardHelper.AssertCardHasFrontSide(db, card.Id, frontSide);
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
@@ -54,12 +56,14 @@ namespace MemCheck.Application.CardChanging
             var db = DbHelper.GetEmptyTestDB();
             var cardCreator = await UserHelper.CreateInDbAsync(db);
             var languageId = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: cardCreator.ToEnumerable());
+            var frontSide = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: cardCreator.ToEnumerable(), frontSide: frontSide);
             var otherUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
             var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), otherUser);
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer()));
+            await CardHelper.AssertCardHasFrontSide(db, card.Id, frontSide);
         }
         [TestMethod()]
         public async Task PublicCard()
@@ -77,11 +81,7 @@ namespace MemCheck.Application.CardChanging
                 await new UpdateCard(dbContext).RunAsync(r, new TestLocalizer());
             }
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var cardFromDb = dbContext.Cards.Single(c => c.Id == card.Id);
-                Assert.AreEqual(newFrontSide, cardFromDb.FrontSide);
-            }
+            await CardHelper.AssertCardHasFrontSide(db, card.Id, newFrontSide);
         }
         [TestMethod()]
         public async Task UserNotInNewVisibilityList()

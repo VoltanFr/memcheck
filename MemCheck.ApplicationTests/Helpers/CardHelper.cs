@@ -87,5 +87,11 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result;
         }
+        public static async Task AssertCardHasFrontSide(DbContextOptions<MemCheckDbContext> testDB, Guid cardId, string expected)
+        {
+            using var dbContext = new MemCheckDbContext(testDB);
+            var cardFromDb = await dbContext.Cards.SingleAsync(c => c.Id == cardId);
+            Assert.AreEqual(expected, cardFromDb.FrontSide);
+        }
     }
 }
