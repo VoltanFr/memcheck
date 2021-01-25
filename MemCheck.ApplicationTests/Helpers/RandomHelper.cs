@@ -51,5 +51,6 @@ namespace MemCheck.Application.Tests.Helpers
         {
             return d.AddDays(-random.Next(1, 3650));
         }
+        public static Random Random => random;
     }
 }
