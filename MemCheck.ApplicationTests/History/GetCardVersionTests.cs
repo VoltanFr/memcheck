@@ -38,7 +38,7 @@ namespace MemCheck.Application.History
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             var language = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.ToEnumerable()); //Private
+            var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray()); //Private
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: Array.Empty<Guid>()), new TestLocalizer());    //Now public
             var otherUserId = await UserHelper.CreateInDbAsync(db);

@@ -39,7 +39,7 @@ namespace MemCheck.Application.Loading
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             var language = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.ToEnumerable());
+            var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray());
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
             await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
@@ -92,7 +92,7 @@ namespace MemCheck.Application.Loading
             var otherUserName = RandomHelper.String();
             var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
             var versionDescription = RandomHelper.String();
-            var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, tagIds: tag.ToEnumerable(), userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
+            var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, tagIds: tag.AsArray(), userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
 
             var deck = await DeckHelper.CreateAsync(db, otherUserId);
             await DeckHelper.AddCardAsync(db, deck, card.Id, 0);

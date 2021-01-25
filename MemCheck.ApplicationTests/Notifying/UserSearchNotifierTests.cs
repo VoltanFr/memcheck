@@ -45,7 +45,7 @@ namespace MemCheck.Application.Tests.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var card = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), userWithViewIds: user.ToEnumerable());
+            var card = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), userWithViewIds: user.AsArray());
             var subscription = await SearchSubscriptionHelper.CreateAsync(db, user);
             var runDate = new DateTime(2050, 05, 01);
 
@@ -230,12 +230,12 @@ namespace MemCheck.Application.Tests.Notifying
             var excludedTag = await TagHelper.CreateAsync(db);
 
             var card1 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { requiredTag, excludedTag });
-            var card2 = await CardHelper.CreateAsync(db, user, language: language, tagIds: requiredTag.ToEnumerable());
+            var card2 = await CardHelper.CreateAsync(db, user, language: language, tagIds: requiredTag.AsArray());
 
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", requiredTag.ToEnumerable(), new[] { excludedTag });
+                var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", requiredTag.AsArray(), new[] { excludedTag });
                 var subscriber = new SubscribeToSearch(dbContext);
                 subscriptionId = await subscriber.RunAsync(subscriberRequest);
             }
@@ -257,7 +257,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateDate = new DateTime(2050, 05, 02);
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card1, requiredTag.ToEnumerable()), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForTagChange(card1, requiredTag.AsArray()), new TestLocalizer(), updateDate);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -386,7 +386,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deleter = new DeleteCards(dbContext, new TestLocalizer());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.ToEnumerable()), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
 
             var runDate = new DateTime(2050, 05, 04);
@@ -476,7 +476,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.ToEnumerable());
+                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
@@ -520,7 +520,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.ToEnumerable());
+                var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.AsArray());
                 await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(deletionRequest);
             }
 
@@ -587,14 +587,14 @@ namespace MemCheck.Application.Tests.Notifying
             //Create a previous version which prevents subscriber from seing the card
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.ToEnumerable());
+                var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
                 await new UpdateCard(dbContext).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
             }
 
             //Delete the card
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.ToEnumerable());
+                var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.AsArray());
                 await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(deletionRequest);
             }
 

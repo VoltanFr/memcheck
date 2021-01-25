@@ -18,7 +18,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
             var cardId = Guid.NewGuid();
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, cardId.ToEnumerable());
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, cardId.AsArray());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[cardId]);
         }
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Loading
             var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.ToEnumerable());
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.AsArray());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[card.Id]);
         }
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Loading
             await CardSubscriptionHelper.CreateAsync(db, user, card.Id);
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(otherUser, card.Id.ToEnumerable());
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(otherUser, card.Id.AsArray());
             Assert.AreEqual(1, result.Count);
             Assert.IsFalse(result[card.Id]);
         }
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Loading
             var card = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, card.Id);
             using var dbContext = new MemCheckDbContext(db);
-            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.ToEnumerable());
+            var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.AsArray());
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result[card.Id]);
         }
@@ -67,11 +67,11 @@ namespace MemCheck.Application.Loading
             var deletedCard = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, deletedCard.Id);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.ToEnumerable()));
+                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, deletedCard.Id.ToEnumerable());
+                var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, deletedCard.Id.AsArray());
                 Assert.AreEqual(1, result.Count);
                 Assert.IsTrue(result[deletedCard.Id]);
             }
@@ -91,7 +91,7 @@ namespace MemCheck.Application.Loading
             var deletedCard = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, deletedCard.Id);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.ToEnumerable()));
+                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
 
             var nonRegisteredCard = await CardHelper.CreateAsync(db, user);
 

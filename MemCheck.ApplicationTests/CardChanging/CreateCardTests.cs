@@ -132,7 +132,7 @@ namespace MemCheck.Application.CardChanging
                 new Guid[] { otherUser },
                 RandomHelper.String());
             var ownerMustHaveVisibility = RandomHelper.String();
-            var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).ToEnumerable());
+            var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).AsArray());
             var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
         }
@@ -194,9 +194,9 @@ namespace MemCheck.Application.CardChanging
                 RandomHelper.String(),
                 Array.Empty<Guid>(),
                 RandomHelper.String(),
-                image.ToEnumerable(),
+                image.AsArray(),
                 RandomHelper.String(),
-                image.ToEnumerable(),
+                image.AsArray(),
                 language,
                 Array.Empty<Guid>(),
                 Array.Empty<Guid>(),

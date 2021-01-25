@@ -150,7 +150,7 @@ namespace MemCheck.Application.Tests.Notifying
             var testDB = DbHelper.GetEmptyTestDB();
             var user1 = await UserHelper.CreateInDbAsync(testDB);
 
-            var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2), user1.ToEnumerable());
+            var card = await CardHelper.CreateAsync(testDB, user1, new DateTime(2020, 11, 2), user1.AsArray());
             var previousVersion = await CreateCardPreviousVersionAsync(testDB, user1, card.Id, new DateTime(2020, 11, 1));
 
             var user2 = await UserHelper.CreateInDbAsync(testDB);

@@ -329,12 +329,12 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             if (notif)
             {
-                var request = new AddCardSubscriptions.Request(userId, cardId.ToEnumerable());
+                var request = new AddCardSubscriptions.Request(userId, cardId.AsArray());
                 await new AddCardSubscriptions(dbContext).RunAsync(request);
             }
             else
             {
-                var request = new RemoveCardSubscriptions.Request(userId, cardId.ToEnumerable());
+                var request = new RemoveCardSubscriptions.Request(userId, cardId.AsArray());
                 await new RemoveCardSubscriptions(dbContext).RunAsync(request);
             }
             return Ok();

@@ -13,7 +13,7 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(db);
             var deleter = new DeleteCards(dbContext, new TestLocalizer());
-            var deletionRequest = new DeleteCards.Request(userId, cardId.ToEnumerable());
+            var deletionRequest = new DeleteCards.Request(userId, cardId.AsArray());
             await deleter.RunAsync(deletionRequest, deletionDate);
         }
     }

@@ -61,7 +61,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Guid.NewGuid().ToEnumerable())));
+            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Guid.NewGuid().AsArray())));
         }
         [TestMethod()]
         public async Task ACardDoesNotExist()
@@ -81,9 +81,9 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.ToEnumerable()));
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.ToEnumerable()));
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
             await DeckHelper.CheckDeckContainsCards(db, deck, card.Id);
         }
         [TestMethod()]
@@ -95,7 +95,7 @@ namespace MemCheck.Application.DeckChanging
             var card1 = await CardHelper.CreateAsync(db, user);
             var card2 = await CardHelper.CreateAsync(db, user);
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card1.Id.ToEnumerable()));
+                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card1.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
                 await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card2.Id, card1.Id }));
             await DeckHelper.CheckDeckContainsCards(db, deck, new[] { card2.Id, card1.Id });
@@ -105,19 +105,19 @@ namespace MemCheck.Application.DeckChanging
         {
             var db = DbHelper.GetEmptyTestDB();
             var cardCreator = await UserHelper.CreateInDbAsync(db);
-            var card = await CardHelper.CreateAsync(db, cardCreator, userWithViewIds: cardCreator.ToEnumerable());
+            var card = await CardHelper.CreateAsync(db, cardCreator, userWithViewIds: cardCreator.AsArray());
             var deckOwner = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.ToEnumerable())));
+            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task UserNotAllowedToViewACard()
         {
             var db = DbHelper.GetEmptyTestDB();
             var cardCreator = await UserHelper.CreateInDbAsync(db);
-            var cardNotAllowed = await CardHelper.CreateAsync(db, cardCreator, userWithViewIds: cardCreator.ToEnumerable());
+            var cardNotAllowed = await CardHelper.CreateAsync(db, cardCreator, userWithViewIds: cardCreator.AsArray());
             var deckOwner = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
             var publicCard = await CardHelper.CreateAsync(db, cardCreator);
