@@ -40,7 +40,7 @@ namespace MemCheck.Application.Loading
             if (card == null)
                 throw new RequestInputException("Card not found in database");
 
-            var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId.AsArray());
+            var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId);
 
             var ownersOfDecksWithThisCard = dbContext.CardsInDecks
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId)

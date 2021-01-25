@@ -47,6 +47,10 @@ namespace MemCheck.Application.Loading
             return averageRatings.Where(IdAndRating => IdAndRating.Value <= r).Select(IdAndRating => IdAndRating.Key).ToImmutableHashSet();
         }
 
+        public static async Task<CardRatings> LoadAsync(MemCheckDbContext dbContext, Guid userId, params Guid[] cardIds)
+        {
+            return await LoadAsync(dbContext, userId, (IEnumerable<Guid>)cardIds);
+        }
         public static async Task<CardRatings> LoadAsync(MemCheckDbContext dbContext, Guid userId, IEnumerable<Guid> cardIds)
         {
             //This class is internal, so no input validity checking
