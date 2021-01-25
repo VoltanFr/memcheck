@@ -31,7 +31,7 @@ namespace MemCheck.Application.Ratings
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user);
-            var rating = RandomHelper.Random.Next(1, 5);
+            var rating = RandomHelper.Rating();
 
             using (var dbContext = new MemCheckDbContext(db))
                 await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card.Id, rating));
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Ratings
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, user);
-            var rating = RandomHelper.Random.Next(1, 5);
+            var rating = RandomHelper.Rating();
 
             using (var dbContext = new MemCheckDbContext(db))
                 await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card.Id, rating));
