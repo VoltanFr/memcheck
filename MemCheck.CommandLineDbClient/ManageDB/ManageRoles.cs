@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Heaping;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;

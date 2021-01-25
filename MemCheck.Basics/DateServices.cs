@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MemCheck.Application
+namespace MemCheck.Basics
 {
     public static class DateServices
     {
