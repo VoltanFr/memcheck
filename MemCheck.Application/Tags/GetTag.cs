@@ -1,8 +1,6 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
@@ -22,16 +20,8 @@ namespace MemCheck.Application.Tags
             return new Result(tag.Id, tag.Name, tag.TagsInCards == null ? 0 : tag.TagsInCards.Count);
         }
         #region Request type
-        public sealed record Request(Guid TagId)
-        {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
-            {
-                QueryValidationHelper.CheckNotReservedGuid(TagId);
-                if (!await dbContext.Tags.AsNoTracking().Include(tag => tag.TagsInCards).AnyAsync())
-                    throw new InvalidOperationException("Invalid tag ID");
-            }
-        }
+        public sealed record Request(Guid TagId);
         public sealed record Result(Guid TagId, string TagName, int CardCount);
+        #endregion
     }
-    #endregion
 }
