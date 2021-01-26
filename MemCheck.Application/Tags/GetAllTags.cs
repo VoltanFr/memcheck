@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Tags
 {
     public sealed class GetAllTags
     {
@@ -19,7 +19,7 @@ namespace MemCheck.Application
         {
             var tags = dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{filter}%")).OrderBy(tag => tag.Name);
             var totalCount = tags.Count();
-            var pageCount = (int)Math.Ceiling(((double)totalCount) / pageSize);
+            var pageCount = (int)Math.Ceiling((double)totalCount / pageSize);
             var pageTags = tags.Skip((pageNo - 1) * pageSize).Take(pageSize);
 
             return new ResultModel(totalCount, pageCount, pageTags.Select(tag => new ResultTagModel(tag.Id, tag.Name, tag.TagsInCards.Count)));
