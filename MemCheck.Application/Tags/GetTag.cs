@@ -1,7 +1,9 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
 {
@@ -14,23 +16,22 @@ namespace MemCheck.Application.Tags
         {
             this.dbContext = dbContext;
         }
-        public ResultModel Run(Guid tagId)
+        public async Task<Result> RunAsync(Request request)
         {
-            var tag = dbContext.Tags.Include(tag => tag.TagsInCards).Single(tag => tag.Id == tagId);
-            return new ResultModel(tag.Id, tag.Name, tag.TagsInCards == null ? 0 : tag.TagsInCards.Count);
+            var tag = await dbContext.Tags.AsNoTracking().Include(tag => tag.TagsInCards).SingleAsync(tag => tag.Id == request.TagId);
+            return new Result(tag.Id, tag.Name, tag.TagsInCards == null ? 0 : tag.TagsInCards.Count);
         }
-        public sealed class ResultModel
+        #region Request type
+        public sealed record Request(Guid TagId)
         {
-            public ResultModel(Guid tagId, string tagName, int cardCount)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                TagId = tagId;
-                TagName = tagName;
-                CardCount = cardCount;
+                QueryValidationHelper.CheckNotReservedGuid(TagId);
+                if (!await dbContext.Tags.AsNoTracking().Include(tag => tag.TagsInCards).AnyAsync())
+                    throw new InvalidOperationException("Invalid tag ID");
             }
-            public Guid TagId { get; }
-            public string TagName { get; } = null!;
-            public int CardCount { get; }
         }
+        public sealed record Result(Guid TagId, string TagName, int CardCount);
     }
+    #endregion
 }
-

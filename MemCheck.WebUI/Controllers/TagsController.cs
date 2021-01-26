@@ -39,14 +39,14 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetTag
         [HttpGet("GetTag/{tagId}")]
-        public IActionResult GetTag(Guid tagId)
+        public async Task<IActionResult> GetTag(Guid tagId)
         {
-            var result = new GetTag(dbContext).Run(tagId);
+            var result = await new GetTag(dbContext).RunAsync(new GetTag.Request(tagId));
             return Ok(new GetTagViewModel(result));
         }
         public sealed class GetTagViewModel
         {
-            public GetTagViewModel(GetTag.ResultModel tag)
+            public GetTagViewModel(GetTag.Result tag)
             {
                 TagId = tag.TagId;
                 TagName = tag.TagName;
