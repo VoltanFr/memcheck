@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Tags;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Tags;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
