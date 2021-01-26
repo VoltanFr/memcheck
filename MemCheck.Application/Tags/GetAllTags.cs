@@ -1,8 +1,10 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
 {
@@ -15,18 +17,33 @@ namespace MemCheck.Application.Tags
         {
             this.dbContext = dbContext;
         }
-        public ResultModel Run(int pageSize, int pageNo, string filter)
+        public async Task<Result> RunAsync(Request request)
         {
-            var tags = dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{filter}%")).OrderBy(tag => tag.Name);
-            var totalCount = tags.Count();
-            var pageCount = (int)Math.Ceiling((double)totalCount / pageSize);
-            var pageTags = tags.Skip((pageNo - 1) * pageSize).Take(pageSize);
-
-            return new ResultModel(totalCount, pageCount, pageTags.Select(tag => new ResultTagModel(tag.Id, tag.Name, tag.TagsInCards.Count)));
+            request.CheckValidity();
+            var tags = dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%")).OrderBy(tag => tag.Name);
+            var totalCount = await tags.CountAsync();
+            var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
+            var pageTags = tags.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
+            return new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.TagsInCards.Count)));
         }
-        public sealed class ResultModel
+
+        #region Request type
+        public sealed record Request(int PageSize, int PageNo, string Filter)
         {
-            public ResultModel(int totalCount, int pageCount, IEnumerable<ResultTagModel> tags)
+            public const int MaxPageSize = 500;
+            public void CheckValidity()
+            {
+                if (PageNo < 1)
+                    throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
+                if (PageSize < 1)
+                    throw new RequestInputException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
+                if (PageSize > MaxPageSize)
+                    throw new RequestInputException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+            }
+        }
+        public sealed class Result
+        {
+            public Result(int totalCount, int pageCount, IEnumerable<ResultTag> tags)
             {
                 TotalCount = totalCount;
                 PageCount = pageCount;
@@ -34,11 +51,11 @@ namespace MemCheck.Application.Tags
             }
             public int TotalCount { get; }
             public int PageCount { get; }
-            public IEnumerable<ResultTagModel> Tags { get; }
+            public IEnumerable<ResultTag> Tags { get; }
         }
-        public sealed class ResultTagModel
+        public sealed class ResultTag
         {
-            public ResultTagModel(Guid tagId, string tagName, int cardCount)
+            public ResultTag(Guid tagId, string tagName, int cardCount)
             {
                 TagId = tagId;
                 TagName = tagName;
@@ -48,6 +65,7 @@ namespace MemCheck.Application.Tags
             public string TagName { get; } = null!;
             public int CardCount { get; }
         }
+        #endregion
     }
 }
 

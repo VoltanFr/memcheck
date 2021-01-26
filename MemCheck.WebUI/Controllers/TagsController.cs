@@ -59,10 +59,10 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetTags
         [HttpPost("GetTags")]
-        public IActionResult GetTags([FromBody] GetTagsRequest request)
+        public async Task<IActionResult> GetTagsAsync([FromBody] GetTagsRequest request)
         {
             CheckBodyParameter(request);
-            var result = new GetAllTags(dbContext).Run(request.PageSize, request.PageNo, request.Filter);
+            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
             return Ok(new GetTagsViewModel(result));
         }
         public sealed class GetTagsRequest
@@ -73,7 +73,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetTagsViewModel
         {
-            public GetTagsViewModel(GetAllTags.ResultModel applicationResult)
+            public GetTagsViewModel(GetAllTags.Result applicationResult)
             {
                 TotalCount = applicationResult.TotalCount;
                 PageCount = applicationResult.PageCount;
@@ -85,7 +85,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetTagsTagViewModel
         {
-            public GetTagsTagViewModel(GetAllTags.ResultTagModel tag)
+            public GetTagsTagViewModel(GetAllTags.ResultTag tag)
             {
                 TagId = tag.TagId;
                 TagName = tag.TagName;
