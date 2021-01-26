@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Tags
 {
     public sealed class GetTag
     {
