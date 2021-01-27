@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
+using MemCheck.Application.Tags;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -102,9 +103,7 @@ namespace MemCheck.Application.Loading
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
             var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
-
-
-            var tagNames = GetAllAvailableTags.Run(dbContext);
+            var tagNames = TagLoadingHelper.Run(dbContext);
 
             var result = new List<ResultCard>();
             result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));

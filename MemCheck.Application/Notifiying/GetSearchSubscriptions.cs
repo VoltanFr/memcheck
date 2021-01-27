@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Tags;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace MemCheck.Application.Notifying
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            var tagDictionary = GetAllAvailableTags.Run(dbContext);
+            var tagDictionary = TagLoadingHelper.Run(dbContext);
             var deckDictionary = dbContext.Decks.AsNoTracking().Where(d => d.Owner.Id == request.UserId).Select(t => new { t.Id, t.Description }).ToImmutableDictionary(t => t.Id, t => t.Description);
 
             var result = await dbContext.SearchSubscriptions.AsNoTracking()
