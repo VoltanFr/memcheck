@@ -60,9 +60,9 @@ namespace MemCheck.Application.Tags
                 await new CreateTag(dbContext).RunAsync(new CreateTag.Request(name), new TestLocalizer());
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var allTags = new GetAllAvailableTags(dbContext).Run();
-                Assert.AreEqual(1, allTags.Count());
-                Assert.AreEqual(name, allTags.Single().Name);
+                var allTags = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+                Assert.AreEqual(1, allTags.Tags.Count());
+                Assert.AreEqual(name, allTags.Tags.Single().TagName);
             }
         }
     }

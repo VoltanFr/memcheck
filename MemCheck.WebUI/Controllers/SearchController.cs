@@ -4,6 +4,7 @@ using MemCheck.Application.DeckChanging;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Searching;
+using MemCheck.Application.Tags;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -41,27 +42,27 @@ namespace MemCheck.WebUI.Controllers
                 decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.ResultModel>();
             else
                 decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(user.Id);
-            var allTags = new GetAllAvailableTags(dbContext).Run();
+            var allTags = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             var allUsers = new GetUsers(dbContext).Run();
-            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags, allUsers, this, user);
+            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
             return base.Ok(value);
         }
         #region View model classes
         public sealed class GetAllStaticDataViewModel
         {
-            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllAvailableTags.ViewModel> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
+            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllTags.ResultTag> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
             {
                 UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer.Get("Ignore")) }
                     .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer)));
                 AllDecksForAddingCards = userDecks.Select(applicationResult => new GetAllStaticDataDeckForAddViewModel(applicationResult.DeckId, applicationResult.Description));
-                AllApplicableTags = allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name));
+                AllApplicableTags = allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName));
                 AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")) }
-                    .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
+                    .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 AllExcludableTags = new[] {
                     new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")),
                     new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.Get("All"))
                     }
-                    .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.Name)));
+                    .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer.Get("Any")) }
                     .Concat(allUsers.Select(user => new GetAllStaticDataUserViewModel(user.UserId, user.UserName)));
                 LocalizedText = new GetAllStaticDataLocalizedTextViewModel(localizer);

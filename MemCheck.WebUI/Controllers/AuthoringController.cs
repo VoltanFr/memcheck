@@ -5,6 +5,7 @@ using MemCheck.Application.History;
 using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
+using MemCheck.Application.Tags;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -125,10 +126,10 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetAllAvailableTags
         [HttpGet("AllAvailableTags")]
-        public IActionResult GetAllAvailableTags()
+        public async Task<IActionResult> GetAllAvailableTagsAsync()
         {
-            var result = new GetAllAvailableTags(dbContext).Run();
-            return Ok(result.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.Name)));
+            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            return Ok(result.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName)));
         }
         public sealed class GetAllAvailableTagsViewModel
         {
