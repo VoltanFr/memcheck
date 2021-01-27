@@ -1,4 +1,6 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,21 +16,22 @@ namespace MemCheck.Application.Tags
         {
             this.dbContext = dbContext;
         }
-        public async Task<bool> RunAsync(Guid tagId, string newName)
+        public async Task RunAsync(Request request, ILocalized localizer)
         {
-            newName = newName.Trim();
-            //CreateTag.CheckNameValidity(dbContext, newName);
+            await request.CheckValidityAsync(localizer, dbContext);
 
-            var tag = dbContext.Tags.Single(tag => tag.Id == tagId);
-            tag.Name = newName;
+            var tag = await dbContext.Tags.SingleAsync(tag => tag.Id == request.TagId);
+            tag.Name = request.NewName;
             await dbContext.SaveChangesAsync();
-            return true;
         }
-        public sealed class Request
+        #region Request type
+        public sealed record Request(Guid TagId, string NewName)
         {
-            public Guid DeckId { get; set; }
-            public string Description { get; set; } = null!;
-            public int HeapingAlgorithmId { get; set; }
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            {
+                await QueryValidationHelper.CheckCanCreateTagWithName(NewName, dbContext, localizer);
+            }
         }
+        #endregion
     }
 }

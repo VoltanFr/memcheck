@@ -123,7 +123,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new UpdateTag(dbContext).RunAsync(tagId, request.NewName);
+            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tagId, request.NewName.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
