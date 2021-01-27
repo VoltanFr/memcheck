@@ -24,7 +24,7 @@ namespace MemCheck.Application.QueryValidation
         public const int TagMinNameLength = 3;
         public const int TagMaxNameLength = 50;
         public const int DeckMinNameLength = 3;
-        public const int DeckMaxNameLength = 50;
+        public const int DeckMaxNameLength = 36;
         public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
         public static bool IsReservedGuid(Guid g)
         {

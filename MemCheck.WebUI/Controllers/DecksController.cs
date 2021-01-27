@@ -103,13 +103,14 @@ namespace MemCheck.WebUI.Controllers
         async public Task<IActionResult> Create([FromBody] CreateRequest request)
         {
             CheckBodyParameter(request);
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var appRequest = new CreateDeck.Request(user, request.Description ?? "", request.HeapingAlgorithmId);
-            return Ok(await new CreateDeck(dbContext).RunAsync(appRequest, this));
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new CreateDeck.Request(userId, request.Description.Trim(), request.HeapingAlgorithmId);
+            await new CreateDeck(dbContext).RunAsync(appRequest, this);
+            return Ok();
         }
         public sealed class CreateRequest
         {
-            public string? Description { get; set; }
+            public string Description { get; set; } = null!;
             public int HeapingAlgorithmId { get; set; }
         }
         #endregion

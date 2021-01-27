@@ -28,11 +28,11 @@ var app = new Vue({
             newDeck = { description: this.description, heapingAlgorithmId: this.heapingAlgorithm.id };
             await axios.post('/Decks/Create/', newDeck)
                 .then(result => {
+                    window.location.href = '/';
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
                 });
-            window.location.href = '/';
         },
     },
 });

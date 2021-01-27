@@ -1,9 +1,8 @@
-﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.DeckChanging
@@ -17,41 +16,23 @@ namespace MemCheck.Application.DeckChanging
         {
             this.dbContext = dbContext;
         }
-        public async Task<Guid> RunAsync(Request request, ILocalized localizer)
+        public async Task RunAsync(Request request, ILocalized localizer)
         {
             await request.CheckValidityAsync(localizer, dbContext);
-
-            var deck = new Deck() { Owner = request.User, Description = request.Description, HeapingAlgorithmId = request.HeapingAlgorithmId };
+            var user = await dbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            var deck = new Deck() { Owner = user, Description = request.Name, HeapingAlgorithmId = request.HeapingAlgorithmId };
             dbContext.Decks.Add(deck);
             await dbContext.SaveChangesAsync();
-            return deck.Id;
         }
-        public sealed class Request
+        #region Request type
+        public sealed record Request(Guid UserId, string Name, int HeapingAlgorithmId)
         {
-            #region Fields
-            private const int minDescriptionLength = 1;
-            private const int maxDescriptionLength = 36;
-            #endregion
-            public Request(MemCheckUser user, string description, int heapingAlgorithmId)
-            {
-                User = user;
-                Description = description;
-                HeapingAlgorithmId = heapingAlgorithmId;
-            }
-            public MemCheckUser User { get; }
-            public string Description { get; }
-            public int HeapingAlgorithmId { get; }
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(User.Id))
-                    throw new RequestInputException("Invalid user");
-                if (!HeapingAlgorithms.Instance.Ids.Any(algoId => algoId == HeapingAlgorithmId))
-                    throw new RequestInputException($"Invalid algo id '{HeapingAlgorithmId}'");
-                if (Description.Length < minDescriptionLength || Description.Length > maxDescriptionLength)
-                    throw new InvalidOperationException($"Invalid description '{Description}' (length must be between {minDescriptionLength} and {maxDescriptionLength}, is {Description.Length})");
-                await QueryValidationHelper.ChecUserDoesNotHaveDeckWithNameAsync(dbContext, User.Id, Description, localizer);
+                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, dbContext, localizer);
             }
         }
+        #endregion
 
     }
 }

@@ -49,13 +49,7 @@ namespace MemCheck.Application.Tests.Notifying
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            Guid deckId;
-
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var user = await dbContext.Users.SingleAsync();
-                deckId = await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, RandomHelper.String(), HeapingAlgorithms.DefaultAlgoId), new TestLocalizer());
-            }
+            var deckId = await DeckHelper.CreateAsync(testDB, userId);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
