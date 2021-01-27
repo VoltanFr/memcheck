@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Heaping;
+using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace MemCheck.Application.QueryValidation
         #endregion
         public const int TagMinNameLength = 3;
         public const int TagMaxNameLength = 50;
+        public const int DeckMinNameLength = 3;
+        public const int DeckMaxNameLength = 50;
         public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
         public static bool IsReservedGuid(Guid g)
         {
@@ -31,6 +34,11 @@ namespace MemCheck.Application.QueryValidation
         {
             if (IsReservedGuid(g))
                 throw new RequestInputException("Bad Guid");
+        }
+        public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
+        {
+            if (!await dbContext.Users.AsNoTracking().AnyAsync(user => user.Id == userId))
+                throw new InvalidOperationException("Current user not owner of deck");
         }
         public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {
@@ -65,6 +73,20 @@ namespace MemCheck.Application.QueryValidation
                     throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
             if (await dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"{name}")).AnyAsync())
                 throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+        }
+        public static async Task CheckCanCreateDeckAsync(Guid userId, string deckName, int heapingAlgorithmId, MemCheckDbContext dbContext, ILocalized localizer)
+        {
+            if (deckName != deckName.Trim())
+                throw new InvalidOperationException("Invalid Name: not trimmed");
+
+            if (deckName.Length < DeckMinNameLength || deckName.Length > DeckMaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {deckName.Length}" + localizer.Get("MustBeBetween") + $" {DeckMinNameLength} " + localizer.Get("And") + $" {DeckMaxNameLength}");
+
+            if (!HeapingAlgorithms.Instance.Ids.Contains(heapingAlgorithmId))
+                throw new InvalidOperationException($"Invalid heaping algorithm: {heapingAlgorithmId}");
+
+            await CheckUserExistsAsync(dbContext, userId);
+            await ChecUserDoesNotHaveDeckWithNameAsync(dbContext, userId, deckName, localizer);
         }
     }
 }

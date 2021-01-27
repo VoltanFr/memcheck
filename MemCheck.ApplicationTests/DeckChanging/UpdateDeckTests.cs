@@ -79,7 +79,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(UpdateDeck.Request.MinNameLength - 1), 0);
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
@@ -90,7 +90,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(UpdateDeck.Request.MaxNameLength + 1), 0);
+            var request = new UpdateDeck.Request(user, deck, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
