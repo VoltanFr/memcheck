@@ -117,11 +117,32 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AlreadyExistsCaseInsensitive" xml:space="preserve">
+    <value>already exists (this check is not case sensitive)</value>
+  </data>
   <data name="AlreadyExistsErrMesg" xml:space="preserve">
     <value>There is already a tag with this name.</value>
   </data>
+  <data name="And" xml:space="preserve">
+    <value>and</value>
+  </data>
+  <data name="ATagWithName" xml:space="preserve">
+    <value>A tag with name</value>
+  </data>
   <data name="Failure" xml:space="preserve">
     <value>Failure</value>
+  </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Invalid length for a tag:</value>
+  </data>
+  <data name="InvalidTagName" xml:space="preserve">
+    <value>Invalid tag name</value>
+  </data>
+  <data name="IsForbidden" xml:space="preserve">
+    <value>is forbidden</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>must be between</value>
   </data>
   <data name="NameLengthErrMesg" xml:space="preserve">
     <value>Invalid length (must be between 3 and 50 characters).</value>
