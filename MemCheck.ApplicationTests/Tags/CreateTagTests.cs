@@ -36,6 +36,12 @@ namespace MemCheck.Application.Tags
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(CreateTag.Request.MaxNameLength + 1)), new TestLocalizer()));
         }
         [TestMethod()]
+        public async Task NameWithForbiddenChar()
+        {
+            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request("a<b"), new TestLocalizer()));
+        }
+        [TestMethod()]
         public async Task AlreadyExists()
         {
             var name = RandomHelper.String();
