@@ -57,7 +57,7 @@ namespace MemCheck.Application.QueryValidation
             if (deckOwnerId != userId)
                 throw new RequestInputException("Current user not owner of deck");
         }
-        public static async Task ChecUserDoesNotHaveDeckWithNameAsync(MemCheckDbContext dbContext, Guid userId, string name, ILocalized localizer)
+        public static async Task CheckUserDoesNotHaveDeckWithNameAsync(MemCheckDbContext dbContext, Guid userId, string name, ILocalized localizer)
         {
             if (await dbContext.Decks.Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
                 throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
@@ -86,7 +86,7 @@ namespace MemCheck.Application.QueryValidation
                 throw new InvalidOperationException($"Invalid heaping algorithm: {heapingAlgorithmId}");
 
             await CheckUserExistsAsync(dbContext, userId);
-            await ChecUserDoesNotHaveDeckWithNameAsync(dbContext, userId, deckName, localizer);
+            await CheckUserDoesNotHaveDeckWithNameAsync(dbContext, userId, deckName, localizer);
         }
     }
 }
