@@ -98,10 +98,10 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetTagNames
         [HttpGet("GetTagNames")]
-        public IActionResult GetTagNames()
+        public async Task<IActionResult> GetTagNamesAsync()
         {
-            var result = new GetAllTagNames(dbContext).Run();
-            return Ok(result);
+            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            return Ok(result.Tags.Select(tag => tag.TagName));
         }
         #endregion
         #region Create
