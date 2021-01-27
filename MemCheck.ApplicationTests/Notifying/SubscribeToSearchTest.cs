@@ -113,7 +113,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid tagId;
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                tagId = await new CreateTag(dbContext).RunAsync(RandomHelper.String());
+                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String()), new TestLocalizer());
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -145,7 +145,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(RandomHelper.String());
+                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String()), new TestLocalizer());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -233,7 +233,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(RandomHelper.String());
+                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String()), new TestLocalizer());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -252,7 +252,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(RandomHelper.String());
+                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String()), new TestLocalizer());
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))

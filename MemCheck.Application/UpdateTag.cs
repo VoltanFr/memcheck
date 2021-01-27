@@ -18,7 +18,7 @@ namespace MemCheck.Application
         public async Task<bool> RunAsync(Guid tagId, string newName)
         {
             newName = newName.Trim();
-            CreateTag.CheckNameValidity(dbContext, newName);
+            //CreateTag.CheckNameValidity(dbContext, newName);
 
             var tag = dbContext.Tags.Single(tag => tag.Id == tagId);
             tag.Name = newName;

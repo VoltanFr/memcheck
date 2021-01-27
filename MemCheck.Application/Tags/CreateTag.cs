@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,38 +11,42 @@ namespace MemCheck.Application.Tags
     public sealed class CreateTag
     {
         #region Fields
-        private const int minLength = 3;
-        private const int maxLength = 50;
         private readonly MemCheckDbContext dbContext;
-        private static readonly char[] forbiddenChars = new[] { '<', '>' };
         #endregion
         public CreateTag(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
-        public async Task<Guid> RunAsync(string name)
+        public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
-            name = name.Trim();
-            CheckNameValidity(dbContext, name);
-
-            Tag tag = new Tag() { Name = name };
+            await request.CheckValidityAsync(localizer, dbContext);
+            Tag tag = new Tag() { Name = request.Name };
             dbContext.Tags.Add(tag);
             await dbContext.SaveChangesAsync();
-
             return tag.Id;
         }
-        public static void CheckNameValidity(MemCheckDbContext dbContext, string name)
+        #region Request type
+        public sealed record Request(string Name)
         {
-            if (name.Length < minLength || name.Length > maxLength)
-                throw new InvalidOperationException($"Invalid tag name '{name}' (length must be between {minLength} and {maxLength})");
+            public const int MinNameLength = 3;
+            public const int MaxNameLength = 50;
+            private static readonly char[] forbiddenChars = new[] { '<', '>' };
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            {
+                if (Name != Name.Trim())
+                    throw new InvalidOperationException("Invalid Name: not trimmed");
+                if (Name.Length < MinNameLength || Name.Length > MaxNameLength)
+                    throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {Name.Length}" + localizer.Get("MustBeBetween") + $" {MinNameLength} " + localizer.Get("And") + $" {MaxNameLength}");
 
-            foreach (var forbiddenChar in forbiddenChars)
-                if (name.Contains(forbiddenChar))
-                    throw new InvalidOperationException($"Invalid tag name '{name}' (length must be between {minLength} and {maxLength})");
+                foreach (var forbiddenChar in forbiddenChars)
+                    if (Name.Contains(forbiddenChar))
+                        throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + Name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
 
-            var exists = dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"{name}")).Any();
-            if (exists)
-                throw new InvalidOperationException($"A tag with name '{name}' already exists (tags are case insensitive)");
+                var exists = await dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"{Name}")).AnyAsync();
+                if (exists)
+                    throw new RequestInputException(localizer.Get("ATagWithName") + " '" + Name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+            }
         }
+        #endregion
     }
 }

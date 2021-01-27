@@ -109,7 +109,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new CreateTag(dbContext).RunAsync(request.NewName);
+            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(request.NewName.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
