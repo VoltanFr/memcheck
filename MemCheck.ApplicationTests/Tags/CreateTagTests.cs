@@ -21,19 +21,19 @@ namespace MemCheck.Application.Tags
         public async Task NameNotTrimmed()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(CreateTag.Request.MinNameLength) + '\t'), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMinNameLength) + '\t'), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(CreateTag.Request.MinNameLength - 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMinNameLength - 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(CreateTag.Request.MaxNameLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMaxNameLength + 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameWithForbiddenChar()

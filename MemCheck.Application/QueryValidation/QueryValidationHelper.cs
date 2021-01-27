@@ -20,6 +20,9 @@ namespace MemCheck.Application.QueryValidation
             return result.ToImmutableHashSet();
         }
         #endregion
+        public const int TagMinNameLength = 3;
+        public const int TagMaxNameLength = 50;
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
         public static bool IsReservedGuid(Guid g)
         {
             return reservedGuids.Contains(g);
@@ -50,6 +53,18 @@ namespace MemCheck.Application.QueryValidation
         {
             if (await dbContext.Decks.Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
                 throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
+        }
+        public static async Task CheckCanCreateTagWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
+        {
+            if (name != name.Trim())
+                throw new InvalidOperationException("Invalid Name: not trimmed");
+            if (name.Length < TagMinNameLength || name.Length > TagMaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {TagMinNameLength} " + localizer.Get("And") + $" {TagMaxNameLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInTags)
+                if (name.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+            if (await dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"{name}")).AnyAsync())
+                throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
         }
     }
 }
