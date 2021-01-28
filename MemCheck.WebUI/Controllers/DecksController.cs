@@ -216,23 +216,5 @@ namespace MemCheck.WebUI.Controllers
             return Ok();
         }
         #endregion
-        #region GetTagsOfDeck
-        [HttpGet("GetTagsOfDeck/{deckId}")]
-        public IActionResult GetTagsOfDeck(Guid deckId)
-        {
-            var applicationResult = new GetTagsOfDeck(dbContext).Run(deckId);
-            return base.Ok(applicationResult.Select(resultModel => new GetTagsOfDeckViewModel(resultModel.TagId, resultModel.TagName)));
-        }
-        public sealed class GetTagsOfDeckViewModel
-        {
-            public GetTagsOfDeckViewModel(Guid tagId, string tagName)
-            {
-                this.TagId = tagId;
-                this.TagName = tagName;
-            }
-            public Guid TagId { get; }
-            public string TagName { get; }
-        }
-        #endregion
     }
 }
