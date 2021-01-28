@@ -1,12 +1,11 @@
-﻿using MemCheck.Application.Decks;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.ApplicationTests.Decks
+namespace MemCheck.Application.Decks
 {
     [TestClass()]
     public class DeleteDeckTests
