@@ -4,7 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Images
 {
     public static class ImageLoadingHelper
     {
