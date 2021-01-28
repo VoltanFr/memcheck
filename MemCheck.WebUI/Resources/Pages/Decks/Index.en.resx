@@ -136,7 +136,7 @@
     <value>Heap view</value>
   </data>
   <data name="NextExpiry" xml:space="preserve">
-    <value>First expiry</value>
+    <value>Next expiry</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Heap view</value>

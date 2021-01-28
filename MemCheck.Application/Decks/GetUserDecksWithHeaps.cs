@@ -1,8 +1,11 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
@@ -21,7 +24,7 @@ namespace MemCheck.Application.Decks
                 ExpiredCardCount = 0;
                 NextExpiryUtcDate = DateTime.MaxValue;
             }
-            public int HeapId { get; set; }
+            public int HeapId { get; }
             public int TotalCardCount { get; set; }
             public int ExpiredCardCount { get; set; }
             public DateTime NextExpiryUtcDate { get; set; }
@@ -31,12 +34,15 @@ namespace MemCheck.Application.Decks
         {
             this.dbContext = dbContext;
         }
-        public IEnumerable<ResultModel> Run(Guid userId)
+        public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? nowUtc = null)
         {
-            var result = new List<ResultModel>();
-            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == userId).OrderBy(deck => deck.Description).Select(
+            await request.CheckValidityAsync(dbContext);
+            nowUtc ??= DateTime.UtcNow;
+
+            var result = new List<Result>();
+            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(
                 deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId, CardCount = deck.CardInDecks.Count }
-                ).ToList();
+                ).ToImmutableArray();
 
             foreach (var deck in decks)
             {
@@ -53,50 +59,37 @@ namespace MemCheck.Application.Decks
                     heapInfo.TotalCardCount++;
                     if (cardInDeck.CurrentHeap != 0)
                     {
-                        if (heapingAlgorithm.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, DateTime.UtcNow))
+                        if (heapingAlgorithm.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, nowUtc.Value))
                             heapInfo.ExpiredCardCount++;
-                        var expiryDate = heapingAlgorithm.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime);
-                        if (expiryDate < heapInfo.NextExpiryUtcDate)
-                            heapInfo.NextExpiryUtcDate = expiryDate;
+                        else
+                        {
+                            var expiryDate = heapingAlgorithm.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime);
+                            if (expiryDate < heapInfo.NextExpiryUtcDate)
+                                heapInfo.NextExpiryUtcDate = expiryDate;
+                        }
                     }
                 });
 
-                result.Add(new ResultModel(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardCount,
-                    heaps.Values.Select(heapInfo => new ResultHeapModel(heapInfo.HeapId, heapInfo.TotalCardCount, heapInfo.ExpiredCardCount, heapInfo.NextExpiryUtcDate)))
+                result.Add(new Result(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardCount,
+                    heaps.Values.Select(heapInfo => new ResultHeap(heapInfo.HeapId, heapInfo.TotalCardCount, heapInfo.ExpiredCardCount, heapInfo.NextExpiryUtcDate)))
                     );
             }
 
             return result;
         }
-        public sealed class ResultModel
+        #region Request & Result
+        public sealed record Request(Guid UserId)
         {
-            public ResultModel(Guid deckId, string description, int heapingAlgorithmId, int cardCount, IEnumerable<ResultHeapModel> heaps)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                DeckId = deckId;
-                Description = description;
-                HeapingAlgorithmId = heapingAlgorithmId;
-                CardCount = cardCount;
-                Heaps = heaps;
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
             }
-            public Guid DeckId { get; set; }
-            public string Description { get; }
-            public int HeapingAlgorithmId { get; }
-            public int CardCount { get; }
-            public IEnumerable<ResultHeapModel> Heaps { get; }
         }
-        public sealed class ResultHeapModel
-        {
-            public ResultHeapModel(int heapId, int totalCardCount, int expiredCardCount, DateTime nextExpiryUtcDate)
-            {
-                HeapId = heapId;
-                TotalCardCount = totalCardCount;
-                ExpiredCardCount = expiredCardCount;
-                NextExpiryUtcDate = nextExpiryUtcDate;
-            }
-            public int HeapId { get; }
-            public int TotalCardCount { get; }
-            public int ExpiredCardCount { get; }
-            public DateTime NextExpiryUtcDate { get; }
-        }
+        public sealed record Result(Guid DeckId, string Description, int HeapingAlgorithmId, int CardCount, IEnumerable<ResultHeap> Heaps);
+        public sealed record ResultHeap(int HeapId, int TotalCardCount, int ExpiredCardCount, DateTime NextExpiryUtcDate);
+        //NextExpiryUtcDate is the first expiry date among the non expired cards in this heap, so it is meaningless (DateTime.MaxValue) if all cards in the heap are expired.
+        //ExpiredCardCount and NextExpiryUtcDate are meaningless for heap 0.
+        #endregion
+
     }
 }

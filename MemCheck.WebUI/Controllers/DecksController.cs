@@ -132,7 +132,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecksWithHeaps()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = new GetUserDecksWithHeaps(dbContext).Run(userId);
+            var decks = await new GetUserDecksWithHeaps(dbContext).RunAsync(new GetUserDecksWithHeaps.Request(userId));
             var result = decks.Select(deck =>
                 new GetUserDecksWithHeapsViewModel(
                     deck.DeckId,
@@ -148,7 +148,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetUserDecksWithHeapsViewModel
         {
-            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeapModel> heaps, ILocalized localizer)
+            public GetUserDecksWithHeapsViewModel(Guid deckId, string description, string heapingAlgorithmName, string heapingAlgorithmDescription, int cardCount, IEnumerable<GetUserDecksWithHeaps.ResultHeap> heaps, ILocalized localizer)
             {
                 DeckId = deckId;
                 Description = description;
