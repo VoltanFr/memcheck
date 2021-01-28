@@ -142,7 +142,7 @@ namespace MemCheck.Application.Decks
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, deck, card.Id, RandomHelper.Heap());
+            await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
 
