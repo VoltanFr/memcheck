@@ -234,23 +234,5 @@ namespace MemCheck.WebUI.Controllers
             public string TagName { get; }
         }
         #endregion
-        #region GetHeapsOfDeck
-        [HttpGet("GetHeapsOfDeck/{deckId}")]
-        public IActionResult GetHeapsOfDeck(Guid deckId)
-        {
-            var applicationResult = new GetHeapsOfDeck(dbContext).Run(deckId);
-            return base.Ok(applicationResult.OrderBy(heapId => heapId).Select(heapId => new GetHeapsOfDeckViewModel(heapId, DisplayServices.HeapName(heapId, this))));
-        }
-        public sealed class GetHeapsOfDeckViewModel
-        {
-            public GetHeapsOfDeckViewModel(int heapId, string heapName)
-            {
-                HeapId = heapId;
-                HeapName = heapName;
-            }
-            public int HeapId { get; }
-            public string HeapName { get; }
-        }
-        #endregion
     }
 }
