@@ -25,7 +25,10 @@ namespace MemCheck.Application.QueryValidation
         public const int TagMaxNameLength = 50;
         public const int DeckMinNameLength = 3;
         public const int DeckMaxNameLength = 36;
+        public const int LanguageMinNameLength = 2;
+        public const int LanguageMaxNameLength = 36;
         public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInLanguages = new[] { '<', '>' }.ToImmutableHashSet();
         public static bool IsReservedGuid(Guid g)
         {
             return reservedGuids.Contains(g);
@@ -81,8 +84,20 @@ namespace MemCheck.Application.QueryValidation
             foreach (var forbiddenChar in ForbiddenCharsInTags)
                 if (name.Contains(forbiddenChar))
                     throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
-            if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, $"{name}")).AnyAsync())
+            if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
                 throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+        }
+        public static async Task CheckCanCreateLanguageWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
+        {
+            if (name != name.Trim())
+                throw new InvalidOperationException("Invalid Name: not trimmed");
+            if (name.Length < LanguageMinNameLength || name.Length > LanguageMaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {LanguageMinNameLength} " + localizer.Get("And") + $" {LanguageMaxNameLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInLanguages)
+                if (name.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidLanguageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+            if (await dbContext.CardLanguages.AsNoTracking().Where(language => EF.Functions.Like(language.Name, name)).AnyAsync())
+                throw new RequestInputException(localizer.Get("ALanguageWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
         }
         public static async Task CheckCanCreateDeckAsync(Guid userId, string deckName, int heapingAlgorithmId, MemCheckDbContext dbContext, ILocalized localizer)
         {

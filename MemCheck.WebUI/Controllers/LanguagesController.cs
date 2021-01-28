@@ -1,7 +1,9 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Languages;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System.Threading.Tasks;
@@ -13,17 +15,26 @@ namespace MemCheck.WebUI.Controllers
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public LanguagesController(MemCheckDbContext dbContext, IStringLocalizer<LanguagesController> localizer) : base(localizer)
+        public LanguagesController(MemCheckDbContext dbContext, IStringLocalizer<LanguagesController> localizer, UserManager<MemCheckUser> userManager) : base(localizer)
         {
             this.dbContext = dbContext;
+            this.userManager = userManager;
         }
         [HttpGet("GetAllLanguages")] public IActionResult GetAllLanguagesController() => Ok(new GetAllLanguages(dbContext).Run());
+        #region Create
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] CreateLanguage.Request language)
+        public async Task<IActionResult> Create([FromBody] CreateRequest language)
         {
             CheckBodyParameter(language);
-            return Ok(await new CreateLanguage(dbContext).RunAsync(language));
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            return Ok(await new CreateLanguage(dbContext, new ProdRoleChecker(userManager)).RunAsync(new CreateLanguage.Request(userId, language.Name), this));
         }
+        public sealed class CreateRequest
+        {
+            public string Name { get; set; } = null!;
+        }
+        #endregion
     }
 }

@@ -1,5 +1,7 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -9,24 +11,34 @@ namespace MemCheck.Application.Languages
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly IRoleChecker roleChecker;
         #endregion
-        public CreateLanguage(MemCheckDbContext dbContext)
+        public CreateLanguage(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
             this.dbContext = dbContext;
+            this.roleChecker = roleChecker;
         }
-        public async Task<GetAllLanguages.ViewModel> RunAsync(Request request)
+        public async Task<Result> RunAsync(Request request, ILocalized localizer)
         {
-            if (request.Name.Length < 4)
-                throw new InvalidOperationException($"Invalid language name '{request.Name}'");
+            await request.CheckValidityAsync(localizer, dbContext, roleChecker);
             var language = new CardLanguage() { Name = request.Name };
             dbContext.CardLanguages.Add(language);
             await dbContext.SaveChangesAsync();
-
-            return new GetAllLanguages.ViewModel(language.Id, language.Name, 0);
+            return new Result(language.Id, language.Name, 0);
         }
-        public sealed class Request
+        #region Request type
+        public sealed record Request(Guid UserId, string Name)
         {
-            public string Name { get; set; } = null!;
+            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext, IRoleChecker roleChecker)
+            {
+                await QueryValidationHelper.CheckCanCreateLanguageWithName(Name, dbContext, localizer);
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                var user = await dbContext.Users.AsNoTracking().SingleAsync(user => user.Id == UserId);
+                if (!await roleChecker.UserIsAdminAsync(user))
+                    throw new InvalidOperationException("User not admin");
+            }
         }
+        public sealed record Result(Guid Id, string Name, int CardCount);
+        #endregion
     }
 }
