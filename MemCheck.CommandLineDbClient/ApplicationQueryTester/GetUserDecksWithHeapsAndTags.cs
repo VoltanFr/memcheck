@@ -29,7 +29,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             for (int i = 0; i < 5; i++)
             {
                 var realCodeChrono = Stopwatch.StartNew();
-                var runner = new Application.GetUserDecksWithHeapsAndTags(dbContext);
+                var runner = new Application.Decks.GetUserDecksWithHeapsAndTags(dbContext);
                 var result = await runner.RunAsync(userId);
                 var deck = result.First();
                 logger.LogInformation($"Deck: {deck.Description}");
