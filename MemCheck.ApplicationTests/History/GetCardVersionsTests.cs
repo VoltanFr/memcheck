@@ -57,13 +57,13 @@ namespace MemCheck.Application.History
             var userName = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var language = await CardLanguagHelper.CreateAsync(db);
-            var oldestDate = DateHelper.Random();
+            var oldestDate = RandomHelper.Date();
             var oldestDescription = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, userId, language: language, versionDate: oldestDate, versionDescription: oldestDescription);
 
             var otherUserName = RandomHelper.String();
             var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
-            var intermediaryDate = DateHelper.Random();
+            var intermediaryDate = RandomHelper.Date();
             var intermediaryDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -72,7 +72,7 @@ namespace MemCheck.Application.History
                 await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer(), intermediaryDate);
             }
 
-            var newestDate = DateHelper.Random();
+            var newestDate = RandomHelper.Date();
             var newestDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
             {

@@ -32,7 +32,7 @@ namespace MemCheck.Application.Tests.Helpers
                 CardId = card,
                 DeckId = deck,
                 CurrentHeap = heap ?? RandomHelper.Heap(),
-                LastLearnUtcTime = lastLearnUtcTime == null ? DateHelper.Random() : lastLearnUtcTime.Value,
+                LastLearnUtcTime = lastLearnUtcTime == null ? RandomHelper.Date() : lastLearnUtcTime.Value,
                 AddToDeckUtcTime = DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,
                 BiggestHeapReached = 0

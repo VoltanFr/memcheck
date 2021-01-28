@@ -50,12 +50,12 @@ namespace MemCheck.Application.Cards
             var language = await CardLanguagHelper.CreateAsync(db);
 
             var firstVersionCreatorId = await UserHelper.CreateInDbAsync(db);
-            var firstVersionDate = DateHelper.Random();
+            var firstVersionDate = RandomHelper.Date();
             var card = await CardHelper.CreateAsync(db, firstVersionCreatorId, language: language, versionDate: firstVersionDate);
 
             var lastVersionCreatorName = RandomHelper.String();
             var lastVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: lastVersionCreatorName);
-            var lastVersionDate = DateHelper.Random();
+            var lastVersionDate = RandomHelper.Date();
             var lastVersionDescription = RandomHelper.String();
             var lastVersionFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
@@ -82,7 +82,7 @@ namespace MemCheck.Application.Cards
             var language = await CardLanguagHelper.CreateAsync(db, languageName);
             var creatorName = RandomHelper.String();
             var creatorId = await UserHelper.CreateInDbAsync(db, userName: creatorName);
-            var creationDate = DateHelper.Random();
+            var creationDate = RandomHelper.Date();
             var frontSide = RandomHelper.String();
             var backSide = RandomHelper.String();
             var additionalInfo = RandomHelper.String();

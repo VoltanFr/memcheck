@@ -59,14 +59,14 @@ namespace MemCheck.Application.History
 
             var initialVersionCreatorName = RandomHelper.String();
             var initialVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: initialVersionCreatorName);
-            var initialVersionDate = DateHelper.Random();
+            var initialVersionDate = RandomHelper.Date();
             var initialVersionDescription = RandomHelper.String();
             var initialVersionFrontSide = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, initialVersionCreatorId, language: language, versionDate: initialVersionDate, versionDescription: initialVersionDescription, frontSide: initialVersionFrontSide);
 
             var intermediaryVersionCreatorName = RandomHelper.String();
             var intermediaryVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: intermediaryVersionCreatorName);
-            var intermediaryVersionDate = DateHelper.Random();
+            var intermediaryVersionDate = RandomHelper.Date();
             var intermediaryVersionDescription = RandomHelper.String();
             var intermediaryVersionFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
@@ -74,7 +74,7 @@ namespace MemCheck.Application.History
 
             using (var dbContext = new MemCheckDbContext(db))
                 //We need a new version to exist but don't mind about its contents
-                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(), versionCreator: initialVersionCreatorId), new TestLocalizer(), DateHelper.Random());
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(), versionCreator: initialVersionCreatorId), new TestLocalizer(), RandomHelper.Date());
 
             using (var dbContext = new MemCheckDbContext(db))
             {

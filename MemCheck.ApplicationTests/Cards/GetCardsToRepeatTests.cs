@@ -91,7 +91,7 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
-            var loadTime = DateHelper.Random();
+            var loadTime = RandomHelper.Date();
             const int cardCount = 50;
             for (int i = 0; i < cardCount; i++)
             {
@@ -117,7 +117,7 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
-            var loadTime = DateHelper.Random();
+            var loadTime = RandomHelper.Date();
             const int cardCount = 100;
             for (int i = 0; i < cardCount; i++)
             {

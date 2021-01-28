@@ -61,9 +61,9 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var language = await CardLanguagHelper.CreateAsync(db);
-            var creationDate = DateHelper.Random();
+            var creationDate = RandomHelper.Date();
             var card = await CardHelper.CreateAsync(db, user, language: language, versionDate: creationDate);
-            var deletionDate = DateHelper.Random();
+            var deletionDate = RandomHelper.Date();
             await CardDeletionHelper.DeleteCardAsync(db, user, card.Id, deletionDate);
 
             using var dbContext = new MemCheckDbContext(db);
