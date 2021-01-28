@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.Decks;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
