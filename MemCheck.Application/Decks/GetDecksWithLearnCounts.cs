@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Decks
 {
     public sealed class GetDecksWithLearnCounts
     {

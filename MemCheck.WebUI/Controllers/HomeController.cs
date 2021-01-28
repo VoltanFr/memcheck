@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Loading;
+﻿using MemCheck.Application.Decks;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
