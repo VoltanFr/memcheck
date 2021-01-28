@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {
@@ -17,18 +18,22 @@ namespace MemCheck.Application
         {
             this.dbContext = dbContext;
         }
-        public IEnumerable<ResultModel> Run(Guid userId)
+        public async Task<IEnumerable<ResultModel>> RunAsync(Guid userId)
         {
             if (QueryValidationHelper.IsReservedGuid(userId))
                 throw new RequestInputException($"Invalid user id {userId}");
 
             var userDecks = dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == userId).Select(deck => new { deckId = deck.Id, deckDescription = deck.Description }).ToList();
 
-            var result = userDecks.Select(deck =>
-                new ResultModel(deck.deckId, deck.deckDescription, new GetTagsOfDeck(dbContext).Run(deck.deckId).Select(tag => new ResultTagModel(tag.TagId, tag.TagName)))
-            );
+            var result = new List<ResultModel>();
+            foreach (var userDeck in userDecks)
+            {
+                var appTags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(userId, userDeck.deckId));
+                var resultTags = appTags.Select(tag => new ResultTagModel(tag.TagId, tag.TagName));
+                result.Add(new ResultModel(userDeck.deckId, userDeck.deckDescription, resultTags));
+            }
 
-            return result.ToList();
+            return result;
         }
         #region Result classes
         public sealed class ResultModel

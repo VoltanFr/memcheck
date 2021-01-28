@@ -46,7 +46,7 @@ namespace MemCheck.Application
             foreach (var deck in decks)
             {
                 var heaps = await dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deck.Id).Select(cardInDeck => cardInDeck.CurrentHeap).Distinct().ToListAsync();
-                var tags = new GetTagsOfDeck(dbContext).Run(deck.Id);
+                var tags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(userId, deck.Id));
                 result.Add(new ResultModel(deck.Id, deck.Description, heaps, tags.Select(tag => new ResultTagModel(tag.TagId, tag.TagName))));
             }
 
