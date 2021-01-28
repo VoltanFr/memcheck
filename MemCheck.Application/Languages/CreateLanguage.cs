@@ -3,7 +3,7 @@ using MemCheck.Domain;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Languages
 {
     public sealed class CreateLanguage
     {
