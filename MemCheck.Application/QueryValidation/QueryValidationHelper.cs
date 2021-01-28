@@ -69,7 +69,7 @@ namespace MemCheck.Application.QueryValidation
         }
         public static async Task CheckUserDoesNotHaveDeckWithNameAsync(MemCheckDbContext dbContext, Guid userId, string name, ILocalized localizer)
         {
-            if (await dbContext.Decks.Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
+            if (await dbContext.Decks.AsNoTracking().Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
                 throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
         }
         public static async Task CheckCanCreateTagWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
@@ -81,7 +81,7 @@ namespace MemCheck.Application.QueryValidation
             foreach (var forbiddenChar in ForbiddenCharsInTags)
                 if (name.Contains(forbiddenChar))
                     throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
-            if (await dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"{name}")).AnyAsync())
+            if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, $"{name}")).AnyAsync())
                 throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
         }
         public static async Task CheckCanCreateDeckAsync(Guid userId, string deckName, int heapingAlgorithmId, MemCheckDbContext dbContext, ILocalized localizer)

@@ -24,6 +24,7 @@ namespace MemCheck.Application.Cards
             await request.CheckValidityAsync(dbContext);
 
             var card = await dbContext.Cards
+                .AsNoTracking()
                 .Include(card => card.VersionCreator)
                 .Include(card => card.Images)
                 .ThenInclude(img => img.Image)
@@ -39,6 +40,7 @@ namespace MemCheck.Application.Cards
             var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId);
 
             var ownersOfDecksWithThisCard = dbContext.CardsInDecks
+                .AsNoTracking()
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId)
                 .Select(cardInDeck => cardInDeck.Deck.Owner.UserName)
                 .Distinct();
