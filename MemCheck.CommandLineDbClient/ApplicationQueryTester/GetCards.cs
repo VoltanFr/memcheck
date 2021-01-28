@@ -1,5 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Cards;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Heaping;
 using MemCheck.Basics;
 using MemCheck.Database;

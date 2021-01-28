@@ -2,7 +2,6 @@
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags

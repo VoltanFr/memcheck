@@ -1,5 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Tags;
+﻿using MemCheck.Application.Tags;
 using MemCheck.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
