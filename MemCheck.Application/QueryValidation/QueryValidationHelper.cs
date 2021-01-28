@@ -55,7 +55,7 @@ namespace MemCheck.Application.QueryValidation
                 .Select(deck => deck.Owner.Id)
                 .SingleAsync();
             if (deckOwnerId != userId)
-                throw new RequestInputException("Current user not owner of deck");
+                throw new InvalidOperationException("Current user not owner of deck");
         }
         public static async Task CheckUserDoesNotHaveDeckWithNameAsync(MemCheckDbContext dbContext, Guid userId, string name, ILocalized localizer)
         {

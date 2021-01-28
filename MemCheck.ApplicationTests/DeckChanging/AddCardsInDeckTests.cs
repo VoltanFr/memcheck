@@ -1,11 +1,9 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.DeckChanging
@@ -31,7 +29,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -51,7 +49,7 @@ namespace MemCheck.Application.DeckChanging
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()

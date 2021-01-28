@@ -2,12 +2,9 @@
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -58,7 +55,7 @@ namespace MemCheck.Application.DeckChanging
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(otherUser, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()

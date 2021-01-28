@@ -210,7 +210,13 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #region DeleteDeck
-        [HttpDelete("DeleteDeck/{deckId}")] public async Task<IActionResult> DeleteDeck(Guid deckId) => Ok(await new DeleteDeck(dbContext).RunAsync(deckId));
+        [HttpDelete("DeleteDeck/{deckId}")]
+        public async Task<IActionResult> DeleteDeck(Guid deckId)
+        {
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            await new DeleteDeck(dbContext).RunAsync(new DeleteDeck.Request(userId, deckId));
+            return Ok();
+        }
         #endregion
         #region GetTagsOfDeck
         [HttpGet("GetTagsOfDeck/{deckId}")]

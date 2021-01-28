@@ -134,7 +134,7 @@ namespace MemCheck.Application.Searching
 
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { Deck = user1Emptydeck }));
 
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck }));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck }));
             }
         }
         [TestMethod()]
@@ -165,7 +165,7 @@ namespace MemCheck.Application.Searching
 
                 await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { Deck = user1Emptydeck, DeckIsInclusive = false }));
 
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck, DeckIsInclusive = false }));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck, DeckIsInclusive = false }));
             }
         }
         [TestMethod()]
