@@ -1,11 +1,15 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
+    //This class ignores the cards in the request which are not in the deck
+    //Because some cards could have been removed in another session
     public sealed class RemoveCardsFromDeck
     {
         #region Fields
@@ -15,13 +19,28 @@ namespace MemCheck.Application.Decks
         {
             this.dbContext = dbContext;
         }
-        public void Run(Guid deckId, IEnumerable<Guid> cardIds)
+        public async Task RunAsync(Request request)
         {
-            //By design, this ignores cards not in the deck
-            foreach (var cardId in cardIds)
-                if (dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deckId && cardInDeck.CardId == cardId).Any())
-                    dbContext.CardsInDecks.Remove(new CardInDeck() { CardId = cardId, DeckId = deckId });
+            await request.CheckValidityAsync(dbContext);
+
+            var existing = request.CardIds
+                .Where(cardId => dbContext.CardsInDecks.Any(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CardId == cardId))
+                .Select(cardId => new CardInDeck() { CardId = cardId, DeckId = request.DeckId });
+            dbContext.CardsInDecks.RemoveRange(existing);
+
             dbContext.SaveChanges();
         }
+        #region Request type
+        public sealed record Request(Guid CurrentUserId, Guid DeckId, IEnumerable<Guid> CardIds)
+        {
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            {
+                QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
+                QueryValidationHelper.CheckNotReservedGuid(DeckId);
+                QueryValidationHelper.CheckContainsNoReservedGuid(CardIds);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, CurrentUserId, DeckId);
+            }
+        }
+        #endregion
     }
 }
