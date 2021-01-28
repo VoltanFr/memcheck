@@ -37,7 +37,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 for (int i = 0; i < 5; i++)
                 {
                     var realCodeChrono = Stopwatch.StartNew();
-                    var userDecks = await new Application.GetUserDecksWithTags(dbContext).RunAsync(user.Id);
+                    var userDecks = await new Application.Decks.GetUserDecksWithTags(dbContext).RunAsync(new Application.Decks.GetUserDecksWithTags.Request(user.Id));
                     logger.LogInformation($"{userDecks.First().DeckId} id");
                     logger.LogInformation($"{userDecks.First().Description}");
                     logger.LogInformation($"{userDecks.First().Tags.Count()} tags");
