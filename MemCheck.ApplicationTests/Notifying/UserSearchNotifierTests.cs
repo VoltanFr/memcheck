@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.CardChanging;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.Searching;
 using MemCheck.Application.Tests.Helpers;

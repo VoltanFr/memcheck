@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.CardChanging;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -125,7 +125,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = "Comment s'appelle cet État américain ?";
             var backSide = $"{state.ArticleWithFirstCharUpper}{state.FrenchName}";
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -145,7 +145,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"Où est {state.Article}{state.FrenchName} sur cette carte ?";
             var backSide = "";
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -165,7 +165,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"Comment s'appelle la capitale de {state.Article}{state.FrenchName} ?";
             var backSide = state.Capitale;
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -185,7 +185,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"De quel État américain {state.Capitale} est-elle la capitale ?";
             var backSide = $"{state.ArticleWithFirstCharUpper}{state.FrenchName}";
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -205,7 +205,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"Comment s'appelle la ville la plus peuplée de {state.Article}{state.FrenchName} ?";
             var backSide = state.MainCity;
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -225,7 +225,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"Dans quel État américain la ville de {state.MainCity} se trouve-t-elle ?";
             var backSide = $"{state.ArticleWithFirstCharUpper}{state.FrenchName}";
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -264,7 +264,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var frontSide = $"Où est {state.MainCity} sur cette carte ?";
             var additionalInfo = state.AdditionalInfo;
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.AdditionalInfo == additionalInfo).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.AdditionalInfo == additionalInfo).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -284,7 +284,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var backSide = $"{state.Capitale}";
             var additionalInfo = state.AdditionalInfo;
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide && card.AdditionalInfo == additionalInfo).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide && card.AdditionalInfo == additionalInfo).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;
@@ -304,7 +304,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var backSide = $"{state.MainCity}";
             var additionalInfo = state.AdditionalInfo;
 
-            if (dbContext.Cards.Where(card =>  card.FrontSide == frontSide && card.BackSide == backSide && card.AdditionalInfo == additionalInfo).Any())
+            if (dbContext.Cards.Where(card => card.FrontSide == frontSide && card.BackSide == backSide && card.AdditionalInfo == additionalInfo).Any())
             {
                 logger.LogInformation($"Card already exists for {state.FrenchName}: {frontSide}");
                 return;

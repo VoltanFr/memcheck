@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application;
-using MemCheck.Application.CardChanging;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;

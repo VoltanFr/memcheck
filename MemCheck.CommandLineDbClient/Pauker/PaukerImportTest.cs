@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.CardChanging;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;

@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.CardChanging
+namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class PreviousVersionCreatorTests

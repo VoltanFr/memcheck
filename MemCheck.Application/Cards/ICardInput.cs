@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MemCheck.Application.CardChanging
+namespace MemCheck.Application.Cards
 {
     public interface ICardInput
     {

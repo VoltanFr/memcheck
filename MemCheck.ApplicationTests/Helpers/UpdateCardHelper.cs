@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.CardChanging;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
