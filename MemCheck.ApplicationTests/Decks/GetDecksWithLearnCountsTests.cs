@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

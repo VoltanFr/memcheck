@@ -24,14 +24,14 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result.Id;
         }
-        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int heap, DateTime? lastLearnUtcTime = null)
+        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var cardForUser = new CardInDeck()
             {
                 CardId = card,
                 DeckId = deck,
-                CurrentHeap = heap,
+                CurrentHeap = heap ?? RandomHelper.Heap(),
                 LastLearnUtcTime = lastLearnUtcTime == null ? DateHelper.Random() : lastLearnUtcTime.Value,
                 AddToDeckUtcTime = DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,

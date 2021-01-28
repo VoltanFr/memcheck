@@ -17,7 +17,7 @@ namespace MemCheck.Application.Decks
         {
             this.dbContext = dbContext;
         }
-        public async Task<IEnumerable<ResultModel>> RunAsync(Request request)
+        public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
             await request.CheckValidityAsync(dbContext);
             return dbContext.CardsInDecks
@@ -28,31 +28,20 @@ namespace MemCheck.Application.Decks
                 .SelectMany(cardInDeck => cardInDeck.Card.TagsInCards)
                 .Select(tagInCard => tagInCard.Tag)
                 .Distinct()
-                .Select(tag => new ResultModel(tag.Id, tag.Name))
+                .Select(tag => new Result(tag.Id, tag.Name))
                 .ToList()
                 .OrderBy(resultModel => resultModel.TagName);
         }
-        #region Result class
-        public sealed class ResultModel
-        {
-            public ResultModel(Guid tagId, string tagName)
-            {
-                TagId = tagId;
-                TagName = tagName;
-            }
-            public Guid TagId { get; }
-            public string TagName { get; }
-        }
-        #endregion
         #region Request & Result
         public sealed record Request(Guid UserId, Guid DeckId)
         {
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
             }
         }
-        public sealed record Result(Guid DeckId, string Description, int HeapingAlgorithmId, int CardCount);
+        public sealed record Result(Guid TagId, string TagName);
         #endregion
     }
 }
