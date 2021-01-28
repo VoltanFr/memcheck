@@ -33,49 +33,33 @@ namespace MemCheck.Application.Decks
         {
             this.dbContext = dbContext;
         }
-        public async Task<IEnumerable<ResultModel>> RunAsync(Guid userId)
+        public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            if (QueryValidationHelper.IsReservedGuid(userId))
-                throw new RequestInputException($"Invalid user id {userId}");
+            await request.CheckValidityAsync(dbContext);
 
-            var decks = dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == userId).OrderBy(deck => deck.Description).Select(deck => new { deck.Id, deck.Description }).ToList();
+            var decks = dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(deck => new { deck.Id, deck.Description }).ToList();
 
-            var result = new List<ResultModel>();
+            var result = new List<Result>();
 
             foreach (var deck in decks)
             {
                 var heaps = await dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deck.Id).Select(cardInDeck => cardInDeck.CurrentHeap).Distinct().ToListAsync();
-                var tags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(userId, deck.Id));
-                result.Add(new ResultModel(deck.Id, deck.Description, heaps, tags.Select(tag => new ResultTagModel(tag.TagId, tag.TagName))));
+                var tags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(request.UserId, deck.Id));
+                result.Add(new Result(deck.Id, deck.Description, heaps, tags.Select(tag => new ResultTag(tag.TagId, tag.TagName))));
             }
 
             return result;
         }
-        #region Result classes
-        public sealed class ResultModel
+        #region Request & Result
+        public sealed record Request(Guid UserId)
         {
-            public ResultModel(Guid deckId, string description, IEnumerable<int> heaps, IEnumerable<ResultTagModel> tags)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                DeckId = deckId;
-                Description = description;
-                Heaps = heaps;
-                Tags = tags;
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
             }
-            public Guid DeckId { get; set; }
-            public string Description { get; }
-            public IEnumerable<int> Heaps { get; }
-            public IEnumerable<ResultTagModel> Tags { get; }
         }
-        public sealed class ResultTagModel
-        {
-            public ResultTagModel(Guid tagId, string tagName)
-            {
-                TagId = tagId;
-                TagName = tagName;
-            }
-            public Guid TagId { get; }
-            public string TagName { get; }
-        }
+        public sealed record Result(Guid DeckId, string Description, IEnumerable<int> Heaps, IEnumerable<ResultTag> Tags);
+        public sealed record ResultTag(Guid TagId, string TagName);
         #endregion
     }
 }

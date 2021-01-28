@@ -30,7 +30,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             {
                 var realCodeChrono = Stopwatch.StartNew();
                 var runner = new Application.Decks.GetUserDecksWithHeapsAndTags(dbContext);
-                var result = await runner.RunAsync(userId);
+                var result = await runner.RunAsync(new Application.Decks.GetUserDecksWithHeapsAndTags.Request(userId));
                 var deck = result.First();
                 logger.LogInformation($"Deck: {deck.Description}");
                 logger.LogInformation($"Heaps: {string.Join(',', deck.Heaps.Select(heap => heap.ToString()))}");

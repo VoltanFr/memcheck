@@ -37,11 +37,11 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetAllStaticData()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
-            IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> decksWithHeapsAndTags;
+            IEnumerable<GetUserDecksWithHeapsAndTags.Result> decksWithHeapsAndTags;
             if (user == null)
-                decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.ResultModel>();
+                decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.Result>();
             else
-                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(user.Id);
+                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
             var allTags = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             var allUsers = new GetUsers(dbContext).Run();
             GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
@@ -50,7 +50,7 @@ namespace MemCheck.WebUI.Controllers
         #region View model classes
         public sealed class GetAllStaticDataViewModel
         {
-            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.ResultModel> userDecks, IEnumerable<GetAllTags.ResultTag> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
+            public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.Result> userDecks, IEnumerable<GetAllTags.ResultTag> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
             {
                 UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer.Get("Ignore")) }
                     .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer)));
@@ -83,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllStaticDataDeckViewModel
         {
-            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.ResultModel applicationResult, ILocalized localizer)
+            public GetAllStaticDataDeckViewModel(GetUserDecksWithHeapsAndTags.Result applicationResult, ILocalized localizer)
             {
                 DeckId = applicationResult.DeckId;
                 DeckName = applicationResult.Description;
