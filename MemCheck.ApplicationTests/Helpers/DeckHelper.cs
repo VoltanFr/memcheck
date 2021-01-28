@@ -50,5 +50,10 @@ namespace MemCheck.Application.Tests.Helpers
             var matchingCardsInDeckCount = await dbContext.CardsInDecks.AsNoTracking().CountAsync(cardInDeck => cardInDeck.DeckId == deck && cards.Contains(cardInDeck.CardId));
             Assert.AreEqual(cards.Length, matchingCardsInDeckCount);
         }
+        public static async Task CheckDeckDoesNotContainCard(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card)
+        {
+            using var dbContext = new MemCheckDbContext(testDB);
+            Assert.IsFalse(await dbContext.CardsInDecks.AsNoTracking().AnyAsync(cardInDeck => cardInDeck.DeckId == deck && card == cardInDeck.CardId));
+        }
     }
 }

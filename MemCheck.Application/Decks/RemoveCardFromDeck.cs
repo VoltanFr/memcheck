@@ -18,19 +18,17 @@ namespace MemCheck.Application.Decks
         }
         public async Task<Result> RunAsync(Request request)
         {
-            request.CheckValidity();
-            QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, request.CurrentUserId, request.DeckId);
+            await request.CheckValidityAsync(dbContext);
 
-            var cardsInDeck = dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.CardId == request.CardId && cardInDeck.DeckId == request.DeckId);
-            if (cardsInDeck.Count() != 1)
-                throw new RequestInputException($"There are {cardsInDeck.Count()} cards with the given id");
-
-            var cardInDeck = cardsInDeck.Include(cardInDeck => cardInDeck.Card).Include(cardInDeck => cardInDeck.Deck).Single();
-
-            dbContext.CardsInDecks.Remove(cardInDeck);
+            var card = dbContext.CardsInDecks
+                .Where(cardInDeck => cardInDeck.CardId == request.CardId && cardInDeck.DeckId == request.DeckId)
+                .Include(cardInDeck => cardInDeck.Card)
+                .Include(cardInDeck => cardInDeck.Deck)
+                .Single();
+            dbContext.CardsInDecks.Remove(card);
             await dbContext.SaveChangesAsync();
 
-            return new Result(cardInDeck.Card.FrontSide, cardInDeck.Deck.Description);
+            return new Result(card.Card.FrontSide, card.Deck.Description);
         }
         #region Request class
         public sealed class Request
@@ -44,14 +42,12 @@ namespace MemCheck.Application.Decks
             public Guid CurrentUserId { get; }
             public Guid DeckId { get; }
             public Guid CardId { get; }
-            public void CheckValidity()
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
-                    throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
-                if (QueryValidationHelper.IsReservedGuid(DeckId))
-                    throw new RequestInputException($"Invalid deck id '{DeckId}'");
-                if (QueryValidationHelper.IsReservedGuid(CardId))
-                    throw new RequestInputException($"Invalid card id '{DeckId}'");
+                QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
+                QueryValidationHelper.CheckNotReservedGuid(DeckId);
+                QueryValidationHelper.CheckNotReservedGuid(CardId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, CurrentUserId, DeckId);
             }
         }
         public sealed class Result
