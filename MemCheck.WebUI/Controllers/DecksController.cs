@@ -1,5 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Decks;
+﻿using MemCheck.Application.Decks;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
