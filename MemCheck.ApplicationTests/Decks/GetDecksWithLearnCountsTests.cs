@@ -16,13 +16,13 @@ namespace MemCheck.Application.Decks
         public async Task EmptyDB_UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
         }
         [TestMethod()]
         public async Task EmptyDB_UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task OneEmptyDeck()

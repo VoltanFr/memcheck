@@ -74,10 +74,7 @@ namespace MemCheck.Application.Decks
         {
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                QueryValidationHelper.CheckNotReservedGuid(UserId);
-
-                if (!await dbContext.Users.AnyAsync(u => u.Id == UserId))
-                    throw new RequestInputException("Bad user");
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
             }
         }
         public sealed record Result(
