@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.DeckChanging;
+﻿using MemCheck.Application.Decks;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;

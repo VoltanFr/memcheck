@@ -2,11 +2,10 @@
 using MemCheck.Database;
 using MemCheck.Domain;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.DeckChanging
+namespace MemCheck.Application.Decks
 {
     public sealed class AddCardsInDeck
     {

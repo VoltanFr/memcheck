@@ -1,6 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.CardChanging;
-using MemCheck.Application.DeckChanging;
+using MemCheck.Application.Decks;
 using MemCheck.Application.History;
 using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;

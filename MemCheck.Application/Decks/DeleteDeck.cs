@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.DeckChanging
+namespace MemCheck.Application.Decks
 {
     public sealed class DeleteDeck
     {
