@@ -42,7 +42,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardSubscriptions(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardSubscriptions(dbContext).RunAsync(request));
         }
     }
 }

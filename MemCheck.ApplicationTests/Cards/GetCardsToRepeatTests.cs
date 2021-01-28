@@ -22,7 +22,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(Guid.Empty, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -55,7 +55,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(otherUser, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckContainsOneCardNonExpired()
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Cards
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, deck, card.Id, lastLearnUtcTime: new DateTime(2000, 1, 1));
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, new DateTime(2000, 1, 1));
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);

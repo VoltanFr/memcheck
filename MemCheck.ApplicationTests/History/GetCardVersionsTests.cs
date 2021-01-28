@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -18,13 +17,13 @@ namespace MemCheck.Application.History
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()

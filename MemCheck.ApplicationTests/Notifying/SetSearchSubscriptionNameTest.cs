@@ -21,7 +21,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(Guid.Empty, subscription.Id, RandomHelper.String());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestInvalidSubscriptionId()
@@ -31,7 +31,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, Guid.Empty, RandomHelper.String());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfSubscription()

@@ -108,7 +108,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task UserNotAllowedToViewACard()
@@ -121,7 +121,7 @@ namespace MemCheck.Application.Decks
             var publicCard = await CardHelper.CreateAsync(db, cardCreator);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
         }
         [TestMethod()]
         public async Task Success()

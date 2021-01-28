@@ -22,7 +22,7 @@ namespace MemCheck.Application.Decks
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new RemoveCardFromDeck(dbContext).RunAsync(new RemoveCardFromDeck.Request(Guid.Empty, deck, card.Id)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext).RunAsync(new RemoveCardFromDeck.Request(Guid.Empty, deck, card.Id)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()

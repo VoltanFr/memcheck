@@ -23,7 +23,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new DeleteSearchSubscription.Request(Guid.Empty, subscription.Id);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task InvalidSubscriptionId()
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new DeleteSearchSubscription.Request(userId, Guid.Empty);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfSubscription()

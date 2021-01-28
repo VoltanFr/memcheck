@@ -102,7 +102,7 @@ namespace MemCheck.Application.Cards
         }
         public async Task<IEnumerable<ResultCard>> RunAsync(Request request, DateTime? now = null)
         {
-            request.CheckValidity(dbContext);
+            await request.CheckValidityAsync(dbContext);
 
             var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
@@ -127,19 +127,15 @@ namespace MemCheck.Application.Cards
             public IEnumerable<Guid> ExcludedCardIds { get; }
             public IEnumerable<Guid> ExcludedTagIds { get; }
             public int CardsToDownload { get; }
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
-                    throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
-                if (QueryValidationHelper.IsReservedGuid(DeckId))
-                    throw new RequestInputException($"Invalid deck id '{DeckId}'");
-                if (ExcludedCardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
-                    throw new RequestInputException($"Invalid card id");
-                if (ExcludedTagIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
-                    throw new RequestInputException($"Invalid tag id");
+                QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
+                QueryValidationHelper.CheckNotReservedGuid(DeckId);
+                QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedCardIds);
+                QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedTagIds);
                 if (CardsToDownload < 1 || CardsToDownload > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
-                QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, CurrentUserId, DeckId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, CurrentUserId, DeckId);
             }
         }
         public sealed class ResultCard

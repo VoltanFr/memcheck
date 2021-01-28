@@ -33,7 +33,17 @@ namespace MemCheck.Application.QueryValidation
         public static void CheckNotReservedGuid(Guid g)
         {
             if (IsReservedGuid(g))
-                throw new RequestInputException("Bad Guid");
+                throw new InvalidOperationException("Bad Guid");
+        }
+        public static void CheckContainsNoReservedGuid(IEnumerable<Guid> guids)
+        {
+            if (guids.Any(g => IsReservedGuid(g)))
+                throw new InvalidOperationException("Bad Guid");
+        }
+        public static async Task CheckCardExistsAsync(MemCheckDbContext dbContext, Guid cardId)
+        {
+            if (!await dbContext.Cards.AsNoTracking().AnyAsync(card => card.Id == cardId))
+                throw new InvalidOperationException("Card noes not exist");
         }
         public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
         {
@@ -44,7 +54,7 @@ namespace MemCheck.Application.QueryValidation
         {
             var owner = dbContext.Decks.AsNoTracking().Where(deck => deck.Id == deckId).Select(deck => deck.Owner.Id).Single();
             if (owner != userId)
-                throw new RequestInputException("Current user not owner of deck");
+                throw new InvalidOperationException("Current user not owner of deck");
         }
         public static async Task CheckUserIsOwnerOfDeckAsync(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {

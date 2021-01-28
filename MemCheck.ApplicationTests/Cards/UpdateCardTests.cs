@@ -296,7 +296,7 @@ namespace MemCheck.Application.Cards
             using (var dbContext = new MemCheckDbContext(db))
             {
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
-                Assert.ThrowsException<ApplicationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
+                Assert.ThrowsException<InvalidOperationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
             }
         }
         [TestMethod()]
@@ -323,7 +323,7 @@ namespace MemCheck.Application.Cards
             using (var dbContext = new MemCheckDbContext(db))
             {
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
-                Assert.ThrowsException<ApplicationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
+                Assert.ThrowsException<InvalidOperationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id));
             }
         }
         [TestMethod()]

@@ -34,7 +34,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(otherUser, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
         }
         [TestMethod()]
         public async Task OneCardToRepeat()

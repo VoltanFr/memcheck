@@ -17,9 +17,9 @@ namespace MemCheck.Application.QueryValidation
         public static bool CardIsVisibleToUser(Guid userId, IEnumerable<Guid> usersWithView)
         {
             if (QueryValidationHelper.IsReservedGuid(userId))
-                throw new ApplicationException("Invalid user id");
+                throw new InvalidOperationException("Invalid user id");
             if (usersWithView.Any(uwv => QueryValidationHelper.IsReservedGuid(uwv)))
-                throw new ApplicationException("Invalid user with view id");
+                throw new InvalidOperationException("Invalid user with view id");
             return !usersWithView.Any() || usersWithView.Any(userWithView => userWithView == userId);
         }
         public static void CheckUserIsAllowedToViewCards(MemCheckDbContext dbContext, Guid userId, params Guid[] cardIds)
@@ -31,7 +31,7 @@ namespace MemCheck.Application.QueryValidation
                 .Where(card => cardIds.Contains(card.Id));
             foreach (var card in cards)
                 if (!CardIsVisibleToUser(userId, card.UsersWithView))
-                    throw new ApplicationException("User not allowed to view card");
+                    throw new InvalidOperationException("User not allowed to view card");
         }
         public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
         {

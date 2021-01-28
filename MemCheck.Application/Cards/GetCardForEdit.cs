@@ -21,7 +21,7 @@ namespace MemCheck.Application.Cards
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
-            request.CheckValidity(dbContext);
+            await request.CheckValidityAsync(dbContext);
 
             var card = await dbContext.Cards
                 .Include(card => card.VersionCreator)
@@ -34,10 +34,7 @@ namespace MemCheck.Application.Cards
                 .ThenInclude(userWithView => userWithView.User)
                 .Where(card => card.Id == request.CardId)
                 .AsSingleQuery()
-                .SingleOrDefaultAsync();
-
-            if (card == null)
-                throw new RequestInputException("Card not found in database");
+                .SingleAsync();
 
             var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId);
 
@@ -75,10 +72,11 @@ namespace MemCheck.Application.Cards
             }
             public Guid CurrentUserId { get; }
             public Guid CardId { get; }
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
                 QueryValidationHelper.CheckNotReservedGuid(CardId);
+                await QueryValidationHelper.CheckCardExistsAsync(dbContext, CardId);
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, CurrentUserId, CardId);
             }
         }
