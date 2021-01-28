@@ -474,10 +474,11 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region RemoveCardsFromDeck
         [HttpPost("RemoveCardsFromDeck/{deckId}"), Authorize]
-        public IActionResult RemoveCardsFromDeck(Guid deckId, [FromBody] RemoveCardsFromDeckRequest request)
+        public async Task<IActionResult> RemoveCardsFromDeckAsync(Guid deckId, [FromBody] RemoveCardsFromDeckRequest request)
         {
             CheckBodyParameter(request);
-            new RemoveCardsFromDeck(dbContext).Run(deckId, request.CardIds);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            await new RemoveCardsFromDeck(dbContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardRemoved") : Get("CardsRemoved"), this);
         }
         public sealed class RemoveCardsFromDeckRequest
