@@ -43,7 +43,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecks()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = new GetUserDecks(dbContext).Run(userId);
+            var decks = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
             var result = decks.Select(deck => new GetUserDecksViewModel(deck.DeckId, deck.Description, deck.HeapingAlgorithmId, deck.CardCount));
             return base.Ok(result);
         }
@@ -187,7 +187,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecksForDeletion()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = new GetUserDecks(dbContext).Run(userId);
+            var decks = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
             var result = decks.Select(deck => new GetUserDecksForDeletionViewModel(deck.DeckId, deck.Description, deck.CardCount,
                 Get("SureYouWantToDelete") + " " + deck.Description + " " + Get("AndLose") + " " + deck.CardCount + " " + Get("CardLearningInfo") + " " + Get("NoUndo")));
             return base.Ok(result);

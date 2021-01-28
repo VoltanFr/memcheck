@@ -226,7 +226,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> DecksOfUser()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = new GetUserDecks(dbContext).Run(userId);
+            var result = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
             return Ok(result.Select(deck => new DecksOfUserViewModel(deck.DeckId, deck.Description)));
         }
         public sealed class DecksOfUserViewModel

@@ -1,7 +1,9 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
@@ -14,30 +16,22 @@ namespace MemCheck.Application.Decks
         {
             this.dbContext = dbContext;
         }
-        public IEnumerable<ViewModel> Run(Guid userId)
+        public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == userId).OrderBy(deck => deck.Description);
-            return decks.Select(deck => new ViewModel(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardInDecks.Count));
+            await request.CheckValidityAsync(dbContext);
+            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description);
+            return decks.Select(deck => new Result(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardInDecks.Count));
         }
-        public sealed class ViewModel
+        #region Request & Result
+        public sealed record Request(Guid UserId)
         {
-            #region Fields
-            private Guid deckId;
-            private readonly string description;
-            private readonly int heapingAlgorithmId;
-            private readonly int cardCount;
-            #endregion
-            public ViewModel(Guid deckId, string description, int heapingAlgorithmId, int cardCount)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                this.deckId = deckId;
-                this.description = description;
-                this.heapingAlgorithmId = heapingAlgorithmId;
-                this.cardCount = cardCount;
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
             }
-            public string Description => description;
-            public Guid DeckId => deckId;
-            public int HeapingAlgorithmId => heapingAlgorithmId;
-            public int CardCount => cardCount;
         }
+        public sealed record Result(Guid DeckId, string Description, int HeapingAlgorithmId, int CardCount);
+        #endregion
+
     }
 }
