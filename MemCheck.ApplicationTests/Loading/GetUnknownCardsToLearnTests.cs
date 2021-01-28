@@ -149,9 +149,6 @@ namespace MemCheck.Application.Loading
             Assert.IsFalse(firstRunCards.SequenceEqual(secondRunCards));
             Assert.IsFalse(firstRunCards.SequenceEqual(thirdRunCards));
             Assert.IsFalse(secondRunCards.SequenceEqual(thirdRunCards));
-            Assert.AreNotEqual(firstRunCards[0], secondRunCards[0]);
-            Assert.AreNotEqual(firstRunCards[0], thirdRunCards[0]);
-            Assert.AreNotEqual(secondRunCards[0], thirdRunCards[0]);
         }
         [TestMethod()]
         public async Task OneUnknownCardLearnt()
