@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
 using MemCheck.Application.Tags;
@@ -12,7 +13,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Cards
 {
     public sealed class GetUnknownCardsToLearn
     {

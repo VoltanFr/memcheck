@@ -1,12 +1,11 @@
-﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class CardRegistrationsLoaderTests

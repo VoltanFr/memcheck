@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application;
-using MemCheck.Application.Loading;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;

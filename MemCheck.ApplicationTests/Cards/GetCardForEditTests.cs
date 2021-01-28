@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.Cards;
-using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -8,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Loading
+namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class GetCardForEditTests

@@ -28,7 +28,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             var chronos = new List<double>();
             for (int i = 0; i < runCount; i++)
             {
-                var request = new Application.Loading.GetCardForEdit.Request(userId, cardId);
+                var request = new Application.Cards.GetCardForEdit.Request(userId, cardId);
                 var runner = new Application.Loading.GetCardForEdit(dbContext);
                 var oneRunChrono = Stopwatch.StartNew();
                 var card = await runner.RunAsync(request);

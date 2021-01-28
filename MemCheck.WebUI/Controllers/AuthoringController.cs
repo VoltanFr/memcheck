@@ -2,7 +2,6 @@
 using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.History;
-using MemCheck.Application.Loading;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
 using MemCheck.Application.Tags;
