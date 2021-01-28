@@ -29,7 +29,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             for (int i = 0; i < runCount; i++)
             {
                 var request = new Application.Cards.GetCardForEdit.Request(userId, cardId);
-                var runner = new Application.Loading.GetCardForEdit(dbContext);
+                var runner = new Application.Cards.GetCardForEdit(dbContext);
                 var oneRunChrono = Stopwatch.StartNew();
                 var card = await runner.RunAsync(request);
                 logger.LogInformation($"Got a card with {card.Images.Count()} images, {card.CountOfUserRatings} ratings, {card.Tags.Count()} tags, {card.UsersOwningDeckIncluding.Count()} users, {card.UsersWithVisibility} users with access in {oneRunChrono.Elapsed}");
