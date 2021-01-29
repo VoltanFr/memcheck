@@ -1,12 +1,10 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tags;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Languages

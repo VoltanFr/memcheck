@@ -22,7 +22,7 @@ namespace MemCheck.WebUI.Controllers
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
-        [HttpGet("GetAllLanguages")] public IActionResult GetAllLanguagesController() => Ok(new GetAllLanguages(dbContext).Run());
+        [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(dbContext).RunAsync());
         #region Create
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateRequest language)
