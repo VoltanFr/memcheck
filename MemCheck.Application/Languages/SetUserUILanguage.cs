@@ -3,7 +3,7 @@ using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Languages
 {
     public sealed class SetUserUILanguage
     {
