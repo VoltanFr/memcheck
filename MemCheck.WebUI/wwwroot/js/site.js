@@ -2,15 +2,21 @@
     el: '#SelectLanguageDiv',
     data: {
         activeLanguage: "",
-        availableLanguages: []
+        availableLanguages: [],
+        mountFinished: false,
     },
     async mounted() {
-        this.getAvailableLanguages();
-        this.getActiveLanguage();
+        try {
+            await this.getAvailableLanguages();
+            await this.getActiveLanguage();
+        }
+        finally {
+            this.mountFinished = true;
+        }
     },
     methods: {
-        getAvailableLanguages() {
-            axios.get('/UILanguages/getAvailableLanguages')
+        async getAvailableLanguages() {
+            await axios.get('/UILanguages/getAvailableLanguages')
                 .then(result => {
                     this.availableLanguages = result.data;
                 })
@@ -18,8 +24,8 @@
                     tellAxiosError(error, this);
                 });
         },
-        getActiveLanguage() {
-            axios.get('/UILanguages/getActiveLanguage')
+        async getActiveLanguage() {
+            await axios.get('/UILanguages/getActiveLanguage')
                 .then(result => {
                     this.activeLanguage = result.data;
                 })
@@ -40,7 +46,8 @@
     },
     watch: {
         activeLanguage: async function () {
-            await this.activeLanguageChange();
+            if (this.mountFinished)
+                await this.activeLanguageChange();
         }, immediate: false
     },
 });
