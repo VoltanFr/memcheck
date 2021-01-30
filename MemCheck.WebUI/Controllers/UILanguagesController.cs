@@ -19,19 +19,19 @@ namespace MemCheck.WebUI.Controllers
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
+        private readonly SignInManager<MemCheckUser> signInManager;
         #endregion
         #region Private methods
-        private IEnumerable<string> GetSupportedUILanguages()
+        private static IEnumerable<string> GetSupportedUILanguages()
         {
-            var requestCulture = HttpContext.Features.Get<IRequestCultureFeature>();
-            if (requestCulture.Provider is not RequestCultureProvider provider) throw new InvalidProgramException("requestCulture.Provider as RequestCultureProvider returns null");
-            return provider.Options.SupportedUICultures.Select(c => c.Name);
+            return MemCheckRequestCultureProvider.SupportedCultures.Select(c => c.Name);
         }
         #endregion
-        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager) : base()
+        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager) : base()
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
+            this.signInManager = signInManager;
         }
         [HttpGet("GetAvailableLanguages")] public IActionResult GetAvailableLanguages() => base.Ok(GetSupportedUILanguages());
         [HttpGet("GetActiveLanguage")]
@@ -47,11 +47,12 @@ namespace MemCheck.WebUI.Controllers
             if (requestCulture.RequestCulture.UICulture.Name == culture)
                 return Ok(false);
 
-            Response.Cookies.Append(CookieRequestCultureProvider.DefaultCookieName, CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)), new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) });
-
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user != null)
+            {
                 new SetUserUILanguage(dbContext, GetSupportedUILanguages()).Run(user, culture);
+                await signInManager.RefreshSignInAsync(user);   //So that the culture claim is renewed
+            }
 
             return Ok(true);
         }

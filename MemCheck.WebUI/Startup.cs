@@ -1,6 +1,8 @@
 using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -14,8 +16,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace MemCheck.WebUI
 {
@@ -65,14 +67,12 @@ namespace MemCheck.WebUI
 
             ConfigureDataBase(services);
 
-            services.AddIdentity<MemCheckUser, MemCheckUserRole>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = true;
-            })
+            services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; })
                 .AddEntityFrameworkStores<MemCheckDbContext>()
                 .AddDefaultTokenProviders()
                 .AddDefaultUI()
-                .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
+                .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
+                .AddClaimsPrincipalFactory<MemCheckClaimsFactory>();
 
             services.AddAuthorization(options =>
             {
@@ -100,30 +100,11 @@ namespace MemCheck.WebUI
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
 
-            services.Configure<RequestLocalizationOptions>(options =>
-            {
-                var supportedCultures = new[]
-                {
-                    new CultureInfo("en"    ),
-                    new CultureInfo("fr")
-                };
-
-                options.DefaultRequestCulture = new RequestCulture("en");
-                options.SupportedCultures = supportedCultures;
-                options.SupportedUICultures = supportedCultures;
-
-                //options.AddInitialRequestCultureProvider(new CustomRequestCultureProvider(async context =>
-                //{
-                //    // My custom request culture logic
-                //    return new ProviderCultureResult("en");
-                //}));
-            });
-
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = $"/Identity/Account/Login";
-                options.LogoutPath = $"/Identity/Account/Logout";
-                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+                options.LoginPath = "/Identity/Pages/Account/Login";
+                options.LogoutPath = "/Identity/Pages/Account/Logout";
+                options.AccessDeniedPath = "/Identity/Pages/Account/AccessDenied";
             });
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -149,15 +130,16 @@ namespace MemCheck.WebUI
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseRequestLocalization(options =>
-            {
-                options.DefaultRequestCulture = new RequestCulture("en");
-                CultureInfo[] cultureInfo = new[] { new CultureInfo("en"), new CultureInfo("fr") };
-                options.SupportedCultures = cultureInfo;
-                options.SupportedUICultures = cultureInfo;
-            });
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseRequestLocalization(options =>
+            {
+                options.DefaultRequestCulture = new RequestCulture(MemCheckRequestCultureProvider.English);
+                options.SupportedCultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray();    //Culture is used for numbers, dates, etc.
+                options.SupportedUICultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray(); //UI culture is used for looking up translations from resource files
+                options.RequestCultureProviders = new MemCheckRequestCultureProvider().AsArray();
+            });
 
             app.UseMvc();
 
