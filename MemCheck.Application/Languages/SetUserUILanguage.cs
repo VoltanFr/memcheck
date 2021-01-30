@@ -1,7 +1,8 @@
-﻿using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Languages
 {
@@ -9,20 +10,32 @@ namespace MemCheck.Application.Languages
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly HashSet<string> supportedUILanguages;
         #endregion
-        public SetUserUILanguage(MemCheckDbContext dbContext, IEnumerable<string> supportedUILanguages)
+        public SetUserUILanguage(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.supportedUILanguages = new HashSet<string>(supportedUILanguages);
         }
-        public void Run(MemCheckUser user, string cultureName)
+        public async Task RunAsync(Request request)
         {
-            if (!supportedUILanguages.Contains(cultureName))
-                throw new InvalidProgramException($"Invalid culture '{cultureName}'");
-            user.UILanguage = cultureName;
+            await request.CheckValidityAsync(dbContext);
+            var user = await dbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            user.UILanguage = request.CultureName;
             dbContext.SaveChanges();
         }
-
+        #region Request type
+        public sealed record Request(Guid UserId, string CultureName)
+        {
+            public const int MinNameLength = 5;
+            public const int MaxNameLength = 5;
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            {
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                if (CultureName != CultureName.Trim())
+                    throw new InvalidOperationException("Invalid Name: not trimmed");
+                if (CultureName.Length < MinNameLength || CultureName.Length > MaxNameLength)
+                    throw new InvalidOperationException($"Invalid culture name '{CultureName}'");
+            }
+        }
+        #endregion
     }
 }

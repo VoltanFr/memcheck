@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Languages;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,10 @@ namespace MemCheck.Application.Tests.Helpers
             if (length != null)
                 result.Length = length.Value;
             return result.ToString();
+        }
+        public static string CultureName()
+        {
+            return String(SetUserUILanguage.Request.MinNameLength);
         }
         public static DateTime Date(DateTime? after = null)
         {

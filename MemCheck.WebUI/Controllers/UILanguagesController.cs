@@ -50,7 +50,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user != null)
             {
-                new SetUserUILanguage(dbContext, GetSupportedUILanguages()).Run(user, culture);
+                await new SetUserUILanguage(dbContext).RunAsync(new SetUserUILanguage.Request(user.Id, culture));
                 await signInManager.RefreshSignInAsync(user);   //So that the culture claim is renewed
             }
 
