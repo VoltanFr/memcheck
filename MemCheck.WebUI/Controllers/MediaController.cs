@@ -177,9 +177,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Delete(Guid imageId, [FromBody] DeleteRequest request)
         {
             CheckBodyParameter(request);
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var applicationRequest = new DeleteImage.Request(user, imageId, request.DeletionDescription);
-            var imageName = await new DeleteImage(dbContext, this).RunAsync(applicationRequest);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var applicationRequest = new DeleteImage.Request(userId, imageId, request.DeletionDescription);
+            var imageName = await new DeleteImage(dbContext).RunAsync(applicationRequest, this);
             var toastText = $"{Get("SuccessfullyDeletedImage")} '{imageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
