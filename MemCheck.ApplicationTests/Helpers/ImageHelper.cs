@@ -12,6 +12,10 @@ namespace MemCheck.Application.Tests.Helpers
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.SingleAsync(u => u.Id == creatorId);
+            var originalBlob = new[] { (byte)0, (byte)0, (byte)0, (byte)0 };
+            var smallBlob = new[] { (byte)0 };
+            var mediumBlob = new[] { (byte)0, (byte)0 };
+            var bigBlob = new[] { (byte)0, (byte)0, (byte)0 };
             var result = new Image
             {
                 Owner = creator,
@@ -23,14 +27,14 @@ namespace MemCheck.Application.Tests.Helpers
                 VersionDescription = versionDescription ?? RandomHelper.String(),
                 VersionType = ImageVersionType.Creation,
                 OriginalContentType = "InvalidForUnitTests",
-                OriginalSize = 1,
-                OriginalBlob = new[] { (byte)0 },
-                SmallBlobSize = 1,
-                SmallBlob = new[] { (byte)0 },
-                MediumBlobSize = 1,
-                MediumBlob = new[] { (byte)0 },
-                BigBlobSize = 1,
-                BigBlob = new[] { (byte)0 }
+                OriginalSize = originalBlob.Length,
+                OriginalBlob = originalBlob,
+                SmallBlobSize = smallBlob.Length,
+                SmallBlob = smallBlob,
+                MediumBlobSize = mediumBlob.Length,
+                MediumBlob = mediumBlob,
+                BigBlobSize = bigBlob.Length,
+                BigBlob = bigBlob
             };
             dbContext.Images.Add(result);
             await dbContext.SaveChangesAsync();

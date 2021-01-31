@@ -1,8 +1,8 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
@@ -15,43 +15,20 @@ namespace MemCheck.Application.Images
         {
             this.dbContext = dbContext;
         }
-        public byte[] Run(Request request)
+        public async Task<byte[]> RunAsync(Request request)
         {
-            request.CheckValidity();
-
-            //This implementation takes care of not loading all sizes :-)
-            var images = dbContext.Images.AsNoTracking().Where(image => image.Id == request.ImageId).ToList();
-
-            if (images.Count != 1)
-                throw new RequestInputException($"Unknown image (dbcount={images.Count})");
-
-            var image = images[0];
-
-            if (request.Size == 3)
-                return image.BigBlob;
-
-            if (request.Size == 2)
-                return image.MediumBlob;
-
-            return image.SmallBlob;
+            return request.Size switch
+            {
+                Request.ImageSize.Small => (await dbContext.Images.AsNoTracking().Select(img => new { img.Id, img.SmallBlob }).SingleAsync(img => img.Id == request.ImageId)).SmallBlob,
+                Request.ImageSize.Medium => (await dbContext.Images.AsNoTracking().Select(img => new { img.Id, img.MediumBlob }).SingleAsync(img => img.Id == request.ImageId)).MediumBlob,
+                Request.ImageSize.Big => (await dbContext.Images.AsNoTracking().Select(img => new { img.Id, img.BigBlob }).SingleAsync(img => img.Id == request.ImageId)).BigBlob,
+                _ => throw new NotImplementedException(request.Size.ToString()),
+            };
         }
         #region Request class
-        public sealed class Request
+        public sealed record Request(Guid ImageId, Request.ImageSize Size)
         {
-            public Request(Guid imageId, int size)
-            {
-                ImageId = imageId;
-                Size = size;
-            }
-            public Guid ImageId { get; }
-            public int Size { get; }
-            public void CheckValidity()
-            {
-                if (QueryValidationHelper.IsReservedGuid(ImageId))
-                    throw new RequestInputException($"Invalid image id {ImageId}");
-                if (Size < 1 || Size > 3)
-                    throw new RequestInputException($"Invalid image size {Size}");
-            }
+            public enum ImageSize { Small, Medium, Big };
         }
         #endregion
     }

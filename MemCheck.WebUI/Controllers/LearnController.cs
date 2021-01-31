@@ -35,9 +35,20 @@ namespace MemCheck.WebUI.Controllers
         }
         #region GetImage
         [HttpGet("GetImage/{imageId}/{size}")]
-        public IActionResult GetImage(Guid imageId, int size)
+        public async Task<IActionResult> GetImageAsync(Guid imageId, int size)
         {
-            var blob = new GetImage(dbContext).Run(new GetImage.Request(imageId, size));
+            static GetImage.Request.ImageSize AppSizeFromWebParam(int size)
+            {
+                return size switch
+                {
+                    1 => GetImage.Request.ImageSize.Small,
+                    2 => GetImage.Request.ImageSize.Medium,
+                    3 => GetImage.Request.ImageSize.Big,
+                    _ => throw new NotImplementedException(size.ToString())
+                };
+            }
+
+            var blob = await new GetImage(dbContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
             var content = new MemoryStream(blob);
             return base.File(content, "APPLICATION/octet-stream", "noname");
         }
