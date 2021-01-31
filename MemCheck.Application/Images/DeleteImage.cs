@@ -12,7 +12,6 @@ namespace MemCheck.Application.Images
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
@@ -25,16 +24,16 @@ namespace MemCheck.Application.Images
             };
         }
         #endregion
-        public DeleteImage(MemCheckDbContext dbContext, ILocalized localizer)
+        public DeleteImage(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
         }
-        public async Task<string> RunAsync(Request request)
+        public async Task<string> RunAsync(Request request, ILocalized localizer, DateTime? deletionUtcDate = null)
         {
             await request.CheckValidityAsync(localizer, dbContext);
 
             var image = await dbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
+            var user = await dbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
             //For a deletion, we create two previous versions:
             //- one for the last known operation (described in the image)
@@ -60,12 +59,12 @@ namespace MemCheck.Application.Images
             var deletionVersion = new ImagePreviousVersion()
             {
                 Image = request.ImageId,
-                Owner = request.User,
+                Owner = user,
                 Name = image.Name,
                 Description = image.Description,
                 Source = image.Source,
                 InitialUploadUtcDate = image.InitialUploadUtcDate,
-                VersionUtcDate = DateTime.UtcNow,
+                VersionUtcDate = deletionUtcDate ?? DateTime.UtcNow,
                 OriginalContentType = image.OriginalContentType,
                 OriginalSize = image.OriginalSize,
                 OriginalBlob = image.OriginalBlob,
@@ -82,42 +81,26 @@ namespace MemCheck.Application.Images
 
             return image.Name;
         }
-        #region Request class
-        public sealed class Request
+        #region Request type
+        public sealed record Request(Guid UserId, Guid ImageId, string DeletionDescription)
         {
-            #region Fields
-            private const int minDescriptionLength = 3;
-            private const int maxDescriptionLength = 1000;
-            #endregion
-            public Request(MemCheckUser user, Guid imageId, string deletionDescription)
-            {
-                User = user;
-                ImageId = imageId;
-                DeletionDescription = deletionDescription.Trim();
-            }
-
-            public MemCheckUser User { get; }
-            public Guid ImageId { get; }
-            public string DeletionDescription { get; }
+            public const int MinDescriptionLength = 3;
+            public const int MaxDescriptionLength = 1000;
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
                 if (DeletionDescription != DeletionDescription.Trim())
                     throw new InvalidOperationException("Invalid name: not trimmed");
-                if (DeletionDescription.Length < minDescriptionLength || DeletionDescription.Length > maxDescriptionLength)
-                    throw new RequestInputException(localizer.Get("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + localizer.Get("MustBeBetween") + $" {minDescriptionLength} " + localizer.Get("And") + $" {maxDescriptionLength}");
+                if (DeletionDescription.Length < MinDescriptionLength || DeletionDescription.Length > MaxDescriptionLength)
+                    throw new RequestInputException(localizer.Get("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + localizer.Get("MustBeBetween") + $" {MinDescriptionLength} " + localizer.Get("And") + $" {MaxDescriptionLength}");
 
-                if (QueryValidationHelper.IsReservedGuid(User.Id))
-                    throw new RequestInputException("InvalidUserId");
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+
                 if (QueryValidationHelper.IsReservedGuid(ImageId))
                     throw new RequestInputException("InvalidImageId");
 
-                var images = dbContext.Images.Where(img => img.Id == ImageId);
-                if (!await images.AnyAsync())
-                    throw new RequestInputException(localizer.Get("UnknownImage"));
-                var cardCounts = images.Select(img => img.Cards.Count());
-                var cardCount = await cardCounts.SingleAsync();
-                if (cardCount != 0)
-                    throw new RequestInputException(localizer.Get("ImageUsedInCardsPart1") + ' ' + cardCount + ' ' + localizer.Get("ImageUsedInCardsPart2"));
+                var image = await dbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
+                if (image.Cards.Any())
+                    throw new RequestInputException(localizer.Get("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + localizer.Get("ImageUsedInCardsPart2"));
             }
         }
         #endregion

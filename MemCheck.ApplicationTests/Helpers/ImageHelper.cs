@@ -8,7 +8,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class ImageHelper
     {
-        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatorId, string? name = null)
+        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatorId, string? name = null, string? versionDescription = null, DateTime? lastChangeUtcDate = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.SingleAsync(u => u.Id == creatorId);
@@ -18,9 +18,9 @@ namespace MemCheck.Application.Tests.Helpers
                 Name = name ?? RandomHelper.String(),
                 Description = RandomHelper.String(),
                 Source = RandomHelper.String(),
-                InitialUploadUtcDate = DateTime.UtcNow,
-                LastChangeUtcDate = DateTime.UtcNow,
-                VersionDescription = RandomHelper.String(),
+                InitialUploadUtcDate = lastChangeUtcDate ?? DateTime.UtcNow,
+                LastChangeUtcDate = lastChangeUtcDate ?? DateTime.UtcNow,
+                VersionDescription = versionDescription ?? RandomHelper.String(),
                 VersionType = ImageVersionType.Creation,
                 OriginalContentType = "InvalidForUnitTests",
                 OriginalSize = 1,
