@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Images
 {
     public sealed class GetImage
     {

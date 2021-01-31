@@ -30,8 +30,8 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             for (int i = 0; i < 5; i++)
             {
                 var realCodeChrono = Stopwatch.StartNew();
-                var request = new Application.GetImage.Request(new Guid("980ce406-0417-4963-c9b4-08d8206a4d4c"), 2);
-                var runner = new Application.GetImage(dbContext);
+                var request = new Application.Images.GetImage.Request(new Guid("980ce406-0417-4963-c9b4-08d8206a4d4c"), 2);
+                var runner = new Application.Images.GetImage(dbContext);
                 var bytes = runner.Run(request);
                 logger.LogInformation($"Got {bytes.Length} bytes in {realCodeChrono.Elapsed}");
                 chronos.Add(realCodeChrono.Elapsed.TotalSeconds);
