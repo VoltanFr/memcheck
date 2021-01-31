@@ -42,7 +42,6 @@ namespace MemCheck.Application.Images
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var request = new DeleteDeck.Request(user, Guid.NewGuid());
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String()), new TestLocalizer()));
         }
         [TestMethod()]
