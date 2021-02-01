@@ -8,7 +8,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class ImageHelper
     {
-        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatorId, string? name = null, string? versionDescription = null, DateTime? lastChangeUtcDate = null, string? source = null)
+        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatorId, string? name = null, string? versionDescription = null, DateTime? lastChangeUtcDate = null, string? source = null, string? description = null)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.SingleAsync(u => u.Id == creatorId);
@@ -20,7 +20,7 @@ namespace MemCheck.Application.Tests.Helpers
             {
                 Owner = creator,
                 Name = name ?? RandomHelper.String(),
-                Description = RandomHelper.String(),
+                Description = description ?? RandomHelper.String(),
                 Source = source ?? RandomHelper.String(),
                 InitialUploadUtcDate = lastChangeUtcDate ?? DateTime.UtcNow,
                 LastChangeUtcDate = lastChangeUtcDate ?? DateTime.UtcNow,
