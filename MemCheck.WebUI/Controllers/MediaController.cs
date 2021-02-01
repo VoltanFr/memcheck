@@ -129,7 +129,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImageMetadata/{imageId}")]
         public async Task<IActionResult> GetImageMetadata(Guid imageId)
         {
-            var appRequest = new GetImageInfo(dbContext, this);
+            var appRequest = new Application.Images.GetImageInfo(dbContext, this);
             var result = await appRequest.RunAsync(imageId);
             return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
         }
@@ -194,7 +194,7 @@ namespace MemCheck.WebUI.Controllers
         {
             try
             {
-                GetImageInfo runner = new GetImageInfo(dbContext, this);
+                var runner = new Application.Images.GetImageInfo(dbContext, this);
                 var result = await runner.RunAsync(imageId);
                 return Ok(new GetImageInfoForDeletionResult(result, this));
             }
@@ -205,7 +205,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetImageInfoForDeletionResult
         {
-            public GetImageInfoForDeletionResult(GetImageInfo.Result appResult, ILocalized localizer)
+            public GetImageInfoForDeletionResult(Application.Images.GetImageInfo.Result appResult, ILocalized localizer)
             {
                 ImageName = appResult.Name;
                 CardCount = appResult.CardCount;
