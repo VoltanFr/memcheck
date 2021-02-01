@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Images
 {
     public sealed class UpdateImageMetadata
     {
@@ -121,7 +121,7 @@ namespace MemCheck.Application
 
                 var imageDataBeforeUpdate = await images.Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description }).SingleAsync();
 
-                if ((imageDataBeforeUpdate.nameBeforeUpdate == Name) && (imageDataBeforeUpdate.sourceBeforeUpdate == Source) && (imageDataBeforeUpdate.descriptionBeforeUpdate == Description))
+                if (imageDataBeforeUpdate.nameBeforeUpdate == Name && imageDataBeforeUpdate.sourceBeforeUpdate == Source && imageDataBeforeUpdate.descriptionBeforeUpdate == Description)
                     throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
             }
         }
