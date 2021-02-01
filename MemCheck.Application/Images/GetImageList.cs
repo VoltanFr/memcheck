@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Images
 {
     public sealed class GetImageList
     {
@@ -25,7 +25,7 @@ namespace MemCheck.Application
                 );
             var ordered = imagesWithFilter.OrderBy(image => image.Name);
             var totalCount = ordered.Count();
-            var pageCount = (int)Math.Ceiling(((double)totalCount) / pageSize);
+            var pageCount = (int)Math.Ceiling((double)totalCount / pageSize);
             var pageImages = ordered.Skip((pageNo - 1) * pageSize).Take(pageSize);
             return new ResultModel(totalCount, pageCount,
                 pageImages.Select(img => new ResultImageModel(
