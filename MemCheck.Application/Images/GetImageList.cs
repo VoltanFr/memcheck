@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
@@ -15,20 +16,23 @@ namespace MemCheck.Application.Images
         {
             this.dbContext = dbContext;
         }
-        public ResultModel Run(int pageSize, int pageNo, string filter)
+        public async Task<Result> RunAsync(Request request)
         {
-            var images = dbContext.Images.Include(img => img.Cards);
-            var imagesWithFilter = images.Where(image =>
-                EF.Functions.Like(image.Name, $"%{filter}%")
-                || EF.Functions.Like(image.Description, $"%{filter}%")
-                || EF.Functions.Like(image.Source, $"%{filter}%")
-                );
-            var ordered = imagesWithFilter.OrderBy(image => image.Name);
-            var totalCount = ordered.Count();
-            var pageCount = (int)Math.Ceiling((double)totalCount / pageSize);
-            var pageImages = ordered.Skip((pageNo - 1) * pageSize).Take(pageSize);
-            return new ResultModel(totalCount, pageCount,
-                pageImages.Select(img => new ResultImageModel(
+            request.CheckValidity();
+
+            IQueryable<Domain.Image>? images = dbContext.Images.AsNoTracking().Include(img => img.Cards);
+            if (request.Filter.Length > 0)
+                images = images.Where(image =>
+                    EF.Functions.Like(image.Name, $"%{request.Filter}%")
+                    || EF.Functions.Like(image.Description, $"%{request.Filter}%")
+                    || EF.Functions.Like(image.Source, $"%{request.Filter}%")
+                    );
+            var ordered = images.OrderBy(image => image.Name);
+            var totalCount = await ordered.CountAsync();
+            var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
+            var pageImages = ordered.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
+            return new Result(totalCount, pageCount,
+                pageImages.Select(img => new ResultImage(
                     img.Id,
                     img.Name,
                     img.Cards.Count(),
@@ -47,55 +51,24 @@ namespace MemCheck.Application.Images
                 )
             );
         }
-        #region Result classes
-        public sealed class ResultModel
+        #region Request & Result types
+        public sealed record Request(int PageSize, int PageNo, string Filter)
         {
-            public ResultModel(int totalCount, int pageCount, IEnumerable<ResultImageModel> images)
+            public const int MaxPageSize = 100;
+            public void CheckValidity()
             {
-                TotalCount = totalCount;
-                PageCount = pageCount;
-                Images = images;
+                if (PageNo < 1)
+                    throw new InvalidOperationException($"First page is numbered 1, received a request for page {PageNo}");
+                if (PageSize < 1)
+                    throw new InvalidOperationException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
+                if (PageSize > MaxPageSize)
+                    throw new InvalidOperationException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
             }
-            public int TotalCount { get; }
-            public int PageCount { get; }
-            public IEnumerable<ResultImageModel> Images { get; }
         }
-        public sealed class ResultImageModel
-        {
-            public ResultImageModel(Guid imageId, string imageName, int cardCount, string originalImageContentType,
-                string uploader, string description, string source, int originalImageSize, int smallSize, int mediumSize, int bigSize,
-                DateTime initialUploadUtcDate, DateTime lastChangeUtcDate, string currentVersionDescription)
-            {
-                ImageId = imageId;
-                ImageName = imageName;
-                CardCount = cardCount;
-                OriginalImageContentType = originalImageContentType;
-                Uploader = uploader;
-                Description = description;
-                Source = source;
-                OriginalImageSize = originalImageSize;
-                SmallSize = smallSize;
-                MediumSize = mediumSize;
-                BigSize = bigSize;
-                InitialUploadUtcDate = initialUploadUtcDate;
-                LastChangeUtcDate = lastChangeUtcDate;
-                CurrentVersionDescription = currentVersionDescription;
-            }
-            public Guid ImageId { get; }
-            public string ImageName { get; } = null!;
-            public int CardCount { get; }
-            public string OriginalImageContentType { get; }
-            public string Uploader { get; } = null!; //aka original version creator
-            public string Description { get; } = null!;
-            public string Source { get; } = null!;
-            public int OriginalImageSize { get; }
-            public int SmallSize { get; }
-            public int MediumSize { get; }
-            public int BigSize { get; }
-            public DateTime InitialUploadUtcDate { get; }
-            public DateTime LastChangeUtcDate { get; }
-            public string CurrentVersionDescription { get; } = null!;
-        }
+        public sealed record Result(int TotalCount, int PageCount, IEnumerable<ResultImage> Images);
+        public sealed record ResultImage(Guid ImageId, string ImageName, int CardCount, string OriginalImageContentType,
+                string Uploader, string Description, string Source, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize,
+                DateTime InitialUploadUtcDate, DateTime LastChangeUtcDate, string CurrentVersionDescription);
         #endregion
     }
 }

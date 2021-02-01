@@ -8,7 +8,7 @@ var app = new Vue({
         },
         totalCount: -1, //int
         pageCount: 0,   //int
-        offeredPageSizes: [10, 50, 100, 500],
+        offeredPageSizes: [10, 50, 100],
         images: [],
         mountFinished: false,
         loading: false,

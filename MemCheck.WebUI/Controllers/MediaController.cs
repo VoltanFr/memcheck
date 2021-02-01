@@ -64,10 +64,10 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetImageList
         [HttpPost("GetImageList")]
-        public IActionResult GetImageList([FromBody] GetImageListRequest request)
+        public async Task<IActionResult> GetImageListAsync([FromBody] GetImageListRequest request)
         {
             CheckBodyParameter(request);
-            var result = new GetImageList(dbContext).Run(request.PageSize, request.PageNo, request.Filter ?? "");
+            var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
             return Ok(new GetImageListViewModel(result, this));
         }
         public sealed class GetImageListRequest
@@ -78,7 +78,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetImageListViewModel
         {
-            public GetImageListViewModel(GetImageList.ResultModel applicationResult, ILocalized localizer)
+            public GetImageListViewModel(GetImageList.Result applicationResult, ILocalized localizer)
             {
                 TotalCount = applicationResult.TotalCount;
                 PageCount = applicationResult.PageCount;
@@ -90,7 +90,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetImageListImageViewModel
         {
-            public GetImageListImageViewModel(GetImageList.ResultImageModel img, ILocalized localizer)
+            public GetImageListImageViewModel(GetImageList.ResultImage img, ILocalized localizer)
             {
                 ImageId = img.ImageId;
                 ImageName = img.ImageName;
