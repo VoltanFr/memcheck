@@ -245,7 +245,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetImageInfo([FromBody] GetImageInfoRequest request)
         {
             CheckBodyParameter(request);
-            var appResult = await new GetImageInfo(dbContext, this).RunAsync(request.ImageName);
+            var appResult = await new Application.Images.GetImageInfo(dbContext, this).RunAsync(request.ImageName);
             return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
         }
         #region Request and view model classes
