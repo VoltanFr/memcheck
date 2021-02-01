@@ -29,14 +29,6 @@ namespace MemCheck.Application.Images
             this.dbContext = dbContext;
             this.localizer = localizer;
         }
-        public async Task<Result> RunAsync(string imageName)
-        {
-            imageName = imageName.Trim();
-            if (imageName.Length == 0)
-                throw new RequestInputException(localizer.Get("PleaseEnterAnImageName"));
-            var images = dbContext.Images.Include(img => img.Cards).Where(image => EF.Functions.Like(image.Name, $"{imageName}"));
-            return await ResultFromSearchAsync(images, imageName);
-        }
         public async Task<Result> RunAsync(Guid imageId)
         {
             if (QueryValidationHelper.IsReservedGuid(imageId))
