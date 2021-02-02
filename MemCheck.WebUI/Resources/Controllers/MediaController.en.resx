@@ -117,8 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AlreadyExistsCaseInsensitive" xml:space="preserve">
+    <value>already exists (this check is not case sensitive)</value>
+  </data>
   <data name="And" xml:space="preserve">
     <value>and</value>
+  </data>
+  <data name="AnImageWithName" xml:space="preserve">
+    <value>An image named</value>
   </data>
   <data name="AreYouSure" xml:space="preserve">
     <value>Are you sure you want to delete this image?</value>
@@ -243,11 +249,29 @@
   <data name="InvalidImageContentType" xml:space="preserve">
     <value>Invalid content type</value>
   </data>
+  <data name="InvalidImageDescription" xml:space="preserve">
+    <value>Invalid image description</value>
+  </data>
+  <data name="InvalidImageName" xml:space="preserve">
+    <value>Invalid image name</value>
+  </data>
+  <data name="InvalidImageSource" xml:space="preserve">
+    <value>Invalid image source</value>
+  </data>
+  <data name="InvalidImageVersionDescription" xml:space="preserve">
+    <value>Invalid image version description</value>
+  </data>
   <data name="InvalidNameLength" xml:space="preserve">
     <value>Invalid name: length is</value>
   </data>
   <data name="InvalidSourceLength" xml:space="preserve">
     <value>Invalid source information: length is</value>
+  </data>
+  <data name="InvalidVersionDescriptionLength" xml:space="preserve">
+    <value>Invalid version description length:</value>
+  </data>
+  <data name="IsForbidden" xml:space="preserve">
+    <value>is forbidden</value>
   </data>
   <data name="LooksLikeABug" xml:space="preserve">
     <value>Ooops! Looks like there was a bug.</value>

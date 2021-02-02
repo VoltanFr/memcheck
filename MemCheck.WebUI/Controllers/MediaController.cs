@@ -151,9 +151,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
         {
             CheckBodyParameter(request);
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var applicationRequest = new UpdateImageMetadata.Request(imageId, user, request.ImageName, request.Source, request.Description, request.VersionDescription);
-            await new UpdateImageMetadata(dbContext, this).RunAsync(applicationRequest);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName, request.Source, request.Description, request.VersionDescription);
+            await new UpdateImageMetadata(dbContext).RunAsync(applicationRequest, this);
             var toastText = $"{Get("SuccessfullyUpdatedImage")} '{request.ImageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }

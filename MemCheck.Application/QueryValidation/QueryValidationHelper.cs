@@ -23,11 +23,23 @@ namespace MemCheck.Application.QueryValidation
         #endregion
         public const int TagMinNameLength = 3;
         public const int TagMaxNameLength = 50;
+        public const int ImageMinNameLength = 3;
+        public const int ImageMaxNameLength = 100;
+        public const int ImageMinSourceLength = 3;
+        public const int ImageMaxSourceLength = 1000;
+        public const int ImageMinDescriptionLength = 3;
+        public const int ImageMaxDescriptionLength = 5000;
+        public const int ImageMinVersionDescriptionLength = 3;
+        public const int ImageMaxVersionDescriptionLength = 1000;
         public const int DeckMinNameLength = 3;
         public const int DeckMaxNameLength = 36;
         public const int LanguageMinNameLength = 2;
         public const int LanguageMaxNameLength = 36;
         public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInImageNames = new[] { '<', '>' }.ToImmutableHashSet();
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInImageSource = new[] { '<', '>' }.ToImmutableHashSet();
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInImageDescription = new[] { '<', '>' }.ToImmutableHashSet();
+        public static readonly ImmutableHashSet<char> ForbiddenCharsInImageVersionDescription = new[] { '<', '>' }.ToImmutableHashSet();
         public static readonly ImmutableHashSet<char> ForbiddenCharsInLanguages = new[] { '<', '>' }.ToImmutableHashSet();
         public static bool IsReservedGuid(Guid g)
         {
@@ -112,6 +124,48 @@ namespace MemCheck.Application.QueryValidation
 
             await CheckUserExistsAsync(dbContext, userId);
             await CheckUserDoesNotHaveDeckWithNameAsync(dbContext, userId, deckName, localizer);
+        }
+        public static async Task CheckCanCreateImageWithNameAsync(string name, MemCheckDbContext dbContext, ILocalized localizer)
+        {
+            if (name != name.Trim())
+                throw new InvalidOperationException("Invalid Name: not trimmed");
+            if (name.Length < ImageMinNameLength || name.Length > ImageMaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinNameLength} " + localizer.Get("And") + $" {ImageMaxNameLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInImageNames)
+                if (name.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidImageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+            if (await dbContext.Images.AsNoTracking().Where(img => EF.Functions.Like(img.Name, name)).AnyAsync())
+                throw new RequestInputException(localizer.Get("AnImageWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+        }
+        public static void CheckCanCreateImageWithSource(string source, ILocalized localizer)
+        {
+            if (source != source.Trim())
+                throw new InvalidOperationException("Invalid source: not trimmed");
+            if (source.Length < ImageMinSourceLength || source.Length > ImageMaxSourceLength)
+                throw new RequestInputException(localizer.Get("InvalidSourceLength") + $" {source.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinSourceLength} " + localizer.Get("And") + $" {ImageMaxSourceLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInImageSource)
+                if (source.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidImageSource") + " '" + source + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+        }
+        public static void CheckCanCreateImageWithDescription(string description, ILocalized localizer)
+        {
+            if (description != description.Trim())
+                throw new InvalidOperationException("Invalid description: not trimmed");
+            if (description.Length < ImageMinDescriptionLength || description.Length > ImageMaxDescriptionLength)
+                throw new RequestInputException(localizer.Get("InvalidDescriptionLength") + $" {description.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.Get("And") + $" {ImageMaxDescriptionLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInImageDescription)
+                if (description.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidImageDescription") + " '" + description + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+        }
+        public static void CheckCanCreateImageWithVersionDescription(string versionDescription, ILocalized localizer)
+        {
+            if (versionDescription != versionDescription.Trim())
+                throw new InvalidOperationException("Invalid version description: not trimmed");
+            if (versionDescription.Length < ImageMinVersionDescriptionLength || versionDescription.Length > ImageMaxVersionDescriptionLength)
+                throw new RequestInputException(localizer.Get("InvalidVersionDescriptionLength") + $" {versionDescription.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.Get("And") + $" {ImageMaxVersionDescriptionLength}");
+            foreach (var forbiddenChar in ForbiddenCharsInImageVersionDescription)
+                if (versionDescription.Contains(forbiddenChar))
+                    throw new RequestInputException(localizer.Get("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
         }
     }
 }

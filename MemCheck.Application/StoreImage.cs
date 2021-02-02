@@ -137,7 +137,7 @@ namespace MemCheck.Application
             public byte[] Blob { get; }
             public void CheckValidity(ILocalized localizer)
             {
-                ImageMetadataInputValidator.Run(this, localizer);
+                //ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
                     throw new RequestInputException(localizer.Get("InvalidImageContentType") + $" '{ContentType}'");
                 if (Blob.Length < minBlobLength || Blob.Length > maxBlobLength)
