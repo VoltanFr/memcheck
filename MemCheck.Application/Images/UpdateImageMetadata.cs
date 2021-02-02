@@ -65,7 +65,7 @@ namespace MemCheck.Application.Images
             await dbContext.SaveChangesAsync();
         }
         #region Request class
-        public sealed class Request : IImageMetadata
+        public sealed class Request
         {
             public Request(Guid imageId, Guid userId, string name, string source, string description, string versionDescription)
             {

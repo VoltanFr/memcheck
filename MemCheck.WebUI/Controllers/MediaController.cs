@@ -40,18 +40,14 @@ namespace MemCheck.WebUI.Controllers
             if (request.File == null)
                 return ControllerResultWithToast.FailureWithResourceMesg("FileNotSet", this);
 
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            if (user == null)
-                return ControllerResultWithToast.FailureWithResourceMesg("NeedLogin", this);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
 
             using var stream = request.File.OpenReadStream();
             using var reader = new BinaryReader(stream);
             var fileContent = reader.ReadBytes((int)request.File.Length);
-            var applicationRequest = new StoreImage.Request(user, request.Name, request.Description, request.Source, request.File.ContentType, fileContent);
-            var id = await new StoreImage(dbContext, this).RunAsync(applicationRequest);
-            if (id == Guid.Empty)
-                throw new ApplicationException("Stored image with empty GUID as id");
-            return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name}'", this);
+            var applicationRequest = new StoreImage.Request(userId, request.Name.Trim(), request.Description.Trim(), request.Source.Trim(), request.File.ContentType, fileContent);
+            await new StoreImage(dbContext, this).RunAsync(applicationRequest);
+            return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
         }
         public sealed class UploadImageRequest
         {

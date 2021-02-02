@@ -65,5 +65,11 @@ namespace MemCheck.Application.Tests.Helpers
         {
             return random.Next(1, 5);
         }
+        public static byte[] Bytes(int length)
+        {
+            var b = new byte[length];
+            random.NextBytes(b);
+            return b;
+        }
     }
 }

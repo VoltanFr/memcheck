@@ -14,16 +14,11 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    internal interface IImageMetadata
-    {
-        public string Name { get; }
-        public string Description { get; }
-        public string Source { get; }
-    }
     public sealed class StoreImage
     {
         #region Fields
-        private const string svgImageContentType = "image/svg+xml";
+        public const string svgImageContentType = "image/svg+xml";
+        public const string pngImageContentType = "image/png";
         private readonly MemCheckDbContext dbContext;
         private readonly ILocalized localizer;
         private static readonly ImmutableHashSet<string> supportedContentTypes = GetSupportedContentTypes();
@@ -32,7 +27,7 @@ namespace MemCheck.Application.Images
         #region Private methods
         private static ImmutableHashSet<string> GetSupportedContentTypes()
         {
-            return new HashSet<string>(new string[] { svgImageContentType, "image/jpeg", "image/png", "image/gif" }).ToImmutableHashSet();
+            return new HashSet<string>(new string[] { svgImageContentType, "image/jpeg", pngImageContentType, "image/gif" }).ToImmutableHashSet();
         }
         public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
@@ -78,22 +73,21 @@ namespace MemCheck.Application.Images
             this.dbContext = dbContext;
             this.localizer = localizer;
         }
-        public async Task<Guid> RunAsync(Request request)
+        public async Task RunAsync(Request request, DateTime? now = null)
         {
-            request.CheckValidity(localizer);
+            await request.CheckValidityAsync(dbContext, localizer);
 
-            if (dbContext.Images.Where(image => EF.Functions.Like(image.Name, request.Name)).Any())
-                throw new RequestInputException(localizer.Get("ImageAlreadyExists") + $" '{request.Name}'");
+            var owner = await dbContext.Users.SingleAsync(u => u.Id == request.Owner);
 
             var image = new Domain.Image
             {
                 Name = request.Name,
                 Description = request.Description,
                 Source = request.Source,
-                Owner = request.Owner,
+                Owner = owner,
                 VersionDescription = localizer.Get("InitialImageVersionCreation"),
                 VersionType = ImageVersionType.Creation,
-                InitialUploadUtcDate = DateTime.UtcNow
+                InitialUploadUtcDate = now ?? DateTime.UtcNow
             };
             image.LastChangeUtcDate = image.InitialUploadUtcDate;
 
@@ -111,37 +105,40 @@ namespace MemCheck.Application.Images
             image.BigBlobSize = image.BigBlob.Length;
             dbContext.Images.Add(image);
             await dbContext.SaveChangesAsync();
-            return image.Id;
         }
         #region Request class
-        public sealed class Request : IImageMetadata
+        public sealed class Request
         {
             #region Fields
-            private const int minBlobLength = 10;
-            private const int maxBlobLength = 10000000;
+            public const int minBlobLength = 10;
+            public const int maxBlobLength = 10000000;
             #endregion
-            public Request(MemCheckUser owner, string name, string description, string source, string contentType, byte[] blob)
+            public Request(Guid owner, string name, string description, string source, string contentType, IEnumerable<byte> blob)
             {
-                Name = name.Trim();
-                Description = description.Trim();
-                Source = source.Trim();
-                ContentType = contentType.Trim();
+                Name = name;
+                Description = description;
+                Source = source;
+                ContentType = contentType;
                 Owner = owner;
-                Blob = blob;
+                Blob = blob.ToArray();
             }
-            public MemCheckUser Owner { get; }
+            public Guid Owner { get; }
             public string Name { get; }
             public string Description { get; }
             public string Source { get; }
             public string ContentType { get; }
             public byte[] Blob { get; }
-            public void CheckValidity(ILocalized localizer)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext, ILocalized localizer)
             {
                 //ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
-                    throw new RequestInputException(localizer.Get("InvalidImageContentType") + $" '{ContentType}'");
+                    throw new InvalidOperationException(localizer.Get("InvalidImageContentType") + $" '{ContentType}'");
                 if (Blob.Length < minBlobLength || Blob.Length > maxBlobLength)
                     throw new RequestInputException(localizer.Get("InvalidBlobLength") + $" {Blob.Length}" + localizer.Get("MustBeBetween") + $" {minBlobLength} " + localizer.Get("And") + $" {maxBlobLength}");
+
+                await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, dbContext, localizer);
+                QueryValidationHelper.CheckCanCreateImageWithDescription(Description, localizer);
+                QueryValidationHelper.CheckCanCreateImageWithSource(Source, localizer);
             }
         }
         #endregion
