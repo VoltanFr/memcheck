@@ -1,5 +1,4 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Images;
+﻿using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -232,7 +231,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("ImageVersions/{imageId}")]
         public async Task<IActionResult> ImageVersions(Guid imageId)
         {
-            var appResults = await new GetImageVersions(dbContext, this).RunAsync(imageId);
+            var appResults = await new GetImageVersions(dbContext).RunAsync(imageId);
             var result = appResults.Select(appResult => new ImageVersion(appResult, this));
             return Ok(result);
         }
