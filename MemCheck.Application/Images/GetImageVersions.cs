@@ -17,24 +17,20 @@ namespace MemCheck.Application.Images
         private const string ImageDescriptionFieldName = "ImageDescription";
         private const string ImageSourceFieldName = "ImageSource";
         private readonly MemCheckDbContext dbContext;
-        private readonly ILocalized localizer;
         #endregion
         #region Private methods
         #endregion
-        public GetImageVersions(MemCheckDbContext dbContext, ILocalized localizer)
+        public GetImageVersions(MemCheckDbContext dbContext)
         {
             this.dbContext = dbContext;
-            this.localizer = localizer;
         }
         public async Task<IEnumerable<ResultImageVersion>> RunAsync(Guid imageId)
         {
-            if (QueryValidationHelper.IsReservedGuid(imageId))
-                throw new RequestInputException("Invalid image id");
             var images = dbContext.Images.Where(img => img.Id == imageId);
-            if (!await images.AnyAsync())
-                throw new RequestInputException(localizer.Get("UnknownImage"));
 
-            var currentVersion = await images.Include(img => img.PreviousVersion)
+            var currentVersion = await images
+                .AsNoTracking()
+                .Include(img => img.PreviousVersion)
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
                     img.PreviousVersion == null ? (Guid?)null : img.PreviousVersion.Id,
@@ -47,6 +43,7 @@ namespace MemCheck.Application.Images
                 ).SingleAsync();
 
             var allPreviousVersions = dbContext.ImagePreviousVersions.Where(img => img.Image == imageId)
+                .AsNoTracking()
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
                     img.PreviousVersion == null ? (Guid?)null : img.PreviousVersion.Id,
@@ -55,18 +52,16 @@ namespace MemCheck.Application.Images
                     img.Name,
                     img.Description,
                     img.Source,
-                    img.VersionDescription)
-                );
-
-            var versionDico = allPreviousVersions.ToImmutableDictionary(ver => ver.Id, ver => ver);
+                    img.VersionDescription))
+                .ToImmutableDictionary(ver => ver.Id, ver => ver);
 
             var result = new List<ResultImageVersion>();
-            var iterationVersion = currentVersion.PreviousVersion == null ? null : versionDico[currentVersion.PreviousVersion.Value];
+            var iterationVersion = currentVersion.PreviousVersion == null ? null : allPreviousVersions[currentVersion.PreviousVersion.Value];
             result.Add(new ResultImageVersion(currentVersion, iterationVersion));
 
             while (iterationVersion != null)
             {
-                var previousVersion = iterationVersion.PreviousVersion == null ? null : versionDico[iterationVersion.PreviousVersion.Value];
+                var previousVersion = iterationVersion.PreviousVersion == null ? null : allPreviousVersions[iterationVersion.PreviousVersion.Value];
                 result.Add(new ResultImageVersion(iterationVersion, previousVersion));
                 iterationVersion = previousVersion;
             }
