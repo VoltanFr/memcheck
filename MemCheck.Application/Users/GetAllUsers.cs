@@ -9,7 +9,7 @@ using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Users
 {
     public sealed class GetAllUsers
     {
@@ -29,7 +29,7 @@ namespace MemCheck.Application
             var users = dbContext.Users.Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
 
             var totalCount = users.Count();
-            var pageCount = (int)Math.Ceiling(((double)totalCount) / request.PageSize);
+            var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var pageEntries = await users.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
             var resultUsers = new List<ResultUserModel>();

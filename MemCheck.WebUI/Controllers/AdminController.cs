@@ -1,5 +1,5 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Notifying;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
@@ -43,6 +43,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
             CheckBodyParameter(request);
+            //var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
             var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);
