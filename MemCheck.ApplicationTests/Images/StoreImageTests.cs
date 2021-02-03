@@ -234,5 +234,22 @@ namespace MemCheck.Application.Images
                 Assert.IsNull(image.PreviousVersion);
             }
         }
+        [TestMethod()]
+        public async Task SuccessWithOtherOneExisting()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            await ImageHelper.CreateAsync(db, user);
+
+            var name = RandomHelper.String();
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new StoreImage.Request(user, name, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
+                await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.IsTrue(dbContext.Images.Any(img => img.Owner.Id == user));
+        }
     }
 }

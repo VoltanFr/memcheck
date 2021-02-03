@@ -89,7 +89,11 @@ namespace MemCheck.Application.Images
                 if (QueryValidationHelper.IsReservedGuid(ImageId))
                     throw new InvalidOperationException("Invalid image id");
 
-                var imageDataBeforeUpdate = await dbContext.Images.Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description }).SingleAsync();
+                var imageDataBeforeUpdate = await dbContext.Images
+                    .AsNoTracking()
+                    .Where(img => img.Id == ImageId)
+                    .Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description })
+                    .SingleAsync();
 
                 if (imageDataBeforeUpdate.nameBeforeUpdate == Name && imageDataBeforeUpdate.sourceBeforeUpdate == Source && imageDataBeforeUpdate.descriptionBeforeUpdate == Description)
                     throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));

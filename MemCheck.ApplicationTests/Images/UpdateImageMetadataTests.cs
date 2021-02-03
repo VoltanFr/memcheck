@@ -178,6 +178,19 @@ namespace MemCheck.Application.Images
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateImageMetadata(dbContext).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
+        public async Task NameAlreadyUsed()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var name = RandomHelper.String();
+            await ImageHelper.CreateAsync(db, user, name: name);
+            var imageToRename = await ImageHelper.CreateAsync(db, user);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new UpdateImageMetadata.Request(imageToRename, user, name, RandomHelper.String(), RandomHelper.String(), RandomHelper.String());
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateImageMetadata(dbContext).RunAsync(request, new TestLocalizer()));
+        }
+        [TestMethod()]
         public async Task UpdateName()
         {
             var db = DbHelper.GetEmptyTestDB();
