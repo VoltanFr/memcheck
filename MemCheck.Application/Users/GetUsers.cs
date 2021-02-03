@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
@@ -15,11 +16,11 @@ namespace MemCheck.Application.Users
         {
             this.dbContext = dbContext;
         }
-        public IEnumerable<ViewModel> Run()
+        public async Task<IEnumerable<ViewModel>> RunAsync()
         {
-            return dbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToList();
+            return await dbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToListAsync();
         }
-
+        #region Result type
         public sealed class ViewModel
         {
             public ViewModel()
@@ -33,5 +34,6 @@ namespace MemCheck.Application.Users
             public Guid UserId { get; set; }
             public string UserName { get; set; } = null!;
         }
+        #endregion
     }
 }

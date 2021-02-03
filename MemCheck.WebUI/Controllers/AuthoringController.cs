@@ -34,9 +34,9 @@ namespace MemCheck.WebUI.Controllers
         }
         #region GetUsers, returns IEnumerable<GetUsersViewModel>
         [HttpGet("GetUsers")]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsersAsync()
         {
-            var result = new GetUsers(dbContext).Run();
+            var result = await new GetUsers(dbContext).RunAsync();
             return Ok(result.Select(user => new GetUsersViewModel(user.UserId, user.UserName)));
         }
         public sealed class GetUsersViewModel
