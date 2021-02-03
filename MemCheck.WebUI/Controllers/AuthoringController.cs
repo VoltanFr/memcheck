@@ -1,10 +1,10 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Cards;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.History;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
 using MemCheck.Application.Tags;
+using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;

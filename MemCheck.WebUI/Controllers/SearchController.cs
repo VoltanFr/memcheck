@@ -5,6 +5,7 @@ using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Searching;
 using MemCheck.Application.Tags;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;

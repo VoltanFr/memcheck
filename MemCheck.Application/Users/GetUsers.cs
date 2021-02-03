@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Users
 {
     public sealed class GetUsers
     {
