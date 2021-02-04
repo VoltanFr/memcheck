@@ -1,3 +1,4 @@
+using MemCheck.Application.Languages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using System.Reflection;
 
 namespace MemCheck.WebUI.Pages.Admin
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = IRoleChecker.AdminRoleName)]
     public sealed class IndexModel : PageModel
     {
         private readonly IWebHostEnvironment currentEnvironment;

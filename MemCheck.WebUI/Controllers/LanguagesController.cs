@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]"), Authorize(Roles = "Admin")]
+    [Route("[controller]"), Authorize(Roles = IRoleChecker.AdminRoleName)]
     public class LanguagesController : MemCheckController
     {
         #region Fields

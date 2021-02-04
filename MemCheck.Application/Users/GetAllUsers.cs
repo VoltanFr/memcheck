@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.Languages;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
@@ -15,18 +16,18 @@ namespace MemCheck.Application.Users
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
-        private readonly UserManager<MemCheckUser> userManager;
+        private readonly IRoleChecker roleChecker;
         #endregion
-        public GetAllUsers(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager)
+        public GetAllUsers(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
             this.dbContext = dbContext;
-            this.userManager = userManager;
+            this.roleChecker = roleChecker;
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(userManager);
+            await request.CheckValidityAsync(dbContext, roleChecker);
 
-            var users = dbContext.Users.Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
+            var users = dbContext.Users.AsNoTracking().Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
 
             var totalCount = users.Count();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
@@ -35,35 +36,25 @@ namespace MemCheck.Application.Users
             var resultUsers = new List<ResultUserModel>();
             foreach (var user in pageEntries)
             {
-                var roles = await userManager.GetRolesAsync(user);
+                var roles = await roleChecker.GetRolesAsync(user);
                 resultUsers.Add(new ResultUserModel(user.UserName, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate));
             }
             return new ResultModel(totalCount, pageCount, resultUsers);
         }
         #region Request and result classes
-        public sealed class Request
+        public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter)
         {
-            public Request(MemCheckUser currentUser, int pageSize, int pageNo, string filter)
+            public const int MaxPageSize = 100;
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext, IRoleChecker roleChecker)
             {
-                CurrentUser = currentUser;
-                PageSize = pageSize;
-                PageNo = pageNo;
-                Filter = filter;
-            }
-            public MemCheckUser CurrentUser { get; }
-            public int PageSize { get; }
-            public int PageNo { get; }
-            public string Filter { get; }
-            public async Task CheckValidityAsync(UserManager<MemCheckUser> userManager)
-            {
-                if (QueryValidationHelper.IsReservedGuid(CurrentUser.Id))
-                    throw new RequestInputException($"Invalid user id '{CurrentUser.Id}'");
-                if (PageSize < 0 || PageSize > 100)
-                    throw new RequestInputException($"Invalid page size: {PageSize}");
-                if (PageNo < 0)
-                    throw new RequestInputException($"Invalid page index: {PageNo}");
-                if (!await userManager.IsInRoleAsync(CurrentUser, "Admin"))
-                    throw new SecurityException($"User not admin: {CurrentUser.UserName}");
+                QueryValidationHelper.CheckNotReservedGuid(UserId);
+                if (PageSize < 1 || PageSize > MaxPageSize)
+                    throw new InvalidOperationException($"Invalid page size: {PageSize}");
+                if (PageNo < 1)
+                    throw new InvalidOperationException($"Invalid page index: {PageNo}");
+                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+                if (!await roleChecker.UserIsAdminAsync(user))
+                    throw new InvalidOperationException($"User not admin: {user.UserName}");
             }
         }
         public sealed class ResultModel

@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Languages;
+using MemCheck.Application.Notifying;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -18,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]"), Authorize(Roles = "Admin")]
+    [Route("[controller]"), Authorize(Roles = IRoleChecker.AdminRoleName)]
     public class AdminController : MemCheckController
     {
         #region Fields
@@ -43,10 +44,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUsers([FromBody] GetUsersRequest request)
         {
             CheckBodyParameter(request);
-            //var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var appRequest = new GetAllUsers.Request(user, request.PageSize, request.PageNo, request.Filter);
-            var result = await new GetAllUsers(dbContext, userManager).RunAsync(appRequest);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new GetAllUsers.Request(userId, request.PageSize, request.PageNo, request.Filter);
+            var result = await new GetAllUsers(dbContext, new ProdRoleChecker(userManager)).RunAsync(appRequest);
             return Ok(new GetUsersViewModel(result));
         }
         #region Request and result classes

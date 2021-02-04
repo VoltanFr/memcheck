@@ -1,3 +1,4 @@
+using MemCheck.Application.Languages;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -76,7 +77,7 @@ namespace MemCheck.WebUI
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
             });
 
             services.AddTransient<IEmailSender, SendGridEmailSender>();

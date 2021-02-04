@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Languages;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
@@ -14,9 +15,13 @@ namespace MemCheck.WebUI.Controllers
         {
             this.userManager = userManager;
         }
+        public async Task<IEnumerable<string>> GetRolesAsync(MemCheckUser user)
+        {
+            return await userManager.GetRolesAsync(user);
+        }
         public async Task<bool> UserIsAdminAsync(MemCheckUser user)
         {
-            return await userManager.IsInRoleAsync(user, "Admin");
+            return await userManager.IsInRoleAsync(user, IRoleChecker.AdminRoleName);
         }
     }
 }

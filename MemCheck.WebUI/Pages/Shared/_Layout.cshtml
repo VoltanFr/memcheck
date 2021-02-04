@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Mvc.Localization
 @using Microsoft.AspNetCore.Identity
 @using MemCheck.Domain
+@using MemCheck.Application.Languages;
 @inject SignInManager<MemCheckUser> SignInManager
 @inject UserManager<MemCheckUser> UserManager
 @inject IViewLocalizer Localizer
@@ -115,7 +116,7 @@
                 <a class="nav-item nav-link text-primary" asp-page="/Index">MemCheck</a>
                 @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
                 <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>
-                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
                 {
                     <a class="nav-item nav-link text-primary" asp-page="/Admin/Index">@Localizer["Admin"]</a>
                 }

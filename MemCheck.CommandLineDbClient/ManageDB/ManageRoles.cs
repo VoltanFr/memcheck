@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Languages;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -31,17 +32,15 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {
-            const string adminRoleName = "Admin";
-
-            if (!await roleManager.RoleExistsAsync(adminRoleName))
+            if (!await roleManager.RoleExistsAsync(IRoleChecker.AdminRoleName))
             {
-                var adminRole = new MemCheckUserRole() { Name = adminRoleName };
+                var adminRole = new MemCheckUserRole() { Name = IRoleChecker.AdminRoleName };
                 await roleManager.CreateAsync(adminRole);
             }
 
             var toto1 = await dbContext.Users.Where(user => user.UserName == "Toto1").SingleOrDefaultAsync();
             if (toto1 != null)
-                await userManager.AddToRoleAsync(toto1, adminRoleName);
+                await userManager.AddToRoleAsync(toto1, IRoleChecker.AdminRoleName);
         }
         public void DescribeForOpportunityToCancel()
         {
