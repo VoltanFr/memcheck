@@ -22,51 +22,33 @@ namespace MemCheck.Application.Heaping
 
             var card = await dbContext.CardsInDecks.SingleAsync(card => card.DeckId.Equals(request.DeckId) && card.CardId.Equals(request.CardId));
 
-            if (request.TargetHeap != 0)
+            if (request.TargetHeap != CardInDeck.UnknownHeap)
             {
                 if (request.TargetHeap == card.CurrentHeap)
                     return; //This happens due to connection problems on client side
                 if (!request.ManualMove && (request.TargetHeap < card.CurrentHeap || request.TargetHeap - card.CurrentHeap > 1))
-                    throw new RequestInputException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
+                    throw new InvalidOperationException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
             }
 
             if (!request.ManualMove)
                 card.LastLearnUtcTime = lastLearnUtcTime ?? DateTime.UtcNow;
 
-            card.CurrentHeap = request.TargetHeap;
-            if (request.TargetHeap == 0)
+            if (card.CurrentHeap != CardInDeck.UnknownHeap && request.TargetHeap == CardInDeck.UnknownHeap)
                 card.NbTimesInNotLearnedHeap++;
+            card.CurrentHeap = request.TargetHeap;
             if (card.CurrentHeap > card.BiggestHeapReached)
                 card.BiggestHeapReached = card.CurrentHeap;
             await dbContext.SaveChangesAsync();
         }
         #region Request
-        public sealed class Request
+        public sealed record Request(Guid UserId, Guid DeckId, Guid CardId, int TargetHeap, bool ManualMove)
         {
-            #region Fields
-            private const int minHeapId = 0;
-            #endregion
-            public Request(Guid userId, Guid deckId, Guid cardId, int targetHeap, bool manualMove)
-            {
-                UserId = userId;
-                DeckId = deckId;
-                CardId = cardId;
-                TargetHeap = targetHeap;
-                ManualMove = manualMove;
-            }
-            public Guid UserId { get; }
-            public Guid DeckId { get; }
-            public Guid CardId { get; }
-            public int TargetHeap { get; }
-            public bool ManualMove { get; }
             public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                if (QueryValidationHelper.IsReservedGuid(DeckId))
-                    throw new RequestInputException($"Invalid DeckId '{DeckId}'");
-                if (QueryValidationHelper.IsReservedGuid(CardId))
-                    throw new RequestInputException($"Invalid DeckId '{DeckId}'");
-                if (TargetHeap < minHeapId || TargetHeap > CardInDeck.MaxHeapValue)
-                    throw new RequestInputException($"Invalid target heap {TargetHeap}");
+                QueryValidationHelper.CheckNotReservedGuid(DeckId);
+                QueryValidationHelper.CheckNotReservedGuid(CardId);
+                if (TargetHeap < CardInDeck.UnknownHeap || TargetHeap > CardInDeck.MaxHeapValue)
+                    throw new InvalidOperationException($"Invalid target heap {TargetHeap}");
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
             }
         }

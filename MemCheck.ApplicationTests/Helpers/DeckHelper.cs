@@ -26,16 +26,17 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null)
         {
+            heap ??= RandomHelper.Heap();
             using var dbContext = new MemCheckDbContext(testDB);
             var cardForUser = new CardInDeck()
             {
                 CardId = card,
                 DeckId = deck,
-                CurrentHeap = heap ?? RandomHelper.Heap(),
+                CurrentHeap = heap.Value,
                 LastLearnUtcTime = lastLearnUtcTime == null ? RandomHelper.Date() : lastLearnUtcTime.Value,
                 AddToDeckUtcTime = DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,
-                BiggestHeapReached = 0
+                BiggestHeapReached = heap.Value
             };
             dbContext.CardsInDecks.Add(cardForUser);
             await dbContext.SaveChangesAsync();
