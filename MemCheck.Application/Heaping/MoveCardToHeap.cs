@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application.Heaping
 {
     public sealed class MoveCardToHeap
     {

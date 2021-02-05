@@ -1,6 +1,6 @@
-﻿using MemCheck.Application;
-using MemCheck.Application.Cards;
+﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
+using MemCheck.Application.Heaping;
 using MemCheck.Application.Images;
 using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
