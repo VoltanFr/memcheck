@@ -1,9 +1,9 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,43 +20,35 @@ namespace MemCheck.Application.Heaping
         }
         public async Task RunAsync(Request request)
         {
-            request.CheckValidity();
-            QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, request.UserId, request.DeckId);
+            await request.CheckValidityAsync(dbContext);
 
-            var cards = dbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId));
+            var cardsInDecks = dbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
 
-            await cards.ForEachAsync(card => { if (card.BiggestHeapReached < request.TargetHeapId) card.BiggestHeapReached = request.TargetHeapId; });
+            if (request.CardIds.Any(cardId => !cardsInDecks.ContainsKey(cardId)))
+                throw new InvalidOperationException("One card is not in the deck");
 
-            await cards.ForEachAsync(card => card.CurrentHeap = request.TargetHeapId);
-
-            if (request.TargetHeapId == 0)
-                await cards.ForEachAsync(card => card.NbTimesInNotLearnedHeap++);
+            foreach (var cardInDeck in cardsInDecks.Values)
+            {
+                if (cardInDeck.BiggestHeapReached < request.TargetHeap)
+                    cardInDeck.BiggestHeapReached = request.TargetHeap;
+                if (request.TargetHeap == 0 && cardInDeck.CurrentHeap != 0)
+                    cardInDeck.NbTimesInNotLearnedHeap++;
+                cardInDeck.CurrentHeap = request.TargetHeap;
+            }
 
             await dbContext.SaveChangesAsync();
         }
-        public sealed class Request
+        #region Request
+        public sealed record Request(Guid UserId, Guid DeckId, int TargetHeap, IEnumerable<Guid> CardIds)
         {
-            public Request(Guid userId, Guid deckId, int targetHeapId, IEnumerable<Guid> cardIds)
+            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
             {
-                UserId = userId;
-                DeckId = deckId;
-                TargetHeapId = targetHeapId;
-                CardIds = cardIds;
-            }
-
-            public Guid UserId { get; }
-            public Guid DeckId { get; }
-            public int TargetHeapId { get; }
-            public IEnumerable<Guid> CardIds { get; }
-            public void CheckValidity()
-            {
-                if (QueryValidationHelper.IsReservedGuid(DeckId))
-                    throw new RequestInputException($"Invalid DeckId '{DeckId}'");
-                if (TargetHeapId < 0 || TargetHeapId > CardInDeck.MaxHeapValue)
-                    throw new RequestInputException($"Invalid target heap {TargetHeapId}");
-                if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
-                    throw new RequestInputException($"Invalid card id");
+                QueryValidationHelper.CheckNotReservedGuid(DeckId);
+                if (TargetHeap < CardInDeck.UnknownHeap || TargetHeap > CardInDeck.MaxHeapValue)
+                    throw new InvalidOperationException($"Invalid target heap {TargetHeap}");
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
             }
         }
+        #endregion
     }
 }
