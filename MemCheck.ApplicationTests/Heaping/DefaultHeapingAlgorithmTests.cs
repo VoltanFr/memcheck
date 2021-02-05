@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace MemCheck.Application.Heaping.Tests
+namespace MemCheck.Application.Heaping
 {
     [TestClass()]
     public class DefaultHeapingAlgorithmTests
