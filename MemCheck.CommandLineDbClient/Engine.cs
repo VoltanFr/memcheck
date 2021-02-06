@@ -1,4 +1,5 @@
-﻿using MemCheck.CommandLineDbClient.UsStates;
+﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
+using MemCheck.CommandLineDbClient.Ratings;
 using MemCheck.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,7 +46,7 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new HandleBadImages.ChangeOwner(serviceProvider);
+            IMemCheckTest test = new RecomputeAllCardEvaluationAverageAndCountOfRatings(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
