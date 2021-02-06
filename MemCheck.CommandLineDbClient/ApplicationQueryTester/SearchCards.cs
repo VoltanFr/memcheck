@@ -12,36 +12,51 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     internal sealed class SearchCards : IMemCheckTest
     {
         #region Fields
-        private readonly ILogger<GetCards> logger;
+        private readonly ILogger<SearchCards> logger;
         private readonly MemCheckDbContext dbContext;
         #endregion
         public SearchCards(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<GetCards>>();
+            logger = serviceProvider.GetRequiredService<ILogger<SearchCards>>();
+        }
+        private async Task<(int cardCount, double secondsElapsed)> RunTestAsync(Guid userId)
+        {
+            var request = new Application.Searching.SearchCards.Request
+            {
+                UserId = userId,
+                PageSize = Application.Searching.SearchCards.Request.MaxPageSize,
+                RatingFiltering = Application.Searching.SearchCards.Request.RatingFilteringMode.AtLeast,
+                RatingFilteringValue = 5,
+                Visibility = Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner
+            };
+            var runner = new Application.Searching.SearchCards(dbContext);
+            var chrono = Stopwatch.StartNew();
+            var result = await runner.RunAsync(request);
+            return new(result.TotalNbCards, chrono.Elapsed.TotalSeconds);
+
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {
-            var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
+            var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single().Id;
             var deckId = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;
+
+            var expectedCardCount = (await RunTestAsync(user)).cardCount;
 
             var chronos = new List<double>();
 
             for (int i = 0; i < 5; i++)
             {
-                var request = new Application.Searching.SearchCards.Request { UserId = user, PageSize = 3000, Visibility = Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner };
-                var runner = new Application.Searching.SearchCards(dbContext);
-                var realCodeChrono = Stopwatch.StartNew();
-                var result = await runner.RunAsync(request);
-                chronos.Add(realCodeChrono.Elapsed.TotalSeconds);
-                logger.LogInformation($"Got {result.TotalNbCards} cards in {realCodeChrono.Elapsed}");
-                logger.LogInformation($"First card has {result.Cards.First().Tags.Count()} tags, the first tag is {result.Cards.First().Tags.First()}");
-                logger.LogInformation($"Last card has {result.Cards.Last().VisibleTo.Count()} users with view, the first user is {result.Cards.Last().VisibleTo.First()}");
+                (int cardCount, double secondsElapsed) = await RunTestAsync(user);
+
+                if (cardCount != expectedCardCount)
+                    throw new InvalidProgramException($"Expected {expectedCardCount} cards, got {cardCount}");
+
+                chronos.Add(secondsElapsed);
+                logger.LogInformation($"Got {cardCount} cards in {secondsElapsed} seconds");
             }
 
             logger.LogInformation($"Average time: {chronos.Average()} seconds");
-
-            await Task.CompletedTask;
         }
         public void DescribeForOpportunityToCancel()
         {
