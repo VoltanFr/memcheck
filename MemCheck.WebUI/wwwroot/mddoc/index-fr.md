@@ -1,4 +1,6 @@
-﻿# Bienvenue !
+﻿<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+# Bienvenue !
 MemCheck est un logiciel d'auto-apprentissage, qui vous aide à apprendre par cœur ce que vous voulez.
 MemCheck est basé sur le principe des cartes d'apprentissage : la face avant d'une carte indique une question, et la face arrière contient la réponse.
 Un apprentissage consiste à regarder la question, formuler pour soi-même une réponse, regarder la réponse, et décider si on avait bon.
@@ -6,9 +8,9 @@ Un apprentissage consiste à regarder la question, formuler pour soi-même une r
 ## Vous choisissez ce que vous voulez apprendre
 - Vous pouvez sélectionner des choses à apprendre parmi la base de données des cartes disponibles.
     La recherche se fait dans le menu [Cartes/Parcourir](https://memcheckfr.azurewebsites.net/Search/Index).
-    Dépliez la zone des critères de sélection par le menu à trois points.
-    Par exemple, si voulez apprendre à identifier les régions françaises, spécifiez comme label requis "Régions françaises".
-    Dans la liste, vous pouvez cocher des cartes, puis les ajouter à votre paquet en utilisant le bouton en forme de paquet en haut à gauche.
+    Dépliez la zone des critères de sélection par le menu à trois points <i class="fa fa-ellipsis-v"></i>.  
+    Par exemple, si voulez apprendre à identifier les régions françaises, spécifiez comme label requis `Régions françaises`.  
+    Dans la liste, vous pouvez cocher des cartes, puis les ajouter à votre paquet en utilisant le bouton en forme de paquet en haut à gauche <i class="fa fa-inbox"></i>.
 - Créer vos cartes est aussi très facile.
     Ça se passe dans la [page dédiée](https://memcheckfr.azurewebsites.net/Authoring/Index).
     Vous contrôlez la visibilité des cartes que vous créez (strictement privées, visibles seulement par des utilisateurs spécifiés, publiques).
