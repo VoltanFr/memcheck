@@ -189,4 +189,7 @@
   <data name="UploadMedia" xml:space="preserve">
     <value>Ajouter une image</value>
   </data>
+  <data name="Home" xml:space="preserve">
+    <value>Démarrage</value>
+  </data>
 </root>

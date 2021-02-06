@@ -113,7 +113,7 @@
     <footer class="footer" style="padding-top:100px">
         <div class="container">
             <nav class="navbar navbar-expand-sm navbar-light bg-white border-top box-shadow nav-fill nav-justified">
-                <a class="nav-item nav-link text-primary" asp-page="/Index">MemCheck</a>
+                <a class="nav-item nav-link text-primary" asp-page="/Index">@Localizer["Home"]</a>
                 @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
                 <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>
                 @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
