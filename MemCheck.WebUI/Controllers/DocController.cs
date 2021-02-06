@@ -26,7 +26,7 @@ namespace MemCheck.WebUI.Controllers
         {
             //We provide contextual doc for the previously active page if any, otherwise we return the doc root page in the GUI language
             var refererRoute = GetRefererRoute();
-            var cultureName = Request.HttpContext.Features.Get<IRequestCultureFeature>().RequestCulture.Culture.Name;
+            var cultureName = Request.HttpContext.Features.Get<IRequestCultureFeature>().RequestCulture.Culture.Name.Substring(0, 2);
             return RedirectToPage("/Doc/MdRenderer", new { refererRoute, cultureName });
         }
     }
