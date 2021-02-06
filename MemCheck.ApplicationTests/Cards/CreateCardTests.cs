@@ -76,6 +76,8 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
                 Assert.AreEqual(ImageInCard.AdditionalInfo, card.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
                 Assert.IsTrue(card.TagsInCards.Any(t => t.TagId == tagId));
+                Assert.AreEqual(0, card.RatingCount);
+                Assert.AreEqual(0, card.AverageRating);
             }
             Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
         }

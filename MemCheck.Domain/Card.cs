@@ -24,5 +24,7 @@ namespace MemCheck.Domain
         public string VersionDescription { get; set; } = null!;
         [Column(TypeName = "int")] public CardVersionType VersionType { get; set; }
         public CardPreviousVersion? PreviousVersion { get; set; }  //null for initial version (VersionType == Creation)
+        public int RatingCount { get; set; } = 0; //Number of ratings for this card (ie number of users who have set a rating)
+        public double AverageRating { get; set; } = 0; //The average of all ratings for this card (in the table UserCardRating). A rating is between 1 and 5, so the average is in this interval too. An average of 0 means that RatingCount is 0
     }
 }

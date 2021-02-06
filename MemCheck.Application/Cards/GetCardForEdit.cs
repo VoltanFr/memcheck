@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Ratings;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +36,7 @@ namespace MemCheck.Application.Cards
                 .AsSingleQuery()
                 .SingleAsync();
 
-            var ratings = await CardRatings.LoadAsync(dbContext, request.CurrentUserId, request.CardId);
+            var userRating = await dbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
 
             var ownersOfDecksWithThisCard = dbContext.CardsInDecks
                 .AsNoTracking()
@@ -59,9 +58,9 @@ namespace MemCheck.Application.Cards
                 card.VersionDescription,
                 ownersOfDecksWithThisCard,
                 card.Images.Select(img => new ResultImageModel(img)),
-                ratings.User(request.CardId),
-                ratings.Average(request.CardId),
-                ratings.Count(request.CardId)
+                userRating == null ? 0 : userRating.Rating,
+                card.AverageRating,
+                card.RatingCount
                 );
         }
         #region Result classes

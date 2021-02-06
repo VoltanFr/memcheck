@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Ratings;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -60,13 +59,17 @@ namespace MemCheck.Application.Cards
                 VersionCreator = cardInDeck.Card.VersionCreator.Id,
                 tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
                 userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
+                imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
+                cardInDeck.Card.AverageRating,
+                cardInDeck.Card.RatingCount
             });
 
             var listed = await withDetails.ToListAsync();
             var cardIds = listed.Select(cardInDeck => cardInDeck.CardId);
-            var ratings = await CardRatings.LoadAsync(dbContext, userId, cardIds);
             var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, cardIds);
+
+            //The following line could be improved with a joint. Not sure this would perform better, to be checked
+            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
             var result = listed.Select(cardInDeck => new ResultCard(
                 cardInDeck.CardId,
@@ -82,9 +85,9 @@ namespace MemCheck.Application.Cards
                 cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
                 cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
                 heapingAlgorithm,
-                ratings.User(cardInDeck.CardId),
-                ratings.Average(cardInDeck.CardId),
-                ratings.Count(cardInDeck.CardId),
+                userRatings.ContainsKey(cardInDeck.CardId) ? userRatings[cardInDeck.CardId] : 0,
+                cardInDeck.AverageRating,
+                cardInDeck.RatingCount,
                 notifications[cardInDeck.CardId]
             ));
             if (neverLearnt)

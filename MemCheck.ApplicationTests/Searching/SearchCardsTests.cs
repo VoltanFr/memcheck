@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Decks;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Ratings;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -192,6 +193,198 @@ namespace MemCheck.Application.Searching
 
             var result8Jan = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { MinimumUtcDateOfCards = new DateTime(2040, 1, 8) });
             Assert.AreEqual(0, result8Jan.TotalNbCards);
+        }
+        [TestMethod()]
+        public async Task Rating_SingleCard_SingleUser()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, userId);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.NoRating });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(0, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(0, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(0, result.Cards.Single().AverageRating);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtMost, RatingFilteringValue = 3 });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(userId, cardId, 4));
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.NoRating });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(4, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(1, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(4, result.Cards.Single().AverageRating);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 4 });
+                Assert.AreEqual(1, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 5 });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtMost, RatingFilteringValue = 3 });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtMost, RatingFilteringValue = 4 });
+                Assert.AreEqual(1, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = userId, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtMost, RatingFilteringValue = 5 });
+                Assert.AreEqual(1, result.TotalNbCards);
+            }
+        }
+        [TestMethod()]
+        public async Task Rating_SingleCard_SearchByOtherUser()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, userId);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { RatingFiltering = SearchCards.Request.RatingFilteringMode.NoRating });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(0, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(0, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(0, result.Cards.Single().AverageRating);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(userId, cardId, 4));
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { RatingFiltering = SearchCards.Request.RatingFilteringMode.NoRating });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(0, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(1, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(4, result.Cards.Single().AverageRating);
+            }
+        }
+        [TestMethod()]
+        public async Task Rating_SingleCard_TwoUsers()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+
+            var user1Id = await UserHelper.CreateInDbAsync(testDB);
+            var user2Id = await UserHelper.CreateInDbAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, user1Id);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1Id, cardId, 4));
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user2Id, cardId, 2));
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user1Id, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(4, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(2, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(3, result.Cards.Single().AverageRating);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user2Id, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(2, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(2, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(3, result.Cards.Single().AverageRating);
+            }
+
+        }
+        [TestMethod()]
+        public async Task Rating_TwoCards_TwoUsers()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+
+            var user1Id = await UserHelper.CreateInDbAsync(testDB);
+            var user2Id = await UserHelper.CreateInDbAsync(testDB);
+            var card1Id = await CardHelper.CreateIdAsync(testDB, user1Id);
+            var card2Id = await CardHelper.CreateIdAsync(testDB, user2Id);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user1Id, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(0, result.TotalNbCards);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1Id, card1Id, 4));
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user2Id, card1Id, 2));
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1Id, card2Id, 5));
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user2Id, card2Id, 3));
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user1Id, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 3 });
+                Assert.AreEqual(2, result.TotalNbCards);
+                Assert.AreEqual(4, result.Cards.Single(c => c.CardId == card1Id).CurrentUserRating);
+                Assert.AreEqual(5, result.Cards.Single(c => c.CardId == card2Id).CurrentUserRating);
+                Assert.AreEqual(2, result.Cards.Single(c => c.CardId == card1Id).CountOfUserRatings);
+                Assert.AreEqual(2, result.Cards.Single(c => c.CardId == card2Id).CountOfUserRatings);
+                Assert.AreEqual(3, result.Cards.Single(c => c.CardId == card1Id).AverageRating);
+                Assert.AreEqual(4, result.Cards.Single(c => c.CardId == card2Id).AverageRating);
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var result = await new SearchCards(dbContext).RunAsync(new SearchCards.Request { UserId = user1Id, RatingFiltering = SearchCards.Request.RatingFilteringMode.AtLeast, RatingFilteringValue = 4 });
+                Assert.AreEqual(1, result.TotalNbCards);
+                Assert.AreEqual(card2Id, result.Cards.Single().CardId);
+                Assert.AreEqual(5, result.Cards.Single().CurrentUserRating);
+                Assert.AreEqual(2, result.Cards.Single().CountOfUserRatings);
+                Assert.AreEqual(4, result.Cards.Single().AverageRating);
+            }
         }
     }
 }

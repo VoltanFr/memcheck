@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Ratings;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -457,6 +458,28 @@ namespace MemCheck.Application.Cards
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, cardCreator, card.Id);
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, otherUser, card.Id);
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, userWithCardInDeck, card.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task UpdateDoesNotAlterRatings()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, user, language: languageId);
+            var rating = RandomHelper.Rating();
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card.Id, rating));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()), new TestLocalizer());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var loaded = dbContext.Cards.Single();
+                Assert.AreEqual(1, loaded.RatingCount);
+                Assert.AreEqual(rating, loaded.AverageRating);
             }
         }
     }

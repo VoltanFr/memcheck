@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Ratings;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -68,11 +67,15 @@ namespace MemCheck.Application.Cards
                         VersionCreator = cardInDeck.Card.VersionCreator.Id,
                         tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
                         userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                        imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide })
+                        imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
+                        cardInDeck.Card.AverageRating,
+                        cardInDeck.Card.RatingCount
                     }).ToList();
 
-                var ratings = await CardRatings.LoadAsync(dbContext, userId, expired);
                 var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, expired);
+
+                //The following line could be improved with a joint. Not sure this would perform better, to be checked
+                var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
                 var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
@@ -83,9 +86,9 @@ namespace MemCheck.Application.Cards
                     oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
                     oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
                     heapingAlgorithm,
-                    ratings.User(oldestCard.CardId),
-                    ratings.Average(oldestCard.CardId),
-                    ratings.Count(oldestCard.CardId),
+                    userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
+                    oldestCard.AverageRating,
+                    oldestCard.RatingCount,
                     notifications[oldestCard.CardId]
                     )
                 ).OrderBy(r => r.LastLearnUtcTime);

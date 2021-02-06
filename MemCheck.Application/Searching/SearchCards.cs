@@ -20,16 +20,16 @@ namespace MemCheck.Application.Searching
         #region Private class ResultCardBeforeDeckInfo
         private sealed class ResultCardBeforeDeckInfo
         {
-            public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, CardRatings cardRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
+            public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, int userRating, double averageRating, int ratingCount)
             {
                 CardId = cardId;
                 FrontSide = frontSide;
                 Tags = tags;
                 VisibleTo = visibleTo;
 
-                CurrentUserRating = cardRatings.User(cardId);
-                AverageRating = cardRatings.Average(cardId);
-                CountOfUserRatings = cardRatings.Count(cardId);
+                CurrentUserRating = userRating;
+                AverageRating = averageRating;
+                CountOfUserRatings = ratingCount;
                 VersionCreator = versionCreator;
                 VersionUtcDate = versionUtcDate;
                 VersionDescription = versionDescription;
@@ -97,8 +97,7 @@ namespace MemCheck.Application.Searching
                 .Include(card => card.UsersWithView)
                 .AsSingleQuery();
 
-            var cardsViewableByUser = allCards.Where(
-                card =>
+            var cardsViewableByUser = allCards.Where(card =>
                 card.VersionCreator.Id == request.UserId
                 || !card.UsersWithView.Any()    //card is public
                 || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any()
@@ -148,22 +147,19 @@ namespace MemCheck.Application.Searching
                 cardsFilteredWithVisibility = cardsFilteredWithText;
 
             IQueryable<Card> cardsFilteredWithAverageRating;
-            CardRatings? cardRatings = null;
             if (request.RatingFiltering == Request.RatingFilteringMode.Ignore)
                 cardsFilteredWithAverageRating = cardsFilteredWithVisibility;
             else
             {
-                if (cardsFilteredWithVisibility.Count() > 20000)
-                    throw new SearchResultTooBigForRatingException();
-
-                cardRatings = await CardRatings.LoadAsync(dbContext, request.UserId, cardsFilteredWithVisibility.Select(card => card.Id));
                 if (request.RatingFiltering == Request.RatingFilteringMode.NoRating)
-                    cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithoutEval.Contains(card.Id));
+                    cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount == 0);
                 else
-                if (request.RatingFiltering == Request.RatingFilteringMode.AtLeast)
-                    cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtLeast(request.RatingFilteringValue).Contains(card.Id));
-                else
-                    cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => cardRatings.CardsWithAverageRatingAtMost(request.RatingFilteringValue).Contains(card.Id));
+                {
+                    if (request.RatingFiltering == Request.RatingFilteringMode.AtLeast)
+                        cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating >= request.RatingFilteringValue);
+                    else
+                        cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating <= request.RatingFilteringValue);
+                }
             }
 
             IQueryable<Card> cardsFilteredWithNotifications;
@@ -183,10 +179,22 @@ namespace MemCheck.Application.Searching
 
             var pageCards = await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
-            if (cardRatings == null)
-                cardRatings = await CardRatings.LoadAsync(dbContext, request.UserId, pageCards.Select(card => card.Id));
+            //The following line could be improved with a joint. Not sure this would perform better, to be checked
+            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == request.UserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
-            var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(card.Id, card.FrontSide, card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name), card.UsersWithView, cardRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
+            var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(
+                card.Id,
+                card.FrontSide,
+                card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
+                card.UsersWithView,
+                card.VersionCreator,
+                card.VersionUtcDate,
+                card.VersionDescription,
+                userRatings.ContainsKey(card.Id) ? userRatings[card.Id] : 0,
+                card.AverageRating,
+                card.RatingCount
+                )
+            );
 
             var withUserDeckInfo = AddDeckInfo(request.UserId, resultCards);
 
