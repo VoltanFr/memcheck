@@ -10,4 +10,5 @@ Just access the site.
 The end user doc is available from links at the bottom of each page in MemCheck, providing contextual information.
 
 ## Development
-The website is built with ASP.NET Core and Vue.js.
+The website is built with ASP.NET Core and Vue.js. It also uses a number of third party packages.  
+Contributions are welcome, please create pull requests or issues on the [GitHub project](https://github.com/VoltanFr/memcheck).
