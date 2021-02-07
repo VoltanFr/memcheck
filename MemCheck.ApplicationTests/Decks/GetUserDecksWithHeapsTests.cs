@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MemCheck.Application.Decks
 {
     [TestClass()]
-    public class GetUserDecksWithHeapsWithHeapsTests
+    public class GetUserDecksWithHeapsTests
     {
         [TestMethod()]
         public async Task UserNotLoggedIn()
