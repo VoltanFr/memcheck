@@ -94,8 +94,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         private async Task<IEnumerable<string>> GetCardsToRepeatAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds)
         {
             var result = new List<string>();
-            var heapingAlgorithmId = await dbContext.Decks.Where(deck => deck.Id == deckId).Select(deck => deck.HeapingAlgorithmId).SingleAsync();
-            var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, deckId);
 
             var chrono = Stopwatch.StartNew();
             var heaps = await dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deckId && cardInDeck.CurrentHeap != 0).Select(cardInDeck => cardInDeck.CurrentHeap).Distinct().ToListAsync();

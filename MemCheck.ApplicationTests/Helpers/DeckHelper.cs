@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Heaping;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,7 +11,7 @@ namespace MemCheck.Application.Tests.Helpers
 {
     public static class DeckHelper
     {
-        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid ownerId, string? description = null, int? algorithmId = null)
+        public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid ownerId, string? description = null, int algorithmId = UnitTestsHeapingAlgorithm.ID)
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var result = new Deck
@@ -18,7 +19,7 @@ namespace MemCheck.Application.Tests.Helpers
                 Owner = await dbContext.Users.SingleAsync(u => u.Id == ownerId),
                 Description = description ?? RandomHelper.String(),
                 CardInDecks = Array.Empty<CardInDeck>(),
-                HeapingAlgorithmId = algorithmId == null ? RandomHelper.HeapingAlgorithm() : algorithmId.Value
+                HeapingAlgorithmId = algorithmId
             };
             dbContext.Decks.Add(result);
             await dbContext.SaveChangesAsync();
@@ -27,13 +28,26 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null)
         {
             heap ??= RandomHelper.Heap();
+            lastLearnUtcTime ??= RandomHelper.Date();
+
             using var dbContext = new MemCheckDbContext(testDB);
+
+            DateTime expiryTime;
+            if (heap.Value != CardInDeck.UnknownHeap)
+            {
+                var heapingAlgo = await HeapingAlgorithm.OfDeckAsync(dbContext, deck);
+                expiryTime = heapingAlgo.ExpiryUtcDate(heap.Value, lastLearnUtcTime.Value);
+            }
+            else
+                expiryTime = DateTime.MinValue;
+
             var cardForUser = new CardInDeck()
             {
                 CardId = card,
                 DeckId = deck,
                 CurrentHeap = heap.Value,
-                LastLearnUtcTime = lastLearnUtcTime == null ? RandomHelper.Date() : lastLearnUtcTime.Value,
+                LastLearnUtcTime = lastLearnUtcTime.Value,
+                ExpiryUtcTime = expiryTime,
                 AddToDeckUtcTime = DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,
                 BiggestHeapReached = heap.Value

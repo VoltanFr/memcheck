@@ -1,5 +1,9 @@
 ﻿using MemCheck.Basics;
+using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Heaping
 {
@@ -22,6 +26,13 @@ namespace MemCheck.Application.Heaping
             var result = GetExpiryUtcDate(currentHeap, lastLearnUtcTime);
             DateServices.CheckUTC(result);
             return result;
+        }
+        public static async Task<HeapingAlgorithm> OfDeckAsync(MemCheckDbContext dbContext, Guid deckId)
+        {
+            var heapingAlgorithmId = await dbContext.Decks.AsNoTracking().Where(deck => deck.Id == deckId).Select(deck => deck.HeapingAlgorithmId).SingleAsync();
+            var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
+            return heapingAlgorithm;
+
         }
     }
 }

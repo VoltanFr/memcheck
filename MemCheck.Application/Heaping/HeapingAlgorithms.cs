@@ -16,9 +16,11 @@ namespace MemCheck.Application.Heaping
         {
             var developer = new DeveloperHeapingAlgorithm();
             var def = new DefaultHeapingAlgorithm();
+            var unitTests = new UnitTestsHeapingAlgorithm();
             algorithms = new Dictionary<int, HeapingAlgorithm>(){
                 { developer.Id, developer },
-                { def.Id, def }
+                { def.Id, def },
+                { unitTests.Id, unitTests },
             }.ToImmutableDictionary();
         }
         #endregion

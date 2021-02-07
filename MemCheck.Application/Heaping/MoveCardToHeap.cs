@@ -3,6 +3,7 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Heaping
@@ -25,19 +26,33 @@ namespace MemCheck.Application.Heaping
             if (request.TargetHeap != CardInDeck.UnknownHeap)
             {
                 if (request.TargetHeap == card.CurrentHeap)
-                    return; //This happens due to connection problems on client side
+                    return; //This could happen due to connection problems on client side, or to multiple sessions
                 if (!request.ManualMove && (request.TargetHeap < card.CurrentHeap || request.TargetHeap - card.CurrentHeap > 1))
                     throw new InvalidOperationException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
             }
 
             if (!request.ManualMove)
-                card.LastLearnUtcTime = lastLearnUtcTime ?? DateTime.UtcNow;
+            {
+                lastLearnUtcTime ??= DateTime.UtcNow;
+                if (request.TargetHeap != CardInDeck.UnknownHeap)
+                {
+                    var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
+                    card.ExpiryUtcTime = heapingAlgorithm.ExpiryUtcDate(request.TargetHeap, lastLearnUtcTime.Value);
+                }
+                card.LastLearnUtcTime = lastLearnUtcTime.Value;
+            }
+
+            if (request.TargetHeap == CardInDeck.UnknownHeap)
+                card.ExpiryUtcTime = DateTime.MinValue.ToUniversalTime(); //Setting this is useless for normal operations, but would help detect any misuse of this field (bugs)
 
             if (card.CurrentHeap != CardInDeck.UnknownHeap && request.TargetHeap == CardInDeck.UnknownHeap)
                 card.NbTimesInNotLearnedHeap++;
+
             card.CurrentHeap = request.TargetHeap;
+
             if (card.CurrentHeap > card.BiggestHeapReached)
                 card.BiggestHeapReached = card.CurrentHeap;
+
             await dbContext.SaveChangesAsync();
         }
         #region Request

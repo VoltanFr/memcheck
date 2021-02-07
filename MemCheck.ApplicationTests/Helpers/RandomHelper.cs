@@ -55,11 +55,11 @@ namespace MemCheck.Application.Tests.Helpers
         public static DateTime Date(DateTime? after = null)
         {
             var start = after == null ? new DateTime(1995, 1, 1) : after.Value;
-            return start.AddDays(random.Next(3650));
+            return start.AddDays(random.Next(3650)).ToUniversalTime();
         }
         public static DateTime DateBefore(DateTime d)
         {
-            return d.AddDays(-random.Next(1, 3650));
+            return d.AddDays(-random.Next(1, 3650)).ToUniversalTime();
         }
         public static int Rating()
         {

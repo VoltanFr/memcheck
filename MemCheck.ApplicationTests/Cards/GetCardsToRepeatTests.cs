@@ -75,11 +75,12 @@ namespace MemCheck.Application.Cards
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, deck, card.Id, lastLearnUtcTime: new DateTime(2000, 1, 1));
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 4, lastLearnUtcTime: addDate);
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 2));
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(4));
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
@@ -89,11 +90,12 @@ namespace MemCheck.Application.Cards
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, new DateTime(2000, 1, 1));
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, addDate);
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4));
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(1));
             Assert.AreEqual(card.Id, cards.Single().CardId);
         }
         [TestMethod()]
@@ -155,11 +157,12 @@ namespace MemCheck.Application.Cards
             var image1 = await ImageHelper.CreateAsync(db, user);
             var image2 = await ImageHelper.CreateAsync(db, user);
             var createdCard = await CardHelper.CreateAsync(db, user, frontSideImages: new[] { image1, image2 });
-            await DeckHelper.AddCardAsync(db, deck, createdCard.Id, 1, new DateTime(2000, 1, 1));
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, createdCard.Id, 1, addDate);
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4));
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(1));
             var resultImages = cards.Single().Images;
             Assert.AreEqual(2, resultImages.Count());
             Assert.AreEqual(image1, resultImages.First().ImageId);

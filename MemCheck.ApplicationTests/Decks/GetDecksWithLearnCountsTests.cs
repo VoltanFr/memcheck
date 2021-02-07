@@ -47,13 +47,14 @@ namespace MemCheck.Application.Decks
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String(), Deck.DefaultHeapingAlgorithmId);
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String());
 
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 10, 0, 0));
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 01, 12, 0, 0));
+            var addToDeckDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate.AddHours(2));
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var resultDeck = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2030, 01, 03, 11, 30, 0))).First();
+            var resultDeck = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(1).AddHours(1.5))).First();
             Assert.AreEqual(1, resultDeck.ExpiredCardCount);
             Assert.AreEqual(1, resultDeck.ExpiringNextHourCount);
             Assert.AreEqual(0, resultDeck.ExpiringFollowing24hCount);
@@ -64,40 +65,41 @@ namespace MemCheck.Application.Decks
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String(), Deck.DefaultHeapingAlgorithmId);
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String());
 
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, new DateTime(2020, 12, 11, 2, 0, 0)); //Expires on 2020, 12, 27 at 2:00
+            var addToDeckDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, addToDeckDate);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var resultOn27_0030 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 27, 0, 30, 0))).First();
-            Assert.AreEqual(0, resultOn27_0030.ExpiringNextHourCount);
-            Assert.AreEqual(1, resultOn27_0030.ExpiringFollowing24hCount);
-            Assert.AreEqual(0, resultOn27_0030.ExpiringFollowing3DaysCount);
+            var result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(4).AddMinutes(-61))).First();
+            Assert.AreEqual(0, result.ExpiringNextHourCount);
+            Assert.AreEqual(1, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            var resultOn27_0130 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 27, 1, 30, 0))).First();
-            Assert.AreEqual(1, resultOn27_0130.ExpiringNextHourCount);
-            Assert.AreEqual(0, resultOn27_0130.ExpiringFollowing24hCount);
-            Assert.AreEqual(0, resultOn27_0130.ExpiringFollowing3DaysCount);
+            result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(4).AddMinutes(-10))).First();
+            Assert.AreEqual(1, result.ExpiringNextHourCount);
+            Assert.AreEqual(0, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            var resultOn26_0130 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 26, 1, 30, 0))).First();
-            Assert.AreEqual(0, resultOn26_0130.ExpiringNextHourCount);
-            Assert.AreEqual(1, resultOn26_0130.ExpiringFollowing24hCount);
-            Assert.AreEqual(0, resultOn26_0130.ExpiringFollowing3DaysCount);
+            result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(3).AddMinutes(1))).First();
+            Assert.AreEqual(0, result.ExpiringNextHourCount);
+            Assert.AreEqual(1, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            var resultOn26_0030 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 26, 0, 30, 0))).First();
-            Assert.AreEqual(0, resultOn26_0030.ExpiringNextHourCount);
-            Assert.AreEqual(0, resultOn26_0030.ExpiringFollowing24hCount);
-            Assert.AreEqual(1, resultOn26_0030.ExpiringFollowing3DaysCount);
+            result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(3).AddMinutes(-61))).First();
+            Assert.AreEqual(0, result.ExpiringNextHourCount);
+            Assert.AreEqual(0, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
 
-            var resultOn23_0230 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 23, 2, 30, 0))).First();
-            Assert.AreEqual(0, resultOn23_0230.ExpiringNextHourCount);
-            Assert.AreEqual(0, resultOn23_0230.ExpiringFollowing24hCount);
-            Assert.AreEqual(1, resultOn23_0230.ExpiringFollowing3DaysCount);
+            result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(1))).First();
+            Assert.AreEqual(0, result.ExpiringNextHourCount);
+            Assert.AreEqual(0, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
 
-            var resultOn23_0000 = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), new DateTime(2020, 12, 23, 0, 0, 0))).First();
-            Assert.AreEqual(0, resultOn23_0000.ExpiringNextHourCount);
-            Assert.AreEqual(0, resultOn23_0000.ExpiringFollowing24hCount);
-            Assert.AreEqual(0, resultOn23_0000.ExpiringFollowing3DaysCount);
+            result = (await new GetDecksWithLearnCounts(dbContext).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate)).First();
+            Assert.AreEqual(0, result.ExpiringNextHourCount);
+            Assert.AreEqual(0, result.ExpiringFollowing24hCount);
+            Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
         }
         [TestMethod()]
         public async Task FullTest()
@@ -111,11 +113,11 @@ namespace MemCheck.Application.Decks
             var deck2Description = RandomHelper.String();
             var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description, Deck.DefaultHeapingAlgorithmId);
 
-            var jan01 = new DateTime(2030, 01, 01);
-            var jan28 = new DateTime(2030, 01, 28);
-            var jan30_00h00 = new DateTime(2030, 01, 30, 0, 0, 0);
-            var jan31 = new DateTime(2030, 01, 31);
-            var jan30_12h00 = new DateTime(2030, 01, 30, 12, 0, 0);
+            var jan01 = new DateTime(2030, 01, 01).ToUniversalTime();
+            var jan28 = new DateTime(2030, 01, 28).ToUniversalTime();
+            var jan30_00h00 = new DateTime(2030, 01, 30, 0, 0, 0).ToUniversalTime();
+            var jan31 = new DateTime(2030, 01, 31).ToUniversalTime();
+            var jan30_12h00 = new DateTime(2030, 01, 30, 12, 0, 0).ToUniversalTime();
 
             //Fill deck1
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);

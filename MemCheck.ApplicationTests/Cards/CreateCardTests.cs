@@ -163,12 +163,13 @@ namespace MemCheck.Application.Cards
                 cardGuid = await new CreateCard(dbContext).RunAsync(createRequest, new TestLocalizer());
 
             var deck = await DeckHelper.CreateAsync(db, user);
-            await DeckHelper.AddCardAsync(db, deck, cardGuid, 1, new DateTime(2000, 1, 1));
+            var addToDeckDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, cardGuid, 1, addToDeckDate);
 
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-                var card = (await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 4))).Single();
+                var card = (await new GetCardsToRepeat(dbContext).RunAsync(request, addToDeckDate.AddDays(1))).Single();
 
                 var images = card.Images;
                 Assert.AreEqual(2, images.Count());

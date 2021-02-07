@@ -20,13 +20,6 @@ namespace MemCheck.Application.Cards
         private readonly MemCheckDbContext dbContext;
         #endregion
         #region Private methods
-        private async Task<HeapingAlgorithm> GetHeapingAlgorithmAsync(Guid deckId)
-        {
-            var heapingAlgorithmId = await dbContext.Decks.Where(deck => deck.Id == deckId).Select(deck => deck.HeapingAlgorithmId).SingleAsync();
-            var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
-            return heapingAlgorithm;
-
-        }
         private async Task<IEnumerable<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
         {
             var result = new List<ResultCard>();
@@ -112,7 +105,7 @@ namespace MemCheck.Application.Cards
         {
             await request.CheckValidityAsync(dbContext);
 
-            var heapingAlgorithm = await GetHeapingAlgorithmAsync(request.DeckId);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
             var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
             var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
             var tagNames = TagLoadingHelper.Run(dbContext);
