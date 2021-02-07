@@ -1,9 +1,9 @@
 ﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
-using MemCheck.CommandLineDbClient.Ratings;
 using MemCheck.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,7 +46,7 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new RecomputeAllCardEvaluationAverageAndCountOfRatings(serviceProvider);
+            IMemCheckTest test = new GetCardsToRepeatPerf(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
@@ -64,6 +64,8 @@ namespace MemCheck.CommandLineDbClient
                 logger.LogError(e, e.Message);
             }
             logger.LogInformation($"Program terminating");
+            Debugger.Break();
+            throw new InvalidProgramException("Test done");
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
