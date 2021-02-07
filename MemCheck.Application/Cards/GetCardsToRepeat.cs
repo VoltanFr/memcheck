@@ -34,25 +34,15 @@ namespace MemCheck.Application.Cards
         }
         private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
         {
-            var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CurrentHeap == heap);
-
-            var withoutExcuded = cardsOfHeap.Where(cardInDeck => !request.ExcludedCardIds.Contains(cardInDeck.CardId));
-            withoutExcuded = withoutExcuded.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)));
-
-            var ordered = withoutExcuded.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime);
-            var oldest = ordered.Take(maxCount);
-
-            var withInfoToComputeExpiration = oldest.Select(cardInDeck => new
-            {
-                cardInDeck.CardId,
-                cardInDeck.CurrentHeap,
-                cardInDeck.LastLearnUtcTime,
-            }).ToList();
-
-            var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime, now)).Select(card => card.CardId).ToList();
-
-            var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == request.DeckId && expired.Contains(cardInDeck.CardId))
-                .Include(cardInDeck => cardInDeck.Card).AsSingleQuery()
+            var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking()
+                .Include(cardInDeck => cardInDeck.Card)
+                .Where(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CurrentHeap == heap)
+                .Where(cardInDeck => !request.ExcludedCardIds.Contains(cardInDeck.CardId))
+                .Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)))
+                .Where(cardInDeck => cardInDeck.ExpiryUtcTime <= now)
+                .OrderBy(cardInDeck => cardInDeck.ExpiryUtcTime)
+                .Take(maxCount)
+                .AsSingleQuery()
                 .Select(cardInDeck => new
                 {
                     cardInDeck.CardId,
@@ -71,14 +61,14 @@ namespace MemCheck.Application.Cards
                     imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
                     cardInDeck.Card.AverageRating,
                     cardInDeck.Card.RatingCount
-                }).ToList();
+                }).ToImmutableArray();
 
-            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(request.CurrentUserId, expired);
+            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(request.CurrentUserId, cardsOfHeap.Select(c => c.CardId));
 
             //The following line could be improved with a joint. Not sure this would perform better, to be checked
             var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == request.CurrentUserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
-            var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
+            var thisHeapResult = cardsOfHeap.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                 oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
                 oldestCard.FrontSide, oldestCard.BackSide, oldestCard.AdditionalInfo,
                 oldestCard.VersionUtcDate,

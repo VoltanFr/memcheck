@@ -4,6 +4,7 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,11 +21,11 @@ namespace MemCheck.Application.Decks
         #region Private methods
         private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime now)
         {
-            var allCards = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId)
-                .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId })
-                .ToList();
+            var allCards = dbContext.CardsInDecks.AsNoTracking()
+                .Where(cardInDeck => cardInDeck.DeckId == deckId)
+                .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId, cardInDeck.ExpiryUtcTime })
+                .ToImmutableArray();
             var groups = allCards.ToLookup(card => card.CurrentHeap == 0);
-            var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(heapingAlgorithmId);
             var expiredCardCount = 0;
             var nextExpiryUTCDate = DateTime.MaxValue;
             var expiringNextHourCount = 0;
@@ -32,12 +33,11 @@ namespace MemCheck.Application.Decks
             var expiringFollowing3DaysCount = 0;
             foreach (var card in groups[false])
             {
-                var expiryDate = heapingAlgorithm.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
-                if (expiryDate <= now)
+                if (card.ExpiryUtcTime <= now)
                     expiredCardCount++;
                 else
                 {
-                    var distanceToNow = expiryDate - now;
+                    var distanceToNow = card.ExpiryUtcTime - now;
                     if (distanceToNow <= oneHour)
                         expiringNextHourCount++;
                     else
@@ -50,11 +50,11 @@ namespace MemCheck.Application.Decks
                                 expiringFollowing3DaysCount++;
                         }
                     }
-                    if (expiryDate < nextExpiryUTCDate)
-                        nextExpiryUTCDate = expiryDate;
+                    if (card.ExpiryUtcTime < nextExpiryUTCDate)
+                        nextExpiryUTCDate = card.ExpiryUtcTime;
                 }
             }
-            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Count, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
+            return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Length, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
         }
         #endregion
         public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
