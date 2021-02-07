@@ -57,7 +57,19 @@ namespace MemCheck.Application.Cards
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
         }
         [TestMethod()]
-        public async Task DeckContainsOneCardNonExpired()
+        public async Task EmptyDeck()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 2));
+            Assert.IsFalse(cards.Any());
+        }
+        [TestMethod()]
+        public async Task OneCardNonExpired()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -71,7 +83,7 @@ namespace MemCheck.Application.Cards
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
-        public async Task DeckContainsOneCardExpired()
+        public async Task OneCardExpired()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
