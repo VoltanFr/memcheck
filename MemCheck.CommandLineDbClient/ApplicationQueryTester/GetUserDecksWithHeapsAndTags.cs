@@ -12,13 +12,13 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     internal sealed class GetUserDecksWithHeapsAndTags : IMemCheckTest
     {
         #region Fields
-        private readonly ILogger<GetCards> logger;
+        private readonly ILogger<GetUserDecksWithHeapsAndTags> logger;
         private readonly MemCheckDbContext dbContext;
         #endregion
         public GetUserDecksWithHeapsAndTags(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<GetCards>>();
+            logger = serviceProvider.GetRequiredService<ILogger<GetUserDecksWithHeapsAndTags>>();
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {

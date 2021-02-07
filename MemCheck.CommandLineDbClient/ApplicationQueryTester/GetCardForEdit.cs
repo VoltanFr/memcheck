@@ -12,11 +12,11 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     internal sealed class GetCardForEdit : IMemCheckTest
     {
         #region Fields
-        private readonly ILogger<GetCards> logger;
+        private readonly ILogger<GetCardForEdit> logger;
         #endregion
         public GetCardForEdit(IServiceProvider serviceProvider)
         {
-            logger = serviceProvider.GetRequiredService<ILogger<GetCards>>();
+            logger = serviceProvider.GetRequiredService<ILogger<GetCardForEdit>>();
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {

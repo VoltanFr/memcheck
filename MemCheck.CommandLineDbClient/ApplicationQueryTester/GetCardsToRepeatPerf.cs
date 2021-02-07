@@ -23,7 +23,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         public GetCardsToRepeatPerf(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<GetCards>>();
+            logger = serviceProvider.GetRequiredService<ILogger<GetCardsToRepeatPerf>>();
         }
         public void DescribeForOpportunityToCancel()
         {
@@ -36,7 +36,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 
             var chronos = new List<double>();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var chrono = await RunOneGet(user, deck);
                 chronos.Add(chrono);

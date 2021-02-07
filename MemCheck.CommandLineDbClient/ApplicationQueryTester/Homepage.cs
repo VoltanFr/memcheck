@@ -17,14 +17,14 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     internal sealed class Homepage : IMemCheckTest
     {
         #region Fields
-        private readonly ILogger<GetCards> logger;
+        private readonly ILogger<Homepage> logger;
         private readonly MemCheckDbContext dbContext;
         private readonly bool realCode = true;
         #endregion
         public Homepage(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<GetCards>>();
+            logger = serviceProvider.GetRequiredService<ILogger<Homepage>>();
         }
         async public Task RunAsync(MemCheckDbContext dbContext)
         {
