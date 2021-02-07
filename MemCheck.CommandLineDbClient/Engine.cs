@@ -1,4 +1,5 @@
 ﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
+using MemCheck.CommandLineDbClient.HandleBadCards;
 using MemCheck.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -46,7 +47,7 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new GetCardsToRepeatPerf(serviceProvider);
+            IMemCheckTest test = new RecomputeAllExpirationDates(serviceProvider);
             test.DescribeForOpportunityToCancel();
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();
