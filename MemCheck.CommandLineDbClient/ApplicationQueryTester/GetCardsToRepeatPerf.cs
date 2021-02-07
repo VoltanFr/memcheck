@@ -46,12 +46,16 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         }
         private async Task<double> RunOneGet(Guid userId, Guid deckId)
         {
-            var realCodeChrono = Stopwatch.StartNew();
             var request = new GetCardsToRepeat.Request(userId, deckId, Array.Empty<Guid>(), Array.Empty<Guid>(), 100);
             var runner = new GetCardsToRepeat(dbContext);
+            var chrono = Stopwatch.StartNew();
             var cards = await runner.RunAsync(request);
-            logger.LogInformation($"Got {cards.Count()} in {realCodeChrono.Elapsed}");
-            return realCodeChrono.Elapsed.TotalSeconds;
+            chrono.Stop();
+            logger.LogInformation($"Got {cards.Count()} in {chrono.Elapsed}");
+            return chrono.Elapsed.TotalSeconds;
         }
     }
 }
+
+//[10:28:04 INF] Got 14 in 00:00:00.9131297
+//[10:28:04 INF] Average time: 1,1713525000000002 seconds

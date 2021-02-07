@@ -27,76 +27,81 @@ namespace MemCheck.Application.Cards
             return heapingAlgorithm;
 
         }
-        private async Task<IEnumerable<ResultCard>> RunAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, DateTime now)
+        private async Task<IEnumerable<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
         {
             var result = new List<ResultCard>();
 
-            for (var heap = CardInDeck.MaxHeapValue; heap > 0 && result.Count < cardCount; heap--)
+            for (var heap = CardInDeck.MaxHeapValue; heap > 0 && result.Count < request.CardsToDownload; heap--)
             {
-                var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && cardInDeck.CurrentHeap == heap);
+                var heapResults = await RunForHeapAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now, heap, request.CardsToDownload - result.Count);
+                result.AddRange(heapResults);
+            }
 
-                var withoutExcuded = cardsOfHeap.Where(cardInDeck => !excludedCardIds.Contains(cardInDeck.CardId));
-                withoutExcuded = withoutExcuded.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => excludedTagIds.Contains(tag.TagId)));
+            return result;
+        }
+        private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
+        {
+            var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CurrentHeap == heap);
 
-                var ordered = withoutExcuded.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime);
-                var oldest = ordered.Take(cardCount - result.Count);
+            var withoutExcuded = cardsOfHeap.Where(cardInDeck => !request.ExcludedCardIds.Contains(cardInDeck.CardId));
+            withoutExcuded = withoutExcuded.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)));
 
-                var withInfoToComputeExpiration = oldest.Select(cardInDeck => new
+            var ordered = withoutExcuded.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime);
+            var oldest = ordered.Take(maxCount);
+
+            var withInfoToComputeExpiration = oldest.Select(cardInDeck => new
+            {
+                cardInDeck.CardId,
+                cardInDeck.CurrentHeap,
+                cardInDeck.LastLearnUtcTime,
+            }).ToList();
+
+            var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime, now)).Select(card => card.CardId).ToList();
+
+            var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == request.DeckId && expired.Contains(cardInDeck.CardId))
+                .Include(cardInDeck => cardInDeck.Card).AsSingleQuery()
+                .Select(cardInDeck => new
                 {
                     cardInDeck.CardId,
                     cardInDeck.CurrentHeap,
                     cardInDeck.LastLearnUtcTime,
+                    cardInDeck.AddToDeckUtcTime,
+                    cardInDeck.BiggestHeapReached,
+                    cardInDeck.NbTimesInNotLearnedHeap,
+                    cardInDeck.Card.FrontSide,
+                    cardInDeck.Card.BackSide,
+                    cardInDeck.Card.AdditionalInfo,
+                    cardInDeck.Card.VersionUtcDate,
+                    VersionCreator = cardInDeck.Card.VersionCreator.Id,
+                    tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
+                    userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
+                    imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
+                    cardInDeck.Card.AverageRating,
+                    cardInDeck.Card.RatingCount
                 }).ToList();
 
-                var expired = withInfoToComputeExpiration.Where(resultCard => heapingAlgorithm.HasExpired(resultCard.CurrentHeap, resultCard.LastLearnUtcTime, now)).Select(card => card.CardId).ToList();
+            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(request.CurrentUserId, expired);
 
-                var withDetails = dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deckId && expired.Contains(cardInDeck.CardId))
-                    .Include(cardInDeck => cardInDeck.Card).AsSingleQuery()
-                    .Select(cardInDeck => new
-                    {
-                        cardInDeck.CardId,
-                        cardInDeck.CurrentHeap,
-                        cardInDeck.LastLearnUtcTime,
-                        cardInDeck.AddToDeckUtcTime,
-                        cardInDeck.BiggestHeapReached,
-                        cardInDeck.NbTimesInNotLearnedHeap,
-                        cardInDeck.Card.FrontSide,
-                        cardInDeck.Card.BackSide,
-                        cardInDeck.Card.AdditionalInfo,
-                        cardInDeck.Card.VersionUtcDate,
-                        VersionCreator = cardInDeck.Card.VersionCreator.Id,
-                        tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
-                        userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                        imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
-                        cardInDeck.Card.AverageRating,
-                        cardInDeck.Card.RatingCount
-                    }).ToList();
+            //The following line could be improved with a joint. Not sure this would perform better, to be checked
+            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == request.CurrentUserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
-                var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, expired);
+            var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
+                oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
+                oldestCard.FrontSide, oldestCard.BackSide, oldestCard.AdditionalInfo,
+                oldestCard.VersionUtcDate,
+                userNames[oldestCard.VersionCreator],
+                oldestCard.tagIds.Select(tagId => tagNames[tagId]),
+                oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
+                oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
+                heapingAlgorithm,
+                userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
+                oldestCard.AverageRating,
+                oldestCard.RatingCount,
+                notifications[oldestCard.CardId]
+                )
+            ).OrderBy(r => r.LastLearnUtcTime);
 
-                //The following line could be improved with a joint. Not sure this would perform better, to be checked
-                var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
-
-                var thisHeapResult = withDetails.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
-                    oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
-                    oldestCard.FrontSide, oldestCard.BackSide, oldestCard.AdditionalInfo,
-                    oldestCard.VersionUtcDate,
-                    userNames[oldestCard.VersionCreator],
-                    oldestCard.tagIds.Select(tagId => tagNames[tagId]),
-                    oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
-                    oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
-                    heapingAlgorithm,
-                    userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
-                    oldestCard.AverageRating,
-                    oldestCard.RatingCount,
-                    notifications[oldestCard.CardId]
-                    )
-                ).OrderBy(r => r.LastLearnUtcTime);
-
-                result.AddRange(thisHeapResult);
-            }
-
-            return result;
+            return thisHeapResult;
         }
         #endregion
         public GetCardsToRepeat(MemCheckDbContext dbContext)
@@ -112,7 +117,7 @@ namespace MemCheck.Application.Cards
             var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
             var tagNames = TagLoadingHelper.Run(dbContext);
 
-            return await RunAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, now == null ? DateTime.UtcNow : now.Value);
+            return await RunAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now == null ? DateTime.UtcNow : now.Value);
         }
         #region Request and result classes
         public sealed class Request
