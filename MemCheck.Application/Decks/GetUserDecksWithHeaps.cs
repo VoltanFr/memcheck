@@ -47,7 +47,6 @@ namespace MemCheck.Application.Decks
             foreach (var deck in decks)
             {
                 var heaps = new Dictionary<int, HeapInfo>();
-                var heapingAlgorithm = HeapingAlgorithms.Instance.FromId(deck.HeapingAlgorithmId);
 
                 var cardsInDeck = dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deck.Id).ToList();
 
@@ -59,13 +58,12 @@ namespace MemCheck.Application.Decks
                     heapInfo.TotalCardCount++;
                     if (cardInDeck.CurrentHeap != 0)
                     {
-                        if (heapingAlgorithm.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, nowUtc.Value))
+                        if (cardInDeck.ExpiryUtcTime <= nowUtc.Value)
                             heapInfo.ExpiredCardCount++;
                         else
                         {
-                            var expiryDate = heapingAlgorithm.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime);
-                            if (expiryDate < heapInfo.NextExpiryUtcDate)
-                                heapInfo.NextExpiryUtcDate = expiryDate;
+                            if (cardInDeck.ExpiryUtcTime < heapInfo.NextExpiryUtcDate)
+                                heapInfo.NextExpiryUtcDate = cardInDeck.ExpiryUtcTime;
                         }
                     }
                 });

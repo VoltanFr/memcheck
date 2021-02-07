@@ -47,9 +47,8 @@ namespace MemCheck.Application.Searching
         }
         #endregion
         #region private methods
-        private static ResultCardDeckInfo GetCardDeckInfo(CardInDeck cardInDeck, Dictionary<Guid, HeapingAlgorithm> heapingAlgoCache)
+        private static ResultCardDeckInfo GetCardDeckInfo(CardInDeck cardInDeck)
         {
-            var heapingAlgo = heapingAlgoCache[cardInDeck.DeckId];
             return new ResultCardDeckInfo(
                 cardInDeck.DeckId,
                 cardInDeck.Deck.Description,
@@ -58,10 +57,10 @@ namespace MemCheck.Application.Searching
                 cardInDeck.NbTimesInNotLearnedHeap,
                 cardInDeck.AddToDeckUtcTime,
                 cardInDeck.LastLearnUtcTime,
-                cardInDeck.CurrentHeap == 0 || heapingAlgo.HasExpired(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, DateTime.UtcNow),
-                cardInDeck.CurrentHeap == 0 ? DateTime.MinValue : heapingAlgo.ExpiryUtcDate(cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime));
+                cardInDeck.CurrentHeap == 0 || cardInDeck.ExpiryUtcTime <= DateTime.UtcNow,
+                cardInDeck.ExpiryUtcTime);
         }
-        private IEnumerable<ResultCardDeckInfo> GetCardDeckInfo(ResultCardBeforeDeckInfo card, Guid userId, Dictionary<Guid, HeapingAlgorithm> heapingAlgoCache)
+        private IEnumerable<ResultCardDeckInfo> GetCardDeckInfo(ResultCardBeforeDeckInfo card, Guid userId)
         {
             var cardsInDecksForThisUserAndThisCard = dbContext.CardsInDecks
                 .AsNoTracking()
@@ -69,16 +68,11 @@ namespace MemCheck.Application.Searching
                 .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && cardInDeck.CardId == card.CardId)
                 .ToArray();
 
-            foreach (var cardInDeck in cardsInDecksForThisUserAndThisCard)
-                if (!heapingAlgoCache.ContainsKey(cardInDeck.DeckId))
-                    heapingAlgoCache.Add(cardInDeck.DeckId, HeapingAlgorithms.Instance.FromId(cardInDeck.Deck.HeapingAlgorithmId));
-
-            return cardsInDecksForThisUserAndThisCard.Select(cardInDeck => GetCardDeckInfo(cardInDeck, heapingAlgoCache));
+            return cardsInDecksForThisUserAndThisCard.Select(cardInDeck => GetCardDeckInfo(cardInDeck));
         }
         private IEnumerable<ResultCard> AddDeckInfo(Guid userId, IEnumerable<ResultCardBeforeDeckInfo> resultCards)
         {
-            var heapingAlgoCache = new Dictionary<Guid, HeapingAlgorithm>();
-            return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId, heapingAlgoCache), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
+            return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
         }
         #endregion
         public SearchCards(MemCheckDbContext dbContext)
