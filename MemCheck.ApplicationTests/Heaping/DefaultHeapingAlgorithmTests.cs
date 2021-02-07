@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Tests.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
 namespace MemCheck.Application.Heaping
@@ -16,23 +17,22 @@ namespace MemCheck.Application.Heaping
             Assert.AreEqual(1, new DefaultHeapingAlgorithm().Id);
         }
         [TestMethod()]
-        public void HasExpiredMustCrashOnUnknownCard()
+        public void UnknownCard()
         {
-            Assert.ThrowsException<ArgumentException>(() => new DefaultHeapingAlgorithm().HasExpired(0, DateTime.UtcNow, DateTime.UtcNow));
+            Assert.ThrowsException<ArgumentException>(() => new DefaultHeapingAlgorithm().ExpiryUtcDate(0, RandomHelper.Date()));
         }
         [TestMethod()]
-        public void HasExpiredOnHeap1()
+        public void NonUtc()
         {
-            var lastLearnDate = DateTime.UtcNow;
-            Assert.IsFalse(new DefaultHeapingAlgorithm().HasExpired(1, lastLearnDate, lastLearnDate));
-            Assert.IsFalse(new DefaultHeapingAlgorithm().HasExpired(1, lastLearnDate, lastLearnDate.AddDays(1.9)));
-            Assert.IsTrue(new DefaultHeapingAlgorithm().HasExpired(1, lastLearnDate, lastLearnDate.AddDays(2.1)));
+            Assert.ThrowsException<ArgumentException>(() => new DefaultHeapingAlgorithm().ExpiryUtcDate(0, DateTime.Now));
         }
         [TestMethod()]
-        public void HasExpiredOnRealProdCase()
+        public void ExpiryUtcDate()
         {
-            var lastLearnDate = new DateTime(2020, 04, 21, 22, 43, 00).ToUniversalTime();
-            Assert.IsFalse(new DefaultHeapingAlgorithm().HasExpired(3, lastLearnDate, new DateTime(2020, 04, 23, 10, 06, 00)));
+            var d = RandomHelper.Date();
+            Assert.AreEqual(d.AddDays(2), new DefaultHeapingAlgorithm().ExpiryUtcDate(1, d));
+            Assert.AreEqual(d.AddDays(4), new DefaultHeapingAlgorithm().ExpiryUtcDate(2, d));
+            Assert.AreEqual(d.AddDays(1024), new DefaultHeapingAlgorithm().ExpiryUtcDate(10, d));
         }
     }
 }
