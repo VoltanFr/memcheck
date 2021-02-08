@@ -75,9 +75,12 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region GetHeapingAlgorithms
         [HttpGet("GetHeapingAlgorithms")]
-        public IActionResult GetHeapingAlgorithms()
+        public async Task<IActionResult> GetHeapingAlgorithmsAsync()
         {
-            var ids = HeapingAlgorithms.Instance.Ids;
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            if (user == null)
+                throw new UnauthorizedAccessException();
+            var ids = await new ProdRoleChecker(userManager).UserIsAdminAsync(user) ? HeapingAlgorithms.Instance.Ids : HeapingAlgorithms.DefaultAlgoId.AsArray();
             var result = ids.Select(id => new HeapingAlgorithmViewModel(id, HeapingAlgoNameFromId(id), HeapingAlgoDescriptionFromId(id)));
             return base.Ok(result);
         }

@@ -145,16 +145,22 @@
     <value>It was added to the deck on</value>
   </data>
   <data name="HeapingAlgoDescriptionForId1" xml:space="preserve">
-    <value>Escalates cards with an exponentiation formula (based on power of 2).</value>
+    <value>Escalates cards with an expiration delay based on power of 2.</value>
   </data>
   <data name="HeapingAlgoDescriptionForId2" xml:space="preserve">
-    <value>Escalates cards using a constant formula, making it expire after 3 minutes. Use only for tests!</value>
+    <value>Escalates cards using a constant formula for expiration, making cards expire after 3 minutes. Use only for tests!</value>
+  </data>
+  <data name="HeapingAlgoDescriptionForId3" xml:space="preserve">
+    <value>Escalates cards using an expiration delay equal to the index of the heap</value>
   </data>
   <data name="HeapingAlgoNameForId1" xml:space="preserve">
     <value>Default</value>
   </data>
   <data name="HeapingAlgoNameForId2" xml:space="preserve">
     <value>Development</value>
+  </data>
+  <data name="HeapingAlgoNameForId3" xml:space="preserve">
+    <value>Unit tests</value>
   </data>
   <data name="InvalidNameLength" xml:space="preserve">
     <value>Invalid name: length is</value>

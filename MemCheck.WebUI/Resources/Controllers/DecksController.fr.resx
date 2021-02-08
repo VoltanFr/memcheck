@@ -145,16 +145,22 @@
     <value>Elle a été ajoutée au paquet le</value>
   </data>
   <data name="HeapingAlgoDescriptionForId1" xml:space="preserve">
-    <value>Les cartes progressent dans les tas exponentiellement (fonction carrée).</value>
+    <value>La formule d'expiration est 2 puissance numéro du tas.</value>
   </data>
   <data name="HeapingAlgoDescriptionForId2" xml:space="preserve">
     <value>Les cartes progressent dans les tas de façon constante (elles expirent toujours après 3 minutes). À n'utiliser que pour des tests !</value>
+  </data>
+  <data name="HeapingAlgoDescriptionForId3" xml:space="preserve">
+    <value>Les cartes expirent après un nombre de jours égal au numéro du tas.</value>
   </data>
   <data name="HeapingAlgoNameForId1" xml:space="preserve">
     <value>Algorithme par défaut</value>
   </data>
   <data name="HeapingAlgoNameForId2" xml:space="preserve">
     <value>Développement</value>
+  </data>
+  <data name="HeapingAlgoNameForId3" xml:space="preserve">
+    <value>Tests unitaires</value>
   </data>
   <data name="InvalidNameLength" xml:space="preserve">
     <value>Nom incorrect, longueur :</value>
