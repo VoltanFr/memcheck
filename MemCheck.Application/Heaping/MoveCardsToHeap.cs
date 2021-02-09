@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Heaping
 {
+    //This is used during manual moves
+    //Learning moves are implemented by the sister class MoveCardToHeap
     public sealed class MoveCardsToHeap
     {
         #region Fields
@@ -28,13 +30,19 @@ namespace MemCheck.Application.Heaping
                 throw new InvalidOperationException("One card is not in the deck");
 
             foreach (var cardInDeck in cardsInDecks.Values)
-            {
-                if (cardInDeck.BiggestHeapReached < request.TargetHeap)
-                    cardInDeck.BiggestHeapReached = request.TargetHeap;
-                if (request.TargetHeap == 0 && cardInDeck.CurrentHeap != 0)
-                    cardInDeck.NbTimesInNotLearnedHeap++;
-                cardInDeck.CurrentHeap = request.TargetHeap;
-            }
+                if (cardInDeck.CurrentHeap != request.TargetHeap)
+                {
+                    if (cardInDeck.BiggestHeapReached < request.TargetHeap)
+                        cardInDeck.BiggestHeapReached = request.TargetHeap;
+
+                    if (request.TargetHeap == CardInDeck.UnknownHeap)
+                    {
+                        cardInDeck.NbTimesInNotLearnedHeap++;
+                        cardInDeck.ExpiryUtcTime = DateTime.MinValue.ToUniversalTime(); //Setting this is useless for normal operations, but would help detect any misuse of this field (bugs)
+                    }
+
+                    cardInDeck.CurrentHeap = request.TargetHeap;
+                }
 
             await dbContext.SaveChangesAsync();
         }

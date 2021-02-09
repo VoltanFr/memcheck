@@ -58,8 +58,16 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> MoveCardToHeap(Guid deckId, Guid cardId, int targetHeap, bool manualMove)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap, manualMove);
-            await new MoveCardToHeap(dbContext).RunAsync(request);
+            if (manualMove)
+            {
+                var request = new MoveCardsToHeap.Request(userId, deckId, targetHeap, cardId.AsArray());
+                await new MoveCardsToHeap(dbContext).RunAsync(request);
+            }
+            else
+            {
+                var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap);
+                await new MoveCardToHeap(dbContext).RunAsync(request);
+            }
             return Ok();
         }
         #endregion
