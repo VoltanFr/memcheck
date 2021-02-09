@@ -24,6 +24,7 @@ namespace MemCheck.Application.Heaping
         {
             await request.CheckValidityAsync(dbContext);
 
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
             var cardsInDecks = dbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
 
             if (request.CardIds.Any(cardId => !cardsInDecks.ContainsKey(cardId)))
@@ -40,6 +41,8 @@ namespace MemCheck.Application.Heaping
                         cardInDeck.NbTimesInNotLearnedHeap++;
                         cardInDeck.ExpiryUtcTime = DateTime.MinValue.ToUniversalTime(); //Setting this is useless for normal operations, but would help detect any misuse of this field (bugs)
                     }
+                    else
+                        cardInDeck.ExpiryUtcTime = heapingAlgorithm.ExpiryUtcDate(request.TargetHeap, cardInDeck.LastLearnUtcTime);
 
                     cardInDeck.CurrentHeap = request.TargetHeap;
                 }
