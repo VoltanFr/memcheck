@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.8.31</VersionPrefix>
+    <VersionPrefix>0.8.32</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
