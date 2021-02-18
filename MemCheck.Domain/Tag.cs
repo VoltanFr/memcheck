@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MemCheck.Domain
 {
-    //Deleting a card is not possible, because a tag may be used in an old version of a card
-    //If we think something is needed, implement a soft deletion algorithm
+    //Deleting a tag is not possible, because a tag may be used in an old version of a card. If we were to allow that, we should implement some sort of soft deletion
     public sealed class Tag
     {
+        public const int MinNameLength = 3;
+        public const int MaxNameLength = 50;
+
         [Key] public Guid Id { get; set; }
-        [StringLength(50, MinimumLength = 3)] public string Name { get; set; } = null!;
+        [StringLength(MaxNameLength, MinimumLength = MinNameLength)] public string Name { get; set; } = null!;
         public IList<TagInCard> TagsInCards { get; set; } = null!;
         public override bool Equals(object? obj)
         {

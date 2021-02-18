@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,6 @@ namespace MemCheck.Application.QueryValidation
             return result.ToImmutableHashSet();
         }
         #endregion
-        public const int TagMinNameLength = 3;
-        public const int TagMaxNameLength = 50;
         public const int ImageMinNameLength = 3;
         public const int ImageMaxNameLength = 100;
         public const int ImageMinSourceLength = 3;
@@ -91,8 +90,8 @@ namespace MemCheck.Application.QueryValidation
         {
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
-            if (name.Length < TagMinNameLength || name.Length > TagMaxNameLength)
-                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {TagMinNameLength} " + localizer.Get("And") + $" {TagMaxNameLength}");
+            if (name.Length < Tag.MinNameLength || name.Length > Tag.MaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.Get("And") + $" {Tag.MaxNameLength}");
             foreach (var forbiddenChar in ForbiddenCharsInTags)
                 if (name.Contains(forbiddenChar))
                     throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");

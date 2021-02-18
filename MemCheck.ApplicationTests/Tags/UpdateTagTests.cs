@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(QueryValidationHelper.TagMinNameLength) + '\t'), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(Tag.MinNameLength) + '\t'), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -42,7 +43,7 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(QueryValidationHelper.TagMinNameLength - 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(Tag.MinNameLength - 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -51,7 +52,7 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(QueryValidationHelper.TagMaxNameLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tag, RandomHelper.String(Tag.MaxNameLength + 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameWithForbiddenChar()

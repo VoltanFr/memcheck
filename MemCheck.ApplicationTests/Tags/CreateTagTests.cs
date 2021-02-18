@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -21,19 +22,19 @@ namespace MemCheck.Application.Tags
         public async Task NameNotTrimmed()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMinNameLength) + '\t'), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(Tag.MinNameLength) + '\t'), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMinNameLength - 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(Tag.MinNameLength - 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(QueryValidationHelper.TagMaxNameLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext).RunAsync(new CreateTag.Request(RandomHelper.String(Tag.MaxNameLength + 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameWithForbiddenChar()
