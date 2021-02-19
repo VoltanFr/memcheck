@@ -21,14 +21,15 @@ namespace MemCheck.Application.Tags
 
             var tag = await dbContext.Tags.SingleAsync(tag => tag.Id == request.TagId);
             tag.Name = request.NewName;
+            tag.Description = request.NewDescription;
             await dbContext.SaveChangesAsync();
         }
         #region Request type
-        public sealed record Request(Guid TagId, string NewName)
+        public sealed record Request(Guid TagId, string NewName, string NewDescription)
         {
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
-                await QueryValidationHelper.CheckCanCreateTagWithName(NewName, dbContext, localizer);
+                await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, dbContext, localizer);
             }
         }
         #endregion

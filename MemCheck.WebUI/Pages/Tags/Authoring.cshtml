@@ -28,12 +28,20 @@
                         <td>{{editedTag.tagName}}</td>
                     </tr>
                     <tr v-if="editedTag">
+                        <th>@Localizer["Description"]</th>
+                        <td>{{editedTag.description}}</td>
+                    </tr>
+                    <tr v-if="editedTag">
                         <th>@Localizer["CardsWithThisTag"]</th>
                         <td>{{editedTag.cardCount}}</td>
                     </tr>
                     <tr>
                         <th><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></th>
                         <td><input class="form-control responsive-padding-edit" v-model="newName" /></td>
+                    </tr>
+                    <tr>
+                        <th><span v-if="editedTag">@Localizer["NewDescription"]</span><span v-else>@Localizer["Name"]</span></th>
+                        <td><b-form-textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15" /></td>
                     </tr>
                 </tbody>
             </table>

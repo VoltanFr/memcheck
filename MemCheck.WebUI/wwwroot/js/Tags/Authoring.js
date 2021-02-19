@@ -1,10 +1,11 @@
 var app = new Vue({
     el: '#TagAuthoringDiv',
     data: {
-        editedTag: "",  //A TagsController.GetTagsTagViewModel if we are editing a tag, otherwise null
+        editedTag: "",  //A TagsController.GetTagViewModel if we are editing a tag, otherwise null (we are creating)
         existingTagNames: "",    //Set of string
         newName: "",    //string
         newNameProblem: "", //string
+        newDescription: "",    //string
         mountFinished: false,
         returnUrl: "", //string
         guiMessages: {
@@ -47,7 +48,7 @@ var app = new Vue({
                 });
         },
         async postNewTag() {
-            await axios.post('/Tags/Create/', { NewName: this.newName })
+            await axios.post('/Tags/Create/', { NewName: this.newName, NewDescription: this.newDescription })
                 .then(result => {
                     this.afterSave(result);
                 })
@@ -69,7 +70,7 @@ var app = new Vue({
                 await this.postNewTag();
         },
         async updateTagName() {
-            await axios.put('/Tags/Update/' + this.editedTag.tagId, { NewName: this.newName })
+            await axios.put('/Tags/Update/' + this.editedTag.tagId, { NewName: this.newName, NewDescription: this.newDescription })
                 .then(result => {
                     this.afterSave(result);
                 })
@@ -83,6 +84,7 @@ var app = new Vue({
             this.toastVisible = true;
             this.editedTag = "";
             this.newName = "";
+            this.newDescription = "";
             this.newNameProblem = "";
             if (this.returnUrl)
                 window.location = this.returnUrl;
@@ -103,6 +105,8 @@ var app = new Vue({
             await axios.get('/Tags/GetTag/' + tagId)
                 .then(result => {
                     this.editedTag = result.data;
+                    this.newName = this.editedTag.tagName;
+                    this.newDescription = this.editedTag.description;
                 })
                 .catch(error => {
                     tellAxiosError(error, this);
@@ -114,7 +118,7 @@ var app = new Vue({
                 this.newNameProblem = "";
                 return;
             }
-            if (this.existingTagNames.has(this.newName)) {
+            if (this.newName != this.editedTag.tagName && this.existingTagNames.has(this.newName)) {
                 this.newNameProblem = this.guiMessages.alreadyExistsErr;
                 return;
             }

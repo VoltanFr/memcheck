@@ -20,13 +20,15 @@ namespace MemCheck.Application.Tags
         {
             var db = DbHelper.GetEmptyTestDB();
             var tagName = RandomHelper.String();
-            var tag = await TagHelper.CreateAsync(db, tagName);
+            var description = RandomHelper.String();
+            var tag = await TagHelper.CreateAsync(db, tagName, description);
 
             using var dbContext = new MemCheckDbContext(db);
             var loadedTag = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
 
             Assert.AreEqual(tag, loadedTag.TagId);
             Assert.AreEqual(tagName, loadedTag.TagName);
+            Assert.AreEqual(description, loadedTag.Description);
             Assert.AreEqual(0, loadedTag.CardCount);
         }
         [TestMethod()]
@@ -36,7 +38,8 @@ namespace MemCheck.Application.Tags
             var user = await UserHelper.CreateInDbAsync(db);
             var otherTag = await TagHelper.CreateAsync(db);
             var tagName = RandomHelper.String();
-            var tag = await TagHelper.CreateAsync(db, tagName);
+            var description = RandomHelper.String();
+            var tag = await TagHelper.CreateAsync(db, tagName, description);
 
             await CardHelper.CreateAsync(db, user, tagIds: new[] { tag, otherTag });
             await CardHelper.CreateAsync(db, user, tagIds: new[] { tag });
@@ -47,6 +50,7 @@ namespace MemCheck.Application.Tags
 
             Assert.AreEqual(tag, loadedTag.TagId);
             Assert.AreEqual(tagName, loadedTag.TagName);
+            Assert.AreEqual(description, loadedTag.Description);
             Assert.AreEqual(2, loadedTag.CardCount);
         }
     }

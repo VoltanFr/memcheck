@@ -123,8 +123,14 @@
   <data name="CurrentName" xml:space="preserve">
     <value>Current name</value>
   </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="NewDescription" xml:space="preserve">
+    <value>New description</value>
   </data>
   <data name="NewName" xml:space="preserve">
     <value>New name</value>

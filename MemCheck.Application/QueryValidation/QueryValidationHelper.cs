@@ -86,17 +86,39 @@ namespace MemCheck.Application.QueryValidation
             if (await dbContext.Decks.AsNoTracking().Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
                 throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
         }
-        public static async Task CheckCanCreateTagWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
+        public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer)
         {
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
+            if (description != description.Trim())
+                throw new InvalidOperationException("Invalid Description: not trimmed");
             if (name.Length < Tag.MinNameLength || name.Length > Tag.MaxNameLength)
                 throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.Get("And") + $" {Tag.MaxNameLength}");
+            if (description.Length > Tag.MaxDescriptionLength)
+                throw new RequestInputException(localizer.Get("InvalidDescriptionLength") + $" {name.Length}, " + localizer.Get("MustBeNoMoreThan") + $" {Tag.MaxDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInTags)
                 if (name.Contains(forbiddenChar))
                     throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
-            if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
-                throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+            if (updatingId != null)
+            {
+                var current = await dbContext.Tags.AsNoTracking().SingleAsync(tag => tag.Id == updatingId.Value);
+
+                if (current.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (current.Description == description)
+                        throw new RequestInputException(localizer.Get("NoDifference"));
+                }
+                else
+                {
+                    if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
+                        throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+                }
+            }
+            else
+            {
+                if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
+                    throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+            }
         }
         public static async Task CheckCanCreateLanguageWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
         {

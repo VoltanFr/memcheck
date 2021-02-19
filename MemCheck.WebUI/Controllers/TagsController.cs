@@ -49,10 +49,12 @@ namespace MemCheck.WebUI.Controllers
             {
                 TagId = tag.TagId;
                 TagName = tag.TagName;
+                Description = tag.Description;
                 CardCount = tag.CardCount;
             }
             public Guid TagId { get; }
-            public string TagName { get; } = null!;
+            public string TagName { get; }
+            public string Description { get; }
             public int CardCount { get; }
         }
         #endregion
@@ -108,13 +110,14 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(request.NewName.Trim()), this);
+            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(request.NewName.Trim(), request.NewDescription.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
         public sealed class CreateRequestModel
         {
             public string NewName { get; set; } = null!;
+            public string NewDescription { get; set; } = null!;
         }
         #endregion
         #region Update
@@ -122,13 +125,14 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tagId, request.NewName.Trim()), this);
+            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tagId, request.NewName.Trim(), request.NewDescription.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
         public sealed class UpdateRequestModel
         {
             public string NewName { get; set; } = null!;
+            public string NewDescription { get; set; } = null!;
         }
         #endregion
     }

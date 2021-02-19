@@ -9,9 +9,11 @@ namespace MemCheck.Domain
     {
         public const int MinNameLength = 3;
         public const int MaxNameLength = 50;
+        public const int MaxDescriptionLength = 5000;
 
         [Key] public Guid Id { get; set; }
         [StringLength(MaxNameLength, MinimumLength = MinNameLength)] public string Name { get; set; } = null!;
+        [StringLength(MaxDescriptionLength)] public string Description { get; set; } = null!;
         public IList<TagInCard> TagsInCards { get; set; } = null!;
         public override bool Equals(object? obj)
         {

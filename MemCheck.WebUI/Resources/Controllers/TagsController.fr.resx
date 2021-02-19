@@ -132,8 +132,11 @@
   <data name="Failure" xml:space="preserve">
     <value>Échec</value>
   </data>
+  <data name="InvalidDescriptionLength" xml:space="preserve">
+    <value>Longueur de description incorrecte :</value>
+  </data>
   <data name="InvalidNameLength" xml:space="preserve">
-    <value>Longueur incorrecte :</value>
+    <value>Longueur de nom incorrecte :</value>
   </data>
   <data name="InvalidTagName" xml:space="preserve">
     <value>Nom de label incorrect</value>
@@ -144,8 +147,14 @@
   <data name="MustBeBetween" xml:space="preserve">
     <value>doit être entre</value>
   </data>
+  <data name="MustBeNoMoreThan" xml:space="preserve">
+    <value>ne doit pas dépasser</value>
+  </data>
   <data name="NameLengthErrMesg" xml:space="preserve">
-    <value>Longueur incorrecte (doit être entre 3 et 50 caractères).</value>
+    <value>Longueur incorrecte pour le nom(doit être entre 3 et 50 caractères).</value>
+  </data>
+  <data name="NoDifference" xml:space="preserve">
+    <value>Aucune modification</value>
   </data>
   <data name="Saved" xml:space="preserve">
     <value>Enregistré</value>

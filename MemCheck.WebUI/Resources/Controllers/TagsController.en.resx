@@ -132,8 +132,11 @@
   <data name="Failure" xml:space="preserve">
     <value>Failure</value>
   </data>
+  <data name="InvalidDescriptionLength" xml:space="preserve">
+    <value>Invalid length for a tag description:</value>
+  </data>
   <data name="InvalidNameLength" xml:space="preserve">
-    <value>Invalid length for a tag:</value>
+    <value>Invalid length for a tag name:</value>
   </data>
   <data name="InvalidTagName" xml:space="preserve">
     <value>Invalid tag name</value>
@@ -144,8 +147,14 @@
   <data name="MustBeBetween" xml:space="preserve">
     <value>must be between</value>
   </data>
+  <data name="MustBeNoMoreThan" xml:space="preserve">
+    <value>must not be more than</value>
+  </data>
   <data name="NameLengthErrMesg" xml:space="preserve">
     <value>Invalid length (must be between 3 and 50 characters).</value>
+  </data>
+  <data name="NoDifference" xml:space="preserve">
+    <value>No change</value>
   </data>
   <data name="Saved" xml:space="preserve">
     <value>Saved</value>

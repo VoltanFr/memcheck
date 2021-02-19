@@ -18,17 +18,17 @@ namespace MemCheck.Application.Tags
         public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
             await request.CheckValidityAsync(localizer, dbContext);
-            Tag tag = new Tag() { Name = request.Name };
+            Tag tag = new Tag() { Name = request.Name, Description = request.Description };
             dbContext.Tags.Add(tag);
             await dbContext.SaveChangesAsync();
             return tag.Id;
         }
         #region Request type
-        public sealed record Request(string Name)
+        public sealed record Request(string Name, string Description)
         {
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
-                await QueryValidationHelper.CheckCanCreateTagWithName(Name, dbContext, localizer);
+                await QueryValidationHelper.CheckCanCreateTag(Name, Description, null, dbContext, localizer);
             }
         }
         #endregion
