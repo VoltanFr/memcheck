@@ -1,5 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
-using MemCheck.CommandLineDbClient.HandleBadCards;
+﻿using MemCheck.CommandLineDbClient.HandleBadCards;
 using MemCheck.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

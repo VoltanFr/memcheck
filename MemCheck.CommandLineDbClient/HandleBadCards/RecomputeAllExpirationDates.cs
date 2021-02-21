@@ -1,12 +1,9 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,14 +29,20 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
             var deck = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;
             var algo = await HeapingAlgorithm.OfDeckAsync(dbContext, deck);
+            logger.LogInformation($"Algo: {algo.GetType().Name}, id: {algo.Id}");
 
-            var allCardsWithNoExpirationDate = dbContext.CardsInDecks.Where(c => c.DeckId == deck && c.ExpiryUtcTime == DateTime.MinValue && c.CurrentHeap != CardInDeck.UnknownHeap).OrderBy(c => c.LastLearnUtcTime).Take(10000);
-            int count = allCardsWithNoExpirationDate.Count();
+            var allCardsNotUnkown = dbContext.CardsInDecks.Where(c => c.DeckId == deck && c.CurrentHeap != CardInDeck.UnknownHeap).OrderBy(c => c.LastLearnUtcTime);
+            int count = allCardsNotUnkown.Count();
             logger.LogInformation($"Will recompute expiration dates of {count} cards");
 
-            foreach (var card in allCardsWithNoExpirationDate)
+            var doneCount = 0;
+
+            foreach (var card in allCardsNotUnkown)
             {
+                var initialExpiryDate = card.ExpiryUtcTime;
                 var expiryDate = algo.ExpiryUtcDate(card.CurrentHeap, card.LastLearnUtcTime);
+                doneCount++;
+                logger.LogInformation($"Will update card {doneCount} of {count} in heap {card.CurrentHeap} expiry from {initialExpiryDate} to {expiryDate}");
                 card.ExpiryUtcTime = expiryDate;
             }
 
