@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Languages;
+using MemCheck.Basics;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
@@ -10,27 +11,24 @@ namespace MemCheck.Application.Tests.Helpers
 {
     internal static class RandomHelper
     {
-        #region Private field random
-        private static readonly Random random = new Random();
-        #endregion
         #region Private methods
         private static T Entry<T>(IEnumerable<T> values)
         {
             var array = values.ToImmutableArray();
-            return array[random.Next(array.Length)];
+            return array[Randomizer.Next(array.Length)];
         }
         #endregion
         public static int ValueNotInSet(IEnumerable<int> excludedPossibilities)
         {
             var excl = excludedPossibilities.ToImmutableHashSet();
-            var result = random.Next();
+            var result = Randomizer.Next();
             while (excl.Contains(result))
-                result = random.Next();
+                result = Randomizer.Next();
             return result;
         }
         public static int Heap(bool notUnknown = false)
         {
-            return random.Next(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
+            return Randomizer.Next(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
         }
         public static int HeapingAlgorithm()
         {
@@ -55,20 +53,20 @@ namespace MemCheck.Application.Tests.Helpers
         public static DateTime Date(DateTime? after = null)
         {
             var start = after == null ? new DateTime(1995, 1, 1) : after.Value;
-            return start.AddDays(random.Next(3650)).ToUniversalTime();
+            return start.AddDays(Randomizer.Next(3650)).ToUniversalTime();
         }
         public static DateTime DateBefore(DateTime d)
         {
-            return d.AddDays(-random.Next(1, 3650)).ToUniversalTime();
+            return d.AddDays(-Randomizer.Next(1, 3650)).ToUniversalTime();
         }
         public static int Rating()
         {
-            return random.Next(1, 5);
+            return Randomizer.Next(1, 5);
         }
         public static byte[] Bytes(int length)
         {
             var b = new byte[length];
-            random.NextBytes(b);
+            Randomizer.NextBytes(b);
             return b;
         }
     }
