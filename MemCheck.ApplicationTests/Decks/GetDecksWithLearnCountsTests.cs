@@ -102,7 +102,42 @@ namespace MemCheck.Application.Decks
             Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
         }
         [TestMethod()]
-        public async Task FullTest()
+        public async Task FullTestWithOneDeck()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+
+            var deckDescription = RandomHelper.String();
+            var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription, Deck.DefaultHeapingAlgorithmId);
+
+            var jan01 = new DateTime(2030, 01, 01).ToUniversalTime();
+            var jan30_00h00 = new DateTime(2030, 01, 30, 0, 0, 0).ToUniversalTime();
+            var jan31 = new DateTime(2030, 01, 31).ToUniversalTime();
+
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30_00h00);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_00h00);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, new DateTime(2030, 01, 30, 12, 0, 0).ToUniversalTime());
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, new DateTime(2030, 01, 28).ToUniversalTime());
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan01);
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new GetDecksWithLearnCounts.Request(userId);
+            var result = await new GetDecksWithLearnCounts(dbContext).RunAsync(request, new DateTime(2030, 02, 01, 0, 0, 0));
+            var loaded = result.Single();
+            Assert.AreEqual(deckDescription, loaded.Description);
+            Assert.AreEqual(2, loaded.UnknownCardCount);
+            Assert.AreEqual(3, loaded.ExpiredCardCount);
+            Assert.AreEqual(0, loaded.ExpiringNextHourCount);
+            Assert.AreEqual(2, loaded.ExpiringFollowing24hCount);
+            Assert.AreEqual(1, loaded.ExpiringFollowing3DaysCount);
+            Assert.AreEqual(9, loaded.CardCount);
+        }
+        [TestMethod()]
+        public async Task FullTestWithTwoDecks()
         {
             var testDB = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(testDB);
