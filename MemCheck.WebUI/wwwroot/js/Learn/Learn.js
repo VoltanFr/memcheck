@@ -13,7 +13,7 @@ var app = new Vue({
         pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool}
         currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool}
         currentMovePromise: null, //promise
-        pendingRatingOperations: [],  //{cardId: Guid, rating: int}
+        pendingRatingOperations: [],  //{cardId: Guid, rating: int, nbAttempts: int}
         currentRatingPromise: null, //promise
         pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
         currentNotificationRegistrationPromise: null, //promise
@@ -27,6 +27,7 @@ var app = new Vue({
         userQuitAttemptDisplay: false,
         lastDownloadIsEmpty: false,
         bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+        additionalDebugInfo: null,
     },
     async mounted() {
         try {
@@ -292,7 +293,7 @@ var app = new Vue({
             }
         },
         enqueueRatingUpload() {
-            this.pendingRatingOperations.push({ cardId: this.currentCard.cardId, rating: this.currentCard.currentUserRating });
+            this.pendingRatingOperations.push({ cardId: this.currentCard.cardId, rating: this.currentCard.currentUserRating, nbAttempts: 0 });
         },
         timeToExitPage() {
             result = !this.currentCard;
@@ -313,6 +314,7 @@ var app = new Vue({
         handlePendingRatingOperations() {
             if (!this.currentRatingPromise && this.pendingRatingOperations.length > 0) {
                 var ratingOperation = this.pendingRatingOperations.shift();
+                this.additionalDebugInfo = "Recording rating (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
 
                 this.currentRatingPromise = axios.patch('/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating)
                     .then(result => {
@@ -321,13 +323,11 @@ var app = new Vue({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        const sleep = (milliseconds) => {
-                            return new Promise(resolve => setTimeout(resolve, milliseconds))
-                        }
-
+                        this.additionalDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                         sleep(1000).then(() => {
+                            this.additionalDebugInfo = "Rating failed, will retry asap (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                             this.currentRatingPromise = null;
-                            this.pendingRatingOperations.push(ratingOperation);
+                            this.pendingRatingOperations.push({ cardId: ratingOperation.cardId, rating: ratingOperation.rating, nbAttempts: ratingOperation.nbAttempts + 1 });
                         })
                     });
             }
