@@ -319,6 +319,7 @@ var app = new Vue({
                 this.currentRatingPromise = axios.patch('/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating)
                     .then(result => {
                         this.currentRatingPromise = null;
+                        this.additionalDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
