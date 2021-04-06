@@ -10,8 +10,8 @@ var app = new Vue({
         mountFinished: false,
         loading: false,
         currentFullScreenImage: null,   //LearnController.GetCardsImageViewModel
-        pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool}
-        currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool}
+        pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
+        currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
         currentMovePromise: null, //promise
         pendingRatingOperations: [],  //{cardId: Guid, rating: int, nbAttempts: int}
         currentRatingPromise: null, //promise
@@ -27,7 +27,8 @@ var app = new Vue({
         userQuitAttemptDisplay: false,
         lastDownloadIsEmpty: false,
         bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
-        additionalDebugInfo: null,
+        additionalMoveDebugInfo: null,
+        additionalRatingDebugInfo: null,
     },
     async mounted() {
         try {
@@ -103,11 +104,11 @@ var app = new Vue({
             this.backSideVisible = true;
         },
         knew() {
-            this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: this.currentCard.heapId + 1, manualMove: false });
+            this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: this.currentCard.heapId + 1, manualMove: false, nbAttempts: 0 });
             this.getCard();
         },
         forgot() {
-            this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: 0, manualMove: false });
+            this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: 0, manualMove: false, nbAttempts: 0 });
             this.getCard();
         },
         editCard() {
@@ -143,22 +144,23 @@ var app = new Vue({
         handlePendingMoveOperations() {
             if (!this.currentMovePromise && this.pendingMoveOperations.length > 0) {
                 this.currentMovingCard = this.pendingMoveOperations.shift();
+                this.additionalMoveDebugInfo = "Moving (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
 
                 this.currentMovePromise = axios.patch('/Learn/MoveCardToHeap/' + this.currentMovingCard.deckId + '/' + this.currentMovingCard.cardId + '/' + this.currentMovingCard.targetHeap + '/' + this.currentMovingCard.manualMove)
                     .then(result => {
                         this.currentMovePromise = null;
+                        this.additionalMoveDebugInfo = "Moved (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
                         this.currentMovingCard = null;
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        const sleep = (milliseconds) => {
-                            return new Promise(resolve => setTimeout(resolve, milliseconds))
-                        }
+                        this.additionalMoveDebugInfo = "Move failed, will retry in 1 sec (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
 
                         sleep(1000).then(() => {
+                            this.additionalMoveDebugInfo = "Move failed, will retry asap (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
                             this.currentMovePromise = null;
-                            this.pendingMoveOperations.push(this.currentMovingCard);
+                            this.pendingMoveOperations.push({ deckId: this.currentMovingCard.deckId, cardId: this.currentMovingCard.cardId, targetHeap: this.currentMovingCard.targetHeap, manualMove: this.currentMovingCard.manualMove, nbAttempts: this.currentMovingCard.nbAttempts });
                             this.currentMovingCard = null;
                         })
                     });
@@ -288,7 +290,7 @@ var app = new Vue({
         moveToHeap(targetHeap) {    //GetCardsHeapModel
             const alertMesg = targetHeap.moveToAlertMessage + (targetHeap.expiryUtcDate == "0001-01-01T00:00:00Z" ? "" : (this.dt(targetHeap.expiryUtcDate + '.')));
             if (confirm(alertMesg)) {
-                this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true });
+                this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true, nbAttempts: 0 });
                 this.getCard();
             }
         },
@@ -314,19 +316,19 @@ var app = new Vue({
         handlePendingRatingOperations() {
             if (!this.currentRatingPromise && this.pendingRatingOperations.length > 0) {
                 var ratingOperation = this.pendingRatingOperations.shift();
-                this.additionalDebugInfo = "Recording rating (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                this.additionalRatingDebugInfo = "Recording rating (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
 
                 this.currentRatingPromise = axios.patch('/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating)
                     .then(result => {
                         this.currentRatingPromise = null;
-                        this.additionalDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                        this.additionalRatingDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        this.additionalDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                        this.additionalRatingDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                         sleep(1000).then(() => {
-                            this.additionalDebugInfo = "Rating failed, will retry asap (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                            this.additionalRatingDebugInfo = "Rating failed, will retry asap (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                             this.currentRatingPromise = null;
                             this.pendingRatingOperations.push({ cardId: ratingOperation.cardId, rating: ratingOperation.rating, nbAttempts: ratingOperation.nbAttempts + 1 });
                         })
