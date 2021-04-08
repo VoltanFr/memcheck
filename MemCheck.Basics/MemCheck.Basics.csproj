@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.5" />
     <PackageReference Include="Svg" Version="3.2.3" />
   </ItemGroup>
 
