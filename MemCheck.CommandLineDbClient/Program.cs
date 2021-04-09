@@ -17,19 +17,16 @@ namespace MemCheck.CommandLineDbClient
         #region Private methods
         private static string GetConnectionString(IConfiguration config)
         {
-            if (config["ConnectionStrings:DebuggingDb"] == "Local")
-            {
-                Log.Information("Using local DB");
-                return config[$"ConnectionStrings:DbConnection"];
-            }
-
             if (config["ConnectionStrings:DebuggingDb"] == "Azure")
             {
                 Log.Warning("Using Azure DB");
                 return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
             }
 
-            throw new IOException($"Invalid DebuggingDb '{config["ConnectionStrings:DebuggingDb"]}'");
+
+            var db = config["ConnectionStrings:DebuggingDb"];
+            Log.Information($"Using DB '{db}'");
+            return config[db];
         }
         private static IConfiguration GetConfig()
         {

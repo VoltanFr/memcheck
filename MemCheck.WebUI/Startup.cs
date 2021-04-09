@@ -32,15 +32,13 @@ namespace MemCheck.WebUI
         private string GetConnectionString()
         {
             if (prodEnvironment)
-                return configuration[$"ConnectionStrings:AzureDbConnection"];
-
-            if (configuration["ConnectionStrings:DebuggingDb"] == "Local")
-                return configuration[$"ConnectionStrings:LocalDbConnection"];
+                return configuration["ConnectionStrings:AzureDbConnection"];
 
             if (configuration["ConnectionStrings:DebuggingDb"] == "Azure")
                 return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
 
-            throw new IOException($"Invalid DebuggingDb '{configuration["ConnectionStrings:DebuggingDb"]}'");
+            var db = configuration["ConnectionStrings:DebuggingDb"];
+            return configuration[$"ConnectionStrings:{db}"];
         }
         private void ConfigureDataBase(IServiceCollection services)
         {
