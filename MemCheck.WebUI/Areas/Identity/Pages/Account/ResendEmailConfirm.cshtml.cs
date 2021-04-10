@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -29,7 +28,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             _emailSender = emailSender;
             this.localizer = localizer;
             this.logger = logger;
-            Console.WriteLine(localizer["ConfirmYourEmail"].SearchedLocation);
         }
 
         [BindProperty]
