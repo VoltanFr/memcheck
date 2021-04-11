@@ -29,7 +29,7 @@ namespace MemCheck.WebUI
             if (prodEnvironment)
             {
                 logger.LogInformation("Using prod SendGrid settings from app settings");
-                return new SendGridSettings(configuration["SendGrid:SendGridUser"], configuration["SendGrid:Key"], configuration["SendGrid:Sender"]);
+                return new SendGridSettings(configuration["SendGrid:User"], configuration["SendGrid:Key"], configuration["SendGrid:Sender"]);
             }
             var debuggingDb = configuration["ConnectionStrings:DebuggingDb"];
             if (debuggingDb == "AlternativeProdDbConnection" || debuggingDb == "Azure")
