@@ -3,7 +3,6 @@ using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -16,8 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
 using System.Linq;
 
 namespace MemCheck.WebUI
@@ -28,25 +27,6 @@ namespace MemCheck.WebUI
         private readonly bool prodEnvironment;
         private readonly IConfiguration configuration;
         #endregion
-        #region Private methods
-        private string GetConnectionString()
-        {
-            if (prodEnvironment)
-                return configuration["ConnectionStrings:AzureDbConnection"];
-
-            if (configuration["ConnectionStrings:DebuggingDb"] == "Azure")
-                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
-
-            var db = configuration["ConnectionStrings:DebuggingDb"];
-            return configuration[$"ConnectionStrings:{db}"];
-        }
-        private void ConfigureDataBase(IServiceCollection services)
-        {
-            services.AddDatabaseDeveloperPageExceptionFilter();
-            var connectionString = GetConnectionString();
-            services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
-        }
-        #endregion
         public Startup(IConfiguration configuration, IWebHostEnvironment currentEnvironment)
         {
             this.configuration = configuration;
@@ -54,6 +34,13 @@ namespace MemCheck.WebUI
         }
         public void ConfigureServices(IServiceCollection services)
         {
+            using var loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Trace);
+                builder.AddConsole();
+                builder.AddEventSourceLogger();
+            });
+
             services.AddLocalization(option => option.ResourcesPath = "Resources");
             services.AddMvc(option =>
             {
@@ -64,7 +51,10 @@ namespace MemCheck.WebUI
                 options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
             });
 
-            ConfigureDataBase(services);
+            var appSettings = new AppSettings(configuration, prodEnvironment, loggerFactory.CreateLogger<AppSettings>());
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
             services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; })
                 .AddEntityFrameworkStores<MemCheckDbContext>()
@@ -78,8 +68,7 @@ namespace MemCheck.WebUI
                 options.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
             });
 
-            services.AddTransient<IEmailSender, SendGridEmailSender>();
-            services.Configure<AuthMessageSenderOptions>(options => configuration.Bind(options));
+            services.AddSingleton<IEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
 
             services.AddRazorPages().AddRazorPagesOptions(config =>
                 {

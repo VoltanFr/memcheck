@@ -1,31 +1,25 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI
 {
-    public class AuthMessageSenderOptions
-    {
-        public string SendGridUser { get; set; } = null!;
-        public string SendGridKey { get; set; } = null!;
-        public string SendGridSender { get; set; } = null!;
-    }
+    public sealed record SendGridSettings(string SendGridUser, string SendGridKey, string SendGridSender);
 
     public class SendGridEmailSender : IEmailSender
     {
         #region fields
-        private readonly AuthMessageSenderOptions options;
+        private readonly SendGridSettings settings;
         #endregion
-        public SendGridEmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
+        public SendGridEmailSender(SendGridSettings settings)
         {
-            options = optionsAccessor.Value;
+            this.settings = settings;
         }
         public async Task SendEmailAsync(string email, string subject, string message)
         {
-            var client = new SendGridClient(options.SendGridKey);
-            var senderEmail = new EmailAddress(options.SendGridSender, options.SendGridUser);
+            var client = new SendGridClient(settings.SendGridKey);
+            var senderEmail = new EmailAddress(settings.SendGridSender, settings.SendGridUser);
             var msg = new SendGridMessage()
             {
                 From = senderEmail,
@@ -34,7 +28,7 @@ namespace MemCheck.WebUI
                 HtmlContent = message,
             };
             msg.AddTo(new EmailAddress(email));
-            msg.AddBcc(new EmailAddress(options.SendGridSender));
+            msg.AddBcc(new EmailAddress(settings.SendGridSender));
             msg.SetClickTracking(false, false);
             await client.SendEmailAsync(msg);
         }
