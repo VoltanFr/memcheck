@@ -96,7 +96,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                     await _emailSender.SendEmailAsync(Input.Email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        return RedirectToPage("RegisterConfirmation", new { userName = Input.UserName });
+                        return RedirectToPage("RegisterConfirmation");
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);

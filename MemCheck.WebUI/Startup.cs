@@ -56,7 +56,7 @@ namespace MemCheck.WebUI
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
-            services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; })
+            services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; options.User.RequireUniqueEmail = false; })
                 .AddEntityFrameworkStores<MemCheckDbContext>()
                 .AddDefaultTokenProviders()
                 .AddDefaultUI()
