@@ -18,14 +18,14 @@ namespace MemCheck.CommandLineDbClient.Ratings
         #endregion
         public RecomputeAllCardEvaluationAverageAndCountOfRatings(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will recompute average rating and rating count for all cards");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var allCardWithRatings = (await dbContext.UserCardRatings.Select(c => c.CardId).ToListAsync()).ToImmutableArray();
             logger.LogInformation($"Will recompute ratings of {allCardWithRatings.Length} cards");

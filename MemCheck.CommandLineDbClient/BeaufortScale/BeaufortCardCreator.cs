@@ -311,7 +311,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public BeaufortCardCreator(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
             forceFromNumber = GetForcesFromNumber();
             forceFromWindSpeed = GetForcesFromWindSpeed(forceFromNumber);
@@ -321,7 +321,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         {
             logger.LogInformation($"Will generate Beaufort scale cards");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(u => u.UserName == "VoltanBot").Single();
             var frenchLanguageId = dbContext.CardLanguages.Where(lang => lang.Name == "Français").Select(lang => lang.Id).Single();

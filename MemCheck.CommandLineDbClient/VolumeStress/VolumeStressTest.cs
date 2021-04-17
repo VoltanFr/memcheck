@@ -16,10 +16,10 @@ namespace MemCheck.CommandLineDbClient.VolumeStress
         #endregion
         public VolumeStressTest(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<VolumeStressTest>>();
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var cardLanguage = dbContext.CardLanguages.First();
             var user = dbContext.Users.First();

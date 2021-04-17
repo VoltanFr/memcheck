@@ -16,14 +16,14 @@ namespace MemCheck.CommandLineDbClient.HandleBadImages
         #endregion
         public ChangeOwner(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<ChangeOwner>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation("Will change owners previous image versions with null ones");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
 

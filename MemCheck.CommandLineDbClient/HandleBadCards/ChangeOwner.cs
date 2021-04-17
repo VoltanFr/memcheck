@@ -96,14 +96,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public ChangeOwner(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation("Will change owners of cards and images with null ones");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single();
 

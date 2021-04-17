@@ -15,7 +15,7 @@ namespace MemCheck.CommandLineDbClient
     internal static class Program
     {
         #region Private methods
-        private static string GetConnectionString(IConfiguration config)
+        private static string GetPrimaryConnectionString(IConfiguration config)
         {
             if (config["ConnectionStrings:DebuggingDb"] == "Azure")
             {
@@ -25,8 +25,10 @@ namespace MemCheck.CommandLineDbClient
 
 
             var db = config["ConnectionStrings:DebuggingDb"];
+            if (!string.IsNullOrEmpty(config[$"ConnectionStrings:{db}"]))
+                db = config[$"ConnectionStrings:{db}"];
             Log.Information($"Using DB '{db}'");
-            return config[db];
+            return db;
         }
         private static IConfiguration GetConfig()
         {
@@ -41,14 +43,16 @@ namespace MemCheck.CommandLineDbClient
         private static IHostBuilder CreateHostBuilder(IConfiguration config)
         {
             IHostBuilder hostBuilder = new HostBuilder();
-            var connectionString = GetConnectionString(config);
+            var primaryConnectionString = GetPrimaryConnectionString(config);
+            var secondaryConnectionString = config["ConnectionStrings:SecondaryDb"];
             hostBuilder = hostBuilder.ConfigureServices((hostContext, services) =>
                    {
                        services
                        // Setup Dependency Injection container.
                        //.AddTransient(typeof(ClassThatLogs))
                        .AddHostedService<Engine>()
-                       .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
+                       .AddDbContext<PrimaryDbContext>(options => options.UseSqlServer(primaryConnectionString))
+                       .AddDbContext<SecondaryDbContext>(options => options.UseSqlServer(secondaryConnectionString));
 
                        services.AddIdentity<MemCheckUser, MemCheckUserRole>(options =>
                        {

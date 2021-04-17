@@ -18,18 +18,18 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetCardsToRepeatPerf> logger;
-        private readonly MemCheckDbContext dbContext;
+        private readonly PrimaryDbContext dbContext;
         #endregion
         public GetCardsToRepeatPerf(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetCardsToRepeatPerf>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will request cards to repeat");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single().Id;
             var deck = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;

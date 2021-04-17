@@ -17,14 +17,14 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         #endregion
         public RecomputeAllExpirationDates(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllExpirationDates>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will recompute all expiration dates");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
             var deck = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;

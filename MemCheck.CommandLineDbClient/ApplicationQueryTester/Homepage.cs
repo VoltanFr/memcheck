@@ -23,12 +23,12 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public Homepage(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<Homepage>>();
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
-            var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
+            var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single();
 
             if (realCode)
             {

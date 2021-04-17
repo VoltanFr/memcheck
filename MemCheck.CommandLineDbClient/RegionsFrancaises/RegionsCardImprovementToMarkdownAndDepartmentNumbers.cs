@@ -119,14 +119,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public RegionsCardImprovementToMarkdownAndDepartmentNumbers(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will update region cards");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var geoInfo = new GeoInfo();
             var user = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();

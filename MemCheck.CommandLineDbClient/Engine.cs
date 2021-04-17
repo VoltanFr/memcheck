@@ -1,5 +1,4 @@
 ﻿using MemCheck.CommandLineDbClient.HandleBadCards;
-using MemCheck.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -35,13 +34,11 @@ namespace MemCheck.CommandLineDbClient
     {
         #region Fields
         private readonly ILogger<Engine> logger;
-        private readonly MemCheckDbContext dbContext;
         private readonly IServiceProvider serviceProvider;
         #endregion
-        public Engine(ILogger<Engine> logger, MemCheckDbContext dbContext, IServiceProvider serviceProvider)
+        public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
         {
             this.logger = logger;
-            this.dbContext = dbContext;
             this.serviceProvider = serviceProvider;
         }
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -57,7 +54,7 @@ namespace MemCheck.CommandLineDbClient
             }
             try
             {
-                await test.RunAsync(dbContext);
+                await test.RunAsync();
             }
             catch (Exception e)
             {

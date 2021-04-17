@@ -321,14 +321,14 @@ namespace MemCheck.CommandLineDbClient.UsStates
         #endregion
         public StatesCardCreator(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<StatesCardCreator>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will create US states cards");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var infoFileContents = new InfoFileContents();
             logger.LogInformation($"Loaded {infoFileContents.States.Count()} states");

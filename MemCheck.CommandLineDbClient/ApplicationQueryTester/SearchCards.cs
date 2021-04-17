@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public SearchCards(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<SearchCards>>();
         }
         private async Task<(int cardCount, double secondsElapsed)> RunTestAsync(Guid userId)
@@ -36,7 +36,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             return new(result.TotalNbCards, chrono.Elapsed.TotalSeconds);
 
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single().Id;
             var deckId = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;

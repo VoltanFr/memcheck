@@ -13,14 +13,14 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetUserDecksWithHeapsAndTags> logger;
-        private readonly MemCheckDbContext dbContext;
+        private readonly PrimaryDbContext dbContext;
         #endregion
         public GetUserDecksWithHeapsAndTags(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetUserDecksWithHeapsAndTags>>();
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var userId = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
 

@@ -190,14 +190,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public RegionsCardCreator(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will create region cards from path {sourceDir}");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var infoFileContents = new InfoFileContents();
             logger.LogInformation($"Loaded {infoFileContents.Regions.Count()} regions");

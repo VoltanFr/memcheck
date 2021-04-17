@@ -25,12 +25,12 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public ManageRoles(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<ManageRoles>>();
             roleManager = serviceProvider.GetRequiredService<RoleManager<MemCheckUserRole>>();
             userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             if (!await roleManager.RoleExistsAsync(IRoleChecker.AdminRoleName))
             {

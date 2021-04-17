@@ -16,14 +16,14 @@ namespace MemCheck.CommandLineDbClient.Deletion
         #endregion
         public BrutalDeletion(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<BrutalDeletion>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will delete some cards - D A N G E R");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var cards = await dbContext.Cards.Where(c => (c.VersionCreator.UserName == "Toto2" || c.VersionCreator.UserName == "Voltan" || c.VersionCreator.UserName == "VoltanBot") && c.TagsInCards.Count() == 1 && c.TagsInCards.First().Tag.Name == "États américains").ToListAsync();
 

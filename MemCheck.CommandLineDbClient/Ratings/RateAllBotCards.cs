@@ -17,14 +17,14 @@ namespace MemCheck.CommandLineDbClient.Ratings
         #endregion
         public RateAllBotCards(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RateAllBotCards>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will rate all bot cards");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var author = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
             var ratingUser = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();

@@ -86,14 +86,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public PaukerImportTest(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()
         {
             logger.LogInformation($"Will play with {filePath}");
         }
-        async public Task RunAsync(MemCheckDbContext dbContext)
+        async public Task RunAsync()
         {
             var lesson = GetPaukerLesson();
 

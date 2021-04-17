@@ -6,7 +6,7 @@ using System;
 
 namespace MemCheck.Database
 {
-    public sealed class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRole, Guid>
+    public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRole, Guid>
     {
         #region Private methods
         private static void EnforceAllDatesUtc(ModelBuilder builder)
