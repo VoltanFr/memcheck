@@ -13,12 +13,12 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetCardForEdit> logger;
-        private readonly PrimaryDbContext dbContext;
+        private readonly MemCheckDbContext dbContext;
         #endregion
         public GetCardForEdit(IServiceProvider serviceProvider)
         {
             logger = serviceProvider.GetRequiredService<ILogger<GetCardForEdit>>();
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
         }
         async public Task RunAsync()
         {

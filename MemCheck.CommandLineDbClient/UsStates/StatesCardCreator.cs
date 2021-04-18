@@ -321,7 +321,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
         #endregion
         public StatesCardCreator(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<StatesCardCreator>>();
         }
         public void DescribeForOpportunityToCancel()

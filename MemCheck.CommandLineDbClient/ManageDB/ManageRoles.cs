@@ -25,7 +25,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public ManageRoles(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<ManageRoles>>();
             roleManager = serviceProvider.GetRequiredService<RoleManager<MemCheckUserRole>>();
             userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();

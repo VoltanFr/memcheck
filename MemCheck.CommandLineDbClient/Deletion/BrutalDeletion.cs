@@ -16,7 +16,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
         #endregion
         public BrutalDeletion(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<BrutalDeletion>>();
         }
         public void DescribeForOpportunityToCancel()

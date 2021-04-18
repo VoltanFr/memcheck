@@ -18,11 +18,11 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetCardsToRepeatPerf> logger;
-        private readonly PrimaryDbContext dbContext;
+        private readonly MemCheckDbContext dbContext;
         #endregion
         public GetCardsToRepeatPerf(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetCardsToRepeatPerf>>();
         }
         public void DescribeForOpportunityToCancel()

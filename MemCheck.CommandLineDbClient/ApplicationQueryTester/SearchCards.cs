@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public SearchCards(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<SearchCards>>();
         }
         private async Task<(int cardCount, double secondsElapsed)> RunTestAsync(Guid userId)

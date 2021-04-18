@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         #endregion
         public RateAllBotCards(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RateAllBotCards>>();
         }
         public void DescribeForOpportunityToCancel()

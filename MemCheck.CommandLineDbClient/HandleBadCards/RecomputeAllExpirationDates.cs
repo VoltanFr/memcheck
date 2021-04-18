@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         #endregion
         public RecomputeAllExpirationDates(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllExpirationDates>>();
         }
         public void DescribeForOpportunityToCancel()

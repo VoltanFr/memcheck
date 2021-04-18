@@ -96,7 +96,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public ChangeOwner(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
         }
         public void DescribeForOpportunityToCancel()

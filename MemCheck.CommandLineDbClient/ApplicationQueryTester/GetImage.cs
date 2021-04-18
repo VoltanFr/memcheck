@@ -13,11 +13,11 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetImage> logger;
-        private readonly PrimaryDbContext dbContext;
+        private readonly MemCheckDbContext dbContext;
         #endregion
         public GetImage(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetImage>>();
         }
         async public Task RunAsync()

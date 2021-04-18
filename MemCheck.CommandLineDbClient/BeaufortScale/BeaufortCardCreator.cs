@@ -311,7 +311,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         public BeaufortCardCreator(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<PaukerImportTest>>();
             forceFromNumber = GetForcesFromNumber();
             forceFromWindSpeed = GetForcesFromWindSpeed(forceFromNumber);

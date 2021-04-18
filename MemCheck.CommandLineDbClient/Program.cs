@@ -15,7 +15,7 @@ namespace MemCheck.CommandLineDbClient
     internal static class Program
     {
         #region Private methods
-        private static string GetPrimaryConnectionString(IConfiguration config)
+        private static string GetConnectionString(IConfiguration config)
         {
             if (config["ConnectionStrings:DebuggingDb"] == "Azure")
             {
@@ -27,7 +27,6 @@ namespace MemCheck.CommandLineDbClient
             var db = config["ConnectionStrings:DebuggingDb"];
             if (!string.IsNullOrEmpty(config[$"ConnectionStrings:{db}"]))
                 db = config[$"ConnectionStrings:{db}"];
-            Log.Information($"Using DB '{db}'");
             return db;
         }
         private static IConfiguration GetConfig()
@@ -43,24 +42,23 @@ namespace MemCheck.CommandLineDbClient
         private static IHostBuilder CreateHostBuilder(IConfiguration config)
         {
             IHostBuilder hostBuilder = new HostBuilder();
-            var primaryConnectionString = GetPrimaryConnectionString(config);
-            var secondaryConnectionString = config["ConnectionStrings:SecondaryDb"];
+            var connectionString = GetConnectionString(config);
+            Log.Information($"Using DB '{connectionString}'");
             hostBuilder = hostBuilder.ConfigureServices((hostContext, services) =>
                    {
                        services
                        // Setup Dependency Injection container.
                        //.AddTransient(typeof(ClassThatLogs))
                        .AddHostedService<Engine>()
-                       .AddDbContext<PrimaryDbContext>(options => options.UseSqlServer(primaryConnectionString))
-                       .AddDbContext<SecondaryDbContext>(options => options.UseSqlServer(secondaryConnectionString));
+                       .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
 
                        services.AddIdentity<MemCheckUser, MemCheckUserRole>(options =>
                        {
                            options.SignIn.RequireConfirmedAccount = true;
                        })
-    .AddEntityFrameworkStores<MemCheckDbContext>()
-    .AddDefaultTokenProviders()
-    .AddDefaultUI();
+                        .AddEntityFrameworkStores<MemCheckDbContext>()
+                        .AddDefaultTokenProviders()
+                        .AddDefaultUI();
                    }
                 );
             hostBuilder = hostBuilder.ConfigureLogging((hostContext, logging) => logging.AddSerilog());

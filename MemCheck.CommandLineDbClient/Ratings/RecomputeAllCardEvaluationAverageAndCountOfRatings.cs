@@ -18,7 +18,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         #endregion
         public RecomputeAllCardEvaluationAverageAndCountOfRatings(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings>>();
         }
         public void DescribeForOpportunityToCancel()

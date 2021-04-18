@@ -22,7 +22,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public GetUserDecksWithTags(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetUserDecksWithTags>>();
         }
         async public Task RunAsync()

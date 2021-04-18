@@ -23,7 +23,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         public Homepage(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<Homepage>>();
         }
         async public Task RunAsync()

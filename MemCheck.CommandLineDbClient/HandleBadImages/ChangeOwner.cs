@@ -16,7 +16,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadImages
         #endregion
         public ChangeOwner(IServiceProvider serviceProvider)
         {
-            dbContext = serviceProvider.GetRequiredService<PrimaryDbContext>();
+            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<ChangeOwner>>();
         }
         public void DescribeForOpportunityToCancel()
