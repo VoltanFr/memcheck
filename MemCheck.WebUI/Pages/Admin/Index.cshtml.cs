@@ -1,4 +1,4 @@
-using MemCheck.Application.Languages;
+using MemCheck.Application.QueryValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

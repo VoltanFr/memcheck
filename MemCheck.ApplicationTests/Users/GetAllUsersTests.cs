@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Languages;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

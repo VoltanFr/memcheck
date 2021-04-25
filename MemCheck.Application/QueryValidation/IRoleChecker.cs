@@ -1,12 +1,19 @@
-﻿using MemCheck.Application.Languages;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MemCheck.WebUI.Controllers
+namespace MemCheck.Application.QueryValidation
 {
-    public class ProdRoleChecker : IRoleChecker
+    public interface IRoleChecker
+    {
+        const string AdminRoleName = "Admin";
+
+        Task<bool> UserIsAdminAsync(MemCheckUser user);
+        Task<IEnumerable<string>> GetRolesAsync(MemCheckUser user);
+    }
+
+    public sealed class ProdRoleChecker : IRoleChecker
     {
         #region Fields
         private readonly UserManager<MemCheckUser> userManager;

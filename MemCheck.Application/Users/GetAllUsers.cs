@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.Languages;
-using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;

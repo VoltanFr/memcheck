@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Languages;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Domain;
 using System.Collections.Generic;
