@@ -16,13 +16,13 @@ namespace MemCheck.Application.Languages
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.FalseForAdmin).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker()).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String()), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.FalseForAdmin).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker()).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String()), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserIsNotAdmin()
@@ -30,7 +30,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.FalseForAdmin).RunAsync(new CreateLanguage.Request(user, RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String()), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task EmptyName()
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, ""), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength) + '\t'), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength) + '\t'), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength - 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength - 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -62,7 +62,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMaxNameLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMaxNameLength + 1)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameWithForbiddenChar()
@@ -70,7 +70,7 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, "a<b"), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, "a<b"), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task AlreadyExists()
@@ -79,9 +79,9 @@ namespace MemCheck.Application.Languages
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer());
+                await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer());
             using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer()));
+                await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task Success()
@@ -92,7 +92,7 @@ namespace MemCheck.Application.Languages
             Guid createdId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new CreateLanguage(dbContext, TestRoleChecker.TrueForAdmin).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer());
+                var result = await new CreateLanguage(dbContext, new TestRoleChecker(user)).RunAsync(new CreateLanguage.Request(user, name), new TestLocalizer());
                 Assert.AreEqual(name, result.Name);
                 Assert.AreEqual(0, result.CardCount);
                 createdId = result.Id;

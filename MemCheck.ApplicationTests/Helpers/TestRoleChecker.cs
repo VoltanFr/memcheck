@@ -1,7 +1,9 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Domain;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Helpers
@@ -9,29 +11,26 @@ namespace MemCheck.Application.Tests.Helpers
     public sealed class TestRoleChecker : IRoleChecker
     {
         #region Fields
-        private readonly bool adminReply;
-        private readonly IEnumerable<string> rolesReply;
-        private static readonly TestRoleChecker trueForAdmin = new TestRoleChecker(true, IRoleChecker.AdminRoleName.AsArray());
-        private static readonly TestRoleChecker falseForAdmin = new TestRoleChecker(false, System.Array.Empty<string>());
+        private readonly ImmutableHashSet<Guid> admins;
         #endregion
         #region Private method
-        private TestRoleChecker(bool adminReply, IEnumerable<string> rolesReply)
-        {
-            this.adminReply = adminReply;
-            this.rolesReply = rolesReply;
-        }
         #endregion
+        public TestRoleChecker(params Guid[] admins)
+        {
+            this.admins = admins.ToImmutableHashSet();
+        }
         public async Task<bool> UserIsAdminAsync(MemCheckUser user)
         {
             await Task.CompletedTask;
-            return adminReply;
+            return admins.Contains(user.Id);
         }
         public async Task<IEnumerable<string>> GetRolesAsync(MemCheckUser user)
         {
             await Task.CompletedTask;
-            return rolesReply;
+            if (await UserIsAdminAsync(user))
+                return IRoleChecker.AdminRoleName.AsArray();
+
+            return Array.Empty<string>();
         }
-        public static TestRoleChecker TrueForAdmin => trueForAdmin;
-        public static TestRoleChecker FalseForAdmin => falseForAdmin;
     }
 }
