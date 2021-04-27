@@ -69,10 +69,6 @@ namespace MemCheck.Application.Users
             var userToDeleteEmail = RandomHelper.String();
             var userToDelete = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
 
-            string initialPasswordHash;
-            using (var dbContext = new MemCheckDbContext(db))
-                initialPasswordHash = (await dbContext.Users.SingleAsync(u => u.Id == userToDelete)).PasswordHash;
-
             using (var dbContext = new MemCheckDbContext(db))
                 await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
 
