@@ -82,5 +82,66 @@ namespace MemCheck.Application.Users
                 Assert.AreEqual(DateTime.MaxValue, deletedUser.LockoutEnd);
             }
         }
+        [TestMethod()]
+        public async Task UserEmptyDecks()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var deck1 = await DeckHelper.CreateAsync(db, userToDelete);
+            var deck2 = await DeckHelper.CreateAsync(db, userToDelete);
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(await dbContext.Decks.AnyAsync(d => d.Id == deck1));
+                Assert.IsFalse(await dbContext.Decks.AnyAsync(d => d.Id == deck2));
+            }
+        }
+        [TestMethod()]
+        public async Task UserDeckNotEmpty()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var deckToDelete = await DeckHelper.CreateAsync(db, userToDelete);
+            var card = await CardHelper.CreateAsync(db, userToDelete);
+            await DeckHelper.AddCardAsync(db, deckToDelete, card.Id);
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(await dbContext.Decks.AnyAsync(deck => deck.Id == deckToDelete));
+                Assert.IsFalse(await dbContext.CardsInDecks.AnyAsync());
+            }
+        }
+        [TestMethod()]
+        public async Task DoesNotDeleteOtherUserDeck()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var deckNotToDelete = await DeckHelper.CreateAsync(db, loggedUser);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var deckToDelete = await DeckHelper.CreateAsync(db, userToDelete);
+            var card = await CardHelper.CreateAsync(db, userToDelete);
+            await DeckHelper.AddCardAsync(db, deckToDelete, card.Id);
+            await DeckHelper.AddCardAsync(db, deckNotToDelete, card.Id);
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(await dbContext.Decks.AnyAsync(deck => deck.Id == deckToDelete));
+                Assert.IsFalse(await dbContext.CardsInDecks.AnyAsync(cardInDeck => cardInDeck.Deck.Id == deckToDelete));
+
+                Assert.IsTrue(await dbContext.Decks.AnyAsync(deck => deck.Id == deckNotToDelete));
+                Assert.IsTrue(await dbContext.CardsInDecks.AnyAsync(cardInDeck => cardInDeck.Deck.Id == deckNotToDelete));
+            }
+        }
     }
 }

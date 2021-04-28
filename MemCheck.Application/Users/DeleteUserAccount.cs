@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
@@ -18,6 +19,22 @@ namespace MemCheck.Application.Users
         public const string DeletedUserName = "!DeletedUserName!";
         public const string DeletedUserEmail = "!DeletedUserEmail!";
         #endregion
+        #region Private methods
+        private void DeleteDecks(Guid userToDeleteId)
+        {
+            var decks = dbContext.Decks.Where(d => d.Owner.Id == userToDeleteId);
+            dbContext.Decks.RemoveRange(decks);
+        }
+        private async Task AnonymizeUser(Guid userToDeleteId)
+        {
+            var userToDelete = await dbContext.Users.SingleAsync(user => user.Id == userToDeleteId);
+            userToDelete.UserName = DeletedUserName;
+            userToDelete.Email = DeletedUserEmail;
+            userToDelete.EmailConfirmed = false;
+            userToDelete.LockoutEnabled = true;
+            userToDelete.LockoutEnd = DateTime.MaxValue;
+        }
+        #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
             this.dbContext = dbContext;
@@ -26,12 +43,8 @@ namespace MemCheck.Application.Users
         public async Task RunAsync(Request request)
         {
             await request.CheckValidityAsync(dbContext, roleChecker);
-            var userToDelete = await dbContext.Users.SingleAsync(user => user.Id == request.UserToDeleteId);
-            userToDelete.UserName = DeletedUserName;
-            userToDelete.Email = DeletedUserEmail;
-            userToDelete.EmailConfirmed = false;
-            userToDelete.LockoutEnabled = true;
-            userToDelete.LockoutEnd = DateTime.MaxValue;
+            await AnonymizeUser(request.UserToDeleteId);
+            DeleteDecks(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request
