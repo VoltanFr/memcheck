@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Ratings;
+using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -141,6 +142,28 @@ namespace MemCheck.Application.Users
 
                 Assert.IsTrue(await dbContext.Decks.AnyAsync(deck => deck.Id == deckNotToDelete));
                 Assert.IsTrue(await dbContext.CardsInDecks.AnyAsync(cardInDeck => cardInDeck.Deck.Id == deckNotToDelete));
+            }
+        }
+        [TestMethod()]
+        public async Task Ratings()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, userToDelete);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(loggedUser, card.Id, 3));
+                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(userToDelete, card.Id, 3));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(await dbContext.UserCardRatings.AnyAsync(rating => rating.UserId == userToDelete));
+                Assert.IsTrue(await dbContext.UserCardRatings.AnyAsync(rating => rating.UserId == loggedUser));
             }
         }
     }

@@ -34,6 +34,11 @@ namespace MemCheck.Application.Users
             userToDelete.LockoutEnabled = true;
             userToDelete.LockoutEnd = DateTime.MaxValue;
         }
+        private void DeleteRatings(Guid userToDeleteId)
+        {
+            var ratings = dbContext.UserCardRatings.Where(rating => rating.UserId == userToDeleteId);
+            dbContext.UserCardRatings.RemoveRange(ratings);
+        }
         #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
@@ -45,6 +50,7 @@ namespace MemCheck.Application.Users
             await request.CheckValidityAsync(dbContext, roleChecker);
             await AnonymizeUser(request.UserToDeleteId);
             DeleteDecks(request.UserToDeleteId);
+            DeleteRatings(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request
