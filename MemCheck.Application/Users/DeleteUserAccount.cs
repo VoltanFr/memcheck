@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 namespace MemCheck.Application.Users
 {
     //Use this when implementing the real user account deletion by himself:                 await signInManager.SignOutAsync();
+    /// <summary>
+    /// We don't really delete a user account, we just mark it as deleted and anonymize it.
+    /// This is because the user id is used in many places.
+    /// </summary>
     public sealed class DeleteUserAccount
     {
         #region Fields
@@ -39,6 +43,11 @@ namespace MemCheck.Application.Users
             var ratings = dbContext.UserCardRatings.Where(rating => rating.UserId == userToDeleteId);
             dbContext.UserCardRatings.RemoveRange(ratings);
         }
+        private void DeleteSearchSubscriptions(Guid userToDeleteId)
+        {
+            var subscriptions = dbContext.SearchSubscriptions.Where(subscription => subscription.UserId == userToDeleteId);
+            dbContext.SearchSubscriptions.RemoveRange(subscriptions);
+        }
         #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
@@ -51,6 +60,7 @@ namespace MemCheck.Application.Users
             await AnonymizeUser(request.UserToDeleteId);
             DeleteDecks(request.UserToDeleteId);
             DeleteRatings(request.UserToDeleteId);
+            DeleteSearchSubscriptions(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request

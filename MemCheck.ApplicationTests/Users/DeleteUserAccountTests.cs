@@ -1,7 +1,8 @@
-﻿using MemCheck.Application.Ratings;
+﻿using MemCheck.Application.Notifying;
+using MemCheck.Application.Ratings;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Basics;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -166,5 +167,52 @@ namespace MemCheck.Application.Users
                 Assert.IsTrue(await dbContext.UserCardRatings.AnyAsync(rating => rating.UserId == loggedUser));
             }
         }
+        [TestMethod()]
+        public async Task SearchSubscriptions()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var tag = await TagHelper.CreateAsync(db);
+            await CardHelper.CreateAsync(db, userToDelete, tagIds: tag.AsArray());
+            await CardHelper.CreateAsync(db, userToDelete);
+            await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
+
+            Guid loggedUserSubscriptionId;
+            Guid userToDeleteSubscriptionId;
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                loggedUserSubscriptionId = await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(loggedUser, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
+                userToDeleteSubscriptionId = await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(userToDelete, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(loggedUserSubscriptionId);
+                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(userToDeleteSubscriptionId);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(2, dbContext.CardsInSearchResults.Count(c => c.SearchSubscriptionId == loggedUserSubscriptionId));
+                Assert.AreEqual(2, dbContext.CardsInSearchResults.Count(c => c.SearchSubscriptionId == userToDeleteSubscriptionId));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(1, await dbContext.SearchSubscriptions.CountAsync(sub => sub.Id == loggedUserSubscriptionId));
+                Assert.AreEqual(0, await dbContext.SearchSubscriptions.CountAsync(sub => sub.Id == userToDeleteSubscriptionId));
+
+                Assert.AreEqual(1, await dbContext.RequiredTagInSearchSubscriptions.CountAsync(reqTag => reqTag.SearchSubscriptionId == loggedUserSubscriptionId));
+                Assert.AreEqual(0, await dbContext.RequiredTagInSearchSubscriptions.CountAsync(reqTag => reqTag.SearchSubscriptionId == userToDeleteSubscriptionId));
+
+                Assert.AreEqual(2, await dbContext.CardsInSearchResults.CountAsync(cardInSearchResult => cardInSearchResult.SearchSubscriptionId == loggedUserSubscriptionId));
+                Assert.AreEqual(0, await dbContext.CardsInSearchResults.CountAsync(cardInSearchResult => cardInSearchResult.SearchSubscriptionId == userToDeleteSubscriptionId));
+            }
+        }
+        //User name not reachable from a card he is owner of a version. But other user's info not degraded
     }
 }
