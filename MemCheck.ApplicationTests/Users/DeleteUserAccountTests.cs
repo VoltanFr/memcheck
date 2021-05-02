@@ -85,6 +85,25 @@ namespace MemCheck.Application.Users
             }
         }
         [TestMethod()]
+        public async Task CardVersionsNotDeleted()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, userToDelete, language: language);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.CardPreviousVersions.Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
+            }
+        }
+        [TestMethod()]
         public async Task UserEmptyDecks()
         {
             var db = DbHelper.GetEmptyTestDB();

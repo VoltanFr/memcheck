@@ -1,8 +1,11 @@
 ﻿using MemCheck.Application.Cards;
+using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Helpers
 {
@@ -160,6 +163,11 @@ namespace MemCheck.Application.Tests.Helpers
                 card.UsersWithView.Select(uwv => uwv.UserId),
                 versionDescription ?? RandomHelper.String()
                 );
+        }
+        public static async Task RunAsync(DbContextOptions<MemCheckDbContext> db, UpdateCard.Request request)
+        {
+            using var dbContext = new MemCheckDbContext(db);
+            await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer());
         }
     }
 }
