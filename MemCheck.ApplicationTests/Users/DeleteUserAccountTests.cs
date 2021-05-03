@@ -85,25 +85,6 @@ namespace MemCheck.Application.Users
             }
         }
         [TestMethod()]
-        public async Task CardVersionsNotDeleted()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var loggedUser = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
-            var userToDelete = await UserHelper.CreateInDbAsync(db);
-            var card = await CardHelper.CreateAsync(db, userToDelete, language: language);
-            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
-
-            using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
-
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
-                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.CardPreviousVersions.Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
-            }
-        }
-        [TestMethod()]
         public async Task UserEmptyDecks()
         {
             var db = DbHelper.GetEmptyTestDB();
@@ -232,6 +213,110 @@ namespace MemCheck.Application.Users
                 Assert.AreEqual(0, await dbContext.CardsInSearchResults.CountAsync(cardInSearchResult => cardInSearchResult.SearchSubscriptionId == userToDeleteSubscriptionId));
             }
         }
-        //User name not reachable from a card he is owner of a version. But other user's info not degraded
+        [TestMethod()]
+        public async Task NonPrivateCardNotDeleted_UserOwnerOfCurrentAndPrevious()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, userToDelete, language: language);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.CardPreviousVersions.Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
+            }
+        }
+        [TestMethod()]
+        public async Task NonPrivateCardNotDeleted_UserNotOwnerOfCurrentButOfPrevious()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUserName = RandomHelper.String();
+            var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: new[] { loggedUser, userToDelete });
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: loggedUser));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(loggedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.CardPreviousVersions.Include(cardPreviousVersion => cardPreviousVersion.VersionCreator).Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
+            }
+        }
+        [TestMethod()]
+        public async Task NonPrivateCardNotDeleted_UserOwnerOfCurrentButNotPrevious()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUserName = RandomHelper.String();
+            var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, loggedUser, language: language);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
+                Assert.AreEqual(loggedUserName, dbContext.CardPreviousVersions.Include(cardPreviousVersion => cardPreviousVersion.VersionCreator).Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
+            }
+        }
+        [TestMethod()]
+        public async Task PrivateCardDeleted()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, userToDelete, language: language);  //Public
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userToDelete.AsArray())); //Private
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(dbContext.Cards.Any());
+                Assert.IsFalse(dbContext.CardPreviousVersions.Any());
+            }
+        }
+        [TestMethod()]
+        public async Task PrivateCardDeletedWhileOthersExist()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var privateCardToDelete = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: userToDelete.AsArray());
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForBackSideChange(privateCardToDelete, RandomHelper.String()));
+            var privateCardNotToDelete = await CardHelper.CreateAsync(db, loggedUser, language: language, userWithViewIds: loggedUser.AsArray());
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForBackSideChange(privateCardNotToDelete, RandomHelper.String()));
+            var publicCard = await CardHelper.CreateAsync(db, userToDelete, language: language);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForBackSideChange(publicCard, RandomHelper.String()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(dbContext.Cards.Any(card => card.Id == privateCardToDelete.Id));
+                Assert.IsFalse(dbContext.CardPreviousVersions.Any(previousVersion => previousVersion.Card == privateCardToDelete.Id));
+                Assert.IsTrue(dbContext.Cards.Any(card => card.Id == privateCardNotToDelete.Id));
+                Assert.IsTrue(dbContext.CardPreviousVersions.Any(previousVersion => previousVersion.Card == privateCardNotToDelete.Id));
+                Assert.IsTrue(dbContext.Cards.Any(card => card.Id == publicCard.Id));
+                Assert.IsTrue(dbContext.CardPreviousVersions.Any(previousVersion => previousVersion.Card == publicCard.Id));
+            }
+        }
     }
 }

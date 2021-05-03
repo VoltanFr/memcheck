@@ -48,6 +48,16 @@ namespace MemCheck.Application.Users
             var subscriptions = dbContext.SearchSubscriptions.Where(subscription => subscription.UserId == userToDeleteId);
             dbContext.SearchSubscriptions.RemoveRange(subscriptions);
         }
+        private async Task DeletePrivateCardsAsync(Guid userToDeleteId)
+        {
+            //We delete the user's private cards, with all previous versions, without considerations of what happened in the history of the card
+            //We completely ignore non-private cards, including previous versions which were private (this could be subject to debate)
+            var privateCards = dbContext.Cards.Where(card => card.UsersWithView.Count() == 1 && card.UsersWithView.Any(userWithView => userWithView.UserId == userToDeleteId));
+            var privateCardIds = await privateCards.Select(card => card.Id).ToListAsync();
+            var previousVersions = dbContext.CardPreviousVersions.Where(previous => privateCardIds.Contains(previous.Card));
+            dbContext.CardPreviousVersions.RemoveRange(previousVersions);
+            dbContext.Cards.RemoveRange(privateCards);
+        }
         #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
@@ -61,6 +71,7 @@ namespace MemCheck.Application.Users
             DeleteDecks(request.UserToDeleteId);
             DeleteRatings(request.UserToDeleteId);
             DeleteSearchSubscriptions(request.UserToDeleteId);
+            await DeletePrivateCardsAsync(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request
