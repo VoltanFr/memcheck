@@ -160,7 +160,7 @@ var app = new Vue({
                         sleep(1000).then(() => {
                             this.additionalMoveDebugInfo = "Move failed, will retry asap (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
                             this.currentMovePromise = null;
-                            this.pendingMoveOperations.push({ deckId: this.currentMovingCard.deckId, cardId: this.currentMovingCard.cardId, targetHeap: this.currentMovingCard.targetHeap, manualMove: this.currentMovingCard.manualMove, nbAttempts: this.currentMovingCard.nbAttempts });
+                            this.pendingMoveOperations.push({ deckId: this.currentMovingCard.deckId, cardId: this.currentMovingCard.cardId, targetHeap: this.currentMovingCard.targetHeap, manualMove: this.currentMovingCard.manualMove, nbAttempts: this.currentMovingCard.nbAttempts + 1 });
                             this.currentMovingCard = null;
                         })
                     });
