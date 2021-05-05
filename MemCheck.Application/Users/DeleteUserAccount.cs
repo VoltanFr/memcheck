@@ -13,7 +13,7 @@ namespace MemCheck.Application.Users
     //Use this when implementing the real user account deletion by himself:                 await signInManager.SignOutAsync();
     /// <summary>
     /// We don't really delete a user account, we just mark it as deleted and anonymize it.
-    /// This is because the user id is used in many places.
+    /// This is because the user id is used in many places, such as card version creator, image uploader, or tag creator.
     /// </summary>
     public sealed class DeleteUserAccount
     {
@@ -58,6 +58,12 @@ namespace MemCheck.Application.Users
             dbContext.CardPreviousVersions.RemoveRange(previousVersions);
             dbContext.Cards.RemoveRange(privateCards);
         }
+        private void UpdateCardsVisibility(Guid userToDeleteId)
+        {
+            //I don't care about deleted cards (table UsersWithViewOnCardPreviousVersions), because I think it won't be a problem. This can be debated.
+            var usersWithViewOnCards = dbContext.UsersWithViewOnCards.Where(user => user.UserId == userToDeleteId);
+            dbContext.UsersWithViewOnCards.RemoveRange(usersWithViewOnCards);
+        }
         #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
@@ -72,6 +78,7 @@ namespace MemCheck.Application.Users
             DeleteRatings(request.UserToDeleteId);
             DeleteSearchSubscriptions(request.UserToDeleteId);
             await DeletePrivateCardsAsync(request.UserToDeleteId);
+            UpdateCardsVisibility(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request

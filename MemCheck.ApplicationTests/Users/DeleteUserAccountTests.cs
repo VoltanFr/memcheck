@@ -318,5 +318,41 @@ namespace MemCheck.Application.Users
                 Assert.IsTrue(dbContext.CardPreviousVersions.Any(previousVersion => previousVersion.Card == publicCard.Id));
             }
         }
+        [TestMethod()]
+        public async Task LimitedCardVisibilityUpdated()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, cardCreator, userWithViewIds: new[] { loggedUser, cardCreator, userToDelete });
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var card = await dbContext.Cards.Include(card => card.UsersWithView).SingleAsync(c => c.Id == cardId);
+                Assert.AreEqual(2, card.UsersWithView.Count());
+                Assert.IsFalse(card.UsersWithView.Any(userWithView => userWithView.UserId == userToDelete));
+            }
+        }
+        [TestMethod()]
+        public async Task PublicCardVisibilityNotUpdated()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, userToDelete);
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var card = await dbContext.Cards.Include(card => card.UsersWithView).SingleAsync(c => c.Id == cardId);
+                Assert.AreEqual(0, card.UsersWithView.Count());
+            }
+        }
     }
 }
