@@ -64,6 +64,11 @@ namespace MemCheck.Application.Users
             var usersWithViewOnCards = dbContext.UsersWithViewOnCards.Where(user => user.UserId == userToDeleteId);
             dbContext.UsersWithViewOnCards.RemoveRange(usersWithViewOnCards);
         }
+        private void DeleteCardNotificationSubscriptions(Guid userToDeleteId)
+        {
+            var subscriptions = dbContext.CardNotifications.Where(subscription => subscription.UserId == userToDeleteId);
+            dbContext.CardNotifications.RemoveRange(subscriptions);
+        }
         #endregion
         public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
         {
@@ -79,6 +84,7 @@ namespace MemCheck.Application.Users
             DeleteSearchSubscriptions(request.UserToDeleteId);
             await DeletePrivateCardsAsync(request.UserToDeleteId);
             UpdateCardsVisibility(request.UserToDeleteId);
+            DeleteCardNotificationSubscriptions(request.UserToDeleteId);
             await dbContext.SaveChangesAsync();
         }
         #region Request

@@ -354,5 +354,37 @@ namespace MemCheck.Application.Users
                 Assert.AreEqual(0, card.UsersWithView.Count());
             }
         }
+        [TestMethod()]
+        public async Task CardNotificationSubscriptions()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var loggedUser = await UserHelper.CreateInDbAsync(db);
+            var userToDelete = await UserHelper.CreateInDbAsync(db);
+            var tag = await TagHelper.CreateAsync(db);
+            var card1 = await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
+            var card2 = await CardHelper.CreateAsync(db, userToDelete);
+            var card3 = await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                await new AddCardSubscriptions(dbContext).RunAsync(new AddCardSubscriptions.Request(userToDelete, new Guid[] { card1.Id, card2.Id }));
+                await new AddCardSubscriptions(dbContext).RunAsync(new AddCardSubscriptions.Request(loggedUser, new Guid[] { card2.Id, card3.Id }));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser));
+                Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == userToDelete));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser));
+                Assert.AreEqual(0, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == userToDelete));
+            }
+        }
     }
 }
