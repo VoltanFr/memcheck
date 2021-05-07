@@ -29,7 +29,7 @@ namespace MemCheck.Application.Users
             var decks = dbContext.Decks.Where(d => d.Owner.Id == userToDeleteId);
             dbContext.Decks.RemoveRange(decks);
         }
-        private async Task AnonymizeUser(Guid userToDeleteId)
+        private async Task AnonymizeUser(Guid userToDeleteId, DateTime? runUtcDate)
         {
             var userToDelete = await dbContext.Users.SingleAsync(user => user.Id == userToDeleteId);
             userToDelete.UserName = DeletedUserName;
@@ -37,6 +37,7 @@ namespace MemCheck.Application.Users
             userToDelete.EmailConfirmed = false;
             userToDelete.LockoutEnabled = true;
             userToDelete.LockoutEnd = DateTime.MaxValue;
+            userToDelete.DeletionDate = runUtcDate ?? DateTime.UtcNow;
         }
         private void DeleteRatings(Guid userToDeleteId)
         {
@@ -75,16 +76,16 @@ namespace MemCheck.Application.Users
             this.dbContext = dbContext;
             this.roleChecker = roleChecker;
         }
-        public async Task RunAsync(Request request)
+        public async Task RunAsync(Request request, DateTime? runUtcDate = null)
         {
             await request.CheckValidityAsync(dbContext, roleChecker);
-            await AnonymizeUser(request.UserToDeleteId);
             DeleteDecks(request.UserToDeleteId);
             DeleteRatings(request.UserToDeleteId);
             DeleteSearchSubscriptions(request.UserToDeleteId);
             await DeletePrivateCardsAsync(request.UserToDeleteId);
             UpdateCardsVisibility(request.UserToDeleteId);
             DeleteCardNotificationSubscriptions(request.UserToDeleteId);
+            await AnonymizeUser(request.UserToDeleteId, runUtcDate);
             await dbContext.SaveChangesAsync();
         }
         #region Request

@@ -69,19 +69,24 @@ namespace MemCheck.Application.Users
 
             var userToDeleteName = RandomHelper.String();
             var userToDeleteEmail = RandomHelper.String();
-            var userToDelete = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
-
-            using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
+            var runDate = RandomHelper.Date();
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDelete);
+                Assert.IsNull(dbContext.Users.Single(u => u.Id == userToDeleteId).DeletionDate);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDeleteId), runDate);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
                 Assert.IsFalse(deletedUser.EmailConfirmed);
                 Assert.IsTrue(deletedUser.LockoutEnabled);
                 Assert.AreEqual(DateTime.MaxValue, deletedUser.LockoutEnd);
+                Assert.AreEqual(runDate, deletedUser.DeletionDate);
             }
         }
         [TestMethod()]

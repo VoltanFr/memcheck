@@ -12,5 +12,6 @@ namespace MemCheck.Domain
         public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0;   //A number of days. <= 0 means never send any email
         public DateTime LastNotificationUtcDate { get; set; }
         public bool SubscribeToCardOnEdit { get; set; }
+        public DateTime? DeletionDate { get; set; } = null;
     }
 }
