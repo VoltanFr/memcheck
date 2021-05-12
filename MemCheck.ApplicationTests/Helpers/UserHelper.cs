@@ -1,19 +1,45 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Users;
+using MemCheck.Basics;
+using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tests.Helpers
 {
     public class UserHelper
     {
+        public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
+        {
+            var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
+            var optionsAccessor = Options.Create(new IdentityOptions());
+            var passwordHasher = new PasswordHasher<MemCheckUser>();
+            var userValidators = new UserValidator<MemCheckUser>().AsArray();
+            var passwordValidators = new PasswordValidator<MemCheckUser>().AsArray();
+            var keyNormalizer = new UpperInvariantLookupNormalizer();
+            var errors = new IdentityErrorDescriber();
+            var services = new ServiceCollection();
+            var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
+            var serviceProvider = services.BuildServiceProvider();
+            return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger);
+        }
         public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
         {
             using var dbContext = new MemCheckDbContext(db);
             var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate, subscribeToCardOnEdit, userName);
             if (userEMail != null)
+            {
                 result.Email = userEMail;
+                result.EmailConfirmed = true;
+            }
             dbContext.Users.Add(result);
             await dbContext.SaveChangesAsync();
             return result.Id;
@@ -27,6 +53,14 @@ namespace MemCheck.Application.Tests.Helpers
                 SubscribeToCardOnEdit = subscribeToCardOnEdit,
                 UserName = userName ?? RandomHelper.String()
             };
+        }
+        public static async Task SetRandomPasswordAsync(DbContextOptions<MemCheckDbContext> db, Guid userId)
+        {
+            using var dbContext = new MemCheckDbContext(db);
+            var userToDelete = dbContext.Users.Single(u => u.Id == userId);
+            using var userManager = GetUserManager(dbContext);
+            var addPasswordResult = await userManager.AddPasswordAsync(userToDelete, RandomHelper.String().ToUpperInvariant() + RandomHelper.String());
+            Assert.IsTrue(addPasswordResult.Succeeded);
         }
     }
 }

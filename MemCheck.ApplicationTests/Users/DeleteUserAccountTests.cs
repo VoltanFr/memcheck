@@ -3,7 +3,13 @@ using MemCheck.Application.Ratings;
 using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -11,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
+    //Test that deleting a user in UserManager does not cascade delete the info we don't want to delete, such as the user's cards
     [TestClass()]
     public class DeleteUserAccountTests
     {
@@ -21,7 +28,8 @@ namespace MemCheck.Application.Users
             var userToDelete = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker()).RunAsync(new DeleteUserAccount.Request(Guid.Empty, userToDelete)));
+            using var userManager = UserHelper.GetUserManager(dbContext);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.Empty, userToDelete)));
         }
         [TestMethod()]
         public async Task LoggedUserDoesNotExist()
@@ -30,7 +38,8 @@ namespace MemCheck.Application.Users
             var userToDelete = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker()).RunAsync(new DeleteUserAccount.Request(Guid.NewGuid(), userToDelete)));
+            using var userManager = UserHelper.GetUserManager(dbContext);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.NewGuid(), userToDelete)));
         }
         [TestMethod()]
         public async Task LoggedUserIsNotAdmin()
@@ -40,7 +49,8 @@ namespace MemCheck.Application.Users
             var userToDelete = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker()).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
+            using var userManager = UserHelper.GetUserManager(dbContext);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
         }
         [TestMethod()]
         public async Task UserToDeleteDoesNotExist()
@@ -49,7 +59,8 @@ namespace MemCheck.Application.Users
             var loggedUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, Guid.NewGuid())));
+            using var userManager = UserHelper.GetUserManager(dbContext);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task UserToDeleteIsAdmin()
@@ -59,7 +70,8 @@ namespace MemCheck.Application.Users
             var userToDelete = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser, userToDelete)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
+            using var userManager = UserHelper.GetUserManager(dbContext);
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser, userToDelete), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
         }
         [TestMethod()]
         public async Task UserAccountGetsAnonymized()
@@ -70,12 +82,26 @@ namespace MemCheck.Application.Users
             var userToDeleteName = RandomHelper.String();
             var userToDeleteEmail = RandomHelper.String();
             var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
+            await UserHelper.SetRandomPasswordAsync(db, userToDeleteId);
             var runDate = RandomHelper.Date();
 
             using (var dbContext = new MemCheckDbContext(db))
+            //Check user is all set
             {
-                Assert.IsNull(dbContext.Users.Single(u => u.Id == userToDeleteId).DeletionDate);
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDeleteId), runDate);
+                MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
+                Assert.AreEqual(userToDeleteName, userToDelete.UserName);
+                Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
+                Assert.IsTrue(userToDelete.EmailConfirmed);
+                Assert.IsFalse(userToDelete.LockoutEnabled);
+                Assert.IsNull(userToDelete.LockoutEnd);
+                Assert.IsNull(userToDelete.DeletionDate);
+                Assert.IsNotNull(userToDelete.PasswordHash);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDeleteId), runDate);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -87,6 +113,7 @@ namespace MemCheck.Application.Users
                 Assert.IsTrue(deletedUser.LockoutEnabled);
                 Assert.AreEqual(DateTime.MaxValue, deletedUser.LockoutEnd);
                 Assert.AreEqual(runDate, deletedUser.DeletionDate);
+                Assert.IsNull(deletedUser.PasswordHash);
             }
         }
         [TestMethod()]
@@ -99,7 +126,10 @@ namespace MemCheck.Application.Users
             var deck2 = await DeckHelper.CreateAsync(db, userToDelete);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -118,7 +148,10 @@ namespace MemCheck.Application.Users
             await DeckHelper.AddCardAsync(db, deckToDelete, card.Id);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -139,7 +172,10 @@ namespace MemCheck.Application.Users
             await DeckHelper.AddCardAsync(db, deckNotToDelete, card.Id);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -164,7 +200,10 @@ namespace MemCheck.Application.Users
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -204,7 +243,10 @@ namespace MemCheck.Application.Users
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -229,7 +271,10 @@ namespace MemCheck.Application.Users
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -249,7 +294,10 @@ namespace MemCheck.Application.Users
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: loggedUser));
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -269,7 +317,10 @@ namespace MemCheck.Application.Users
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: userToDelete));
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -288,7 +339,10 @@ namespace MemCheck.Application.Users
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userToDelete.AsArray())); //Private
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -311,7 +365,10 @@ namespace MemCheck.Application.Users
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForBackSideChange(publicCard, RandomHelper.String()));
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -333,7 +390,10 @@ namespace MemCheck.Application.Users
             var cardId = await CardHelper.CreateIdAsync(db, cardCreator, userWithViewIds: new[] { loggedUser, cardCreator, userToDelete });
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -351,7 +411,10 @@ namespace MemCheck.Application.Users
             var cardId = await CardHelper.CreateIdAsync(db, userToDelete);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -383,7 +446,10 @@ namespace MemCheck.Application.Users
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser)).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            }
 
             using (var dbContext = new MemCheckDbContext(db))
             {

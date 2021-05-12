@@ -4,7 +4,6 @@ using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +19,7 @@ namespace MemCheck.Application.Users
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly IRoleChecker roleChecker;
+        private readonly UserManager<MemCheckUser> userManager;
         public const string DeletedUserName = "!DeletedUserName!";
         public const string DeletedUserEmail = "!DeletedUserEmail!";
         #endregion
@@ -38,6 +38,7 @@ namespace MemCheck.Application.Users
             userToDelete.LockoutEnabled = true;
             userToDelete.LockoutEnd = DateTime.MaxValue;
             userToDelete.DeletionDate = runUtcDate ?? DateTime.UtcNow;
+            await userManager.RemovePasswordAsync(userToDelete);
         }
         private void DeleteRatings(Guid userToDeleteId)
         {
@@ -71,10 +72,11 @@ namespace MemCheck.Application.Users
             dbContext.CardNotifications.RemoveRange(subscriptions);
         }
         #endregion
-        public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker)
+        public DeleteUserAccount(MemCheckDbContext dbContext, IRoleChecker roleChecker, UserManager<MemCheckUser> userManager)
         {
             this.dbContext = dbContext;
             this.roleChecker = roleChecker;
+            this.userManager = userManager;
         }
         public async Task RunAsync(Request request, DateTime? runUtcDate = null)
         {
