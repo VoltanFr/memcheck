@@ -32,13 +32,15 @@ namespace MemCheck.Application.Users
         private async Task AnonymizeUser(Guid userToDeleteId, DateTime? runUtcDate)
         {
             var userToDelete = await dbContext.Users.SingleAsync(user => user.Id == userToDeleteId);
+            var passwordRemovalResult = await userManager.RemovePasswordAsync(userToDelete);
+            if (!passwordRemovalResult.Succeeded)
+                throw new RequestRunException($"Failed to remove password of user '{userToDelete.UserName}' - {string.Join('-', passwordRemovalResult.Errors.Select(err => err.Description))}");
             userToDelete.UserName = DeletedUserName;
             userToDelete.Email = DeletedUserEmail;
             userToDelete.EmailConfirmed = false;
             userToDelete.LockoutEnabled = true;
             userToDelete.LockoutEnd = DateTime.MaxValue;
             userToDelete.DeletionDate = runUtcDate ?? DateTime.UtcNow;
-            await userManager.RemovePasswordAsync(userToDelete);
         }
         private void DeleteRatings(Guid userToDeleteId)
         {
