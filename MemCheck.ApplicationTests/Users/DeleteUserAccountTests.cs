@@ -74,7 +74,7 @@ namespace MemCheck.Application.Users
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser, userToDelete), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
         }
         [TestMethod()]
-        public async Task UserAccountGetsAnonymized()
+        public async Task DeletionByAdmin()
         {
             var db = DbHelper.GetEmptyTestDB();
             var loggedUser = await UserHelper.CreateInDbAsync(db);
@@ -102,6 +102,48 @@ namespace MemCheck.Application.Users
             {
                 using var userManager = UserHelper.GetUserManager(dbContext);
                 await new DeleteUserAccount(dbContext, new TestRoleChecker(loggedUser), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDeleteId), runDate);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
+                Assert.IsFalse(deletedUser.EmailConfirmed);
+                Assert.IsTrue(deletedUser.LockoutEnabled);
+                Assert.AreEqual(DateTime.MaxValue, deletedUser.LockoutEnd);
+                Assert.AreEqual(runDate, deletedUser.DeletionDate);
+                Assert.IsNull(deletedUser.PasswordHash);
+            }
+        }
+        [TestMethod()]
+        public async Task DeletionByUserHimself()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+
+            var userToDeleteName = RandomHelper.String();
+            var userToDeleteEmail = RandomHelper.String();
+            var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
+            await UserHelper.SetRandomPasswordAsync(db, userToDeleteId);
+            var runDate = RandomHelper.Date();
+
+            using (var dbContext = new MemCheckDbContext(db))
+            //Check user is all set
+            {
+                MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
+                Assert.AreEqual(userToDeleteName, userToDelete.UserName);
+                Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
+                Assert.IsTrue(userToDelete.EmailConfirmed);
+                Assert.IsFalse(userToDelete.LockoutEnabled);
+                Assert.IsNull(userToDelete.LockoutEnd);
+                Assert.IsNull(userToDelete.DeletionDate);
+                Assert.IsNotNull(userToDelete.PasswordHash);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(), userManager).RunAsync(new DeleteUserAccount.Request(userToDeleteId, userToDeleteId), runDate);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
