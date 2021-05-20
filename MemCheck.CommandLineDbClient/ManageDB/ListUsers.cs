@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +30,12 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         }
         async public Task RunAsync()
         {
-            var users = await dbContext.Users.Select(u => new { u.Id, u.UserName }).ToListAsync();
+            var users = await dbContext.Users.ToListAsync();
+            var roleChecker = new ProdRoleChecker(userManager);
+            var usersWithAdminInfo = users.Select(u => new { u.Id, u.UserName, isAdmin = roleChecker.UserIsAdminAsync(u).Result }).ToList();
 
-            foreach (var user in users)
-                logger.LogInformation($"User '{user.UserName}' has id {user.Id}");
+            foreach (var userWithAdminInfo in usersWithAdminInfo)
+                logger.LogInformation($"User '{userWithAdminInfo.UserName}' has id {userWithAdminInfo.Id}, {(userWithAdminInfo.isAdmin ? "IS" : "NOT")} admin");
         }
     }
 }

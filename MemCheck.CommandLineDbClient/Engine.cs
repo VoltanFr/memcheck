@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.HandleBadCards;
+﻿using MemCheck.CommandLineDbClient.ManageDB;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -43,15 +43,9 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new ListCardsWithVisibilityConsistencyProblem(serviceProvider);
+            IMemCheckTest test = new ListUsers(serviceProvider);
             test.DescribeForOpportunityToCancel();
-            logger.LogWarning("Opportunity to cancel. Please confirm with Y");
-            var input = Console.ReadLine();
-            if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError("User cancellation");
-                return;
-            }
+            GetConfirmationOrCancel(logger);
             try
             {
                 await test.RunAsync();
@@ -63,6 +57,16 @@ namespace MemCheck.CommandLineDbClient
             logger.LogInformation($"Program terminating");
             Debugger.Break();
             throw new InvalidProgramException("Test done");
+        }
+        public static void GetConfirmationOrCancel(ILogger logger)
+        {
+            logger.LogWarning("Opportunity to cancel. Please confirm with Y");
+            var input = Console.ReadLine();
+            if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogError("User cancellation");
+                throw new Exception("User cancellation");
+            }
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {
