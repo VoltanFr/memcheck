@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tests.Helpers;
+using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -15,13 +16,49 @@ namespace MemCheck.Application.Cards
     public class DeleteCardTests
     {
         [TestMethod()]
-        public async Task DeleteCardWhenNotAllowed()
+        public async Task FailIfUserDoesNotExist()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, user);
+            using var dbContext = new MemCheckDbContext(db);
+            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await CardDeletionHelper.DeleteCardAsync(db, Guid.NewGuid(), card.Id));
+            Assert.AreEqual("User not found", e.Message);
+        }
+        [TestMethod()]
+        public async Task FailIfNotAllowedToView()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userWithView = await UserHelper.CreateInDbAsync(db);
-            var card = await CardHelper.CreateAsync(db, userWithView, new DateTime(2020, 11, 1), userWithViewIds: userWithView.AsArray());
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, cardCreator, new DateTime(2020, 11, 1), userWithViewIds: new[] { userWithView, cardCreator });
+            using (var dbContext = new MemCheckDbContext(db))
+            using (var userManager = UserHelper.GetUserManager(dbContext))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(userWithView), userManager).RunAsync(new DeleteUserAccount.Request(userWithView, cardCreator));
             var otherUser = await UserHelper.CreateInDbAsync(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await CardDeletionHelper.DeleteCardAsync(db, otherUser, card.Id));
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion")));
+                var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
+                Assert.AreEqual("User not allowed to view card", e.Message);
+            }
+        }
+        [TestMethod()]
+        public async Task FailIfDeletedUser()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, user);
+            var adminUser = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+            using (var userManager = UserHelper.GetUserManager(dbContext))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(adminUser), userManager).RunAsync(new DeleteUserAccount.Request(adminUser, user));
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
+                Assert.AreEqual("User not found", e.Message);
+            }
         }
         [TestMethod()]
         public async Task DeleteNonExistingCard()
@@ -94,6 +131,92 @@ namespace MemCheck.Application.Cards
             Assert.AreEqual(firstVersion.Id, deletionVersion.PreviousVersion!.Id);
             CardComparisonHelper.AssertSameContent(card, deletionVersion, true);
             Assert.AreEqual(deletionDate, deletionVersion.VersionUtcDate);
+        }
+        [TestMethod()]
+        public async Task FailIfOtherUserHasCreatedAPreviousVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
+            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfAllPreviousVersions", "YouAreNotTheCreatorOfAllPreviousVersions")));
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray())));
+                StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfAllPreviousVersions");
+            }
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(card.Id, dbContext.Cards.Single().Id);
+                Assert.AreEqual(card.Id, dbContext.CardPreviousVersions.Single().Card);
+            }
+        }
+        [TestMethod()]
+        public async Task SucceedsIfDeletedUserHasCreatedAPreviousVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
+            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+            using (var dbContext = new MemCheckDbContext(db))
+            using (var userManager = UserHelper.GetUserManager(dbContext))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(lastVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(lastVersionCreator, firstVersionCreator));
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray()));
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(dbContext.Cards.Any());
+                Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
+            }
+        }
+        [TestMethod()]
+        public async Task FailIfNotCreatorOfCurrentVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
+            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion")));
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray())));
+                StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfCurrentVersion");
+            }
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(card.Id, dbContext.Cards.Single().Id);
+                Assert.AreEqual(card.Id, dbContext.CardPreviousVersions.Single().Card);
+            }
+        }
+        [TestMethod()]
+        public async Task SucceedsIfCreatorOfCurrentVersionIsDeleted()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
+            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+            using (var dbContext = new MemCheckDbContext(db))
+            using (var userManager = UserHelper.GetUserManager(dbContext))
+                await new DeleteUserAccount(dbContext, new TestRoleChecker(firstVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(firstVersionCreator, lastVersionCreator));
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray()));
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.IsFalse(dbContext.Cards.Any());
+                Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
+            }
         }
     }
 }

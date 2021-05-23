@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
-    //Use this when implementing the real user account deletion by himself:                 await signInManager.SignOutAsync();
     /// <summary>
     /// We don't really delete a user account, we just mark it as deleted and anonymize it.
     /// This is because the user id is used in many places, such as card version creator, image uploader, or tag creator.
@@ -102,7 +101,6 @@ namespace MemCheck.Application.Users
                     await QueryValidationHelper.CheckUserExistsAsync(dbContext, LoggedUserId);
                     var loggedUser = await dbContext.Users.AsNoTracking().SingleAsync(user => user.Id == LoggedUserId);
                     if (!await roleChecker.UserIsAdminAsync(loggedUser))
-                        //Additional security, to be modified when we really want to support account deletion by user himself
                         throw new InvalidOperationException("Logged user is not admin");
                 }
 

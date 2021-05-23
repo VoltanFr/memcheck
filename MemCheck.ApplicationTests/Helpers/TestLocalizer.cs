@@ -9,7 +9,7 @@ namespace MemCheck.Application.Tests.Helpers
         #region Fields
         private readonly IDictionary<string, string> values;
         #endregion
-        public TestLocalizer(IEnumerable<KeyValuePair<string, string>>? items = null)
+        public TestLocalizer(params KeyValuePair<string, string>[] items)
         {
             values = ImmutableDictionary.CreateRange(items ?? System.Array.Empty<KeyValuePair<string, string>>());
         }

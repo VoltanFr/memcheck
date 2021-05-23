@@ -61,8 +61,10 @@ namespace MemCheck.Application.QueryValidation
         }
         public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
         {
-            if (!await dbContext.Users.AsNoTracking().AnyAsync(user => user.Id == userId))
-                throw new InvalidOperationException("Current user not owner of deck");
+            var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
+
+            if (user == null || user.DeletionDate != null)
+                throw new InvalidOperationException("User not found");
         }
         public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {

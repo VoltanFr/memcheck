@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -61,19 +62,20 @@ namespace MemCheck.Application.Cards
             }
             private async Task CheckCardVersionsCreatorsAsync(Guid cardId, MemCheckDbContext dbContext, ILocalized localizer)
             {
-                var currentVersionOwnerIsUser = await dbContext.Cards
+                var currentVersionCreator = await dbContext.Cards
                     .Include(card => card.VersionCreator)
                     .Where(card => card.Id == cardId)
-                    .Select(card => card.VersionCreator.Id == UserId).SingleAsync();
+                    .Select(card => card.VersionCreator)
+                    .SingleAsync();
 
-                if (!currentVersionOwnerIsUser)
+                if (currentVersionCreator.Id != UserId && currentVersionCreator.DeletionDate == null)
                     //You are not the creator of the current version of the card with front side
                     //Vous n'êtes pas l'auteur de la version actuelle de la carte avec avant
                     throw new RequestInputException(localizer.Get("YouAreNotTheCreatorOfCurrentVersion") + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
 
                 var anyPreviousVersionHasOtherCreator = await dbContext.CardPreviousVersions
                     .Include(version => version.VersionCreator)
-                    .Where(version => version.Card == cardId && version.VersionCreator.Id != UserId)
+                    .Where(version => version.Card == cardId && version.VersionCreator.Id != UserId && version.VersionCreator.DeletionDate == null)
                     .AnyAsync();
 
                 if (anyPreviousVersionHasOtherCreator)
@@ -91,9 +93,10 @@ namespace MemCheck.Application.Cards
             public IEnumerable<Guid> CardIds { get; }
             public async Task CheckValidityAsync(MemCheckDbContext dbContext, ILocalized localizer)
             {
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
-
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, UserId, CardIds.ToArray());
                 foreach (var cardId in CardIds)
                 {
                     await CheckUsersWithCardInADeckAsync(cardId, dbContext, localizer);
