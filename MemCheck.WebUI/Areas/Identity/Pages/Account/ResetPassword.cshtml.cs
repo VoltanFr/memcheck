@@ -65,7 +65,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             }
 
             var user = await _userManager.FindByNameAsync(Input.UserName);
-            if (user == null)
+            if (user == null || user.DeletionDate != null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToPage("./ResetPasswordConfirmation");

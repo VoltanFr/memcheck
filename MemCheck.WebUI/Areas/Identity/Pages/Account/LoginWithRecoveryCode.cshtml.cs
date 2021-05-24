@@ -63,6 +63,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
 
+            if (user.DeletionDate != null)
+                // Don't reveal that the user is deleted
+                return RedirectToPage("./Login");
+
             var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
 
             var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);

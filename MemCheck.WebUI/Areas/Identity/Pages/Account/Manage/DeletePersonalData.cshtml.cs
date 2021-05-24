@@ -1,4 +1,7 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
+using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,28 +14,26 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 {
     public class DeletePersonalDataModel : PageModel
     {
+        #region Fields
+        private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
+        #endregion
 
-        public DeletePersonalDataModel(
-            UserManager<MemCheckUser> userManager,
-            SignInManager<MemCheckUser> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+        public DeletePersonalDataModel(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, ILogger<DeletePersonalDataModel> logger)
         {
+            this.dbContext = dbContext;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; } = null!;
+        [BindProperty] public InputModel Input { get; set; } = null!;
 
         public class InputModel
         {
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; } = null!;
+            [Required, DataType(DataType.Password)] public string Password { get; set; } = null!;
         }
 
         public bool RequirePassword { get; set; }
@@ -44,7 +45,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
             RequirePassword = await _userManager.HasPasswordAsync(user);
             return Page();
         }
@@ -53,30 +53,21 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             RequirePassword = await _userManager.HasPasswordAsync(user);
             if (RequirePassword)
-            {
                 if (!await _userManager.CheckPasswordAsync(user, Input.Password))
                 {
                     ModelState.AddModelError(string.Empty, "Incorrect password.");
                     return Page();
                 }
-            }
 
-            var result = await _userManager.DeleteAsync(user);
-            var userId = await _userManager.GetUserIdAsync(user);
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException($"Unexpected error occurred deleting user with ID '{userId}'.");
-            }
-
+            var deleter = new DeleteUserAccount(dbContext, new ProdRoleChecker(_userManager), _userManager);
+            await deleter.RunAsync(new DeleteUserAccount.Request(user.Id, user.Id));
             await _signInManager.SignOutAsync();
 
-            _logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
+            _logger.LogInformation("User with ID '{UserId}' deleted themselves.", user.Id);
 
             return Redirect("~/");
         }

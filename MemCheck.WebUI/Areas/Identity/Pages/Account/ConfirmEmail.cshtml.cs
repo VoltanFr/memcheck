@@ -55,6 +55,11 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             if (user == null)
                 return NotFound($"Unable to load user with ID '{userId}'.");
 
+            if (user.DeletionDate != null)
+                // Don't reveal that the user is deleted
+                return RedirectToPage("./Login");
+
+
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             StatusMessage = result.Succeeded ? localizer["ThankYou"].Value : localizer["Error"].Value;

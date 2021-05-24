@@ -1,4 +1,5 @@
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -58,6 +59,7 @@ namespace MemCheck.WebUI
             services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; options.User.RequireUniqueEmail = false; })
                 .AddEntityFrameworkStores<MemCheckDbContext>()
                 .AddDefaultTokenProviders()
+                .AddUserManager<MemCheckUserManager>()
                 .AddDefaultUI()
                 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
                 .AddClaimsPrincipalFactory<MemCheckClaimsFactory>();

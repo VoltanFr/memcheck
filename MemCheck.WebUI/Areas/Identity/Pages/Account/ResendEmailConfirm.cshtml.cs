@@ -47,15 +47,15 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var normalizedInputEmail = userManager.NormalizeEmail(Input.Email);
-                var users = userManager.Users.Where(u => u.NormalizedEmail == normalizedInputEmail && !u.EmailConfirmed);
+                var users = userManager.Users.Where(u => u.NormalizedEmail == normalizedInputEmail && !u.EmailConfirmed && u.DeletionDate == null);
                 //Not sure of perf when there are a lot of users
                 //If no user exists or user is confirmed, we don't reveal that information because it could be used for attacks
 
                 foreach (var user in users)
                 {
-                    var confirmationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    confirmationToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(confirmationToken));
-                    var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, confirmationToken }, protocol: Request.Scheme);
+                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, code }, protocol: Request.Scheme);
 
                     var url = HtmlEncoder.Default.Encode(callbackUrl);
                     var body = $"<p>{localizer["Hello"]} {user.UserName}</p><p><a href='{url}'>{localizer["PleaseConfirmYourAccount"]}</a>.";

@@ -41,7 +41,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await userManager.FindByNameAsync(Input.UserName);
-                if (user == null || !(await userManager.IsEmailConfirmedAsync(user)))
+                if (user == null || !await userManager.IsEmailConfirmedAsync(user) || user.DeletionDate != null)
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");
 
