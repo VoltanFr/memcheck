@@ -97,12 +97,7 @@ namespace MemCheck.Application.Users
             public async Task CheckValidityAsync(MemCheckDbContext dbContext, IRoleChecker roleChecker)
             {
                 if (LoggedUserId != UserToDeleteId)
-                {
-                    await QueryValidationHelper.CheckUserExistsAsync(dbContext, LoggedUserId);
-                    var loggedUser = await dbContext.Users.AsNoTracking().SingleAsync(user => user.Id == LoggedUserId);
-                    if (!await roleChecker.UserIsAdminAsync(loggedUser))
-                        throw new InvalidOperationException("Logged user is not admin");
-                }
+                    await QueryValidationHelper.CheckUserExistsAndIsAdminAsync(dbContext, LoggedUserId, roleChecker);
 
                 await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserToDeleteId);
                 var userToDelete = await dbContext.Users.AsNoTracking().SingleAsync(user => user.Id == UserToDeleteId);

@@ -66,6 +66,14 @@ namespace MemCheck.Application.QueryValidation
             if (user == null || user.DeletionDate != null)
                 throw new InvalidOperationException("User not found");
         }
+        public static async Task CheckUserExistsAndIsAdminAsync(MemCheckDbContext dbContext, Guid userId, IRoleChecker roleChecker)
+        {
+            var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
+            if (user == null || user.DeletionDate != null)
+                throw new InvalidOperationException("User not found");
+            if (!await roleChecker.UserIsAdminAsync(user))
+                throw new InvalidOperationException("User not admin");
+        }
         public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
         {
             var owner = dbContext.Decks.AsNoTracking().Where(deck => deck.Id == deckId).Select(deck => deck.Owner.Id).Single();
