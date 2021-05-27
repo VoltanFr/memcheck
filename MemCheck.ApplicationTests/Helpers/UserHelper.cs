@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Users;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -61,6 +62,25 @@ namespace MemCheck.Application.Tests.Helpers
             using var userManager = GetUserManager(dbContext);
             var addPasswordResult = await userManager.AddPasswordAsync(userToDelete, RandomHelper.String().ToUpperInvariant() + RandomHelper.String());
             Assert.IsTrue(addPasswordResult.Succeeded);
+        }
+        public static async Task DeleteAsync(DbContextOptions<MemCheckDbContext> db, Guid userToDeleteId, Guid? deleterUserId = null)
+        {
+            DeleteUserAccount.Request request;
+            IRoleChecker roleChecker;
+            if (deleterUserId == null)
+            {
+                roleChecker = new TestRoleChecker();
+                request = new DeleteUserAccount.Request(userToDeleteId, userToDeleteId);
+            }
+            else
+            {
+                roleChecker = new TestRoleChecker(deleterUserId.Value);
+                request = new DeleteUserAccount.Request(deleterUserId.Value, userToDeleteId);
+            }
+
+            using var dbContext = new MemCheckDbContext(db);
+            using var userManager = GetUserManager(dbContext);
+            await new DeleteUserAccount(dbContext, roleChecker, userManager).RunAsync(request);
         }
     }
 }

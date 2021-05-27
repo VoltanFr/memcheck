@@ -207,9 +207,7 @@ namespace MemCheck.Application.Cards
             var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
-            using (var dbContext = new MemCheckDbContext(db))
-            using (var userManager = UserHelper.GetUserManager(dbContext))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(firstVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(firstVersionCreator, lastVersionCreator));
+            await UserHelper.DeleteAsync(db, lastVersionCreator);
             using (var dbContext = new MemCheckDbContext(db))
                 await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
