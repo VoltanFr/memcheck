@@ -164,6 +164,23 @@ namespace MemCheck.Application.Tests.Helpers
                 versionDescription ?? RandomHelper.String()
                 );
         }
+        public static UpdateCard.Request RequestForImageChange(Card card, IEnumerable<Guid> frontImages, IEnumerable<Guid> backImages, IEnumerable<Guid> additionalInfoImages, Guid? versionCreator = null, string? versionDescription = null)
+        {
+            return new UpdateCard.Request(
+                card.Id,
+                versionCreator ?? card.VersionCreator.Id,
+                card.FrontSide,
+                frontImages,
+                card.BackSide,
+                backImages,
+                card.AdditionalInfo,
+additionalInfoImages,
+                card.CardLanguage.Id,
+                card.TagsInCards.Select(t => t.TagId),
+                card.UsersWithView.Select(uwv => uwv.UserId),
+                versionDescription ?? RandomHelper.String()
+                );
+        }
         public static async Task RunAsync(DbContextOptions<MemCheckDbContext> db, UpdateCard.Request request)
         {
             using var dbContext = new MemCheckDbContext(db);
