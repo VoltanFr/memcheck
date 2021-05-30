@@ -8,33 +8,17 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient
 {
-    //public class TheApp : IHostedService
-    //{
-    //    ClassThatLogs _classThatLogs;
-
-    //    public TheApp(ClassThatLogs classThatLogs)
-    //    {
-    //        _classThatLogs = classThatLogs ?? throw new ArgumentNullException(nameof(classThatLogs));
-    //    }
-
-    //    public Task StartAsync(CancellationToken cancellationToken)
-    //    {
-    //        _classThatLogs.WriteLogs();
-
-    //        return Task.CompletedTask;
-    //    }
-
-    //    public Task StopAsync(CancellationToken cancellationToken)
-    //    {
-    //        return Task.CompletedTask;
-    //    }
-    //}
-
     internal sealed class Engine : IHostedService
     {
         #region Fields
         private readonly ILogger<Engine> logger;
         private readonly IServiceProvider serviceProvider;
+        #endregion
+        #region Private method
+        private IMemCheckTest GetPlugin()
+        {
+            return new MakeUserAdmin(serviceProvider);
+        }
         #endregion
         public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
         {
@@ -43,18 +27,20 @@ namespace MemCheck.CommandLineDbClient
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            IMemCheckTest test = new ListUsers(serviceProvider);
+            var test = GetPlugin();
             test.DescribeForOpportunityToCancel();
             GetConfirmationOrCancel(logger);
+            var chrono = Stopwatch.StartNew();
             try
             {
                 await test.RunAsync();
+                chrono.Stop();
             }
             catch (Exception e)
             {
                 logger.LogError(e, e.Message);
             }
-            logger.LogInformation($"Program terminating");
+            logger.LogInformation($"Program terminating, took {chrono.Elapsed}");
             Debugger.Break();
             throw new InvalidProgramException("Test done");
         }
