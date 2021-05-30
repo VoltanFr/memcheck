@@ -32,10 +32,10 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         {
             var users = await dbContext.Users.ToListAsync();
             var roleChecker = new ProdRoleChecker(userManager);
-            var usersWithAdminInfo = users.Select(u => new { u.Id, u.UserName, isAdmin = roleChecker.UserIsAdminAsync(u).Result, u.PasswordHash, u.DeletionDate, lockoutEnabled = userManager.GetLockoutEnabledAsync(u).Result, u.Email, u.EmailConfirmed }).ToList();
+            var usersWithAdminInfo = users.Select(u => new { u.Id, u.UserName, isAdmin = roleChecker.UserIsAdminAsync(u).Result, u.DeletionDate, lockoutEnabled = userManager.GetLockoutEnabledAsync(u).Result, u.Email, u.EmailConfirmed }).ToList();
 
             foreach (var userWithAdminInfo in usersWithAdminInfo)
-                logger.LogInformation($"User '{userWithAdminInfo.UserName}' has id {userWithAdminInfo.Id}, {(userWithAdminInfo.isAdmin ? "IS" : "NOT")} admin, pwd hash '{userWithAdminInfo.PasswordHash}', deletion '{userWithAdminInfo.DeletionDate}', lockoutEnabled: {userWithAdminInfo.lockoutEnabled}, Email: '{userWithAdminInfo.Email}', Email confirmed: {userWithAdminInfo.EmailConfirmed}");
+                logger.LogInformation($"User '{userWithAdminInfo.UserName}' has id {userWithAdminInfo.Id}, {(userWithAdminInfo.isAdmin ? "IS" : "NOT")} admin, deletion '{userWithAdminInfo.DeletionDate}', lockoutEnabled: {userWithAdminInfo.lockoutEnabled}, Email: '{userWithAdminInfo.Email}', Email confirmed: {userWithAdminInfo.EmailConfirmed}");
         }
     }
 }

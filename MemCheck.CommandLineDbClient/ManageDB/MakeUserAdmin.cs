@@ -18,6 +18,7 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         private readonly MemCheckDbContext dbContext;
         private readonly RoleManager<MemCheckUserRole> roleManager;
         private readonly UserManager<MemCheckUser> userManager;
+        private readonly ListUsers listUsers;
         private const string userName = "TargetUserName";
         #endregion
         public MakeUserAdmin(IServiceProvider serviceProvider)
@@ -26,6 +27,7 @@ namespace MemCheck.CommandLineDbClient.ManageDB
             logger = serviceProvider.GetRequiredService<ILogger<MakeUserAdmin>>();
             roleManager = serviceProvider.GetRequiredService<RoleManager<MemCheckUserRole>>();
             userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
+            listUsers = new ListUsers(serviceProvider);
         }
         public void DescribeForOpportunityToCancel()
         {
@@ -35,7 +37,10 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         {
             var user = await dbContext.Users.Where(user => user.UserName == userName).SingleOrDefaultAsync();
             if (user == null)
+            {
+                await listUsers.RunAsync();
                 throw new InvalidProgramException($"User '{userName}' not found in database");
+            }
             user.EmailConfirmed = true;
             await dbContext.SaveChangesAsync();
 
