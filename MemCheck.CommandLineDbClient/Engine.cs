@@ -15,7 +15,7 @@ namespace MemCheck.CommandLineDbClient
         private readonly IServiceProvider serviceProvider;
         #endregion
         #region Private method
-        private IMemCheckTest GetPlugin()
+        private ICmdLinePlugin GetPlugin()
         {
             return new MakeUserAdmin(serviceProvider);
         }

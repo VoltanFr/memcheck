@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Ratings
 {
-    internal sealed class RateAllBotCards : IMemCheckTest
+    internal sealed class RateAllBotCards : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<RateAllBotCards> logger;

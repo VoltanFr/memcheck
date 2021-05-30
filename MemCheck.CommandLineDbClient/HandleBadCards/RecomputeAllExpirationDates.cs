@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.HandleBadCards
 {
-    internal sealed class RecomputeAllExpirationDates : IMemCheckTest
+    internal sealed class RecomputeAllExpirationDates : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<RecomputeAllExpirationDates> logger;

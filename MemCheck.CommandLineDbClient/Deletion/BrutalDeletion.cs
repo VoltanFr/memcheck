@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Deletion
 {
-    internal sealed class BrutalDeletion : IMemCheckTest
+    internal sealed class BrutalDeletion : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<BrutalDeletion> logger;

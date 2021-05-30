@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.HandleBadImages
 {
-    internal sealed class ChangeOwner : IMemCheckTest
+    internal sealed class ChangeOwner : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<ChangeOwner> logger;

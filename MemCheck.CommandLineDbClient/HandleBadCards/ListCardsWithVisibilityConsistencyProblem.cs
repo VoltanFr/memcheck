@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.HandleBadCards
 {
-    internal sealed class ListCardsWithVisibilityConsistencyProblem : IMemCheckTest
+    internal sealed class ListCardsWithVisibilityConsistencyProblem : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<PaukerImportTest> logger;

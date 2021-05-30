@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class Homepage : IMemCheckTest
+    internal sealed class Homepage : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<Homepage> logger;

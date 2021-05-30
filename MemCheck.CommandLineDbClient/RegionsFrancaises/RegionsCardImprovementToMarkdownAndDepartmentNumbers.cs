@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : IMemCheckTest
+    internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<PaukerImportTest> logger;

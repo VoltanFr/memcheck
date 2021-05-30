@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class GetCardForEdit : IMemCheckTest
+    internal sealed class GetCardForEdit : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<GetCardForEdit> logger;

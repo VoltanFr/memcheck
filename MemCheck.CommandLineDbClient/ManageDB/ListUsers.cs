@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ManageDB
 {
-    internal sealed class ListUsers : IMemCheckTest
+    internal sealed class ListUsers : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<ListUsers> logger;

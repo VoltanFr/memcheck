@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    internal sealed class BeaufortCardCreator : IMemCheckTest
+    internal sealed class BeaufortCardCreator : ICmdLinePlugin
     {
         #region Fields
         private const string CardVersionDescription = "Created by VoltanBot BeaufortCardCreator";

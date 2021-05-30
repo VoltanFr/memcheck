@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Ratings
 {
-    internal sealed class RecomputeAllCardEvaluationAverageAndCountOfRatings : IMemCheckTest
+    internal sealed class RecomputeAllCardEvaluationAverageAndCountOfRatings : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings> logger;

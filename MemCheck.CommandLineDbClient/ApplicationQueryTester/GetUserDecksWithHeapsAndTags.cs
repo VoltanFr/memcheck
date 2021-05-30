@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class GetUserDecksWithHeapsAndTags : IMemCheckTest
+    internal sealed class GetUserDecksWithHeapsAndTags : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<GetUserDecksWithHeapsAndTags> logger;

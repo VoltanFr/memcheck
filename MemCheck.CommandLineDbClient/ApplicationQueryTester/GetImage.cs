@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class GetImage : IMemCheckTest
+    internal sealed class GetImage : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<GetImage> logger;

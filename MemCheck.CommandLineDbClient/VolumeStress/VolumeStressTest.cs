@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.VolumeStress
 {
-    internal sealed class VolumeStressTest : IMemCheckTest
+    internal sealed class VolumeStressTest : ICmdLinePlugin
     {
         #region Fields
         private const int cardCount = 10000;

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    internal sealed class ChangeOwner : IMemCheckTest
+    internal sealed class ChangeOwner : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<PaukerImportTest> logger;

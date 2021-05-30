@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    internal sealed class PaukerImportTest : IMemCheckTest
+    internal sealed class PaukerImportTest : ICmdLinePlugin
     {
         #region Fields
         private const string CardVersionDescription = "Created by VoltanBot PaukerImportTest";

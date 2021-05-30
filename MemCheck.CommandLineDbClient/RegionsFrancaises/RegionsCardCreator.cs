@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    internal sealed class RegionsCardCreator : IMemCheckTest
+    internal sealed class RegionsCardCreator : ICmdLinePlugin
     {
         #region Fields
         private const string CardVersionDescription = "Created by VoltanBot RegionsCardCreator";

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class GetCardsToRepeatPerf : IMemCheckTest
+    internal sealed class GetCardsToRepeatPerf : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<GetCardsToRepeatPerf> logger;

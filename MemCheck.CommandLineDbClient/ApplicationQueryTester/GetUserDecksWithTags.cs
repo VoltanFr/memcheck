@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 {
-    internal sealed class GetUserDecksWithTags : IMemCheckTest
+    internal sealed class GetUserDecksWithTags : ICmdLinePlugin
     {
         #region Fields
         private readonly ILogger<GetUserDecksWithTags> logger;

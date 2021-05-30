@@ -2,7 +2,7 @@
 
 namespace MemCheck.CommandLineDbClient
 {
-    internal interface IMemCheckTest
+    internal interface ICmdLinePlugin
     {
         Task RunAsync();
         void DescribeForOpportunityToCancel();
