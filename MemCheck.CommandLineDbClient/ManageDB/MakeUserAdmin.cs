@@ -34,6 +34,8 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         public async Task RunAsync()
         {
             var user = await dbContext.Users.Where(user => user.UserName == userName).SingleOrDefaultAsync();
+            if (user == null)
+                throw new InvalidProgramException($"User '{userName}' not found in database");
             user.EmailConfirmed = true;
             await dbContext.SaveChangesAsync();
 
