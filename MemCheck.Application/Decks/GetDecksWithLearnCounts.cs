@@ -19,7 +19,7 @@ namespace MemCheck.Application.Decks
         private readonly TimeSpan fourDays = TimeSpan.FromDays(4);
         #endregion
         #region Private methods
-        private Result GetDeck(Guid deckId, int heapingAlgorithmId, string description, DateTime now)
+        private Result GetDeck(Guid deckId, string description, DateTime now)
         {
             var allCards = dbContext.CardsInDecks.AsNoTracking()
                 .Where(cardInDeck => cardInDeck.DeckId == deckId)
@@ -67,7 +67,7 @@ namespace MemCheck.Application.Decks
             if (now == null)
                 now = DateTime.UtcNow;
             var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            return decks.Select(deck => GetDeck(deck.Id, deck.HeapingAlgorithmId, deck.Description, now.Value)).ToList();
+            return decks.Select(deck => GetDeck(deck.Id, deck.Description, now.Value)).ToList();
         }
         #region Request & Result
         public sealed record Request(Guid UserId)
