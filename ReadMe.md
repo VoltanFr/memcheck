@@ -1,16 +1,8 @@
 # MemCheck
 
-This repo holds the source code for the MemCheck web site.
+This repo holds the source code for the [MemCheck web site](https://memcheckfr.azurewebsites.net/).
 MemCheck is a flashcard web site, a tool to help you know things by heart.
-
-## Usage
-
-There is no such thing as _installing_ MemCheck on a user's machine, since it is simply a web site.
-Just access the site.
-
-## Documentation
-
-The end user doc is available from links at the bottom of each page in MemCheck, providing contextual information.
+The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRoute=%2F&cultureName=fr) is available from links at the bottom of each page in MemCheck, providing contextual information.
 
 ## Development
 
@@ -23,7 +15,7 @@ Contributions are welcome, please create pull requests or issues on the [GitHub 
 - The database is used through [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) with a [code first](https://entityframeworkcore.com/approach-code-first) approach.
 - The Javascript code uses [Vue.js](https://vuejs.org/).
 
-### On Windows
+### Prerequesites on Windows
 
 - Your dev environment, probably one of:
   - [Visual Studio Code](https://code.visualstudio.com/). Needed extension: [C#](https://github.com/OmniSharp/omnisharp-vscode).
