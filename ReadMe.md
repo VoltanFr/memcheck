@@ -6,9 +6,6 @@ The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRo
 
 ## Development
 
-The website is built with ASP.NET Core and Vue.js. It also uses a number of third party packages.  
-Contributions are welcome, please create pull requests or issues on the [GitHub project](https://github.com/VoltanFr/memcheck).
-
 ### Technologies
 
 - The web site is an [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core) project.
@@ -22,23 +19,24 @@ Contributions are welcome, please create pull requests or issues on the [GitHub 
   - [Visual Studio](https://visualstudio.microsoft.com/en/vs/), my recommendation (the free Community edition is ok). Needed workload: `ASP.NET and web development` (with at least the default components).
 - A database server. I recommend [SQL Server Express](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb) for simplicity (the basic setup is ok). After installation, run `SqlLocalDB.msi` (it should be in `C:\SQL2019\ExpressAdv_ENU\1033_ENU_LP\x64\Setup\x64`). **Already included if you installed Visual Studio**.
 - [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) (you probably want to use the x64 installer). **Already included if you installed Visual Studio**.
-- [Entity Framework .NET CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet): install by running this command: `dotnet tool install --global dotnet-ef`. **Already done if you installed Visual Studio**.
-- To run the web site, you will need to trust the local issued certificate. For that, run this command: `dotnet dev-certs https --trust`.
+- [Entity Framework .NET CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet): install by running this command: `dotnet tool install --global dotnet-ef`.
+- To run the web site, you will need to trust the local issued certificate. For that, run this command: `dotnet dev-certs https --trust`. Again, **Visual Studio will deal with that on the first launch of the web site project**.
 
 ### On Linux or Mac
 
 I plan to check that but did not have time yet: development on a Mac or Linux machine should work. Feedback welcome.
 
-### First run with your local DB when your environment is setup
+### Tried and true first run with your local DB when your environment is ready
 
+- Begin with compiling the solution. On a blank machine (I ran some tests on a VM), the first compilation takes several minutes (say, 5) because of the very heavy NuGet package restorations. I have seen it failing, and working on the next attempt.
 - You should be able to create a local database by runnning this command line in the folder of the `MemCheck.Database` project: `dotnet ef --startup-project ../MemCheck.WebUI database update`. This creates a database with the connexion string read in the file of the project `MemCheck.WebUI`, which should be ok for development (but has no security).
-- You need an account, which you create as usually in the web site running on your debugger (follow the `Register` link on the home page). You won't receive the confirmation email since you don't have any account set for mail sending (see `SendGrid` in [appsettings.json](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.WebUI/appsettings.json)).
-- You need to changes about your account: you need it to be admin of your local MemCheck, and email-confirmed. This can be done in various ways. Here is how to do that using the project `MemCheck.CommandLineDbClient`:
+- You need an account, which you create as usually in the web site (project `MemCheck.WebUI`) running on your debugger (follow the `Register` link on the home page). You won't receive the confirmation email since you don't have any account set for mail sending (see `SendGrid` in [appsettings.json](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.WebUI/appsettings.json)).
+- You need two changes about your account: you need it to be admin of your local MemCheck, and email-confirmed. This can be done in various ways. Here is how to do that using the project `MemCheck.CommandLineDbClient`:
   1. Open the file `MemCheck.CommandLineDbClient\Engine.cs`, and check in the method `GetPlugin` that the plugin used is `MakeUserAdmin`.
   2. In the file `MemCheck.CommandLineDbClient\ManageDB\MakeUserAdmin.cs`, modify the field `userName` to set it to the user name you created.
-  3. Compile and run the project. Note that it ends on an exception, because the current implementation of this project is a bit askew. Its execution is a success if it logs `Test done`.
+  3. Compile and run the `MemCheck.CommandLineDbClient` project. Note that it ends on an exception, because the current implementation of this project is a bit askew. Its execution is a success if it logs `Test done`.
   4. After that, the MemCheck web site must run correctly from your debugger, and you should be able to log in.
-- You need to create a language for cards. Since your account is admin, you have an `Admin` link at the bottom of the screen. This is where you can create a language (eg `Français`).
+- Now, running the web site project, you should be able to log in. You then need to create a language for cards. Since your account is admin, you have an `Admin` link at the bottom of the screen. This is where you can create a language (eg `Français`).
 - You're now all set, with a fully functional local deployment of MemCheck!
 
 ### Projects
