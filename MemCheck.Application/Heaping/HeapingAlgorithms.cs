@@ -9,7 +9,7 @@ namespace MemCheck.Application.Heaping
     {
         #region Fields
         private readonly ImmutableDictionary<int, HeapingAlgorithm> algorithms;
-        private static readonly HeapingAlgorithms instance = new HeapingAlgorithms();
+        private static readonly HeapingAlgorithms instance = new();
         #endregion
         #region Private methods
         private HeapingAlgorithms()

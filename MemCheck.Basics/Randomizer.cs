@@ -8,7 +8,7 @@ namespace MemCheck.Basics
     public static class Randomizer
     {
         #region Private field
-        private static readonly Random random = new Random();
+        private static readonly Random random = new();
         #endregion
         public static int Next()
         {

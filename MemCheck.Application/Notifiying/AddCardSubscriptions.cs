@@ -32,7 +32,7 @@ namespace MemCheck.Application.Notifying
         {
             if (dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.CardId == cardId).Any())
                 return;
-            CardNotificationSubscription notif = new CardNotificationSubscription
+            CardNotificationSubscription notif = new()
             {
                 CardId = cardId,
                 UserId = userId,

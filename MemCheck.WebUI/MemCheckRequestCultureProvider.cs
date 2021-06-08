@@ -13,8 +13,8 @@ namespace MemCheck.WebUI
     public class MemCheckRequestCultureProvider : RequestCultureProvider
     {
         #region Fields
-        private static readonly CultureInfo english = new CultureInfo("en-US");
-        private static readonly CultureInfo french = new CultureInfo("fr-FR");
+        private static readonly CultureInfo english = new("en-US");
+        private static readonly CultureInfo french = new("fr-FR");
         #endregion
         public async override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
         {

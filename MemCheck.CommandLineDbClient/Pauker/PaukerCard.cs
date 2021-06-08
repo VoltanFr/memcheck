@@ -46,7 +46,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 throw new InvalidProgramException("Non null reverse.LearnedTimestamp found");
             if (front.LearnedTimestamp == null)
                 throw new InvalidProgramException("null front.LearnedTimestamp found");
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime dtDateTime = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddMilliseconds(front.LearnedTimestamp.Value).ToLocalTime();
             return dtDateTime;
         }

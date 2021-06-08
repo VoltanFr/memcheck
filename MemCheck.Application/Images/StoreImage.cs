@@ -27,7 +27,7 @@ namespace MemCheck.Application.Images
         #region Private methods
         private static ImmutableHashSet<string> GetSupportedContentTypes()
         {
-            return new HashSet<string>(new string[] { svgImageContentType, "image/jpeg", pngImageContentType, "image/gif" }).ToImmutableHashSet();
+            return new HashSet<string>(new[] { svgImageContentType, "image/jpeg", pngImageContentType, "image/gif" }).ToImmutableHashSet();
         }
         public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
         {
@@ -40,8 +40,8 @@ namespace MemCheck.Application.Images
             resultImageGraphics.Clear(Color.White);
             resultImageGraphics.DrawImage(originalImage, 0, 0, targetWidth, targetheight);
             using var targetStream = new MemoryStream();
-            using EncoderParameters encoderParameters = new EncoderParameters(1);
-            using EncoderParameter encoderParameter = new EncoderParameter(Encoder.Quality, 80L);
+            using EncoderParameters encoderParameters = new(1);
+            using EncoderParameter encoderParameter = new(Encoder.Quality, 80L);
             encoderParameters.Param[0] = encoderParameter;
             var jpegCodec = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
             resultImage.Save(targetStream, jpegCodec, encoderParameters);

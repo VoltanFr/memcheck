@@ -165,7 +165,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var backSide = $"{(f.MinWind + f.MaxWind) / 2} nœuds";
-            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+            CreateCard.Request request = new(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedMiddleForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
@@ -188,7 +188,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 logger.LogInformation($"Card already exists for {f.Name}: {frontSide}");
                 return;
             }
-            CreateCard.Request? request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+            CreateCard.Request request = new(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
             await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberFromSpeedAsync(int windSpeed, BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)

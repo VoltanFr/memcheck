@@ -18,7 +18,7 @@ namespace MemCheck.Application.Tags
         public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
             await request.CheckValidityAsync(localizer, dbContext);
-            Tag tag = new Tag() { Name = request.Name, Description = request.Description };
+            Tag tag = new() { Name = request.Name, Description = request.Description };
             dbContext.Tags.Add(tag);
             await dbContext.SaveChangesAsync();
             return tag.Id;

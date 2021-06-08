@@ -26,7 +26,7 @@ namespace MemCheck.WebUI.Controllers
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
-        private static readonly Guid allTagsFakeGuid = new Guid("11111111-1111-1111-1111-111111111111");
+        private static readonly Guid allTagsFakeGuid = new("11111111-1111-1111-1111-111111111111");
         #endregion
         public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer) : base(localizer)
         {
@@ -45,7 +45,7 @@ namespace MemCheck.WebUI.Controllers
                 decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
             var allTags = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             var allUsers = await new GetUsers(dbContext).RunAsync();
-            GetAllStaticDataViewModel value = new GetAllStaticDataViewModel(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
+            GetAllStaticDataViewModel value = new(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
             return base.Ok(value);
         }
         #region View model classes
