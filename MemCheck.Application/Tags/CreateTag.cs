@@ -24,10 +24,11 @@ namespace MemCheck.Application.Tags
             return tag.Id;
         }
         #region Request type
-        public sealed record Request(string Name, string Description)
+        public sealed record Request(Guid UserId, string Name, string Description)
         {
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
                 await QueryValidationHelper.CheckCanCreateTag(Name, Description, null, dbContext, localizer);
             }
         }

@@ -1,5 +1,7 @@
 ﻿using MemCheck.Application.Tags;
 using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -14,10 +16,12 @@ namespace MemCheck.WebUI.Controllers
     {
         #region Fields
         private readonly MemCheckDbContext dbContext;
+        private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public TagsController(MemCheckDbContext dbContext, IStringLocalizer<TagsController> localizer) : base(localizer)
+        public TagsController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer) : base(localizer)
         {
             this.dbContext = dbContext;
+            this.userManager = userManager;
         }
         #region GetGuiMessages
         [HttpGet("GetGuiMessages")]
@@ -110,7 +114,8 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(request.NewName.Trim(), request.NewDescription.Trim()), this);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(userId, request.NewName.Trim(), request.NewDescription.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
