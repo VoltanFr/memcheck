@@ -91,9 +91,9 @@ namespace MemCheck.WebUI
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.LoginPath = "/Identity/Pages/Account/Login";
-                options.LogoutPath = "/Identity/Pages/Account/Logout";
-                options.AccessDeniedPath = "/Identity/Pages/Account/AccessDenied";
+                options.LoginPath = "/Identity/Account/Login";
+                options.LogoutPath = "/Identity/Account/Logout";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
             });
 
             services.Configure<CookiePolicyOptions>(options =>
