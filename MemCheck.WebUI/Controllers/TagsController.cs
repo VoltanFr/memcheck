@@ -130,7 +130,8 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
         {
             CheckBodyParameter(request);
-            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(tagId, request.NewName.Trim(), request.NewDescription.Trim()), this);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim()), this);
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }

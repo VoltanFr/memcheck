@@ -25,10 +25,11 @@ namespace MemCheck.Application.Tags
             await dbContext.SaveChangesAsync();
         }
         #region Request type
-        public sealed record Request(Guid TagId, string NewName, string NewDescription)
+        public sealed record Request(Guid UserId, Guid TagId, string NewName, string NewDescription)
         {
             public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
             {
+                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
                 await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, dbContext, localizer);
             }
         }
