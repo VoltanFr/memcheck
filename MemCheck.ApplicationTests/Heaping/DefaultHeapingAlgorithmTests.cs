@@ -39,7 +39,7 @@ namespace MemCheck.Application.Heaping
             var lastLearnDate = RandomHelper.Date();
             var expiryDate = algo.ExpiryUtcDate(heap, lastLearnDate);
             var nbDaysForExpiration = Math.Pow(2, heap);
-            DateAssert.IsInRange(lastLearnDate.AddDays(nbDaysForExpiration), TimeSpan.FromMinutes(nbDaysForExpiration), expiryDate);
+            DateAssert.IsInRange(lastLearnDate.AddDays(nbDaysForExpiration), TimeSpan.FromMinutes(nbDaysForExpiration * 10), expiryDate);
         }
         [DataTestMethod, DynamicData(nameof(AllPossibleHeaps), DynamicDataSourceType.Method)]
         public void ExpiryDateIsRandom(int heap)

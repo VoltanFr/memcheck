@@ -10,7 +10,7 @@ namespace MemCheck.Application.Heaping
     public abstract class HeapingAlgorithm
     {
         #region Protected method GetHasExpired
-        protected abstract DateTime GetExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime);    //currentHeap is guaranteed to be > 0    //Please find a better name for this method
+        protected abstract DateTime GetExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime);    //currentHeap is guaranteed to be > 0 and <= CardInDeck.MaxHeapValue
         #endregion
         public abstract int Id { get; }
         public DateTime ExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime)
