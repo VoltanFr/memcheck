@@ -94,7 +94,7 @@ namespace MemCheck.Application.Decks
             var heap1 = resultDeck.Heaps.Single(heap => heap.HeapId == 1);
             Assert.AreEqual(2, heap1.TotalCardCount);
             Assert.AreEqual(1, heap1.ExpiredCardCount);
-            DateAssert.IsInRange(runDate.AddDays(1), TimeSpan.FromMinutes(2), heap1.NextExpiryUtcDate);
+            DateAssert.IsInRange(runDate.AddDays(1), TimeSpan.FromMinutes(20), heap1.NextExpiryUtcDate);
 
             var heap2 = resultDeck.Heaps.Single(heap => heap.HeapId == 2);
             Assert.AreEqual(1, heap2.TotalCardCount);
@@ -104,7 +104,7 @@ namespace MemCheck.Application.Decks
             var heap4 = resultDeck.Heaps.Single(heap => heap.HeapId == 4);
             Assert.AreEqual(2, heap4.TotalCardCount);
             Assert.AreEqual(0, heap4.ExpiredCardCount);
-            DateAssert.IsInRange(runDate.AddDays(3), TimeSpan.FromMinutes(16), heap4.NextExpiryUtcDate);
+            DateAssert.IsInRange(runDate.AddDays(3), TimeSpan.FromMinutes(160), heap4.NextExpiryUtcDate);
         }
         [TestMethod()]
         public async Task TwoDecks_WithCards()
@@ -161,12 +161,12 @@ namespace MemCheck.Application.Decks
             var resultDeck2Heap1 = resultDeck2.Heaps.Single(heap => heap.HeapId == 1);
             Assert.AreEqual(1, resultDeck2Heap1.TotalCardCount);
             Assert.AreEqual(0, resultDeck2Heap1.ExpiredCardCount);
-            DateAssert.IsInRange(runDate.AddDays(1), TimeSpan.FromMinutes(2), resultDeck2Heap1.NextExpiryUtcDate);
+            DateAssert.IsInRange(runDate.AddDays(1), TimeSpan.FromMinutes(20), resultDeck2Heap1.NextExpiryUtcDate);
 
             var resultDeck2Heap4 = resultDeck2.Heaps.Single(heap => heap.HeapId == 4);
             Assert.AreEqual(2, resultDeck2Heap4.TotalCardCount);
             Assert.AreEqual(0, resultDeck2Heap4.ExpiredCardCount);
-            DateAssert.IsInRange(runDate.AddDays(3), TimeSpan.FromMinutes(16), resultDeck2Heap4.NextExpiryUtcDate);
+            DateAssert.IsInRange(runDate.AddDays(3), TimeSpan.FromMinutes(160), resultDeck2Heap4.NextExpiryUtcDate);
         }
     }
 }
