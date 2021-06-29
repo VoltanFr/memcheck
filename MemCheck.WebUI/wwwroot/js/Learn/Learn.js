@@ -145,8 +145,10 @@ var app = new Vue({
             if (!this.currentMovePromise && this.pendingMoveOperations.length > 0) {
                 this.currentMovingCard = this.pendingMoveOperations.shift();
                 this.additionalMoveDebugInfo = "Moving (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
+                const url = '/Learn/MoveCardToHeap/' + this.currentMovingCard.deckId + '/' + this.currentMovingCard.cardId + '/' + this.currentMovingCard.targetHeap + '/' + this.currentMovingCard.manualMove;
+                const timeOut = Math.min(60000, (this.currentMovingCard.nbAttempts + 1) * 1000);
 
-                this.currentMovePromise = axios.patch('/Learn/MoveCardToHeap/' + this.currentMovingCard.deckId + '/' + this.currentMovingCard.cardId + '/' + this.currentMovingCard.targetHeap + '/' + this.currentMovingCard.manualMove)
+                this.currentMovePromise = pachAxios(url, timeOut)
                     .then(result => {
                         this.currentMovePromise = null;
                         this.additionalMoveDebugInfo = "Moved (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";

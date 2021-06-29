@@ -107,3 +107,18 @@ function ratingAsStars(rating) {    //rating is an int
         result = result + "\u2606";
     return result;
 }
+
+async function pachAxios(url, timeout) {
+    const cancellationTokenSource = axios.CancelToken.source();
+
+    let timeOutId =
+        setTimeout(async () => {
+            clearTimeout(timeOutId);
+            cancellationTokenSource.cancel(`Timeout of ${timeout} ms (through cancellation token).`);
+        }, timeout);
+
+    return await axios.patch(url, {}, { cancelToken: cancellationTokenSource.token })
+        .finally(() => {
+            clearTimeout(timeOutId);
+        });
+}
