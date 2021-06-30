@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -108,7 +109,7 @@ namespace MemCheck.Application.Decks
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
             var deckDescription = RandomHelper.String();
-            var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription, Deck.DefaultHeapingAlgorithmId);
+            var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription, UnitTestsHeapingAlgorithm.ID);
 
             var jan01 = new DateTime(2030, 01, 01).ToUniversalTime();
             var jan30 = new DateTime(2030, 01, 30, 0, 0, 0).ToUniversalTime();
@@ -117,12 +118,15 @@ namespace MemCheck.Application.Decks
 
             await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
             await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30);
-            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);   //expires in the following 24h
-            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);   //expired
-            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);   //expired
-            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);   //expired
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 2, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
             await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan28);
-            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);   //expired
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan28);
+            await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
             await DeckHelper.AddCardAsync(testDB, deck, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan01);
 
             using var dbContext = new MemCheckDbContext(testDB);
@@ -131,11 +135,11 @@ namespace MemCheck.Application.Decks
             var loaded = result.Single();
             Assert.AreEqual(deckDescription, loaded.Description);
             Assert.AreEqual(2, loaded.UnknownCardCount);
-            Assert.AreEqual(4, loaded.ExpiredCardCount);
+            Assert.AreEqual(7, loaded.ExpiredCardCount);
             Assert.AreEqual(0, loaded.ExpiringNextHourCount);
-            Assert.AreEqual(1, loaded.ExpiringFollowing24hCount);
+            Assert.AreEqual(2, loaded.ExpiringFollowing24hCount);
             Assert.AreEqual(1, loaded.ExpiringFollowing3DaysCount);
-            Assert.AreEqual(9, loaded.CardCount);
+            Assert.AreEqual(12, loaded.CardCount);
         }
         [TestMethod()]
         public async Task FullTestWithTwoDecks()
