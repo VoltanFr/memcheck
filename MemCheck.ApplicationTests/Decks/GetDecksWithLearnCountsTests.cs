@@ -148,10 +148,10 @@ namespace MemCheck.Application.Decks
             var userId = await UserHelper.CreateInDbAsync(testDB);
 
             var deck1Description = RandomHelper.String();
-            var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description, Deck.DefaultHeapingAlgorithmId);
+            var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description, UnitTestsHeapingAlgorithm.ID);
 
             var deck2Description = RandomHelper.String();
-            var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description, Deck.DefaultHeapingAlgorithmId);
+            var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description, UnitTestsHeapingAlgorithm.ID);
 
             var jan01 = new DateTime(2030, 01, 01).ToUniversalTime();
             var jan28 = new DateTime(2030, 01, 28).ToUniversalTime();
@@ -162,12 +162,15 @@ namespace MemCheck.Application.Decks
             //Fill deck1
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan31);
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 0, jan30);
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);   //expires in the following 24h
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);   //expired
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30_12h00);
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);   //expired
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 2, jan31);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan30);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, jan01);
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 3, jan28);
-            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);   //expired
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan28);
+            await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, jan01);
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 6, jan01);
 
             //Fill deck2
@@ -182,16 +185,17 @@ namespace MemCheck.Application.Decks
             var loadedDeck1 = result.Single(d => d.Id == deck1);
             Assert.AreEqual(deck1Description, loadedDeck1.Description);
             Assert.AreEqual(2, loadedDeck1.UnknownCardCount);
-            Assert.AreEqual(3, loadedDeck1.ExpiredCardCount);
+            Assert.AreEqual(7, loadedDeck1.ExpiredCardCount);
             Assert.AreEqual(0, loadedDeck1.ExpiringNextHourCount);
             Assert.AreEqual(2, loadedDeck1.ExpiringFollowing24hCount);
             Assert.AreEqual(1, loadedDeck1.ExpiringFollowing3DaysCount);
-            Assert.AreEqual(9, loadedDeck1.CardCount);
+            Assert.AreEqual(12, loadedDeck1.CardCount);
+
 
             var loadedDeck2 = result.Single(d => d.Id == deck2);
             Assert.AreEqual(deck2Description, loadedDeck2.Description);
             Assert.AreEqual(1, loadedDeck2.UnknownCardCount);
-            Assert.AreEqual(0, loadedDeck2.ExpiredCardCount);
+            Assert.AreEqual(1, loadedDeck2.ExpiredCardCount);
             Assert.AreEqual(0, loadedDeck2.ExpiringNextHourCount);
             Assert.AreEqual(0, loadedDeck2.ExpiringFollowing24hCount);
             Assert.AreEqual(0, loadedDeck2.ExpiringFollowing3DaysCount);
