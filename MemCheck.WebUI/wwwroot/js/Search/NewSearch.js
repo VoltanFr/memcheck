@@ -585,6 +585,15 @@ var app = new Vue({
                 this.runQuery();
             }
         },
+        openSelectedCardsInTabs() {
+            selectedCardIds = this.getSelectedCardIds();
+            if (selectedCardIds.length == 0) {
+                alert(this.allStaticData.localizedText.operationIsForSelectedCards);
+                return;
+            }
+            for (let i = 0; i < selectedCardIds.length; i++)
+                window.open("/Authoring?CardId=" + selectedCardIds[i], '_blank');
+        },
         averageRatingFilteringEnabled() {
             return this.selectedAverageRatingFilteringKind != 1 && this.selectedAverageRatingFilteringKind != 4;
         },

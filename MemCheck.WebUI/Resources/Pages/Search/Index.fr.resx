@@ -195,6 +195,12 @@
   <data name="NotInYourDeck" xml:space="preserve">
     <value>Pas dans votre paquet</value>
   </data>
+  <data name="OpenInTab" xml:space="preserve">
+    <value>Ouvrir dans un onglet</value>
+  </data>
+  <data name="OpenInTabs" xml:space="preserve">
+    <value>Ouvrir dans des onglets</value>
+  </data>
   <data name="Owner" xml:space="preserve">
     <value>Propriétaire</value>
   </data>

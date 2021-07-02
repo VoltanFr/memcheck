@@ -87,6 +87,14 @@
                                         <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCards"]</a>
                                     </span>
                                 </span>
+                                <span id="OpenInTabs">
+                                    <span v-if="selectionCount() == 1">
+                                        <a class="dropdown-item" @@click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTab"]</a>
+                                    </span>
+                                    <span v-if="selectionCount() > 1">
+                                        <a class="dropdown-item" @@click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTabs"]</a>
+                                    </span>
+                                </span>
                             </span>
                         </span>
                     </td>

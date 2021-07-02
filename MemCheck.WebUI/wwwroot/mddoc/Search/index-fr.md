@@ -18,4 +18,6 @@ Le filtrage peut vous aider à identifier les cartes supprimables. Le cas typiqu
 La fonctionnalité de déplacement d'une carte vers un tas n'est disponible que lorsque vous filtrez sur un paquet.
 En effet, ça n'aurait pas de sens de vouloir déplacer des cartes vers un tas sans être dans un paquet.
 
+## Ouverture dans des nouveaux onglets
 
+Cette fonctionnalité nécessite que vous autorisiez les _fenêtres popup_ dans votre navigateur.
