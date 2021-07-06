@@ -113,6 +113,12 @@ var app = new Vue({
                     this.editedTag = "";
                 });
         },
+        renderedDescription() {
+            return convertMarkdown(this.editedTag.description);
+        },
+        renderedNewDescription() {
+            return convertMarkdown(this.newDescription);
+        },
         onNameChanged() {
             if (this.toastVisible) {
                 this.newNameProblem = "";

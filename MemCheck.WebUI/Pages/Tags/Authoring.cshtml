@@ -29,7 +29,7 @@
                     </tr>
                     <tr v-if="editedTag">
                         <th>@Localizer["Description"]</th>
-                        <td>{{editedTag.description}}</td>
+                        <td><span v-html="renderedDescription()"></span></td>
                     </tr>
                     <tr v-if="editedTag">
                         <th>@Localizer["CardsWithThisTag"]</th>
@@ -42,6 +42,10 @@
                     <tr>
                         <th><span v-if="editedTag">@Localizer["NewDescription"]</span><span v-else>@Localizer["Description"]</span></th>
                         <td><b-form-textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15" /></td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td><span v-html="renderedNewDescription()"></span></td>
                     </tr>
                 </tbody>
             </table>
