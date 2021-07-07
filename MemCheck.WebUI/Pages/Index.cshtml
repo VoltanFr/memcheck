@@ -11,7 +11,7 @@
     </div>
     <div id="DataLoaded" v-else>
         <div id="UserLoggedIn" v-if="allData.userName">
-            <p>@Localizer["Welcome"] {{allData.userName}}</p>
+            <p>@Localizer["Welcome"] <a href="/Identity/Account/Manage">{{allData.userName}}</a></p>
             <div id="User has decks" v-if="allData.userDecks.length > 0">
                 <div v-for="deck in allData.userDecks">
                     <p v-html="deck.headLine" />
