@@ -319,8 +319,10 @@ var app = new Vue({
             if (!this.currentRatingPromise && this.pendingRatingOperations.length > 0) {
                 var ratingOperation = this.pendingRatingOperations.shift();
                 this.additionalRatingDebugInfo = "Recording rating (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                const url = '/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating;
+                const timeOut = Math.min(60000, (ratingOperation.nbAttempts + 1) * 1000);
 
-                this.currentRatingPromise = axios.patch('/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating)
+                this.currentRatingPromise = axios.patch(url, timeOut)
                     .then(result => {
                         this.currentRatingPromise = null;
                         this.additionalRatingDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
