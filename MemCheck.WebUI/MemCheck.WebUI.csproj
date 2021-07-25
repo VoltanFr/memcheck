@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.20.0</VersionPrefix>
+    <VersionPrefix>0.21.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -39,6 +39,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Pages\Privacy.fr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Pages\Privacy.en.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.fr.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
