@@ -56,12 +56,18 @@ namespace MemCheck.WebUI
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
-            services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => { options.SignIn.RequireConfirmedAccount = true; options.User.RequireUniqueEmail = false; })
+            services.AddIdentity<MemCheckUser, MemCheckUserRole>(
+                options =>
+                    {
+                        options.SignIn.RequireConfirmedAccount = true;
+                        options.User.RequireUniqueEmail = false;
+                    })
                 .AddEntityFrameworkStores<MemCheckDbContext>()
                 .AddDefaultTokenProviders()
                 .AddUserManager<MemCheckUserManager>()
                 .AddDefaultUI()
                 .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
+                .AddSignInManager<MemCheckSignInManager>()
                 .AddClaimsPrincipalFactory<MemCheckClaimsFactory>();
 
             services.AddAuthorization(options =>
@@ -99,7 +105,7 @@ namespace MemCheck.WebUI
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;  //To be understood
+                options.MinimumSameSitePolicy = SameSiteMode.Strict;
             });
         }
         public void Configure(IApplicationBuilder app)
