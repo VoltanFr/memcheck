@@ -75,7 +75,7 @@ jobs:
     #     path: ${{env.PUBLISH_FOLDER_PATH}}
 
     - name: "Deploy to MemCheck Azure Web App"
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v2.1.6
       with:
         app-name: '${{env.AZURE_WEBAPP_NAME}}'
         slot-name: 'production'
