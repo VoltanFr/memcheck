@@ -40,7 +40,7 @@ var app = new Vue({
             return isValidDateTime(utcFromDotNet);
         },
         showDebugInfo() {
-            return false; //(this.allData) && ((this.allData.userName == "Voltan") || (this.allData.userName == "Toto1"));
+            return false;
         },
     },
     watch: {

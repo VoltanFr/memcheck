@@ -15,7 +15,7 @@ namespace MemCheck.WebUI
         }
         public override Task SignOutAsync()
         {
-            MemCheckRequestCultureProvider.AddCultureCookie(Context.Features, Context.Response, MemCheckRequestCultureProvider.French.Name, true);
+            //MemCheckRequestCultureProvider.AddCultureCookie(Context.Features, Context.Response, MemCheckRequestCultureProvider.French.Name, true);
             return base.SignOutAsync();
         }
     }
