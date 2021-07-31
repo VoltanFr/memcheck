@@ -108,7 +108,7 @@ namespace MemCheck.WebUI
                 options.MinimumSameSitePolicy = SameSiteMode.Strict;
             });
         }
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
             app.UseExceptionHandler(a => a.Run(async context =>
             {
@@ -133,7 +133,7 @@ namespace MemCheck.WebUI
                 options.DefaultRequestCulture = new RequestCulture(MemCheckRequestCultureProvider.English);
                 options.SupportedCultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray();    //Culture is used for numbers, dates, etc.
                 options.SupportedUICultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray(); //UI culture is used for looking up translations from resource files
-                options.RequestCultureProviders = new MemCheckRequestCultureProvider().AsArray();
+                options.RequestCultureProviders = new MemCheckRequestCultureProvider(logger).AsArray();
             });
 
             app.UseMvc();

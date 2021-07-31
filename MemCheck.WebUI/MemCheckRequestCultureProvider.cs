@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -18,9 +19,16 @@ namespace MemCheck.WebUI
         #region Fields
         private static readonly CultureInfo english = new("en-US");
         private static readonly CultureInfo french = new("fr-FR");
+        private readonly ILogger logger;
         #endregion
+        public MemCheckRequestCultureProvider(ILogger logger)
+        {
+            this.logger = logger;
+        }
         public async override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
         {
+            logger.LogDebug($"Http request path: {httpContext.Request.Path}");
+
             if (httpContext.User.Identity != null && httpContext.User.Identity.IsAuthenticated)
             {
                 var result = httpContext.User.FindFirstValue(MemCheckClaims.UICulture);
