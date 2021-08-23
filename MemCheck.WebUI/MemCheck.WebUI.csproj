@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.24.0</VersionPrefix>
+    <VersionPrefix>0.24.1</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -25,7 +25,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.8" />
     <PackageReference Include="Microsoft.Web.WebJobs.Publish" Version="2.0.0" />
-    <PackageReference Include="SendGrid" Version="9.24.1" />
+    <PackageReference Include="SendGrid" Version="9.24.2" />
   </ItemGroup>
 
   <ItemGroup>
