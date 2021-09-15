@@ -17,6 +17,7 @@ Pour en savoir plus sur la recherche de cartes, lisez la [documentation spécifi
 ## Créez vos cartes
 Il est très facile d'écrire vos propres carte : ça se passe dans la [page dédiée](https://memcheckfr.azurewebsites.net/Authoring/Index).  
 Vous contrôlez la visibilité des cartes que vous créez (_strictement privées_, _visibles seulement par des utilisateurs choisis_, _publiques_).
+Pour en savoir plus sur la création et la modification de cartes, lisez la [documentation spécifique](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRoute=%2FAuthoring%2FIndex&cultureName=fr).
 
 ## L'apprentissage
 Votre sélection de cartes s'appelle un [paquet de cartes](https://memcheckfr.azurewebsites.net/Decks/Index). Dans un paquet, les cartes sont réparties par **tas** selon l'état de vos connaissances.  
