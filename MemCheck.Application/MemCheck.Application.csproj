@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.10.4</VersionPrefix>
+    <VersionPrefix>0.10.5</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +22,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.10" />
     <PackageReference Include="Svg" Version="3.3.0" />
   </ItemGroup>
 
