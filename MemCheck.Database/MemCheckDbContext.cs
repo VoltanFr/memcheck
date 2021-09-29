@@ -77,6 +77,12 @@ namespace MemCheck.Database
 
             });
 
+            builder.Entity<CardInDeck>(entity =>
+            {
+                entity.HasIndex(e => new { e.DeckId, e.CurrentHeap, e.ExpiryUtcTime })
+                .IncludeProperties(e => new { e.AddToDeckUtcTime, e.BiggestHeapReached, e.CardId, e.LastLearnUtcTime, e.NbTimesInNotLearnedHeap });
+            });
+
             builder.Entity<UserCardRating>(entity =>
             {
                 entity.HasIndex(e => new { e.UserId })
