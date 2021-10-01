@@ -62,7 +62,7 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestLastMigrationName()
         {
-            var expectedLastMigration = typeof(UserDeletionDate);
+            var expectedLastMigration = typeof(AddIndex);
 
             var expectedLastMigrationName = ((MigrationAttribute)(expectedLastMigration.GetCustomAttribute(typeof(MigrationAttribute)))!).Id;
             var actual = dbContext.Database.GetAppliedMigrations().Last();
