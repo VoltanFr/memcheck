@@ -107,7 +107,7 @@ namespace MemCheck.WebUI
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.Strict;
             });
-            services.AddApplicationInsightsTelemetry(configuration["APPINSIGHTS_CONNECTIONSTRING"]);
+            services.AddApplicationInsightsTelemetry();
         }
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {

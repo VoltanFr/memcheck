@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 
 namespace MemCheck.WebUI.Controllers
 {
@@ -18,17 +19,27 @@ namespace MemCheck.WebUI.Controllers
         #region Fields
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
+        private readonly TelemetryClient telemetryClient;
         #endregion
-        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<HomeController> localizer) : base(localizer)
+        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<HomeController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
+            this.telemetryClient = telemetryClient;
         }
         #region GetAll
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllAsync()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
+
+            var properties = new Dictionary<string, string>
+            {
+                ["UserId"] = user == null ? Guid.Empty.ToString() : user.Id.ToString(),
+                ["UserName"] = user == null ? "null" : user.UserName
+            };
+            telemetryClient.TrackEvent("HomeController.GetAll", properties);
+
             if (user == null)
                 return Ok(new GetAllViewModel(null, false, 0, Array.Empty<GetAllDeckViewModel>(), DateTime.UtcNow));
 
