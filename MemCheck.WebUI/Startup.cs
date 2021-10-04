@@ -3,6 +3,8 @@ using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -107,7 +109,9 @@ namespace MemCheck.WebUI
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.Strict;
             });
+
             services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ITelemetryInitializer, MemCheckTelemetryInitializer>();
         }
         public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
         {
