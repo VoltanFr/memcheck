@@ -1,58 +1,23 @@
-﻿using Microsoft.ApplicationInsights.Channel;
+﻿using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
+using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Http;
-using System;
+using System.Linq;
 
 namespace MemCheck.WebUI
 {
-    public class MemCheckTelemetryInitializer : ITelemetryInitializer
+    public class MemCheckTelemetryInitializer : TelemetryInitializerBase
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        public MemCheckTelemetryInitializer(IHttpContextAccessor httpContextAccessor)
+        public MemCheckTelemetryInitializer(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
-            this.httpContextAccessor = httpContextAccessor;
         }
 
-        public void Initialize(ITelemetry telemetry)
+        protected override void OnInitializeTelemetry(HttpContext platformContext, RequestTelemetry requestTelemetry, ITelemetry telemetry)
         {
-            if (telemetry is not RequestTelemetry requestTelemetry)
-                return;
-
-            var context = httpContextAccessor.HttpContext;
-
-            if (context == null)
-            {
-                requestTelemetry.Properties.Add("UserName", "null context");
-                return;
-            }
-
-            var user = context.User;
-
-            if (user == null)
-            {
-                requestTelemetry.Properties.Add("UserName", "null user");
-                return;
-            }
-
-            var identity = user.Identity;
-
-            if (identity == null)
-            {
-                requestTelemetry.Properties.Add("UserName", "null identity");
-                return;
-            }
-
-            var userName = identity.Name;
-
-            if (userName == null)
-            {
-                requestTelemetry.Properties.Add("UserName", "null user name");
-                return;
-            }
-
-            requestTelemetry.Properties.Add("UserName", userName);
+            var user = platformContext.User;
+            var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            telemetry.Context.User.AccountId = userIdClaim?.Value;
+            telemetry.Context.User.AuthenticatedUserId = user?.Identity?.Name;
         }
     }
 }
