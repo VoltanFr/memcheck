@@ -8,6 +8,7 @@ using MemCheck.Application.Ratings;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,13 @@ namespace MemCheck.WebUI.Controllers
         private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
+        private readonly TelemetryClient telemetryClient;
         #endregion
-        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager) : base(localizer)
+        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
             this.dbContext = dbContext;
             this.userManager = userManager;
+            this.telemetryClient = telemetryClient;
         }
         #region GetImage
         [HttpGet("GetImage/{imageId}/{size}")]
@@ -338,6 +341,12 @@ namespace MemCheck.WebUI.Controllers
         [HttpPatch("SetCardRating/{cardId}/{rating}")]
         public async Task<IActionResult> SetCardRating(Guid cardId, int rating)
         {
+            var properties = new Dictionary<string, string>
+            {
+                ["CardId"] = cardId.ToString(),
+                ["Rating"] = rating.ToString()
+            };
+            telemetryClient.TrackEvent("SetCardRating", properties);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var request = new SetCardRating.Request(userId, cardId, rating);
             await new SetCardRating(dbContext).RunAsync(request);
