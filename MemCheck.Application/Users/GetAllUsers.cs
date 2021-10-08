@@ -36,7 +36,7 @@ namespace MemCheck.Application.Users
             foreach (var user in pageEntries)
             {
                 var roles = await roleChecker.GetRolesAsync(user);
-                resultUsers.Add(new ResultUserModel(user.UserName, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate));
+                resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate));
             }
             return new ResultModel(totalCount, pageCount, resultUsers);
         }
@@ -70,15 +70,17 @@ namespace MemCheck.Application.Users
         }
         public sealed class ResultUserModel
         {
-            public ResultUserModel(string userName, string roles, string email, int notifInterval, DateTime lastNotifUtcDate)
+            public ResultUserModel(string userName, Guid userId, string roles, string email, int notifInterval, DateTime lastNotifUtcDate)
             {
                 UserName = userName;
+                UserId = userId;
                 Roles = roles;
                 Email = email;
                 NotifInterval = notifInterval;
                 LastNotifUtcDate = lastNotifUtcDate;
             }
             public string UserName { get; }
+            public Guid UserId { get; }
             public string Roles { get; }
             public string Email { get; }
             public int NotifInterval { get; }

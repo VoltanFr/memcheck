@@ -73,12 +73,14 @@ namespace MemCheck.WebUI.Controllers
             public GetUsersUserViewModel(GetAllUsers.ResultUserModel user)
             {
                 UserName = user.UserName;
+                UserId = user.UserId.ToString();
                 Roles = user.Roles;
                 Email = user.Email;
                 NotifInterval = user.NotifInterval;
                 LastNotifUtcDate = user.LastNotifUtcDate;
             }
             public string UserName { get; }
+            public string UserId { get; }
             public string Roles { get; }
             public string Email { get; }
             public int NotifInterval { get; }
