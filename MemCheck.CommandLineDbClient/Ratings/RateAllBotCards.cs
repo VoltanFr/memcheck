@@ -30,7 +30,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
             var ratingUser = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
             var cardIds = await dbContext.Cards.Where(card => card.VersionCreator.Id == author.Id).Select(card => card.Id).ToListAsync();
 
-            var rater = new SetCardRating(dbContext);
+            var rater = new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext));
 
             foreach (var cardId in cardIds)
             {

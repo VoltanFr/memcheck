@@ -40,7 +40,7 @@ namespace MemCheck.Application.Ratings
             var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(Guid.Empty, card, RandomHelper.Rating())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(Guid.Empty, card, RandomHelper.Rating())));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -51,7 +51,7 @@ namespace MemCheck.Application.Ratings
             var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(Guid.NewGuid(), card, RandomHelper.Rating())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(Guid.NewGuid(), card, RandomHelper.Rating())));
         }
         [TestMethod()]
         public async Task TooSmall()
@@ -62,7 +62,7 @@ namespace MemCheck.Application.Ratings
             var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card, 0)));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user, card, 0)));
         }
         [TestMethod()]
         public async Task TooBig()
@@ -73,7 +73,7 @@ namespace MemCheck.Application.Ratings
             var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card, 6)));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user, card, 6)));
         }
         [TestMethod()]
         public async Task SingleUser_NoPreviousValue()
@@ -85,7 +85,7 @@ namespace MemCheck.Application.Ratings
             var rating = RandomHelper.Rating();
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card, rating));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user, card, rating));
 
             await AssertUserRatingAsync(db, user, card, rating);
             await AssertAverageRatingAsync(db, card, 1, rating);
@@ -102,7 +102,7 @@ namespace MemCheck.Application.Ratings
             {
                 var rating = RandomHelper.Rating();
                 using (var dbContext = new MemCheckDbContext(db))
-                    await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user, card, rating));
+                    await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user, card, rating));
                 await AssertUserRatingAsync(db, user, card, rating);
                 await AssertAverageRatingAsync(db, card, 1, rating);
             }
@@ -119,7 +119,7 @@ namespace MemCheck.Application.Ratings
             var card2 = await CardHelper.CreateIdAsync(db, user2, language: languageId);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1, card1, 1));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1, card1, 1));
             await AssertAverageRatingAsync(db, card1, 1, 1);
             await AssertAverageRatingAsync(db, card2, 0, 0);
             await AssertUserRatingAsync(db, user1, card1, 1);
@@ -130,7 +130,7 @@ namespace MemCheck.Application.Ratings
             await AssertUserRatingAsync(db, user3, card2, 0);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user2, card1, 2));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user2, card1, 2));
             await AssertAverageRatingAsync(db, card1, 2, 1.5);
             await AssertAverageRatingAsync(db, card2, 0, 0);
             await AssertUserRatingAsync(db, user1, card1, 1);
@@ -141,7 +141,7 @@ namespace MemCheck.Application.Ratings
             await AssertUserRatingAsync(db, user3, card2, 0);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user3, card1, 3));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user3, card1, 3));
             await AssertAverageRatingAsync(db, card1, 3, 2);
             await AssertAverageRatingAsync(db, card2, 0, 0);
             await AssertUserRatingAsync(db, user1, card1, 1);
@@ -152,7 +152,7 @@ namespace MemCheck.Application.Ratings
             await AssertUserRatingAsync(db, user3, card2, 0);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1, card2, 1));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1, card2, 1));
             await AssertAverageRatingAsync(db, card1, 3, 2);
             await AssertAverageRatingAsync(db, card2, 1, 1);
             await AssertUserRatingAsync(db, user1, card1, 1);
@@ -163,7 +163,7 @@ namespace MemCheck.Application.Ratings
             await AssertUserRatingAsync(db, user3, card2, 0);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(user1, card1, 4));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1, card1, 4));
             await AssertAverageRatingAsync(db, card1, 3, 3);
             await AssertAverageRatingAsync(db, card2, 1, 1);
             await AssertUserRatingAsync(db, user1, card1, 4);

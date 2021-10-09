@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Cards;
+﻿using MemCheck.Application;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.Images;
@@ -25,16 +26,14 @@ namespace MemCheck.WebUI.Controllers
     public class LearnController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
-        private readonly TelemetryClient telemetryClient;
         #endregion
         public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
             this.userManager = userManager;
-            this.telemetryClient = telemetryClient;
         }
         #region GetImage
         [HttpGet("GetImage/{imageId}/{size}")]
@@ -51,7 +50,7 @@ namespace MemCheck.WebUI.Controllers
                 };
             }
 
-            var blob = await new GetImage(dbContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
+            var blob = await new GetImage(callContext.DbContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
             var content = new MemoryStream(blob);
             return base.File(content, "APPLICATION/octet-stream", "noname");
         }
@@ -64,12 +63,12 @@ namespace MemCheck.WebUI.Controllers
             if (manualMove)
             {
                 var request = new MoveCardsToHeap.Request(userId, deckId, targetHeap, cardId.AsArray());
-                await new MoveCardsToHeap(dbContext).RunAsync(request);
+                await new MoveCardsToHeap(callContext.DbContext).RunAsync(request);
             }
             else
             {
                 var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap);
-                await new MoveCardToHeap(dbContext).RunAsync(request);
+                await new MoveCardToHeap(callContext.DbContext).RunAsync(request);
             }
             return Ok();
         }
@@ -84,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = 30;
                 var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetUnknownCardsToLearn(dbContext).RunAsync(applicationRequest);
+                var applicationResult = await new GetUnknownCardsToLearn(callContext.DbContext).RunAsync(applicationRequest);
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }
@@ -92,7 +91,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
                 var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetCardsToRepeat(dbContext).RunAsync(applicationRequest);
+                var applicationResult = await new GetCardsToRepeat(callContext.DbContext).RunAsync(applicationRequest);
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }
@@ -308,7 +307,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = (user == null) ? Guid.Empty : user.Id;
-            var decks = await new GetUserDecksWithTags(dbContext).RunAsync(new GetUserDecksWithTags.Request(userId));
+            var decks = await new GetUserDecksWithTags(callContext.DbContext).RunAsync(new GetUserDecksWithTags.Request(userId));
             var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
             return base.Ok(result);
         }
@@ -341,15 +340,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpPatch("SetCardRating/{cardId}/{rating}")]
         public async Task<IActionResult> SetCardRating(Guid cardId, int rating)
         {
-            var properties = new Dictionary<string, string>
-            {
-                ["CardId"] = cardId.ToString(),
-                ["Rating"] = rating.ToString()
-            };
-            telemetryClient.TrackEvent("SetCardRating", properties);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var request = new SetCardRating.Request(userId, cardId, rating);
-            await new SetCardRating(dbContext).RunAsync(request);
+            await new SetCardRating(callContext).RunAsync(request);
             return Ok();
         }
         #endregion
@@ -361,12 +354,12 @@ namespace MemCheck.WebUI.Controllers
             if (notif)
             {
                 var request = new AddCardSubscriptions.Request(userId, cardId.AsArray());
-                await new AddCardSubscriptions(dbContext).RunAsync(request);
+                await new AddCardSubscriptions(callContext.DbContext).RunAsync(request);
             }
             else
             {
                 var request = new RemoveCardSubscriptions.Request(userId, cardId.AsArray());
-                await new RemoveCardSubscriptions(dbContext).RunAsync(request);
+                await new RemoveCardSubscriptions(callContext.DbContext).RunAsync(request);
             }
             return Ok();
         }

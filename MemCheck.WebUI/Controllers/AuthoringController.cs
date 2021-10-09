@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Cards;
+﻿using MemCheck.Application;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.History;
 using MemCheck.Application.QueryValidation;
@@ -8,6 +9,7 @@ using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,19 +26,19 @@ namespace MemCheck.WebUI.Controllers
     public class AuthoringController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public AuthoringController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AuthoringController> localizer) : base(localizer)
+        public AuthoringController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AuthoringController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
             this.userManager = userManager;
         }
         #region GetUsers, returns IEnumerable<GetUsersViewModel>
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            var result = await new GetUsers(dbContext).RunAsync();
+            var result = await new GetUsers(callContext.DbContext).RunAsync();
             return Ok(result.Select(user => new GetUsersViewModel(user.UserId, user.UserName)));
         }
         public sealed class GetUsersViewModel
@@ -55,7 +57,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
-            return Ok(new GetCurrentUserViewModel(user, dbContext));
+            return Ok(new GetCurrentUserViewModel(user, callContext.DbContext));
         }
         public sealed class GetCurrentUserViewModel
         {
@@ -79,9 +81,9 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var versionDescription = Get("InitialCardVersionCreation");
             var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
-            var cardId = await new CreateCard(dbContext).RunAsync(request, this);
+            var cardId = await new CreateCard(callContext.DbContext).RunAsync(request, this);
             if (card.AddToDeck != Guid.Empty)
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
+                await new AddCardsInDeck(callContext.DbContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class PostCardOfUserRequest
@@ -105,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
-            await new UpdateCard(dbContext).RunAsync(request, this);
+            await new UpdateCard(callContext.DbContext).RunAsync(request, this);
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class UpdateCardRequest
@@ -127,7 +129,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("AllAvailableTags")]
         public async Task<IActionResult> GetAllAvailableTagsAsync()
         {
-            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            var result = await new GetAllTags(callContext.DbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             return Ok(result.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName)));
         }
         public sealed class GetAllAvailableTagsViewModel
@@ -146,7 +148,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetCardForEdit(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            var result = new GetCardForEdit(callContext.DbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
             return Ok(new GetCardForEditViewModel(await result, this));
         }
         #region Request and view model classes
@@ -226,7 +228,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> DecksOfUser()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
+            var result = await new GetUserDecks(callContext.DbContext).RunAsync(new GetUserDecks.Request(userId));
             return Ok(result.Select(deck => new DecksOfUserViewModel(deck.DeckId, deck.Description)));
         }
         public sealed class DecksOfUserViewModel
@@ -245,7 +247,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetImageInfo([FromBody] GetImageInfoRequest request)
         {
             CheckBodyParameter(request);
-            var appResult = await new Application.Images.GetImageInfoFromName(dbContext).RunAsync(new Application.Images.GetImageInfoFromName.Request(request.ImageName.Trim()), this);
+            var appResult = await new Application.Images.GetImageInfoFromName(callContext.DbContext).RunAsync(new Application.Images.GetImageInfoFromName.Request(request.ImageName.Trim()), this);
             return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
         }
         #region Request and view model classes
@@ -272,7 +274,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> CardVersions(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var appResults = await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(userId, cardId));
+            var appResults = await new GetCardVersions(callContext.DbContext).RunAsync(new GetCardVersions.Request(userId, cardId));
             var result = appResults.Select(appResult => new CardVersion(appResult, this));
             return Ok(result);
         }
@@ -300,7 +302,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var request = new SetCardRating.Request(userId, cardId, rating);
-            await new SetCardRating(dbContext).RunAsync(request);
+            await new SetCardRating(callContext).RunAsync(request);
             return ControllerResultWithToast.Success($"{Get("RatingSavedOk")} {rating}\u2605", this);
         }
         #endregion
@@ -309,8 +311,8 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> CardSelectedVersionDiffWithCurrent(Guid cardId, Guid selectedVersionId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var card = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
-            var selectedVersion = await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
+            var card = await new GetCardForEdit(callContext.DbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            var selectedVersion = await new GetCardVersion(callContext.DbContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
             var result = new CardSelectedVersionDiffWithCurrentResult(card, selectedVersion, this);
             return Ok(result);
         }

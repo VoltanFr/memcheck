@@ -237,8 +237,8 @@ namespace MemCheck.Application.Users
             var card = await CardHelper.CreateAsync(db, userToDelete);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(loggedUser, card.Id, 3));
-                await new SetCardRating(dbContext).RunAsync(new SetCardRating.Request(userToDelete, card.Id, 3));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(loggedUser, card.Id, 3));
+                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(userToDelete, card.Id, 3));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
