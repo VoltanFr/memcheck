@@ -131,7 +131,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhereIsThisRegionAsync(Region region, MemCheckUser user, Guid regionsWithoutNamesImageId, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -149,7 +149,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = new[] { regionsAndDepartmentsWithNamesImageId };
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_HowManyDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -167,7 +167,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var additionalInfo = string.Join(Environment.NewLine, region.Departments);
             var additionalInfoImages = Array.Empty<Guid>();
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatAreTheDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -185,7 +185,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var additionalInfo = $"La région {region.Name} est constituée de {region.Departments.Length} départements.{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
             var additionalInfoImages = Array.Empty<Guid>();
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         #endregion
         public RegionsCardCreator(IServiceProvider serviceProvider)

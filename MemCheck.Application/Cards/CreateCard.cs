@@ -12,27 +12,27 @@ namespace MemCheck.Application.Cards
     public sealed class CreateCard
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private void AddImage(Guid cardId, Guid imageId, int cardSide, List<ImageInCard> cardImageList)
         {
-            var imageFromDb = dbContext.Images.Where(img => img.Id == imageId).Single();
+            var imageFromDb = callContext.DbContext.Images.Where(img => img.Id == imageId).Single();
             var img = new ImageInCard() { ImageId = imageId, Image = imageFromDb, CardId = cardId, CardSide = cardSide };
-            dbContext.ImagesInCards.Add(img);
+            callContext.DbContext.ImagesInCards.Add(img);
             cardImageList.Add(img);
         }
         #endregion
-        public CreateCard(MemCheckDbContext dbContext)
+        public CreateCard(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Guid> RunAsync(Request request, ILocalized localizer)
         {
             CardInputValidator.Run(request, localizer);
 
-            var language = dbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
-            var versionCreator = dbContext.Users.Where(user => user.Id == request.VersionCreatorId).Single();
+            var language = callContext.DbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
+            var versionCreator = callContext.DbContext.Users.Where(user => user.Id == request.VersionCreatorId).Single();
 
             var card = new Card()
             {
@@ -45,14 +45,14 @@ namespace MemCheck.Application.Cards
                 VersionUtcDate = DateTime.Now.ToUniversalTime(),
                 VersionDescription = request.VersionDescription
             };
-            dbContext.Cards.Add(card);
+            callContext.DbContext.Cards.Add(card);
 
             var usersWithView = new List<UserWithViewOnCard>();
             foreach (var userFromRequestId in request.UsersWithVisibility)
             {
-                var userFromDb = dbContext.Users.Where(u => u.Id == userFromRequestId).Single();
+                var userFromDb = callContext.DbContext.Users.Where(u => u.Id == userFromRequestId).Single();
                 var userWithView = new UserWithViewOnCard() { UserId = userFromDb.Id, User = userFromDb, CardId = card.Id, Card = card };
-                dbContext.UsersWithViewOnCards.Add(userWithView);
+                callContext.DbContext.UsersWithViewOnCards.Add(userWithView);
                 usersWithView.Add(userWithView);
             }
             card.UsersWithView = usersWithView;
@@ -60,9 +60,9 @@ namespace MemCheck.Application.Cards
             var tagsInCards = new List<TagInCard>();
             foreach (var tagToAdd in request.Tags)
             {
-                var tagFromDb = dbContext.Tags.Where(t => t.Id == tagToAdd).Single();
+                var tagFromDb = callContext.DbContext.Tags.Where(t => t.Id == tagToAdd).Single();
                 var tagInCard = new TagInCard() { TagId = tagFromDb.Id, Tag = tagFromDb, CardId = card.Id };
-                dbContext.TagsInCards.Add(tagInCard);
+                callContext.DbContext.TagsInCards.Add(tagInCard);
                 tagsInCards.Add(tagInCard);
             }
             card.TagsInCards = tagsInCards;
@@ -77,9 +77,11 @@ namespace MemCheck.Application.Cards
             card.Images = cardImageList;
 
             if (versionCreator.SubscribeToCardOnEdit)
-                AddCardSubscriptions.CreateSubscription(dbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
+                AddCardSubscriptions.CreateSubscription(callContext.DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+
+            callContext.TelemetryClient.TrackEvent("CreateCard", ("CardId", card.Id.ToString()), ("Public", (!request.UsersWithVisibility.Any()).ToString()));
 
             return card.Id;
         }

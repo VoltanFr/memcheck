@@ -50,7 +50,7 @@ namespace MemCheck.Application.Cards
                     new Guid[] { tagId },
                     new Guid[] { ownerId, userWithViewId },
                     versionDescription);
-                cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
+                cardGuid = await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new TestLocalizer());
                 Assert.AreNotEqual(Guid.Empty, cardGuid);
             }
 
@@ -104,7 +104,7 @@ namespace MemCheck.Application.Cards
                     Array.Empty<Guid>(),
                     Array.Empty<Guid>(),
                     RandomHelper.String());
-                cardGuid = await new CreateCard(dbContext).RunAsync(request, new TestLocalizer());
+                cardGuid = await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new TestLocalizer());
             }
 
             Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
@@ -134,7 +134,7 @@ namespace MemCheck.Application.Cards
                 RandomHelper.String());
             var ownerMustHaveVisibility = RandomHelper.String();
             var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).AsArray());
-            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext).RunAsync(request, localizer));
+            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, localizer));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
         }
         [TestMethod()]
@@ -160,7 +160,7 @@ namespace MemCheck.Application.Cards
                 Array.Empty<Guid>(),
                 RandomHelper.String());
             using (var dbContext = new MemCheckDbContext(db))
-                cardGuid = await new CreateCard(dbContext).RunAsync(createRequest, new TestLocalizer());
+                cardGuid = await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(createRequest, new TestLocalizer());
 
             var deck = await DeckHelper.CreateAsync(db, user);
             var addToDeckDate = RandomHelper.Date();
@@ -205,7 +205,7 @@ namespace MemCheck.Application.Cards
                 RandomHelper.String());
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new TestLocalizer()));
         }
     }
 }

@@ -138,7 +138,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { statesWithNamesImageId };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhereIsThisStateAsync(State state, MemCheckUser user, Guid statesWithoutNamesImageId, Guid statesWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -158,7 +158,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { statesWithNamesImageId };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheCapitalOfAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid statesWithNamesImageId, Guid tagId)
         {
@@ -178,7 +178,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { statesWithNamesImageId, state.GetImageDbId(dbContext) };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheStateOfThisCapitalAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid statesWithNamesImageId, Guid tagId)
         {
@@ -198,7 +198,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { statesWithNamesImageId, state.GetImageDbId(dbContext) };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheMainCityOfAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid statesWithNamesImageId, Guid tagId)
         {
@@ -218,7 +218,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { state.GetImageDbId(dbContext), statesWithNamesImageId };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheStateOfThisCityAsync(State state, MemCheckUser user, Guid frenchLanguageId, Guid statesWithNamesImageId, Guid tagId)
         {
@@ -238,7 +238,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = new[] { statesWithNamesImageId, state.GetImageDbId(dbContext) };
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhereIsThisCapitalAsync(State state, MemCheckUser user, Guid statesWithoutNamesImageId, Guid statesWitCapitalsImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -257,7 +257,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var backSide = "";
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhereIsMainCityAsync(State state, MemCheckUser user, Guid statesWithoutNamesImageId, Guid statesWithNamesImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -276,7 +276,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var backSide = "";
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheCapitalOfThisStateAsync(State state, MemCheckUser user, Guid statesWitCapitalsImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -296,7 +296,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = statesWitCapitalsImageId.AsArray();
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task CreateCard_WhatIsTheMainCityOfThisStateAsync(State state, MemCheckUser user, Guid statesWitCapitalsImageId, Guid frenchLanguageId, Guid tagId)
         {
@@ -316,7 +316,7 @@ namespace MemCheck.CommandLineDbClient.UsStates
             var additionalInfoImages = statesWitCapitalsImageId.AsArray();
 
             var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         #endregion
         public StatesCardCreator(IServiceProvider serviceProvider)

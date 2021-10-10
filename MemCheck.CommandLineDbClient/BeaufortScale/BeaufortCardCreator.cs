@@ -94,7 +94,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MinWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMaxSpeedForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -106,7 +106,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MaxWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMinSpeedForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -118,7 +118,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MinWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateMaxSpeedForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -130,7 +130,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MaxWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedIntervalForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -142,7 +142,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MinWind} à {f.MaxWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedIntervalForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -154,7 +154,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{f.MinWind} à {f.MaxWind} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedMiddleForNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -166,7 +166,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{(f.MinWind + f.MaxWind) / 2} nœuds";
             CreateCard.Request request = new(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateSpeedMiddleForNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -178,7 +178,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             }
             var backSide = $"{(f.MinWind + f.MaxWind) / 2} nœuds";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameFromSpeedAsync(int windSpeed, BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -189,7 +189,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             CreateCard.Request request = new(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberFromSpeedAsync(int windSpeed, BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -200,7 +200,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"{f.Number}", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameFromNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -211,7 +211,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Name}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberFromNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -222,7 +222,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             }
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), $"_{f.Number}_", Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceAboveNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -236,7 +236,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"_{forceFromNumber[f.Number + 1].Name}_";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceBelowNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -250,7 +250,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"_{forceFromNumber[f.Number - 1].Name}_";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberOfForceAboveNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -264,7 +264,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"{forceFromNumber[f.Number + 1].Number}";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNumberOfForceBelowNameAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -278,7 +278,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"{forceFromNumber[f.Number - 1].Number}";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceAboveNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -292,7 +292,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"_{forceFromNumber[f.Number + 1].Name}_";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         private async Task GenerateNameOfForceBelowNumberAsync(BeaufortForce f, Guid userId, Guid frenchLanguageId, Guid tagId)
         {
@@ -306,7 +306,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
                 return;
             var backSide = $"_{forceFromNumber[f.Number - 1].Name}_";
             var request = new CreateCard.Request(userId, frontSide, Array.Empty<Guid>(), backSide, Array.Empty<Guid>(), additionalInfo, Array.Empty<Guid>(), frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
-            await new CreateCard(dbContext).RunAsync(request, new FakeStringLocalizer());
+            await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request, new FakeStringLocalizer());
         }
         #endregion
         public BeaufortCardCreator(IServiceProvider serviceProvider)
