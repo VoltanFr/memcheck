@@ -322,7 +322,7 @@ var app = new Vue({
                 const url = '/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating;
                 const timeOut = Math.min(60000, (ratingOperation.nbAttempts + 1) * 1000);
 
-                this.currentRatingPromise = axios.patch(url, timeOut)
+                this.currentRatingPromise = pachAxios(url, timeOut)
                     .then(result => {
                         this.currentRatingPromise = null;
                         this.additionalRatingDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
