@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.Cards;
+﻿using MemCheck.Application;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Decks;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.Notifying;
@@ -8,6 +9,7 @@ using MemCheck.Application.Tags;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +25,14 @@ namespace MemCheck.WebUI.Controllers
     public class SearchController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
         private static readonly Guid allTagsFakeGuid = new("11111111-1111-1111-1111-111111111111");
         #endregion
-        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer) : base(localizer)
+        public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
             this.userManager = userManager;
         }
         #region GetAllStaticData
@@ -42,9 +44,9 @@ namespace MemCheck.WebUI.Controllers
             if (user == null)
                 decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.Result>();
             else
-                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(dbContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
-            var allTags = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
-            var allUsers = await new GetUsers(dbContext).RunAsync();
+                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(callContext.DbContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
+            var allTags = await new GetAllTags(callContext.DbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            var allUsers = await new GetUsers(callContext.DbContext).RunAsync();
             GetAllStaticDataViewModel value = new(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
             return base.Ok(value);
         }
@@ -337,7 +339,7 @@ namespace MemCheck.WebUI.Controllers
             if (request.Heap != -1)
                 applicationRequest = applicationRequest with { Heap = request.Heap };
 
-            var applicationResult = await new SearchCards(dbContext).RunAsync(applicationRequest);
+            var applicationResult = await new SearchCards(callContext.DbContext).RunAsync(applicationRequest);
 
             var result = new RunQueryViewModel(applicationResult, this);
 
@@ -451,7 +453,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
-            await new AddTagToCards(dbContext, this).RunAsync(appRequest);
+            await new AddTagToCards(callContext, this).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("TagAdded"), this);
         }
         public sealed class AddTagToCardsRequest
@@ -465,7 +467,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
+            await new AddCardsInDeck(callContext.DbContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardAdded") : Get("CardsAdded"), this);
         }
         public sealed class AddCardsToDeckRequest
@@ -479,7 +481,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new RemoveCardsFromDeck(dbContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
+            await new RemoveCardsFromDeck(callContext.DbContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardRemoved") : Get("CardsRemoved"), this);
         }
         public sealed class RemoveCardsFromDeckRequest
@@ -494,7 +496,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new MoveCardsToHeap.Request(userId, deckId, heapId, request.CardIds);
-            await new MoveCardsToHeap(dbContext).RunAsync(appRequest);
+            await new MoveCardsToHeap(callContext.DbContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardMoved") : Get("CardsMoved"), this);
 
         }
@@ -510,7 +512,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
-            await new DeleteCards(dbContext, this).RunAsync(appRequest);
+            await new DeleteCards(callContext.DbContext, this).RunAsync(appRequest);
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardDeleted") : Get("CardsDeleted"), this);
 
         }
@@ -526,7 +528,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
-            await new AddCardSubscriptions(dbContext).RunAsync(appRequest);
+            await new AddCardSubscriptions(callContext.DbContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("Registered"), this);
         }
         public sealed class RegisterForNotificationsRequest
@@ -541,7 +543,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
-            await new RemoveCardSubscriptions(dbContext).RunAsync(appRequest);
+            await new RemoveCardSubscriptions(callContext.DbContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("Unregistered"), this);
         }
         public sealed class UnregisterForNotificationsRequest
@@ -575,7 +577,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
             var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Get("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
-            await new SubscribeToSearch(dbContext).RunAsync(applicationRequest);
+            await new SubscribeToSearch(callContext.DbContext).RunAsync(applicationRequest);
             return ControllerResultWithToast.Success(Get("SubscriptionRecorded"), this);
         }
         public sealed class SubscribeToSearchViewModel

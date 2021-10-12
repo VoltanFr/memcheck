@@ -12,27 +12,28 @@ namespace MemCheck.Application.Cards
     public sealed class AddTagToCards
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly ILocalized localizer;
         #endregion
-        public AddTagToCards(MemCheckDbContext dbContext, ILocalized localizer)
+        public AddTagToCards(CallContext callContext, ILocalized localizer)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.localizer = localizer;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var tagName = await dbContext.Tags.Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
-            var previousVersionCreator = new PreviousVersionCreator(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
+            var tagName = await callContext.DbContext.Tags.Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
+            var previousVersionCreator = new PreviousVersionCreator(callContext.DbContext);
             foreach (var cardId in request.CardIds)
-                if (!dbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
+                if (!callContext.DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
                     var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, localizer.Get("AddTag") + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
-                    dbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
+                    callContext.DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }
-            await dbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("AddTagToCards", ("TagId", request.TagId.ToString()), ("TagName", tagName), ("CardCount", request.CardIds.Count().ToString()));
+            await callContext.DbContext.SaveChangesAsync();
         }
         #region Request class
         public sealed class Request
