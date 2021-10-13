@@ -31,7 +31,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public AuthoringController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AuthoringController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region GetUsers, returns IEnumerable<GetUsersViewModel>
@@ -81,7 +81,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var versionDescription = Get("InitialCardVersionCreation");
             var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
-            var cardId = await new CreateCard(callContext).RunAsync(request, this);
+            var cardId = await new CreateCard(callContext).RunAsync(request);
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardsInDeck(callContext.DbContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);

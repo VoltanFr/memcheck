@@ -6,7 +6,7 @@ namespace MemCheck.Application.Tests.Helpers
     {
         public static CallContext InCallContext(MemCheckDbContext dbContext)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient());
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new TestLocalizer());
         }
         public void TrackEvent(string eventName, params (string key, string value)[] properties)
         {

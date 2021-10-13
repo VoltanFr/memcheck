@@ -32,7 +32,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public SearchController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<SearchController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region GetAllStaticData
@@ -453,7 +453,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
-            await new AddTagToCards(callContext, this).RunAsync(appRequest);
+            await new AddTagToCards(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("TagAdded"), this);
         }
         public sealed class AddTagToCardsRequest

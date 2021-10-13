@@ -27,9 +27,9 @@ namespace MemCheck.Application.Cards
         {
             this.callContext = callContext;
         }
-        public async Task<Guid> RunAsync(Request request, ILocalized localizer)
+        public async Task<Guid> RunAsync(Request request)
         {
-            CardInputValidator.Run(request, localizer);
+            CardInputValidator.Run(request, callContext.Localized);
 
             var language = callContext.DbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
             var versionCreator = callContext.DbContext.Users.Where(user => user.Id == request.VersionCreatorId).Single();

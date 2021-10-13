@@ -7,7 +7,7 @@ namespace MemCheck.CommandLineDbClient
     {
         public static CallContext InCallContext(MemCheckDbContext dbContext)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient());
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new FakeStringLocalizer());
         }
         public void TrackEvent(string eventName, params (string key, string value)[] properties)
         {

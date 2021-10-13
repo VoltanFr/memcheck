@@ -13,12 +13,10 @@ namespace MemCheck.Application.Cards
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly ILocalized localizer;
         #endregion
-        public AddTagToCards(CallContext callContext, ILocalized localizer)
+        public AddTagToCards(CallContext callContext)
         {
             this.callContext = callContext;
-            this.localizer = localizer;
         }
         public async Task RunAsync(Request request)
         {
@@ -28,7 +26,7 @@ namespace MemCheck.Application.Cards
             foreach (var cardId in request.CardIds)
                 if (!callContext.DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, localizer.Get("AddTag") + $" '{tagName}'");
+                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, callContext.Localized.Get("AddTag") + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
                     callContext.DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }

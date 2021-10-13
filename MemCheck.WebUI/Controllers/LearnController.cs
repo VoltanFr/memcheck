@@ -32,7 +32,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient));
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region GetImage
