@@ -77,7 +77,7 @@ namespace MemCheck.Application.Cards
             var runDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), RandomHelper.Date(runDate));
             }
             using (var dbContext = new MemCheckDbContext(db))
@@ -97,7 +97,7 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
             using (var dbContext = new MemCheckDbContext(db))
@@ -118,7 +118,7 @@ namespace MemCheck.Application.Cards
             var runDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), RandomHelper.DateBefore(runDate));
             }
             using (var dbContext = new MemCheckDbContext(db))
@@ -145,7 +145,7 @@ namespace MemCheck.Application.Cards
             var cardDeletedAfterRunDate = await CardHelper.CreateAsync(db, user, language: languageId);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedAfterRunDate.Id.AsArray()), RandomHelper.Date(runDate));
             }
 
@@ -155,7 +155,7 @@ namespace MemCheck.Application.Cards
             var cardDeletedBeforeRunDate = await CardHelper.CreateAsync(db, user, language: languageId);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedBeforeRunDate.Id.AsArray()), RandomHelper.DateBefore(runDate));
             }
 
@@ -187,7 +187,7 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
             using (var dbContext = new MemCheckDbContext(db))
@@ -215,7 +215,7 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
             using (var dbContext = new MemCheckDbContext(db))
@@ -244,7 +244,7 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
             using (var dbContext = new MemCheckDbContext(db))

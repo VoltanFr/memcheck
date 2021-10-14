@@ -385,7 +385,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext, new TestLocalizer());
+                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
                 await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
             }
 
@@ -521,7 +521,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.AsArray());
-                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(deletionRequest);
+                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(deletionRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -595,7 +595,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.AsArray());
-                await new DeleteCards(dbContext, new TestLocalizer()).RunAsync(deletionRequest);
+                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(deletionRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);

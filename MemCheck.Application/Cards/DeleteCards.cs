@@ -12,27 +12,25 @@ namespace MemCheck.Application.Cards
     public sealed class DeleteCards
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
-        private readonly ILocalized localizer;
+        private readonly CallContext callContext;
         #endregion
-        public DeleteCards(MemCheckDbContext dbContext, ILocalized localizer)
+        public DeleteCards(CallContext callContext)
         {
-            this.dbContext = dbContext;
-            this.localizer = localizer;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request, DateTime? deletionUtcDate = null)
         {
-            await request.CheckValidityAsync(dbContext, localizer);
+            await request.CheckValidityAsync(callContext.DbContext, callContext.Localized);
 
             foreach (var cardId in request.CardIds)
             {
-                var previousVersionCreator = new PreviousVersionCreator(dbContext);
-                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, localizer.Get("Deletion"), deletionUtcDate);
+                var previousVersionCreator = new PreviousVersionCreator(callContext.DbContext);
+                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, callContext.Localized.Get("Deletion"), deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card, deletionUtcDate);
-                dbContext.Cards.Remove(card);
+                callContext.DbContext.Cards.Remove(card);
             }
-
-            await dbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("DeleteCards", ("CardCount", request.CardIds.Count().ToString()));
+            await callContext.DbContext.SaveChangesAsync();
         }
         public sealed class Request
         {
