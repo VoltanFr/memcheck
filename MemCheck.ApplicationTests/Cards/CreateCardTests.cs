@@ -134,7 +134,7 @@ namespace MemCheck.Application.Cards
                 RandomHelper.String());
             var ownerMustHaveVisibility = RandomHelper.String();
             var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).AsArray());
-            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(request));
+            var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(FakeMemCheckTelemetryClient.InCallContext(dbContext, localizer)).RunAsync(request));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
         }
         [TestMethod()]
