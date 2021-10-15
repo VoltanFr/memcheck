@@ -66,7 +66,7 @@ namespace MemCheck.Application.Cards
             var deletedCard = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, deletedCard.Id);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -90,7 +90,7 @@ namespace MemCheck.Application.Cards
             var deletedCard = await CardHelper.CreateAsync(db, user);
             await CardSubscriptionHelper.CreateAsync(db, user, deletedCard.Id);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(user, deletedCard.Id.AsArray()));
 
             var nonRegisteredCard = await CardHelper.CreateAsync(db, user);
 

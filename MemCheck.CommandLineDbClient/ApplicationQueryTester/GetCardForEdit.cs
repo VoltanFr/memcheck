@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application;
+using MemCheck.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,17 +14,17 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
     {
         #region Fields
         private readonly ILogger<GetCardForEdit> logger;
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         public GetCardForEdit(IServiceProvider serviceProvider)
         {
             logger = serviceProvider.GetRequiredService<ILogger<GetCardForEdit>>();
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+            callContext = FakeMemCheckTelemetryClient.InCallContext(serviceProvider.GetRequiredService<MemCheckDbContext>());
         }
         async public Task RunAsync()
         {
-            var userId = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
-            var cardId = dbContext.Cards.Where(card => !card.UsersWithView.Any() && card.Images.Any()).OrderBy(card => card.VersionUtcDate).First().Id;
+            var userId = callContext.DbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
+            var cardId = callContext.DbContext.Cards.Where(card => !card.UsersWithView.Any() && card.Images.Any()).OrderBy(card => card.VersionUtcDate).First().Id;
 
             const int runCount = 20;
 
@@ -31,7 +32,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             for (int i = 0; i < runCount; i++)
             {
                 var request = new Application.Cards.GetCardForEdit.Request(userId, cardId);
-                var runner = new Application.Cards.GetCardForEdit(dbContext);
+                var runner = new Application.Cards.GetCardForEdit(callContext);
                 var oneRunChrono = Stopwatch.StartNew();
                 var card = await runner.RunAsync(request);
                 logger.LogInformation($"Got a card with {card.Images.Count()} images, {card.CountOfUserRatings} ratings, {card.Tags.Count()} tags, {card.UsersOwningDeckIncluding.Count()} users, {card.UsersWithVisibility} users with access in {oneRunChrono.Elapsed}");

@@ -12,7 +12,7 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime? deletionDate = null)
         {
             using var dbContext = new MemCheckDbContext(db);
-            var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
+            var deleter = new DeleteCards(dbContext.AsCallContext());
             var deletionRequest = new DeleteCards.Request(userId, cardId.AsArray());
             await deleter.RunAsync(deletionRequest, deletionDate);
         }

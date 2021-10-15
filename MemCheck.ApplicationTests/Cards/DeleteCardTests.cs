@@ -38,7 +38,7 @@ namespace MemCheck.Application.Cards
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
                 var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
                 Assert.AreEqual("User not allowed to view card", e.Message);
             }
@@ -55,7 +55,7 @@ namespace MemCheck.Application.Cards
                 await new DeleteUserAccount(dbContext, new TestRoleChecker(adminUser), userManager).RunAsync(new DeleteUserAccount.Request(adminUser, user));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext));
+                var deleter = new DeleteCards(dbContext.AsCallContext());
                 var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
                 Assert.AreEqual("User not found", e.Message);
             }
@@ -144,7 +144,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfAllPreviousVersions", "YouAreNotTheCreatorOfAllPreviousVersions"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfAllPreviousVersions", "YouAreNotTheCreatorOfAllPreviousVersions"))));
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray())));
                 StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfAllPreviousVersions");
             }
@@ -168,7 +168,7 @@ namespace MemCheck.Application.Cards
             using (var userManager = UserHelper.GetUserManager(dbContext))
                 await new DeleteUserAccount(dbContext, new TestRoleChecker(lastVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(lastVersionCreator, firstVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray()));
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 Assert.IsFalse(dbContext.Cards.Any());
@@ -187,7 +187,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext, new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray())));
                 StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfCurrentVersion");
             }
@@ -209,7 +209,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
             await UserHelper.DeleteAsync(db, lastVersionCreator);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray()));
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 Assert.IsFalse(dbContext.Cards.Any());

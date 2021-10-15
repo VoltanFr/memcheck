@@ -148,7 +148,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetCardForEdit(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = new GetCardForEdit(callContext.DbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            var result = new GetCardForEdit(callContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
             return Ok(new GetCardForEditViewModel(await result, this));
         }
         #region Request and view model classes
@@ -311,7 +311,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> CardSelectedVersionDiffWithCurrent(Guid cardId, Guid selectedVersionId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var card = await new GetCardForEdit(callContext.DbContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            var card = await new GetCardForEdit(callContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
             var selectedVersion = await new GetCardVersion(callContext.DbContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
             var result = new CardSelectedVersionDiffWithCurrentResult(card, selectedVersion, this);
             return Ok(result);

@@ -21,6 +21,26 @@ namespace MemCheck.Application.QueryValidation
                 throw new InvalidOperationException("Invalid user with view id");
             return !usersWithView.Any() || usersWithView.Any(userWithView => userWithView == userId);
         }
+        public static bool CardIsPublic(IEnumerable<Guid> usersWithView)
+        {
+            return !usersWithView.Any();
+        }
+        public static bool CardIsPublic(IEnumerable<UserWithViewOnCard> usersWithView)
+        {
+            return !usersWithView.Any();
+        }
+        public static bool CardIsPrivateToSingleUser(Guid userId, IEnumerable<Guid> usersWithView)
+        {
+            if (QueryValidationHelper.IsReservedGuid(userId))
+                throw new InvalidOperationException("Invalid user id");
+            if (usersWithView.Any(uwv => QueryValidationHelper.IsReservedGuid(uwv)))
+                throw new InvalidOperationException("Invalid user with view id");
+            return usersWithView.Count() == 1 && usersWithView.Single(userWithView => userWithView == userId) == userId;
+        }
+        public static bool CardIsPrivateToSingleUser(Guid userId, IEnumerable<UserWithViewOnCard> usersWithView)
+        {
+            return CardIsPrivateToSingleUser(userId, usersWithView.Select(uwv => uwv.UserId));
+        }
         public static void CheckUserIsAllowedToViewCards(MemCheckDbContext dbContext, Guid userId, params Guid[] cardIds)
         {
             var cards = dbContext.Cards

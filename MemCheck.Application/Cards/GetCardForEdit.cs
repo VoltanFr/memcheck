@@ -12,17 +12,17 @@ namespace MemCheck.Application.Cards
     public sealed class GetCardForEdit
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetCardForEdit(MemCheckDbContext dbContext)
+        public GetCardForEdit(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<ResultModel> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var card = await dbContext.Cards
+            var card = await callContext.DbContext.Cards
                 .AsNoTracking()
                 .Include(card => card.VersionCreator)
                 .Include(card => card.Images)
@@ -36,13 +36,21 @@ namespace MemCheck.Application.Cards
                 .AsSingleQuery()
                 .SingleAsync();
 
-            var userRating = await dbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
+            var userRating = await callContext.DbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
 
-            var ownersOfDecksWithThisCard = dbContext.CardsInDecks
+            var ownersOfDecksWithThisCard = callContext.DbContext.CardsInDecks
                 .AsNoTracking()
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId)
                 .Select(cardInDeck => cardInDeck.Deck.Owner.UserName)
                 .Distinct();
+
+            callContext.TelemetryClient.TrackEvent("GetCardForEdit",
+                ("CardId", request.CardId.ToString()),
+                ("CardAverageRating", card.AverageRating.ToString()),
+                ("CardIsPublic", CardVisibilityHelper.CardIsPublic(card.UsersWithView).ToString()),
+                ("AgeOfCardInDays", (card.VersionUtcDate - DateTime.UtcNow).TotalDays.ToString()),
+                ("CardIsPrivateToSingleUser", CardVisibilityHelper.CardIsPrivateToSingleUser(request.CurrentUserId, card.UsersWithView).ToString())
+            );
 
             return new ResultModel(
                 card.FrontSide,

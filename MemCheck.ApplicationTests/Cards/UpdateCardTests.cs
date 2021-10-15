@@ -470,7 +470,7 @@ namespace MemCheck.Application.Cards
             var rating = RandomHelper.Rating();
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user, card.Id, rating));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user, card.Id, rating));
 
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()), new TestLocalizer());

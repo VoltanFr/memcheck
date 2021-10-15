@@ -15,13 +15,13 @@ namespace MemCheck.Application.Cards
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotView()
@@ -40,7 +40,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray());
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
         }
         [TestMethod()]
         public async Task CardWithPreviousVersion()
@@ -64,7 +64,7 @@ namespace MemCheck.Application.Cards
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var loaded = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id));
+                var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id));
 
                 Assert.AreEqual(firstVersionDate, loaded.FirstVersionUtcDate);
                 Assert.AreEqual(lastVersionDate, loaded.LastVersionUtcDate);
@@ -96,7 +96,7 @@ namespace MemCheck.Application.Cards
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetCardForEdit(dbContext).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
+            var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
 
             Assert.AreEqual(frontSide, loaded.FrontSide);
             Assert.AreEqual(backSide, loaded.BackSide);

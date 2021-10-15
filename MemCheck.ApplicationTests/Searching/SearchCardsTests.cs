@@ -224,7 +224,7 @@ namespace MemCheck.Application.Searching
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(userId, cardId, 4));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(userId, cardId, 4));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -289,7 +289,7 @@ namespace MemCheck.Application.Searching
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(userId, cardId, 4));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(userId, cardId, 4));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -317,8 +317,8 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1Id, cardId, 4));
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user2Id, cardId, 2));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user1Id, cardId, 4));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user2Id, cardId, 2));
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -358,10 +358,10 @@ namespace MemCheck.Application.Searching
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1Id, card1Id, 4));
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user2Id, card1Id, 2));
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user1Id, card2Id, 5));
-                await new SetCardRating(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new SetCardRating.Request(user2Id, card2Id, 3));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user1Id, card1Id, 4));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user2Id, card1Id, 2));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user1Id, card2Id, 5));
+                await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user2Id, card2Id, 3));
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))

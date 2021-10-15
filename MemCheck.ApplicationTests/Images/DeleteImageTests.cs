@@ -98,7 +98,7 @@ namespace MemCheck.Application.Images
             var card = await CardHelper.CreateAsync(db, user, additionalSideImages: image.AsArray());
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCards(FakeMemCheckTelemetryClient.InCallContext(dbContext)).RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
 
             var deletionDescription = RandomHelper.String();
             var deletionDate = RandomHelper.Date(imageUploadDate);
