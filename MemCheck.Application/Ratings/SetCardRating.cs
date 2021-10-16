@@ -1,10 +1,12 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,16 +18,44 @@ namespace MemCheck.Application.Ratings
         private readonly CallContext callContext;
         #endregion
         #region Private methods
-        private async Task SaveRatingByUserAsync(Request request)
+        private async Task<int> SaveRatingByUserAsync(Request request)
         {
-            var existingRatingByUser = await callContext.DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();
+            int attempts = 0;
+            while (true)
+            {
+                var existingRatingByUser = await callContext.DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();
 
-            if (existingRatingByUser == null)
-                callContext.DbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = request.CardId, Rating = request.Rating });
-            else
-                existingRatingByUser.Rating = request.Rating;
+                if (existingRatingByUser == null)
+                {
+                    try
+                    {
+                        callContext.DbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = request.CardId, Rating = request.Rating });
+                        await callContext.DbContext.SaveChangesAsync();
+                        return 0;
+                    }
+                    catch (SqlException e)
+                    {
+                        if (attempts < 5 && e.Message.Contains("Violation of PRIMARY KEY constraint"))
+                        {
+                            //Production metrics (Azure Application Insights) show that we are sometimes in this case. My analysis is that this happens because of the JavaScript retries (in Learn.js/handlePendingRatingOperations)
+                            attempts++;
+                            await Task.Delay(TimeSpan.FromMilliseconds(Randomizer.Next(50, 1000)));
+                        }
+                        else
+                            throw;
+                    }
+                }
+                else
+                {
+                    if (existingRatingByUser.Rating == request.Rating)
+                        return existingRatingByUser.Rating;
 
-            await callContext.DbContext.SaveChangesAsync();
+                    var result = existingRatingByUser.Rating;
+                    existingRatingByUser.Rating = request.Rating;
+                    await callContext.DbContext.SaveChangesAsync();
+                    return result;
+                }
+            }
         }
         private async Task UpdateCardAsync(Guid cardId)
         {
@@ -45,9 +75,10 @@ namespace MemCheck.Application.Ratings
         public async Task RunAsync(Request request)
         {
             await request.CheckValidityAsync(callContext.DbContext);
-            await SaveRatingByUserAsync(request);
-            await UpdateCardAsync(request.CardId);
-            callContext.TelemetryClient.TrackEvent("SetCardRating", ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()));
+            var previousValue = await SaveRatingByUserAsync(request);
+            if (previousValue != request.Rating)
+                await UpdateCardAsync(request.CardId);
+            callContext.TelemetryClient.TrackEvent("SetCardRating", ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()), ("PreviousValue", previousValue.ToString()));
         }
         #region Request class
         public sealed class Request
