@@ -3,14 +3,21 @@ using MemCheck.Database;
 
 namespace MemCheck.CommandLineDbClient
 {
-    public sealed class FakeMemCheckTelemetryClient : IMemCheckTelemetryClient
+    internal sealed class FakeMemCheckTelemetryClient : IMemCheckTelemetryClient
     {
-        public static CallContext InCallContext(MemCheckDbContext dbContext)
+        public void TrackEvent(string eventName, params (string key, string value)[] properties)
+        {
+        }
+    }
+    internal static class DbContextExtensions
+    {
+        public static CallContext AsCallContext(this MemCheckDbContext dbContext)
         {
             return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new FakeStringLocalizer());
         }
-        public void TrackEvent(string eventName, params (string key, string value)[] properties)
+        public static CallContext AsCallContext(this MemCheckDbContext dbContext, FakeStringLocalizer fakeLocalizer)
         {
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), fakeLocalizer);
         }
     }
 }

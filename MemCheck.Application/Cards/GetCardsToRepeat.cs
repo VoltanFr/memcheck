@@ -17,10 +17,10 @@ namespace MemCheck.Application.Cards
     public sealed class GetCardsToRepeat
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
-        private async Task<IEnumerable<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
+        private async Task<List<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
         {
             var result = new List<ResultCard>();
 
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Cards
         }
         private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
         {
-            var cardsOfHeap = dbContext.CardsInDecks.AsNoTracking()
+            var cardsOfHeap = callContext.DbContext.CardsInDecks.AsNoTracking()
                 .Include(cardInDeck => cardInDeck.Card)
                 .Where(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CurrentHeap == heap)
                 .Where(cardInDeck => !request.ExcludedCardIds.Contains(cardInDeck.CardId))
@@ -63,10 +63,10 @@ namespace MemCheck.Application.Cards
                     cardInDeck.Card.RatingCount
                 }).ToImmutableArray();
 
-            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(request.CurrentUserId, cardsOfHeap.Select(c => c.CardId));
+            var notifications = new CardRegistrationsLoader(callContext.DbContext).RunForCardIds(request.CurrentUserId, cardsOfHeap.Select(c => c.CardId));
 
             //The following line could be improved with a joint. Not sure this would perform better, to be checked
-            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == request.CurrentUserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
+            var userRatings = await callContext.DbContext.UserCardRatings.Where(r => r.UserId == request.CurrentUserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
             var thisHeapResult = cardsOfHeap.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                 oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
@@ -87,20 +87,29 @@ namespace MemCheck.Application.Cards
             return thisHeapResult;
         }
         #endregion
-        public GetCardsToRepeat(MemCheckDbContext dbContext)
+        public GetCardsToRepeat(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<ResultCard>> RunAsync(Request request, DateTime? now = null)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
-            var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-            var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
-            var tagNames = TagLoadingHelper.Run(dbContext);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
+            var userNames = callContext.DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
+            var imageNames = ImageLoadingHelper.GetAllImageNames(callContext.DbContext);
+            var tagNames = TagLoadingHelper.Run(callContext.DbContext);
 
-            return await RunAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now == null ? DateTime.UtcNow : now.Value);
+            var result = await RunAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now == null ? DateTime.UtcNow : now.Value);
+
+            callContext.TelemetryClient.TrackEvent("GetCardsToRepeat",
+                ("DeckId", request.DeckId.ToString()),
+                ("ExcludedCardCount", request.ExcludedCardIds.Count().ToString()),
+                ("ExcludedTagCount", request.ExcludedTagIds.Count().ToString()),
+                ("RequestedCardCount", request.CardsToDownload.ToString()),
+                ("ResultCount", result.Count.ToString()));
+
+            return result;
         }
         #region Request and result classes
         public sealed class Request

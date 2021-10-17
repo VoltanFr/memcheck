@@ -169,7 +169,7 @@ namespace MemCheck.Application.Cards
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-                var card = (await new GetCardsToRepeat(dbContext).RunAsync(request, addToDeckDate.AddDays(1))).Single();
+                var card = (await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, addToDeckDate.AddDays(1))).Single();
 
                 var images = card.Images;
                 Assert.AreEqual(2, images.Count());

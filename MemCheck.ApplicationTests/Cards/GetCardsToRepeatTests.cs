@@ -21,7 +21,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(Guid.Empty, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -32,7 +32,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(otherUser, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task EmptyDeck()
@@ -65,7 +65,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, new DateTime(2000, 1, 2));
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, new DateTime(2000, 1, 2));
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
@@ -80,7 +80,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(4));
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, addDate.AddDays(4));
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
@@ -95,7 +95,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(1));
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, addDate.AddDays(1));
             Assert.AreEqual(card.Id, cards.Single().CardId);
         }
         [TestMethod()]
@@ -113,15 +113,15 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount / 2);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, loadTime);
             Assert.AreEqual(request.CardsToDownload, cards.Count());
 
             request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
+            cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, loadTime);
             Assert.AreEqual(request.CardsToDownload, cards.Count());
 
             request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);
-            cards = await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime);
+            cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, loadTime);
             Assert.AreEqual(cardCount, cards.Count());
         }
         [TestMethod()]
@@ -139,7 +139,7 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            var cards = (await new GetCardsToRepeat(dbContext).RunAsync(request, loadTime)).ToImmutableArray();
+            var cards = (await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, loadTime)).ToImmutableArray();
             Assert.AreEqual(cardCount, cards.Length);
             for (int i = 1; i < cards.Length; i++)
             {
@@ -162,7 +162,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetCardsToRepeat(dbContext).RunAsync(request, addDate.AddDays(1));
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, addDate.AddDays(1));
             var resultImages = cards.Single().Images;
             Assert.AreEqual(2, resultImages.Count());
             Assert.AreEqual(image1, resultImages.First().ImageId);

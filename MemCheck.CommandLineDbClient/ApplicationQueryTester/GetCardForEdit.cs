@@ -19,7 +19,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         public GetCardForEdit(IServiceProvider serviceProvider)
         {
             logger = serviceProvider.GetRequiredService<ILogger<GetCardForEdit>>();
-            callContext = FakeMemCheckTelemetryClient.InCallContext(serviceProvider.GetRequiredService<MemCheckDbContext>());
+            callContext = serviceProvider.GetRequiredService<MemCheckDbContext>().AsCallContext();
         }
         async public Task RunAsync()
         {

@@ -47,7 +47,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         private async Task<double> RunOneGet(Guid userId, Guid deckId)
         {
             var request = new GetCardsToRepeat.Request(userId, deckId, Array.Empty<Guid>(), Array.Empty<Guid>(), 100);
-            var runner = new GetCardsToRepeat(dbContext);
+            var runner = new GetCardsToRepeat(dbContext.AsCallContext());
             var chrono = Stopwatch.StartNew();
             var cards = await runner.RunAsync(request);
             chrono.Stop();

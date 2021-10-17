@@ -91,7 +91,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
                 var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetCardsToRepeat(callContext.DbContext).RunAsync(applicationRequest);
+                var applicationResult = await new GetCardsToRepeat(callContext).RunAsync(applicationRequest);
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }
