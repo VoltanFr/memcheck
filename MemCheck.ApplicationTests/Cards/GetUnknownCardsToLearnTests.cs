@@ -23,7 +23,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(Guid.Empty, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -44,7 +44,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(otherUser, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task OneCardToRepeat()
@@ -69,7 +69,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetUnknownCardsToLearn(dbContext).RunAsync(request);
+            var cards = await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request);
             Assert.IsFalse(cards.Any());
         }
         [TestMethod()]
@@ -83,7 +83,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetUnknownCardsToLearn(dbContext).RunAsync(request);
+            var cards = await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(1, cards.Count());
         }
         [TestMethod()]
@@ -97,7 +97,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetUnknownCardsToLearn(dbContext).RunAsync(request);
+            var cards = await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(1, cards.Count());
             Assert.AreNotEqual(CardInDeck.NeverLearntLastLearnTime, cards.First().LastLearnUtcTime);
         }
@@ -115,11 +115,11 @@ namespace MemCheck.Application.Cards
             using var dbContext = new MemCheckDbContext(db);
             const int requestCardCount = 10;
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), requestCardCount);
-            var firstRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
+            var firstRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, firstRunCards.Count);
-            var secondRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
+            var secondRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, secondRunCards.Count);
-            var thirdRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
+            var thirdRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, thirdRunCards.Count);
             Assert.IsFalse(firstRunCards.SetEquals(secondRunCards));
             Assert.IsFalse(firstRunCards.SetEquals(thirdRunCards));
@@ -139,11 +139,11 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            var firstRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
+            var firstRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
             Assert.AreEqual(cardCount, firstRunCards.Length);
-            var secondRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
+            var secondRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
             Assert.AreEqual(cardCount, secondRunCards.Length);
-            var thirdRunCards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
+            var thirdRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableArray();
             Assert.AreEqual(cardCount, thirdRunCards.Length);
             Assert.IsFalse(firstRunCards.SequenceEqual(secondRunCards));
             Assert.IsFalse(firstRunCards.SequenceEqual(thirdRunCards));
@@ -160,7 +160,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-            var cards = await new GetUnknownCardsToLearn(dbContext).RunAsync(request);
+            var cards = await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(1, cards.Count());
         }
         [TestMethod()]
@@ -177,7 +177,7 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            var cards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).ToImmutableArray();
+            var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).ToImmutableArray();
             Assert.AreEqual(cardCount, cards.Length);
             for (int i = 1; i < cards.Length; i++)
                 Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
@@ -196,7 +196,7 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
-            var cards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).ToImmutableArray();
+            var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).ToImmutableArray();
             Assert.AreEqual(cardCount, cards.Length);
             for (int i = 1; i < cardCount / 2; i++)
                 Assert.AreEqual(CardInDeck.NeverLearntLastLearnTime, cards[i].LastLearnUtcTime);
@@ -217,7 +217,7 @@ namespace MemCheck.Application.Cards
             }
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);
-            var cards = (await new GetUnknownCardsToLearn(dbContext).RunAsync(request)).ToImmutableArray();
+            var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).ToImmutableArray();
             Assert.AreEqual(cardCount, cards.Length);
             for (int i = 1; i < cardCount / 2; i++)
                 Assert.AreEqual(CardInDeck.NeverLearntLastLearnTime, cards[i].LastLearnUtcTime);

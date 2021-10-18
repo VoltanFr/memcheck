@@ -17,12 +17,12 @@ namespace MemCheck.Application.Cards
     public sealed class GetUnknownCardsToLearn
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
         {
-            var cardsOfDeck = dbContext.CardsInDecks.AsNoTracking()
+            var cardsOfDeck = callContext.DbContext.CardsInDecks.AsNoTracking()
                 .Include(card => card.Card).AsSingleQuery()
                 .Where(card => card.DeckId.Equals(deckId) && card.CurrentHeap == 0 && !excludedCardIds.Contains(card.CardId));
 
@@ -59,10 +59,10 @@ namespace MemCheck.Application.Cards
 
             var listed = await withDetails.ToListAsync();
             var cardIds = listed.Select(cardInDeck => cardInDeck.CardId);
-            var notifications = new CardRegistrationsLoader(dbContext).RunForCardIds(userId, cardIds);
+            var notifications = new CardRegistrationsLoader(callContext.DbContext).RunForCardIds(userId, cardIds);
 
             //The following line could be improved with a joint. Not sure this would perform better, to be checked
-            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
+            var userRatings = await callContext.DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
             var result = listed.Select(cardInDeck => new ResultCard(
                 cardInDeck.CardId,
@@ -89,22 +89,30 @@ namespace MemCheck.Application.Cards
                 return result;
         }
         #endregion
-        public GetUnknownCardsToLearn(MemCheckDbContext dbContext)
+        public GetUnknownCardsToLearn(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<ResultCard>> RunAsync(Request request)
         {
-            request.CheckValidity(dbContext);
+            request.CheckValidity(callContext.DbContext);
 
-            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
-            var userNames = dbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-            var imageNames = ImageLoadingHelper.GetAllImageNames(dbContext);
-            var tagNames = TagLoadingHelper.Run(dbContext);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
+            var userNames = callContext.DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
+            var imageNames = ImageLoadingHelper.GetAllImageNames(callContext.DbContext);
+            var tagNames = TagLoadingHelper.Run(callContext.DbContext);
 
             var result = new List<ResultCard>();
             result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
             result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
+
+            callContext.TelemetryClient.TrackEvent("GetUnknownCardsToLearn",
+                ("DeckId", request.DeckId.ToString()),
+                ("ExcludedCardCount", request.ExcludedCardIds.Count().ToString()),
+                ("ExcludedTagCount", request.ExcludedTagIds.Count().ToString()),
+                ("RequestedCardCount", request.CardsToDownload.ToString()),
+                ("ResultCount", result.Count.ToString()));
+
             return result;
         }
         #region Request and result classes

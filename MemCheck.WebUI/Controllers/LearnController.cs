@@ -83,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = 30;
                 var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetUnknownCardsToLearn(callContext.DbContext).RunAsync(applicationRequest);
+                var applicationResult = await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest);
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }
