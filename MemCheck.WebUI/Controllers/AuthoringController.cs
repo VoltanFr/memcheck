@@ -107,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
-            await new UpdateCard(callContext.DbContext).RunAsync(request, this);
+            await new UpdateCard(callContext).RunAsync(request, this);
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class UpdateCardRequest

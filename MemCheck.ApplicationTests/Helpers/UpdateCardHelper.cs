@@ -184,7 +184,7 @@ additionalInfoImages,
         public static async Task RunAsync(DbContextOptions<MemCheckDbContext> db, UpdateCard.Request request)
         {
             using var dbContext = new MemCheckDbContext(db);
-            await new UpdateCard(dbContext).RunAsync(request, new TestLocalizer());
+            await new UpdateCard(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer());
         }
     }
 }

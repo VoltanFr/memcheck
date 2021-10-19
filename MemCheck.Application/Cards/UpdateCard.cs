@@ -12,22 +12,22 @@ namespace MemCheck.Application.Cards
     public sealed class UpdateCard
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private async Task UpdateUsersWithViewAsync(Request request, Card card)
         {
             //We could do better than the current implem: just add the needed users and remove the unwanted
 
-            var usersWithVisibilityBeforeUpdate = dbContext.UsersWithViewOnCards.Where(userWithView => userWithView.CardId == request.CardId);
-            dbContext.UsersWithViewOnCards.RemoveRange(usersWithVisibilityBeforeUpdate);
+            var usersWithVisibilityBeforeUpdate = callContext.DbContext.UsersWithViewOnCards.Where(userWithView => userWithView.CardId == request.CardId);
+            callContext.DbContext.UsersWithViewOnCards.RemoveRange(usersWithVisibilityBeforeUpdate);
 
             var usersWithView = new List<UserWithViewOnCard>();
             foreach (var userFromRequestId in request.UsersWithVisibility)
             {
-                var userFromDb = dbContext.Users.Where(u => u.Id == userFromRequestId).Single();
+                var userFromDb = callContext.DbContext.Users.Where(u => u.Id == userFromRequestId).Single();
                 var userWithView = new UserWithViewOnCard() { UserId = userFromDb.Id, User = userFromDb, CardId = card.Id, Card = card };
-                await dbContext.UsersWithViewOnCards.AddAsync(userWithView);
+                await callContext.DbContext.UsersWithViewOnCards.AddAsync(userWithView);
                 usersWithView.Add(userWithView);
             }
 
@@ -35,23 +35,23 @@ namespace MemCheck.Application.Cards
         }
         private async Task UpdateTagsAsync(Request request, Card card)
         {
-            var tagsBeforeUpdate = dbContext.TagsInCards.Where(tag => tag.CardId == request.CardId);
-            dbContext.TagsInCards.RemoveRange(tagsBeforeUpdate);
+            var tagsBeforeUpdate = callContext.DbContext.TagsInCards.Where(tag => tag.CardId == request.CardId);
+            callContext.DbContext.TagsInCards.RemoveRange(tagsBeforeUpdate);
 
             var tagsInCards = new List<TagInCard>();
             foreach (var tagToAdd in request.Tags)
             {
-                var tagFromDb = dbContext.Tags.Where(t => t.Id == tagToAdd).Single();
+                var tagFromDb = callContext.DbContext.Tags.Where(t => t.Id == tagToAdd).Single();
                 var tagInCard = new TagInCard() { TagId = tagFromDb.Id, Tag = tagFromDb, CardId = card.Id };
-                await dbContext.TagsInCards.AddAsync(tagInCard);
+                await callContext.DbContext.TagsInCards.AddAsync(tagInCard);
                 tagsInCards.Add(tagInCard);
             }
             card.TagsInCards = tagsInCards;
         }
         private async Task UpdateImagesAsync(Request request, Card card)
         {
-            var imagesBeforeUpdate = dbContext.ImagesInCards.Where(image => image.CardId == request.CardId);
-            dbContext.ImagesInCards.RemoveRange(imagesBeforeUpdate);
+            var imagesBeforeUpdate = callContext.DbContext.ImagesInCards.Where(image => image.CardId == request.CardId);
+            callContext.DbContext.ImagesInCards.RemoveRange(imagesBeforeUpdate);
 
             var cardImageList = new List<ImageInCard>();
             foreach (var image in request.FrontSideImageList)
@@ -65,24 +65,24 @@ namespace MemCheck.Application.Cards
         }
         private async Task AddImageAsync(Guid cardId, Guid imageId, int cardSide, List<ImageInCard> cardImageList)
         {
-            var imageFromDb = dbContext.Images.Where(img => img.Id == imageId).Single();    //To be reviewed: it sounds stupid that we have to load the whole image info, with the blob, while we only need an id???
+            var imageFromDb = callContext.DbContext.Images.Where(img => img.Id == imageId).Single();    //To be reviewed: it sounds stupid that we have to load the whole image info, with the blob, while we only need an id???
             var img = new ImageInCard() { ImageId = imageId, Image = imageFromDb, CardId = cardId, CardSide = cardSide };
-            await dbContext.ImagesInCards.AddAsync(img);
+            await callContext.DbContext.ImagesInCards.AddAsync(img);
             cardImageList.Add(img);
         }
         #endregion
-        public UpdateCard(MemCheckDbContext dbContext)
+        public UpdateCard(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request, ILocalized localizer, DateTime? cardNewVersionUtcDate = null)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
+            await request.CheckValidityAsync(localizer, callContext.DbContext);
 
-            var previousVersionCreator = new PreviousVersionCreator(dbContext);
+            var previousVersionCreator = new PreviousVersionCreator(callContext.DbContext);
             var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreatorId, request.VersionDescription, cardNewVersionUtcDate);
 
-            card.CardLanguage = dbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
+            card.CardLanguage = callContext.DbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
             card.FrontSide = request.FrontSide;
             card.BackSide = request.BackSide;
             card.AdditionalInfo = request.AdditionalInfo;
@@ -90,7 +90,9 @@ namespace MemCheck.Application.Cards
             await UpdateUsersWithViewAsync(request, card);
             await UpdateImagesAsync(request, card);
 
-            await dbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("UpdateCard", ("CardId", request.CardId.ToString()));
+
+            await callContext.DbContext.SaveChangesAsync();
         }
         #region Request class
         public sealed record Request : ICardInput
