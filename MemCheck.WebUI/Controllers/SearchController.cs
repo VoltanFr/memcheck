@@ -467,7 +467,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new AddCardsInDeck(callContext.DbContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
+            await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardAdded") : Get("CardsAdded"), this);
         }
         public sealed class AddCardsToDeckRequest

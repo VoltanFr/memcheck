@@ -83,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
             var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
             var cardId = await new CreateCard(callContext).RunAsync(request);
             if (card.AddToDeck != Guid.Empty)
-                await new AddCardsInDeck(callContext.DbContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
+                await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class PostCardOfUserRequest

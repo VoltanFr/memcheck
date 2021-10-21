@@ -10,17 +10,17 @@ namespace MemCheck.Application.Decks
     public sealed class AddCardsInDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public AddCardsInDeck(MemCheckDbContext dbContext)
+        public AddCardsInDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var cardsInDeck = dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == request.DeckId).Select(cardInDeck => cardInDeck.CardId);
+            var cardsInDeck = callContext.DbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == request.DeckId).Select(cardInDeck => cardInDeck.CardId);
 
             var toAdd = request.CardIds.Where(cardId => !cardsInDeck.Contains(cardId)).Select(cardId => new CardInDeck()
             {
@@ -32,8 +32,9 @@ namespace MemCheck.Application.Decks
                 NbTimesInNotLearnedHeap = 1,
                 BiggestHeapReached = 0
             });
-            dbContext.CardsInDecks.AddRange(toAdd);
-            dbContext.SaveChanges();
+            callContext.DbContext.CardsInDecks.AddRange(toAdd);
+            callContext.DbContext.SaveChanges();
+            callContext.TelemetryClient.TrackEvent("AddCardsInDeck", ("DeckId", request.DeckId.ToString()), ("CardCount", request.CardIds.Length.ToString()));
         }
         #region Request type
         public sealed record Request(Guid UserId, Guid DeckId, params Guid[] CardIds)

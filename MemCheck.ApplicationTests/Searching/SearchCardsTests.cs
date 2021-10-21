@@ -122,7 +122,7 @@ namespace MemCheck.Application.Searching
             var user1deck = await DeckHelper.CreateAsync(testDB, user1Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -154,7 +154,7 @@ namespace MemCheck.Application.Searching
             var user1deck = await DeckHelper.CreateAsync(testDB, user1Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user1Id, user1deck, new[] { card1.Id, card2.Id }));
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

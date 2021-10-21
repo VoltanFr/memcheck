@@ -19,7 +19,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(Guid.Empty, deck, Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.Empty, deck, Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Decks
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, Guid.NewGuid(), Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, Guid.NewGuid(), Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfDeck()
@@ -49,7 +49,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, Guid.NewGuid().AsArray())));
+            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, Guid.NewGuid().AsArray())));
         }
         [TestMethod()]
         public async Task ACardDoesNotExist()
@@ -69,7 +69,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, Guid.NewGuid() })));
+            await Assert.ThrowsExceptionAsync<DbUpdateException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, Guid.NewGuid() })));
         }
         [TestMethod()]
         public async Task CardAlreadyInDeck()
@@ -79,9 +79,9 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user);
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, card.Id.AsArray()));
             await DeckHelper.CheckDeckContainsCards(db, deck, card.Id);
         }
         [TestMethod()]
@@ -93,9 +93,9 @@ namespace MemCheck.Application.Decks
             var card1 = await CardHelper.CreateAsync(db, user);
             var card2 = await CardHelper.CreateAsync(db, user);
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, card1.Id.AsArray()));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, card1.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card2.Id, card1.Id }));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card2.Id, card1.Id }));
             await DeckHelper.CheckDeckContainsCards(db, deck, new[] { card2.Id, card1.Id });
         }
         [TestMethod()]
@@ -108,7 +108,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task UserNotAllowedToViewACard()
@@ -121,7 +121,7 @@ namespace MemCheck.Application.Decks
             var publicCard = await CardHelper.CreateAsync(db, cardCreator);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
         }
         [TestMethod()]
         public async Task Success()
@@ -136,7 +136,7 @@ namespace MemCheck.Application.Decks
             var card3 = await CardHelper.CreateAsync(db, cardCreator);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new AddCardsInDeck(dbContext).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { card1.Id, card2.Id, card3.Id }));
+                await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { card1.Id, card2.Id, card3.Id }));
 
             await DeckHelper.CheckDeckContainsCards(db, deck, card1.Id, card2.Id, card3.Id);
         }
