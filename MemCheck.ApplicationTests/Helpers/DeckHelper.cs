@@ -25,7 +25,7 @@ namespace MemCheck.Application.Tests.Helpers
             await dbContext.SaveChangesAsync();
             return result.Id;
         }
-        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null)
+        public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null)
         {
             heap ??= RandomHelper.Heap();
             lastLearnUtcTime ??= RandomHelper.Date();
@@ -48,16 +48,16 @@ namespace MemCheck.Application.Tests.Helpers
                 CurrentHeap = heap.Value,
                 LastLearnUtcTime = lastLearnUtcTime.Value,
                 ExpiryUtcTime = expiryTime,
-                AddToDeckUtcTime = DateTime.UtcNow,
+                AddToDeckUtcTime = addToDeckUtcTime ?? DateTime.UtcNow,
                 NbTimesInNotLearnedHeap = 1,
                 BiggestHeapReached = heap.Value
             };
             dbContext.CardsInDecks.Add(cardForUser);
             await dbContext.SaveChangesAsync();
         }
-        public static async Task AddNeverLearntCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card)
+        public static async Task AddNeverLearntCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, DateTime? addToDeckUtcTime = null)
         {
-            await AddCardAsync(testDB, deck, card, 0, CardInDeck.NeverLearntLastLearnTime);
+            await AddCardAsync(testDB, deck, card, 0, CardInDeck.NeverLearntLastLearnTime, addToDeckUtcTime);
         }
         public static async Task CheckDeckContainsCards(DbContextOptions<MemCheckDbContext> testDB, Guid deck, params Guid[] cards)
         {

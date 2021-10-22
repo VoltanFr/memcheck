@@ -224,5 +224,25 @@ namespace MemCheck.Application.Cards
             for (int i = cardCount / 2; i < cards.Length; i++)
                 Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
         }
+        [TestMethod()]
+        public async Task OrderingOfNeverLearnt()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
+            var randomDate = RandomHelper.Date();
+            var cardAddedLater = await CardHelper.CreateAsync(db, user);
+            await DeckHelper.AddNeverLearntCardAsync(db, deck, cardAddedLater.Id, randomDate.AddDays(1));
+            for (int i = 0; i < 9; i++)
+            {
+                var card = await CardHelper.CreateAsync(db, user);
+                await DeckHelper.AddNeverLearntCardAsync(db, deck, card.Id, randomDate);
+            }
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 3);
+            var downloadedCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Select(c => c.CardId).ToImmutableHashSet();
+            Assert.IsFalse(downloadedCards.Contains(cardAddedLater.Id));
+        }
     }
 }

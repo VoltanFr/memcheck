@@ -14,6 +14,12 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
+    /* Returns a set of unknown cards
+     * For cards which have already been learned, the result is sorted by LastLearnUtcTime.
+     * For cards which have never been learned, we take a set of 3 times the number of requested cards, sorted by date of adding to the deck, then we shuffle this set.
+     *  This choice might look a bit complicated, but this is because we used to get a warning from Entity Framework because we use `Take` without ordering, which may lead to unpredictable results.
+     *  And I think it makes sense to begin with learning the cards which have been added the longest time ago (this case happens only when at least 10 cards are in the unknown state at the same time).
+     */
     public sealed class GetUnknownCardsToLearn
     {
         #region Fields
@@ -34,7 +40,7 @@ namespace MemCheck.Application.Cards
 
             IQueryable<CardInDeck>? finalSelection;
             if (neverLearnt)
-                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).Take(countToTake);
+                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.AddToDeckUtcTime).Take(countToTake);
             else
                 finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
 
