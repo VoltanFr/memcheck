@@ -10,19 +10,20 @@ namespace MemCheck.Application.Decks
     public sealed class CreateDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public CreateDeck(MemCheckDbContext dbContext)
+        public CreateDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request, ILocalized localizer)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
-            var user = await dbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            await request.CheckValidityAsync(localizer, callContext.DbContext);
+            var user = await callContext.DbContext.Users.SingleAsync(user => user.Id == request.UserId);
             var deck = new Deck() { Owner = user, Description = request.Name, HeapingAlgorithmId = request.HeapingAlgorithmId };
-            dbContext.Decks.Add(deck);
-            await dbContext.SaveChangesAsync();
+            callContext.DbContext.Decks.Add(deck);
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("CreateDeck");
         }
         #region Request type
         public sealed record Request(Guid UserId, string Name, int HeapingAlgorithmId)

@@ -16,13 +16,13 @@ namespace MemCheck.Application.Decks
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(Guid.Empty, RandomHelper.String(), 0), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.Empty, RandomHelper.String(), 0), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(Guid.NewGuid(), RandomHelper.String(), 0), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.NewGuid(), RandomHelper.String(), 0), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -30,7 +30,7 @@ namespace MemCheck.Application.Decks
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, RandomHelper.String() + '\t', 0), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String() + '\t', 0), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Decks
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Decks
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task DeckWithThisNameExists()
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Decks
             var otherDeckName = RandomHelper.String();
             await DeckHelper.CreateAsync(db, user, otherDeckName);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, otherDeckName, RandomHelper.HeapingAlgorithm()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, otherDeckName, RandomHelper.HeapingAlgorithm()), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task InexistentAlgorithm()
@@ -64,7 +64,7 @@ namespace MemCheck.Application.Decks
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids)), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task Success()
@@ -75,7 +75,7 @@ namespace MemCheck.Application.Decks
             int algo = RandomHelper.HeapingAlgorithm();
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new CreateDeck(dbContext).RunAsync(new CreateDeck.Request(user, name, algo), new TestLocalizer());
+                await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, name, algo), new TestLocalizer());
 
             using (var dbContext = new MemCheckDbContext(db))
             {

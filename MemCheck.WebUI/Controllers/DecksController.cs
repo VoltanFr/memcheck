@@ -1,9 +1,11 @@
-﻿using MemCheck.Application.Decks;
+﻿using MemCheck.Application;
+using MemCheck.Application.Decks;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,7 @@ namespace MemCheck.WebUI.Controllers
     public class DecksController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
         #region Private methods
@@ -32,9 +34,9 @@ namespace MemCheck.WebUI.Controllers
             return Get("HeapingAlgoDescriptionForId" + id);
         }
         #endregion
-        public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer) : base(localizer)
+        public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region GetUserDecks
@@ -42,7 +44,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecks()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
+            var decks = await new GetUserDecks(callContext.DbContext).RunAsync(new GetUserDecks.Request(userId));
             var result = decks.Select(deck => new GetUserDecksViewModel(deck.DeckId, deck.Description, deck.HeapingAlgorithmId, deck.CardCount));
             return base.Ok(result);
         }
@@ -67,7 +69,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var currentUserId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
-            var applicationResult = await new RemoveCardFromDeck(dbContext).RunAsync(query);
+            var applicationResult = await new RemoveCardFromDeck(callContext.DbContext).RunAsync(query);
             var frontSide = $" '{applicationResult.FrontSideText.Truncate(30)}'";
             var mesgBody = Get("CardWithFrontSideHead") + frontSide + ' ' + Get("RemovedFromDeck") + ' ' + applicationResult.DeckName;
             return ControllerResultWithToast.Success(mesgBody, this);
@@ -105,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new CreateDeck.Request(userId, request.Description.Trim(), request.HeapingAlgorithmId);
-            await new CreateDeck(dbContext).RunAsync(appRequest, this);
+            await new CreateDeck(callContext).RunAsync(appRequest, this);
             return Ok();
         }
         public sealed class CreateRequest
@@ -121,7 +123,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new UpdateDeck.Request(userId, request.DeckId, request.Description.Trim(), request.HeapingAlgorithmId);
-            return Ok(await new UpdateDeck(dbContext).RunAsync(appRequest, this));
+            return Ok(await new UpdateDeck(callContext.DbContext).RunAsync(appRequest, this));
         }
         public sealed class UpdateRequest
         {
@@ -135,7 +137,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecksWithHeaps()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = await new GetUserDecksWithHeaps(dbContext).RunAsync(new GetUserDecksWithHeaps.Request(userId));
+            var decks = await new GetUserDecksWithHeaps(callContext.DbContext).RunAsync(new GetUserDecksWithHeaps.Request(userId));
             var result = decks.Select(deck =>
                 new GetUserDecksWithHeapsViewModel(
                     deck.DeckId,
@@ -189,7 +191,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecksForDeletion()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(userId));
+            var decks = await new GetUserDecks(callContext.DbContext).RunAsync(new GetUserDecks.Request(userId));
             var result = decks.Select(deck => new GetUserDecksForDeletionViewModel(deck.DeckId, deck.Description, deck.CardCount,
                 Get("SureYouWantToDelete") + " " + deck.Description + " " + Get("AndLose") + " " + deck.CardCount + " " + Get("CardLearningInfo") + " " + Get("NoUndo")));
             return base.Ok(result);
@@ -214,7 +216,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> DeleteDeck(Guid deckId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new DeleteDeck(dbContext).RunAsync(new DeleteDeck.Request(userId, deckId));
+            await new DeleteDeck(callContext.DbContext).RunAsync(new DeleteDeck.Request(userId, deckId));
             return Ok();
         }
         #endregion
