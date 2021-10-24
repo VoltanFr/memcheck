@@ -19,7 +19,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new DeleteDeck.Request(Guid.Empty, deck);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new DeleteDeck.Request(Guid.NewGuid(), deck);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -40,7 +40,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new DeleteDeck.Request(user, Guid.NewGuid());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -52,7 +52,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new DeleteDeck.Request(otherUser, deck);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteDeck(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task Success()
@@ -65,7 +65,7 @@ namespace MemCheck.Application.Decks
             var request = new DeleteDeck.Request(user, deck);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteDeck(dbContext).RunAsync(request);
+                await new DeleteDeck(dbContext.AsCallContext()).RunAsync(request);
 
             using (var dbContext = new MemCheckDbContext(db))
             {

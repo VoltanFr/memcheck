@@ -216,7 +216,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> DeleteDeck(Guid deckId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new DeleteDeck(callContext.DbContext).RunAsync(new DeleteDeck.Request(userId, deckId));
+            await new DeleteDeck(callContext).RunAsync(new DeleteDeck.Request(userId, deckId));
             return Ok();
         }
         #endregion

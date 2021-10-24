@@ -9,18 +9,19 @@ namespace MemCheck.Application.Decks
     public sealed class DeleteDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public DeleteDeck(MemCheckDbContext dbContext)
+        public DeleteDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var deck = dbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
-            dbContext.Decks.Remove(deck);
-            await dbContext.SaveChangesAsync();
+            await request.CheckValidityAsync(callContext.DbContext);
+            var deck = callContext.DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
+            callContext.DbContext.Decks.Remove(deck);
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("DeleteDeck");
         }
         #region Request type
         public sealed record Request(Guid UserId, Guid DeckId)
