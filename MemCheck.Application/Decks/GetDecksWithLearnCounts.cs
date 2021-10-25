@@ -13,7 +13,7 @@ namespace MemCheck.Application.Decks
     public sealed class GetDecksWithLearnCounts
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly TimeSpan oneHour = TimeSpan.FromHours(1);
         private readonly TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
         private readonly TimeSpan fourDays = TimeSpan.FromDays(4);
@@ -21,7 +21,7 @@ namespace MemCheck.Application.Decks
         #region Private methods
         private Result GetDeck(Guid deckId, string description, DateTime now)
         {
-            var allCards = dbContext.CardsInDecks.AsNoTracking()
+            var allCards = callContext.DbContext.CardsInDecks.AsNoTracking()
                 .Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId, cardInDeck.ExpiryUtcTime })
                 .ToImmutableArray();
@@ -57,17 +57,19 @@ namespace MemCheck.Application.Decks
             return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Length, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
         }
         #endregion
-        public GetDecksWithLearnCounts(MemCheckDbContext dbContext)
+        public GetDecksWithLearnCounts(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? now = null)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
             if (now == null)
                 now = DateTime.UtcNow;
-            var decks = await dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            return decks.Select(deck => GetDeck(deck.Id, deck.Description, now.Value)).ToList();
+            var decks = await callContext.DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
+            var result = decks.Select(deck => GetDeck(deck.Id, deck.Description, now.Value)).ToList();
+            callContext.TelemetryClient.TrackEvent("GetDecksWithLearnCounts", ("DeckCount", result.Count.ToString()));
+            return result;
         }
         #region Request & Result
         public sealed record Request(Guid UserId)
