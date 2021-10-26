@@ -11,25 +11,26 @@ namespace MemCheck.Application.Decks
     public sealed class GetUserDecksWithTags
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetUserDecksWithTags(MemCheckDbContext dbContext)
+        public GetUserDecksWithTags(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var userDecks = dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deckId = deck.Id, deckDescription = deck.Description }).ToList();
+            var userDecks = callContext.DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deckId = deck.Id, deckDescription = deck.Description }).ToList();
 
             var result = new List<Result>();
             foreach (var userDeck in userDecks)
             {
-                var appTags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(request.UserId, userDeck.deckId));
+                var appTags = await new GetTagsOfDeck(callContext).RunAsync(new GetTagsOfDeck.Request(request.UserId, userDeck.deckId));
                 var resultTags = appTags.Select(tag => new ResultTag(tag.TagId, tag.TagName));
                 result.Add(new Result(userDeck.deckId, userDeck.deckDescription, resultTags));
             }
+            callContext.TelemetryClient.TrackEvent("GetUserDecksWithTags", ("DeckCount", result.Count.ToString()));
             return result;
         }
         #region Request & Result

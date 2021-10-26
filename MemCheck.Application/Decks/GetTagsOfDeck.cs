@@ -8,29 +8,31 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class GetTagsOfDeck
+    internal sealed class GetTagsOfDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetTagsOfDeck(MemCheckDbContext dbContext)
+        public GetTagsOfDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            return dbContext.CardsInDecks
-                .AsNoTracking()
-                .Include(cardInDeck => cardInDeck.Card.TagsInCards)
-                .ThenInclude(tagInCard => tagInCard.Tag)
-                .Where(cardInDeck => cardInDeck.DeckId == request.DeckId)
-                .SelectMany(cardInDeck => cardInDeck.Card.TagsInCards)
-                .Select(tagInCard => tagInCard.Tag)
-                .Distinct()
-                .Select(tag => new Result(tag.Id, tag.Name))
-                .ToList()
-                .OrderBy(resultModel => resultModel.TagName);
+            await request.CheckValidityAsync(callContext.DbContext);
+            var result = callContext.DbContext.CardsInDecks
+                            .AsNoTracking()
+                            .Include(cardInDeck => cardInDeck.Card.TagsInCards)
+                            .ThenInclude(tagInCard => tagInCard.Tag)
+                            .Where(cardInDeck => cardInDeck.DeckId == request.DeckId)
+                            .SelectMany(cardInDeck => cardInDeck.Card.TagsInCards)
+                            .Select(tagInCard => tagInCard.Tag)
+                            .Distinct()
+                            .Select(tag => new Result(tag.Id, tag.Name))
+                            .ToList()
+                            .OrderBy(resultModel => resultModel.TagName);
+            callContext.TelemetryClient.TrackEvent("GetTagsOfDeck", ("TagCount", result.Count().ToString()));
+            return result;
         }
         #region Request & Result
         public sealed record Request(Guid UserId, Guid DeckId)

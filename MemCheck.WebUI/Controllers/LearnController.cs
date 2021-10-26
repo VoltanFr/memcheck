@@ -307,7 +307,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             var userId = (user == null) ? Guid.Empty : user.Id;
-            var decks = await new GetUserDecksWithTags(callContext.DbContext).RunAsync(new GetUserDecksWithTags.Request(userId));
+            var decks = await new GetUserDecksWithTags(callContext).RunAsync(new GetUserDecksWithTags.Request(userId));
             var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
             return base.Ok(result);
         }

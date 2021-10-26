@@ -11,7 +11,7 @@ namespace MemCheck.Application.Decks
     public sealed class GetUserDecksWithHeapsAndTags
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private class HeapInfo
         private sealed class HeapInfo
@@ -29,25 +29,26 @@ namespace MemCheck.Application.Decks
             public DateTime NextExpiryUtcDate { get; set; }
         }
         #endregion
-        public GetUserDecksWithHeapsAndTags(MemCheckDbContext dbContext)
+        public GetUserDecksWithHeapsAndTags(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var decks = dbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(deck => new { deck.Id, deck.Description }).ToList();
+            var decks = callContext.DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(deck => new { deck.Id, deck.Description }).ToList();
 
             var result = new List<Result>();
 
             foreach (var deck in decks)
             {
-                var heaps = await dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deck.Id).Select(cardInDeck => cardInDeck.CurrentHeap).Distinct().ToListAsync();
-                var tags = await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(request.UserId, deck.Id));
+                var heaps = await callContext.DbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.DeckId == deck.Id).Select(cardInDeck => cardInDeck.CurrentHeap).Distinct().ToListAsync();
+                var tags = await new GetTagsOfDeck(callContext).RunAsync(new GetTagsOfDeck.Request(request.UserId, deck.Id));
                 result.Add(new Result(deck.Id, deck.Description, heaps, tags.Select(tag => new ResultTag(tag.TagId, tag.TagName))));
             }
 
+            callContext.TelemetryClient.TrackEvent("GetUserDecksWithHeapsAndTags", ("DeckCount", result.Count.ToString()));
             return result;
         }
         #region Request & Result

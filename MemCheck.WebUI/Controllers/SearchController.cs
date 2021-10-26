@@ -44,7 +44,7 @@ namespace MemCheck.WebUI.Controllers
             if (user == null)
                 decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.Result>();
             else
-                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(callContext.DbContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
+                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(callContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
             var allTags = await new GetAllTags(callContext.DbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             var allUsers = await new GetUsers(callContext.DbContext).RunAsync();
             GetAllStaticDataViewModel value = new(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
