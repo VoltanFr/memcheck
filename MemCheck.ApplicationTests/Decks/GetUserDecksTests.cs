@@ -18,7 +18,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -28,7 +28,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task NoDeck()
@@ -37,7 +37,7 @@ namespace MemCheck.Application.Decks
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(user));
+            var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
             Assert.IsFalse(result.Any());
         }
         [TestMethod()]
@@ -51,7 +51,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user, deckName, deckAlgo);
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(user));
+            var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
             var resultDeck = result.Single();
             Assert.AreEqual(deck, resultDeck.DeckId);
             Assert.AreEqual(deckName, resultDeck.Description);
@@ -72,7 +72,7 @@ namespace MemCheck.Application.Decks
             var deck2 = await DeckHelper.CreateAsync(db, user, deck2Name, deck2Algo);
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetUserDecks(dbContext).RunAsync(new GetUserDecks.Request(user));
+            var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
             Assert.AreEqual(2, result.Count());
             var resultDeck1 = result.Single(d => d.DeckId == deck1);
             Assert.AreEqual(deck1Name, resultDeck1.Description);

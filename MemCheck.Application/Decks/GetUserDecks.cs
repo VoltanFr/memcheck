@@ -10,17 +10,19 @@ namespace MemCheck.Application.Decks
     public sealed class GetUserDecks
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetUserDecks(MemCheckDbContext dbContext)
+        public GetUserDecks(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description);
-            return decks.Select(deck => new Result(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardInDecks.Count));
+            await request.CheckValidityAsync(callContext.DbContext);
+            var decks = callContext.DbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description);
+            var results = decks.Select(deck => new Result(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardInDecks.Count));
+            callContext.TelemetryClient.TrackEvent("GetUserDecks", ("DeckCount", results.Count().ToString()));
+            return results;
         }
         #region Request & Result
         public sealed record Request(Guid UserId)
