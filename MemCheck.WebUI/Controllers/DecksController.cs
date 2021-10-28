@@ -137,7 +137,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetUserDecksWithHeaps()
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var decks = await new GetUserDecksWithHeaps(callContext.DbContext).RunAsync(new GetUserDecksWithHeaps.Request(userId));
+            var decks = await new GetUserDecksWithHeaps(callContext).RunAsync(new GetUserDecksWithHeaps.Request(userId));
             var result = decks.Select(deck =>
                 new GetUserDecksWithHeapsViewModel(
                     deck.DeckId,

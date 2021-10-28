@@ -12,7 +12,7 @@ namespace MemCheck.Application.Decks
     public sealed class GetUserDecksWithHeaps
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private class HeapInfo
         private sealed class HeapInfo
@@ -30,17 +30,17 @@ namespace MemCheck.Application.Decks
             public DateTime NextExpiryUtcDate { get; set; }
         }
         #endregion
-        public GetUserDecksWithHeaps(MemCheckDbContext dbContext)
+        public GetUserDecksWithHeaps(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? nowUtc = null)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
             nowUtc ??= DateTime.UtcNow;
 
             var result = new List<Result>();
-            var decks = dbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(
+            var decks = callContext.DbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(
                 deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId, CardCount = deck.CardInDecks.Count }
                 ).ToImmutableArray();
 
@@ -48,7 +48,7 @@ namespace MemCheck.Application.Decks
             {
                 var heaps = new Dictionary<int, HeapInfo>();
 
-                var cardsInDeck = dbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deck.Id).ToList();
+                var cardsInDeck = callContext.DbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deck.Id).ToList();
 
                 cardsInDeck.ForEach(cardInDeck =>
                 {
@@ -73,6 +73,7 @@ namespace MemCheck.Application.Decks
                     );
             }
 
+            callContext.TelemetryClient.TrackEvent("GetUserDecksWithHeaps", ("DeckCount", result.Count.ToString()));
             return result;
         }
         #region Request & Result
@@ -88,6 +89,5 @@ namespace MemCheck.Application.Decks
         //NextExpiryUtcDate is the first expiry date among the non expired cards in this heap, so it is meaningless (DateTime.MaxValue) if all cards in the heap are expired.
         //ExpiredCardCount and NextExpiryUtcDate are meaningless for heap 0.
         #endregion
-
     }
 }
