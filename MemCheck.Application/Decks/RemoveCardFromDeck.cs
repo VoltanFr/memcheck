@@ -10,25 +10,26 @@ namespace MemCheck.Application.Decks
     public sealed class RemoveCardFromDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public RemoveCardFromDeck(MemCheckDbContext dbContext)
+        public RemoveCardFromDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var card = dbContext.CardsInDecks
+            var card = callContext.DbContext.CardsInDecks
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId && cardInDeck.DeckId == request.DeckId)
                 .Include(cardInDeck => cardInDeck.Card)
                 .Include(cardInDeck => cardInDeck.Deck)
                 .Single();
-            dbContext.CardsInDecks.Remove(card);
-            await dbContext.SaveChangesAsync();
-
-            return new Result(card.Card.FrontSide, card.Deck.Description);
+            callContext.DbContext.CardsInDecks.Remove(card);
+            await callContext.DbContext.SaveChangesAsync();
+            var result = new Result(card.Card.FrontSide, card.Deck.Description);
+            callContext.TelemetryClient.TrackEvent("RemoveCardFromDeck", ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()));
+            return result;
         }
         #region Request class
         public sealed class Request
