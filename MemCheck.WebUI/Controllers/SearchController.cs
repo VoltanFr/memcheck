@@ -481,7 +481,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new RemoveCardsFromDeck(callContext.DbContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
+            await new RemoveCardsFromDeck(callContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardRemoved") : Get("CardsRemoved"), this);
         }
         public sealed class RemoveCardsFromDeckRequest

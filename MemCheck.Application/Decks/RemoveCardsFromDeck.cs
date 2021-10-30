@@ -13,22 +13,22 @@ namespace MemCheck.Application.Decks
     public sealed class RemoveCardsFromDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public RemoveCardsFromDeck(MemCheckDbContext dbContext)
+        public RemoveCardsFromDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
             var existing = request.CardIds
-                .Where(cardId => dbContext.CardsInDecks.Any(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CardId == cardId))
+                .Where(cardId => callContext.DbContext.CardsInDecks.Any(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CardId == cardId))
                 .Select(cardId => new CardInDeck() { CardId = cardId, DeckId = request.DeckId });
-            dbContext.CardsInDecks.RemoveRange(existing);
-
-            dbContext.SaveChanges();
+            callContext.DbContext.CardsInDecks.RemoveRange(existing);
+            callContext.TelemetryClient.TrackEvent("RemoveCardsFromDeck", ("DeckId", request.DeckId.ToString()), ("CardCount", request.CardIds.Count().ToString()));
+            callContext.DbContext.SaveChanges();
         }
         #region Request type
         public sealed record Request(Guid CurrentUserId, Guid DeckId, IEnumerable<Guid> CardIds)
