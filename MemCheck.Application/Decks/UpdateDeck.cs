@@ -9,19 +9,20 @@ namespace MemCheck.Application.Decks
     public sealed class UpdateDeck
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public UpdateDeck(MemCheckDbContext dbContext)
+        public UpdateDeck(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<bool> RunAsync(Request request, ILocalized localizer)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
-            var deck = dbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
+            await request.CheckValidityAsync(localizer, callContext.DbContext);
+            var deck = callContext.DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
             deck.Description = request.Name;
             deck.HeapingAlgorithmId = request.HeapingAlgorithmId;
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("UpdateDeck", ("DeckId", request.DeckId.ToString()), ("Name", request.Name), ("NameLength", request.Name.Length.ToString()), ("HeapingAlgorithmId", request.HeapingAlgorithmId.ToString()));
             return true;
         }
         #region Request type

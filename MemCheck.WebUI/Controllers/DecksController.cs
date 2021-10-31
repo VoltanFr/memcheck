@@ -123,7 +123,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new UpdateDeck.Request(userId, request.DeckId, request.Description.Trim(), request.HeapingAlgorithmId);
-            return Ok(await new UpdateDeck(callContext.DbContext).RunAsync(appRequest, this));
+            return Ok(await new UpdateDeck(callContext).RunAsync(appRequest, this));
         }
         public sealed class UpdateRequest
         {

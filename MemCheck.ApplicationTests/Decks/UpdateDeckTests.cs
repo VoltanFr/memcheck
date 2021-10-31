@@ -22,7 +22,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(Guid.Empty, deck, RandomHelper.String(), 0);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(Guid.NewGuid(), deck, RandomHelper.String(), 0);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -43,7 +43,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, Guid.NewGuid(), RandomHelper.String(), 0);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -55,7 +55,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(otherUser, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -66,7 +66,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String() + '\t', 0);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -77,7 +77,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -88,7 +88,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task DeckWithThisNameExists()
@@ -101,7 +101,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, deck, otherDeckName, RandomHelper.HeapingAlgorithm());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task InexistentAlgorithm()
@@ -112,7 +112,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids));
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer()));
         }
         [TestMethod()]
         public async Task FieldsCorrectlyUpdated()
@@ -126,7 +126,7 @@ namespace MemCheck.Application.Decks
             var request = new UpdateDeck.Request(user, deck, newName, newAlgo);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer());
+                await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer());
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -147,7 +147,7 @@ namespace MemCheck.Application.Decks
             var request = new UpdateDeck.Request(user, deck, RandomHelper.String(), RandomHelper.HeapingAlgorithm());
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateDeck(dbContext).RunAsync(request, new TestLocalizer());
+                await new UpdateDeck(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer());
 
             using (var dbContext = new MemCheckDbContext(db))
             {
