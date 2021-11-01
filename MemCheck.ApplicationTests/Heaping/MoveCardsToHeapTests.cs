@@ -22,7 +22,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(Guid.Empty, deck, RandomHelper.Heap(), card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.Empty, deck, RandomHelper.Heap(), card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(Guid.NewGuid(), deck, RandomHelper.Heap(), card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.NewGuid(), deck, RandomHelper.Heap(), card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task DeckDoesNotExist()
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, Guid.NewGuid(), RandomHelper.Heap(), card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, Guid.NewGuid(), RandomHelper.Heap(), card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Heaping
             var otherUser = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(otherUser, deck, RandomHelper.Heap(), card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(otherUser, deck, RandomHelper.Heap(), card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task CardDoesNotExist()
@@ -71,7 +71,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { card.Id, Guid.NewGuid() })));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { card.Id, Guid.NewGuid() })));
         }
         [TestMethod()]
         public async Task CardNotInDeck()
@@ -84,7 +84,7 @@ namespace MemCheck.Application.Heaping
             var cardNotInDeck = await CardHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { cardInDeck.Id, cardNotInDeck.Id })));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { cardInDeck.Id, cardNotInDeck.Id })));
         }
         [TestMethod()]
         public async Task HeapTooSmall()
@@ -96,7 +96,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, -1, card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, -1, card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task HeapTooBig()
@@ -108,7 +108,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.MaxHeapValue + 1, card.Id.AsArray())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.MaxHeapValue + 1, card.Id.AsArray())));
         }
         [TestMethod()]
         public async Task MoveMultiple()
@@ -127,7 +127,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card3.Id, heap: CardInDeck.UnknownHeap, lastLearnUtcTime: card3LastLearnTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, new[] { card1.Id, card2.Id, card3.Id }));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, new[] { card1.Id, card2.Id, card3.Id }));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -167,7 +167,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card2.Id, heap: 8, lastLearnUtcTime: card2AddTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, new[] { card1.Id, card2.Id }));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, new[] { card1.Id, card2.Id }));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -197,7 +197,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 1, lastLearnUtcTime: lastLearnTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, card.Id.AsArray()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -220,7 +220,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 4, lastLearnUtcTime: lastLearnTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, 3, card.Id.AsArray()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -243,7 +243,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 1, lastLearnUtcTime: lastLearnTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, 1, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, 1, card.Id.AsArray()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -266,7 +266,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 4, lastLearnUtcTime: initialTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -279,7 +279,7 @@ namespace MemCheck.Application.Heaping
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -302,7 +302,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 8, lastLearnUtcTime: addTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardsToHeap(dbContext).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
+                await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
 
             for (int i = 0; i < 2; i++)
                 using (var dbContext = new MemCheckDbContext(db))

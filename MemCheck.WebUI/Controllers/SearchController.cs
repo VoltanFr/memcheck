@@ -496,7 +496,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new MoveCardsToHeap.Request(userId, deckId, heapId, request.CardIds);
-            await new MoveCardsToHeap(callContext.DbContext).RunAsync(appRequest);
+            await new MoveCardsToHeap(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardMoved") : Get("CardsMoved"), this);
 
         }

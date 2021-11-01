@@ -14,18 +14,18 @@ namespace MemCheck.Application.Heaping
     public sealed class MoveCardsToHeap
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public MoveCardsToHeap(MemCheckDbContext dbContext)
+        public MoveCardsToHeap(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
-            var cardsInDecks = dbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
+            var cardsInDecks = callContext.DbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
 
             if (request.CardIds.Any(cardId => !cardsInDecks.ContainsKey(cardId)))
                 throw new InvalidOperationException("One card is not in the deck");
@@ -47,7 +47,8 @@ namespace MemCheck.Application.Heaping
                     cardInDeck.CurrentHeap = request.TargetHeap;
                 }
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("MoveCardsToHeap", ("DeckId", request.DeckId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardCount", request.CardIds.Count().ToString()));
         }
         #region Request
         public sealed record Request(Guid UserId, Guid DeckId, int TargetHeap, IEnumerable<Guid> CardIds)
