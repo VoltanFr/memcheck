@@ -68,7 +68,7 @@ namespace MemCheck.WebUI.Controllers
             else
             {
                 var request = new MoveCardToHeap.Request(userId, deckId, cardId, targetHeap);
-                await new MoveCardToHeap(callContext.DbContext).RunAsync(request);
+                await new MoveCardToHeap(callContext).RunAsync(request);
             }
             return Ok();
         }

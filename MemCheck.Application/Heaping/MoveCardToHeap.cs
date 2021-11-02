@@ -13,17 +13,17 @@ namespace MemCheck.Application.Heaping
     public sealed class MoveCardToHeap
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public MoveCardToHeap(MemCheckDbContext dbContext)
+        public MoveCardToHeap(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request, DateTime? lastLearnUtcTime = null)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var card = await dbContext.CardsInDecks.SingleAsync(card => card.DeckId.Equals(request.DeckId) && card.CardId.Equals(request.CardId));
+            var card = await callContext.DbContext.CardsInDecks.SingleAsync(card => card.DeckId.Equals(request.DeckId) && card.CardId.Equals(request.CardId));
 
             lastLearnUtcTime ??= DateTime.UtcNow;
 
@@ -35,7 +35,7 @@ namespace MemCheck.Application.Heaping
                 if (request.TargetHeap < card.CurrentHeap || request.TargetHeap - card.CurrentHeap > 1)
                     throw new InvalidOperationException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
 
-                var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, request.DeckId);
+                var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
                 card.ExpiryUtcTime = heapingAlgorithm.ExpiryUtcDate(request.TargetHeap, lastLearnUtcTime.Value);
 
                 if (request.TargetHeap > card.BiggestHeapReached)
@@ -52,7 +52,8 @@ namespace MemCheck.Application.Heaping
             card.LastLearnUtcTime = lastLearnUtcTime.Value;
             card.CurrentHeap = request.TargetHeap;
 
-            await dbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("MoveCardToHeap", ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()));
+            await callContext.DbContext.SaveChangesAsync();
         }
         #region Request
         public sealed record Request(Guid UserId, Guid DeckId, Guid CardId, int TargetHeap)
