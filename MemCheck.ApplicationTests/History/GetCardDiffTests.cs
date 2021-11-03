@@ -17,13 +17,13 @@ namespace MemCheck.Application.History
         public async Task EmptyDB_UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task EmptyDB_UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task EmptyDB_OriginalVersionDoesNotExist()
@@ -37,7 +37,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
                 await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(userId, card.Id, Guid.NewGuid())));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, card.Id, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task EmptyDB_CurrentVersionDoesNotExist()
@@ -52,7 +52,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
                 originalVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(userId, Guid.NewGuid(), originalVersionId)));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, Guid.NewGuid(), originalVersionId)));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotViewOriginalVersion()
@@ -75,7 +75,7 @@ namespace MemCheck.Application.History
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotViewCurrentVersion()
@@ -98,7 +98,7 @@ namespace MemCheck.Application.History
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
         }
         [TestMethod()]
         public async Task FrontDiff()
@@ -122,7 +122,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -162,7 +162,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -203,7 +203,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -243,7 +243,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -285,7 +285,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -324,7 +324,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -364,7 +364,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -404,7 +404,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -446,7 +446,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -505,7 +505,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(userName, result.CurrentVersionCreator);
                 Assert.AreEqual(userName, result.OriginalVersionCreator);
                 Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
@@ -557,7 +557,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, intermediaryVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(currentVersionDate, result.CurrentVersionUtcDate);
                 Assert.AreEqual(intermediaryVersionDate, result.OriginalVersionUtcDate);
                 Assert.AreEqual(currentVersionDescription, result.CurrentVersionDescription);
@@ -576,7 +576,7 @@ namespace MemCheck.Application.History
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var diffRequest = new GetCardDiff.Request(userId, card.Id, initialVersionId);
-                var result = await new GetCardDiff(dbContext).RunAsync(diffRequest);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
                 Assert.AreEqual(currentVersionDate, result.CurrentVersionUtcDate);
                 Assert.AreEqual(initialVersionDate, result.OriginalVersionUtcDate);
                 Assert.AreEqual(currentVersionDescription, result.CurrentVersionDescription);

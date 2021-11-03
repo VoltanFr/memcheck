@@ -11,25 +11,25 @@ namespace MemCheck.Application.History
     public sealed class GetCardDiff
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         #endregion
-        public GetCardDiff(MemCheckDbContext dbContext)
+        public GetCardDiff(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var current = await dbContext.Cards
+            await request.CheckValidityAsync(callContext.DbContext);
+            var current = await callContext.DbContext.Cards
                 .Include(c => c.CardLanguage)
                 .Include(c => c.TagsInCards)
                 .ThenInclude(t => t.Tag)
                 .Include(c => c.Images)
                 .ThenInclude(i => i.Image)
                 .SingleAsync(c => c.Id == request.CurrentCardId);
-            var original = await dbContext.CardPreviousVersions
+            var original = await callContext.DbContext.CardPreviousVersions
                 .Include(c => c.CardLanguage)
                 .Include(c => c.Tags)
                 .ThenInclude(t => t.Tag)
@@ -56,7 +56,7 @@ namespace MemCheck.Application.History
             {
                 var currentUsers = string.Join(",", current.UsersWithView.Select(u => u.User.UserName).OrderBy(userName => userName));
                 var originalUserIds = original.UsersWithView.Select(u => u.AllowedUserId).ToHashSet();
-                var originalUserNames = dbContext.Users.Where(u => originalUserIds.Contains(u.Id)).Select(u => u.UserName);
+                var originalUserNames = callContext.DbContext.Users.Where(u => originalUserIds.Contains(u.Id)).Select(u => u.UserName);
                 var originalUsers = string.Join(",", originalUserNames.OrderBy(userName => userName));
                 result = result with { UsersWithView = new(currentUsers, originalUsers) };
             }
@@ -78,6 +78,7 @@ namespace MemCheck.Application.History
                 var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name).OrderBy(imageName => imageName));
                 result = result with { ImagesOnAdditionalSide = new(currentImages, originalImages) };
             }
+            callContext.TelemetryClient.TrackEvent("GetCardDiff", ("CurrentCardId", request.CurrentCardId.ToString()), ("OriginalVersionId", request.OriginalVersionId.ToString()));
             return result;
         }
         #region Request and result types
