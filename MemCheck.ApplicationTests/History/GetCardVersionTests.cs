@@ -16,13 +16,13 @@ namespace MemCheck.Application.History
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(Guid.Empty, Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(Guid.Empty, Guid.Empty)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(Guid.NewGuid(), Guid.Empty)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(Guid.NewGuid(), Guid.Empty)));
         }
         [TestMethod()]
         public async Task VersionDoesNotExist()
@@ -30,7 +30,7 @@ namespace MemCheck.Application.History
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(userId, Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(userId, Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task FailIfUserCanNotView()
@@ -46,9 +46,9 @@ namespace MemCheck.Application.History
             {
                 var versionId = (await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).Single(v => v.VersionId != null).VersionId!.Value;
 
-                var version = await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(userId, versionId));
+                var version = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(userId, versionId));
                 Assert.AreEqual(1, version.UsersWithVisibility.Count());
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(otherUserId, versionId)));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(otherUserId, versionId)));
             }
         }
         [TestMethod()]
@@ -82,13 +82,13 @@ namespace MemCheck.Application.History
                 var initialVersionId = versions[1];
                 var intermediaryVersionId = versions[0];
 
-                var initialVersion = await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, initialVersionId));
+                var initialVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, initialVersionId));
                 Assert.AreEqual(initialVersionDescription, initialVersion.VersionDescription);
                 Assert.AreEqual(initialVersionDate, initialVersion.VersionUtcDate);
                 Assert.AreEqual(initialVersionCreatorName, initialVersion.CreatorName);
                 Assert.AreEqual(initialVersionFrontSide, initialVersion.FrontSide);
 
-                var intermediaryVersion = await new GetCardVersion(dbContext).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, intermediaryVersionId));
+                var intermediaryVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, intermediaryVersionId));
                 Assert.AreEqual(intermediaryVersionDescription, intermediaryVersion.VersionDescription);
                 Assert.AreEqual(intermediaryVersionDate, intermediaryVersion.VersionUtcDate);
                 Assert.AreEqual(intermediaryVersionCreatorName, intermediaryVersion.CreatorName);

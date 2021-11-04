@@ -312,7 +312,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var card = await new GetCardForEdit(callContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
-            var selectedVersion = await new GetCardVersion(callContext.DbContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
+            var selectedVersion = await new GetCardVersion(callContext).RunAsync(new GetCardVersion.Request(userId, selectedVersionId));
             var result = new CardSelectedVersionDiffWithCurrentResult(card, selectedVersion, this);
             return Ok(result);
         }

@@ -12,17 +12,17 @@ namespace MemCheck.Application.History
     public sealed class GetCardVersion
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetCardVersion(MemCheckDbContext dbContext)
+        public GetCardVersion(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var version = await dbContext.CardPreviousVersions
+            var version = await callContext.DbContext.CardPreviousVersions
                 .Include(card => card.Images)
                 .ThenInclude(img => img.Image)
                 .Include(card => card.CardLanguage)
@@ -33,11 +33,13 @@ namespace MemCheck.Application.History
                 .AsSingleQuery()
                 .SingleOrDefaultAsync();
 
-            var userWithViewNames = version.UsersWithView.Select(userWithView => dbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
+            var userWithViewNames = version.UsersWithView.Select(userWithView => callContext.DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
             var tagNames = version.Tags.Select(t => t.Tag.Name);
             var frontSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name);
             var backSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Image.Name);
             var additionalInfoImageNames = version.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name);
+
+            callContext.TelemetryClient.TrackEvent("GetCardVersion", ("VersionId", request.VersionId.ToString()));
 
             return new Result(
                 version.FrontSide,
