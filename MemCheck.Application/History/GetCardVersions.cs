@@ -22,7 +22,7 @@ namespace MemCheck.Application.History
         private const string FrontSideImages = nameof(FrontSideImages);
         private const string BackSideImages = nameof(BackSideImages);
         private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private classes
         private sealed class CardVersionFromDb
@@ -101,15 +101,15 @@ namespace MemCheck.Application.History
             public IEnumerable<string> ChangedFieldNames { get; }
         }
         #endregion
-        public GetCardVersions(MemCheckDbContext dbContext)
+        public GetCardVersions(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<IResultCardVersion>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
+            await request.CheckValidityAsync(callContext.DbContext);
 
-            var currentVersion = await dbContext.Cards.Include(card => card.PreviousVersion)
+            var currentVersion = await callContext.DbContext.Cards.Include(card => card.PreviousVersion)
                 .Where(card => card.Id == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
@@ -130,7 +130,7 @@ namespace MemCheck.Application.History
                     )
                 ).SingleAsync();
 
-            var allPreviousVersions = dbContext.CardPreviousVersions
+            var allPreviousVersions = callContext.DbContext.CardPreviousVersions
                 .Where(card => card.Card == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
@@ -163,6 +163,8 @@ namespace MemCheck.Application.History
                 result.Add(new ResultCardVersion(iterationVersion, previousVersion));
                 iterationVersion = previousVersion;
             }
+
+            callContext.TelemetryClient.TrackEvent("GetCardVersions", ("CardId", request.CardId.ToString()), ("ResultCount", result.Count.ToString()));
             return result;
         }
         #region Request and result types

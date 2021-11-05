@@ -44,7 +44,7 @@ namespace MemCheck.Application.History
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versionId = (await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).Single(v => v.VersionId != null).VersionId!.Value;
+                var versionId = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).Single(v => v.VersionId != null).VersionId!.Value;
 
                 var version = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(userId, versionId));
                 Assert.AreEqual(1, version.UsersWithVisibility.Count());
@@ -78,7 +78,7 @@ namespace MemCheck.Application.History
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versions = (await new GetCardVersions(dbContext).RunAsync(new GetCardVersions.Request(intermediaryVersionCreatorId, card.Id))).Where(v => v.VersionId != null).Select(v => v.VersionId!.Value).ToList();
+                var versions = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(intermediaryVersionCreatorId, card.Id))).Where(v => v.VersionId != null).Select(v => v.VersionId!.Value).ToList();
                 var initialVersionId = versions[1];
                 var intermediaryVersionId = versions[0];
 

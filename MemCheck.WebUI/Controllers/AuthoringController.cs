@@ -274,7 +274,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> CardVersions(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var appResults = await new GetCardVersions(callContext.DbContext).RunAsync(new GetCardVersions.Request(userId, cardId));
+            var appResults = await new GetCardVersions(callContext).RunAsync(new GetCardVersions.Request(userId, cardId));
             var result = appResults.Select(appResult => new CardVersion(appResult, this));
             return Ok(result);
         }
