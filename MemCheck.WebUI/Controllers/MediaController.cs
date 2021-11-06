@@ -1,7 +1,9 @@
-﻿using MemCheck.Application.Images;
+﻿using MemCheck.Application;
+using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -19,12 +21,12 @@ namespace MemCheck.WebUI.Controllers
     public class MediaController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public MediaController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<MediaController> localizer) : base(localizer)
+        public MediaController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<MediaController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region UploadImage
@@ -46,7 +48,7 @@ namespace MemCheck.WebUI.Controllers
             using var reader = new BinaryReader(stream);
             var fileContent = reader.ReadBytes((int)request.File.Length);
             var applicationRequest = new StoreImage.Request(userId, request.Name.Trim(), request.Description.Trim(), request.Source.Trim(), request.File.ContentType, fileContent);
-            await new StoreImage(dbContext, this).RunAsync(applicationRequest);
+            await new StoreImage(callContext.DbContext, this).RunAsync(applicationRequest);
             return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
         }
         public sealed class UploadImageRequest
@@ -62,7 +64,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetImageListAsync([FromBody] GetImageListRequest request)
         {
             CheckBodyParameter(request);
-            var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
+            var result = await new GetImageList(callContext.DbContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
             return Ok(new GetImageListViewModel(result, this));
         }
         public sealed class GetImageListRequest
@@ -124,7 +126,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImageMetadata/{imageId}")]
         public async Task<IActionResult> GetImageMetadata(Guid imageId)
         {
-            var appRequest = new GetImageInfoFromId(dbContext);
+            var appRequest = new GetImageInfoFromId(callContext.DbContext);
             var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
             return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
         }
@@ -148,7 +150,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName, request.Source, request.Description, request.VersionDescription);
-            await new UpdateImageMetadata(dbContext).RunAsync(applicationRequest, this);
+            await new UpdateImageMetadata(callContext.DbContext).RunAsync(applicationRequest, this);
             var toastText = $"{Get("SuccessfullyUpdatedImage")} '{request.ImageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
@@ -174,7 +176,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new DeleteImage.Request(userId, imageId, request.DeletionDescription);
-            var imageName = await new DeleteImage(dbContext).RunAsync(applicationRequest, this);
+            var imageName = await new DeleteImage(callContext).RunAsync(applicationRequest, this);
             var toastText = $"{Get("SuccessfullyDeletedImage")} '{imageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
@@ -189,7 +191,7 @@ namespace MemCheck.WebUI.Controllers
         {
             try
             {
-                var runner = new GetImageInfoFromId(dbContext);
+                var runner = new GetImageInfoFromId(callContext.DbContext);
                 var result = await runner.RunAsync(new GetImageInfoFromId.Request(imageId));
                 return Ok(new GetImageInfoForDeletionResult(result, this));
             }
@@ -227,7 +229,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("ImageVersions/{imageId}")]
         public async Task<IActionResult> ImageVersions(Guid imageId)
         {
-            var appResults = await new GetImageVersions(dbContext).RunAsync(imageId);
+            var appResults = await new GetImageVersions(callContext.DbContext).RunAsync(imageId);
             var result = appResults.Select(appResult => new ImageVersion(appResult, this));
             return Ok(result);
         }

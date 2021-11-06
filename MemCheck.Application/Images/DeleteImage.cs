@@ -11,7 +11,7 @@ namespace MemCheck.Application.Images
     public sealed class DeleteImage
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
@@ -24,16 +24,16 @@ namespace MemCheck.Application.Images
             };
         }
         #endregion
-        public DeleteImage(MemCheckDbContext dbContext)
+        public DeleteImage(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<string> RunAsync(Request request, ILocalized localizer, DateTime? deletionUtcDate = null)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
+            await request.CheckValidityAsync(localizer, callContext.DbContext);
 
-            var image = await dbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
-            var user = await dbContext.Users.SingleAsync(u => u.Id == request.UserId);
+            var image = await callContext.DbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
+            var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
             //For a deletion, we create two previous versions:
             //- one for the last known operation (described in the image)
@@ -73,13 +73,15 @@ namespace MemCheck.Application.Images
                 PreviousVersion = versionFromCurrentImage
             };
 
-            dbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
-            dbContext.ImagePreviousVersions.Add(deletionVersion);
-            dbContext.Images.Remove(image);
+            callContext.DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
+            callContext.DbContext.ImagePreviousVersions.Add(deletionVersion);
+            callContext.DbContext.Images.Remove(image);
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
 
-            return image.Name;
+            var result = image.Name;
+            callContext.TelemetryClient.TrackEvent("DeleteImage", ("ImageId", request.ImageId.ToString()), ("ImageName", result), ("DeletionDescription", request.DeletionDescription));
+            return result;
         }
         #region Request type
         public sealed record Request(Guid UserId, Guid ImageId, string DeletionDescription)
