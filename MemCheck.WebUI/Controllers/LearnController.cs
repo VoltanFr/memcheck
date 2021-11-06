@@ -50,7 +50,7 @@ namespace MemCheck.WebUI.Controllers
                 };
             }
 
-            var blob = await new GetImage(callContext.DbContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
+            var blob = await new GetImage(callContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
             var content = new MemoryStream(blob);
             return base.File(content, "APPLICATION/octet-stream", "noname");
         }

@@ -17,7 +17,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImage(dbContext).RunAsync(new GetImage.Request(Guid.NewGuid(), GetImage.Request.ImageSize.Medium)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(Guid.NewGuid(), GetImage.Request.ImageSize.Medium)));
         }
         [TestMethod()]
         public async Task SmallBlob()
@@ -27,7 +27,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImage(dbContext).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Small));
+            var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Small));
             Assert.AreEqual(1, loaded.Length);
         }
         [TestMethod()]
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImage(dbContext).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Medium));
+            var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Medium));
             Assert.AreEqual(2, loaded.Length);
         }
         [TestMethod()]
@@ -49,7 +49,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImage(dbContext).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Big));
+            var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Big));
             Assert.AreEqual(3, loaded.Length);
         }
     }
