@@ -496,6 +496,97 @@
     line-height: 15px;
 }
 
+.markdown-edit-div {
+    padding: 0px;
+    border-radius: 4px;
+    color: ButtonText;
+    background-color: transparent;
+    border-style: none;
+    margin: 0px;
+}
+
+.markdown-edit-button {
+    height: 15px;
+    width: 15px;
+    padding: 0px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-align: center;
+    vertical-align: middle;
+    color: ButtonText;
+    background-color: transparent;
+    border-color: ButtonFace;
+    border-width: 1px;
+    box-sizing: unset;
+}
+
+    .markdown-edit-button:hover {
+        background-color: ButtonFace;
+    }
+
+.markdown-edit-table {
+    display: block;
+    padding: 0px;
+    margin: 0px;
+}
+
+.markdown-edit-table-body {
+    display: block;
+    padding: 0px;
+}
+
+.markdown-edit-caption-row {
+    padding-left: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-style: none;
+    font-weight: bold;
+    display: block;
+    vertical-align: middle;
+}
+
+.markdown-edit-row {
+    padding: 0px;
+    border-style: none;
+    font-weight: normal;
+    vertical-align: middle;
+    display: block;
+}
+
+.markdown-edit-td {
+    border-style: none;
+    display: block;
+}
+
+.markdown-edit-textarea {
+    display: block;
+    width: 100%;
+    resize: both;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+    border-radius: 0px;
+    border-spacing: 0px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.markdown-edit-preview {
+    display: block;
+    width: 100%;
+    resize: both;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+    border-radius: 0px;
+    border-spacing: 0px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
