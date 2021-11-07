@@ -68,7 +68,7 @@
             <div id="The card" class="authoring-card-div">
                 <table class="table-responsive authoring-table">
                     <tbody class="authoring-table-body">
-                        <tr id="FrontSideInputRow" class="authoring-row-input">
+                        <tr id="FrontSideRow" class="authoring-row-input">
                             <td class="authoring-td">
                                 <markdown-edit v-model="card.frontSide" rows="2" maxrows="15" title="@Localizer["FrontSide"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
@@ -84,12 +84,9 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr id="BackSideCaptionRow" class="authoring-row-caption">
-                            <td class="authoring-td">@Localizer["BackSide"]</td>
-                        </tr>
-                        <tr id="BackSideInputRow" class="authoring-row-input">
+                        <tr id="BackSideRow" class="authoring-row-input">
                             <td class="authoring-td">
-                                <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.backSide" rows="2" max-rows="15"></b-form-textarea>
+                                <markdown-edit v-model="card.backSide" rows="2" maxrows="15" title="@Localizer["BackSide"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>
@@ -101,17 +98,11 @@
                                         <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
                                     </div>
                                 </div>
-                                <div class="collapse TogglableMarkdownPreview">
-                                    <span class="learning-card-body" v-html="backSideHtml()"></span>
-                                </div>
                             </td>
                         </tr>
-                        <tr id="AdditionalInfoCaptionRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-caption'">
-                            <td class="authoring-td">@Localizer["AdditionalInfo"]</td>
-                        </tr>
-                        <tr id="AdditionalInfoInputRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-input'">
+                        <tr id="AdditionalInfoRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-input'">
                             <td class="authoring-td">
-                                <b-form-textarea class="authoring-textarea responsive-padding-edit" v-model="card.additionalInfo" rows="2" max-rows="15"></b-form-textarea>
+                                <markdown-edit v-model="card.additionalInfo" rows="2" maxrows="15" title="@Localizer["AdditionalInfo"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>
@@ -122,9 +113,6 @@
                                     <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
                                         <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
                                     </div>
-                                </div>
-                                <div class="collapse TogglableMarkdownPreview">
-                                    <span class="learning-card-body" v-html="additionalInfoHtml()"></span>
                                 </div>
                             </td>
                         </tr>
