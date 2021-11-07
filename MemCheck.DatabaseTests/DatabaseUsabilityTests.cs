@@ -15,6 +15,9 @@ using System.Reflection;
 
 namespace MemCheck.DatabaseTests
 {
+    /* Checks that the database specified in the `appsettings.json` file is ok.
+     * Note that when running in GitHub actions, the settings in the file are substituted with the real production database.
+     */
     [TestClass(), TestCategory("IntegrationTests")]
     public class DatabaseUsabilityTests : IDisposable
     {
