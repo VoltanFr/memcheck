@@ -24,7 +24,7 @@
                     </tr>
                     <tr class="markdown-edit-row" v-if="previewVisible">
                         <td class="markdown-edit-td">
-                            <span class="markdown-edit-preview" v-html="renderedHtml()"></span>
+                            <span class="markdown-edit-preview" v-html="renderedHtml()" ></span>
                         </td>
                     </tr>
                 </tbody>
@@ -44,12 +44,17 @@
             };
         },
         insertNbsp() {
-            let textarea = this.$refs.text_area_control;
+            let textarea = this.$refs.text_area_control.$el;
             let cursorStartPosition = textarea.selectionStart;
             let cursorEndPosition = textarea.selectionEnd;
             let tmpStr = textarea.value;
-            this.content = tmpStr.substring(0, cursorStartPosition) + '&nbsp;' + tmpStr.substring(cursorEndPosition, tmpStr.length);
+            const nbsp = '&nbsp;';
+            this.content = tmpStr.substring(0, cursorStartPosition) + nbsp + tmpStr.substring(cursorEndPosition, tmpStr.length);
+            textarea.value = this.content;
             this.onInput();
+            textarea.focus();
+            textarea.selectionStart = cursorStartPosition + nbsp.length;
+            textarea.selectionEnd = cursorStartPosition + nbsp.length;
         },
         togglePreview() {
             this.previewVisible = !this.previewVisible;
