@@ -17,7 +17,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromId(dbContext).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task NotUsedInCards()
@@ -32,7 +32,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImageInfoFromId(dbContext).RunAsync(new GetImageInfoFromId.Request(image));
+            var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
             Assert.AreEqual(user, loaded.Owner.Id);
             Assert.AreEqual(name, loaded.Name);
             Assert.AreEqual(description, loaded.Description);
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Images
             await CardHelper.CreateAsync(db, user, frontSideImages: new[] { otherImage });
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImageInfoFromId(dbContext).RunAsync(new GetImageInfoFromId.Request(image));
+            var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
             Assert.AreEqual(user, loaded.Owner.Id);
             Assert.AreEqual(name, loaded.Name);
             Assert.AreEqual(description, loaded.Description);

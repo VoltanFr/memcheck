@@ -126,7 +126,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImageMetadata/{imageId}")]
         public async Task<IActionResult> GetImageMetadata(Guid imageId)
         {
-            var appRequest = new GetImageInfoFromId(callContext.DbContext);
+            var appRequest = new GetImageInfoFromId(callContext);
             var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
             return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
         }
@@ -191,7 +191,7 @@ namespace MemCheck.WebUI.Controllers
         {
             try
             {
-                var runner = new GetImageInfoFromId(callContext.DbContext);
+                var runner = new GetImageInfoFromId(callContext);
                 var result = await runner.RunAsync(new GetImageInfoFromId.Request(imageId));
                 return Ok(new GetImageInfoForDeletionResult(result, this));
             }

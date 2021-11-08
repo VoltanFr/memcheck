@@ -11,20 +11,22 @@ namespace MemCheck.Application.Images
     public sealed class GetImageInfoFromId
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetImageInfoFromId(MemCheckDbContext dbContext)
+        public GetImageInfoFromId(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request)
         {
             request.CheckValidity();
-            return await dbContext.Images
-                .AsNoTracking()
-                .Where(img => img.Id == request.ImageId)
-                .Select(img => new Result(img.Owner, img.Name, img.Description, img.Source, img.Cards.Count(), img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription))
-                .SingleAsync();
+            var result = await callContext.DbContext.Images
+                            .AsNoTracking()
+                            .Where(img => img.Id == request.ImageId)
+                            .Select(img => new Result(img.Owner, img.Name, img.Description, img.Source, img.Cards.Count(), img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription))
+                            .SingleAsync();
+            callContext.TelemetryClient.TrackEvent("GetImageInfoFromId", ("ImageId", request.ImageId.ToString()));
+            return result;
         }
         #region Request and Result
         public sealed record Request(Guid ImageId)
