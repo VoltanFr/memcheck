@@ -11,20 +11,22 @@ namespace MemCheck.Application.Images
     public sealed class GetImageInfoFromName
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetImageInfoFromName(MemCheckDbContext dbContext)
+        public GetImageInfoFromName(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request, ILocalized localizer)
         {
-            await request.CheckValidity(dbContext, localizer);
-            var img = await dbContext.Images.Include(img => img.Cards)
+            await request.CheckValidity(callContext.DbContext, localizer);
+            var img = await callContext.DbContext.Images.Include(img => img.Cards)
                 .Where(image => EF.Functions.Like(image.Name, $"{request.ImageName}"))
                 .Select(img => new { img.Id, img.Name, img.Source })
                 .SingleAsync();
-            return new Result(img.Id, img.Name, img.Source);
+            var result = new Result(img.Id, img.Name, img.Source);
+            callContext.TelemetryClient.TrackEvent("GetImageInfoFromName", ("ImageName", request.ImageName));
+            return result;
         }
         #region Request and Result types
         public sealed record Request(string ImageName)

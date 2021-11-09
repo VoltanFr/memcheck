@@ -18,7 +18,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext).RunAsync(new GetImageInfoFromName.Request(""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(""), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -28,7 +28,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromName(dbContext).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' '), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' '), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task ImageDoesNotExist()
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String()), new TestLocalizer()));
         }
         [TestMethod()]
         public async Task Success()
@@ -50,7 +50,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user, name: name, source: source);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImageInfoFromName(dbContext).RunAsync(new GetImageInfoFromName.Request(name), new TestLocalizer());
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(name), new TestLocalizer());
             Assert.AreEqual(image, loaded.ImageId);
             Assert.AreEqual(name, loaded.Name);
             Assert.AreEqual(source, loaded.Source);
@@ -65,7 +65,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user, name: name.ToLowerInvariant());
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImageInfoFromName(dbContext).RunAsync(new GetImageInfoFromName.Request(name), new TestLocalizer());
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(name), new TestLocalizer());
             Assert.AreEqual(image, loaded.ImageId);
             Assert.AreEqual(name, loaded.Name);
         }
