@@ -15,7 +15,7 @@ namespace MemCheck.Application.Images
         public async Task EmptyDb()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 10, ""));
+            var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 10, ""));
             Assert.AreEqual(0, result.PageCount);
             Assert.AreEqual(0, result.TotalCount);
         }
@@ -23,25 +23,25 @@ namespace MemCheck.Application.Images
         public async Task Page0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 0, "")));
         }
         [TestMethod()]
         public async Task PageSize0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext).RunAsync(new GetImageList.Request(0, 1, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "")));
         }
         [TestMethod()]
         public async Task PageSizeTooBig()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext).RunAsync(new GetImageList.Request(0, GetImageList.Request.MaxPageSize + 1, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, GetImageList.Request.MaxPageSize + 1, "")));
         }
         [TestMethod()]
         public async Task FilteredNotTrimmed()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext).RunAsync(new GetImageList.Request(0, 1, "  " + RandomHelper.String())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "  " + RandomHelper.String())));
         }
         [TestMethod()]
         public async Task OneImageInDb()
@@ -56,7 +56,7 @@ namespace MemCheck.Application.Images
             var versionDescription = RandomHelper.String();
             var image = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, ""));
+            var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
             var loaded = result.Images.Single();
@@ -83,14 +83,14 @@ namespace MemCheck.Application.Images
             await ImageHelper.CreateAsync(db, user);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, ""));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Images.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 2, ""));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 2, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.IsFalse(result.Images.Any());
@@ -106,21 +106,21 @@ namespace MemCheck.Application.Images
             var loaded = new HashSet<Guid>();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, ""));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
                 Assert.AreEqual(2, result.PageCount);
                 Assert.AreEqual(2, result.TotalCount);
                 loaded.Add(result.Images.Single().ImageId);
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 2, ""));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 2, ""));
                 Assert.AreEqual(2, result.PageCount);
                 Assert.AreEqual(2, result.TotalCount);
                 loaded.Add(result.Images.Single().ImageId);
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 3, ""));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 3, ""));
                 Assert.AreEqual(2, result.PageCount);
                 Assert.AreEqual(2, result.TotalCount);
                 Assert.IsFalse(result.Images.Any());
@@ -137,21 +137,21 @@ namespace MemCheck.Application.Images
             await ImageHelper.CreateAsync(db, user, name: imageName);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, RandomHelper.String()));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, RandomHelper.String()));
                 Assert.AreEqual(0, result.PageCount);
                 Assert.AreEqual(0, result.TotalCount);
                 Assert.IsFalse(result.Images.Any());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, imageName));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, imageName));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Images.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetImageList(dbContext).RunAsync(new GetImageList.Request(1, 1, imageName.Substring(1, 5)));
+                var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, imageName.Substring(1, 5)));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Images.Count());

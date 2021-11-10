@@ -64,7 +64,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetImageListAsync([FromBody] GetImageListRequest request)
         {
             CheckBodyParameter(request);
-            var result = await new GetImageList(callContext.DbContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
+            var result = await new GetImageList(callContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
             return Ok(new GetImageListViewModel(result, this));
         }
         public sealed class GetImageListRequest

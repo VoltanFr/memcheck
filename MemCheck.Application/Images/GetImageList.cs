@@ -10,17 +10,17 @@ namespace MemCheck.Application.Images
     public sealed class GetImageList
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetImageList(MemCheckDbContext dbContext)
+        public GetImageList(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Result> RunAsync(Request request)
         {
             request.CheckValidity();
 
-            IQueryable<Domain.Image>? images = dbContext.Images.AsNoTracking().Include(img => img.Cards);
+            IQueryable<Domain.Image>? images = callContext.DbContext.Images.AsNoTracking().Include(img => img.Cards);
             if (request.Filter.Length > 0)
                 images = images.Where(image =>
                     EF.Functions.Like(image.Name, $"%{request.Filter}%")
@@ -31,25 +31,33 @@ namespace MemCheck.Application.Images
             var totalCount = await ordered.CountAsync();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var pageImages = ordered.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
-            return new Result(totalCount, pageCount,
-                pageImages.Select(img => new ResultImage(
-                    img.Id,
-                    img.Name,
-                    img.Cards.Count(),
-                    img.OriginalContentType,
-                    img.Owner.UserName,
-                    img.Description,
-                    img.Source,
-                    img.OriginalSize,
-                    img.SmallBlobSize,
-                    img.MediumBlobSize,
-                    img.BigBlobSize,
-                    img.InitialUploadUtcDate,
-                    img.LastChangeUtcDate,
-                    img.VersionDescription
-                    )
-                )
-            );
+            var result = new Result(totalCount, pageCount,
+                            pageImages.Select(img => new ResultImage(
+                                img.Id,
+                                img.Name,
+                                img.Cards.Count(),
+                                img.OriginalContentType,
+                                img.Owner.UserName,
+                                img.Description,
+                                img.Source,
+                                img.OriginalSize,
+                                img.SmallBlobSize,
+                                img.MediumBlobSize,
+                                img.BigBlobSize,
+                                img.InitialUploadUtcDate,
+                                img.LastChangeUtcDate,
+                                img.VersionDescription
+                                )
+                            )
+                        );
+            callContext.TelemetryClient.TrackEvent("GetImageList",
+                ("PageSize", request.PageSize.ToString()),
+                ("PageNo", request.PageNo.ToString()),
+                ("Filter", request.Filter),
+                ("ResultTotalCount", result.TotalCount.ToString()),
+                ("ResultPageCount", result.PageCount.ToString()),
+                ("ResultImageCount", result.Images.Count().ToString()));
+            return result;
         }
         #region Request & Result types
         public sealed record Request(int PageSize, int PageNo, string Filter)
