@@ -38,14 +38,14 @@ namespace MemCheck.Application.Images
             var firstVersionDate = RandomHelper.Date(initialVersionDate);
             var firstVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext).RunAsync(new UpdateImageMetadata.Request(image, user2, initialName, initialSource, RandomHelper.String(), firstVersionDescription), new TestLocalizer(), firstVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user2, initialName, initialSource, RandomHelper.String(), firstVersionDescription), firstVersionDate);
 
             var user3Name = RandomHelper.String();
             var user3 = await UserHelper.CreateInDbAsync(db, userName: user3Name);
             var lastVersionDate = RandomHelper.Date(firstVersionDate);
             var lastVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext).RunAsync(new UpdateImageMetadata.Request(image, user3, initialName, RandomHelper.String(), RandomHelper.String(), lastVersionDescription), new TestLocalizer(), lastVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user3, initialName, RandomHelper.String(), RandomHelper.String(), lastVersionDescription), lastVersionDate);
 
             using (var dbContext = new MemCheckDbContext(db))
             {

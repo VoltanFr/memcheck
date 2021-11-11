@@ -150,7 +150,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName, request.Source, request.Description, request.VersionDescription);
-            await new UpdateImageMetadata(callContext.DbContext).RunAsync(applicationRequest, this);
+            await new UpdateImageMetadata(callContext).RunAsync(applicationRequest);
             var toastText = $"{Get("SuccessfullyUpdatedImage")} '{request.ImageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }

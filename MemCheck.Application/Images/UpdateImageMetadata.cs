@@ -11,7 +11,7 @@ namespace MemCheck.Application.Images
     public sealed class UpdateImageMetadata
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
@@ -24,15 +24,15 @@ namespace MemCheck.Application.Images
             };
         }
         #endregion
-        public UpdateImageMetadata(MemCheckDbContext dbContext)
+        public UpdateImageMetadata(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request, ILocalized localizer, DateTime? nowUtc = null)
+        public async Task RunAsync(Request request, DateTime? nowUtc = null)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
-            var image = await dbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
-            var user = await dbContext.Users.SingleAsync(u => u.Id == request.UserId);
+            await request.CheckValidityAsync(callContext.Localized, callContext.DbContext);
+            var image = await callContext.DbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
+            var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
             var versionFromCurrentImage = new ImagePreviousVersion()
             {
@@ -51,7 +51,7 @@ namespace MemCheck.Application.Images
                 PreviousVersion = image.PreviousVersion,
             };
 
-            dbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
+            callContext.DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
 
             image.Owner = user;
             image.Name = request.Name;
@@ -62,7 +62,16 @@ namespace MemCheck.Application.Images
             image.VersionDescription = request.VersionDescription;
             image.PreviousVersion = versionFromCurrentImage;
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+
+            callContext.TelemetryClient.TrackEvent("UpdateImageMetadata",
+                ("ImageId", request.ImageId.ToString()),
+                ("NewName", request.Name),
+                ("NewNameLength", request.Name.Length.ToString()),
+                ("DescriptionLength", request.Description.Length.ToString()),
+                ("SourceFieldLength", request.Source.Length.ToString()),
+                ("VersionDescriptionLength", request.VersionDescription.Length.ToString())
+                );
         }
         #region Request class
         public sealed class Request
