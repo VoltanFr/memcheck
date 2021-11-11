@@ -19,8 +19,7 @@ namespace MemCheck.Application.Images
         #region Fields
         public const string svgImageContentType = "image/svg+xml";
         public const string pngImageContentType = "image/png";
-        private readonly MemCheckDbContext dbContext;
-        private readonly ILocalized localizer;
+        private readonly CallContext callContext;
         private static readonly ImmutableHashSet<string> supportedContentTypes = GetSupportedContentTypes();
         private const int bigImageWidth = 1600;
         #endregion
@@ -55,7 +54,7 @@ namespace MemCheck.Application.Images
             }
             catch
             {
-                throw new RequestInputException(localizer.Get("SvgImageCanNotBeLoaded"));
+                throw new RequestInputException(callContext.Localized.Get("SvgImageCanNotBeLoaded"));
             }
         }
         private Bitmap GetBitmap(Stream sourceStream, string contentType)
@@ -68,16 +67,15 @@ namespace MemCheck.Application.Images
             return new Bitmap(sourceStream);
         }
         #endregion
-        public StoreImage(MemCheckDbContext dbContext, ILocalized localizer)
+        public StoreImage(CallContext callContext)
         {
-            this.dbContext = dbContext;
-            this.localizer = localizer;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request, DateTime? now = null)
         {
-            await request.CheckValidityAsync(dbContext, localizer);
+            await request.CheckValidityAsync(callContext.DbContext, callContext.Localized);
 
-            var owner = await dbContext.Users.SingleAsync(u => u.Id == request.Owner);
+            var owner = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.Owner);
 
             var image = new Domain.Image
             {
@@ -85,7 +83,7 @@ namespace MemCheck.Application.Images
                 Description = request.Description,
                 Source = request.Source,
                 Owner = owner,
-                VersionDescription = localizer.Get("InitialImageVersionCreation"),
+                VersionDescription = callContext.Localized.Get("InitialImageVersionCreation"),
                 VersionType = ImageVersionType.Creation,
                 InitialUploadUtcDate = now ?? DateTime.UtcNow
             };
@@ -103,8 +101,16 @@ namespace MemCheck.Application.Images
             image.MediumBlobSize = image.MediumBlob.Length;
             image.BigBlob = ResizeImage(originalImage, bigImageWidth);
             image.BigBlobSize = image.BigBlob.Length;
-            dbContext.Images.Add(image);
-            await dbContext.SaveChangesAsync();
+            callContext.DbContext.Images.Add(image);
+            await callContext.DbContext.SaveChangesAsync();
+
+            callContext.TelemetryClient.TrackEvent("StoreImage",
+                ("ImageName", request.Name.ToString()),
+                ("DescriptionLength", request.Description.Length.ToString()),
+                ("SourceFieldLength", request.Source.Length.ToString()),
+                ("ContentType", request.ContentType),
+                ("ImageSize", image.OriginalSize.ToString())
+                );
         }
         #region Request class
         public sealed class Request

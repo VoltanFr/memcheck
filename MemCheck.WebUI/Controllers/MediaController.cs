@@ -48,7 +48,7 @@ namespace MemCheck.WebUI.Controllers
             using var reader = new BinaryReader(stream);
             var fileContent = reader.ReadBytes((int)request.File.Length);
             var applicationRequest = new StoreImage.Request(userId, request.Name.Trim(), request.Description.Trim(), request.Source.Trim(), request.File.ContentType, fileContent);
-            await new StoreImage(callContext.DbContext, this).RunAsync(applicationRequest);
+            await new StoreImage(callContext).RunAsync(applicationRequest);
             return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
         }
         public sealed class UploadImageRequest

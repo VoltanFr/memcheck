@@ -38,7 +38,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(Guid.Empty, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -48,7 +48,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(Guid.NewGuid(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -58,7 +58,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength - 1), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -68,7 +68,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(QueryValidationHelper.ImageMaxNameLength + 1), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, "   " + RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DescriptionTooShort()
@@ -88,7 +88,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(QueryValidationHelper.ImageMinDescriptionLength - 1), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DescriptionTooLong()
@@ -98,7 +98,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(QueryValidationHelper.ImageMaxDescriptionLength + 1), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task DescriptionNotTrimmed()
@@ -108,7 +108,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), "   " + RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task SourceTooShort()
@@ -118,7 +118,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(QueryValidationHelper.ImageMinSourceLength - 1), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task SourceTooLong()
@@ -128,7 +128,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(QueryValidationHelper.ImageMaxSourceLength + 1), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task SourceNotTrimmed()
@@ -138,7 +138,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), "\n" + RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UnsupportedImageType()
@@ -148,7 +148,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), pngImage);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task ImageTypeMismatch()
@@ -158,7 +158,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.svgImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task BlobTooShort()
@@ -168,7 +168,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, RandomHelper.Bytes(StoreImage.Request.minBlobLength - 1));
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task BlobTooLong()
@@ -178,7 +178,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, RandomHelper.Bytes(StoreImage.Request.maxBlobLength + 1));
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task ImageWithNameExists()
@@ -190,7 +190,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new StoreImage.Request(user, name, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task Success()
@@ -207,7 +207,7 @@ namespace MemCheck.Application.Images
             {
                 var request = new StoreImage.Request(user, name, description, source, StoreImage.pngImageContentType, pngImage);
                 var localizer = new TestLocalizer(new KeyValuePair<string, string>("InitialImageVersionCreation", versionDesc).AsArray());
-                await new StoreImage(dbContext, localizer).RunAsync(request, uploadDate);
+                await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request, uploadDate);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -245,7 +245,7 @@ namespace MemCheck.Application.Images
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new StoreImage.Request(user, name, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-                await new StoreImage(dbContext, new TestLocalizer()).RunAsync(request);
+                await new StoreImage(dbContext.AsCallContext()).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
