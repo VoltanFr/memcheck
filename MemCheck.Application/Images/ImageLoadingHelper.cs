@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MemCheck.Application.Images
 {
-    public static class ImageLoadingHelper
+    internal static class ImageLoadingHelper
     {
         public static ImmutableDictionary<Guid, string> GetAllImageNames(MemCheckDbContext dbContext)
         {
