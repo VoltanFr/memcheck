@@ -229,7 +229,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("ImageVersions/{imageId}")]
         public async Task<IActionResult> ImageVersions(Guid imageId)
         {
-            var appResults = await new GetImageVersions(callContext.DbContext).RunAsync(imageId);
+            var appResults = await new GetImageVersions(callContext).RunAsync(imageId);
             var result = appResults.Select(appResult => new ImageVersion(appResult, this));
             return Ok(result);
         }

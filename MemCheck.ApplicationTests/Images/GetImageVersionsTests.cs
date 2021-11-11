@@ -18,7 +18,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageVersions(dbContext).RunAsync(Guid.NewGuid()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageVersions(dbContext.AsCallContext()).RunAsync(Guid.NewGuid()));
         }
         [TestMethod()]
         public async Task Versionning()
@@ -49,7 +49,7 @@ namespace MemCheck.Application.Images
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versions = (await new GetImageVersions(dbContext).RunAsync(image)).ToList();
+                var versions = (await new GetImageVersions(dbContext.AsCallContext()).RunAsync(image)).ToList();
 
                 var currentVersion = versions[0];
                 Assert.AreEqual(user3Name, currentVersion.Author);

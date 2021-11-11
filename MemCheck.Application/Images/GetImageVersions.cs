@@ -16,17 +16,17 @@ namespace MemCheck.Application.Images
         private const string ImageNameFieldName = "ImageName";
         private const string ImageDescriptionFieldName = "ImageDescription";
         private const string ImageSourceFieldName = "ImageSource";
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
         #region Private methods
         #endregion
-        public GetImageVersions(MemCheckDbContext dbContext)
+        public GetImageVersions(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<ResultImageVersion>> RunAsync(Guid imageId)
         {
-            var images = dbContext.Images.Where(img => img.Id == imageId);
+            var images = callContext.DbContext.Images.Where(img => img.Id == imageId);
 
             var currentVersion = await images
                 .AsNoTracking()
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Images
                     img.VersionDescription)
                 ).SingleAsync();
 
-            var allPreviousVersions = dbContext.ImagePreviousVersions.Where(img => img.Image == imageId)
+            var allPreviousVersions = callContext.DbContext.ImagePreviousVersions.Where(img => img.Image == imageId)
                 .AsNoTracking()
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
@@ -65,6 +65,7 @@ namespace MemCheck.Application.Images
                 result.Add(new ResultImageVersion(iterationVersion, previousVersion));
                 iterationVersion = previousVersion;
             }
+            callContext.TelemetryClient.TrackEvent("GetImageVersions", ("ImageId", imageId.ToString()), ("ResultCount", result.Count.ToString()));
             return result;
         }
         public sealed class ImageVersionFromDb
