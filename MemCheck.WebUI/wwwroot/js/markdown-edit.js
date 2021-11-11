@@ -13,6 +13,8 @@
                     <tr class="markdown-edit-caption-row">
                         <td class="markdown-edit-td">
                             {{title}}&nbsp;&nbsp;
+                            <button class="markdown-edit-button" v-on:click="bold()" title="Gras"><i class="fas fa-bold"></i></button>
+                            <button class="markdown-edit-button" v-on:click="italic()" title="Italique"><i class="fas fa-italic"></i></button>
                             <button class="markdown-edit-button" v-on:click="insertNbsp()" title="Espace insécable">_</button>
                             <button class="markdown-edit-button" v-on:click="togglePreview()" title="Apperçu du rendu Markdown"><i class="fab fa-markdown"></i></button>
                         </td>
@@ -55,6 +57,33 @@
             textarea.focus();
             textarea.selectionStart = cursorStartPosition + nbsp.length;
             textarea.selectionEnd = cursorStartPosition + nbsp.length;
+        },
+        addMarkup(markup) {
+            const textarea = this.$refs.text_area_control.$el;
+            let cursorStartPosition = textarea.selectionStart;
+            let cursorEndPosition = textarea.selectionEnd;
+            const initialValue = textarea.value;
+            const selectionIsEmpty = cursorStartPosition == cursorEndPosition;
+            if (!selectionIsEmpty) {
+                // Don't include spaces in the modified area
+                while (initialValue.charAt(cursorStartPosition) == ' ')
+                    cursorStartPosition++;
+                while (initialValue.charAt(cursorEndPosition - 1) == ' ')
+                    cursorEndPosition--;
+            }
+            this.content = initialValue.substring(0, cursorStartPosition) + markup + initialValue.substring(cursorStartPosition, cursorEndPosition) + markup + initialValue.substring(cursorEndPosition);
+            textarea.value = this.content;
+            this.onInput();
+            textarea.focus();
+            const newCursorPosition = selectionIsEmpty ? cursorStartPosition + markup.length : cursorEndPosition + markup.length * 2;
+            textarea.selectionStart = newCursorPosition;
+            textarea.selectionEnd = newCursorPosition;
+        },
+        bold() {
+            this.addMarkup('**');
+        },
+        italic() {
+            this.addMarkup('_');
         },
         togglePreview() {
             this.previewVisible = !this.previewVisible;
