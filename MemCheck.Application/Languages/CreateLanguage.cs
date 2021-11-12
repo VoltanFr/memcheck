@@ -10,21 +10,23 @@ namespace MemCheck.Application.Languages
     public sealed class CreateLanguage
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly IRoleChecker roleChecker;
         #endregion
-        public CreateLanguage(MemCheckDbContext dbContext, IRoleChecker roleChecker)
+        public CreateLanguage(CallContext callContext, IRoleChecker roleChecker)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.roleChecker = roleChecker;
         }
         public async Task<Result> RunAsync(Request request, ILocalized localizer)
         {
-            await request.CheckValidityAsync(localizer, dbContext, roleChecker);
+            await request.CheckValidityAsync(localizer, callContext.DbContext, roleChecker);
             var language = new CardLanguage() { Name = request.Name };
-            dbContext.CardLanguages.Add(language);
-            await dbContext.SaveChangesAsync();
-            return new Result(language.Id, language.Name, 0);
+            callContext.DbContext.CardLanguages.Add(language);
+            await callContext.DbContext.SaveChangesAsync();
+            var result = new Result(language.Id, language.Name, 0);
+            callContext.TelemetryClient.TrackEvent("CreateLanguage", ("Name", request.Name));
+            return result;
         }
         #region Request type
         public sealed record Request(Guid UserId, string Name)
