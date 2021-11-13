@@ -24,7 +24,7 @@ namespace MemCheck.WebUI.Controllers
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
-        [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(callContext.DbContext).RunAsync());
+        [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(callContext).RunAsync());
         #region Create
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateRequest language)

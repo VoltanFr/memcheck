@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +9,17 @@ namespace MemCheck.Application.Languages
     public sealed class GetAllLanguages
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetAllLanguages(MemCheckDbContext dbContext)
+        public GetAllLanguages(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync()
         {
-            return await dbContext.CardLanguages.Select(language => new Result(language.Id, language.Name, dbContext.Cards.Where(card => card.CardLanguage.Id == language.Id).Count())).ToListAsync();
+            var result = await callContext.DbContext.CardLanguages.Select(language => new Result(language.Id, language.Name, callContext.DbContext.Cards.Where(card => card.CardLanguage.Id == language.Id).Count())).ToListAsync();
+            callContext.TelemetryClient.TrackEvent("GetAllLanguages", ("ResultCount", result.Count.ToString()));
+            return result;
         }
         public sealed record Result(Guid Id, string Name, int CardCount);
     }
