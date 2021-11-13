@@ -242,27 +242,29 @@
 }
 
 .authoring-table {
+    display: table;
 }
 
 .authoring-table-body {
-    display: block;
+    display: table;
+    width: 100%;
 }
 
 .authoring-row-caption {
     border-top-width: 1px;
     border-top-style: solid;
     font-weight: bold;
-    display: block;
+    display: table-row;
 }
 
 .authoring-row-input {
-    display: block;
+    display: table-row;
     padding-bottom: 10px;
     padding-left: 0px;
 }
 
 .authoring-td {
-    display: block;
+    display: table-cell;
     padding: 0px;
 }
 
@@ -506,8 +508,8 @@
 }
 
 .markdown-edit-button {
-    height: 15px;
-    width: 15px;
+    height: 20px;
+    width: 20px;
     padding: 0px;
     border-radius: 4px;
     font-size: 10px;
@@ -525,13 +527,14 @@
     }
 
 .markdown-edit-table {
-    display: block;
+    display: table;
     padding: 0px;
     margin: 0px;
 }
 
 .markdown-edit-table-body {
-    display: block;
+    display: table;
+    width: 100%;
     padding: 0px;
 }
 
@@ -541,7 +544,7 @@
     padding-bottom: 1px;
     border-style: none;
     font-weight: bold;
-    display: block;
+    display: table-row;
     vertical-align: middle;
 }
 
@@ -550,12 +553,13 @@
     border-style: none;
     font-weight: normal;
     vertical-align: middle;
-    display: block;
+    display: table-row;
 }
 
 .markdown-edit-td {
     border-style: none;
-    display: block;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .markdown-edit-textarea {
