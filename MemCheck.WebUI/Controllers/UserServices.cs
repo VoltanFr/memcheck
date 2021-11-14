@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    public static class UserServices
+    internal static class UserServices
     //This class has to be replaceable by a user service registered in Startup, which knows the userManager
     {
         public static async Task<Guid> UserIdFromContextAsync(Microsoft.AspNetCore.Http.HttpContext httpContext, UserManager<MemCheckUser> userManager)
