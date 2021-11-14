@@ -9,18 +9,19 @@ namespace MemCheck.Application.Languages
     public sealed class SetUserUILanguage
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public SetUserUILanguage(MemCheckDbContext dbContext)
+        public SetUserUILanguage(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var user = await dbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            await request.CheckValidityAsync(callContext.DbContext);
+            var user = await callContext.DbContext.Users.SingleAsync(user => user.Id == request.UserId);
             user.UILanguage = request.CultureName;
-            dbContext.SaveChanges();
+            callContext.DbContext.SaveChanges();
+            callContext.TelemetryClient.TrackEvent("SetUserUILanguage", ("CultureName", request.CultureName));
         }
         #region Request type
         public sealed record Request(Guid UserId, string CultureName)

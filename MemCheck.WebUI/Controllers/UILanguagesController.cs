@@ -1,27 +1,29 @@
-﻿using MemCheck.Application.Languages;
+﻿using MemCheck.Application;
+using MemCheck.Application.Languages;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using Microsoft.Extensions.Localization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
     [Route("[controller]")]
-    public class UILanguagesController : Controller
+    public class UILanguagesController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         private readonly SignInManager<MemCheckUser> signInManager;
         #endregion
-        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager) : base()
+        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, TelemetryClient telemetryClient, IStringLocalizer<TagsController> localizer) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
             this.signInManager = signInManager;
         }
@@ -43,7 +45,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user != null)
             {
-                await new SetUserUILanguage(dbContext).RunAsync(new SetUserUILanguage.Request(user.Id, culture));
+                await new SetUserUILanguage(callContext).RunAsync(new SetUserUILanguage.Request(user.Id, culture));
                 await signInManager.RefreshSignInAsync(user);   //So that the culture claim is renewed
             }
 
