@@ -107,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new CreateDeck.Request(userId, request.Description.Trim(), request.HeapingAlgorithmId);
-            await new CreateDeck(callContext).RunAsync(appRequest, this);
+            await new CreateDeck(callContext).RunAsync(appRequest);
             return Ok();
         }
         public sealed class CreateRequest

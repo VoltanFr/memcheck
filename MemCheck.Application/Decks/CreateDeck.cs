@@ -16,9 +16,9 @@ namespace MemCheck.Application.Decks
         {
             this.callContext = callContext;
         }
-        public async Task RunAsync(Request request, ILocalized localizer)
+        public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(localizer, callContext.DbContext);
+            await request.CheckValidityAsync(callContext.Localized, callContext.DbContext);
             var user = await callContext.DbContext.Users.SingleAsync(user => user.Id == request.UserId);
             var deck = new Deck() { Owner = user, Description = request.Name, HeapingAlgorithmId = request.HeapingAlgorithmId };
             callContext.DbContext.Decks.Add(deck);
