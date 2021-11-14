@@ -4,12 +4,7 @@ using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
@@ -17,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
-    //Test that deleting a user in UserManager does not cascade delete the info we don't want to delete, such as the user's cards
     [TestClass()]
     public class DeleteUserAccountTests
     {
