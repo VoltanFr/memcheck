@@ -354,7 +354,7 @@ namespace MemCheck.WebUI.Controllers
             if (notif)
             {
                 var request = new AddCardSubscriptions.Request(userId, cardId.AsArray());
-                await new AddCardSubscriptions(callContext.DbContext).RunAsync(request);
+                await new AddCardSubscriptions(callContext).RunAsync(request);
             }
             else
             {

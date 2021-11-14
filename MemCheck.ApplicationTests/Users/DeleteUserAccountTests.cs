@@ -477,8 +477,8 @@ namespace MemCheck.Application.Users
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await new AddCardSubscriptions(dbContext).RunAsync(new AddCardSubscriptions.Request(userToDelete, new Guid[] { card1.Id, card2.Id }));
-                await new AddCardSubscriptions(dbContext).RunAsync(new AddCardSubscriptions.Request(loggedUser, new Guid[] { card2.Id, card3.Id }));
+                await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(userToDelete, new Guid[] { card1.Id, card2.Id }));
+                await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(loggedUser, new Guid[] { card2.Id, card3.Id }));
             }
 
             using (var dbContext = new MemCheckDbContext(db))

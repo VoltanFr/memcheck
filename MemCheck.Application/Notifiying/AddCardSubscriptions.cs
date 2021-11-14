@@ -11,22 +11,23 @@ namespace MemCheck.Application.Notifying
     public sealed class AddCardSubscriptions
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public AddCardSubscriptions(MemCheckDbContext dbContext)
+        public AddCardSubscriptions(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            request.CheckValidity(dbContext);
+            request.CheckValidity(callContext.DbContext);
 
             var now = DateTime.UtcNow;
 
             foreach (var cardId in request.CardIds)
-                CreateSubscription(dbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
+                CreateSubscription(callContext.DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("AddCardSubscriptions", ("CardCount", request.CardIds.Count().ToString()));
         }
         internal static void CreateSubscription(MemCheckDbContext dbContext, Guid userId, Guid cardId, DateTime registrationUtcDate, int registrationMethod)
         {

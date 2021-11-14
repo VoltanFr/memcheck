@@ -528,7 +528,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
-            await new AddCardSubscriptions(callContext.DbContext).RunAsync(appRequest);
+            await new AddCardSubscriptions(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("Registered"), this);
         }
         public sealed class RegisterForNotificationsRequest
