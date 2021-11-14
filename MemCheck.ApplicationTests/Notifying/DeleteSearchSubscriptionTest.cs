@@ -23,7 +23,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new DeleteSearchSubscription.Request(Guid.Empty, subscription.Id);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task InvalidSubscriptionId()
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new DeleteSearchSubscription.Request(userId, Guid.Empty);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfSubscription()
@@ -45,7 +45,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new DeleteSearchSubscription.Request(userId, subscription.Id);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task CorrectDeletion_OnlySubscription()
@@ -55,7 +55,7 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new DeleteSearchSubscription(dbContext).RunAsync(new DeleteSearchSubscription.Request(userId, subscription.Id));
+                await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(new DeleteSearchSubscription.Request(userId, subscription.Id));
 
             using (var dbContext = new MemCheckDbContext(testDB))
                 Assert.AreEqual(0, (await new GetSearchSubscriptions(dbContext).RunAsync(new GetSearchSubscriptions.Request(userId))).Count());
@@ -72,7 +72,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new DeleteSearchSubscription.Request(userId, subscription.Id);
-                await new DeleteSearchSubscription(dbContext).RunAsync(request);
+                await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -117,7 +117,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteSearchSubscription(dbContext).RunAsync(new DeleteSearchSubscription.Request(user, subscriptionId));
+                await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(new DeleteSearchSubscription.Request(user, subscriptionId));
 
             using (var dbContext = new MemCheckDbContext(db))
             {

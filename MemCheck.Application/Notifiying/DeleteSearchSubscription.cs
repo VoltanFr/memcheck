@@ -10,18 +10,19 @@ namespace MemCheck.Application.Notifying
     public sealed class DeleteSearchSubscription
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public DeleteSearchSubscription(MemCheckDbContext dbContext)
+        public DeleteSearchSubscription(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var subscription = await dbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
-            dbContext.SearchSubscriptions.Remove(subscription);
-            await dbContext.SaveChangesAsync();
+            await request.CheckValidityAsync(callContext.DbContext);
+            var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
+            callContext.DbContext.SearchSubscriptions.Remove(subscription);
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("DeleteSearchSubscription", ("subscriptionId", request.SubscriptionId.ToString()));
         }
         #region Request class
         public sealed class Request

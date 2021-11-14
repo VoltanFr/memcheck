@@ -1,7 +1,9 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application;
+using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -16,12 +18,12 @@ namespace MemCheck.WebUI.Controllers
     public class AccountController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public AccountController(MemCheckDbContext dbContext, IStringLocalizer<AccountController> localizer, UserManager<MemCheckUser> userManager) : base(localizer)
+        public AccountController(MemCheckDbContext dbContext, IStringLocalizer<AccountController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.userManager = userManager;
         }
         #region GetSearchSubscriptions
@@ -30,7 +32,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
-            var result = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);
+            var result = await new GetSearchSubscriptions(callContext.DbContext).RunAsync(appRequest);
             return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, this)));
         }
         public sealed class SearchSubscriptionViewModel
@@ -78,7 +80,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
-            var results = await new GetSearchSubscriptions(dbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
+            var results = await new GetSearchSubscriptions(callContext.DbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
             var result = results.Where(r => r.Id == id).Single();
             return Ok(new SearchSubscriptionViewModel(result, this));
         }
@@ -90,7 +92,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
-            await new SetSearchSubscriptionName(dbContext).RunAsync(appRequest);
+            await new SetSearchSubscriptionName(callContext.DbContext).RunAsync(appRequest);
             return Ok();
         }
         public sealed class SetSearchSubscriptionNameRequestModel
@@ -104,7 +106,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteSearchSubscription.Request(userId, id);
-            await new DeleteSearchSubscription(dbContext).RunAsync(appRequest);
+            await new DeleteSearchSubscription(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("Deleted"), this);
         }
         #endregion
