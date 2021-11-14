@@ -27,6 +27,9 @@ namespace MemCheck.Application.Users
         }
         private readonly CallContext callContext;
         #endregion
+        public const int MinUserNameLength = 3;
+        public const int MaxUserNameLength = 30;
+        public const string BadUserNameLengthErrorCode = "BadUserNameLength";
 
         public MemCheckUserManager(IUserStore<MemCheckUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<MemCheckUser> passwordHasher,
             IEnumerable<IUserValidator<MemCheckUser>> userValidators, IEnumerable<IPasswordValidator<MemCheckUser>> passwordValidators, ILookupNormalizer keyNormalizer,
@@ -42,6 +45,9 @@ namespace MemCheck.Application.Users
         }
         public async override Task<IdentityResult> CreateAsync(MemCheckUser user)
         {
+            if (user.UserName.Length > MaxUserNameLength || user.UserName.Length < MinUserNameLength)
+                return IdentityResult.Failed(new IdentityError() { Code = BadUserNameLengthErrorCode, Description = $"User name must contain between {MinUserNameLength} and {MaxUserNameLength} chars" }.AsArray());
+
             var result = await base.CreateAsync(user);
             callContext.TelemetryClient.TrackEvent("UserAccountCreated", ("UserName", user.UserName), ("Email", user.Email), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
             return result;
