@@ -94,6 +94,14 @@ namespace MemCheck.Application.Users
                 Assert.AreEqual(userToCreate.Email, userFromDb.Email);
                 Assert.IsNull(userFromDb.DeletionDate);
                 Assert.IsFalse(userFromDb.EmailConfirmed);
+
+                var getUserDecks = new GetUserDecks(dbContext.AsCallContext());
+                var userDecks = await getUserDecks.RunAsync(new GetUserDecks.Request(userToCreate.Id));
+                Assert.AreEqual(1, userDecks.Count());
+                var deck = userDecks.First();
+                Assert.AreEqual(0, deck.CardCount);
+                Assert.AreEqual(MemCheckUserManager.DefaultDeckName, deck.Description);
+                Assert.AreEqual(HeapingAlgorithms.DefaultAlgoId, deck.HeapingAlgorithmId);
             }
         }
     }

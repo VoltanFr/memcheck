@@ -30,6 +30,7 @@ namespace MemCheck.Application.Users
         public const int MinUserNameLength = 3;
         public const int MaxUserNameLength = 30;
         public const string BadUserNameLengthErrorCode = "BadUserNameLength";
+        public const string DefaultDeckName = "Auto";
 
         public MemCheckUserManager(IUserStore<MemCheckUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<MemCheckUser> passwordHasher,
             IEnumerable<IUserValidator<MemCheckUser>> userValidators, IEnumerable<IPasswordValidator<MemCheckUser>> passwordValidators, ILookupNormalizer keyNormalizer,
@@ -50,6 +51,11 @@ namespace MemCheck.Application.Users
 
             var result = await base.CreateAsync(user);
             callContext.TelemetryClient.TrackEvent("UserAccountCreated", ("UserName", user.UserName), ("Email", user.Email), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
+            if (result.Succeeded)
+            {
+                var createDeck = new CreateDeck(callContext);
+                await createDeck.RunAsync(new CreateDeck.Request(user.Id, DefaultDeckName, HeapingAlgorithms.DefaultAlgoId));
+            }
             return result;
         }
         public async override Task<IdentityResult> ConfirmEmailAsync(MemCheckUser user, string token)
