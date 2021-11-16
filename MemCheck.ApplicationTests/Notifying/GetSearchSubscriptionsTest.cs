@@ -19,7 +19,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetSearchSubscriptions.Request(userId);
-            var subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(request);
+            var subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request);
             Assert.IsTrue(!subscriptions.Any());
         }
         [TestMethod()]
@@ -31,7 +31,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetSearchSubscriptions.Request(userId);
-            var subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(request);
+            var subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(1, subscriptions.Count());
         }
         [TestMethod()]
@@ -50,11 +50,11 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var user1Request = new GetSearchSubscriptions.Request(user1Id);
-            var user1Subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(user1Request);
+            var user1Subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(user1Request);
             Assert.AreEqual(2, user1Subscriptions.Count());
 
             var user2Request = new GetSearchSubscriptions.Request(user2Id);
-            var user2Subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(user2Request);
+            var user2Subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(user2Request);
             Assert.AreEqual(3, user2Subscriptions.Count());
         }
         [TestMethod()]
@@ -71,7 +71,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetSearchSubscriptions.Request(userId);
-            var subscription = (await new GetSearchSubscriptions(dbContext).RunAsync(request)).Single();
+            var subscription = (await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request)).Single();
             Assert.AreEqual(savedSubscription.Id, subscription.Id);
             Assert.AreEqual(name, subscription.Name);
             Assert.AreEqual(requiredText, subscription.RequiredText);
@@ -92,7 +92,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetSearchSubscriptions.Request(userId);
-                var s = (await new GetSearchSubscriptions(dbContext).RunAsync(request)).Single();
+                var s = (await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request)).Single();
                 Assert.AreEqual(0, s.CardCountOnLastRun);
             }
 
@@ -107,7 +107,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetSearchSubscriptions.Request(userId);
-                var s = (await new GetSearchSubscriptions(dbContext).RunAsync(request)).Single();
+                var s = (await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request)).Single();
                 Assert.AreEqual(4, s.CardCountOnLastRun);
             }
         }

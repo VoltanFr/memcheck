@@ -32,7 +32,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
-            var result = await new GetSearchSubscriptions(callContext.DbContext).RunAsync(appRequest);
+            var result = await new GetSearchSubscriptions(callContext).RunAsync(appRequest);
             return Ok(result.Select(appResultEntry => new SearchSubscriptionViewModel(appResultEntry, this)));
         }
         public sealed class SearchSubscriptionViewModel
@@ -80,7 +80,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
-            var results = await new GetSearchSubscriptions(callContext.DbContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
+            var results = await new GetSearchSubscriptions(callContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
             var result = results.Where(r => r.Id == id).Single();
             return Ok(new SearchSubscriptionViewModel(result, this));
         }

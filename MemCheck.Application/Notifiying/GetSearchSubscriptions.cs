@@ -14,25 +14,26 @@ namespace MemCheck.Application.Notifying
     public sealed class GetSearchSubscriptions
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public GetSearchSubscriptions(MemCheckDbContext dbContext)
+        public GetSearchSubscriptions(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            var tagDictionary = TagLoadingHelper.Run(dbContext);
-            var deckDictionary = dbContext.Decks.AsNoTracking().Where(d => d.Owner.Id == request.UserId).Select(t => new { t.Id, t.Description }).ToImmutableDictionary(t => t.Id, t => t.Description);
+            var tagDictionary = TagLoadingHelper.Run(callContext.DbContext);
+            var deckDictionary = callContext.DbContext.Decks.AsNoTracking().Where(d => d.Owner.Id == request.UserId).Select(t => new { t.Id, t.Description }).ToImmutableDictionary(t => t.Id, t => t.Description);
 
-            var result = await dbContext.SearchSubscriptions.AsNoTracking()
+            var queryResult = await callContext.DbContext.SearchSubscriptions.AsNoTracking()
                 .Include(s => s.RequiredTags)
                 .Include(s => s.ExcludedTags)
-            //.OrderBy(search => search.Name);
                 .Where(search => search.UserId == request.UserId)
                 .ToListAsync();
 
-            return result.Select(subscription => new Result(subscription, tagDictionary, deckDictionary, dbContext));
+            var result = queryResult.Select(subscription => new Result(subscription, tagDictionary, deckDictionary, callContext.DbContext));
+            callContext.TelemetryClient.TrackEvent("GetSearchSubscriptions", ("ResultCount", result.Count().ToString()));
+            return result;
         }
         #region Request and Result
         public sealed record Request

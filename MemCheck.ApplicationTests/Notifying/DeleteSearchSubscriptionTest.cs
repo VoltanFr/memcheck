@@ -58,7 +58,7 @@ namespace MemCheck.Application.Tests.Notifying
                 await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(new DeleteSearchSubscription.Request(userId, subscription.Id));
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                Assert.AreEqual(0, (await new GetSearchSubscriptions(dbContext).RunAsync(new GetSearchSubscriptions.Request(userId))).Count());
+                Assert.AreEqual(0, (await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(new GetSearchSubscriptions.Request(userId))).Count());
         }
         [TestMethod()]
         public async Task CorrectDeletion_OtherSubscriptionsExist()
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetSearchSubscriptions.Request(userId);
-                var subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(request);
+                var subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request);
                 Assert.AreEqual(2, subscriptions.Count());
                 Assert.IsFalse(subscriptions.Any(s => s.Id == subscription.Id));
             }

@@ -95,7 +95,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new GetSearchSubscriptions.Request(userId);
-                var subscriptions = await new GetSearchSubscriptions(dbContext).RunAsync(request);
+                var subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request);
                 Assert.AreEqual(1, subscriptions.Count());
                 Assert.AreEqual(newName, subscriptions.Single().Name);
             }
