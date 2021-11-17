@@ -543,7 +543,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
-            await new RemoveCardSubscriptions(callContext.DbContext).RunAsync(appRequest);
+            await new RemoveCardSubscriptions(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(Get("Unregistered"), this);
         }
         public sealed class UnregisterForNotificationsRequest

@@ -359,7 +359,7 @@ namespace MemCheck.WebUI.Controllers
             else
             {
                 var request = new RemoveCardSubscriptions.Request(userId, cardId.AsArray());
-                await new RemoveCardSubscriptions(callContext.DbContext).RunAsync(request);
+                await new RemoveCardSubscriptions(callContext).RunAsync(request);
             }
             return Ok();
         }

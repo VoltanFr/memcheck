@@ -11,11 +11,11 @@ namespace MemCheck.Application.Notifying
     public sealed class RemoveCardSubscriptions
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public RemoveCardSubscriptions(MemCheckDbContext dbContext)
+        public RemoveCardSubscriptions(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
@@ -23,12 +23,13 @@ namespace MemCheck.Application.Notifying
 
             foreach (var cardId in request.CardIds)
             {
-                var existing = await dbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).SingleOrDefaultAsync();
+                var existing = await callContext.DbContext.CardNotifications.Where(notif => notif.UserId == request.UserId && notif.CardId == cardId).SingleOrDefaultAsync();
                 if (existing != null)
-                    dbContext.CardNotifications.Remove(existing);
+                    callContext.DbContext.CardNotifications.Remove(existing);
             }
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("RemoveCardSubscriptions", ("CardCount", request.CardIds.Count().ToString()));
         }
         #region Request class
         public sealed class Request
