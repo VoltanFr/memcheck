@@ -92,7 +92,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new SetSearchSubscriptionName.Request(userId, id, request.NewName);
-            await new SetSearchSubscriptionName(callContext.DbContext).RunAsync(appRequest);
+            await new SetSearchSubscriptionName(callContext).RunAsync(appRequest);
             return Ok();
         }
         public sealed class SetSearchSubscriptionNameRequestModel

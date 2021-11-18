@@ -577,7 +577,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
             var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Get("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
-            await new SubscribeToSearch(callContext.DbContext).RunAsync(applicationRequest);
+            await new SubscribeToSearch(callContext).RunAsync(applicationRequest);
             return ControllerResultWithToast.Success(Get("SubscriptionRecorded"), this);
         }
         public sealed class SubscribeToSearchViewModel

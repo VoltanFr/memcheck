@@ -262,8 +262,8 @@ namespace MemCheck.Application.Users
             Guid userToDeleteSubscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                loggedUserSubscriptionId = await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(loggedUser, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
-                userToDeleteSubscriptionId = await new SubscribeToSearch(dbContext).RunAsync(new SubscribeToSearch.Request(userToDelete, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
+                loggedUserSubscriptionId = await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(loggedUser, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
+                userToDeleteSubscriptionId = await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(userToDelete, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))

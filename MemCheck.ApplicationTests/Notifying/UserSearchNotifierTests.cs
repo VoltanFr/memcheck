@@ -236,7 +236,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", requiredTag.AsArray(), new[] { excludedTag });
-                var subscriber = new SubscribeToSearch(dbContext);
+                var subscriber = new SubscribeToSearch(dbContext.AsCallContext());
                 subscriptionId = await subscriber.RunAsync(subscriberRequest);
             }
 
@@ -300,7 +300,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
-                subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
+                subscriptionId = await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(subscriberRequest);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -365,7 +365,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
-                subscriptionId = await new SubscribeToSearch(dbContext).RunAsync(subscriberRequest);
+                subscriptionId = await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(subscriberRequest);
             }
 
             using (var dbContext = new MemCheckDbContext(db))

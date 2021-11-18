@@ -21,7 +21,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(Guid.Empty, subscription.Id, RandomHelper.String());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestInvalidSubscriptionId()
@@ -31,7 +31,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, Guid.Empty, RandomHelper.String());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task UserNotOwnerOfSubscription()
@@ -43,7 +43,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, RandomHelper.String());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestTooShortName()
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + RandomHelper.String(SetSearchSubscriptionName.Request.MinNameLength - 1) + "\t\t");
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task TestTooLongName()
@@ -65,7 +65,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, RandomHelper.String(SetSearchSubscriptionName.Request.MaxNameLength + 1));
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext).RunAsync(request));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
         }
         [TestMethod()]
         public async Task NameWithMaxLengthDoesNotThrow()
@@ -76,7 +76,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + RandomHelper.String(SetSearchSubscriptionName.Request.MaxNameLength) + "\t\t");
-            await new SetSearchSubscriptionName(dbContext).RunAsync(request);
+            await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request);
         }
         [TestMethod()]
         public async Task TestCorrectRenaming()
@@ -89,7 +89,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + newName + "\t\t");
-                await new SetSearchSubscriptionName(dbContext).RunAsync(request);
+                await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))

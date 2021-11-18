@@ -12,15 +12,15 @@ namespace MemCheck.Application.Notifying
     public sealed class SubscribeToSearch
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public SubscribeToSearch(MemCheckDbContext dbContext)
+        public SubscribeToSearch(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task<Guid> RunAsync(Request request)
         {
-            request.CheckValidity(dbContext);
+            request.CheckValidity(callContext.DbContext);
 
             var now = DateTime.UtcNow;
 
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Notifying
                 LastRunUtcDate = DateTime.MinValue
             };
 
-            dbContext.SearchSubscriptions.Add(search);
+            callContext.DbContext.SearchSubscriptions.Add(search);
 
             var requiredTags = new List<RequiredTagInSearchSubscription>();
             foreach (var requiredTag in request.RequiredTags)
@@ -44,7 +44,7 @@ namespace MemCheck.Application.Notifying
                     SearchSubscriptionId = search.Id,
                     TagId = requiredTag
                 };
-                dbContext.RequiredTagInSearchSubscriptions.Add(required);
+                callContext.DbContext.RequiredTagInSearchSubscriptions.Add(required);
                 requiredTags.Add(required);
             }
             search.RequiredTags = requiredTags;
@@ -60,7 +60,7 @@ namespace MemCheck.Application.Notifying
                         TagId = excludedTag
                     };
                     excludedTags.Add(excluded);
-                    dbContext.ExcludedTagInSearchSubscriptions.Add(excluded);
+                    callContext.DbContext.ExcludedTagInSearchSubscriptions.Add(excluded);
                 }
 
                 search.ExcludedTags = excludedTags;
@@ -69,8 +69,15 @@ namespace MemCheck.Application.Notifying
             else
                 search.ExcludeAllTags = true;
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
 
+            callContext.TelemetryClient.TrackEvent("SubscribeToSearch",
+                ("HasAnExcludedDeck", (request.ExcludedDeck != Guid.Empty).ToString()),
+                ("Name", request.Name),
+                ("RequiredText", request.RequiredText),
+                ("RequiredTagCount", request.RequiredTags.Count().ToString()),
+                ("ExcludedTagCount", request.ExcludedTags == null ? "-1" : request.ExcludedTags.Count().ToString()),
+                ("NameLength", request.Name.Length.ToString()));
             return search.Id;
         }
         #region Request class

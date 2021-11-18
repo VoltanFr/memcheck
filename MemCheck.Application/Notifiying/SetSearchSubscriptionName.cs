@@ -10,18 +10,19 @@ namespace MemCheck.Application.Notifying
     public sealed class SetSearchSubscriptionName
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         #endregion
-        public SetSearchSubscriptionName(MemCheckDbContext dbContext)
+        public SetSearchSubscriptionName(CallContext callContext)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
         }
         public async Task RunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-            var subscription = await dbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
+            await request.CheckValidityAsync(callContext.DbContext);
+            var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
             subscription.Name = request.Name;
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
+            callContext.TelemetryClient.TrackEvent("SetSearchSubscriptionName", ("Name", request.Name.ToString()), ("NameLength", request.Name.Length.ToString()));
         }
         #region Request class
         public sealed class Request
