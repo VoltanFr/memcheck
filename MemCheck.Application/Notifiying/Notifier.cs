@@ -11,6 +11,7 @@ namespace MemCheck.Application.Notifying
     public sealed class Notifier
     {
         #region Fields
+        private readonly CallContext callContext;
         private readonly IUserCardSubscriptionCounter userCardSubscriptionCounter;
         private readonly IUserSearchSubscriptionLister userSearchSubscriptionLister;
         private readonly IUserCardVersionsNotifier userCardVersionsNotifier;
@@ -46,20 +47,22 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
+        public Notifier(CallContext callContext, List<string> performanceIndicators)
             : this(
-                  new UserCardSubscriptionCounter(dbContext, performanceIndicators),
-                  new UserCardVersionsNotifier(dbContext, performanceIndicators),
-                  new UserCardDeletionsNotifier(dbContext, performanceIndicators),
-                  new UsersToNotifyGetter(dbContext, performanceIndicators),
-                  new UserLastNotifDateUpdater(dbContext, performanceIndicators, DateTime.UtcNow),
-                  new UserSearchSubscriptionLister(dbContext, performanceIndicators),
-                  new UserSearchNotifier(dbContext, MaxCardsToReportPerSearch, performanceIndicators),
+                  callContext,
+                  new UserCardSubscriptionCounter(callContext.DbContext, performanceIndicators),
+                  new UserCardVersionsNotifier(callContext.DbContext, performanceIndicators),
+                  new UserCardDeletionsNotifier(callContext, performanceIndicators),
+                  new UsersToNotifyGetter(callContext.DbContext, performanceIndicators),
+                  new UserLastNotifDateUpdater(callContext.DbContext, performanceIndicators, DateTime.UtcNow),
+                  new UserSearchSubscriptionLister(callContext.DbContext, performanceIndicators),
+                  new UserSearchNotifier(callContext.DbContext, MaxCardsToReportPerSearch, performanceIndicators),
                   performanceIndicators)
         {
         }
-        internal Notifier(IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators)
+        internal Notifier(CallContext callContext, IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators)
         {
+            this.callContext = callContext;
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
             this.userCardDeletionsNotifier = userCardDeletionsNotifier;
@@ -78,7 +81,9 @@ namespace MemCheck.Application.Notifying
             foreach (var user in users)
                 userNotifications.Add(await GetUserNotificationsAsync(user));
             performanceIndicators.Add($"Total Notifier execution time: {chrono.Elapsed}");
-            return new NotifierResult(userNotifications.ToImmutableArray());
+            var result = userNotifications.ToImmutableArray();
+            callContext.TelemetryClient.TrackEvent("Notifier", ("ResultCount", result.Length.ToString()));
+            return new NotifierResult(result);
         }
         #region Result classes
         public class NotifierResult

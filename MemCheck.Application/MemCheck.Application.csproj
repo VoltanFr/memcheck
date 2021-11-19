@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.12.4</VersionPrefix>
+    <VersionPrefix>0.12.5</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

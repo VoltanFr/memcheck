@@ -17,21 +17,21 @@ namespace MemCheck.Application.Notifying
     internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly List<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
-        public UserCardDeletionsNotifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
+        public UserCardDeletionsNotifier(CallContext callContext, List<string> performanceIndicators)
         {
             //prod constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.performanceIndicators = performanceIndicators;
             runningUtcDate = DateTime.UtcNow;
         }
-        public UserCardDeletionsNotifier(MemCheckDbContext dbContext, DateTime runningUtcDate)
+        public UserCardDeletionsNotifier(CallContext callContext, DateTime runningUtcDate)
         {
             //Unit tests constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             performanceIndicators = new List<string>();
             this.runningUtcDate = runningUtcDate;
         }
@@ -40,9 +40,9 @@ namespace MemCheck.Application.Notifying
             //It is a little strange to keep checking for deleted cards when the user has been notified of their deletion. But I'm not clear right now about what to do in case a card is undeleted
 
             var chrono = Stopwatch.StartNew();
-            var deletedCards = dbContext.CardPreviousVersions.Include(card => card.UsersWithView)
+            var deletedCards = callContext.DbContext.CardPreviousVersions.Include(card => card.UsersWithView)
                 .Join(
-                    dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId),
+                    callContext.DbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId),
                     previousVersion => previousVersion.Card,
                     cardNotif => cardNotif.CardId,
                     (previousVersion, cardNotif) => new { previousVersion, cardNotif }
@@ -62,9 +62,10 @@ namespace MemCheck.Application.Notifying
                              )
                       ).ToImmutableArray();
 
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's subscribed cards which have been deleted, and update the notification's last notif date");
 
+            callContext.TelemetryClient.TrackEvent("UserCardDeletionsNotifier", ("ResultCount", result.Length.ToString()));
             return result;
         }
     }

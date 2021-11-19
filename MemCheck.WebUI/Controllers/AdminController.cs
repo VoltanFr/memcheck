@@ -1,8 +1,10 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application;
+using MemCheck.Application.Notifying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,16 +25,16 @@ namespace MemCheck.WebUI.Controllers
     public class AdminController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly IEmailSender emailSender;
         private readonly UserManager<MemCheckUser> userManager;
         private readonly string authoringPageLink;
         private readonly string comparePageLink;
         private readonly string historyPageLink;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator) : base(localizer)
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
             this.emailSender = emailSender;
             this.userManager = userManager;
             authoringPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Index");
@@ -46,7 +48,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetAllUsers.Request(userId, request.PageSize, request.PageNo, request.Filter);
-            var result = await new GetAllUsers(dbContext, new ProdRoleChecker(userManager)).RunAsync(appRequest);
+            var result = await new GetAllUsers(callContext.DbContext, new ProdRoleChecker(userManager)).RunAsync(appRequest);
             return Ok(new GetUsersViewModel(result));
         }
         #region Request and result classes
@@ -292,7 +294,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var mailSendingsToWaitFor = new List<Task>();
                 var performanceIndicators = new List<string>();
-                var notifierResult = await new Notifier(dbContext, performanceIndicators).GetNotificationsAndUpdateLastNotifDatesAsync();
+                var notifierResult = await new Notifier(callContext, performanceIndicators).GetNotificationsAndUpdateLastNotifDatesAsync();
                 var sentEmailCount = 0;
 
                 foreach (var userNotifications in notifierResult.UserNotifications)
