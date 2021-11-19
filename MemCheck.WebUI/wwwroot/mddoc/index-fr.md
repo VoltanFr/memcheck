@@ -6,15 +6,18 @@ MemCheck est basé sur le principe des cartes d'apprentissage : la face avant d'
 Wikipédia a une [page dédiée aux cartes d'apprentissage](https://fr.wikipedia.org/wiki/Carte_m%C3%A9moire_(apprentissage)).
 
 ## Démarrage rapide
-1. Créez un compte
-2. Créez un paquet
-3. Ouvrez la page de recherche
-4. Choisissez comme critères le label _États américains_ et une note d'au moins quatre étoiles.
-5. Sélectionnez toutes les cartes
-6. Ajoutez les cartes à votre paquet
-7. Revenez à la page de démarrage
-8. Cliquez sur le lien des cartes non apprises
-9. Carte par carte, testez vos connaissances. Quand vous connaissez une réponse, la question ne vous sera plus posée avant deux jours (et cet intervalle augmentera dans les révisions suivantes). Quand vous ne connaissez pas la réponse, la carte est remise sous le tas des cartes non apprises.
+1. Créez un compte en suivant le lien de la page d'accueil.
+2. Ouvrez la page de recherche (menu _Cartes_ / _Parcourir_).
+3. Choisissez des critères de sélection, par exemple :
+    - un label (suggestion : choisissez un sujet qui vous intéresse parmi _États américains_, _Régions françaises_, _Vocabulaire anglais_, _Vocabulaire culinaire et alimentaire anglais_, _Fromage_, _Échelle de Beaufort_, _VHF_, _Vocabulaire du marin_, _Permis bateau maritime_, _Marine_, _Vocabulaire maritime anglais_, _Carte marine_) ;
+    - une note de cinq étoiles (_Éval moyenne_ : _Au moins_ et _Cinq étoiles_).
+4. Dans l'option _Taille de la page_, mettez _500_.
+5. Lancez la recherche avec le bouton _Exécuter_.
+4. Sélectionnez toutes les cartes en cochant la case tout en haut à gauche, au-dessus de la liste (ou sélectionnez juste les cartes qui vous intéressent).
+5. Ajoutez les cartes à votre paquet en utilisant le bouton <i class="fa fa-inbox"></i> et _Ajouter à votre paquet_.
+6. Revenez à la page de démarrage (en cliquant sur le nom _MemCheck_, en haut, ou sur le lien _Démarrage_, en bas).
+7. Cliquez sur le lien des cartes non apprises.
+8. Carte par carte, testez vos connaissances. Quand vous connaissez une réponse, la question ne vous sera plus posée avant deux jours (et cet intervalle augmentera dans les révisions suivantes). Quand vous ne connaissez pas la réponse, la carte est remise sous le tas des cartes non apprises.
 
 ## Choisissez ce que vous voulez apprendre parmi les cartes existantes
 Vous pouvez **sélectionner des choses à apprendre parmi la base de données des cartes disponibles**.
