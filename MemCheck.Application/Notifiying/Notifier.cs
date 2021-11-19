@@ -50,7 +50,7 @@ namespace MemCheck.Application.Notifying
         public Notifier(CallContext callContext, List<string> performanceIndicators)
             : this(
                   callContext,
-                  new UserCardSubscriptionCounter(callContext.DbContext, performanceIndicators),
+                  new UserCardSubscriptionCounter(callContext, performanceIndicators),
                   new UserCardVersionsNotifier(callContext.DbContext, performanceIndicators),
                   new UserCardDeletionsNotifier(callContext, performanceIndicators),
                   new UsersToNotifyGetter(callContext.DbContext, performanceIndicators),

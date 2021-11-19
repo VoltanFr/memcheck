@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,19 +14,20 @@ namespace MemCheck.Application.Notifying
     internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly List<string> performanceIndicators;
         #endregion
-        public UserCardSubscriptionCounter(MemCheckDbContext dbContext, List<string>? performanceIndicators = null)
+        public UserCardSubscriptionCounter(CallContext callContext, List<string>? performanceIndicators = null)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.performanceIndicators = performanceIndicators ?? new List<string>();
         }
         public async Task<int> RunAsync(Guid userId)
         {
             var chrono = Stopwatch.StartNew();
-            var result = await dbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
+            var result = await callContext.DbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+            callContext.TelemetryClient.TrackEvent("UserCardSubscriptionCounter", ("Result", result.ToString()));
             return result;
         }
     }

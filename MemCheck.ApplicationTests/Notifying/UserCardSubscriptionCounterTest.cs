@@ -17,7 +17,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user = await UserHelper.CreateInDbAsync(testDB);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+            var count = await new UserCardSubscriptionCounter(dbContext.AsCallContext()).RunAsync(user);
             Assert.AreEqual(0, count);
         }
         [TestMethod()]
@@ -30,7 +30,7 @@ namespace MemCheck.Application.Tests.Notifying
             await CardSubscriptionHelper.CreateAsync(testDB, user, card.Id);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+            var count = await new UserCardSubscriptionCounter(dbContext.AsCallContext()).RunAsync(user);
             Assert.AreEqual(1, count);
         }
         [TestMethod()]
@@ -44,7 +44,7 @@ namespace MemCheck.Application.Tests.Notifying
             await CardSubscriptionHelper.CreateAsync(testDB, user, await CardHelper.CreateIdAsync(testDB, user));
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var count = await new UserCardSubscriptionCounter(dbContext).RunAsync(user);
+            var count = await new UserCardSubscriptionCounter(dbContext.AsCallContext()).RunAsync(user);
             Assert.AreEqual(3, count);
         }
         [TestMethod()]
@@ -63,7 +63,7 @@ namespace MemCheck.Application.Tests.Notifying
             await CardSubscriptionHelper.CreateAsync(testDB, user3, await CardHelper.CreateIdAsync(testDB, user3));
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var counter = new UserCardSubscriptionCounter(dbContext);
+            var counter = new UserCardSubscriptionCounter(dbContext.AsCallContext());
             Assert.AreEqual(0, await counter.RunAsync(user1));
             Assert.AreEqual(1, await counter.RunAsync(user2));
             Assert.AreEqual(3, await counter.RunAsync(user3));
