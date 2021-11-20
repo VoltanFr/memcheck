@@ -17,41 +17,41 @@ namespace MemCheck.Application.Notifying
     internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly List<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
         #region Private methods
         private Guid? GetCardVersionOn(Guid cardId, DateTime utc)
         {
-            var resultVersion = dbContext.CardPreviousVersions.AsNoTracking()
+            var resultVersion = callContext.DbContext.CardPreviousVersions.AsNoTracking()
                 .Where(cardVersion => cardVersion.Card == cardId && cardVersion.VersionUtcDate <= utc)
                 .OrderByDescending(cardVersion => cardVersion.VersionUtcDate)
                 .FirstOrDefault();
             return resultVersion?.Id;
         }
         #endregion
-        public UserCardVersionsNotifier(MemCheckDbContext dbContext, List<string> performanceIndicators)
+        public UserCardVersionsNotifier(CallContext callContext, List<string> performanceIndicators)
         {
             //Prod constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.performanceIndicators = performanceIndicators;
             runningUtcDate = DateTime.UtcNow;
         }
-        public UserCardVersionsNotifier(MemCheckDbContext dbContext, DateTime runningUtcDate)
+        public UserCardVersionsNotifier(CallContext callContext, DateTime runningUtcDate)
         {
             //Unit tests constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             performanceIndicators = new List<string>();
             this.runningUtcDate = runningUtcDate;
         }
         public async Task<ImmutableArray<CardVersion>> RunAsync(Guid userId)
         {
             var chrono = Stopwatch.StartNew();
-            var cardVersions = await dbContext.Cards
+            var cardVersions = await callContext.DbContext.Cards
                 .Include(card => card.VersionCreator)
                 .Include(card => card.UsersWithView)
-                .Join(dbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId), card => card.Id, cardNotif => cardNotif.CardId, (card, cardNotif) => new { card, cardNotif })
+                .Join(callContext.DbContext.CardNotifications.Where(cardNotif => cardNotif.UserId == userId), card => card.Id, cardNotif => cardNotif.CardId, (card, cardNotif) => new { card, cardNotif })
                 .Where(cardAndNotif => cardAndNotif.card.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate)
                 .ToListAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's registered cards with new versions");
@@ -73,9 +73,9 @@ namespace MemCheck.Application.Notifying
             chrono.Restart();
             foreach (var cardVersion in cardVersions)
                 cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
-            await dbContext.SaveChangesAsync();
+            await callContext.DbContext.SaveChangesAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's registered cards last notif date");
-
+            callContext.TelemetryClient.TrackEvent("UserCardVersionsNotifier", ("ResultCount", result.Length.ToString()));
             return result;
         }
     }
