@@ -14,30 +14,31 @@ namespace MemCheck.Application.Notifying
     internal sealed class UserLastNotifDateUpdater : IUserLastNotifDateUpdater
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly List<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
-        public UserLastNotifDateUpdater(MemCheckDbContext dbContext, List<string> performanceIndicators, DateTime runningUtcDate)
+        public UserLastNotifDateUpdater(CallContext callContext, List<string> performanceIndicators, DateTime runningUtcDate)
         {
             //Prod constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.performanceIndicators = performanceIndicators;
             this.runningUtcDate = runningUtcDate;
         }
-        public UserLastNotifDateUpdater(MemCheckDbContext dbContext, DateTime runningUtcDate)
+        public UserLastNotifDateUpdater(CallContext callContext, DateTime runningUtcDate)
         {
             //Unit tests constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             performanceIndicators = new List<string>();
             this.runningUtcDate = runningUtcDate;
         }
         public async Task RunAsync(Guid userId)
         {
             var chrono = Stopwatch.StartNew();
-            dbContext.Users.Single(u => u.Id == userId).LastNotificationUtcDate = runningUtcDate;
-            await dbContext.SaveChangesAsync();
+            callContext.DbContext.Users.Single(u => u.Id == userId).LastNotificationUtcDate = runningUtcDate;
+            await callContext.DbContext.SaveChangesAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's last notif date");
+            callContext.TelemetryClient.TrackEvent("UserLastNotifDateUpdater");
         }
     }
 }
