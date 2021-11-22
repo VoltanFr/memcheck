@@ -87,7 +87,7 @@ namespace MemCheck.Application.Tests.Notifying
             var subscription = await SearchSubscriptionHelper.CreateAsync(testDB, userId);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new UserSearchNotifier(dbContext, 100, new DateTime(2050, 05, 01)).RunAsync(subscription.Id);
+                await new UserSearchNotifier(dbContext.AsCallContext(), 100, new DateTime(2050, 05, 01)).RunAsync(subscription.Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -102,7 +102,7 @@ namespace MemCheck.Application.Tests.Notifying
             await CardHelper.CreateAsync(testDB, userId);
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                await new UserSearchNotifier(dbContext, 100, new DateTime(2050, 05, 02)).RunAsync(subscription.Id);
+                await new UserSearchNotifier(dbContext.AsCallContext(), 100, new DateTime(2050, 05, 02)).RunAsync(subscription.Id);
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {

@@ -56,7 +56,7 @@ namespace MemCheck.Application.Notifying
                   new UsersToNotifyGetter(callContext.DbContext, performanceIndicators),
                   new UserLastNotifDateUpdater(callContext, performanceIndicators, DateTime.UtcNow),
                   new UserSearchSubscriptionLister(callContext.DbContext, performanceIndicators),
-                  new UserSearchNotifier(callContext.DbContext, MaxCardsToReportPerSearch, performanceIndicators),
+                  new UserSearchNotifier(callContext, MaxCardsToReportPerSearch, performanceIndicators),
                   performanceIndicators)
         {
         }

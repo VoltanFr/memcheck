@@ -27,7 +27,7 @@ namespace MemCheck.Application.Notifying
     internal sealed class UserSearchNotifier : IUserSearchNotifier
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly DateTime runningUtcDate;
         private readonly int maxCountToReport;
         private readonly List<string> performanceIndicators;
@@ -55,18 +55,18 @@ namespace MemCheck.Application.Notifying
             return request;
         }
         #endregion
-        public UserSearchNotifier(MemCheckDbContext dbContext, int maxCountToReport, List<string> performanceIndicators)
+        public UserSearchNotifier(CallContext callContext, int maxCountToReport, List<string> performanceIndicators)
         {
             //Prod constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             runningUtcDate = DateTime.UtcNow;
             this.maxCountToReport = maxCountToReport;
             this.performanceIndicators = performanceIndicators;
         }
-        public UserSearchNotifier(MemCheckDbContext dbContext, int maxCountToReport, DateTime runningUtcDate)
+        public UserSearchNotifier(CallContext callContext, int maxCountToReport, DateTime runningUtcDate)
         {
             //Unit tests constructor
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.runningUtcDate = runningUtcDate;
             this.maxCountToReport = maxCountToReport;
             performanceIndicators = new List<string>();
@@ -74,7 +74,7 @@ namespace MemCheck.Application.Notifying
         public async Task<UserSearchNotifierResult> RunAsync(Guid searchSubscriptionId)
         {
             var chrono = Stopwatch.StartNew();
-            var subscription = await dbContext.SearchSubscriptions
+            var subscription = await callContext.DbContext.SearchSubscriptions
                 .Include(s => s.ExcludedTags)
                 .Include(s => s.RequiredTags)
                 .Include(s => s.CardsInLastRun)
@@ -91,7 +91,7 @@ namespace MemCheck.Application.Notifying
             do
             {
                 request = request with { PageNo = request.PageNo + 1 };
-                var searcher = new SearchCards(dbContext);
+                var searcher = new SearchCards(callContext.DbContext);
                 searchResult = await searcher.RunAsync(request);
                 allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId), null)));
             }
@@ -107,14 +107,14 @@ namespace MemCheck.Application.Notifying
             chrono.Restart();
             foreach (var cardNotFoundAnymore in cardsNotFoundAnymore)
             {
-                var entity = await dbContext.CardsInSearchResults.SingleAsync(c => c.SearchSubscriptionId == searchSubscriptionId && c.CardId == cardNotFoundAnymore);
-                dbContext.CardsInSearchResults.Remove(entity);
+                var entity = await callContext.DbContext.CardsInSearchResults.SingleAsync(c => c.SearchSubscriptionId == searchSubscriptionId && c.CardId == cardNotFoundAnymore);
+                callContext.DbContext.CardsInSearchResults.Remove(entity);
             }
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {cardsNotFoundAnymore.Length} search result cards for deletion in DB");
 
             chrono.Restart();
             foreach (var addedCard in newFoundCards)
-                dbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
+                callContext.DbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {newFoundCards.Length} search result cards for add to DB");
 
             var countOfCardsNotFoundAnymore_StillExists_UserAllowedToView = 0;
@@ -127,7 +127,7 @@ namespace MemCheck.Application.Notifying
             chrono.Restart();
             foreach (Guid notFoundId in cardsNotFoundAnymore)
             {
-                var card = await dbContext.Cards
+                var card = await callContext.DbContext.Cards
                     .Include(c => c.UsersWithView)
                     .Include(c => c.VersionCreator)
                     .Where(c => c.Id == notFoundId).SingleOrDefaultAsync();
@@ -143,7 +143,7 @@ namespace MemCheck.Application.Notifying
                 }
                 else
                 {
-                    var previousVersion = await dbContext.CardPreviousVersions
+                    var previousVersion = await callContext.DbContext.CardPreviousVersions
                         .Include(previousVersion => previousVersion.UsersWithView)
                         .Include(previousVersion => previousVersion.VersionCreator)
                         .Where(previousVersion => previousVersion.Card == notFoundId && previousVersion.VersionType == CardPreviousVersionType.Deletion)
@@ -167,16 +167,28 @@ namespace MemCheck.Application.Notifying
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to work on cards not found anymore");
 
             subscription.LastRunUtcDate = runningUtcDate;
-            await dbContext.SaveChangesAsync();
-            return new UserSearchNotifierResult(subscription.Name,
-                newFoundCards.Length,
-                newFoundCards.Take(maxCountToReport),
-                countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
-                cardsNotFoundAnymore_StillExists_UserAllowedToView,
-                countOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
-                cardsNotFoundAnymore_Deleted_UserAllowedToView,
-                countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
-                countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+            await callContext.DbContext.SaveChangesAsync();
+            var result = new UserSearchNotifierResult(subscription.Name,
+                            newFoundCards.Length,
+                            newFoundCards.Take(maxCountToReport),
+                            countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
+                            cardsNotFoundAnymore_StillExists_UserAllowedToView,
+                            countOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
+                            cardsNotFoundAnymore_Deleted_UserAllowedToView,
+                            countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
+                            countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+            callContext.TelemetryClient.TrackEvent("UserSearchNotifier",
+                ("searchSubscriptionId", searchSubscriptionId.ToString()),
+                ("SubscriptionName", result.SubscriptionName.ToString()),
+                ("TotalNewlyFoundCardCount", result.TotalNewlyFoundCardCount.ToString()),
+                ("NewlyFoundCardsCount", result.NewlyFoundCards.Length.ToString()),
+                ("CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView", result.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView.ToString()),
+                ("CardsNotFoundAnymore_StillExists_UserAllowedToViewCount", result.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length.ToString()),
+                ("CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView", result.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView.ToString()),
+                ("CardsNotFoundAnymore_Deleted_UserAllowedToViewCount", result.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length.ToString()),
+                ("CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView", result.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView.ToString()),
+                ("CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToViewCount", result.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView.ToString()));
+            return result;
         }
     }
 }

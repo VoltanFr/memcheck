@@ -107,7 +107,7 @@ namespace MemCheck.Application.Tests.Notifying
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
+                await new UserSearchNotifier(dbContext.AsCallContext(), 10, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
 
             using (var dbContext = new MemCheckDbContext(db))
             {

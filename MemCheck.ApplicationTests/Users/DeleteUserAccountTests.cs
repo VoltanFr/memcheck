@@ -268,8 +268,8 @@ namespace MemCheck.Application.Users
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(loggedUserSubscriptionId);
-                await new UserSearchNotifier(dbContext, 10, new DateTime(2050, 05, 01)).RunAsync(userToDeleteSubscriptionId);
+                await new UserSearchNotifier(dbContext.AsCallContext(), 10, new DateTime(2050, 05, 01)).RunAsync(loggedUserSubscriptionId);
+                await new UserSearchNotifier(dbContext.AsCallContext(), 10, new DateTime(2050, 05, 01)).RunAsync(userToDeleteSubscriptionId);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
