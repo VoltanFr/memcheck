@@ -14,7 +14,7 @@ namespace MemCheck.Application.Tests.Notifying
         public async Task TestWithoutUser()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(Guid.Empty);
+            var subscriptions = await new UserSearchSubscriptionLister(dbContext.AsCallContext()).RunAsync(Guid.Empty);
             Assert.AreEqual(0, subscriptions.Length);
         }
         [TestMethod()]
@@ -25,7 +25,7 @@ namespace MemCheck.Application.Tests.Notifying
             var user = await UserHelper.CreateInDbAsync(testDB);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var subscriptions = await new UserSearchSubscriptionLister(dbContext).RunAsync(user);
+            var subscriptions = await new UserSearchSubscriptionLister(dbContext.AsCallContext()).RunAsync(user);
             Assert.AreEqual(0, subscriptions.Length);
         }
         [TestMethod()]
@@ -44,7 +44,7 @@ namespace MemCheck.Application.Tests.Notifying
             await SearchSubscriptionHelper.CreateAsync(testDB, user3);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var counter = new UserSearchSubscriptionLister(dbContext);
+            var counter = new UserSearchSubscriptionLister(dbContext.AsCallContext());
 
             var user1Subscriptions = await counter.RunAsync(user1);
             Assert.AreEqual(0, user1Subscriptions.Length);

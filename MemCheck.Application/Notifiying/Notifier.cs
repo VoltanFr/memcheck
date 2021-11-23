@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -55,7 +54,7 @@ namespace MemCheck.Application.Notifying
                   new UserCardDeletionsNotifier(callContext, performanceIndicators),
                   new UsersToNotifyGetter(callContext.DbContext, performanceIndicators),
                   new UserLastNotifDateUpdater(callContext, performanceIndicators, DateTime.UtcNow),
-                  new UserSearchSubscriptionLister(callContext.DbContext, performanceIndicators),
+                  new UserSearchSubscriptionLister(callContext, performanceIndicators),
                   new UserSearchNotifier(callContext, MaxCardsToReportPerSearch, performanceIndicators),
                   performanceIndicators)
         {
