@@ -12,25 +12,22 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Ratings
 {
-    public sealed class SetCardRating
+    public sealed class SetCardRating : RequestRunner<SetCardRating.Request, SetCardRating.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
         #region Private methods
         private async Task<int> SaveRatingByUserAsync(Request request)
         {
             int attempts = 0;
             while (true)
             {
-                var existingRatingByUser = await callContext.DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();
+                var existingRatingByUser = await DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();
 
                 if (existingRatingByUser == null)
                 {
                     try
                     {
-                        callContext.DbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = request.CardId, Rating = request.Rating });
-                        await callContext.DbContext.SaveChangesAsync();
+                        DbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = request.CardId, Rating = request.Rating });
+                        await DbContext.SaveChangesAsync();
                         return 0;
                     }
                     catch (SqlException e)
@@ -52,36 +49,34 @@ namespace MemCheck.Application.Ratings
 
                     var result = existingRatingByUser.Rating;
                     existingRatingByUser.Rating = request.Rating;
-                    await callContext.DbContext.SaveChangesAsync();
+                    await DbContext.SaveChangesAsync();
                     return result;
                 }
             }
         }
         private async Task UpdateCardAsync(Guid cardId)
         {
-            var newAverageRatingForThisCard = await callContext.DbContext.UserCardRatings.AsNoTracking().Where(rating => rating.CardId == cardId).Select(rating => rating.Rating).AverageAsync();
-            var newRatingCountForThisCard = await callContext.DbContext.UserCardRatings.AsNoTracking().Where(rating => rating.CardId == cardId).CountAsync();
+            var newAverageRatingForThisCard = await DbContext.UserCardRatings.AsNoTracking().Where(rating => rating.CardId == cardId).Select(rating => rating.Rating).AverageAsync();
+            var newRatingCountForThisCard = await DbContext.UserCardRatings.AsNoTracking().Where(rating => rating.CardId == cardId).CountAsync();
 
-            var card = await callContext.DbContext.Cards.SingleAsync(card => card.Id == cardId);
+            var card = await DbContext.Cards.SingleAsync(card => card.Id == cardId);
             card.RatingCount = newRatingCountForThisCard;
             card.AverageRating = newAverageRatingForThisCard;
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
         }
         #endregion
-        public SetCardRating(CallContext callContext)
+        public SetCardRating(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
             var previousValue = await SaveRatingByUserAsync(request);
             if (previousValue != request.Rating)
                 await UpdateCardAsync(request.CardId);
-            callContext.TelemetryClient.TrackEvent("SetCardRating", ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()), ("PreviousValue", previousValue.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()), ("PreviousValue", previousValue.ToString()));
         }
         #region Request class
-        public sealed class Request
+        public sealed class Request : IRequest
         {
             public Request(Guid userId, Guid cardId, int rating)
             {
@@ -99,6 +94,9 @@ namespace MemCheck.Application.Ratings
                 if (Rating < 1 || Rating > 5)
                     throw new RequestInputException($"Invalid rating: {Rating}");
             }
+        }
+        public sealed class Result
+        {
         }
         #endregion
     }
