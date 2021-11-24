@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,23 +17,24 @@ namespace MemCheck.Application.Notifying
     internal sealed class UsersToNotifyGetter : IUsersToNotifyGetter
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly List<string> performanceIndicators;
         #endregion
-        public UsersToNotifyGetter(MemCheckDbContext dbContext, List<string>? performanceIndicators = null)
+        public UsersToNotifyGetter(CallContext callContext, List<string>? performanceIndicators = null)
         {
-            this.dbContext = dbContext;
+            this.callContext = callContext;
             this.performanceIndicators = performanceIndicators ?? new List<string>();
         }
         public ImmutableArray<MemCheckUser> Run(DateTime? now = null)
         {
             now ??= DateTime.UtcNow;
             var chrono = Stopwatch.StartNew();
-            var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
+            var userList = callContext.DbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0 && EF.Functions.DateDiffHour(user.LastNotificationUtcDate, now) >= user.MinimumCountOfDaysBetweenNotifs * 24);
             //var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0;
             //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
             var result = userList.ToImmutableArray();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+            callContext.TelemetryClient.TrackEvent("UsersToNotifyGetter", ("ResultCount", result.Length.ToString()));
             return result;
         }
     }

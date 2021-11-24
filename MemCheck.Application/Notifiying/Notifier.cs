@@ -52,7 +52,7 @@ namespace MemCheck.Application.Notifying
                   new UserCardSubscriptionCounter(callContext, performanceIndicators),
                   new UserCardVersionsNotifier(callContext, performanceIndicators),
                   new UserCardDeletionsNotifier(callContext, performanceIndicators),
-                  new UsersToNotifyGetter(callContext.DbContext, performanceIndicators),
+                  new UsersToNotifyGetter(callContext, performanceIndicators),
                   new UserLastNotifDateUpdater(callContext, performanceIndicators, DateTime.UtcNow),
                   new UserSearchSubscriptionLister(callContext, performanceIndicators),
                   new UserSearchNotifier(callContext, MaxCardsToReportPerSearch, performanceIndicators),
