@@ -9,20 +9,16 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
-    public sealed class GetCardForEdit
+    public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCardForEdit.ResultModel>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public GetCardForEdit(CallContext callContext)
+        public GetCardForEdit(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<ResultModel> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
+            await request.CheckValidityAsync(DbContext);
 
-            var card = await callContext.DbContext.Cards
+            var card = await DbContext.Cards
                 .AsNoTracking()
                 .Include(card => card.VersionCreator)
                 .Include(card => card.Images)
@@ -36,43 +32,46 @@ namespace MemCheck.Application.Cards
                 .AsSingleQuery()
                 .SingleAsync();
 
-            var userRating = await callContext.DbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
+            var userRating = await DbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
+            int userRatingValue = userRating == null ? 0 : userRating.Rating;
 
-            var ownersOfDecksWithThisCard = callContext.DbContext.CardsInDecks
+            var ownersOfDecksWithThisCard = DbContext.CardsInDecks
                 .AsNoTracking()
                 .Where(cardInDeck => cardInDeck.CardId == request.CardId)
                 .Select(cardInDeck => cardInDeck.Deck.Owner.UserName)
                 .Distinct();
 
-            callContext.TelemetryClient.TrackEvent("GetCardForEdit",
-                ("CardId", request.CardId.ToString()),
-                ("CardAverageRating", card.AverageRating.ToString()),
-                ("CardIsPublic", CardVisibilityHelper.CardIsPublic(card.UsersWithView).ToString()),
-                ("AgeOfCardInDays", (card.VersionUtcDate - DateTime.UtcNow).TotalDays.ToString()),
-                ("CardIsPrivateToSingleUser", CardVisibilityHelper.CardIsPrivateToSingleUser(request.CurrentUserId, card.UsersWithView).ToString())
-            );
+            var result = new ResultModel(
+                            card.FrontSide,
+                            card.BackSide,
+                            card.AdditionalInfo,
+                            card.CardLanguage.Id,
+                            card.CardLanguage.Name,
+                            card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
+                            card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.UserName)),
+                            card.InitialCreationUtcDate,
+                            card.VersionUtcDate,
+                            card.VersionCreator.UserName,
+                            card.VersionDescription,
+                            ownersOfDecksWithThisCard,
+                            card.Images.Select(img => new ResultImageModel(img)),
+                            userRatingValue,
+                            card.AverageRating,
+                            card.RatingCount
+                            );
 
-            return new ResultModel(
-                card.FrontSide,
-                card.BackSide,
-                card.AdditionalInfo,
-                card.CardLanguage.Id,
-                card.CardLanguage.Name,
-                card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
-                card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.UserName)),
-                card.InitialCreationUtcDate,
-                card.VersionUtcDate,
-                card.VersionCreator.UserName,
-                card.VersionDescription,
-                ownersOfDecksWithThisCard,
-                card.Images.Select(img => new ResultImageModel(img)),
-                userRating == null ? 0 : userRating.Rating,
-                card.AverageRating,
-                card.RatingCount
-                );
+            return new ResultWithMetrologyProperties<ResultModel>(result,
+                ("CardId", request.CardId.ToString()),
+                ("CardIsPublic", CardVisibilityHelper.CardIsPublic(card.UsersWithView).ToString()),
+                ("CardIsPrivateToSingleUser", CardVisibilityHelper.CardIsPrivateToSingleUser(request.CurrentUserId, card.UsersWithView).ToString()),
+                ("CardAverageRating", card.AverageRating.ToString()),
+                ("CardUserRating", userRatingValue.ToString()),
+                ("AgeOfCurrentVersionInDays", (DateTime.UtcNow - card.VersionUtcDate).TotalDays.ToString()),
+                ("AgeOfCardInDays", (DateTime.UtcNow - card.InitialCreationUtcDate).TotalDays.ToString()),
+                ("CardLanguage", card.CardLanguage.Name));
         }
         #region Result classes
-        public sealed class Request
+        public sealed class Request : IRequest
         {
             public Request(Guid currentUserId, Guid cardId)
             {
