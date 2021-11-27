@@ -75,7 +75,7 @@ namespace MemCheck.Application.Ratings
                 await UpdateCardAsync(request.CardId);
             return new ResultWithMetrologyProperties<Result>(new Result(), ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()), ("PreviousValue", previousValue.ToString()));
         }
-        #region Request class
+        #region Request & Result
         public sealed class Request : IRequest
         {
             public Request(Guid userId, Guid cardId, int rating)
@@ -87,15 +87,15 @@ namespace MemCheck.Application.Ratings
             public Guid UserId { get; }
             public Guid CardId { get; }
             public int Rating { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
-                await QueryValidationHelper.CheckCardExistsAsync(dbContext, CardId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+                await QueryValidationHelper.CheckCardExistsAsync(callContext.DbContext, CardId);
                 if (Rating < 1 || Rating > 5)
                     throw new RequestInputException($"Invalid rating: {Rating}");
             }
         }
-        public sealed class Result
+        public sealed record Result
         {
         }
         #endregion

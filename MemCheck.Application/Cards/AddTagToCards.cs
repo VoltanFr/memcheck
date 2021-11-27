@@ -9,32 +9,31 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
-    public sealed class AddTagToCards
+    public sealed class AddTagToCards : RequestRunner<AddTagToCards.Request, AddTagToCards.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public AddTagToCards(CallContext callContext)
+        public AddTagToCards(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var tagName = await callContext.DbContext.Tags.Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
-            var previousVersionCreator = new PreviousVersionCreator(callContext.DbContext);
+            var tagName = await DbContext.Tags.Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
+            var previousVersionCreator = new PreviousVersionCreator(DbContext);
             foreach (var cardId in request.CardIds)
-                if (!callContext.DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
+                if (!DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, callContext.Localized.Get("AddTag") + $" '{tagName}'");
+                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, Localized.Get("AddTag") + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
-                    callContext.DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
+                    DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }
-            callContext.TelemetryClient.TrackEvent("AddTagToCards", ("TagId", request.TagId.ToString()), ("TagName", tagName), ("CardCount", request.CardIds.Count().ToString()));
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
+
+            return new ResultWithMetrologyProperties<Result>(new Result(),
+                ("TagId", request.TagId.ToString()),
+                ("TagName", tagName),
+                ("CardCount", request.CardIds.Count().ToString()));
         }
         #region Request class
-        public sealed class Request
+        public sealed class Request : IRequest
         {
             public Request(MemCheckUser versionCreator, Guid tagId, IEnumerable<Guid> cardIds)
             {
@@ -45,7 +44,7 @@ namespace MemCheck.Application.Cards
             public MemCheckUser VersionCreator { get; }
             public Guid TagId { get; }
             public IEnumerable<Guid> CardIds { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (!CardIds.Any())
                     throw new RequestInputException("No card to add label to");
@@ -54,10 +53,13 @@ namespace MemCheck.Application.Cards
                 if (QueryValidationHelper.IsReservedGuid(TagId))
                     throw new RequestInputException("Reserved tag id");
                 foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, VersionCreator.Id, cardId);
-                if (!await dbContext.Tags.Where(tag => tag.Id == TagId).AnyAsync())
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, VersionCreator.Id, cardId);
+                if (!await callContext.DbContext.Tags.Where(tag => tag.Id == TagId).AnyAsync())
                     throw new RequestInputException("Invalid tag id");
             }
+        }
+        public sealed class Result
+        {
         }
         #endregion
     }

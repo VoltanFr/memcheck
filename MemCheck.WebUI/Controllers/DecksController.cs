@@ -36,7 +36,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
         #region GetUserDecks

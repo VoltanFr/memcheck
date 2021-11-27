@@ -21,7 +21,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public LanguagesController(MemCheckDbContext dbContext, IStringLocalizer<LanguagesController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
         [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(callContext).RunAsync());

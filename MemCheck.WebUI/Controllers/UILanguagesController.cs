@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Languages;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
@@ -23,7 +24,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, TelemetryClient telemetryClient, IStringLocalizer<TagsController> localizer) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
             this.signInManager = signInManager;
         }

@@ -90,7 +90,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = new UpdateCard.Request(card2.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -139,7 +139,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = new UpdateCard.Request(card1.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -194,7 +194,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 UpdateCard.Request updateRequest = new(card1.Id, user, someText, Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -257,7 +257,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateDate = new DateTime(2050, 05, 02);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card1, requiredTag.AsArray()), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext.AsCallContext(), updateDate).RunAsync(UpdateCardHelper.RequestForTagChange(card1, requiredTag.AsArray()));
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -320,11 +320,11 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateDate = new DateTime(2050, 05, 02);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card1, new[] { ignoredTag, requiredTag1, requiredTag2 }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card2, new[] { requiredTag1, requiredTag2, excludedTag }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1, requiredTag2 }), new TestLocalizer(), new DateTime(2050, 05, 03));
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card4, new[] { requiredTag1 }), new TestLocalizer(), updateDate);
+                await new UpdateCard(dbContext.AsCallContext(), updateDate).RunAsync(UpdateCardHelper.RequestForTagChange(card1, new[] { ignoredTag, requiredTag1, requiredTag2 }));
+                await new UpdateCard(dbContext.AsCallContext(), updateDate).RunAsync(UpdateCardHelper.RequestForTagChange(card2, new[] { requiredTag1, requiredTag2, excludedTag }));
+                await new UpdateCard(dbContext.AsCallContext(), updateDate).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1 }));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 03)).RunAsync(UpdateCardHelper.RequestForTagChange(card3, new[] { requiredTag1, requiredTag2 }));
+                await new UpdateCard(dbContext.AsCallContext(), updateDate).RunAsync(UpdateCardHelper.RequestForTagChange(card4, new[] { requiredTag1 }));
             }
 
             var runDate = new DateTime(2050, 05, 04);
@@ -385,8 +385,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
 
             var runDate = new DateTime(2050, 05, 04);
@@ -433,7 +433,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -477,7 +477,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             var runDate = new DateTime(2050, 05, 03);
@@ -567,7 +567,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             //So this version does not appear as new in a search
@@ -588,7 +588,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var updateRequest = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(updateRequest, new TestLocalizer(), new DateTime(2050, 05, 02));
+                await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
             //Delete the card

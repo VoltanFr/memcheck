@@ -12,11 +12,15 @@ namespace MemCheck.Application.Tests.Helpers
     {
         public static CallContext AsCallContext(this MemCheckDbContext dbContext)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new TestLocalizer());
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new TestLocalizer(), new TestRoleChecker());
         }
         public static CallContext AsCallContext(this MemCheckDbContext dbContext, TestLocalizer testLocalizer)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), testLocalizer);
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), testLocalizer, new TestRoleChecker());
+        }
+        public static CallContext AsCallContext(this MemCheckDbContext dbContext, TestRoleChecker roleChecker)
+        {
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new TestLocalizer(), roleChecker);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             var chrono = Stopwatch.StartNew();
             var cards = await runner.RunAsync(request);
             chrono.Stop();
-            logger.LogInformation($"Got {cards.Count()} in {chrono.Elapsed}");
+            logger.LogInformation($"Got {cards.Cards.Count()} in {chrono.Elapsed}");
             return chrono.Elapsed.TotalSeconds;
         }
     }

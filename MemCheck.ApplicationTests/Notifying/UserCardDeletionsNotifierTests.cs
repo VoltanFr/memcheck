@@ -63,9 +63,9 @@ namespace MemCheck.Application.Tests.Notifying
         private static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, Guid cardId, DateTime deletionDate)
         {
             using var dbContext = new MemCheckDbContext(testDB);
-            var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new KeyValuePair<string, string>("Deletion", DeletionDescription).AsArray())));
+            var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new KeyValuePair<string, string>("Deletion", DeletionDescription).AsArray())), deletionDate);
             var deletionRequest = new DeleteCards.Request(userId, cardId.AsArray());
-            await deleter.RunAsync(deletionRequest, deletionDate);
+            await deleter.RunAsync(deletionRequest);
         }
         #endregion
         [TestMethod()]

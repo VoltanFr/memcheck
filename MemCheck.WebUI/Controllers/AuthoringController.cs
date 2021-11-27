@@ -31,7 +31,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public AuthoringController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AuthoringController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
         #region GetUsers, returns IEnumerable<GetUsersViewModel>
@@ -81,7 +81,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var versionDescription = Get("InitialCardVersionCreation");
             var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
-            var cardId = await new CreateCard(callContext).RunAsync(request);
+            var cardId = (await new CreateCard(callContext).RunAsync(request)).CardId;
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
@@ -107,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
-            await new UpdateCard(callContext).RunAsync(request, this);
+            await new UpdateCard(callContext).RunAsync(request);
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
         public sealed class UpdateCardRequest

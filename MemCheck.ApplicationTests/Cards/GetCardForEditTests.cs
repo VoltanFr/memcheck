@@ -58,7 +58,7 @@ namespace MemCheck.Application.Cards
             var lastVersionDescription = RandomHelper.String();
             var lastVersionFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, lastVersionFrontSide, versionCreator: lastVersionCreatorId, versionDescription: lastVersionDescription), new TestLocalizer(), lastVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), lastVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, lastVersionFrontSide, versionCreator: lastVersionCreatorId, versionDescription: lastVersionDescription));
 
             var otherUserId = await UserHelper.CreateInDbAsync(db);
 

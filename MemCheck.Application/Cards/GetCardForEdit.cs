@@ -16,8 +16,6 @@ namespace MemCheck.Application.Cards
         }
         protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(DbContext);
-
             var card = await DbContext.Cards
                 .AsNoTracking()
                 .Include(card => card.VersionCreator)
@@ -80,12 +78,12 @@ namespace MemCheck.Application.Cards
             }
             public Guid CurrentUserId { get; }
             public Guid CardId { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext context)
             {
                 QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
                 QueryValidationHelper.CheckNotReservedGuid(CardId);
-                await QueryValidationHelper.CheckCardExistsAsync(dbContext, CardId);
-                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, CurrentUserId, CardId);
+                await QueryValidationHelper.CheckCardExistsAsync(context.DbContext, CardId);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(context.DbContext, CurrentUserId, CardId);
             }
         }
         public sealed class ResultModel

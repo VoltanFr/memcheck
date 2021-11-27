@@ -18,7 +18,7 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(Guid.NewGuid(), DateTime.MaxValue);
             using var dbContext = new MemCheckDbContext(db);
-            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker()).RunAsync(request));
+            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
             Assert.AreEqual("User not found", e.Message);
         }
         [TestMethod()]
@@ -28,7 +28,7 @@ namespace MemCheck.Application.Cards
             var user = await UserHelper.CreateInDbAsync(db);
             var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
             using var dbContext = new MemCheckDbContext(db);
-            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker()).RunAsync(request));
+            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
             Assert.AreEqual("User not admin", e.Message);
         }
         [TestMethod()]
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Cards
             await UserHelper.DeleteAsync(db, user);
             var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
             using var dbContext = new MemCheckDbContext(db);
-            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(request));
+            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
             Assert.AreEqual("User not found", e.Message);
         }
         [TestMethod()]
@@ -47,10 +47,9 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var roleChecker = new TestRoleChecker(user);
             var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
             using var dbContext = new MemCheckDbContext(db);
-            await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, roleChecker).RunAsync(request);
+            await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(request);
         }
         [TestMethod()]
         public async Task CardWithPreviousVersionsNotDeleted()
@@ -63,7 +62,7 @@ namespace MemCheck.Application.Cards
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(1, dbContext.CardPreviousVersions.Count());
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue));
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(1, dbContext.CardPreviousVersions.Count());
         }
@@ -77,13 +76,13 @@ namespace MemCheck.Application.Cards
             var runDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), RandomHelper.Date(runDate));
+                var deleter = new DeleteCards(dbContext.AsCallContext(), RandomHelper.Date(runDate));
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(2, dbContext.CardPreviousVersions.Count());
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(2, dbContext.CardPreviousVersions.Count());
         }
@@ -97,13 +96,13 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(2, dbContext.CardPreviousVersions.Count());
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());
         }
@@ -118,13 +117,13 @@ namespace MemCheck.Application.Cards
             var runDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), RandomHelper.DateBefore(runDate));
+                var deleter = new DeleteCards(dbContext.AsCallContext(), RandomHelper.DateBefore(runDate));
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());
         }
@@ -145,8 +144,8 @@ namespace MemCheck.Application.Cards
             var cardDeletedAfterRunDate = await CardHelper.CreateAsync(db, user, language: languageId);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedAfterRunDate.Id.AsArray()), RandomHelper.Date(runDate));
+                var deleter = new DeleteCards(dbContext.AsCallContext(), RandomHelper.Date(runDate));
+                await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedAfterRunDate.Id.AsArray()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -155,15 +154,15 @@ namespace MemCheck.Application.Cards
             var cardDeletedBeforeRunDate = await CardHelper.CreateAsync(db, user, language: languageId);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedBeforeRunDate.Id.AsArray()), RandomHelper.DateBefore(runDate));
+                var deleter = new DeleteCards(dbContext.AsCallContext(), RandomHelper.DateBefore(runDate));
+                await deleter.RunAsync(new DeleteCards.Request(user, cardDeletedBeforeRunDate.Id.AsArray()));
             }
 
             using (var dbContext = new MemCheckDbContext(db))
                 Assert.AreEqual(5, dbContext.CardPreviousVersions.Count());
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, runDate));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -187,8 +186,8 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -196,7 +195,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(4, dbContext.TagInPreviousCardVersions.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());
@@ -215,8 +214,8 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -224,7 +223,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(5, dbContext.UsersWithViewOnCardPreviousVersions.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());
@@ -244,8 +243,8 @@ namespace MemCheck.Application.Cards
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext());
-                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()), deletionDate);
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -253,7 +252,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(5, dbContext.ImagesInCardPreviousVersions.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext, new TestRoleChecker(user)).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());

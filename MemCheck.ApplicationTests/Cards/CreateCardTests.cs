@@ -50,7 +50,7 @@ namespace MemCheck.Application.Cards
                     new Guid[] { tagId },
                     new Guid[] { ownerId, userWithViewId },
                     versionDescription);
-                cardGuid = await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
+                cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
                 Assert.AreNotEqual(Guid.Empty, cardGuid);
             }
 
@@ -104,7 +104,7 @@ namespace MemCheck.Application.Cards
                     Array.Empty<Guid>(),
                     Array.Empty<Guid>(),
                     RandomHelper.String());
-                cardGuid = await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
+                cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
             }
 
             Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
@@ -160,7 +160,7 @@ namespace MemCheck.Application.Cards
                 Array.Empty<Guid>(),
                 RandomHelper.String());
             using (var dbContext = new MemCheckDbContext(db))
-                cardGuid = await new CreateCard(dbContext.AsCallContext()).RunAsync(createRequest);
+                cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(createRequest)).CardId;
 
             var deck = await DeckHelper.CreateAsync(db, user);
             var addToDeckDate = RandomHelper.Date();
@@ -169,7 +169,7 @@ namespace MemCheck.Application.Cards
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
-                var card = (await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request, addToDeckDate.AddDays(1))).Single();
+                var card = (await new GetCardsToRepeat(dbContext.AsCallContext(), addToDeckDate.AddDays(1)).RunAsync(request)).Cards.Single();
 
                 var images = card.Images;
                 Assert.AreEqual(2, images.Count());

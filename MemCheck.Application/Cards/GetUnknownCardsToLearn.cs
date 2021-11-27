@@ -20,15 +20,12 @@ namespace MemCheck.Application.Cards
      *  This choice might look a bit complicated, but this is because we used to get a warning from Entity Framework because we use `Take` without ordering, which may lead to unpredictable results.
      *  And I think it makes sense to begin with learning the cards which have been added the longest time ago (this case happens only when at least 10 cards are in the unknown state at the same time).
      */
-    public sealed class GetUnknownCardsToLearn
+    public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLearn.Request, GetUnknownCardsToLearn.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
         #region Private methods
         private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
         {
-            var cardsOfDeck = callContext.DbContext.CardsInDecks.AsNoTracking()
+            var cardsOfDeck = DbContext.CardsInDecks.AsNoTracking()
                 .Include(card => card.Card).AsSingleQuery()
                 .Where(card => card.DeckId.Equals(deckId) && card.CurrentHeap == 0 && !excludedCardIds.Contains(card.CardId));
 
@@ -65,10 +62,10 @@ namespace MemCheck.Application.Cards
 
             var listed = await withDetails.ToListAsync();
             var cardIds = listed.Select(cardInDeck => cardInDeck.CardId);
-            var notifications = new CardRegistrationsLoader(callContext.DbContext).RunForCardIds(userId, cardIds);
+            var notifications = new CardRegistrationsLoader(DbContext).RunForCardIds(userId, cardIds);
 
             //The following line could be improved with a joint. Not sure this would perform better, to be checked
-            var userRatings = await callContext.DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
+            var userRatings = await DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
             var result = listed.Select(cardInDeck => new ResultCard(
                 cardInDeck.CardId,
@@ -95,34 +92,29 @@ namespace MemCheck.Application.Cards
                 return result;
         }
         #endregion
-        public GetUnknownCardsToLearn(CallContext callContext)
+        public GetUnknownCardsToLearn(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<IEnumerable<ResultCard>> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            request.CheckValidity(callContext.DbContext);
-
-            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
-            var userNames = callContext.DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-            var imageNames = ImageLoadingHelper.GetAllImageNames(callContext.DbContext);
-            var tagNames = TagLoadingHelper.Run(callContext.DbContext);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
+            var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
+            var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
+            var tagNames = TagLoadingHelper.Run(DbContext);
 
             var result = new List<ResultCard>();
             result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
             result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
 
-            callContext.TelemetryClient.TrackEvent("GetUnknownCardsToLearn",
+            return new ResultWithMetrologyProperties<Result>(new Result(result),
                 ("DeckId", request.DeckId.ToString()),
                 ("ExcludedCardCount", request.ExcludedCardIds.Count().ToString()),
                 ("ExcludedTagCount", request.ExcludedTagIds.Count().ToString()),
                 ("RequestedCardCount", request.CardsToDownload.ToString()),
                 ("ResultCount", result.Count.ToString()));
-
-            return result;
         }
-        #region Request and result classes
-        public sealed class Request
+        #region Request and Result
+        public sealed class Request : IRequest
         {
             public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, int cardsToDownload)
             {
@@ -137,7 +129,7 @@ namespace MemCheck.Application.Cards
             public IEnumerable<Guid> ExcludedCardIds { get; }
             public IEnumerable<Guid> ExcludedTagIds { get; }
             public int CardsToDownload { get; }
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(CurrentUserId))
                     throw new RequestInputException($"Invalid user id '{CurrentUserId}'");
@@ -149,9 +141,10 @@ namespace MemCheck.Application.Cards
                     throw new RequestInputException($"Invalid tag id");
                 if (CardsToDownload < 1 || CardsToDownload > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
-                QueryValidationHelper.CheckUserIsOwnerOfDeck(dbContext, CurrentUserId, DeckId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);
             }
         }
+        public sealed record Result(IEnumerable<ResultCard> Cards);
         public sealed class ResultCard
         {
             public ResultCard(Guid cardId, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,

@@ -32,7 +32,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this);
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
         #region GetImage
@@ -83,7 +83,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = 30;
                 var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest);
+                var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }
@@ -91,7 +91,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
                 var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = await new GetCardsToRepeat(callContext).RunAsync(applicationRequest);
+                var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
                 var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                 return Ok(result);
             }

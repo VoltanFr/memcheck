@@ -141,7 +141,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
             var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfAllPreviousVersions", "YouAreNotTheCreatorOfAllPreviousVersions"))));
@@ -163,7 +163,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
             var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             using (var userManager = UserHelper.GetUserManager(dbContext))
                 await new DeleteUserAccount(dbContext, new TestRoleChecker(lastVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(lastVersionCreator, firstVersionCreator));
@@ -184,7 +184,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
             var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
@@ -206,7 +206,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
             var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             await UserHelper.DeleteAsync(db, lastVersionCreator);
             using (var dbContext = new MemCheckDbContext(db))
                 await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray()));

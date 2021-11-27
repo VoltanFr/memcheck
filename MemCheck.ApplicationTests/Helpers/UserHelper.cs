@@ -33,6 +33,7 @@ namespace MemCheck.Application.Tests.Helpers
             var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
             var serviceProvider = services.BuildServiceProvider();
             var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
+            //var roleChecker = new TestRoleChecker();
             return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
         }
         public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)

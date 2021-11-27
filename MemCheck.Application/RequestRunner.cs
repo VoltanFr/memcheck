@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace MemCheck.Application
         public async Task<TResult> RunAsync(TRequest request)
         {
             var checkValidityChrono = Stopwatch.StartNew();
-            await request.CheckValidityAsync(callContext.DbContext);
+            await request.CheckValidityAsync(callContext);
             checkValidityChrono.Stop();
 
             var runChrono = Stopwatch.StartNew();
@@ -34,6 +35,7 @@ namespace MemCheck.Application
             return result.ActualResult;
         }
         protected MemCheckDbContext DbContext => callContext.DbContext;
+        protected ILocalized Localized => callContext.Localized;
     }
 
 }

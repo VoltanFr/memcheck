@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,30 +8,29 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
-    public sealed class DeleteCards
+    public sealed class DeleteCards : RequestRunner<DeleteCards.Request, DeleteCards.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
+        private readonly DateTime? deletionUtcDate;
         #endregion
-        public DeleteCards(CallContext callContext)
+        public DeleteCards(CallContext callContext, DateTime? deletionUtcDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.deletionUtcDate = deletionUtcDate;
         }
-        public async Task RunAsync(Request request, DateTime? deletionUtcDate = null)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext, callContext.Localized);
-
             foreach (var cardId in request.CardIds)
             {
-                var previousVersionCreator = new PreviousVersionCreator(callContext.DbContext);
-                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, callContext.Localized.Get("Deletion"), deletionUtcDate);
+                var previousVersionCreator = new PreviousVersionCreator(DbContext);
+                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.Get("Deletion"), deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card, deletionUtcDate);
-                callContext.DbContext.Cards.Remove(card);
+                DbContext.Cards.Remove(card);
             }
-            callContext.TelemetryClient.TrackEvent("DeleteCards", ("CardCount", request.CardIds.Count().ToString()));
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
         }
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             #region Private methods
             private static async Task<string> CardFrontSideInfoForExceptionMessageAsync(Guid cardId, MemCheckDbContext dbContext, ILocalized localizer)
@@ -89,18 +87,22 @@ namespace MemCheck.Application.Cards
             }
             public Guid UserId { get; }
             public IEnumerable<Guid> CardIds { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext, ILocalized localizer)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
-                CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, UserId, CardIds.ToArray());
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, CardIds.ToArray());
                 foreach (var cardId in CardIds)
                 {
-                    await CheckUsersWithCardInADeckAsync(cardId, dbContext, localizer);
-                    await CheckCardVersionsCreatorsAsync(cardId, dbContext, localizer);
+                    await CheckUsersWithCardInADeckAsync(cardId, callContext.DbContext, callContext.Localized);
+                    await CheckCardVersionsCreatorsAsync(cardId, callContext.DbContext, callContext.Localized);
                 }
             }
         }
+        public sealed record Result
+        {
+        }
+        #endregion
     }
 }

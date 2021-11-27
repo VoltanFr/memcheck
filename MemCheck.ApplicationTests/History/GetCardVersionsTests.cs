@@ -41,7 +41,7 @@ namespace MemCheck.Application.History
             var language = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);    //Created public
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userId.AsArray()), new TestLocalizer());    //Now private
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userId.AsArray()));    //Now private
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -69,7 +69,7 @@ namespace MemCheck.Application.History
             {
                 var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: otherUserId, versionDescription: intermediaryDescription);
                 request = request with { AdditionalInfo = RandomHelper.String() };
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(request, new TestLocalizer(), intermediaryDate);
+                await new UpdateCard(dbContext.AsCallContext(), intermediaryDate).RunAsync(request);
             }
 
             var newestDate = RandomHelper.Date();
@@ -84,7 +84,7 @@ namespace MemCheck.Application.History
                     .Include(c => c.TagsInCards)
                     .Include(c => c.UsersWithView)
                     .SingleAsync(c => c.Id == card.Id);
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, RandomHelper.String(), versionDescription: newestDescription, versionCreator: userId), new TestLocalizer(), newestDate);
+                await new UpdateCard(dbContext.AsCallContext(), newestDate).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, RandomHelper.String(), versionDescription: newestDescription, versionCreator: userId));
             }
 
             using (var dbContext = new MemCheckDbContext(db))

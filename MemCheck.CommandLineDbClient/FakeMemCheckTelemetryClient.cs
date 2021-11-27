@@ -13,11 +13,11 @@ namespace MemCheck.CommandLineDbClient
     {
         public static CallContext AsCallContext(this MemCheckDbContext dbContext)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new FakeStringLocalizer());
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new FakeStringLocalizer(), new TestRoleChecker());
         }
         public static CallContext AsCallContext(this MemCheckDbContext dbContext, FakeStringLocalizer fakeLocalizer)
         {
-            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), fakeLocalizer);
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), fakeLocalizer, new TestRoleChecker());
         }
     }
 }

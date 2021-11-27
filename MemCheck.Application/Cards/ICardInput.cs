@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MemCheck.Application.Cards
 {
-    public interface ICardInput
+    public interface ICardInput : IRequest
     {
         public Guid VersionCreatorId { get; }
         public string FrontSide { get; }

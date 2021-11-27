@@ -33,7 +33,7 @@ namespace MemCheck.Application.History
             var language = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
             using (var dbContext = new MemCheckDbContext(db))
                 await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
             using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
@@ -47,7 +47,7 @@ namespace MemCheck.Application.History
             var language = await CardLanguagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()), new TestLocalizer());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
             Guid originalVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 originalVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -69,7 +69,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, Array.Empty<Guid>()), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, Array.Empty<Guid>()));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -92,7 +92,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userId.AsArray()), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userId.AsArray()));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -115,7 +115,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -155,7 +155,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, newBackSide, versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, newBackSide, versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -196,7 +196,7 @@ namespace MemCheck.Application.History
             var newLanguageName = RandomHelper.String();
             var newVersionLanguage = await CardLanguagHelper.CreateAsync(db, newLanguageName);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForLanguageChange(card, newVersionLanguage, versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForLanguageChange(card, newVersionLanguage, versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -236,7 +236,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForAdditionalInfoChange(card, newAdditionalInfo, versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForAdditionalInfoChange(card, newAdditionalInfo, versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -278,7 +278,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForTagChange(card, originalTagId1.AsArray(), versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForTagChange(card, originalTagId1.AsArray(), versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -317,7 +317,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, Array.Empty<Guid>(), versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, Array.Empty<Guid>(), versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -357,7 +357,7 @@ namespace MemCheck.Application.History
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideImageChange(card, Array.Empty<Guid>(), versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideImageChange(card, Array.Empty<Guid>(), versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -397,7 +397,7 @@ namespace MemCheck.Application.History
             var imageName = RandomHelper.String();
             var image = await ImageHelper.CreateAsync(db, userId, imageName);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForBackSideImageChange(card, image.AsArray(), versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForBackSideImageChange(card, image.AsArray(), versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -439,7 +439,7 @@ namespace MemCheck.Application.History
             var newVersionImageName = RandomHelper.String();
             var newVersionImage = await ImageHelper.CreateAsync(db, userId, newVersionImageName);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForAdditionalSideImageChange(card, newVersionImage.AsArray(), versionDescription: newVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForAdditionalSideImageChange(card, newVersionImage.AsArray(), versionDescription: newVersionDescription));
             Guid previousVersionId;
             using (var dbContext = new MemCheckDbContext(db))
                 previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
@@ -495,7 +495,7 @@ namespace MemCheck.Application.History
                 r = r with { BackSide = newBackSide };
                 r = r with { AdditionalInfoImageList = newVersionImage.AsArray() };
                 r = r with { Tags = originalTagId1.AsArray() };
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(r, new TestLocalizer(), cardNewVersionUtcDate: newVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(r);
             }
 
             Guid previousVersionId;
@@ -539,7 +539,7 @@ namespace MemCheck.Application.History
             var intermediaryVersionDate = RandomHelper.Date(initialVersionDate);
             var intermediaryFrontSide = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryFrontSide, versionDescription: intermediaryVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: intermediaryVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), intermediaryVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryFrontSide, versionDescription: intermediaryVersionDescription));
 
             Guid initialVersionId;
             using (var dbContext = new MemCheckDbContext(db))
@@ -548,7 +548,7 @@ namespace MemCheck.Application.History
             var currentVersionDescription = RandomHelper.String();
             var currentVersionDate = RandomHelper.Date(initialVersionDate);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, initialFrontSide, versionDescription: currentVersionDescription), new TestLocalizer(), cardNewVersionUtcDate: currentVersionDate);
+                await new UpdateCard(dbContext.AsCallContext(), currentVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, initialFrontSide, versionDescription: currentVersionDescription));
 
             Guid intermediaryVersionId;
             using (var dbContext = new MemCheckDbContext(db))
