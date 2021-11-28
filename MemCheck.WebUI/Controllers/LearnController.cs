@@ -168,6 +168,7 @@ namespace MemCheck.WebUI.Controllers
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
                 CountOfUserRatings = applicationResult.CountOfUserRatings;
+                IsInFrench = applicationResult.IsInFrench;
                 if (VisibleToCount == 1)
                 {
                     var visibleToUser = applicationResult.VisibleTo.First();
