@@ -67,7 +67,7 @@
                     <tbody class="authoring-table-body">
                         <tr id="FrontSideRow" class="authoring-row-input">
                             <td class="authoring-td">
-                                <markdown-edit v-model="card.frontSide" rows="2" maxrows="15" title="@Localizer["FrontSide"]"></markdown-edit>
+                                <markdown-edit v-model="card.frontSide" rows="2" maxrows="15" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span class="small-screen-text">@Localizer["ImageName_SmallScreen"]</span><span class="medium-screen-text">@Localizer["ImageName_MediumScreen"]</span><span class="big-screen-text">@Localizer["ImageName_BigScreen"]</span>
@@ -83,7 +83,7 @@
                         </tr>
                         <tr id="BackSideRow" class="authoring-row-input">
                             <td class="authoring-td">
-                                <markdown-edit v-model="card.backSide" rows="2" maxrows="15" title="@Localizer["BackSide"]"></markdown-edit>
+                                <markdown-edit v-model="card.backSide" rows="2" maxrows="15" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>
@@ -99,7 +99,7 @@
                         </tr>
                         <tr id="AdditionalInfoRow" v-bind:class="classForAdditionalInfo() + ' TogglableAdditionalInfo authoring-row-input'">
                             <td class="authoring-td">
-                                <markdown-edit v-model="card.additionalInfo" rows="2" maxrows="15" title="@Localizer["AdditionalInfo"]"></markdown-edit>
+                                <markdown-edit v-model="card.additionalInfo" rows="2" maxrows="15" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]"></markdown-edit>
                                 <div v-bind:class="classForImages() + ' TogglableImages'">
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>

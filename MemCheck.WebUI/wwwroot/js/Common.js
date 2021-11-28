@@ -90,13 +90,21 @@ function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure,
     });
 }
 
-function convertMarkdown(src) {
+function beautifyTextForFrench(src) {
+    var result = src.replace(/\s\?/g, "&nbsp;?");
+    result = result.replace(/\s!/g, "&nbsp;!");
+    result = result.replace(/\s;/g, "&nbsp;;");
+    result = result.replace(/\s:/g, "&nbsp;:");
+    return result;
+}
+
+function convertMarkdown(src, beautifyForFrench) {
+    const acutalText = beautifyForFrench ? beautifyTextForFrench(src) : src;
     var converter = new showdown.Converter({ tables: true });
     converter.setOption('openLinksInNewWindow', 'true');
     converter.setOption('simplifiedAutoLink', 'true');
     converter.setOption('simpleLineBreaks', 'true');
-    var html = converter.makeHtml(src);
-    return html;
+    return converter.makeHtml(acutalText);
 }
 
 function ratingAsStars(rating) {    //rating is an int

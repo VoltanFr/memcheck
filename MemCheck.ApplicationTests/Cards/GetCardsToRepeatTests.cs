@@ -168,5 +168,57 @@ namespace MemCheck.Application.Cards
             Assert.AreEqual(image1, resultImages.First().ImageId);
             Assert.AreEqual(image2, resultImages.Last().ImageId);
         }
+        [TestMethod()]
+        public async Task OneCardInNonFrench()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var otherLanguage = await CardLanguagHelper.CreateAsync(db, RandomHelper.String());
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user);
+            var card = await CardHelper.CreateAsync(db, user, language: otherLanguage);
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, addDate);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext(), addDate.AddDays(1)).RunAsync(request);
+            Assert.IsFalse(cards.Cards.Single().IsInFrench);
+        }
+        [TestMethod()]
+        public async Task OneCardInFrench()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var french = await CardLanguagHelper.CreateAsync(db, "Français");
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user);
+            var card = await CardHelper.CreateAsync(db, user, language: french);
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, card.Id, 1, addDate);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext(), addDate.AddDays(1)).RunAsync(request);
+            Assert.IsTrue(cards.Cards.Single().IsInFrench);
+        }
+        [TestMethod()]
+        public async Task TwoCardsWithLanguages()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var french = await CardLanguagHelper.CreateAsync(db, "Français");
+            var otherLanguage = await CardLanguagHelper.CreateAsync(db, RandomHelper.String());
+            var user = await UserHelper.CreateInDbAsync(db);
+            var deck = await DeckHelper.CreateAsync(db, user);
+            var frenchCreatedCard = await CardHelper.CreateAsync(db, user, language: french);
+            var otherLanguageCard = await CardHelper.CreateAsync(db, user, language: otherLanguage);
+            var addDate = RandomHelper.Date();
+            await DeckHelper.AddCardAsync(db, deck, frenchCreatedCard.Id, 1, addDate);
+            await DeckHelper.AddCardAsync(db, deck, otherLanguageCard.Id, 1, addDate);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var cards = await new GetCardsToRepeat(dbContext.AsCallContext(), addDate.AddDays(1)).RunAsync(request);
+            Assert.IsTrue(cards.Cards.Single(card => card.CardId == frenchCreatedCard.Id).IsInFrench);
+            Assert.IsFalse(cards.Cards.Single(card => card.CardId == otherLanguageCard.Id).IsInFrench);
+        }
     }
 }

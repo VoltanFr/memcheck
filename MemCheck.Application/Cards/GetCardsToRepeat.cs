@@ -3,7 +3,6 @@ using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -60,7 +59,9 @@ namespace MemCheck.Application.Cards
                     userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
                     imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
                     cardInDeck.Card.AverageRating,
-                    cardInDeck.Card.RatingCount
+                    cardInDeck.Card.RatingCount,
+                    LanguageName = cardInDeck.Card.CardLanguage.Name
+
                 }).ToImmutableArray();
 
             var notifications = new CardRegistrationsLoader(DbContext).RunForCardIds(request.CurrentUserId, cardsOfHeap.Select(c => c.CardId));
@@ -80,7 +81,8 @@ namespace MemCheck.Application.Cards
                 userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
                 oldestCard.AverageRating,
                 oldestCard.RatingCount,
-                notifications[oldestCard.CardId]
+                notifications[oldestCard.CardId],
+                oldestCard.LanguageName == "Français" //Questionable hardcoding
                 )
             ).OrderBy(r => r.LastLearnUtcTime);
 
@@ -139,7 +141,8 @@ namespace MemCheck.Application.Cards
         {
             public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
                 string frontSide, string backSide, string additionalInfo, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-                IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings, bool registeredForNotifications)
+                IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings,
+                bool registeredForNotifications, bool isInFrench)
             {
                 DateServices.CheckUTC(lastLearnUtcTime);
                 CardId = cardId;
@@ -160,6 +163,7 @@ namespace MemCheck.Application.Cards
                 AverageRating = averageRating;
                 CountOfUserRatings = countOfUserRatings;
                 RegisteredForNotifications = registeredForNotifications;
+                IsInFrench = isInFrench;
                 MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
                     .Where(heapId => heapId != heap)
                     .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
@@ -180,6 +184,7 @@ namespace MemCheck.Application.Cards
             public double AverageRating { get; }
             public int CountOfUserRatings { get; }
             public bool RegisteredForNotifications { get; }
+            public bool IsInFrench { get; }
             public IEnumerable<string> Tags { get; }
             public IEnumerable<string> VisibleTo { get; }
             public IEnumerable<ResultImageModel> Images { get; }

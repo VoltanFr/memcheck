@@ -426,14 +426,14 @@ var app = new Vue({
         cardHistory() {
             window.location.href = "/Authoring/History?CardId=" + this.editingCardId;
         },
-        frontSideHtml() {
-            return convertMarkdown(this.card.frontSide);
-        },
-        backSideHtml() {
-            return convertMarkdown(this.card.backSide);
-        },
-        additionalInfoHtml() {
-            return convertMarkdown(this.card.additionalInfo);
+        isInFrench() {
+            for (var i = 0; i < this.allAvailableLanguages.length; i++)
+                if (this.allAvailableLanguages[i].id == this.card.languageId) {
+                    var currentLanguageName = this.allAvailableLanguages[i].name;
+                    var result = currentLanguageName.startsWith('Fr'); //This hardcoding is questionable
+                    return result;
+                }
+            return false;
         },
         currentUserRatingAsStars() {
             return ratingAsStars(this.card.currentUserRating);

@@ -114,10 +114,10 @@ var app = new Vue({
                 });
         },
         renderedDescription() {
-            return convertMarkdown(this.editedTag.description);
+            return convertMarkdown(this.editedTag.description, true); //Questionable hardcoding of French
         },
         renderedNewDescription() {
-            return convertMarkdown(this.newDescription);
+            return convertMarkdown(this.newDescription, true); //Questionable hardcoding of French
         },
         onNameChanged() {
             if (this.toastVisible) {

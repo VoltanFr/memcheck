@@ -4,6 +4,7 @@
         rows: { required: true, Type: Number },
         maxrows: { required: true, Type: Number },
         title: { required: true, Type: String },
+        isinfrench: { required: true, Type: Boolean },
         previewVisible: { required: false, Type: Boolean, default: false }
     },
     template: `
@@ -89,7 +90,7 @@
             this.previewVisible = !this.previewVisible;
         },
         renderedHtml() {
-            return convertMarkdown(this.content);
+            return convertMarkdown(this.content, this.isinfrench);
         },
     },
 })

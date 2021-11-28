@@ -340,13 +340,13 @@ var app = new Vue({
             }
         },
         currentCardFrontSide() {
-            return convertMarkdown(this.currentCard.frontSide);
+            return convertMarkdown(this.currentCard.frontSide, this.currentCard.isInFrench);
         },
         currentCardBackSide() {
-            return convertMarkdown(this.currentCard.backSide);
+            return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench);
         },
         currentCardAdditionalInfo() {
-            return convertMarkdown(this.currentCard.additionalInfo);
+            return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench);
         },
         currentUserRatingAsStars() {
             if (!this.currentCard)

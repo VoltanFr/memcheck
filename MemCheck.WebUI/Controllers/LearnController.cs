@@ -208,6 +208,7 @@ namespace MemCheck.WebUI.Controllers
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
                 CountOfUserRatings = applicationResult.CountOfUserRatings;
+                IsInFrench = applicationResult.IsInFrench;
                 if (VisibleToCount == 1)
                 {
                     var visibleToUser = applicationResult.VisibleTo.First();
@@ -250,6 +251,7 @@ namespace MemCheck.WebUI.Controllers
             public double AverageRating { get; }
             public int CountOfUserRatings { get; }
             public bool RegisteredForNotifications { get; }
+            public bool IsInFrench { get; }
         }
         public sealed class GetCardsImageViewModel
         {
