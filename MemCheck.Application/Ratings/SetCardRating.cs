@@ -95,9 +95,7 @@ namespace MemCheck.Application.Ratings
                     throw new RequestInputException($"Invalid rating: {Rating}");
             }
         }
-        public sealed record Result
-        {
-        }
+        public sealed record Result();
         #endregion
     }
 }

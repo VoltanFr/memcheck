@@ -1,41 +1,37 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Heaping
 {
     //This is used during learning: a card either moves up one heap or down to the unknown heap
     //Manual moves are implemented by the sister class MoveCardsToHeap
-    public sealed class MoveCardToHeap
+    public sealed class MoveCardToHeap : RequestRunner<MoveCardToHeap.Request, MoveCardToHeap.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
+        private readonly DateTime? runDate;
         #endregion
-        public MoveCardToHeap(CallContext callContext)
+        public MoveCardToHeap(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task RunAsync(Request request, DateTime? lastLearnUtcTime = null)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
+            var card = await DbContext.CardsInDecks.SingleAsync(card => card.DeckId.Equals(request.DeckId) && card.CardId.Equals(request.CardId));
 
-            var card = await callContext.DbContext.CardsInDecks.SingleAsync(card => card.DeckId.Equals(request.DeckId) && card.CardId.Equals(request.CardId));
-
-            lastLearnUtcTime ??= DateTime.UtcNow;
+            var lastLearnUtcTime = runDate == null ? DateTime.UtcNow : runDate;
 
             if (request.TargetHeap != CardInDeck.UnknownHeap)
             {
                 if (request.TargetHeap == card.CurrentHeap)
-                    return; //This could happen due to connection problems on client side, or to multiple sessions
+                    return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardWasAlreadyInHeap", true.ToString())); //This could happen due to connection problems on client side, or to multiple sessions
 
                 if (request.TargetHeap < card.CurrentHeap || request.TargetHeap - card.CurrentHeap > 1)
                     throw new InvalidOperationException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
 
-                var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
+                var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
                 card.ExpiryUtcTime = heapingAlgorithm.ExpiryUtcDate(request.TargetHeap, lastLearnUtcTime.Value);
 
                 if (request.TargetHeap > card.BiggestHeapReached)
@@ -52,21 +48,22 @@ namespace MemCheck.Application.Heaping
             card.LastLearnUtcTime = lastLearnUtcTime.Value;
             card.CurrentHeap = request.TargetHeap;
 
-            callContext.TelemetryClient.TrackEvent("MoveCardToHeap", ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()));
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardWasAlreadyInHeap", false.ToString()));
         }
-        #region Request
-        public sealed record Request(Guid UserId, Guid DeckId, Guid CardId, int TargetHeap)
+        #region Request & result
+        public sealed record Request(Guid UserId, Guid DeckId, Guid CardId, int TargetHeap) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(DeckId);
                 QueryValidationHelper.CheckNotReservedGuid(CardId);
                 if (TargetHeap < CardInDeck.UnknownHeap || TargetHeap > CardInDeck.MaxHeapValue)
                     throw new InvalidOperationException($"Invalid target heap {TargetHeap}");
-                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

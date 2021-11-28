@@ -145,7 +145,7 @@ namespace MemCheck.Application.Heaping
             var runTime = RandomHelper.Date();
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 2), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 2));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -170,7 +170,7 @@ namespace MemCheck.Application.Heaping
             await DeckHelper.AddCardAsync(db, deck, card.Id, heap: 1, lastLearnUtcTime: initialTime);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 1), RandomHelper.Date(initialTime));
+                await new MoveCardToHeap(dbContext.AsCallContext(), RandomHelper.Date(initialTime)).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 1));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -193,7 +193,7 @@ namespace MemCheck.Application.Heaping
             var runTime = RandomHelper.Date();
 
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -216,7 +216,7 @@ namespace MemCheck.Application.Heaping
 
             var runTime = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -229,7 +229,7 @@ namespace MemCheck.Application.Heaping
 
             runTime = RandomHelper.Date(runTime);
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -251,7 +251,7 @@ namespace MemCheck.Application.Heaping
 
             var runTime = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 1), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 1));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -264,7 +264,7 @@ namespace MemCheck.Application.Heaping
 
             runTime = RandomHelper.Date(runTime);
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 2), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, 2));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -277,7 +277,7 @@ namespace MemCheck.Application.Heaping
 
             runTime = RandomHelper.Date(runTime);
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();
@@ -290,7 +290,7 @@ namespace MemCheck.Application.Heaping
 
             runTime = RandomHelper.Date(runTime);
             using (var dbContext = new MemCheckDbContext(db))
-                await new MoveCardToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap), runTime);
+                await new MoveCardToHeap(dbContext.AsCallContext(), runTime).RunAsync(new MoveCardToHeap.Request(user, deck, card.Id, CardInDeck.UnknownHeap));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var cardInDeck = dbContext.CardsInDecks.Single();

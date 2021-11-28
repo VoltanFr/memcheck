@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
@@ -11,21 +10,15 @@ namespace MemCheck.Application.Heaping
 {
     //This is used during manual moves
     //Learning moves are implemented by the sister class MoveCardToHeap
-    public sealed class MoveCardsToHeap
+    public sealed class MoveCardsToHeap : RequestRunner<MoveCardsToHeap.Request, MoveCardsToHeap.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public MoveCardsToHeap(CallContext callContext)
+        public MoveCardsToHeap(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-
-            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(callContext.DbContext, request.DeckId);
-            var cardsInDecks = callContext.DbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
+            var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
+            var cardsInDecks = DbContext.CardsInDecks.Where(card => card.DeckId.Equals(request.DeckId) && request.CardIds.Any(cardId => cardId == card.CardId)).ToImmutableDictionary(c => c.CardId, c => c);
 
             if (request.CardIds.Any(cardId => !cardsInDecks.ContainsKey(cardId)))
                 throw new InvalidOperationException("One card is not in the deck");
@@ -47,20 +40,21 @@ namespace MemCheck.Application.Heaping
                     cardInDeck.CurrentHeap = request.TargetHeap;
                 }
 
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("MoveCardsToHeap", ("DeckId", request.DeckId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardCount", request.CardIds.Count().ToString()));
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardCount", request.CardIds.Count().ToString()));
         }
-        #region Request
-        public sealed record Request(Guid UserId, Guid DeckId, int TargetHeap, IEnumerable<Guid> CardIds)
+        #region Request & result
+        public sealed record Request(Guid UserId, Guid DeckId, int TargetHeap, IEnumerable<Guid> CardIds) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(DeckId);
                 if (TargetHeap < CardInDeck.UnknownHeap || TargetHeap > CardInDeck.MaxHeapValue)
                     throw new InvalidOperationException($"Invalid target heap {TargetHeap}");
-                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }
