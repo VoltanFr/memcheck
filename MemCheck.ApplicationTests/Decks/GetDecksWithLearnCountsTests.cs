@@ -55,7 +55,7 @@ namespace MemCheck.Application.Decks
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate.AddHours(2));
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var resultDeck = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(1).AddHours(1.5))).First();
+            var resultDeck = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(1).AddHours(1.5)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(1, resultDeck.ExpiredCardCount);
             Assert.AreEqual(1, resultDeck.ExpiringNextHourCount);
             Assert.AreEqual(0, resultDeck.ExpiringFollowing24hCount);
@@ -72,32 +72,32 @@ namespace MemCheck.Application.Decks
             await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, addToDeckDate);
 
             using var dbContext = new MemCheckDbContext(testDB);
-            var result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(4).AddMinutes(-61))).First();
+            var result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(4).AddMinutes(-61)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(0, result.ExpiringNextHourCount);
             Assert.AreEqual(1, result.ExpiringFollowing24hCount);
             Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(4).AddMinutes(-10))).First();
+            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(4).AddMinutes(-10)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(1, result.ExpiringNextHourCount);
             Assert.AreEqual(0, result.ExpiringFollowing24hCount);
             Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(3).AddMinutes(1))).First();
+            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(3).AddMinutes(1)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(0, result.ExpiringNextHourCount);
             Assert.AreEqual(1, result.ExpiringFollowing24hCount);
             Assert.AreEqual(0, result.ExpiringFollowing3DaysCount);
 
-            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(3).AddMinutes(-61))).First();
+            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(3).AddMinutes(-61)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(0, result.ExpiringNextHourCount);
             Assert.AreEqual(0, result.ExpiringFollowing24hCount);
             Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
 
-            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate.AddDays(1))).First();
+            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(1)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(0, result.ExpiringNextHourCount);
             Assert.AreEqual(0, result.ExpiringFollowing24hCount);
             Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
 
-            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(userId), addToDeckDate)).First();
+            result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
             Assert.AreEqual(0, result.ExpiringNextHourCount);
             Assert.AreEqual(0, result.ExpiringFollowing24hCount);
             Assert.AreEqual(1, result.ExpiringFollowing3DaysCount);
@@ -131,7 +131,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetDecksWithLearnCounts.Request(userId);
-            var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(request, new DateTime(2030, 02, 01, 0, 30, 0));
+            var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext(), new DateTime(2030, 02, 01, 0, 30, 0)).RunAsync(request);
             var loaded = result.Single();
             Assert.AreEqual(deckDescription, loaded.Description);
             Assert.AreEqual(2, loaded.UnknownCardCount);
@@ -179,7 +179,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(testDB);
             var request = new GetDecksWithLearnCounts.Request(userId);
-            var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(request, new DateTime(2030, 02, 01, 0, 30, 0));
+            var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext(), new DateTime(2030, 02, 01, 0, 30, 0)).RunAsync(request);
             Assert.AreEqual(2, result.Count());
 
             var loadedDeck1 = result.Single(d => d.Id == deck1);

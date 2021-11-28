@@ -19,7 +19,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
         }
         [TestMethod()]
         public async Task UserNotOwner()
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Decks
             var deck = await DeckHelper.CreateAsync(db, user);
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(new GetTagsOfDeck.Request(otherUser, deck)));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(otherUser, deck)));
         }
         [TestMethod()]
         public async Task EmptyDeck()
@@ -52,7 +52,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetTagsOfDeck.Request(user, deck);
-            var result = await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(request);
+            var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
             Assert.IsFalse(result.Any());
         }
         [TestMethod()]
@@ -67,7 +67,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetTagsOfDeck.Request(user, deck);
-            var result = await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(request);
+            var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
             Assert.AreEqual(tag, result.Single().TagId);
         }
         [TestMethod()]
@@ -93,7 +93,7 @@ namespace MemCheck.Application.Decks
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetTagsOfDeck.Request(user, deck);
-            var result = await new GetTagsOfDeck(dbContext.AsCallContext()).RunAsync(request);
+            var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
             Assert.AreEqual(2, result.Count());
             Assert.IsTrue(result.Any(t => t.TagId == tag1));
             Assert.IsTrue(result.Any(t => t.TagId == tag2));

@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,18 +9,18 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class GetDecksWithLearnCounts
+    public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCounts.Request, IEnumerable<GetDecksWithLearnCounts.Result>>
     {
         #region Fields
-        private readonly CallContext callContext;
-        private readonly TimeSpan oneHour = TimeSpan.FromHours(1);
-        private readonly TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
-        private readonly TimeSpan fourDays = TimeSpan.FromDays(4);
+        private readonly static TimeSpan oneHour = TimeSpan.FromHours(1);
+        private readonly static TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
+        private readonly static TimeSpan fourDays = TimeSpan.FromDays(4);
+        private readonly DateTime? runDate;
         #endregion
         #region Private methods
-        private Result GetDeck(Guid deckId, string description, DateTime now)
+        private static Result GetDeck(MemCheckDbContext dbContext, Guid deckId, string description, DateTime runDate)
         {
-            var allCards = callContext.DbContext.CardsInDecks.AsNoTracking()
+            var allCards = dbContext.CardsInDecks.AsNoTracking()
                 .Where(cardInDeck => cardInDeck.DeckId == deckId)
                 .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId, cardInDeck.ExpiryUtcTime })
                 .ToImmutableArray();
@@ -33,11 +32,11 @@ namespace MemCheck.Application.Decks
             var expiringFollowing3DaysCount = 0;
             foreach (var card in groups[false])
             {
-                if (card.ExpiryUtcTime <= now)
+                if (card.ExpiryUtcTime <= runDate)
                     expiredCardCount++;
                 else
                 {
-                    var distanceToNow = card.ExpiryUtcTime - now;
+                    var distanceToNow = card.ExpiryUtcTime - runDate;
                     if (distanceToNow <= oneHour)
                         expiringNextHourCount++;
                     else
@@ -57,26 +56,23 @@ namespace MemCheck.Application.Decks
             return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Length, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
         }
         #endregion
-        public GetDecksWithLearnCounts(CallContext callContext)
+        public GetDecksWithLearnCounts(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? now = null)
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<Result>>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            if (now == null)
-                now = DateTime.UtcNow;
-            var decks = await callContext.DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-            var result = decks.Select(deck => GetDeck(deck.Id, deck.Description, now.Value)).ToList();
-            callContext.TelemetryClient.TrackEvent("GetDecksWithLearnCounts", ("DeckCount", result.Count.ToString()));
-            return result;
+            var now = runDate == null ? DateTime.UtcNow : runDate;
+            var decks = await DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
+            var result = decks.Select(deck => GetDeck(DbContext, deck.Id, deck.Description, now.Value));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count().ToString()));
         }
         #region Request & Result
-        public sealed record Request(Guid UserId)
+        public sealed record Request(Guid UserId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
             }
         }
         public sealed record Result(

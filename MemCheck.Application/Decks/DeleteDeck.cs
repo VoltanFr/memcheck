@@ -1,36 +1,31 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class DeleteDeck
+    public sealed class DeleteDeck : RequestRunner<DeleteDeck.Request, DeleteDeck.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public DeleteDeck(CallContext callContext)
+        public DeleteDeck(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var deck = callContext.DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
-            callContext.DbContext.Decks.Remove(deck);
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("DeleteDeck");
+            var deck = DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
+            DbContext.Decks.Remove(deck);
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result());
         }
         #region Request type
-        public sealed record Request(Guid UserId, Guid DeckId)
+        public sealed record Request(Guid UserId, Guid DeckId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

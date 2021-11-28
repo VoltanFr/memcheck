@@ -81,7 +81,7 @@ namespace MemCheck.Application.Decks
             await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 4, runDate.AddDays(-13));
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeaps.Request(user), runDate);
+            var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext(), runDate).RunAsync(new GetUserDecksWithHeaps.Request(user));
             var resultDeck = result.Single();
             Assert.AreEqual(deck, resultDeck.DeckId);
             Assert.AreEqual(7, resultDeck.CardCount);
@@ -130,7 +130,7 @@ namespace MemCheck.Application.Decks
             await DeckHelper.AddCardAsync(db, deck2, (await CardHelper.CreateAsync(db, user)).Id, 4, runDate.AddDays(-13));
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeaps.Request(user), runDate);
+            var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext(), runDate).RunAsync(new GetUserDecksWithHeaps.Request(user));
 
             var resultDeck1 = result.Single(deck => deck.DeckId == deck1);
             Assert.AreEqual(4, resultDeck1.CardCount);

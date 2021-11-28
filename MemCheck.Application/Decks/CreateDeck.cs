@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,32 +6,28 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class CreateDeck
+    public sealed class CreateDeck : RequestRunner<CreateDeck.Request, CreateDeck.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public CreateDeck(CallContext callContext)
+        public CreateDeck(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.Localized, callContext.DbContext);
-            var user = await callContext.DbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            var user = await DbContext.Users.SingleAsync(user => user.Id == request.UserId);
             var deck = new Deck() { Owner = user, Description = request.Name, HeapingAlgorithmId = request.HeapingAlgorithmId };
-            callContext.DbContext.Decks.Add(deck);
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("CreateDeck");
+            DbContext.Decks.Add(deck);
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result());
         }
         #region Request type
-        public sealed record Request(Guid UserId, string Name, int HeapingAlgorithmId)
+        public sealed record Request(Guid UserId, string Name, int HeapingAlgorithmId) : IRequest
         {
-            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, dbContext, localizer);
+                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, callContext.DbContext, callContext.Localized);
             }
         }
+        public sealed record Result();
         #endregion
 
     }

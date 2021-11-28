@@ -1,18 +1,16 @@
-﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
+﻿using MemCheck.Application.QueryValidation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class GetUserDecksWithHeaps
+    public sealed class GetUserDecksWithHeaps : RequestRunner<GetUserDecksWithHeaps.Request, IEnumerable<GetUserDecksWithHeaps.Result>>
     {
         #region Fields
-        private readonly CallContext callContext;
+        private readonly DateTime? runDate;
         #endregion
         #region Private class HeapInfo
         private sealed class HeapInfo
@@ -30,25 +28,24 @@ namespace MemCheck.Application.Decks
             public DateTime NextExpiryUtcDate { get; set; }
         }
         #endregion
-        public GetUserDecksWithHeaps(CallContext callContext)
+        public GetUserDecksWithHeaps(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task<IEnumerable<Result>> RunAsync(Request request, DateTime? nowUtc = null)
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<Result>>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            nowUtc ??= DateTime.UtcNow;
+            var nowUtc = runDate == null ? DateTime.UtcNow : runDate;
 
             var result = new List<Result>();
-            var decks = callContext.DbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(
+            var decks = await DbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description).Select(
                 deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId, CardCount = deck.CardInDecks.Count }
-                ).ToImmutableArray();
+                ).ToArrayAsync();
 
             foreach (var deck in decks)
             {
                 var heaps = new Dictionary<int, HeapInfo>();
 
-                var cardsInDeck = callContext.DbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deck.Id).ToList();
+                var cardsInDeck = await DbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == deck.Id).ToListAsync();
 
                 cardsInDeck.ForEach(cardInDeck =>
                 {
@@ -73,15 +70,14 @@ namespace MemCheck.Application.Decks
                     );
             }
 
-            callContext.TelemetryClient.TrackEvent("GetUserDecksWithHeaps", ("DeckCount", result.Count.ToString()));
-            return result;
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count.ToString()));
         }
         #region Request & Result
-        public sealed record Request(Guid UserId)
+        public sealed record Request(Guid UserId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
             }
         }
         public sealed record Result(Guid DeckId, string Description, int HeapingAlgorithmId, int CardCount, IEnumerable<ResultHeap> Heaps);

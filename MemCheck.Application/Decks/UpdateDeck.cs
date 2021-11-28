@@ -1,39 +1,33 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks
 {
-    public sealed class UpdateDeck
+    public sealed class UpdateDeck : RequestRunner<UpdateDeck.Request, UpdateDeck.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public UpdateDeck(CallContext callContext)
+        public UpdateDeck(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<bool> RunAsync(Request request, ILocalized localizer)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(localizer, callContext.DbContext);
-            var deck = callContext.DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
+            var deck = DbContext.Decks.Where(deck => deck.Id == request.DeckId).Single();
             deck.Description = request.Name;
             deck.HeapingAlgorithmId = request.HeapingAlgorithmId;
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("UpdateDeck", ("DeckId", request.DeckId.ToString()), ("Name", request.Name), ("NameLength", request.Name.Length.ToString()), ("HeapingAlgorithmId", request.HeapingAlgorithmId.ToString()));
-            return true;
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("Name", request.Name), ("NameLength", request.Name.Length.ToString()), ("HeapingAlgorithmId", request.HeapingAlgorithmId.ToString()));
         }
         #region Request type
-        public sealed record Request(Guid UserId, Guid DeckId, string Name, int HeapingAlgorithmId)
+        public sealed record Request(Guid UserId, Guid DeckId, string Name, int HeapingAlgorithmId) : IRequest
         {
-            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, dbContext, localizer);
-                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, DeckId);
+                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, callContext.DbContext, callContext.Localized);
+                await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

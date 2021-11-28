@@ -11,16 +11,16 @@ namespace MemCheck.Application.Decks
     internal sealed class GetTagsOfDeck
     {
         #region Fields
-        private readonly CallContext callContext;
+        private readonly MemCheckDbContext dbContext;
         #endregion
-        public GetTagsOfDeck(CallContext callContext)
+        public GetTagsOfDeck(MemCheckDbContext dbContext)
         {
-            this.callContext = callContext;
+            this.dbContext = dbContext;
         }
         public async Task<IEnumerable<Result>> RunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var result = callContext.DbContext.CardsInDecks
+            await request.CheckValidityAsync(dbContext);
+            var result = dbContext.CardsInDecks
                             .AsNoTracking()
                             .Include(cardInDeck => cardInDeck.Card.TagsInCards)
                             .ThenInclude(tagInCard => tagInCard.Tag)
@@ -31,7 +31,6 @@ namespace MemCheck.Application.Decks
                             .Select(tag => new Result(tag.Id, tag.Name))
                             .ToList()
                             .OrderBy(resultModel => resultModel.TagName);
-            callContext.TelemetryClient.TrackEvent("GetTagsOfDeck", ("TagCount", result.Count().ToString()));
             return result;
         }
         #region Request & Result
