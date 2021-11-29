@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class DeleteImage
+    public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
+        private readonly DateTime? runDate;
         #endregion
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
@@ -24,16 +24,14 @@ namespace MemCheck.Application.Images
             };
         }
         #endregion
-        public DeleteImage(CallContext callContext)
+        public DeleteImage(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task<string> RunAsync(Request request, ILocalized localizer, DateTime? deletionUtcDate = null)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(localizer, callContext.DbContext);
-
-            var image = await callContext.DbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
-            var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.UserId);
+            var image = await DbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
+            var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
             //For a deletion, we create two previous versions:
             //- one for the last known operation (described in the image)
@@ -64,7 +62,7 @@ namespace MemCheck.Application.Images
                 Description = image.Description,
                 Source = image.Source,
                 InitialUploadUtcDate = image.InitialUploadUtcDate,
-                VersionUtcDate = deletionUtcDate ?? DateTime.UtcNow,
+                VersionUtcDate = runDate ?? DateTime.UtcNow,
                 OriginalContentType = image.OriginalContentType,
                 OriginalSize = image.OriginalSize,
                 OriginalBlob = image.OriginalBlob,
@@ -73,38 +71,38 @@ namespace MemCheck.Application.Images
                 PreviousVersion = versionFromCurrentImage
             };
 
-            callContext.DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
-            callContext.DbContext.ImagePreviousVersions.Add(deletionVersion);
-            callContext.DbContext.Images.Remove(image);
+            DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
+            DbContext.ImagePreviousVersions.Add(deletionVersion);
+            DbContext.Images.Remove(image);
 
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             var result = image.Name;
-            callContext.TelemetryClient.TrackEvent("DeleteImage", ("ImageId", request.ImageId.ToString()), ("ImageName", result), ("DeletionDescription", request.DeletionDescription));
-            return result;
+            return new ResultWithMetrologyProperties<Result>(new Result(result), ("ImageId", request.ImageId.ToString()), ("ImageName", result), ("DeletionDescription", request.DeletionDescription));
         }
         #region Request type
-        public sealed record Request(Guid UserId, Guid ImageId, string DeletionDescription)
+        public sealed record Request(Guid UserId, Guid ImageId, string DeletionDescription) : IRequest
         {
             public const int MinDescriptionLength = 3;
             public const int MaxDescriptionLength = 1000;
-            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (DeletionDescription != DeletionDescription.Trim())
                     throw new InvalidOperationException("Invalid name: not trimmed");
                 if (DeletionDescription.Length < MinDescriptionLength || DeletionDescription.Length > MaxDescriptionLength)
-                    throw new RequestInputException(localizer.Get("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + localizer.Get("MustBeBetween") + $" {MinDescriptionLength} " + localizer.Get("And") + $" {MaxDescriptionLength}");
+                    throw new RequestInputException(callContext.Localized.Get("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + callContext.Localized.Get("MustBeBetween") + $" {MinDescriptionLength} " + callContext.Localized.Get("And") + $" {MaxDescriptionLength}");
 
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
 
                 if (QueryValidationHelper.IsReservedGuid(ImageId))
                     throw new RequestInputException("InvalidImageId");
 
-                var image = await dbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
+                var image = await callContext.DbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
                 if (image.Cards.Any())
-                    throw new RequestInputException(localizer.Get("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + localizer.Get("ImageUsedInCardsPart2"));
+                    throw new RequestInputException(callContext.Localized.Get("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + callContext.Localized.Get("ImageUsedInCardsPart2"));
             }
         }
+        public sealed record Result(string ImageName);
         #endregion
     }
 }

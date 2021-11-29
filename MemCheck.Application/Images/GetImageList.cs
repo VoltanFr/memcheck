@@ -7,20 +7,16 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class GetImageList
+    public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageList.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
         #endregion
-        public GetImageList(CallContext callContext)
+        public GetImageList(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<Result> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            request.CheckValidity();
-
-            IQueryable<Domain.Image>? images = callContext.DbContext.Images.AsNoTracking().Include(img => img.Cards);
+            IQueryable<Domain.Image>? images = DbContext.Images.AsNoTracking().Include(img => img.Cards);
             if (request.Filter.Length > 0)
                 images = images.Where(image =>
                     EF.Functions.Like(image.Name, $"%{request.Filter}%")
@@ -50,20 +46,19 @@ namespace MemCheck.Application.Images
                                 )
                             )
                         );
-            callContext.TelemetryClient.TrackEvent("GetImageList",
-                ("PageSize", request.PageSize.ToString()),
+            return new ResultWithMetrologyProperties<Result>(result,
+            ("PageSize", request.PageSize.ToString()),
                 ("PageNo", request.PageNo.ToString()),
                 ("Filter", request.Filter),
                 ("ResultTotalCount", result.TotalCount.ToString()),
                 ("ResultPageCount", result.PageCount.ToString()),
                 ("ResultImageCount", result.Images.Count().ToString()));
-            return result;
         }
         #region Request & Result types
-        public sealed record Request(int PageSize, int PageNo, string Filter)
+        public sealed record Request(int PageSize, int PageNo, string Filter) : IRequest
         {
             public const int MaxPageSize = 100;
-            public void CheckValidity()
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (PageNo < 1)
                     throw new InvalidOperationException($"First page is numbered 1, received a request for page {PageNo}");
@@ -71,6 +66,7 @@ namespace MemCheck.Application.Images
                     throw new InvalidOperationException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
                 if (PageSize > MaxPageSize)
                     throw new InvalidOperationException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+                await Task.CompletedTask;
             }
         }
         public sealed record Result(int TotalCount, int PageCount, IEnumerable<ResultImage> Images);

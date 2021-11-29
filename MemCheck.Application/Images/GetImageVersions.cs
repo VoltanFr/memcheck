@@ -10,23 +10,21 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class GetImageVersions
+    public sealed class GetImageVersions : RequestRunner<GetImageVersions.Request, IEnumerable<GetImageVersions.ResultImageVersion>>
     {
         #region Fields
         private const string ImageNameFieldName = "ImageName";
         private const string ImageDescriptionFieldName = "ImageDescription";
         private const string ImageSourceFieldName = "ImageSource";
-        private readonly CallContext callContext;
         #endregion
         #region Private methods
         #endregion
-        public GetImageVersions(CallContext callContext)
+        public GetImageVersions(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<IEnumerable<ResultImageVersion>> RunAsync(Guid imageId)
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<ResultImageVersion>>> DoRunAsync(Request request)
         {
-            var images = callContext.DbContext.Images.Where(img => img.Id == imageId);
+            var images = DbContext.Images.Where(img => img.Id == request.ImageId);
 
             var currentVersion = await images
                 .AsNoTracking()
@@ -42,7 +40,7 @@ namespace MemCheck.Application.Images
                     img.VersionDescription)
                 ).SingleAsync();
 
-            var allPreviousVersions = callContext.DbContext.ImagePreviousVersions.Where(img => img.Image == imageId)
+            var allPreviousVersions = DbContext.ImagePreviousVersions.Where(img => img.Image == request.ImageId)
                 .AsNoTracking()
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
@@ -65,8 +63,14 @@ namespace MemCheck.Application.Images
                 result.Add(new ResultImageVersion(iterationVersion, previousVersion));
                 iterationVersion = previousVersion;
             }
-            callContext.TelemetryClient.TrackEvent("GetImageVersions", ("ImageId", imageId.ToString()), ("ResultCount", result.Count.ToString()));
-            return result;
+            return new ResultWithMetrologyProperties<IEnumerable<ResultImageVersion>>(result, ("ImageId", request.ImageId.ToString()), ("ResultCount", result.Count.ToString()));
+        }
+        public sealed record Request(Guid ImageId) : IRequest
+        {
+            public async Task CheckValidityAsync(CallContext callContext)
+            {
+                await Task.CompletedTask;
+            }
         }
         public sealed class ImageVersionFromDb
         {

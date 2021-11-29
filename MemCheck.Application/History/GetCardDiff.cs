@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -8,28 +7,23 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.History
 {
-    public sealed class GetCardDiff
+    public sealed class GetCardDiff : RequestRunner<GetCardDiff.Request, GetCardDiff.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
         #region Private methods
         #endregion
-        public GetCardDiff(CallContext callContext)
+        public GetCardDiff(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<Result> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var current = await callContext.DbContext.Cards
+            var current = await DbContext.Cards
                 .Include(c => c.CardLanguage)
                 .Include(c => c.TagsInCards)
                 .ThenInclude(t => t.Tag)
                 .Include(c => c.Images)
                 .ThenInclude(i => i.Image)
                 .SingleAsync(c => c.Id == request.CurrentCardId);
-            var original = await callContext.DbContext.CardPreviousVersions
+            var original = await DbContext.CardPreviousVersions
                 .Include(c => c.CardLanguage)
                 .Include(c => c.Tags)
                 .ThenInclude(t => t.Tag)
@@ -56,7 +50,7 @@ namespace MemCheck.Application.History
             {
                 var currentUsers = string.Join(",", current.UsersWithView.Select(u => u.User.UserName).OrderBy(userName => userName));
                 var originalUserIds = original.UsersWithView.Select(u => u.AllowedUserId).ToHashSet();
-                var originalUserNames = callContext.DbContext.Users.Where(u => originalUserIds.Contains(u.Id)).Select(u => u.UserName);
+                var originalUserNames = DbContext.Users.Where(u => originalUserIds.Contains(u.Id)).Select(u => u.UserName);
                 var originalUsers = string.Join(",", originalUserNames.OrderBy(userName => userName));
                 result = result with { UsersWithView = new(currentUsers, originalUsers) };
             }
@@ -78,23 +72,22 @@ namespace MemCheck.Application.History
                 var originalImages = string.Join(",", original.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name).OrderBy(imageName => imageName));
                 result = result with { ImagesOnAdditionalSide = new(currentImages, originalImages) };
             }
-            callContext.TelemetryClient.TrackEvent("GetCardDiff", ("CurrentCardId", request.CurrentCardId.ToString()), ("OriginalVersionId", request.OriginalVersionId.ToString()));
-            return result;
+            return new ResultWithMetrologyProperties<Result>(result, ("CurrentCardId", request.CurrentCardId.ToString()), ("OriginalVersionId", request.OriginalVersionId.ToString()));
         }
         #region Request and result types
-        public sealed record Request(Guid UserId, Guid CurrentCardId, Guid OriginalVersionId)
+        public sealed record Request(Guid UserId, Guid CurrentCardId, Guid OriginalVersionId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new InvalidOperationException("Invalid user ID");
-                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+                var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
-                var currentCard = await dbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CurrentCardId);
+                var currentCard = await callContext.DbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CurrentCardId);
                 if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, currentCard.UsersWithView))
                     throw new InvalidOperationException("Current not visible to user");
 
-                var originalCard = await dbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == OriginalVersionId);
+                var originalCard = await callContext.DbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == OriginalVersionId);
                 if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, originalCard.UsersWithView.Select(uwv => uwv.AllowedUserId)))
                     throw new InvalidOperationException("Original not visible to user");
             }

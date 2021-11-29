@@ -23,7 +23,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String())));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
         }
         [TestMethod()]
         public async Task ImageDoesNotExist()
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Images
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String())));
         }
         [TestMethod()]
         public async Task DescriptionTooShort()
@@ -52,7 +52,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength - 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength - 1))));
         }
         [TestMethod()]
         public async Task DescriptionTooLong()
@@ -62,7 +62,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MaxDescriptionLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MaxDescriptionLength + 1))));
         }
         [TestMethod()]
         public async Task DescriptionNotTrimmed()
@@ -72,7 +72,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength) + Environment.NewLine), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength) + Environment.NewLine)));
         }
         [TestMethod()]
         public async Task UsedInCard()
@@ -83,7 +83,7 @@ namespace MemCheck.Application.Images
             await CardHelper.CreateAsync(db, user, additionalSideImages: image.AsArray());
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String()), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String())));
         }
         [TestMethod()]
         public async Task Complex()
@@ -103,7 +103,7 @@ namespace MemCheck.Application.Images
             var deletionDescription = RandomHelper.String();
             var deletionDate = RandomHelper.Date(imageUploadDate);
             using (var dbContext = new MemCheckDbContext(db))
-                await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, deletionDescription), new TestLocalizer(), deletionDate);
+                await new DeleteImage(dbContext.AsCallContext(), deletionDate).RunAsync(new DeleteImage.Request(user, image, deletionDescription));
 
             using (var dbContext = new MemCheckDbContext(db))
             {

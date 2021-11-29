@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.History
 {
-    public sealed class GetCardVersions
+    public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEnumerable<GetCardVersions.IResultCardVersion>>
     {
         #region Fields
         private const string LanguageName = nameof(LanguageName);
@@ -22,7 +21,6 @@ namespace MemCheck.Application.History
         private const string FrontSideImages = nameof(FrontSideImages);
         private const string BackSideImages = nameof(BackSideImages);
         private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
-        private readonly CallContext callContext;
         #endregion
         #region Private classes
         private sealed class CardVersionFromDb
@@ -101,15 +99,12 @@ namespace MemCheck.Application.History
             public IEnumerable<string> ChangedFieldNames { get; }
         }
         #endregion
-        public GetCardVersions(CallContext callContext)
+        public GetCardVersions(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<IEnumerable<IResultCardVersion>> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<IResultCardVersion>>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-
-            var currentVersion = await callContext.DbContext.Cards.Include(card => card.PreviousVersion)
+            var currentVersion = await DbContext.Cards.Include(card => card.PreviousVersion)
                 .Where(card => card.Id == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
@@ -130,7 +125,7 @@ namespace MemCheck.Application.History
                     )
                 ).SingleAsync();
 
-            var allPreviousVersions = callContext.DbContext.CardPreviousVersions
+            var allPreviousVersions = DbContext.CardPreviousVersions
                 .Where(card => card.Card == request.CardId)
                 .Select(card => new CardVersionFromDb(
                     card.Id,
@@ -164,22 +159,21 @@ namespace MemCheck.Application.History
                 iterationVersion = previousVersion;
             }
 
-            callContext.TelemetryClient.TrackEvent("GetCardVersions", ("CardId", request.CardId.ToString()), ("ResultCount", result.Count.ToString()));
-            return result;
+            return new ResultWithMetrologyProperties<IEnumerable<IResultCardVersion>>(result, ("CardId", request.CardId.ToString()), ("ResultCount", result.Count.ToString()));
         }
         #region Request and result types
-        public sealed record Request(Guid UserId, Guid CardId)
+        public sealed record Request(Guid UserId, Guid CardId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 //We allow viewing the history of a card as soon as the user can access the current version of the card. Of course the differ will refuse to give details to a user not allowed
 
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
                 QueryValidationHelper.CheckNotReservedGuid(CardId);
 
-                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+                var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
-                var card = await dbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CardId);
+                var card = await callContext.DbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CardId);
                 if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, card.UsersWithView))
                     throw new InvalidOperationException("Current not visible to user");
             }

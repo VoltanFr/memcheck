@@ -33,7 +33,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 var request = new Application.Images.GetImage.Request(new Guid("980ce406-0417-4963-c9b4-08d8206a4d4c"), Application.Images.GetImage.Request.ImageSize.Medium);
                 var runner = new Application.Images.GetImage(dbContext.AsCallContext());
                 var bytes = await runner.RunAsync(request);
-                logger.LogInformation($"Got {bytes.Length} bytes in {realCodeChrono.Elapsed}");
+                logger.LogInformation($"Got {bytes.ImageBytes.Length} bytes in {realCodeChrono.Elapsed}");
                 chronos.Add(realCodeChrono.Elapsed.TotalSeconds);
             }
 

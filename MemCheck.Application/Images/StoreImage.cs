@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class StoreImage
+    public sealed class StoreImage : RequestRunner<StoreImage.Request, StoreImage.Result>
     {
         #region Fields
         public const string svgImageContentType = "image/svg+xml";
         public const string pngImageContentType = "image/png";
-        private readonly CallContext callContext;
         private static readonly ImmutableHashSet<string> supportedContentTypes = GetSupportedContentTypes();
+        private readonly DateTime? runDate;
         private const int bigImageWidth = 1600;
         #endregion
         #region Private methods
@@ -54,7 +54,7 @@ namespace MemCheck.Application.Images
             }
             catch
             {
-                throw new RequestInputException(callContext.Localized.Get("SvgImageCanNotBeLoaded"));
+                throw new RequestInputException(Localized.Get("SvgImageCanNotBeLoaded"));
             }
         }
         private Bitmap GetBitmap(Stream sourceStream, string contentType)
@@ -67,15 +67,13 @@ namespace MemCheck.Application.Images
             return new Bitmap(sourceStream);
         }
         #endregion
-        public StoreImage(CallContext callContext)
+        public StoreImage(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task RunAsync(Request request, DateTime? now = null)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext, callContext.Localized);
-
-            var owner = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.Owner);
+            var owner = await DbContext.Users.SingleAsync(u => u.Id == request.Owner);
 
             var image = new Domain.Image
             {
@@ -83,9 +81,9 @@ namespace MemCheck.Application.Images
                 Description = request.Description,
                 Source = request.Source,
                 Owner = owner,
-                VersionDescription = callContext.Localized.Get("InitialImageVersionCreation"),
+                VersionDescription = Localized.Get("InitialImageVersionCreation"),
                 VersionType = ImageVersionType.Creation,
-                InitialUploadUtcDate = now ?? DateTime.UtcNow
+                InitialUploadUtcDate = runDate ?? DateTime.UtcNow
             };
             image.LastChangeUtcDate = image.InitialUploadUtcDate;
 
@@ -101,11 +99,11 @@ namespace MemCheck.Application.Images
             image.MediumBlobSize = image.MediumBlob.Length;
             image.BigBlob = ResizeImage(originalImage, bigImageWidth);
             image.BigBlobSize = image.BigBlob.Length;
-            callContext.DbContext.Images.Add(image);
-            await callContext.DbContext.SaveChangesAsync();
+            DbContext.Images.Add(image);
+            await DbContext.SaveChangesAsync();
 
-            callContext.TelemetryClient.TrackEvent("StoreImage",
-                ("ImageName", request.Name.ToString()),
+            return new ResultWithMetrologyProperties<Result>(new Result(),
+            ("ImageName", request.Name.ToString()),
                 ("DescriptionLength", request.Description.Length.ToString()),
                 ("SourceFieldLength", request.Source.Length.ToString()),
                 ("ContentType", request.ContentType),
@@ -113,7 +111,7 @@ namespace MemCheck.Application.Images
                 );
         }
         #region Request class
-        public sealed class Request
+        public sealed class Request : IRequest
         {
             #region Fields
             public const int minBlobLength = 10;
@@ -134,19 +132,20 @@ namespace MemCheck.Application.Images
             public string Source { get; }
             public string ContentType { get; }
             public byte[] Blob { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext, ILocalized localizer)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 //ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
-                    throw new InvalidOperationException(localizer.Get("InvalidImageContentType") + $" '{ContentType}'");
+                    throw new InvalidOperationException(callContext.Localized.Get("InvalidImageContentType") + $" '{ContentType}'");
                 if (Blob.Length < minBlobLength || Blob.Length > maxBlobLength)
-                    throw new RequestInputException(localizer.Get("InvalidBlobLength") + $" {Blob.Length}" + localizer.Get("MustBeBetween") + $" {minBlobLength} " + localizer.Get("And") + $" {maxBlobLength}");
+                    throw new RequestInputException(callContext.Localized.Get("InvalidBlobLength") + $" {Blob.Length}" + callContext.Localized.Get("MustBeBetween") + $" {minBlobLength} " + callContext.Localized.Get("And") + $" {maxBlobLength}");
 
-                await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, dbContext, localizer);
-                QueryValidationHelper.CheckCanCreateImageWithDescription(Description, localizer);
-                QueryValidationHelper.CheckCanCreateImageWithSource(Source, localizer);
+                await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);
+                QueryValidationHelper.CheckCanCreateImageWithDescription(Description, callContext.Localized);
+                QueryValidationHelper.CheckCanCreateImageWithSource(Source, callContext.Localized);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

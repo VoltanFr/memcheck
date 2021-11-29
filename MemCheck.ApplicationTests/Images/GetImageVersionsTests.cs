@@ -18,7 +18,7 @@ namespace MemCheck.Application.Images
             var image = await ImageHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageVersions(dbContext.AsCallContext()).RunAsync(Guid.NewGuid()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageVersions(dbContext.AsCallContext()).RunAsync(new GetImageVersions.Request(Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task Versionning()
@@ -38,18 +38,18 @@ namespace MemCheck.Application.Images
             var firstVersionDate = RandomHelper.Date(initialVersionDate);
             var firstVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user2, initialName, initialSource, RandomHelper.String(), firstVersionDescription), firstVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), firstVersionDate).RunAsync(new UpdateImageMetadata.Request(image, user2, initialName, initialSource, RandomHelper.String(), firstVersionDescription));
 
             var user3Name = RandomHelper.String();
             var user3 = await UserHelper.CreateInDbAsync(db, userName: user3Name);
             var lastVersionDate = RandomHelper.Date(firstVersionDate);
             var lastVersionDescription = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user3, initialName, RandomHelper.String(), RandomHelper.String(), lastVersionDescription), lastVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), lastVersionDate).RunAsync(new UpdateImageMetadata.Request(image, user3, initialName, RandomHelper.String(), RandomHelper.String(), lastVersionDescription));
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var versions = (await new GetImageVersions(dbContext.AsCallContext()).RunAsync(image)).ToList();
+                var versions = (await new GetImageVersions(dbContext.AsCallContext()).RunAsync(new GetImageVersions.Request(image))).ToList();
 
                 var currentVersion = versions[0];
                 Assert.AreEqual(user3Name, currentVersion.Author);

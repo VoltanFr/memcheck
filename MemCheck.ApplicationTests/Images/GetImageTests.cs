@@ -28,7 +28,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Small));
-            Assert.AreEqual(1, loaded.Length);
+            Assert.AreEqual(1, loaded.ImageBytes.Length);
         }
         [TestMethod()]
         public async Task MediumBlob()
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Medium));
-            Assert.AreEqual(2, loaded.Length);
+            Assert.AreEqual(2, loaded.ImageBytes.Length);
         }
         [TestMethod()]
         public async Task BigBlob()
@@ -50,7 +50,7 @@ namespace MemCheck.Application.Images
 
             using var dbContext = new MemCheckDbContext(db);
             var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Big));
-            Assert.AreEqual(3, loaded.Length);
+            Assert.AreEqual(3, loaded.ImageBytes.Length);
         }
     }
 }

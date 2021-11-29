@@ -176,7 +176,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new DeleteImage.Request(userId, imageId, request.DeletionDescription);
-            var imageName = await new DeleteImage(callContext).RunAsync(applicationRequest, this);
+            var imageName = await new DeleteImage(callContext).RunAsync(applicationRequest);
             var toastText = $"{Get("SuccessfullyDeletedImage")} '{imageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
@@ -229,7 +229,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("ImageVersions/{imageId}")]
         public async Task<IActionResult> ImageVersions(Guid imageId)
         {
-            var appResults = await new GetImageVersions(callContext).RunAsync(imageId);
+            var appResults = await new GetImageVersions(callContext).RunAsync(new GetImageVersions.Request(imageId));
             var result = appResults.Select(appResult => new ImageVersion(appResult, this));
             return Ok(result);
         }

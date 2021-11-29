@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class UpdateImageMetadata
+    public sealed class UpdateImageMetadata : RequestRunner<UpdateImageMetadata.Request, UpdateImageMetadata.Result>
     {
+        private readonly DateTime? runDate;
         #region Fields
-        private readonly CallContext callContext;
         #endregion
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
@@ -24,15 +24,14 @@ namespace MemCheck.Application.Images
             };
         }
         #endregion
-        public UpdateImageMetadata(CallContext callContext)
+        public UpdateImageMetadata(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
-            this.callContext = callContext;
+            this.runDate = runDate;
         }
-        public async Task RunAsync(Request request, DateTime? nowUtc = null)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.Localized, callContext.DbContext);
-            var image = await callContext.DbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
-            var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == request.UserId);
+            var image = await DbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
+            var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
             var versionFromCurrentImage = new ImagePreviousVersion()
             {
@@ -51,20 +50,20 @@ namespace MemCheck.Application.Images
                 PreviousVersion = image.PreviousVersion,
             };
 
-            callContext.DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
+            DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
 
             image.Owner = user;
             image.Name = request.Name;
             image.Description = request.Description;
             image.Source = request.Source;
-            image.LastChangeUtcDate = nowUtc ?? DateTime.UtcNow;
+            image.LastChangeUtcDate = runDate ?? DateTime.UtcNow;
             image.VersionType = ImageVersionType.Changes;
             image.VersionDescription = request.VersionDescription;
             image.PreviousVersion = versionFromCurrentImage;
 
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
-            callContext.TelemetryClient.TrackEvent("UpdateImageMetadata",
+            return new ResultWithMetrologyProperties<Result>(new Result(),
                 ("ImageId", request.ImageId.ToString()),
                 ("NewName", request.Name),
                 ("NewNameLength", request.Name.Length.ToString()),
@@ -73,8 +72,8 @@ namespace MemCheck.Application.Images
                 ("VersionDescriptionLength", request.VersionDescription.Length.ToString())
                 );
         }
-        #region Request class
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             public Request(Guid imageId, Guid userId, string name, string source, string description, string versionDescription)
             {
@@ -91,30 +90,31 @@ namespace MemCheck.Application.Images
             public string Source { get; }
             public string Description { get; }
             public string VersionDescription { get; }
-            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new InvalidOperationException("Invalid user id");
                 if (QueryValidationHelper.IsReservedGuid(ImageId))
                     throw new InvalidOperationException("Invalid image id");
 
-                var imageDataBeforeUpdate = await dbContext.Images
+                var imageDataBeforeUpdate = await callContext.DbContext.Images
                     .AsNoTracking()
                     .Where(img => img.Id == ImageId)
                     .Select(img => new { nameBeforeUpdate = img.Name, sourceBeforeUpdate = img.Source, descriptionBeforeUpdate = img.Description })
                     .SingleAsync();
 
                 if (imageDataBeforeUpdate.nameBeforeUpdate == Name && imageDataBeforeUpdate.sourceBeforeUpdate == Source && imageDataBeforeUpdate.descriptionBeforeUpdate == Description)
-                    throw new RequestInputException(localizer.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
+                    throw new RequestInputException(callContext.Localized.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
 
                 if (imageDataBeforeUpdate.nameBeforeUpdate != Name)
-                    await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, dbContext, localizer);
+                    await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);
 
-                QueryValidationHelper.CheckCanCreateImageWithSource(Source, localizer);
-                QueryValidationHelper.CheckCanCreateImageWithDescription(Description, localizer);
-                QueryValidationHelper.CheckCanCreateImageWithVersionDescription(VersionDescription, localizer);
+                QueryValidationHelper.CheckCanCreateImageWithSource(Source, callContext.Localized);
+                QueryValidationHelper.CheckCanCreateImageWithDescription(Description, callContext.Localized);
+                QueryValidationHelper.CheckCanCreateImageWithVersionDescription(VersionDescription, callContext.Localized);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

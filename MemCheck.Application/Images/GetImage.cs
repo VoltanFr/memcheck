@@ -5,32 +5,34 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class GetImage
+    public sealed class GetImage : RequestRunner<GetImage.Request, GetImage.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
         #endregion
-        public GetImage(CallContext callContext)
+        public GetImage(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<byte[]> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
             byte[] result = request.Size switch
             {
-                Request.ImageSize.Small => (await callContext.DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.SmallBlob }).SingleAsync(img => img.Id == request.ImageId)).SmallBlob,
-                Request.ImageSize.Medium => (await callContext.DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.MediumBlob }).SingleAsync(img => img.Id == request.ImageId)).MediumBlob,
-                Request.ImageSize.Big => (await callContext.DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.BigBlob }).SingleAsync(img => img.Id == request.ImageId)).BigBlob,
+                Request.ImageSize.Small => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.SmallBlob }).SingleAsync(img => img.Id == request.ImageId)).SmallBlob,
+                Request.ImageSize.Medium => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.MediumBlob }).SingleAsync(img => img.Id == request.ImageId)).MediumBlob,
+                Request.ImageSize.Big => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.BigBlob }).SingleAsync(img => img.Id == request.ImageId)).BigBlob,
                 _ => throw new NotImplementedException(request.Size.ToString()),
             };
-            callContext.TelemetryClient.TrackEvent("GetImage", ("ImageId", request.ImageId.ToString()), ("RequestedSize", request.Size.ToString()), ("ByteCount", result.Length.ToString()));
-            return result;
+            return new ResultWithMetrologyProperties<Result>(new Result(result), ("ImageId", request.ImageId.ToString()), ("RequestedSize", request.Size.ToString()), ("ByteCount", result.Length.ToString()));
         }
         #region Request class
-        public sealed record Request(Guid ImageId, Request.ImageSize Size)
+        public sealed record Request(Guid ImageId, Request.ImageSize Size) : IRequest
         {
+            public async Task CheckValidityAsync(CallContext callContext)
+            {
+                await Task.CompletedTask;
+            }
             public enum ImageSize { Small, Medium, Big };
         }
+        public sealed record Result(byte[] ImageBytes);
         #endregion
     }
 }

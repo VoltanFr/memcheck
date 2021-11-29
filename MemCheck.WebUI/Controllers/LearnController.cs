@@ -51,7 +51,7 @@ namespace MemCheck.WebUI.Controllers
             }
 
             var blob = await new GetImage(callContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
-            var content = new MemoryStream(blob);
+            var content = new MemoryStream(blob.ImageBytes);
             return base.File(content, "APPLICATION/octet-stream", "noname");
         }
         #endregion

@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,20 +8,14 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.History
 {
-    public sealed class GetCardVersion
+    public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCardVersion.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public GetCardVersion(CallContext callContext)
+        public GetCardVersion(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<Result> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-
-            var version = await callContext.DbContext.CardPreviousVersions
+            var version = await DbContext.CardPreviousVersions
                 .Include(card => card.Images)
                 .ThenInclude(img => img.Image)
                 .Include(card => card.CardLanguage)
@@ -33,15 +26,13 @@ namespace MemCheck.Application.History
                 .AsSingleQuery()
                 .SingleOrDefaultAsync();
 
-            var userWithViewNames = version.UsersWithView.Select(userWithView => callContext.DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
+            var userWithViewNames = version.UsersWithView.Select(userWithView => DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
             var tagNames = version.Tags.Select(t => t.Tag.Name);
             var frontSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name);
             var backSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Image.Name);
             var additionalInfoImageNames = version.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name);
 
-            callContext.TelemetryClient.TrackEvent("GetCardVersion", ("VersionId", request.VersionId.ToString()));
-
-            return new Result(
+            var result = new Result(
                 version.FrontSide,
                 version.BackSide,
                 version.AdditionalInfo,
@@ -56,17 +47,18 @@ namespace MemCheck.Application.History
                 version.VersionDescription,
                 version.VersionCreator.UserName
                 );
+            return new ResultWithMetrologyProperties<Result>(result, ("VersionId", request.VersionId.ToString()));
         }
         #region Request & Result types
-        public sealed record Request(Guid UserId, Guid VersionId)
+        public sealed record Request(Guid UserId, Guid VersionId) : IRequest
         {
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new InvalidOperationException("Invalid user ID");
-                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
+                var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
-                var cardVersion = await dbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == VersionId);
+                var cardVersion = await callContext.DbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == VersionId);
                 if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, cardVersion.UsersWithView.Select(uwv => uwv.AllowedUserId)))
                     throw new InvalidOperationException("Original not visible to user");
             }

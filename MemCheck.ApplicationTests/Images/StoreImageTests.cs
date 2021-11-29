@@ -207,7 +207,7 @@ namespace MemCheck.Application.Images
             {
                 var request = new StoreImage.Request(user, name, description, source, StoreImage.pngImageContentType, pngImage);
                 var localizer = new TestLocalizer(new KeyValuePair<string, string>("InitialImageVersionCreation", versionDesc).AsArray());
-                await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request, uploadDate);
+                await new StoreImage(dbContext.AsCallContext(localizer), uploadDate).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(db))

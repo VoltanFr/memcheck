@@ -207,7 +207,7 @@ namespace MemCheck.Application.Images
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new UpdateImageMetadata.Request(image, user, newName, source, description, versionDescription);
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(request, runDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), runDate).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -241,7 +241,7 @@ namespace MemCheck.Application.Images
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new UpdateImageMetadata.Request(image, user, name, newSource, description, versionDescription);
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(request, runDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), runDate).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -275,7 +275,7 @@ namespace MemCheck.Application.Images
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new UpdateImageMetadata.Request(image, user, name, source, newDescription, versionDescription);
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(request, runDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), runDate).RunAsync(request);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -325,12 +325,12 @@ namespace MemCheck.Application.Images
             var user2 = await UserHelper.CreateInDbAsync(db);
             var firstVersionDate = RandomHelper.Date(initialVersionDate);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user2, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String()), firstVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), firstVersionDate).RunAsync(new UpdateImageMetadata.Request(image, user2, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String()));
 
             var user3 = await UserHelper.CreateInDbAsync(db);
             var lastVersionDate = RandomHelper.Date(firstVersionDate);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user3, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String()), lastVersionDate);
+                await new UpdateImageMetadata(dbContext.AsCallContext(), lastVersionDate).RunAsync(new UpdateImageMetadata.Request(image, user3, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String()));
 
             using (var dbContext = new MemCheckDbContext(db))
             {

@@ -8,38 +8,34 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
 {
-    public sealed class GetImageInfoFromName
+    public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Request, GetImageInfoFromName.Result>
     {
         #region Fields
-        private readonly CallContext callContext;
         #endregion
-        public GetImageInfoFromName(CallContext callContext)
+        public GetImageInfoFromName(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<Result> RunAsync(Request request, ILocalized localizer)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidity(callContext.DbContext, localizer);
-            var img = await callContext.DbContext.Images.Include(img => img.Cards)
+            var img = await DbContext.Images.Include(img => img.Cards)
                 .Where(image => EF.Functions.Like(image.Name, $"{request.ImageName}"))
                 .Select(img => new { img.Id, img.Name, img.Source })
                 .SingleAsync();
             var result = new Result(img.Id, img.Name, img.Source);
-            callContext.TelemetryClient.TrackEvent("GetImageInfoFromName", ("ImageName", request.ImageName));
-            return result;
+            return new ResultWithMetrologyProperties<Result>(result, ("ImageName", request.ImageName));
         }
         #region Request and Result types
-        public sealed record Request(string ImageName)
+        public sealed record Request(string ImageName) : IRequest
         {
-            public async Task CheckValidity(MemCheckDbContext dbContext, ILocalized localizer)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (ImageName != ImageName.Trim())
                     throw new InvalidOperationException($"Name not trimmed: '{ImageName}'");
                 if (ImageName.Length == 0)
-                    throw new RequestInputException(localizer.Get("PleaseEnterAnImageName"));
+                    throw new RequestInputException(callContext.Localized.Get("PleaseEnterAnImageName"));
 
-                if (!await dbContext.Images.AnyAsync(image => EF.Functions.Like(image.Name, $"{ImageName}")))
-                    throw new RequestInputException(localizer.Get("ImageNotFound") + ' ' + ImageName);
+                if (!await callContext.DbContext.Images.AnyAsync(image => EF.Functions.Like(image.Name, $"{ImageName}")))
+                    throw new RequestInputException(callContext.Localized.Get("ImageNotFound") + ' ' + ImageName);
 
             }
         }
