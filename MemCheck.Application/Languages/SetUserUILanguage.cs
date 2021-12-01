@@ -1,42 +1,37 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Languages
 {
-    public sealed class SetUserUILanguage
+    public sealed class SetUserUILanguage : RequestRunner<SetUserUILanguage.Request, SetUserUILanguage.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public SetUserUILanguage(CallContext callContext)
+        public SetUserUILanguage(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var user = await callContext.DbContext.Users.SingleAsync(user => user.Id == request.UserId);
+            var user = await DbContext.Users.SingleAsync(user => user.Id == request.UserId);
             user.UILanguage = request.CultureName;
-            callContext.DbContext.SaveChanges();
-            callContext.TelemetryClient.TrackEvent("SetUserUILanguage", ("CultureName", request.CultureName));
+            DbContext.SaveChanges();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CultureName", request.CultureName));
         }
-        #region Request type
-        public sealed record Request(Guid UserId, string CultureName)
+        #region Request & Result
+        public sealed record Request(Guid UserId, string CultureName) : IRequest
         {
             public const int MinNameLength = 5;
             public const int MaxNameLength = 5;
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 if (CultureName != CultureName.Trim())
                     throw new InvalidOperationException("Invalid Name: not trimmed");
                 if (CultureName.Length < MinNameLength || CultureName.Length > MaxNameLength)
                     throw new InvalidOperationException($"Invalid culture name '{CultureName}'");
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

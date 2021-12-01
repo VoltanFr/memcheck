@@ -24,14 +24,14 @@ namespace MemCheck.WebUI.Controllers
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
-        [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(callContext).RunAsync());
+        [HttpGet("GetAllLanguages")] public async Task<IActionResult> GetAllLanguagesControllerAsync() => Ok(await new GetAllLanguages(callContext).RunAsync(new GetAllLanguages.Request()));
         #region Create
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateRequest language)
         {
             CheckBodyParameter(language);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            return Ok(await new CreateLanguage(callContext, new ProdRoleChecker(userManager)).RunAsync(new CreateLanguage.Request(userId, language.Name), this));
+            return Ok(await new CreateLanguage(callContext).RunAsync(new CreateLanguage.Request(userId, language.Name)));
         }
         public sealed class CreateRequest
         {

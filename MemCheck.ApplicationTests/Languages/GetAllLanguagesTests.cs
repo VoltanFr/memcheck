@@ -13,7 +13,7 @@ namespace MemCheck.Application.Languages
         public async Task None()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync();
+            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync(new GetAllLanguages.Request());
             Assert.IsFalse(result.Any());
         }
         [TestMethod()]
@@ -24,7 +24,7 @@ namespace MemCheck.Application.Languages
             var id = await CardLanguagHelper.CreateAsync(db, name);
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync();
+            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync(new GetAllLanguages.Request());
             var resultLang = result.Single();
             Assert.AreEqual(id, resultLang.Id);
             Assert.AreEqual(name, resultLang.Name);
@@ -45,7 +45,7 @@ namespace MemCheck.Application.Languages
             await CardHelper.CreateAsync(db, versionCreatorId: user, language: language2);
 
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync();
+            var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync(new GetAllLanguages.Request());
 
             var resultLang1 = result.Single(l => l.Id == language1);
             Assert.AreEqual(language1Name, resultLang1.Name);
