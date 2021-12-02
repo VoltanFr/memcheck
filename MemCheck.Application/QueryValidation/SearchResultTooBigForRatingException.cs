@@ -2,7 +2,7 @@
 
 namespace MemCheck.Application.QueryValidation
 {
-    public sealed class SearchResultTooBigForRatingException : Exception
+    internal sealed class SearchResultTooBigForRatingException : Exception
     {
         public SearchResultTooBigForRatingException() : base()
         {
