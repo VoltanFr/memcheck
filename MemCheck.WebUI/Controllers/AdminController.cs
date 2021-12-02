@@ -294,7 +294,7 @@ namespace MemCheck.WebUI.Controllers
             {
                 var mailSendingsToWaitFor = new List<Task>();
                 var performanceIndicators = new List<string>();
-                var notifierResult = await new Notifier(callContext, performanceIndicators).GetNotificationsAndUpdateLastNotifDatesAsync();
+                var notifierResult = await new Notifier(callContext, performanceIndicators).RunAsync(new Notifier.Request());
                 var sentEmailCount = 0;
 
                 foreach (var userNotifications in notifierResult.UserNotifications)

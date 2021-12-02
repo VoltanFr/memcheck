@@ -11,41 +11,37 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class GetSearchSubscriptions
+    public sealed class GetSearchSubscriptions : RequestRunner<GetSearchSubscriptions.Request, IEnumerable<GetSearchSubscriptions.Result>>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public GetSearchSubscriptions(CallContext callContext)
+        public GetSearchSubscriptions(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<IEnumerable<Result>> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<Result>>> DoRunAsync(Request request)
         {
-            var tagDictionary = TagLoadingHelper.Run(callContext.DbContext);
-            var deckDictionary = callContext.DbContext.Decks.AsNoTracking().Where(d => d.Owner.Id == request.UserId).Select(t => new { t.Id, t.Description }).ToImmutableDictionary(t => t.Id, t => t.Description);
+            var tagDictionary = TagLoadingHelper.Run(DbContext);
+            var deckDictionary = DbContext.Decks.AsNoTracking().Where(d => d.Owner.Id == request.UserId).Select(t => new { t.Id, t.Description }).ToImmutableDictionary(t => t.Id, t => t.Description);
 
-            var queryResult = await callContext.DbContext.SearchSubscriptions.AsNoTracking()
+            var queryResult = await DbContext.SearchSubscriptions.AsNoTracking()
                 .Include(s => s.RequiredTags)
                 .Include(s => s.ExcludedTags)
                 .Where(search => search.UserId == request.UserId)
                 .ToListAsync();
 
-            var result = queryResult.Select(subscription => new Result(subscription, tagDictionary, deckDictionary, callContext.DbContext));
-            callContext.TelemetryClient.TrackEvent("GetSearchSubscriptions", ("ResultCount", result.Count().ToString()));
-            return result;
+            var result = queryResult.Select(subscription => new Result(subscription, tagDictionary, deckDictionary, DbContext));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("ResultCount", result.Count().ToString()));
         }
-        #region Request and Result
-        public sealed record Request
+        #region Request & Result
+        public sealed record Request : IRequest
         {
             public Request(Guid userId)
             {
                 UserId = userId;
             }
             public Guid UserId { get; }
-            public void CheckValidity()
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
+                await Task.CompletedTask;
             }
         }
         public sealed record Result

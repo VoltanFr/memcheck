@@ -7,25 +7,20 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class SetSearchSubscriptionName
+    public sealed class SetSearchSubscriptionName : RequestRunner<SetSearchSubscriptionName.Request, SetSearchSubscriptionName.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public SetSearchSubscriptionName(CallContext callContext)
+        public SetSearchSubscriptionName(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
+            var subscription = await DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
             subscription.Name = request.Name;
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("SetSearchSubscriptionName", ("Name", request.Name.ToString()), ("NameLength", request.Name.Length.ToString()));
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("Name", request.Name.ToString()), ("NameLength", request.Name.Length.ToString()));
         }
-        #region Request class
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             public const int MinNameLength = 3;
             public const int MaxNameLength = 36;
@@ -38,7 +33,7 @@ namespace MemCheck.Application.Notifying
             public Guid UserId { get; }
             public Guid SubscriptionId { get; }
             public string Name { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
                 QueryValidationHelper.CheckNotReservedGuid(SubscriptionId);
@@ -46,13 +41,14 @@ namespace MemCheck.Application.Notifying
                     throw new RequestInputException($"Name '{Name}' is too short, must be between {MinNameLength} and {MaxNameLength} chars long, is {Name.Length}");
                 if (Name.Length > MaxNameLength)
                     throw new RequestInputException($"Name '{Name}' is too long, must be between {MinNameLength} and {MaxNameLength} chars long, is {Name.Length}");
-                var subscription = await dbContext.SearchSubscriptions.Where(s => s.Id == SubscriptionId).SingleOrDefaultAsync();
+                var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == SubscriptionId).SingleOrDefaultAsync();
                 if (subscription == null)
                     throw new RequestInputException("Subscription not found");
                 if (subscription.UserId != UserId)
                     throw new RequestInputException("User not owner of subscription");
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

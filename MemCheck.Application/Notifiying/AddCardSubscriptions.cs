@@ -8,26 +8,20 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class AddCardSubscriptions
+    public sealed class AddCardSubscriptions : RequestRunner<AddCardSubscriptions.Request, AddCardSubscriptions.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public AddCardSubscriptions(CallContext callContext)
+        public AddCardSubscriptions(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            request.CheckValidity(callContext.DbContext);
-
             var now = DateTime.UtcNow;
 
             foreach (var cardId in request.CardIds)
-                CreateSubscription(callContext.DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
+                CreateSubscription(DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
 
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("AddCardSubscriptions", ("CardCount", request.CardIds.Count().ToString()));
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
         }
         internal static void CreateSubscription(MemCheckDbContext dbContext, Guid userId, Guid cardId, DateTime registrationUtcDate, int registrationMethod)
         {
@@ -43,8 +37,8 @@ namespace MemCheck.Application.Notifying
             };
             dbContext.CardNotifications.Add(notif);
         }
-        #region Request class
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             public Request(Guid userId, IEnumerable<Guid> cardIds)
             {
@@ -53,15 +47,17 @@ namespace MemCheck.Application.Notifying
             }
             public Guid UserId { get; }
             public IEnumerable<Guid> CardIds { get; }
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
                 foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(dbContext, UserId, cardId);
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, cardId);
+                await Task.CompletedTask;
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

@@ -32,7 +32,7 @@ namespace MemCheck.Application.Tests.Notifying
             using var dbContext = new MemCheckDbContext(db);
 
             var notifier = new Notifier(dbContext.AsCallContext(), userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
-            var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync();
+            var result = await notifier.RunAsync(new Notifier.Request());
             Assert.AreEqual(0, result.UserNotifications.Length);
 
             usersToNotifyGetter.VerifyAll();
@@ -68,8 +68,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(db);
 
-            var notifier = new Notifier(dbContext.AsCallContext(), userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
-            var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync(now);
+            var notifier = new Notifier(dbContext.AsCallContext(), userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>(), now);
+            var result = await notifier.RunAsync(new Notifier.Request());
             Assert.AreEqual(1, result.UserNotifications.Length);
             Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
             Assert.AreEqual(1, result.UserNotifications[0].CardVersions.Length);
@@ -115,8 +115,8 @@ namespace MemCheck.Application.Tests.Notifying
 
             using var dbContext = new MemCheckDbContext(db);
 
-            var notifier = new Notifier(dbContext.AsCallContext(), userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>());
-            var result = await notifier.GetNotificationsAndUpdateLastNotifDatesAsync(now);
+            var notifier = new Notifier(dbContext.AsCallContext(), userCardSubscriptionCounter.Object, userCardVersionsNotifier.Object, userCardDeletionsNotifier.Object, usersToNotifyGetter.Object, userLastNotifDateUpdater.Object, userSearchSubscriptionLister.Object, userSearchNotifier.Object, new List<string>(), now);
+            var result = await notifier.RunAsync(new Notifier.Request());
             Assert.AreEqual(1, result.UserNotifications.Length);
             Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
             Assert.AreEqual(0, result.UserNotifications[0].CardVersions.Length);

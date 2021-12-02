@@ -9,19 +9,13 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class SubscribeToSearch
+    public sealed class SubscribeToSearch : RequestRunner<SubscribeToSearch.Request, SubscribeToSearch.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public SubscribeToSearch(CallContext callContext)
+        public SubscribeToSearch(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task<Guid> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            request.CheckValidity(callContext.DbContext);
-
             var now = DateTime.UtcNow;
 
             var search = new SearchSubscription
@@ -34,7 +28,7 @@ namespace MemCheck.Application.Notifying
                 LastRunUtcDate = DateTime.MinValue
             };
 
-            callContext.DbContext.SearchSubscriptions.Add(search);
+            DbContext.SearchSubscriptions.Add(search);
 
             var requiredTags = new List<RequiredTagInSearchSubscription>();
             foreach (var requiredTag in request.RequiredTags)
@@ -44,7 +38,7 @@ namespace MemCheck.Application.Notifying
                     SearchSubscriptionId = search.Id,
                     TagId = requiredTag
                 };
-                callContext.DbContext.RequiredTagInSearchSubscriptions.Add(required);
+                DbContext.RequiredTagInSearchSubscriptions.Add(required);
                 requiredTags.Add(required);
             }
             search.RequiredTags = requiredTags;
@@ -60,7 +54,7 @@ namespace MemCheck.Application.Notifying
                         TagId = excludedTag
                     };
                     excludedTags.Add(excluded);
-                    callContext.DbContext.ExcludedTagInSearchSubscriptions.Add(excluded);
+                    DbContext.ExcludedTagInSearchSubscriptions.Add(excluded);
                 }
 
                 search.ExcludedTags = excludedTags;
@@ -69,19 +63,18 @@ namespace MemCheck.Application.Notifying
             else
                 search.ExcludeAllTags = true;
 
-            await callContext.DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
-            callContext.TelemetryClient.TrackEvent("SubscribeToSearch",
+            return new ResultWithMetrologyProperties<Result>(new Result(search.Id),
                 ("HasAnExcludedDeck", (request.ExcludedDeck != Guid.Empty).ToString()),
                 ("Name", request.Name),
                 ("RequiredText", request.RequiredText),
                 ("RequiredTagCount", request.RequiredTags.Count().ToString()),
                 ("ExcludedTagCount", request.ExcludedTags == null ? "-1" : request.ExcludedTags.Count().ToString()),
                 ("NameLength", request.Name.Length.ToString()));
-            return search.Id;
         }
-        #region Request class
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             public const int MaxSubscriptionCount = 5;
             public Request(Guid userId, Guid excludedDeck, string name, string requiredText, IEnumerable<Guid> requiredTags, IEnumerable<Guid>? excludedTags)
@@ -99,14 +92,14 @@ namespace MemCheck.Application.Notifying
             public string RequiredText { get; }
             public IEnumerable<Guid> RequiredTags { get; }
             public IEnumerable<Guid>? ExcludedTags { get; } //null means that we return only cards which have no tag (we exclude all tags)
-            public void CheckValidity(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new RequestInputException("Invalid user id");
 
                 if (ExcludedDeck != Guid.Empty)
                 {
-                    var deck = dbContext.Decks.Include(d => d.Owner).SingleOrDefault(d => d.Id == ExcludedDeck);
+                    var deck = callContext.DbContext.Decks.Include(d => d.Owner).SingleOrDefault(d => d.Id == ExcludedDeck);
                     if (deck == null)
                         throw new RequestInputException($"Invalid deck id '{ExcludedDeck}'");
                     if (deck.Owner.Id != UserId)
@@ -116,24 +109,25 @@ namespace MemCheck.Application.Notifying
                 if (ExcludedTags != null)
                 {
                     foreach (var excludedTag in ExcludedTags)
-                        if (!dbContext.Tags.Any(t => t.Id == excludedTag))
+                        if (!await callContext.DbContext.Tags.AnyAsync(t => t.Id == excludedTag))
                             throw new RequestInputException($"Invalid excluded tag id '{excludedTag}'");
                     if (ExcludedTags.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
                         throw new RequestInputException("Excluded tag list contains duplicate");
                 }
 
                 foreach (var requiredTag in RequiredTags)
-                    if (!dbContext.Tags.Any(t => t.Id == requiredTag))
+                    if (!callContext.DbContext.Tags.Any(t => t.Id == requiredTag))
                         throw new RequestInputException($"Invalid required tag id '{requiredTag}'");
 
                 if (RequiredTags.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
                     throw new RequestInputException("Required tag list contains duplicate");
 
-                int userSubscriptionsCount = dbContext.SearchSubscriptions.Count(s => s.UserId == UserId);
+                int userSubscriptionsCount = callContext.DbContext.SearchSubscriptions.Count(s => s.UserId == UserId);
                 if (userSubscriptionsCount >= MaxSubscriptionCount)
                     throw new RequestInputException($"User already has {userSubscriptionsCount} subscriptions, can not have more than {MaxSubscriptionCount}");
             }
         }
+        public sealed record Result(Guid SearchId);
         #endregion
     }
 }

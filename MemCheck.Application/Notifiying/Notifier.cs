@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class Notifier
+    public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.NotifierResult>
     {
         #region Fields
-        private readonly CallContext callContext;
         private readonly IUserCardSubscriptionCounter userCardSubscriptionCounter;
         private readonly IUserSearchSubscriptionLister userSearchSubscriptionLister;
         private readonly IUserCardVersionsNotifier userCardVersionsNotifier;
@@ -19,6 +18,7 @@ namespace MemCheck.Application.Notifying
         private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
         private readonly IUserSearchNotifier userSearchNotifier;
         private readonly List<string> performanceIndicators;
+        private readonly DateTime? runDate;
         public const int MaxLengthForTextFields = 150;
         public const int MaxCardsToReportPerSearch = 100;
         #endregion
@@ -59,9 +59,9 @@ namespace MemCheck.Application.Notifying
                   performanceIndicators)
         {
         }
-        internal Notifier(CallContext callContext, IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators)
+        internal Notifier(CallContext callContext, IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators, DateTime? runDate = null)
+             : base(callContext)
         {
-            this.callContext = callContext;
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
             this.userCardVersionsNotifier = userCardVersionsNotifier;
             this.userCardDeletionsNotifier = userCardDeletionsNotifier;
@@ -70,21 +70,29 @@ namespace MemCheck.Application.Notifying
             this.userSearchSubscriptionLister = userSearchSubscriptionLister;
             this.userSearchNotifier = userSearchNotifier;
             this.performanceIndicators = performanceIndicators;
+            this.runDate = runDate;
         }
-        public async Task<NotifierResult> GetNotificationsAndUpdateLastNotifDatesAsync(DateTime? now = null)
+        protected override async Task<ResultWithMetrologyProperties<NotifierResult>> DoRunAsync(Request request)
         {
             var chrono = Stopwatch.StartNew();
-            now ??= DateTime.UtcNow;
+            var now = runDate == null ? DateTime.UtcNow : runDate;
             var users = usersToNotifyGetter.Run(now);
             var userNotifications = new List<UserNotifications>();
             foreach (var user in users)
                 userNotifications.Add(await GetUserNotificationsAsync(user));
             performanceIndicators.Add($"Total Notifier execution time: {chrono.Elapsed}");
             var result = userNotifications.ToImmutableArray();
-            callContext.TelemetryClient.TrackEvent("Notifier", ("ResultCount", result.Length.ToString()));
-            return new NotifierResult(result);
+            return new ResultWithMetrologyProperties<NotifierResult>(new NotifierResult(result), ("ResultCount", result.Length.ToString()));
         }
-        #region Result classes
+        #region Request & Result
+        public sealed record Request() : IRequest
+        {
+            public async Task CheckValidityAsync(CallContext callContext)
+            {
+                await Task.CompletedTask;
+            }
+        }
+
         public class NotifierResult
         {
             public NotifierResult(ImmutableArray<UserNotifications> userNotifications)

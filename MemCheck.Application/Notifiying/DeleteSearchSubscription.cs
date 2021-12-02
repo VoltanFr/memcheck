@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -7,25 +6,20 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
-    public sealed class DeleteSearchSubscription
+    public sealed class DeleteSearchSubscription : RequestRunner<DeleteSearchSubscription.Request, DeleteSearchSubscription.Result>
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        public DeleteSearchSubscription(CallContext callContext)
+        public DeleteSearchSubscription(CallContext callContext) : base(callContext)
         {
-            this.callContext = callContext;
         }
-        public async Task RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(callContext.DbContext);
-            var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
-            callContext.DbContext.SearchSubscriptions.Remove(subscription);
-            await callContext.DbContext.SaveChangesAsync();
-            callContext.TelemetryClient.TrackEvent("DeleteSearchSubscription", ("subscriptionId", request.SubscriptionId.ToString()));
+            var subscription = await DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
+            DbContext.SearchSubscriptions.Remove(subscription);
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("subscriptionId", request.SubscriptionId.ToString()));
         }
-        #region Request class
-        public sealed class Request
+        #region Request & Result
+        public sealed class Request : IRequest
         {
             public Request(Guid userId, Guid subscriptionId)
             {
@@ -34,17 +28,18 @@ namespace MemCheck.Application.Notifying
             }
             public Guid UserId { get; }
             public Guid SubscriptionId { get; }
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
                 QueryValidationHelper.CheckNotReservedGuid(SubscriptionId);
-                var subscription = await dbContext.SearchSubscriptions.Where(s => s.Id == SubscriptionId).SingleOrDefaultAsync();
+                var subscription = await callContext.DbContext.SearchSubscriptions.Where(s => s.Id == SubscriptionId).SingleOrDefaultAsync();
                 if (subscription == null)
                     throw new RequestInputException("Subscription not found");
                 if (subscription.UserId != UserId)
                     throw new RequestInputException("User not owner of subscription");
             }
         }
+        public sealed record Result();
         #endregion
     }
 }
