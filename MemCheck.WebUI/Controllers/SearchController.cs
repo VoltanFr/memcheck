@@ -339,7 +339,7 @@ namespace MemCheck.WebUI.Controllers
             if (request.Heap != -1)
                 applicationRequest = applicationRequest with { Heap = request.Heap };
 
-            var applicationResult = await new SearchCards(callContext.DbContext).RunAsync(applicationRequest);
+            var applicationResult = await new SearchCards(callContext).RunAsync(applicationRequest);
 
             var result = new RunQueryViewModel(applicationResult, this);
 

@@ -30,7 +30,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 RatingFilteringValue = 5,
                 Visibility = Application.Searching.SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner
             };
-            var runner = new Application.Searching.SearchCards(dbContext);
+            var runner = new Application.Searching.SearchCards(dbContext.AsCallContext());
             var chrono = Stopwatch.StartNew();
             var result = await runner.RunAsync(request);
             return new(result.TotalNbCards, chrono.Elapsed.TotalSeconds);

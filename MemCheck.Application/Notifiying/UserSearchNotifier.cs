@@ -91,7 +91,7 @@ namespace MemCheck.Application.Notifying
             do
             {
                 request = request with { PageNo = request.PageNo + 1 };
-                var searcher = new SearchCards(callContext.DbContext);
+                var searcher = new SearchCards(callContext);
                 searchResult = await searcher.RunAsync(request);
                 allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId), null)));
             }

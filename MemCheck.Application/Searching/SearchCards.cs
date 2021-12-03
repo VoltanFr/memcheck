@@ -12,11 +12,8 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Searching
 {
-    public sealed class SearchCards
+    public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards.Result>
     {
-        #region Fields
-        private readonly MemCheckDbContext dbContext;
-        #endregion
         #region Private class ResultCardBeforeDeckInfo
         private sealed class ResultCardBeforeDeckInfo
         {
@@ -62,7 +59,7 @@ namespace MemCheck.Application.Searching
         }
         private IEnumerable<ResultCardDeckInfo> GetCardDeckInfo(ResultCardBeforeDeckInfo card, Guid userId)
         {
-            var cardsInDecksForThisUserAndThisCard = dbContext.CardsInDecks
+            var cardsInDecksForThisUserAndThisCard = DbContext.CardsInDecks
                 .AsNoTracking()
                 .Include(card => card.Deck)
                 .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && cardInDeck.CardId == card.CardId)
@@ -75,15 +72,12 @@ namespace MemCheck.Application.Searching
             return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
         }
         #endregion
-        public SearchCards(MemCheckDbContext dbContext)
+        public SearchCards(CallContext callContext) : base(callContext)
         {
-            this.dbContext = dbContext;
         }
-        public async Task<Result> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext);
-
-            var allCards = dbContext.Cards.AsNoTracking()
+            var allCards = DbContext.Cards.AsNoTracking()
                 .Include(card => card.TagsInCards)
                 .ThenInclude(tagInCard => tagInCard.Tag)
                 .Include(card => card.VersionCreator)
@@ -104,11 +98,11 @@ namespace MemCheck.Application.Searching
             {
                 if (request.DeckIsInclusive)
                     cardsFilteredWithDeck = cardsFilteredWithDate.Where(card =>
-                        dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any()
-                        && (request.Heap == null || dbContext.CardsInDecks.AsNoTracking().Single(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).CurrentHeap == request.Heap.Value)
+                        DbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any()
+                        && (request.Heap == null || DbContext.CardsInDecks.AsNoTracking().Single(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).CurrentHeap == request.Heap.Value)
                         );
                 else
-                    cardsFilteredWithDeck = cardsFilteredWithDate.Where(card => !dbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any());
+                    cardsFilteredWithDeck = cardsFilteredWithDate.Where(card => !DbContext.CardsInDecks.AsNoTracking().Where(cardInDeck => cardInDeck.CardId == card.Id && cardInDeck.DeckId == request.Deck).Any());
             }
             else
                 cardsFilteredWithDeck = cardsFilteredWithDate;
@@ -162,7 +156,7 @@ namespace MemCheck.Application.Searching
             else
             {
                 var notifMustExist = request.Notification == Request.NotificationFiltering.RegisteredCards;
-                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => dbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == request.UserId).Any() == notifMustExist);
+                cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => DbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == request.UserId).Any() == notifMustExist);
             }
 
             var finalResult = cardsFilteredWithNotifications;
@@ -174,7 +168,7 @@ namespace MemCheck.Application.Searching
             var pageCards = await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
 
             //The following line could be improved with a joint. Not sure this would perform better, to be checked
-            var userRatings = await dbContext.UserCardRatings.Where(r => r.UserId == request.UserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
+            var userRatings = await DbContext.UserCardRatings.Where(r => r.UserId == request.UserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
 
             var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(
                 card.Id,
@@ -191,11 +185,27 @@ namespace MemCheck.Application.Searching
             );
 
             var withUserDeckInfo = AddDeckInfo(request.UserId, resultCards);
-
-            return new Result(totalNbCards, totalPageCount, withUserDeckInfo);
+            var result = new Result(totalNbCards, totalPageCount, withUserDeckInfo);
+            return new ResultWithMetrologyProperties<Result>(result,
+                ("DeckMode", request.Deck == Guid.Empty ? "Ignore" : request.DeckIsInclusive ? "Inclusive" : "Exclusive"),
+                ("InHeap", (request.Heap != null).ToString()),
+                ("PageNo", request.PageNo.ToString()),
+                ("PageSize", request.PageSize.ToString()),
+                ("RequiredTextLength", request.RequiredText.Length.ToString()),
+                ("VibilityFiltering", request.Visibility.ToString()),
+                ("RatingFilteringMode", request.RatingFiltering.ToString()),
+                ("RatingFilteringValue", request.RatingFilteringValue.ToString()),
+                ("RequiredTagCount", request.RequiredTags.Count().ToString()),
+                ("ExcludedTagCount", request.ExcludedTags == null ? "All" : request.ExcludedTags.Count().ToString()),
+                ("NotificationFiltering", request.Notification.ToString()),
+                ("WithMinimumUtcDateOfCard", (request.MinimumUtcDateOfCards != null).ToString()),
+                ("ResultTotalCardCount", result.TotalNbCards.ToString()),
+                ("ResultPageCount", result.PageCount.ToString()),
+                ("ResultCardCount", result.Cards.Count().ToString())
+                );
         }
         #region Request and result classes
-        public sealed record Request
+        public sealed record Request : IRequest
         {
             public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
             public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
@@ -217,7 +227,7 @@ namespace MemCheck.Application.Searching
             public NotificationFiltering Notification { get; init; } = NotificationFiltering.Ignore;
             public DateTime? MinimumUtcDateOfCards { get; init; } = null;
 
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
                     throw new RequestInputException($"Invalid heap {Heap}");
@@ -233,7 +243,7 @@ namespace MemCheck.Application.Searching
                 {
                     QueryValidationHelper.CheckNotReservedGuid(UserId);
                     if (Deck != Guid.Empty)
-                        await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(dbContext, UserId, Deck);
+                        await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, Deck);
                 }
             }
         }
