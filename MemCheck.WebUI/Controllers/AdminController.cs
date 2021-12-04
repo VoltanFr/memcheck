@@ -48,7 +48,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetAllUsers.Request(userId, request.PageSize, request.PageNo, request.Filter);
-            var result = await new GetAllUsers(callContext.DbContext, new ProdRoleChecker(userManager)).RunAsync(appRequest);
+            var result = await new GetAllUsers(callContext).RunAsync(appRequest);
             return Ok(new GetUsersViewModel(result));
         }
         #region Request and result classes

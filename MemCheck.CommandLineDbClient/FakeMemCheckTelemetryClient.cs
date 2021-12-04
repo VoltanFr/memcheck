@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 
 namespace MemCheck.CommandLineDbClient
@@ -18,6 +19,10 @@ namespace MemCheck.CommandLineDbClient
         public static CallContext AsCallContext(this MemCheckDbContext dbContext, FakeStringLocalizer fakeLocalizer)
         {
             return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), fakeLocalizer, new TestRoleChecker());
+        }
+        public static CallContext AsCallContext(this MemCheckDbContext dbContext, IRoleChecker roleChecker)
+        {
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new FakeStringLocalizer(), roleChecker);
         }
     }
 }

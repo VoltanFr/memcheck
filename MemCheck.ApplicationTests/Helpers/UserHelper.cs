@@ -70,7 +70,7 @@ namespace MemCheck.Application.Tests.Helpers
         public static async Task DeleteAsync(DbContextOptions<MemCheckDbContext> db, Guid userToDeleteId, Guid? deleterUserId = null)
         {
             DeleteUserAccount.Request request;
-            IRoleChecker roleChecker;
+            TestRoleChecker roleChecker;
             if (deleterUserId == null)
             {
                 roleChecker = new TestRoleChecker();
@@ -84,7 +84,7 @@ namespace MemCheck.Application.Tests.Helpers
 
             using var dbContext = new MemCheckDbContext(db);
             using var userManager = GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext, roleChecker, userManager).RunAsync(request);
+            await new DeleteUserAccount(dbContext.AsCallContext(roleChecker), userManager).RunAsync(request);
         }
     }
 }

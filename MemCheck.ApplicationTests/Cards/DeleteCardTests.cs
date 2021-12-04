@@ -34,7 +34,7 @@ namespace MemCheck.Application.Cards
             var card = await CardHelper.CreateAsync(db, cardCreator, new DateTime(2020, 11, 1), userWithViewIds: new[] { userWithView, cardCreator });
             using (var dbContext = new MemCheckDbContext(db))
             using (var userManager = UserHelper.GetUserManager(dbContext))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(userWithView), userManager).RunAsync(new DeleteUserAccount.Request(userWithView, cardCreator));
+                await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(userWithView)), userManager).RunAsync(new DeleteUserAccount.Request(userWithView, cardCreator));
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
@@ -52,7 +52,7 @@ namespace MemCheck.Application.Cards
             var adminUser = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             using (var userManager = UserHelper.GetUserManager(dbContext))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(adminUser), userManager).RunAsync(new DeleteUserAccount.Request(adminUser, user));
+                await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(adminUser)), userManager).RunAsync(new DeleteUserAccount.Request(adminUser, user));
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var deleter = new DeleteCards(dbContext.AsCallContext());
@@ -166,7 +166,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             using (var userManager = UserHelper.GetUserManager(dbContext))
-                await new DeleteUserAccount(dbContext, new TestRoleChecker(lastVersionCreator), userManager).RunAsync(new DeleteUserAccount.Request(lastVersionCreator, firstVersionCreator));
+                await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(lastVersionCreator)), userManager).RunAsync(new DeleteUserAccount.Request(lastVersionCreator, firstVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
                 await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray()));
             using (var dbContext = new MemCheckDbContext(db))

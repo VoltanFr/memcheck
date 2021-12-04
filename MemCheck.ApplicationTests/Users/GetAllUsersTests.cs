@@ -15,13 +15,13 @@ namespace MemCheck.Application.Users
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker()).RunAsync(new GetAllUsers.Request(Guid.Empty, 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext()).RunAsync(new GetAllUsers.Request(Guid.Empty, 1, 0, "")));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker()).RunAsync(new GetAllUsers.Request(Guid.NewGuid(), 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext()).RunAsync(new GetAllUsers.Request(Guid.NewGuid(), 1, 0, "")));
         }
         [TestMethod()]
         public async Task UserIsNotAdmin()
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker()).RunAsync(new GetAllUsers.Request(user, 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext()).RunAsync(new GetAllUsers.Request(user, 1, 0, "")));
         }
         [TestMethod()]
         public async Task Page0()
@@ -37,7 +37,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker(user)).RunAsync(new GetAllUsers.Request(user, 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext()).RunAsync(new GetAllUsers.Request(user, 1, 0, "")));
         }
         [TestMethod()]
         public async Task PageSize0()
@@ -45,7 +45,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker(user)).RunAsync(new GetAllUsers.Request(user, 0, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext()).RunAsync(new GetAllUsers.Request(user, 0, 0, "")));
         }
         [TestMethod()]
         public async Task PageSizeTooBig()
@@ -53,7 +53,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext, new TestRoleChecker(user)).RunAsync(new GetAllUsers.Request(user, GetAllUsers.Request.MaxPageSize + 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsers.Request(user, GetAllUsers.Request.MaxPageSize + 1, 0, "")));
         }
         [TestMethod()]
         public async Task OnlyUser()
@@ -63,7 +63,7 @@ namespace MemCheck.Application.Users
             var userEMail = RandomHelper.String();
             var user = await UserHelper.CreateInDbAsync(db, userName: userName, userEMail: userEMail);
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user)).RunAsync(new GetAllUsers.Request(user, 10, 1, ""));
+            var loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsers.Request(user, 10, 1, ""));
             Assert.AreEqual(1, loaded.TotalCount);
             Assert.AreEqual(1, loaded.PageCount);
             var loadedUsers = loaded.Users.ToArray();
@@ -85,17 +85,17 @@ namespace MemCheck.Application.Users
 
             using var dbContext = new MemCheckDbContext(db);
 
-            var loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 1, ""));
+            var loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, ""));
             Assert.AreEqual(2, loaded.TotalCount);
             Assert.AreEqual(2, loaded.PageCount);
             Assert.AreEqual(user1Name, loaded.Users.Single().UserName);
 
-            loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 2, ""));
+            loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 2, ""));
             Assert.AreEqual(2, loaded.TotalCount);
             Assert.AreEqual(2, loaded.PageCount);
             Assert.AreEqual(user2Name, loaded.Users.Single().UserName);
 
-            loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 3, ""));
+            loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 3, ""));
             Assert.AreEqual(2, loaded.TotalCount);
             Assert.AreEqual(2, loaded.PageCount);
             Assert.IsFalse(loaded.Users.Any());
@@ -111,17 +111,17 @@ namespace MemCheck.Application.Users
 
             using var dbContext = new MemCheckDbContext(db);
 
-            var loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 1, user1Name.ToLowerInvariant()));
+            var loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, user1Name.ToLowerInvariant()));
             Assert.AreEqual(1, loaded.TotalCount);
             Assert.AreEqual(1, loaded.PageCount);
             Assert.AreEqual(user1Name, loaded.Users.Single().UserName);
 
-            loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 1, user2Name.ToUpperInvariant()));
+            loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, user2Name.ToUpperInvariant()));
             Assert.AreEqual(1, loaded.TotalCount);
             Assert.AreEqual(1, loaded.PageCount);
             Assert.AreEqual(user2Name, loaded.Users.Single().UserName);
 
-            loaded = await new GetAllUsers(dbContext, new TestRoleChecker(user1)).RunAsync(new GetAllUsers.Request(user1, 1, 1, RandomHelper.String()));
+            loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, RandomHelper.String()));
             Assert.AreEqual(0, loaded.TotalCount);
             Assert.AreEqual(0, loaded.PageCount);
             Assert.IsFalse(loaded.Users.Any());

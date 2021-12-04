@@ -1,10 +1,13 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -15,18 +18,18 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
     public class DeletePersonalDataModel : PageModel
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
+        private readonly CallContext callContext;
         #endregion
 
-        public DeletePersonalDataModel(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, ILogger<DeletePersonalDataModel> logger)
+        public DeletePersonalDataModel(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, ILogger<DeletePersonalDataModel> logger, TelemetryClient telemetryClient)
         {
-            this.dbContext = dbContext;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), new ProdRoleChecker(userManager));
         }
 
         [BindProperty] public InputModel Input { get; set; } = null!;
@@ -63,13 +66,20 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
                     return Page();
                 }
 
-            var deleter = new DeleteUserAccount(dbContext, new ProdRoleChecker(_userManager), _userManager);
+            var deleter = new DeleteUserAccount(callContext, _userManager);
             await deleter.RunAsync(new DeleteUserAccount.Request(user.Id, user.Id));
             await _signInManager.SignOutAsync();
 
             _logger.LogInformation("User with ID '{UserId}' deleted themselves.", user.Id);
 
             return Redirect("~/");
+        }
+        private sealed class FakeStringLocalizer : ILocalized
+        {
+            public string Get(string resourceName)
+            {
+                return "no translation";
+            }
         }
     }
 }

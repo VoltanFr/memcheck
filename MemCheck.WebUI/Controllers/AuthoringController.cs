@@ -38,7 +38,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsersAsync()
         {
-            var result = await new GetUsers(callContext.DbContext).RunAsync();
+            var result = await new GetUsers(callContext).RunAsync(new GetUsers.Request());
             return Ok(result.Select(user => new GetUsersViewModel(user.UserId, user.UserName)));
         }
         public sealed class GetUsersViewModel

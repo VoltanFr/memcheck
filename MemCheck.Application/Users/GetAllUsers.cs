@@ -1,32 +1,20 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
-using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
-    public sealed class GetAllUsers
+    public sealed class GetAllUsers : RequestRunner<GetAllUsers.Request, GetAllUsers.ResultModel>
     {
-        #region Fields
-        private readonly MemCheckDbContext dbContext;
-        private readonly IRoleChecker roleChecker;
-        #endregion
-        public GetAllUsers(MemCheckDbContext dbContext, IRoleChecker roleChecker)
+        public GetAllUsers(CallContext callContext) : base(callContext)
         {
-            this.dbContext = dbContext;
-            this.roleChecker = roleChecker;
         }
-        public async Task<ResultModel> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(dbContext, roleChecker);
-
-            var users = dbContext.Users.AsNoTracking().Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
+            var users = DbContext.Users.AsNoTracking().Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
 
             var totalCount = users.Count();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
@@ -35,24 +23,32 @@ namespace MemCheck.Application.Users
             var resultUsers = new List<ResultUserModel>();
             foreach (var user in pageEntries)
             {
-                var roles = await roleChecker.GetRolesAsync(user);
+                var roles = await RoleChecker.GetRolesAsync(user);
                 resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate));
             }
-            return new ResultModel(totalCount, pageCount, resultUsers);
+            var result = new ResultModel(totalCount, pageCount, resultUsers);
+            return new ResultWithMetrologyProperties<ResultModel>(result,
+                ("LoggedUser", request.UserId.ToString()),
+                ("PageSize", request.PageSize.ToString()),
+                ("PageNo", request.PageNo.ToString()),
+                ("FilterLength", request.Filter.Length.ToString()),
+                ("TotalCount", result.TotalCount.ToString()),
+                ("PageCount", result.PageCount.ToString()),
+                ("ResultCount", result.Users.Count().ToString()));
         }
-        #region Request and result classes
-        public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter)
+        #region Request & Result
+        public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter) : IRequest
         {
             public const int MaxPageSize = 100;
-            public async Task CheckValidityAsync(MemCheckDbContext dbContext, IRoleChecker roleChecker)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
                 if (PageSize < 1 || PageSize > MaxPageSize)
                     throw new InvalidOperationException($"Invalid page size: {PageSize}");
                 if (PageNo < 1)
                     throw new InvalidOperationException($"Invalid page index: {PageNo}");
-                var user = await dbContext.Users.SingleAsync(u => u.Id == UserId);
-                if (!await roleChecker.UserIsAdminAsync(user))
+                var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
+                if (!await callContext.RoleChecker.UserIsAdminAsync(user))
                     throw new InvalidOperationException($"User not admin: {user.UserName}");
             }
         }

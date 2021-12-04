@@ -50,7 +50,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
 
             var adminUserId = await dbContext.Users.Where(u => u.UserName == adminUserName).Select(u => u.Id).SingleAsync();
 
-            var deleter = new DeleteUserAccount(dbContext, new ProdRoleChecker(userManager), userManager);
+            var deleter = new DeleteUserAccount(dbContext.AsCallContext(new ProdRoleChecker(userManager)), userManager);
             await deleter.RunAsync(new DeleteUserAccount.Request(adminUserId, userToDelete.Id));
 
             logger.LogInformation($"Deletion finished");

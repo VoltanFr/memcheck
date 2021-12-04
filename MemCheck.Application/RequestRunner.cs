@@ -36,6 +36,7 @@ namespace MemCheck.Application
         }
         protected MemCheckDbContext DbContext => callContext.DbContext;
         protected ILocalized Localized => callContext.Localized;
+        protected IRoleChecker RoleChecker => callContext.RoleChecker;
     }
 
 }

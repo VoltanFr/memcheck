@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,20 +6,25 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
-    public sealed class GetUsers
+    public sealed class GetUsers : RequestRunner<GetUsers.Request, IEnumerable<GetUsers.ViewModel>>
     {
-        #region Fields
-        private readonly MemCheckDbContext dbContext;
-        #endregion
-        public GetUsers(MemCheckDbContext dbContext)
+        public GetUsers(CallContext callContext) : base(callContext)
         {
-            this.dbContext = dbContext;
         }
-        public async Task<IEnumerable<ViewModel>> RunAsync()
+        protected override async Task<ResultWithMetrologyProperties<IEnumerable<ViewModel>>> DoRunAsync(Request request)
         {
-            return await dbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToListAsync();
+            var result = await DbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToListAsync();
+            return new ResultWithMetrologyProperties<IEnumerable<ViewModel>>(result, ("ResultCount", result.Count.ToString()));
         }
-        #region Result type
+        #region Request & Result
+        public sealed record Request() : IRequest
+        {
+            public async Task CheckValidityAsync(CallContext callContext)
+            {
+                await Task.CompletedTask;
+            }
+        }
+
         public sealed class ViewModel
         {
             public ViewModel()
