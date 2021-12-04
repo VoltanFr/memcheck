@@ -287,7 +287,7 @@ var app = new Vue({
             return "visibilityPopover2";
         },
         moveToHeap(targetHeap) {    //GetCardsHeapModel
-            const alertMesg = targetHeap.moveToAlertMessage + (targetHeap.expiryUtcDate == "0001-01-01T00:00:00Z" ? "" : (dateTime(targetHeap.expiryUtcDate + '.')));
+            const alertMesg = targetHeap.moveToAlertMessage + ' ' + dateTime(targetHeap.expiryUtcDate) + '.';
             if (confirm(alertMesg)) {
                 this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true, nbAttempts: 0 });
                 this.getCard();
