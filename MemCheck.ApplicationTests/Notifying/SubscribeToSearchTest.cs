@@ -106,7 +106,7 @@ namespace MemCheck.Application.Tests.Notifying
             Guid tagId;
 
             using (var dbContext = new MemCheckDbContext(testDB))
-                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(userId, RandomHelper.String(), ""), new TestLocalizer());
+                tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(userId, RandomHelper.String(), ""))).TagId;
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
@@ -138,7 +138,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""), new TestLocalizer());
+                tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -226,7 +226,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""), new TestLocalizer());
+                tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))
@@ -245,7 +245,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var user = await dbContext.Users.SingleAsync();
-                tagId = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""), new TestLocalizer());
+                tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
             }
 
             using (var dbContext = new MemCheckDbContext(testDB))

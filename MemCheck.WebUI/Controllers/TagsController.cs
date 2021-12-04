@@ -1,6 +1,9 @@
-﻿using MemCheck.Application.Tags;
+﻿using MemCheck.Application;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Tags;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -15,12 +18,12 @@ namespace MemCheck.WebUI.Controllers
     public class TagsController : MemCheckController
     {
         #region Fields
-        private readonly MemCheckDbContext dbContext;
+        private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         #endregion
-        public TagsController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer) : base(localizer)
+        public TagsController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<TagsController> localizer, TelemetryClient telemetryClient) : base(localizer)
         {
-            this.dbContext = dbContext;
+            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
         }
         #region GetGuiMessages
@@ -44,7 +47,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetTag/{tagId}")]
         public async Task<IActionResult> GetTag(Guid tagId)
         {
-            var result = await new GetTag(dbContext).RunAsync(new GetTag.Request(tagId));
+            var result = await new GetTag(callContext).RunAsync(new GetTag.Request(tagId));
             return Ok(new GetTagViewModel(result));
         }
         public sealed class GetTagViewModel
@@ -67,7 +70,7 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetTagsAsync([FromBody] GetTagsRequest request)
         {
             CheckBodyParameter(request);
-            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
+            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
             return Ok(new GetTagsViewModel(result));
         }
         public sealed class GetTagsRequest
@@ -105,7 +108,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetTagNames")]
         public async Task<IActionResult> GetTagNamesAsync()
         {
-            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             return Ok(result.Tags.Select(tag => tag.TagName));
         }
         #endregion
@@ -115,7 +118,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new CreateTag(dbContext).RunAsync(new CreateTag.Request(userId, request.NewName.Trim(), request.NewDescription.Trim()), this);
+            await new CreateTag(callContext).RunAsync(new CreateTag.Request(userId, request.NewName.Trim(), request.NewDescription.Trim()));
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }
@@ -131,7 +134,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim()), this);
+            await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim()));
             return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
 
         }

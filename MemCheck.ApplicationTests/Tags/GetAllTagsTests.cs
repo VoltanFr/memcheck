@@ -15,25 +15,25 @@ namespace MemCheck.Application.Tags
         public async Task Page0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 0, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 0, "")));
         }
         [TestMethod()]
         public async Task PagSize0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(0, 1, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, 1, "")));
         }
         [TestMethod()]
         public async Task PagSizeTooBig()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(0, GetAllTags.Request.MaxPageSize + 1, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, GetAllTags.Request.MaxPageSize + 1, "")));
         }
         [TestMethod()]
         public async Task None()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 10, ""));
+            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 10, ""));
             Assert.AreEqual(0, result.PageCount);
             Assert.AreEqual(0, result.TotalCount);
             Assert.AreEqual(0, result.Tags.Count());
@@ -47,7 +47,7 @@ namespace MemCheck.Application.Tags
             var user = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
             using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 1, ""));
+            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
             Assert.AreEqual(1, result.Tags.Count());
@@ -62,14 +62,14 @@ namespace MemCheck.Application.Tags
             await TagHelper.CreateAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 1, ""));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Tags.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 2, ""));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 2, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.IsFalse(result.Tags.Any());
@@ -83,14 +83,14 @@ namespace MemCheck.Application.Tags
             await TagHelper.CreateAsync(db, tagName);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 1, RandomHelper.String()));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, RandomHelper.String()));
                 Assert.AreEqual(0, result.PageCount);
                 Assert.AreEqual(0, result.TotalCount);
                 Assert.AreEqual(0, result.Tags.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext).RunAsync(new GetAllTags.Request(1, 1, tagName.Substring(1, 5)));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, tagName.Substring(1, 5)));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Tags.Count());

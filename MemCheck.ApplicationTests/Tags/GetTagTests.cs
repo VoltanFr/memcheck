@@ -13,7 +13,7 @@ namespace MemCheck.Application.Tags
         public async Task DoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTag(dbContext).RunAsync(new GetTag.Request(Guid.NewGuid())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(Guid.NewGuid())));
         }
         [TestMethod()]
         public async Task TagNotUsedInCards()
@@ -24,7 +24,7 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db, tagName, description);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loadedTag = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
+            var loadedTag = await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag));
 
             Assert.AreEqual(tag, loadedTag.TagId);
             Assert.AreEqual(tagName, loadedTag.TagName);
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Tags
             await CardHelper.CreateAsync(db, user);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loadedTag = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
+            var loadedTag = await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag));
 
             Assert.AreEqual(tag, loadedTag.TagId);
             Assert.AreEqual(tagName, loadedTag.TagName);

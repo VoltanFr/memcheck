@@ -18,7 +18,7 @@ namespace MemCheck.Application.Tags
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, Guid.NewGuid(), RandomHelper.String(), ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, Guid.NewGuid(), RandomHelper.String(), "")));
         }
         [TestMethod()]
         public async Task EmptyName()
@@ -28,7 +28,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, "", ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, "", "")));
         }
         [TestMethod()]
         public async Task NameNotTrimmed()
@@ -38,7 +38,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MinNameLength) + '\t', ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MinNameLength) + '\t', "")));
         }
         [TestMethod()]
         public async Task DescriptionNotTrimmed()
@@ -48,7 +48,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(), "\t"), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(), "\t")));
         }
         [TestMethod()]
         public async Task NameTooShort()
@@ -58,7 +58,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MinNameLength - 1), ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MinNameLength - 1), "")));
         }
         [TestMethod()]
         public async Task NameTooLong()
@@ -68,7 +68,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MaxNameLength + 1), ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(Tag.MaxNameLength + 1), "")));
         }
         [TestMethod()]
         public async Task DescriptionTooLong()
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1)), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1))));
         }
         [TestMethod()]
         public async Task NameWithForbiddenChar()
@@ -88,7 +88,7 @@ namespace MemCheck.Application.Tags
             var userId = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, "a<b", ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, "a<b", "")));
         }
         [TestMethod()]
         public async Task AlreadyExists()
@@ -99,7 +99,7 @@ namespace MemCheck.Application.Tags
             var otherTag = await TagHelper.CreateAsync(db, name);
             var userId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, name, ""), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, name, "")));
         }
         [TestMethod()]
         public async Task NoChange()
@@ -110,7 +110,7 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db, name, description);
             var userId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, name, description), new TestLocalizer()));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, name, description)));
         }
         [TestMethod()]
         public async Task SuccessfulUpdateOfBothFields()
@@ -121,10 +121,10 @@ namespace MemCheck.Application.Tags
             var description = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, name, description), new TestLocalizer());
+                await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, name, description));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var loaded = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
+                var loaded = await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag));
                 Assert.AreEqual(name, loaded.TagName);
                 Assert.AreEqual(description, loaded.Description);
             }
@@ -138,10 +138,10 @@ namespace MemCheck.Application.Tags
             var name = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, name, description), new TestLocalizer());
+                await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, name, description));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var loaded = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
+                var loaded = await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag));
                 Assert.AreEqual(name, loaded.TagName);
                 Assert.AreEqual(description, loaded.Description);
             }
@@ -155,10 +155,10 @@ namespace MemCheck.Application.Tags
             var description = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(userId, tag, name, description), new TestLocalizer());
+                await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, tag, name, description));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var loaded = await new GetTag(dbContext).RunAsync(new GetTag.Request(tag));
+                var loaded = await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag));
                 Assert.AreEqual(name, loaded.TagName);
                 Assert.AreEqual(description, loaded.Description);
             }
@@ -172,10 +172,10 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db, name);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String()), new TestLocalizer()));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String())));
 
             using (var dbContext = new MemCheckDbContext(db))
-                Assert.AreEqual(name, (await new GetTag(dbContext).RunAsync(new GetTag.Request(tag))).TagName);
+                Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
         }
         [TestMethod()]
         public async Task UnknownUser()
@@ -188,10 +188,10 @@ namespace MemCheck.Application.Tags
             await UserHelper.CreateInDbAsync(db);
 
             using (var dbContext = new MemCheckDbContext(db))
-                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String()), new TestLocalizer()));
+                await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String())));
 
             using (var dbContext = new MemCheckDbContext(db))
-                Assert.AreEqual(name, (await new GetTag(dbContext).RunAsync(new GetTag.Request(tag))).TagName);
+                Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
         }
     }
 }

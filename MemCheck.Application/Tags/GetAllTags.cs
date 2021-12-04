@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,30 +7,32 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
 {
-    public sealed class GetAllTags
+    public sealed class GetAllTags : RequestRunner<GetAllTags.Request, GetAllTags.Result>
     {
-        #region Fields
-        private readonly MemCheckDbContext dbContext;
-        #endregion
-        public GetAllTags(MemCheckDbContext dbContext)
+        public GetAllTags(CallContext callContext) : base(callContext)
         {
-            this.dbContext = dbContext;
         }
-        public async Task<Result> RunAsync(Request request)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            request.CheckValidity();
-            var tags = dbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%")).OrderBy(tag => tag.Name);
+            var tags = DbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%")).OrderBy(tag => tag.Name);
             var totalCount = await tags.CountAsync();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var pageTags = tags.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
-            return new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.TagsInCards.Count)));
+            var result = new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.TagsInCards.Count)));
+            return new ResultWithMetrologyProperties<Result>(result,
+                ("PageSize", request.PageSize.ToString()),
+                ("PageNo", request.PageNo.ToString()),
+                ("FilterLength", request.Filter.Length.ToString()),
+                ("TotalCount", result.TotalCount.ToString()),
+                ("PageCount", result.PageCount.ToString()),
+                ("TagCount", result.Tags.Count().ToString()));
         }
 
-        #region Request type
-        public sealed record Request(int PageSize, int PageNo, string Filter)
+        #region Request & Result
+        public sealed record Request(int PageSize, int PageNo, string Filter) : IRequest
         {
             public const int MaxPageSize = 500;
-            public void CheckValidity()
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (PageNo < 1)
                     throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
@@ -39,6 +40,7 @@ namespace MemCheck.Application.Tags
                     throw new RequestInputException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
                 if (PageSize > MaxPageSize)
                     throw new RequestInputException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+                await Task.CompletedTask;
             }
         }
         public sealed class Result

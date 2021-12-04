@@ -1,38 +1,34 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
 {
-    public sealed class UpdateTag
+    public sealed class UpdateTag : RequestRunner<UpdateTag.Request, UpdateTag.Result>
     {
-        #region Fields
-        private readonly MemCheckDbContext dbContext;
-        #endregion
-        public UpdateTag(MemCheckDbContext dbContext)
+        public UpdateTag(CallContext callContext) : base(callContext)
         {
-            this.dbContext = dbContext;
         }
-        public async Task RunAsync(Request request, ILocalized localizer)
+        protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            await request.CheckValidityAsync(localizer, dbContext);
-
-            var tag = await dbContext.Tags.SingleAsync(tag => tag.Id == request.TagId);
+            var tag = await DbContext.Tags.SingleAsync(tag => tag.Id == request.TagId);
+            var initialName = tag.Name;
             tag.Name = request.NewName;
             tag.Description = request.NewDescription;
-            await dbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("InitialName", initialName), ("NewName", request.NewName), ("NewDescription", request.NewDescription));
         }
-        #region Request type
-        public sealed record Request(Guid UserId, Guid TagId, string NewName, string NewDescription)
+        #region Request & Result
+        public sealed record Request(Guid UserId, Guid TagId, string NewName, string NewDescription) : IRequest
         {
-            public async Task CheckValidityAsync(ILocalized localizer, MemCheckDbContext dbContext)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckUserExistsAsync(dbContext, UserId);
-                await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, dbContext, localizer);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+                await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, callContext.DbContext, callContext.Localized);
             }
         }
+        public sealed record Result();
         #endregion
     }
 }

@@ -91,7 +91,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             Guid tagId1;
             using (var dbContext = new MemCheckDbContext(db))
-                tagId1 = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""), new TestLocalizer());
+                tagId1 = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""))).TagId;
 
             await CardHelper.CreateAsync(db, user, tagIds: tagId1.AsArray());
             await CardHelper.CreateAsync(db, user);
@@ -100,8 +100,8 @@ namespace MemCheck.Application.Tests.Notifying
             Guid subscriptionId;
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var tagId2 = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""), new TestLocalizer());
-                var tagId3 = await new CreateTag(dbContext).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""), new TestLocalizer());
+                var tagId2 = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""))).TagId;
+                var tagId3 = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user, RandomHelper.String(), ""))).TagId;
                 var request = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", tagId1.AsArray(), new[] { tagId2, tagId3 });
                 subscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request)).SearchId;
             }
