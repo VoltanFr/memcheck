@@ -55,11 +55,11 @@
                         <li id="Info button" data-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
                             <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover"><i class="fas fa-info"></i></b-button>
                             <b-popover target="infoPopover" triggers="focus">
-                                @Localizer["LastLearnDate"] {{dt(currentCard.lastLearnUtcTime)}}<br />
-                                @Localizer["DateAddedInDeck"] {{dt(currentCard.addToDeckUtcTime)}}<br />
+                                @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}<br />
+                                @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}<br />
                                 <hr class="menu-separation-line" />
                                 @Localizer["CardVersionCreator"] {{currentCard.owner}}<br />
-                                @Localizer["LastChangeDate"] {{dt(currentCard.lastChangeUtcTime)}}<br />
+                                @Localizer["LastChangeDate"] {{dateTime(currentCard.lastChangeUtcTime)}}<br />
                                 <hr class="menu-separation-line" /><br />
                                 <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                             </b-popover>
@@ -100,7 +100,7 @@
                             </b-popover>
                         </li>
                         <li id="Last learn date" v-if="!learningUnknowns" class="ml-auto" data-toggle="tooltip" data-placement="top" title=@Localizer["Expired"]>
-                            <i class="fas fa-clock"></i> {{dt(currentCard.lastLearnUtcTime)}}
+                            <i class="fas fa-clock"></i> {{dateTime(currentCard.lastLearnUtcTime)}}
                         </li>
                     </ul>
                 </div>

@@ -93,9 +93,6 @@ var app = new Vue({
                     return false;
             return true;
         },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
         openSettingsPage() {
             if (this.activeDeck)
                 window.location.href = '/Decks/Settings?DeckId=' + this.activeDeck.deckId;
@@ -127,7 +124,7 @@ var app = new Vue({
                 });
         },
         async removeCard() {
-            if (confirm(this.currentCard.removeAlertMessage + this.dt(this.currentCard.addToDeckUtcTime))) {
+            if (confirm(this.currentCard.removeAlertMessage + dateTime(this.currentCard.addToDeckUtcTime))) {
                 await axios.delete('/Decks/RemoveCardFromDeck/' + this.activeDeck.deckId + "/" + this.currentCard.cardId)
                     .then(result => {
                         this.getCard();
@@ -290,7 +287,7 @@ var app = new Vue({
             return "visibilityPopover2";
         },
         moveToHeap(targetHeap) {    //GetCardsHeapModel
-            const alertMesg = targetHeap.moveToAlertMessage + (targetHeap.expiryUtcDate == "0001-01-01T00:00:00Z" ? "" : (this.dt(targetHeap.expiryUtcDate + '.')));
+            const alertMesg = targetHeap.moveToAlertMessage + (targetHeap.expiryUtcDate == "0001-01-01T00:00:00Z" ? "" : (dateTime(targetHeap.expiryUtcDate + '.')));
             if (confirm(alertMesg)) {
                 this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true, nbAttempts: 0 });
                 this.getCard();
