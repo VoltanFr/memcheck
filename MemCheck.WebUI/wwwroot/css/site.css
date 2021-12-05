@@ -382,23 +382,6 @@
     margin: 0px;
 }
 
-.markdown-edit-preview {
-    display: block;
-    width: 100%;
-    resize: both;
-    background-color: gainsboro;
-    border-radius: 0.25rem;
-    border-width: 1px;
-    border-style: solid;
-    border-color: lightgray;
-    border-radius: 0px;
-    border-spacing: 0px;
-    padding-left: 1px;
-    padding-right: 1px;
-    padding-top: 1px;
-    padding-bottom: 1px;
-}
-
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
@@ -482,50 +465,6 @@
         font-size: .7rem;
         border-width: 1px;
     }
-
-    .learning-card-body {
-        padding-top: 2px;
-        padding-bottom: 2px;
-        padding-left: 2px;
-        padding-right: 2px;
-    }
-
-        .learning-card-body p {
-            padding-bottom: 15px;
-        }
-
-        .learning-card-body ul,
-        .learning-card-body ol {
-            padding-bottom: 15px;
-        }
-
-        .learning-card-body h1,
-        .learning-card-body h2,
-        .learning-card-body h3,
-        .learning-card-body h4,
-        .learning-card-body h5,
-        .learning-card-body h6 {
-            padding-top: 3px;
-        }
-
-        .learning-card-body li {
-            display: list-item;
-            white-space: pre-wrap;
-            padding-bottom: 2px;
-        }
-
-        .learning-card-body table,
-        .learning-card-body tbody,
-        .learning-card-body thead,
-        .learning-card-body th,
-        .learning-card-body tr,
-        .learning-card-body td {
-            padding: 3px;
-        }
-
-        .learning-card-body table {
-            padding-bottom: 15px;
-        }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -583,50 +522,6 @@
         position: relative;
         left: 10px;
     }
-
-    .learning-card-body {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-        .learning-card-body p {
-            padding-bottom: 17px;
-        }
-
-        .learning-card-body ul,
-        .learning-card-body ol {
-            padding-bottom: 17px;
-        }
-
-        .learning-card-body h1,
-        .learning-card-body h2,
-        .learning-card-body h3,
-        .learning-card-body h4,
-        .learning-card-body h5,
-        .learning-card-body h6 {
-            padding-top: 10px;
-        }
-
-        .learning-card-body li {
-            display: list-item;
-            white-space: pre-wrap;
-            padding-bottom: 4px;
-        }
-
-        .learning-card-body table,
-        .learning-card-body tbody,
-        .learning-card-body thead,
-        .learning-card-body th,
-        .learning-card-body tr,
-        .learning-card-body td {
-            padding: 10px;
-        }
-
-        .learning-card-body table {
-            padding-bottom: 17px;
-        }
 }
 
 @media (min-width: 979px) {

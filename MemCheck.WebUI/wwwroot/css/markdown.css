@@ -1,78 +1,68 @@
-﻿.markdown-render {
-    display: block;
-    flex-direction: column;
+﻿.markdown-render table {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+    display: table;
 }
 
-    .markdown-render * {
-        margin: 0px;
-        padding-top: 0px;
-        padding-left: 0px;
-        padding-right: 0px;
-        padding-bottom: 0px;
-    }
+.markdown-render tbody {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+}
 
-    .markdown-render p {
-        white-space: normal;
-        padding-bottom: 20px;
-    }
+.markdown-render thead {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+    display: table-row-group;
+}
 
-    .markdown-render ul,
-    .markdown-render ol {
-        display: grid;
-        padding-left: 25px;
-        padding-bottom: 20px;
-    }
+.markdown-render tr {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+    display: table-row;
+}
 
-    .markdown-render li {
-        display: list-item;
-        white-space: pre-wrap;
-        padding-bottom: 6px;
-    }
+.markdown-render th {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+    display: table-cell;
+}
 
-    .markdown-render h1,
-    .markdown-render h2,
-    .markdown-render h3,
-    .markdown-render h4,
-    .markdown-render h5,
-    .markdown-render h6 {
+.markdown-render td {
+    width: auto;
+    border-style: solid;
+    border-width: 1px;
+    display: table-cell;
+}
+
+@media (max-width: 550px) {
+    .markdown-render {
         display: block;
-        padding-top: 5px;
+        white-space: normal;
+        padding-top: 1px;
+        padding-bottom: 1px;
+        padding-left: 1px;
+        padding-right: 1px;
+        width: 100%;
+        border-style: none;
+        margin: 0px;
     }
+}
 
-    .markdown-render table,
-    .markdown-render tbody,
-    .markdown-render thead,
-    .markdown-render th,
-    .markdown-render tr,
-    .markdown-render td {
-        border-style: solid;
-        border-width: 1px;
-        padding: 10px;
+@media (min-width: 551px) {
+    .markdown-render {
+        display: block;
+        white-space: normal;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+        width: 100%;
+        border-style: none;
+        margin: 0px;
     }
-
-    .markdown-render table {
-        width: auto;
-        display: table;
-        padding-bottom: 20px;
-    }
-
-    .markdown-render tbody {
-        display: table-row-group;
-    }
-
-    .markdown-render thead {
-        display: table-row-group;
-    }
-
-    .markdown-render th {
-        display: table-cell
-    }
-
-    .markdown-render tr {
-        display: table-row
-    }
-
-    .markdown-render td {
-        display: table-cell;
-        white-space: pre-wrap;
-    }
+}
