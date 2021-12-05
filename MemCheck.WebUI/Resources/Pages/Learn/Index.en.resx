@@ -132,11 +132,14 @@
   <data name="BiggestHeapReached" xml:space="preserve">
     <value>Biggest heap reached in this deck:</value>
   </data>
-  <data name="CardVersionCreator" xml:space="preserve">
-    <value>Creator of current version:</value>
+  <data name="CardVersion" xml:space="preserve">
+    <value>Card version</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
+  </data>
+  <data name="CreatedBy" xml:space="preserve">
+    <value>Created by:</value>
   </data>
   <data name="CreationDate" xml:space="preserve">
     <value>Creation date</value>
@@ -201,9 +204,6 @@
   <data name="Knew" xml:space="preserve">
     <value>I knew it</value>
   </data>
-  <data name="LastChangeDate" xml:space="preserve">
-    <value>Current version created on</value>
-  </data>
   <data name="LastHeapMoveFailed" xml:space="preserve">
     <value>Previous heap move failed, this will be ignored but the card will need learn again</value>
   </data>
@@ -227,6 +227,9 @@
   </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
+  </data>
+  <data name="OnDate" xml:space="preserve">
+    <value>On</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Learn</value>

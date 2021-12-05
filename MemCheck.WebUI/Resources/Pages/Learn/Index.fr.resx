@@ -132,11 +132,14 @@
   <data name="BiggestHeapReached" xml:space="preserve">
     <value>Tas maxi atteint dans ce paquet :</value>
   </data>
-  <data name="CardVersionCreator" xml:space="preserve">
-    <value>Version actuelle créée par :</value>
+  <data name="CardVersion" xml:space="preserve">
+    <value>Version de la carte</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Fermer</value>
+  </data>
+  <data name="CreatedBy" xml:space="preserve">
+    <value>Créée par :</value>
   </data>
   <data name="CreationDate" xml:space="preserve">
     <value>Créée le :</value>
@@ -202,14 +205,11 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="Knew" xml:space="preserve">
     <value>Je le savais</value>
   </data>
-  <data name="LastChangeDate" xml:space="preserve">
-    <value>Version créée le</value>
-  </data>
   <data name="LastHeapMoveFailed" xml:space="preserve">
     <value>Erreur lors du déplacement dans le tas, la fiche devra être répétée à nouveau.</value>
   </data>
   <data name="LastLearnDate" xml:space="preserve">
-    <value>Dernier apprentissage :</value>
+    <value>Dernière étude :</value>
   </data>
   <data name="LastPrefetchTimedOut" xml:space="preserve">
     <value>Le préchargement précédent a échoué, chargement de la carte maintenant.</value>
@@ -228,6 +228,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   </data>
   <data name="Ok" xml:space="preserve">
     <value>Ok</value>
+  </data>
+  <data name="OnDate" xml:space="preserve">
+    <value>Le</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Apprendre</value>

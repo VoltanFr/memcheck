@@ -62,10 +62,12 @@
                             <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover"><i class="fas fa-info"></i></b-button>
                             <b-popover target="infoPopover" triggers="focus">
                                 @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}<br />
+                                <hr class="menu-separation-line" />
                                 @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}<br />
                                 <hr class="menu-separation-line" />
-                                @Localizer["CardVersionCreator"] {{currentCard.owner}}<br />
-                                @Localizer["LastChangeDate"] {{dateTime(currentCard.lastChangeUtcTime)}}<br />
+                                <div class="popover-section-title">@Localizer["CardVersion"]</div><br />
+                                @Localizer["CreatedBy"] {{currentCard.owner}}<br />
+                                @Localizer["OnDate"] {{dateTime(currentCard.lastChangeUtcTime)}}
                                 <hr class="menu-separation-line" /><br />
                                 <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                             </b-popover>
@@ -192,6 +194,7 @@
             <li v-if="!currentCard">No currentCard</li>
             <li v-if="currentCard">currentCard.visibleToCount: {{currentCard.visibleToCount}}</li>
             <li v-if="currentCard">currentCard.heapId: {{currentCard.heapId}}</li>
+            <li v-if="currentCard">currentCard.Last learn time: {{dateTimeWithTime(currentCard.lastLearnUtcTime)}}</li>
             <li>pendingMoveOperations.length: {{pendingMoveOperations.length}}</li>
             <li v-if="!currentMovePromise">currentMovePromise is null</li>
             <li v-if="currentMovePromise">currentMovePromise: {{currentMovePromise}}</li>
