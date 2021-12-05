@@ -2,7 +2,13 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model LearnViewModel
-
+@section head {
+    <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
+}
+@section scripts {
+    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
+    <script src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -199,8 +205,3 @@
         </ul>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
-    <script src="~/js/Learn/Learn.js" asp-append-version="true"></script>
-}
