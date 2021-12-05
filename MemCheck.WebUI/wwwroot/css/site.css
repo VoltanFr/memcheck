@@ -273,12 +273,6 @@
     max-height: 100%;
 }
 
-.learn-image {
-    width: 400px;
-    height: auto;
-    padding-bottom: 50px;
-}
-
 .thumbnail-image {
     width: 100px;
     height: auto;
@@ -434,13 +428,6 @@
         display: none;
     }
 
-    .learning-small-button {
-        height: 22px;
-        border-radius: 2px;
-        font-size: 14px;
-        border-width: 1px;
-    }
-
     .rating-button {
         height: 22px;
         border-radius: 2px;
@@ -454,11 +441,6 @@
 
     .preview-image {
         width: 200px;
-    }
-
-    .learn-image {
-        width: 200px;
-        padding-bottom: 5px;
     }
 
     .image-delete-image {
@@ -505,11 +487,6 @@
         padding-left: 0px;
         padding-right: 0px;
         font-size: 80%;
-    }
-
-    .learning-card {
-        margin-top: 2px;
-        margin-bottom: 2px;
     }
 
     .card-history-ul {
@@ -607,11 +584,6 @@
         width: 300px;
     }
 
-    .learn-image {
-        width: 300px;
-        padding-bottom: 25px;
-    }
-
     .image-delete-image {
         width: 300px;
     }
@@ -622,12 +594,6 @@
 
     .image-list-card-columns {
         column-count: 2;
-    }
-
-
-    .learning-card {
-        margin-top: 4px;
-        margin-bottom: 4px;
     }
 
     .card-history-ul {
@@ -698,41 +664,6 @@
     .big-screen-text {
         display: inline-block;
     }
-}
-
-.btn-circle.btn-sm {
-    width: 22px;
-    height: 22px;
-    padding: 0px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: normal;
-    text-align: center;
-    color: ButtonText;
-    background-color: ButtonFace;
-    border-color: ButtonFace;
-    border-width: 1px;
-    border-style: outset;
-    border-image: initial;
-}
-
-.learning-card-rating-menuentry {
-    height: 22px;
-    padding: 0px;
-    border-radius: 2px;
-    font-size: 14px;
-    font-weight: bolder;
-    color: black;
-    background-color: white;
-    border-color: ButtonFace;
-    border-width: 1px;
-    border-style: outset;
-    border-image: initial;
-    text-align: left;
-}
-
-.learning-popover-menu {
-    text-align: left;
 }
 
 .menu-separation-line {

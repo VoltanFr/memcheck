@@ -95,3 +95,72 @@
 .popover-section-title {
     font-weight: bold;
 }
+
+.learn-image {
+    width: 400px;
+    height: auto;
+    padding-bottom: 50px;
+}
+
+.btn-circle.btn-sm {
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+    border-radius: 15px;
+    font-size: 15px;
+    font-weight: normal;
+    text-align: center;
+    color: ButtonText;
+    background-color: ButtonFace;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+}
+
+.learning-card-rating-menuentry {
+    height: 22px;
+    padding: 0px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: bolder;
+    color: black;
+    background-color: white;
+    border-color: ButtonFace;
+    border-width: 1px;
+    border-style: outset;
+    border-image: initial;
+    text-align: left;
+}
+
+.learning-popover-menu {
+    text-align: left;
+}
+
+@media (max-width: 550px) {
+    .learning-small-button {
+        height: 22px;
+        font-size: 14px;
+        border-radius: 2px;
+        border-width: 1px;
+    }
+    .btn-circle.btn-sm {
+        width: 22px;
+        height: 22px;
+        padding: 0px;
+        border-radius: 11px;
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .learn-image {
+        width: 300px;
+        padding-bottom: 25px;
+    }
+
+    .learning-card {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+}
