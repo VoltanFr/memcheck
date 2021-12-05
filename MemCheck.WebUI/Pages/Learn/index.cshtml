@@ -61,14 +61,14 @@
                         <li id="Info button" data-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
                             <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover"><i class="fas fa-info"></i></b-button>
                             <b-popover target="infoPopover" triggers="focus">
-                                @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}<br />
+                                @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}
                                 <hr class="menu-separation-line" />
-                                @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}<br />
+                                @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}
                                 <hr class="menu-separation-line" />
                                 <div class="popover-section-title">@Localizer["CardVersion"]</div><br />
                                 @Localizer["CreatedBy"] {{currentCard.owner}}<br />
                                 @Localizer["OnDate"] {{dateTime(currentCard.lastChangeUtcTime)}}
-                                <hr class="menu-separation-line" /><br />
+                                <hr class="menu-separation-line" />
                                 <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                             </b-popover>
                         </li>
