@@ -51,7 +51,7 @@
                         <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="cardHistory()"><i class="fas fa-history"></i></button>
                     </span>
                     <span id="Rating" v-if="!creatingNewCard">
-                        <b-button class="btn btn-primary btn-sm learning-rating-button" id="ratingPopover" data-toggle="tooltip" data-placement="top">
+                        <b-button class="btn btn-primary btn-sm rating-button" id="ratingPopover" data-toggle="tooltip" data-placement="top">
                             {{currentUserRatingAsStars()}}<br />
                             {{averageRatingAsStars()}}
                         </b-button>
