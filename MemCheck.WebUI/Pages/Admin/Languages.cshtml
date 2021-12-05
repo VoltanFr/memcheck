@@ -1,6 +1,9 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@section head {
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+}
 @{
     ViewData["Title"] = "Languages page";
 }
@@ -28,7 +31,7 @@
                     </tr>
                     <tr v-for="language in allLanguages">
                         <td>{{language.name}}</td>
-                        <td><button type="button" class="btn btn-info btn-sm" @@click="showCardsWithLanguage(language.name)">{{language.cardCount}}</button></td>
+                        <td><button type="button" class="btn btn-info toolbar-button" @@click="showCardsWithLanguage(language.name)">{{language.cardCount}}</button></td>
                     </tr>
                 </table>
             </div>

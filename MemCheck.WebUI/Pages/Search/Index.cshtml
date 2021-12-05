@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
+@section head {
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -169,7 +172,7 @@
                                     <td>
                                         <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddReqiredTagButton" v-if="CanAddSelectedRequiredTag()">
-                                            <button type="button" class="btn btn-success btn-sm" @@click="addRequiredTag">+</button>
+                                            <button type="button" class="btn btn-success toolbar-button" @@click="addRequiredTag">+</button>
                                         </span>
                                         <button type="button" class="tag" v-for="(tag,index) in selectedRequiredTags" @@click="removeRequiredTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
                                     </td>
@@ -179,7 +182,7 @@
                                     <td>
                                         <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
-                                            <button type="button" class="btn btn-success btn-sm" @@click="addExcludedTag">+</button>
+                                            <button type="button" class="btn btn-success toolbar-button" @@click="addExcludedTag">+</button>
                                         </span>
                                         <button type="button" class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
                                     </td>
@@ -223,7 +226,7 @@
                                 </tr>
                                 <tr id="Run & Subscribe buttons">
                                     <td></td>
-                                    <td><button class="btn btn-info btn-sm" @@click="runQuery()">@Localizer["Run"]</button> <button class="btn btn-info btn-sm" @@click="subscribe()">@Localizer["Subscribe"]</button></td>
+                                    <td><button class="btn btn-info toolbar-button" @@click="runQuery()">@Localizer["Run"]</button> <button class="btn btn-info toolbar-button" @@click="subscribe()">@Localizer["Subscribe"]</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -234,7 +237,7 @@
                         <input type="checkbox" style="padding:0px;vertical-align:middle" v-model="cardWithSelectionInfo.selected" />
                     </td>
                     <td id="Visibility" class="search-page-widget-td">
-                        <b-button class="btn btn-primary btn-circle btn-sm" style="padding:0px" v-bind:id="'visi'+htmlClassForCard(cardWithSelectionInfo.card)">
+                        <b-button class="btn btn-primary toolbar-button-circle toolbar-button" style="padding:0px" v-bind:id="'visi'+htmlClassForCard(cardWithSelectionInfo.card)">
                             <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
                             <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
                             <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
@@ -242,7 +245,7 @@
                         <b-popover v-bind:target="'visi'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">{{cardWithSelectionInfo.card.popoverVisibility}}</b-popover>
                     </td>
                     <td id="Heap" info class="search-page-widget-td">
-                        <b-button class="btn btn-sm search-page-heap-info" style="width:100%" v-bind:id="'heap'+htmlClassForCard(cardWithSelectionInfo.card)">
+                        <b-button class="btn toolbar-button search-page-heap-info" style="width:100%" v-bind:id="'heap'+htmlClassForCard(cardWithSelectionInfo.card)">
                             <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
                             <span v-else>
                                 <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
@@ -275,7 +278,7 @@
                         </b-popover>
                     </td>
                     <td id="Rating" info class="search-page-widget-td">
-                        <b-button class="btn btn-sm search-page-rating-button" style="width:100%" v-bind:id="'rating'+htmlClassForCard(cardWithSelectionInfo.card)">
+                        <b-button class="btn toolbar-button search-page-rating-button" style="width:100%" v-bind:id="'rating'+htmlClassForCard(cardWithSelectionInfo.card)">
                             <span v-if="cardWithSelectionInfo.card.averageRating == 0" style="color: InactiveCaptionText">{{cardWithSelectionInfo.card.ratingShort}}</span>
                             <span v-else style="color:ButtonText">{{cardWithSelectionInfo.card.ratingShort}}</span>
                         </b-button>

@@ -1,6 +1,9 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@section head {
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["ActivePage"] = ManageNavPages.Users;
@@ -22,7 +25,7 @@
                     <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
                 </select><br />
             </span>
-            <button type="button" class="btn btn-success btn-sm" @@click="getUsers">@Localizer["Run"]</button>
+            <button type="button" class="btn btn-success toolbar-button" @@click="getUsers">@Localizer["Run"]</button>
             <span v-if="totalUserCount != -1">
                 {{totalUserCount}}&nbsp;<label>@Localizer["PageTitle"]</label>
             </span>
@@ -48,17 +51,17 @@
             </table>
         </div>
         <div id="Paging" class="container" style="align-content:flex-end">
-            <button class="btn btn-info btn-sm" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
-            <button class="btn btn-info btn-sm" @@click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
-            <button class="btn btn-success btn-sm" disabled>{{request.pageNo}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
-            <button class="btn btn-info btn-sm" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
-            <button class="btn btn-info btn-sm" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
+            <button class="btn btn-info toolbar-button" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
+            <button class="btn btn-success toolbar-button" disabled>{{request.pageNo}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
+            <button class="btn btn-info toolbar-button" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
+            <button class="btn btn-info toolbar-button" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
         </div>
     </div>
 </div>

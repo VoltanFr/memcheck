@@ -305,22 +305,6 @@
     vertical-align: middle;
 }
 
-.rating-button {
-    height: 30px;
-    padding: 0px;
-    border-radius: 4px;
-    font-size: 15px;
-    text-align: center;
-    vertical-align: middle;
-    color: ButtonText;
-    background-color: ButtonFace;
-    border-color: ButtonFace;
-    border-width: 1px;
-    border-style: outset;
-    border-image: initial;
-    line-height: 15px;
-}
-
 .markdown-edit-div {
     padding: 0px;
     border-radius: 4px;
@@ -426,13 +410,6 @@
 
     .big-screen-text {
         display: none;
-    }
-
-    .rating-button {
-        height: 22px;
-        border-radius: 2px;
-        font-size: 11px;
-        line-height: 10px;
     }
 
     #MoveFivePagesBackward, #MoveFivePagesForward {

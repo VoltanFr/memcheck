@@ -5,6 +5,7 @@
 @section head {
     <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/css/markdown.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
     <script src="~/js/big-size-image.js" asp-append-version="true"></script>
@@ -25,11 +26,11 @@
             @Localizer["ExcludedTags"]
             <select v-model="selectedExcludedTagToAdd"><option v-for="tag in activeDeck.tags" v-bind:value="tag">{{tag.tagName}}</option></select>
             <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
-                <button type="button" class="btn btn-success btn-sm" @@click="addExcludedTag">+</button>
+                <button type="button" class="btn btn-success toolbar-button" @@click="addExcludedTag">+</button>
             </span>
             <button type="button" class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
         </div>
-        <button class="btn btn-info btn-sm learn-filtering-ok-button" @@click="closeFilteringMode()">@Localizer["Ok"]</button>
+        <button class="btn btn-info toolbar-button learn-filtering-ok-button" @@click="closeFilteringMode()">@Localizer["Ok"]</button>
     </div>
     <div id="NormalOrFullScreenMode" v-if="mountFinished && !filteringDisplay && !userQuitAttemptDisplay">
         <div id="FullScreenImage" v-if="currentFullScreenImage">
@@ -43,7 +44,7 @@
                             <th>@Localizer["Deck"]</th>
                             <td>
                                 <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
-                                <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -54,13 +55,13 @@
                 <div id="Small buttons" class="card-header" style="padding:1px">
                     <ul class="nav small text-decoration-none" style="align-items:center">
                         <li id="Edit button" style="padding-right:5px">
-                            <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
                         </li>
                         <li id="Remove button" style="padding-right:5px">
-                            <button class="btn btn-primary btn-circle btn-sm" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-primary toolbar-button toolbar-button-circle" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
                         </li>
                         <li id="Info button" data-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
-                            <b-button class="btn btn-primary btn-circle btn-sm" id="infoPopover"><i class="fas fa-info"></i></b-button>
+                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" id="infoPopover"><i class="fas fa-info"></i></b-button>
                             <b-popover target="infoPopover" triggers="focus">
                                 @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}
                                 <hr class="menu-separation-line" />
@@ -74,16 +75,16 @@
                             </b-popover>
                         </li>
                         <li id="Visibility button" style="padding-right:5px" data-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>
-                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount == 0" id="visibilityPopover0" key="public"><i class="far fa-eye"></i></b-button>
-                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount == 1" id="visibilityPopover1" key="private"><i class="far fa-eye-slash"></i></b-button>
-                            <b-button class="btn btn-primary btn-circle btn-sm" v-if="currentCard.visibleToCount > 1" id="visibilityPopover2" key="selectedvisi"><i class="fas fa-users"></i></b-button>
+                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 0" id="visibilityPopover0" key="public"><i class="far fa-eye"></i></b-button>
+                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 1" id="visibilityPopover1" key="private"><i class="far fa-eye-slash"></i></b-button>
+                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount > 1" id="visibilityPopover2" key="selectedvisi"><i class="fas fa-users"></i></b-button>
                             <b-popover v-bind:target="visibilityPopoverTarget()" v-bind:key="visibilityPopoverTarget()" triggers="focus">@Localizer["Visibility"]: {{currentCard.visibleTo}}</b-popover>
                         </li>
                         <li id="FilteringButton" style="padding-right:5px">
-                            <button type="button" class="btn btn-primary btn-circle btn-sm" @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></button>
+                            <button type="button" class="btn btn-primary toolbar-button toolbar-button-circle" @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></button>
                         </li>
                         <li id="Heap info" data-toggle="tooltip" data-placement="top" title=@Localizer["Heap"] style="padding-right:5px">
-                            <b-button class="btn btn-primary btn-sm learning-small-button" id="heapPopover"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</b-button>
+                            <b-button class="btn btn-primary toolbar-button" id="heapPopover"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</b-button>
                             <b-popover target="heapPopover" triggers="focus">
                                 @Localizer["CurrentlyInHeap"] {{currentCard.heap}}<br />
                                 @Localizer["TimesInNotLearnedHeap"] {{currentCard.nbTimesInNotLearnedHeap}}<br />
@@ -99,7 +100,7 @@
                             </b-popover>
                         </li>
                         <li id="Rating" data-toggle="tooltip" data-placement="top">
-                            <b-button class="btn btn-primary btn-sm rating-button" id="ratingPopover">
+                            <b-button class="btn btn-primary toolbar-button" id="ratingPopover">
                                 {{currentUserRatingAsStars()}}<br />
                                 {{averageRatingAsStars()}}
                             </b-button>
@@ -180,7 +181,7 @@
     </div>
     <div id="UserQuitAttemptDisplayMode" v-if="userQuitAttemptDisplay">
         <p>@Localizer["ExplainMoveOperationsBeforeIcon"] <i class="fas fa-save"></i> @Localizer["ExplainMoveOperationsAfterIcon"]</p>
-        <button type="button" class="btn btn-success btn-sm" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
+        <button type="button" class="btn btn-success toolbar-button" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
     </div>
     <div id="Processing info">
         <p v-if="preventQuittingPage()"><i class="fas fa-save"></i></p>
