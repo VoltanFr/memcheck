@@ -125,7 +125,7 @@
                         </span>
                     </td>
                 </tr>
-                <tr id="QueryRow" class="collapse">
+                <tr id="QueryRow" v-bind:class="'collapse' + (!runResult.cardsWithSelectionInfo || (runResult.cardsWithSelectionInfo.length == 0) ? ' show' : '')">
                     <td id="Request details" colspan="100">
                         <table class="table table-hover table-sm" style="width:100%">
                             <tbody>

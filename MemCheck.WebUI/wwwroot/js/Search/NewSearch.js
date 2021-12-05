@@ -63,7 +63,6 @@ var app = new Vue({
         try {
             await this.getAllStaticData();
             this.getFieldsFromPageParameters();
-            await this.runQuery();
         }
         finally {
             this.mountFinished = true;
