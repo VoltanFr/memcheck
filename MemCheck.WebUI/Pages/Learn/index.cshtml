@@ -99,7 +99,7 @@
                                 @Localizer["Average"] ({{currentCard.countOfUserRatings}} <span v-if="currentCard.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>)<b-form-rating inline readonly show-value v-model="currentCard.averageRating"></b-form-rating>
                             </b-popover>
                         </li>
-                        <li id="Last learn date" v-if="!learningUnknowns" class="ml-auto" data-toggle="tooltip" data-placement="top" title=@Localizer["Expired"]>
+                        <li id="Last learn date" v-if="!learningUnknowns" class="ml-auto" data-toggle="tooltip" data-placement="top" v-bind:title="'@Localizer["LastLearnDate"] ' + dateTimeWithTime(currentCard.lastLearnUtcTime)">
                             <i class="fas fa-clock"></i> {{dateTime(currentCard.lastLearnUtcTime)}}
                         </li>
                     </ul>
