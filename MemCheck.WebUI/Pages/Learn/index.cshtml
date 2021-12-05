@@ -4,6 +4,7 @@
 @model LearnViewModel
 @section head {
     <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/markdown.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
     <script src="~/js/big-size-image.js" asp-append-version="true"></script>
@@ -117,7 +118,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["FrontSide"]</p>
                         </div>
-                        <div class="card-body learning-card-body">
+                        <div class="card-body markdown-render">
                             <span v-html="currentCardFrontSide()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
@@ -133,7 +134,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["BackSide"]</p>
                         </div>
-                        <div class="card-body learning-card-body">
+                        <div class="card-body markdown-render">
                             <span v-html="currentCardBackSide()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
@@ -152,7 +153,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["AdditionalInfo"]</p>
                         </div>
-                        <div class="card-body learning-card-body">
+                        <div class="card-body markdown-render">
                             <span v-html="currentCardAdditionalInfo()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">

@@ -1,0 +1,78 @@
+﻿.markdown-render {
+    display: block;
+    flex-direction: column;
+}
+
+    .markdown-render * {
+        margin: 0px;
+        padding-top: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+    }
+
+    .markdown-render p {
+        white-space: normal;
+        padding-bottom: 20px;
+    }
+
+    .markdown-render ul,
+    .markdown-render ol {
+        display: grid;
+        padding-left: 25px;
+        padding-bottom: 20px;
+    }
+
+    .markdown-render li {
+        display: list-item;
+        white-space: pre-wrap;
+        padding-bottom: 6px;
+    }
+
+    .markdown-render h1,
+    .markdown-render h2,
+    .markdown-render h3,
+    .markdown-render h4,
+    .markdown-render h5,
+    .markdown-render h6 {
+        display: block;
+        padding-top: 5px;
+    }
+
+    .markdown-render table,
+    .markdown-render tbody,
+    .markdown-render thead,
+    .markdown-render th,
+    .markdown-render tr,
+    .markdown-render td {
+        border-style: solid;
+        border-width: 1px;
+        padding: 10px;
+    }
+
+    .markdown-render table {
+        width: auto;
+        display: table;
+        padding-bottom: 20px;
+    }
+
+    .markdown-render tbody {
+        display: table-row-group;
+    }
+
+    .markdown-render thead {
+        display: table-row-group;
+    }
+
+    .markdown-render th {
+        display: table-cell
+    }
+
+    .markdown-render tr {
+        display: table-row
+    }
+
+    .markdown-render td {
+        display: table-cell;
+        white-space: pre-wrap;
+    }
