@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.ManageDB;
+﻿using MemCheck.CommandLineDbClient.Ratings;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient
         #region Private method
         private ICmdLinePlugin GetPlugin()
         {
-            return new MakeUserAdmin(serviceProvider);
+            return new DumpCardRatings(serviceProvider);
         }
         #endregion
         public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
