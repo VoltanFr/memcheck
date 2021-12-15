@@ -31,6 +31,7 @@ namespace MemCheck.Domain
         public int BigBlobSize { get; set; }
 
         public IEnumerable<ImageInCard> Cards { get; set; } = null!;
+        public IEnumerable<ImageInCardPreviousVersion> CardPreviousVersions { get; set; } = null!;
 
         public ImagePreviousVersion? PreviousVersion { get; set; }  //null for initial version (VersionType == Creation)
     }

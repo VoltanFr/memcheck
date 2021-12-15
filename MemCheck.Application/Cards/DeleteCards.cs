@@ -24,9 +24,12 @@ namespace MemCheck.Application.Cards
                 var previousVersionCreator = new PreviousVersionCreator(DbContext);
                 var card = await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.Get("Deletion"), deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card, deletionUtcDate);
-                DbContext.Cards.Remove(card);
+                await DbContext.SaveChangesAsync();
+
+                var actualCard = await DbContext.Cards.SingleAsync(card=>card.Id==cardId);
+                DbContext.Cards.Remove(actualCard);
+                await DbContext.SaveChangesAsync();
             }
-            await DbContext.SaveChangesAsync();
             return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
         }
         #region Request & Result

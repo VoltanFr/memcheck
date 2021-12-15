@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <Nullable>enable</Nullable>
-    <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.38.0</VersionPrefix>
+    <TargetFramework>net6.0</TargetFramework>
+    <VersionPrefix>0.39.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>

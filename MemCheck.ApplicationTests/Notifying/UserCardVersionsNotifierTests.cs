@@ -17,12 +17,16 @@ namespace MemCheck.Application.Tests.Notifying
         #region Private methods
         private static async Task<CardPreviousVersion> CreateCardPreviousVersionAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, Guid cardId, DateTime versionDate)
         {
+            var cardLanguageId = await CardLanguagHelper.CreateAsync(testDB);
+
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
+            var cardLanguage = await dbContext.CardLanguages.SingleAsync(cardLanguage => cardLanguage.Id == cardLanguageId);
 
             var result = new CardPreviousVersion
             {
                 Card = cardId,
+                CardLanguage = cardLanguage,
                 VersionCreator = creator,
                 VersionUtcDate = versionDate,
                 VersionType = CardPreviousVersionType.Creation,
@@ -44,10 +48,12 @@ namespace MemCheck.Application.Tests.Notifying
         {
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();
+            var cardLanguage = await dbContext.CardLanguages.SingleAsync(cardLanguage => cardLanguage.Id == previousVersion.CardLanguage.Id);
 
             var result = new CardPreviousVersion
             {
                 Card = previousVersion.Card,
+                CardLanguage = cardLanguage,
                 VersionCreator = creator,
                 VersionUtcDate = versionDate,
                 VersionType = CardPreviousVersionType.Creation,

@@ -25,7 +25,7 @@ namespace MemCheck.WebUI
         {
             this.logger = logger;
         }
-        public async override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
+        public async override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
             logger.LogDebug($"Http request path: {httpContext.Request.Path}");
 

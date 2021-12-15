@@ -7,8 +7,10 @@ using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,7 +34,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetActiveLanguage")]
         public IActionResult GetActiveLanguage()
         {
-            var requestCulture = HttpContext.Features.Get<IRequestCultureFeature>();
+            var requestCulture = HttpContext.Features.Get<IRequestCultureFeature>()!;
             return Ok(requestCulture.RequestCulture.UICulture.Name);
         }
         [HttpPost("SetCulture/{culture}")]

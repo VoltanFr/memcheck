@@ -55,7 +55,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 {
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, code }, protocol: Request.Scheme);
+                    var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, code }, protocol: Request.Scheme)!;
 
                     var url = HtmlEncoder.Default.Encode(callbackUrl);
                     var body = $"<p>{localizer["Hello"]} {user.UserName}</p><p><a href='{url}'>{localizer["PleaseConfirmYourAccount"]}</a>.";

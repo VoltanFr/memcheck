@@ -86,7 +86,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                         "/Account/ConfirmEmail",
                         pageHandler: null,
                         values: new { area = "Identity", userId = user.Id, code },
-                        protocol: Request.Scheme);
+                        protocol: Request.Scheme)!;
 
                     var mailBody = new StringBuilder();
                     mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");

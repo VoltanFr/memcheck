@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <VersionPrefix>0.3.6</VersionPrefix>
+    <TargetFramework>net6.0</TargetFramework>
+    <VersionPrefix>0.4.0</VersionPrefix>
   </PropertyGroup>
 
   <PropertyGroup>

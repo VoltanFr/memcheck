@@ -26,6 +26,9 @@ namespace MemCheck.Application.History
                 .AsSingleQuery()
                 .SingleOrDefaultAsync();
 
+            if (version == null)
+                throw new RequestInputException($"Card version not found: '{request.VersionId}'");
+
             var userWithViewNames = version.UsersWithView.Select(userWithView => DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
             var tagNames = version.Tags.Select(t => t.Tag.Name);
             var frontSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name);

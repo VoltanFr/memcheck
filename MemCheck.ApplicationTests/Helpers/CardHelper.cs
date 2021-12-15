@@ -31,8 +31,9 @@ namespace MemCheck.Application.Tests.Helpers
                 VersionDescription = versionDescription ?? RandomHelper.String(),
                 VersionType = CardVersionType.Creation
             };
-            if (language != null)
-                result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);
+            if (language == null)
+                language = await CardLanguagHelper.CreateAsync(testDB);
+            result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);
             if (versionDate != null)
             {
                 result.InitialCreationUtcDate = versionDate.Value;

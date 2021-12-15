@@ -90,11 +90,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             {
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
-                var callbackUrl = Url.Page(
-                    "/Account/ConfirmEmailChange",
-                    pageHandler: null,
-                    values: new { userId, email = Input.NewEmail, code },
-                    protocol: Request.Scheme);
+                var callbackUrl = Url.Page("/Account/ConfirmEmailChange", pageHandler: null, values: new { userId, email = Input.NewEmail, code }, protocol: Request.Scheme)!;
 
                 var mailBody = new StringBuilder();
                 mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
@@ -129,11 +125,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ConfirmEmail",
-                pageHandler: null,
-                values: new { area = "Identity", userId, code },
-                protocol: Request.Scheme);
+            var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId, code }, protocol: Request.Scheme)!;
 
             var mailBody = new StringBuilder();
             mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");

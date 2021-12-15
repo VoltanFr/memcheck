@@ -23,6 +23,11 @@ namespace MemCheck.Application.Images
                 _ => throw new NotImplementedException(),
             };
         }
+        private void DeleteFromCardPreviousVersions(Guid imageId)
+        {
+            var cardPreviousVersions = DbContext.ImagesInCardPreviousVersions.Where(imageInCardPreviousVersions => imageInCardPreviousVersions.ImageId == imageId);
+            DbContext.ImagesInCardPreviousVersions.RemoveRange(cardPreviousVersions);
+        }
         #endregion
         public DeleteImage(CallContext callContext, DateTime? runDate = null) : base(callContext)
         {
@@ -32,6 +37,8 @@ namespace MemCheck.Application.Images
         {
             var image = await DbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
             var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
+
+            DeleteFromCardPreviousVersions(request.ImageId);
 
             //For a deletion, we create two previous versions:
             //- one for the last known operation (described in the image)

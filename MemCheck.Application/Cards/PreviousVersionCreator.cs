@@ -98,11 +98,11 @@ namespace MemCheck.Application.Cards
                 .SingleAsync(img => img.Id == cardId);
 
             var previousVersion = await CreatePreviousVersionAsync(card);
+            card.PreviousVersion = previousVersion;
 
             var newVersionCreator = dbContext.Users.Single(u => u.Id == newVersionCreatorId);
-
-            card.PreviousVersion = previousVersion;
             card.VersionCreator = newVersionCreator;
+
             card.VersionUtcDate = cardNewVersionUtcDate ?? DateTime.UtcNow;
             card.VersionDescription = newVersionDescription;
             card.VersionType = CardVersionType.Changes;

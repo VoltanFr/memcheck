@@ -29,7 +29,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             url += $"?cultureName={CultureInfo.CurrentCulture.TwoLetterISOLanguageName}";
             var docLinkText = localizer["DocLinkText"];
             var appLine = localizer["AppLine"];
-            var appUrl = HtmlEncoder.Default.Encode(Url.Page(pageName: "/Index", pageHandler: null, values: null, protocol: Request.Scheme));
+            var appUrl = HtmlEncoder.Default.Encode(Url.Page(pageName: "/Index", pageHandler: null, values: null, protocol: Request.Scheme)!);
             var appLinkText = localizer["AppLinkText"];
             var thank = localizer["Thank"];
             var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='{HtmlEncoder.Default.Encode(url)}'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";

@@ -32,14 +32,14 @@ namespace MemCheck.WebUI.Controllers
         private readonly string comparePageLink;
         private readonly string historyPageLink;
         #endregion
-        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, IHttpContextAccessor contextAccessor, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
+        public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
         {
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.emailSender = emailSender;
             this.userManager = userManager;
-            authoringPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Index");
-            comparePageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/Compare");
-            historyPageLink = linkGenerator.GetUriByPage(contextAccessor.HttpContext, page: "/Authoring/History");
+            authoringPageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Index")!;
+            comparePageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Compare")!;
+            historyPageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/History")!;
         }
         #region GetUsers
         [HttpPost("GetUsers")]

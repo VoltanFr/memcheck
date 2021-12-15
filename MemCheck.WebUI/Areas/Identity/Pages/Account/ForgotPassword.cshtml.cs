@@ -49,11 +49,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
+                var callbackUrl = Url.Page("/Account/ResetPassword", pageHandler: null, values: new { area = "Identity", code }, protocol: Request.Scheme)!;
 
                 var body = $"<p>{localizer["Hello"]} {user.UserName}.</p><p>{localizer["MailPhrasePart1"]} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["MailLinkText"]}</a> {localizer["MailPhrasePart2"]}.</p>";
 

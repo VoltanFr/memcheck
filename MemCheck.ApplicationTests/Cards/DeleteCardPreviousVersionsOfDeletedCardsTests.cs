@@ -231,7 +231,41 @@ namespace MemCheck.Application.Cards
             }
         }
         [TestMethod()]
-        public async Task CascadeDeletionOfImageInCardPreviousVersion()
+        public async Task CascadeDeletionOfImageInCardPreviousVersion_ImageRemoved()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var image = await ImageHelper.CreateAsync(db, user);
+            var card = await CardHelper.CreateAsync(db, user, language: languageId, frontSideImages: image.AsArray());
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.AreEqual(1, dbContext.ImagesInCards.Count());
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForImageChange(card, Array.Empty<Guid>(), Array.Empty<Guid>(), Array.Empty<Guid>()));
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.AreEqual(0, dbContext.ImagesInCards.Count());
+            var deletionDate = RandomHelper.Date();
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+                await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
+            }
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
+                Assert.AreEqual(1, dbContext.ImagesInCardPreviousVersions.Count());
+            }
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate));
+                await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(request);
+            }
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());
+                Assert.AreEqual(0, dbContext.ImagesInCardPreviousVersions.Count());
+            }
+        }
+        public async Task CascadeDeletionOfImageInCardPreviousVersion_ImageChangesSide()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);

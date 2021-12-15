@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 
 namespace MemCheck.Domain
 {
@@ -13,5 +14,8 @@ namespace MemCheck.Domain
         public DateTime LastNotificationUtcDate { get; set; }
         public bool SubscribeToCardOnEdit { get; set; }
         public DateTime? DeletionDate { get; set; } = null;
+        public IEnumerable<UserCardRating> UserCardRating { get; set; } = null!;
+        public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
+        public IEnumerable<UserWithViewOnCardPreviousVersion> UsersWithViewOnPreviousVersion { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
     }
 }

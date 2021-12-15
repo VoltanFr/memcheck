@@ -117,9 +117,8 @@ namespace MemCheck.WebUI
         {
             app.UseExceptionHandler(a => a.Run(async context =>
             {
-                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                var e = exceptionHandlerPathFeature.Error;
-                var cultureName = context.Features.Get<IRequestCultureFeature>().RequestCulture.Culture.Name;
+                var e = context.Features.Get<IExceptionHandlerPathFeature>()!.Error;
+                var cultureName = context.Features.Get<IRequestCultureFeature>()!.RequestCulture.Culture.Name;
                 var ToastTitle = cultureName.Equals("FR", StringComparison.OrdinalIgnoreCase) ? "Échec" : "Failure";
                 var ShowStatus = !(e is RequestInputException);
                 var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));

@@ -16,6 +16,38 @@ namespace MemCheck.Application.Cards
     public class CreateCardTests
     {
         [TestMethod()]
+        public async Task WithOneImage()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: false);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var imageId = await ImageHelper.CreateAsync(testDB, ownerId);
+
+            Guid cardGuid = Guid.Empty;
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var request = new CreateCard.Request(
+                    ownerId,
+                    RandomHelper.String(),
+                    new Guid[] { imageId },
+                    RandomHelper.String(),
+                    new Guid[0],
+                    RandomHelper.String(),
+                    new Guid[0],
+                    languageId,
+                    new Guid[0],
+                    new Guid[0],
+                    RandomHelper.String());
+                cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
+            }
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var card = dbContext.Cards.Include(c => c.Images).Single(c => c.Id == cardGuid);
+                Assert.AreEqual(ImageInCard.FrontSide, card.Images.Single(i => i.ImageId == imageId).CardSide);
+            }
+        }
+        [TestMethod()]
         public async Task WithAllData()
         {
             var testDB = DbHelper.GetEmptyTestDB();

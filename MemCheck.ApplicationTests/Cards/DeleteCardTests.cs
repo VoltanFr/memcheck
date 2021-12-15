@@ -216,5 +216,28 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
             }
         }
+        [TestMethod()]
+        public async Task CardContainingImage()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var image = await ImageHelper.CreateAsync(db, user, RandomHelper.String(), RandomHelper.String());
+            var card = await CardHelper.CreateAsync(db, user, additionalSideImages: image.AsArray());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(1, dbContext.Images.Count());
+                Assert.AreEqual(1, dbContext.ImagesInCards.Count());
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(1, dbContext.Images.Count());
+                Assert.AreEqual(0, dbContext.ImagesInCards.Count());
+            }
+        }
     }
 }
