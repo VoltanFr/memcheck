@@ -65,7 +65,7 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestLastMigrationName()
         {
-            var expectedLastMigration = typeof(UpgradeToDotNet6);
+            var expectedLastMigration = typeof(AddCascadeBehaviorForUserCardRating);
 
             var expectedLastMigrationName = ((MigrationAttribute)(expectedLastMigration.GetCustomAttribute(typeof(MigrationAttribute)))!).Id;
             var actual = dbContext.Database.GetAppliedMigrations().Last();

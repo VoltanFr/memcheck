@@ -4,14 +4,16 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211215220431_AddCascadeBehaviorForCardInDecks")]
+    partial class AddCascadeBehaviorForCardInDecks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -919,7 +921,7 @@ namespace MemCheck.Database.Migrations
                     b.HasOne("MemCheck.Domain.Image", "Image")
                         .WithMany("Cards")
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
@@ -938,7 +940,7 @@ namespace MemCheck.Database.Migrations
                     b.HasOne("MemCheck.Domain.Image", "Image")
                         .WithMany("CardPreviousVersions")
                         .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CardPreviousVersion");
@@ -1022,13 +1024,13 @@ namespace MemCheck.Database.Migrations
                     b.HasOne("MemCheck.Domain.Card", "Card")
                         .WithMany("UserCardRating")
                         .HasForeignKey("CardId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MemCheck.Domain.MemCheckUser", "User")
                         .WithMany("UserCardRating")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
@@ -1047,7 +1049,7 @@ namespace MemCheck.Database.Migrations
                     b.HasOne("MemCheck.Domain.MemCheckUser", "User")
                         .WithMany("UsersWithView")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
@@ -1060,7 +1062,7 @@ namespace MemCheck.Database.Migrations
                     b.HasOne("MemCheck.Domain.MemCheckUser", "AllowedUser")
                         .WithMany("UsersWithViewOnPreviousVersion")
                         .HasForeignKey("AllowedUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MemCheck.Domain.CardPreviousVersion", "CardPreviousVersion")
