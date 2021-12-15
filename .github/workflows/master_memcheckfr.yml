@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      NETCORE_VERSION: "5.0.100"
+      NETCORE_VERSION: "6.0"
       COMPIL_CONFIG: "Release"
       PUBLISH_FOLDER_PATH: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
