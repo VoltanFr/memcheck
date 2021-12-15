@@ -55,7 +55,7 @@ jobs:
     - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
       uses: microsoft/variable-substitution@v1
       with:
-        files: 'MemCheck.DatabaseTests/bin/Release/net5.0/appsettings.json'
+        files: 'MemCheck.DatabaseTests/bin/Release/net6.0/appsettings.json'
       env:
         ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
 
