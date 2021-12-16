@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -33,6 +34,24 @@ namespace MemCheck.DatabaseTests
                 .AddEnvironmentVariables()
                 .Build();
         }
+        private static IMigrationsAssembly GetMigrationsAssembly()
+        {
+            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(@"Server=none;Database=none;Trusted_Connection=True;").Options);
+            IMigrationsAssembly? result = dbContext.GetService<IMigrationsAssembly>();
+            Assert.IsNotNull(result);
+            return result;
+        }
+        private static IRelationalModel GetModelFromMigrations()
+        {
+            var migrationsAssembly = GetMigrationsAssembly();
+            IModel migrationsAssemblyModel = migrationsAssembly.ModelSnapshot?.Model!;
+            if (migrationsAssemblyModel is IMutableModel mutableModel)
+                migrationsAssemblyModel = mutableModel.FinalizeModel();
+            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(@"Server=none;Database=none;Trusted_Connection=True;").Options);
+            migrationsAssemblyModel = dbContext.GetService<IModelRuntimeInitializer>().Initialize(migrationsAssemblyModel);
+            var result = migrationsAssemblyModel.GetRelationalModel();
+            return result;
+        }
         #endregion
         public DatabaseUsabilityTests()
         {
@@ -40,19 +59,13 @@ namespace MemCheck.DatabaseTests
             dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
         }
         [TestMethod()]
-        public void TestNoDbMigrationNeeded()
+        public void TestNoMigrationNeeded()
         {
-            using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(@"Server=none;Database=none;Trusted_Connection=True;").Options);
+            var modelFromMigrations = GetModelFromMigrations();
+            var modelFromCode = dbContext.GetService<IDesignTimeModel>().Model.GetRelationalModel();
 
-            var relationalDependencies = dbContext.GetService<RelationalConventionSetBuilderDependencies>();
-            var relationalModelConvention = new RelationalModelConvention(dbContext.GetService<ProviderConventionSetBuilderDependencies>(), relationalDependencies);
-            var modelSnapshot = (IConventionModel)dbContext.GetService<IMigrationsAssembly>().ModelSnapshot.Model;
-            var finalizedSnapshotModel = relationalModelConvention.ProcessModelFinalized(modelSnapshot).GetRelationalModel();
-
-            var possiblyModifiedModel = dbContext.Model.GetRelationalModel();
-
-            var changes = dbContext.GetService<IMigrationsModelDiffer>().GetDifferences(finalizedSnapshotModel, possiblyModifiedModel);
-            Assert.AreEqual(0, changes.Count, "A DB model update is needed - Run dotnet ef migrations add - " + string.Join(',', changes.Select(change => change.ToString())));
+            var changes = dbContext.GetService<IMigrationsModelDiffer>().GetDifferences(modelFromMigrations, modelFromCode);
+            Assert.AreEqual(0, changes.Count, "A DB model update is needed - Run dotnet ef migrations add - Changes: " + string.Join(',', changes.Select(change => change.ToString())));
         }
         [TestMethod()]
         public void TestConnectionToRightDB()
@@ -65,18 +78,16 @@ namespace MemCheck.DatabaseTests
         [TestMethod()]
         public void TestLastMigrationName()
         {
-            var expectedLastMigration = typeof(AddCascadeBehaviorForUserCardRating);
-
-            var expectedLastMigrationName = ((MigrationAttribute)(expectedLastMigration.GetCustomAttribute(typeof(MigrationAttribute)))!).Id;
+            var migrationsAssembly = GetMigrationsAssembly();
+            var expectedLastMigrationName = migrationsAssembly.Migrations.Last().Key;
             var actual = dbContext.Database.GetAppliedMigrations().Last();
-
             Assert.AreEqual(expectedLastMigrationName, actual);
         }
         [TestMethod()]
         public void TestNoDbUpdateNeeded()
         {
             var pendingDbUpdates = dbContext.Database.GetPendingMigrations();
-            Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB");
+            Assert.AreEqual(0, pendingDbUpdates.Count(), $"There are {pendingDbUpdates.Count()} migrations to run on the DB: " + string.Join(',', pendingDbUpdates.Select(pendingDbUpdate => pendingDbUpdate.ToString())));
         }
         public void Dispose()
         {
