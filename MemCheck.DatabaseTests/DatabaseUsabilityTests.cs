@@ -31,7 +31,6 @@ namespace MemCheck.DatabaseTests
             return new ConfigurationBuilder()
                 .SetBasePath(Path.GetDirectoryName(typeof(DatabaseUsabilityTests).Assembly.Location))
                 .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables()
                 .Build();
         }
         private static IMigrationsAssembly GetMigrationsAssembly()
