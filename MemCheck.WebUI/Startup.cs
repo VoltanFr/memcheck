@@ -55,7 +55,9 @@ namespace MemCheck.WebUI
 
             var appSettings = new AppSettings(configuration, prodEnvironment, loggerFactory.CreateLogger<AppSettings>());
 
-            services.AddDatabaseDeveloperPageExceptionFilter();
+            if (!prodEnvironment)
+                services.AddDatabaseDeveloperPageExceptionFilter();
+
             services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
             services.AddIdentity<MemCheckUser, MemCheckUserRole>(
