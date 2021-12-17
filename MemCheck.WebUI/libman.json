@@ -21,7 +21,7 @@
       ]
     },
     {
-      "library": "axios@0.21.0",
+      "library": "axios@0.24.0",
       "destination": "wwwroot/lib/axios/",
       "files": [
         "axios.min.js",
