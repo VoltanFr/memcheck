@@ -35,9 +35,7 @@ namespace MemCheck.CommandLineDbClient
         }
         private static void SetupStaticLogger(IConfiguration config)
         {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(config)
-                .CreateLogger();
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
         }
         private static IHostBuilder CreateHostBuilder(IConfiguration config)
         {
