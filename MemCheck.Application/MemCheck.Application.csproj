@@ -4,7 +4,7 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <VersionPrefix>0.15.2</VersionPrefix>
+    <VersionPrefix>0.15.3</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.19.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="5.0.10" />
     <PackageReference Include="Svg" Version="3.3.0" />
