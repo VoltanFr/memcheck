@@ -22,7 +22,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent border-bottom box-shadow">
             <div class="container">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                     <span class="navbar-brand">MemCheck</span>
                 </button>
@@ -30,14 +30,14 @@
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item"><a class="navbar-brand" asp-page="/Index">MemCheck</a></li>
                         <li id="Learn" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
                             <div class="dropdown-menu" aria-labelledby="LearnDropdown">
                                 <a class="dropdown-item" href="/Learn/Index?LearnMode=Unknown">@Localizer["Unknown"]</a>
                                 <a class="dropdown-item" href="/Learn/Index?LearnMode=Expired">@Localizer["Expired"]</a>
                             </div>
                         </li>
                         <li id="Decks" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="DecksDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Decks"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="DecksDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Decks"]</a>
                             <div class="dropdown-menu" aria-labelledby="DecksDropdown">
                                 <a class="dropdown-item" href="/Decks/Index">@Localizer["Browse"]</a>
                                 <div class="dropdown-divider"></div>
@@ -47,7 +47,7 @@
                             </div>
                         </li>
                         <li id="Cards" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Cards"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Cards"]</a>
                             <div class="dropdown-menu" aria-labelledby="CardDropdown">
                                 <a class="dropdown-item" href="/Search/Index">@Localizer["Browse"]</a>
                                 <a class="dropdown-item" href="/Authoring/Index">@Localizer["Create"]</a>
@@ -57,7 +57,7 @@
                             </div>
                         </li>
                         <li id="Tags" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="TagDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Tags"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="TagDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Tags"]</a>
                             <div class="dropdown-menu" aria-labelledby="TagDropdown">
                                 <a class="dropdown-item" href="/Tags/Authoring">@Localizer["Create"]</a>
                                 <a class="dropdown-item" href="/Tags/Index">@Localizer["Browse"]</a>
@@ -66,9 +66,9 @@
                     </ul>
                 </div>
                 <div id="Right part" class="navbar-collapse collapse bg-transparent">
-                    <ul class="navbar-nav ml-auto" style="align-items:center">
+                    <ul class="navbar-nav ms-auto" style="align-items:center">
                         <li id="User" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="UserDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="UserDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @if (SignInManager.IsSignedIn(User))
                                 {
                                     <i class="fas fa-user"></i>

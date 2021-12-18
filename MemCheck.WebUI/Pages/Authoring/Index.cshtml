@@ -29,7 +29,7 @@
                 <h1 class="title">
                     <span id="Title" v-if="creatingNewCard">@Localizer["Create"]</span><span v-else>@Localizer["Edit"]</span>
                     <span id="Info button" v-if="!creatingNewCard">
-                        <b-button class="btn btn-primary toolbar-button-circle toolbar-button" id="infoPopover" data-toggle="tooltip" data-placement="top"><i class="fas fa-info"></i></b-button>
+                        <b-button class="btn btn-primary toolbar-button-circle toolbar-button" id="infoPopover" data-bs-toggle="tooltip" data-placement="top"><i class="fas fa-info"></i></b-button>
                         <b-popover target="infoPopover" triggers="focus">
                             <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
                             <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
@@ -37,25 +37,25 @@
                         </b-popover>
                     </span>
                     <span id="Additional details toggle button">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="collapse" href=".TogglableAdditionalInfo"><i class="fas fa-plus"></i></button>
+                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableAdditionalInfo"><i class="fas fa-plus"></i></button>
                     </span>
                     <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
+                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
                     </span>
                     <span id="VisibilityToggleButton_1" v-if="card.usersWithView.length == 1">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
+                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
                     </span>
                     <span id="VisibilityToggleButton_2" v-if="card.usersWithView.length > 1">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
+                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
                     </span>
                     <span id="ImagesToggleButton">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="collapse" href=".TogglableImages"><i class="fas fa-camera"></i></button>
+                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableImages"><i class="fas fa-camera"></i></button>
                     </span>
                     <span id="HistoryButton" v-if="!creatingNewCard">
                         <button type="button" class="btn btn-primary toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
                     </span>
                     <span id="Rating" v-if="!creatingNewCard">
-                        <b-button class="btn btn-primary toolbar-button rating-button" id="ratingPopover" data-toggle="tooltip" data-placement="top">
+                        <b-button class="btn btn-primary toolbar-button rating-button" id="ratingPopover" data-bs-toggle="tooltip" data-placement="top">
                             {{currentUserRatingAsStars()}}<br />
                             {{averageRatingAsStars()}}
                         </b-button>

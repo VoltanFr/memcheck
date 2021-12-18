@@ -44,7 +44,7 @@
                             <th>@Localizer["Deck"]</th>
                             <td>
                                 <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
-                                <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -55,12 +55,12 @@
                 <div id="Small buttons" class="card-header" style="padding:1px">
                     <ul class="nav small text-decoration-none" style="align-items:center">
                         <li id="Edit button" style="padding-right:5px">
-                            <button class="btn btn-primary toolbar-button-circle toolbar-button" data-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
                         </li>
                         <li id="Remove button" style="padding-right:5px">
-                            <button class="btn btn-primary toolbar-button toolbar-button-circle" data-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-primary toolbar-button toolbar-button-circle" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
                         </li>
-                        <li id="Info button" data-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
+                        <li id="Info button" data-bs-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
                             <b-button class="btn btn-primary toolbar-button toolbar-button-circle" id="infoPopover"><i class="fas fa-info"></i></b-button>
                             <b-popover target="infoPopover" triggers="focus">
                                 @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}
@@ -74,7 +74,7 @@
                                 <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                             </b-popover>
                         </li>
-                        <li id="Visibility button" style="padding-right:5px" data-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>
+                        <li id="Visibility button" style="padding-right:5px" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>
                             <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 0" id="visibilityPopover0" key="public"><i class="far fa-eye"></i></b-button>
                             <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 1" id="visibilityPopover1" key="private"><i class="far fa-eye-slash"></i></b-button>
                             <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount > 1" id="visibilityPopover2" key="selectedvisi"><i class="fas fa-users"></i></b-button>
@@ -83,14 +83,14 @@
                         <li id="FilteringButton" style="padding-right:5px">
                             <button type="button" class="btn btn-primary toolbar-button toolbar-button-circle" @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></button>
                         </li>
-                        <li id="Heap info" data-toggle="tooltip" data-placement="top" title=@Localizer["Heap"] style="padding-right:5px">
+                        <li id="Heap info" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Heap"] style="padding-right:5px">
                             <b-button class="btn btn-primary toolbar-button" id="heapPopover"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</b-button>
                             <b-popover target="heapPopover" triggers="focus">
                                 @Localizer["CurrentlyInHeap"] {{currentCard.heap}}<br />
                                 @Localizer["TimesInNotLearnedHeap"] {{currentCard.nbTimesInNotLearnedHeap}}<br />
                                 @Localizer["BiggestHeapReached"] {{currentCard.biggestHeapReached}}<br />
                                 <hr class="menu-separation-line" />
-                                <a href="#" id="MoveToHeapDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["MoveToHeap"] class="learning-popover-menu"><i class="far fa-caret-square-down"></i> @Localizer["MoveToHeap"]</a>
+                                <a href="#" id="MoveToHeapDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["MoveToHeap"] class="learning-popover-menu"><i class="far fa-caret-square-down"></i> @Localizer["MoveToHeap"]</a>
                                 <span class="dropdown-menu" role="menu">
                                     <a v-for="targetHeap in currentCard.moveToHeapTargets" class="dropdown-item" @@click="moveToHeap(targetHeap)">
                                         <span v-if="targetHeap.heapId < currentCard.heapId"><i class="fas fa-angle-left"></i></span><span v-else><i class="fas fa-angle-right"></i></span>
@@ -99,7 +99,7 @@
                                 </span>
                             </b-popover>
                         </li>
-                        <li id="Rating" data-toggle="tooltip" data-placement="top">
+                        <li id="Rating" data-bs-toggle="tooltip" data-placement="top">
                             <b-button class="btn btn-primary toolbar-button" id="ratingPopover">
                                 {{currentUserRatingAsStars()}}<br />
                                 {{averageRatingAsStars()}}
@@ -109,7 +109,7 @@
                                 @Localizer["Average"] ({{currentCard.countOfUserRatings}} <span v-if="currentCard.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>)<b-form-rating inline readonly show-value v-model="currentCard.averageRating"></b-form-rating>
                             </b-popover>
                         </li>
-                        <li id="Last learn date" v-if="!learningUnknowns" class="ml-auto" data-toggle="tooltip" data-placement="top" v-bind:title="'@Localizer["LastLearnDate"] ' + dateTimeWithTime(currentCard.lastLearnUtcTime)">
+                        <li id="Last learn date" v-if="!learningUnknowns" class="ms-auto" data-bs-toggle="tooltip" data-placement="top" v-bind:title="'@Localizer["LastLearnDate"] ' + dateTimeWithTime(currentCard.lastLearnUtcTime)">
                             <i class="fas fa-clock"></i> {{dateTime(currentCard.lastLearnUtcTime)}}
                         </li>
                     </ul>
@@ -146,7 +146,7 @@
                 <div id="Knew Forgot" v-if="backSideVisible" class="card-footer learning-card-footer">
                     <ul class="nav small">
                         <li><button class="btn btn-success btn-md" @@click="knew">@Localizer["Knew"]</button></li>
-                        <li class="ml-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learningUnknowns">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
+                        <li class="ms-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learningUnknowns">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
                 <div id="Additional info" v-if="backSideVisible && currentCardHasAdditionalSide()" class="learning-card">
@@ -179,7 +179,7 @@
             </div>
         </div>
     </div>
-    <div id="UserQuitAttemptDisplayMode" v-if="userQuitAttemptDisplay">
+    <div id="UserQuitAttemptDisplayMode"  v-if="userQuitAttemptDisplay">
         <p>@Localizer["ExplainMoveOperationsBeforeIcon"] <i class="fas fa-save"></i> @Localizer["ExplainMoveOperationsAfterIcon"]</p>
         <button type="button" class="btn btn-success toolbar-button" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
     </div>

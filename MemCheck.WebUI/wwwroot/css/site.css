@@ -87,6 +87,7 @@
 
 .authoring-table {
     display: table;
+    width: 100%;
 }
 
 .authoring-table-body {
@@ -312,6 +313,7 @@
     background-color: transparent;
     border-style: none;
     margin: 0px;
+    width: 100%;
 }
 
 .markdown-edit-button {
@@ -337,6 +339,7 @@
     display: table;
     padding: 0px;
     margin: 0px;
+    width: 100%;
 }
 
 .markdown-edit-table-body {

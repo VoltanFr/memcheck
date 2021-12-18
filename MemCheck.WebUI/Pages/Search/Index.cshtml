@@ -33,18 +33,18 @@
                 </tr>
                 <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:lightgray">
                     <td id="Select all checkbox" class="search-page-widget-td" style="text-align:left">
-                        <input type="checkbox" id="selectAllCheckBox" @@change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-toggle="dropdown"></a>
+                        <input type="checkbox" id="selectAllCheckBox" @@change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-bs-toggle="dropdown"></a>
                         <span class="dropdown-menu" role="menu">
                             <a class="dropdown-item" @@click="selectAll()">@Localizer["SelectAll"]</a>
                             <a class="dropdown-item" @@click="unselectAll()">@Localizer["SelectNone"]</a>
                         </span>
                     </td>
                     <td id="Request row toggler" class="search-page-widget-td">
-                        <button type="button" class="btn btn-default" style="padding:0px" data-toggle="collapse" href="#QueryRow" data-placement="top" title=@Localizer["Request"]><i class="fas fa-ellipsis-v"></i></button>
+                        <button type="button" class="btn btn-default" style="padding:0px" data-bs-toggle="collapse" href="#QueryRow" data-placement="top" title=@Localizer["Request"]><i class="fas fa-ellipsis-v"></i></button>
                     </td>
                     <td id="DeckActionButton" class="search-page-widget-td">
                         <span v-if="deckActionDropDownButtonEnabled()">
-                            <a href="#" id="DeckActionDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></a>
+                            <a href="#" id="DeckActionDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></a>
                             <span class="dropdown-menu" role="menu">
                                 <span id="AddToDeck" v-if="addToDeckEnabled()">
                                     <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
@@ -74,7 +74,7 @@
                     </td>
                     <td id="NonDeckActionButton" class="search-page-widget-td">
                         <span v-if="nonDeckActionDropDownButtonEnabled()">
-                            <a href="#" id="NonDeckActionDropdown" role="button" data-toggle="dropdown" data-placement="top" title=@Localizer["Card"]><i class="fas fa-ellipsis-h"></i></a>
+                            <a href="#" id="NonDeckActionDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Card"]><i class="fas fa-ellipsis-h"></i></a>
                             <span class="dropdown-menu" role="menu">
                                 <span id="RegisterForNotifications" v-if="registerForNotificationsEnabled()">
                                     <a class="dropdown-item" @@click="registerForNotifications()"><i class="fas fa-bell"></i> @Localizer["RegisterForNotifications"]</a>
@@ -118,7 +118,7 @@
                         <span class="label" style="white-space:nowrap" v-if="selectionCount() == 1">, {{selectionCount()}} <span class="small-screen-text">@Localizer["Selected_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Selected_MediumScreen"]</span><span class="big-screen-text">@Localizer["Selected_BigScreen"]</span></span>
                         <span class="label" style="white-space:nowrap" v-if="selectionCount() > 1">, {{selectionCount()}} <span class="small-screen-text">@Localizer["Selecteds_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Selecteds_MediumScreen"]</span><span class="big-screen-text">@Localizer["Selecteds_BigScreen"]</span></span>
                         <span v-if="addTagDropDownButtonEnabled()" class="search-page-tag-button-column">
-                            <a class="dropdown-toggle" href="#" id="TagDropdown" role="button" data-toggle="dropdown"><i class="fas fa-tags"></i></a>
+                            <a class="dropdown-toggle" href="#" id="TagDropdown" role="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i></a>
                             <span class="dropdown-menu pre-scrollable" role="menu" v-if="addTagDropDownButtonEnabled()">
                                 <a class="dropdown-item" v-for="tag in allStaticData.allApplicableTags" @@click="addTagToSelectedCards(tag)"><i class="fas fa-plus"></i>&nbsp;{{tag.tagName}}</a>
                             </span>
