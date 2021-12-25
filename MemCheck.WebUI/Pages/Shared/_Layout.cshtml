@@ -12,9 +12,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MemCheck - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/vant/index.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap-vue/bootstrap-vue.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @RenderSection("head", required: false)
 </head>
@@ -128,13 +128,12 @@
 
     <script src="~/lib/jquery/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/vue/vue.min.js"></script>
-    <script src="~/lib/bootstrap-vue/bootstrap-vue.min.js"></script>
+    <script src="~/lib/vue/vue.global.js"></script>
     <script src="~/lib/axios/axios.min.js"></script>
     <script src="~/lib/font-awesome/js/all.min.js"></script>
     <script src="~/lib/showdown/showdown.min.js"></script>
     <script src="~/js/Common.js" asp-append-version="true"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

@@ -31,7 +31,7 @@ var app = new Vue({
                     this.error = null;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.cardId = null;
                     this.error = "Card not found: " + error;
                     this.loading = false;

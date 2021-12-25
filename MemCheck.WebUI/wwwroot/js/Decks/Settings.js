@@ -37,7 +37,7 @@ var app = new Vue({
                     this.heapingAlgorithms = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async GetUserDecks() {
@@ -54,7 +54,7 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         currentHeapingAlgorithmDescription() {
@@ -74,7 +74,7 @@ var app = new Vue({
                     return;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },

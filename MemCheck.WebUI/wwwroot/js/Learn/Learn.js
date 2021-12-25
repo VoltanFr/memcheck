@@ -1,40 +1,58 @@
-var app = new Vue({
-    el: '#LearnMainDiv',
-    data: {
-        userDecks: [],  //LearnController.UserDecksViewModel
-        activeDeck: null,  //LearnController.UserDecksViewModel
-        singleDeckDisplay: false,
-        learningUnknowns: true, //If false we are in repeat expired mode
-        currentCard: null,    //LearnController.GetCardsCardViewModel
-        backSideVisible: false,
-        mountFinished: false,
-        loading: false,
-        currentFullScreenImage: null,   //LearnController.GetCardsImageViewModel
-        pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
-        currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
-        currentMovePromise: null, //promise
-        pendingRatingOperations: [],  //{cardId: Guid, rating: int, nbAttempts: int}
-        currentRatingPromise: null, //promise
-        pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
-        currentNotificationRegistrationPromise: null, //promise
-        downloadedCards: [],    //LearnController.GetCardsCardViewModel
-        cardDownloadOperation: null,
-        currentImageLoadingPromise: null,
-        filteringDisplay: false,
-        selectedExcludedTags: [],   //LearnController.GetAllStaticDataTagViewModel
-        selectedExcludedTagToAdd: "",   //LearnController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
-        guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
-        userQuitAttemptDisplay: false,
-        lastDownloadIsEmpty: false,
-        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
-        additionalMoveDebugInfo: null,
-        additionalRatingDebugInfo: null,
+import * as vant from '../../lib/vant/vant.js';
+
+const learnApp = Vue.createApp({
+    components: {
+        'van-button': globalThis.vant.Button,
+        'van-popover': globalThis.vant.Popover,
+        'van-rate': globalThis.vant.Rate,
+        'big-size-image': BigSizeImage,
+    },
+    data() {
+        return {
+            showInfoPopover: false,
+            showVisibilityPopover: false,
+            heapInfoPopover: false,
+            showMoveToHeapMenuPopover: false,
+            ratingPopover: false,
+            userDecks: [],  //LearnController.UserDecksViewModel
+            activeDeck: null,  //LearnController.UserDecksViewModel
+            singleDeckDisplay: false,
+            learningUnknowns: true, //If false we are in repeat expired mode
+            currentCard: null,    //LearnController.GetCardsCardViewModel
+            backSideVisible: false,
+            mountFinished: false,
+            loading: false,
+            currentFullScreenImage: null,   //LearnController.GetCardsImageViewModel
+            pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
+            currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
+            currentMovePromise: null, //promise
+            pendingRatingOperations: [],  //{cardId: Guid, rating: int, nbAttempts: int}
+            currentRatingPromise: null, //promise
+            pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
+            currentNotificationRegistrationPromise: null, //promise
+            downloadedCards: [],    //LearnController.GetCardsCardViewModel
+            cardDownloadOperation: null,
+            currentImageLoadingPromise: null,
+            filteringDisplay: false,
+            selectedExcludedTags: [],   //LearnController.GetAllStaticDataTagViewModel
+            selectedExcludedTagToAdd: "",   //LearnController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
+            guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
+            userQuitAttemptDisplay: false,
+            lastDownloadIsEmpty: false,
+            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+            additionalMoveDebugInfo: null,
+            additionalRatingDebugInfo: null,
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
+        this.dateTimeWithTime = dateTimeWithTime;
     },
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
-            getBigSizeImageLabelsTask = this.GetBigSizeImageLabels();
+            const getBigSizeImageLabelsTask = this.GetBigSizeImageLabels();
             await this.GetUserDecks();
             this.GetLearnModeFromPageParameter();
             this.downloadCardsIfNeeded();
@@ -54,7 +72,7 @@ var app = new Vue({
     methods: {
         GetLearnModeFromPageParameter() {
             //There has to be a better way, but here's how I get a parameter passed to a page
-            wantedLearnMode = document.getElementById("LearnModeInput").value;
+            const wantedLearnMode = document.getElementById("LearnModeInput").value;
             this.learningUnknowns = wantedLearnMode == "Unknown";
         },
         async GetUserDecks() {
@@ -71,7 +89,7 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         getCard() {
@@ -128,10 +146,10 @@ var app = new Vue({
                 await axios.delete('/Decks/RemoveCardFromDeck/' + this.activeDeck.deckId + "/" + this.currentCard.cardId)
                     .then(result => {
                         this.getCard();
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     })
             }
         },
@@ -243,7 +261,7 @@ var app = new Vue({
             return this.selectedExcludedTags.some(t => t.tagId == tagId);
         },
         CanAddSelectedExcludedTag() {
-            result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
+            const result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
             return result;
         },
         addExcludedTag() {
@@ -292,19 +310,21 @@ var app = new Vue({
                 this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true, nbAttempts: 0 });
                 this.getCard();
             }
+            this.showMoveToHeapMenuPopover = false;
+            this.heapInfoPopover = false;
         },
-        enqueueRatingUpload() {
+        enqueueRatingUpload(value) {
             this.pendingRatingOperations.push({ cardId: this.currentCard.cardId, rating: this.currentCard.currentUserRating, nbAttempts: 0 });
         },
         timeToExitPage() {
-            result = !this.currentCard;
+            var result = !this.currentCard;
             result = result && this.downloadedCards.length == 0;
             result = result && this.lastDownloadIsEmpty;
             result = result && this.canExitPageSafely();
             return result;
         },
         canExitPageSafely() {
-            result = this.pendingMoveOperations.length == 0;
+            var result = this.pendingMoveOperations.length == 0;
             result = result && !this.currentMovePromise;
             result = result && this.pendingRatingOperations.length == 0;
             result = result && !this.currentRatingPromise;
@@ -327,7 +347,7 @@ var app = new Vue({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        this.additionalRatingDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                        this.additionalRatingDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")" + " - Error: " + error;
                         sleep(1000).then(() => {
                             this.additionalRatingDebugInfo = "Rating failed, will retry asap (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
                             this.currentRatingPromise = null;
@@ -395,62 +415,68 @@ var app = new Vue({
                     this.bigSizeImageLabels = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },
     watch: {
         pendingMoveOperations: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingMoveOperations();
             },
+            deep: true
         },
         currentMovePromise: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingMoveOperations();
             },
         },
         downloadedCards: {
-            handler() {
+            handler: function (newValue) {
                 this.downloadCardsIfNeeded();
                 this.downloadImagesIfNeeded();
             },
+            deep: true
         },
-        currentCardDownloadOperation: {
-            handler() {
+        cardDownloadOperation: {
+            handler: function (newValue) {
                 this.downloadCardsIfNeeded();
             },
         },
         currentImageLoadingPromise: {
-            handler() {
+            handler: function (newValue) {
                 this.downloadImagesIfNeeded();
             },
         },
         selectedExcludedTagToAdd: {
-            handler() {
+            handler: function (newValue) {
                 this.addExcludedTag();
                 this.selectedExcludedTagToAdd = "";
             }
         },
         pendingRatingOperations: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingRatingOperations();
             },
+            deep: true
         },
         currentRatingPromise: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingRatingOperations();
             },
         },
         pendingNotificationRegistrations: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingNotificationRegistrations();
             },
+            deep: true
         },
         currentNotificationRegistrationPromise: {
-            handler() {
+            handler: function (newValue) {
                 this.handlePendingNotificationRegistrations();
             },
         },
     },
 });
+
+learnApp.mount('#LearnMainDiv');

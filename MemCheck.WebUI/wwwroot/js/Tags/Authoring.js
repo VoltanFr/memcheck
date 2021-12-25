@@ -34,7 +34,7 @@ var app = new Vue({
                     this.existingTagNames = new Set(result.data);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.existingTagNames = new Set();
                 });
         },
@@ -44,7 +44,7 @@ var app = new Vue({
                     this.guiMessages = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async postNewTag() {
@@ -53,7 +53,7 @@ var app = new Vue({
                     this.afterSave(result);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     return;
                 });
         },
@@ -75,12 +75,12 @@ var app = new Vue({
                     this.afterSave(result);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     return;
                 });
         },
         async afterSave(axiosResult) {
-            tellControllerSuccess(axiosResult, this);
+            tellControllerSuccess(axiosResult);
             this.toastVisible = true;
             this.editedTag = "";
             this.newName = "";
@@ -109,7 +109,7 @@ var app = new Vue({
                     this.newDescription = this.editedTag.description;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.editedTag = "";
                 });
         },

@@ -51,7 +51,7 @@ var app = new Vue({
                     this.image.lastChangeUtcDate = result.data.lastChangeUtcDate;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.error = "Image not found: " + error;
                     return;
                 });
@@ -62,7 +62,7 @@ var app = new Vue({
                     this.image.blob = base64FromBytes(result.data);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async GetReturnUrlFromPageParameter() {
@@ -75,12 +75,12 @@ var app = new Vue({
                 await axios.post('/Media/Delete/' + this.image.imageId, body)
                     .then(result => {
                         this.deleting = false;
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                         this.goBack();
                     })
                     .catch(error => {
                         this.deleting = false;
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     })
             }
 

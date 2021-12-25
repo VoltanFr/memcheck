@@ -3,16 +3,6 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "bootstrap-vue@2.21.2",
-      "destination": "wwwroot/lib/bootstrap-vue/",
-      "files": [
-        "bootstrap-vue.min.js",
-        "bootstrap-vue.min.css",
-        "bootstrap-vue.min.js.map",
-        "bootstrap-vue.min.css.map"
-      ]
-    },
-    {
       "library": "showdown@1.9.1",
       "destination": "wwwroot/lib/showdown/",
       "files": [
@@ -26,13 +16,6 @@
       "files": [
         "axios.min.js",
         "axios.min.map"
-      ]
-    },
-    {
-      "library": "vue@2.6.11",
-      "destination": "wwwroot/lib/vue/",
-      "files": [
-        "vue.min.js"
       ]
     },
     {
@@ -78,6 +61,14 @@
         "webfonts/fa-regular-400.woff2",
         "webfonts/fa-brands-400.woff2"
       ]
+    },
+    {
+      "library": "vue@3.2.26",
+      "destination": "wwwroot/lib/vue/"
+    },
+    {
+      "library": "vant@3.3.7",
+      "destination": "wwwroot/lib/vant/"
     }
   ]
 }

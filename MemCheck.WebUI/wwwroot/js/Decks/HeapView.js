@@ -1,10 +1,20 @@
-var app = new Vue({
-    el: '#HeapViewMainDiv',
-    data: {
-        userDecks: [],  //DecksController.GetUserDecksWithHeapsViewModel
-        activeDeck: "",  //DecksController.GetUserDecksWithHeapsViewModel
-        singleDeckDisplay: false,
-        mountFinished: false,
+import * as vant from '../../lib/vant/vant.js';
+
+const heapViewApp = Vue.createApp({
+    components: {
+        'van-button': globalThis.vant.Button,
+    },
+    data() {
+        return {
+            userDecks: [],  //DecksController.GetUserDecksWithHeapsViewModel
+            activeDeck: "",  //DecksController.GetUserDecksWithHeapsViewModel
+            singleDeckDisplay: false,
+            mountFinished: false,
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
+        this.dateTimeWithTime = dateTimeWithTime;
     },
     async mounted() {
         try {
@@ -19,7 +29,7 @@ var app = new Vue({
         GetActiveDeckFromPageParameter() {
             //There has to be a better way, but here's how I get a parameter passed to a page
             if (!this.singleDeckDisplay) {
-                wantedDeck = document.getElementById("DeckIdInput").value;
+                const wantedDeck = document.getElementById("DeckIdInput").value;
                 if (!wantedDeck)
                     return;
                 for (let i = 0; i < this.userDecks.length; i++) {
@@ -42,7 +52,7 @@ var app = new Vue({
                     }
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         dt(utcFromDotNet) {
@@ -54,3 +64,5 @@ var app = new Vue({
         },
     },
 });
+
+heapViewApp.mount('#HeapViewMainDiv');

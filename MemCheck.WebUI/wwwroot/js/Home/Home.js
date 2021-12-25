@@ -1,9 +1,12 @@
-var app = new Vue({
-    el: '#HomeDiv',
-    data: {
-        allData: null, //HomeController.GetAllViewModel
-        reload: false,
-        dateTimeMinValue: "9999-12-31T23:59:59.9999999",
+import * as vant from '../../lib/vant/vant.js';
+
+var app = Vue.createApp({
+    data() {
+        return {
+            allData: null, //HomeController.GetAllViewModel
+            reload: false,
+            dateTimeMinValue: "9999-12-31T23:59:59.9999999",
+        }
     },
     async mounted() {
         await this.getAll();
@@ -21,7 +24,7 @@ var app = new Vue({
                         })
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
 
                     if (this.allData)
                         sleepTime = 600000; //10'
@@ -45,10 +48,12 @@ var app = new Vue({
     },
     watch: {
         reload: {
-            handler() {
+            handler: function (newValue) {
                 if (this.reload)
                     this.getAll();
-            },
+            }
         },
     },
 });
+
+app.mount('#HomeDiv');

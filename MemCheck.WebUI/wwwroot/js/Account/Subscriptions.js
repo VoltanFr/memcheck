@@ -23,7 +23,7 @@ var app = new Vue({
                     this.searchSubscriptions = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
             this.loading = false;
         },
@@ -36,10 +36,10 @@ var app = new Vue({
 
                 await axios.delete('/Account/DeleteSearchSubscription/' + subscription.id)
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
                 this.loading = false;

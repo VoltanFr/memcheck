@@ -1,9 +1,12 @@
-﻿var app = new Vue({
-    el: '#SelectLanguageDiv',
-    data: {
-        activeLanguage: "",
-        availableLanguages: [],
-        mountFinished: false,
+﻿import * as vant from '../../lib/vant/vant.js';
+
+const layoutApp = Vue.createApp({
+    data() {
+        return {
+            activeLanguage: "",
+            availableLanguages: [],
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
@@ -29,7 +32,7 @@
                     setCookie("AvailableLanguages", result.data.toString(), 1);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async getActiveLanguage() {
@@ -46,7 +49,7 @@
                     setCookie("ActiveLanguage", result.data, 1);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async activeLanguageChange() {
@@ -57,14 +60,16 @@
                         window.location.reload(false);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },
     watch: {
-        activeLanguage: async function () {
+       async activeLanguage() {
             if (this.mountFinished)
-                await this.activeLanguageChange();
-        }, immediate: false
+            await    this.activeLanguageChange();
+        }
     },
 });
+
+layoutApp.mount('#SelectLanguageDiv');

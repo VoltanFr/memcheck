@@ -50,11 +50,11 @@ var app = new Vue({
 
             await axios.post('/Media/UploadImage/', f, { headers: { 'Content-Type': 'multipart/form-data' } })
                 .then((result) => {
-                    tellControllerSuccess(result, this);
+                    tellControllerSuccess(result);
                     this.clearAll();
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async uploadEdited() {
@@ -64,13 +64,13 @@ var app = new Vue({
 
             await axios.post('/Media/Update/' + this.editingImageId, data)
                 .then((result) => {
-                    tellControllerSuccess(result, this);
+                    tellControllerSuccess(result);
                     this.clearAll();
                     if (this.returnUrl)
                         window.location = this.returnUrl;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         clearAll() {
@@ -110,7 +110,7 @@ var app = new Vue({
                     this.originalSource = this.source;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.clearAll();
                     return;
                 });
@@ -120,7 +120,7 @@ var app = new Vue({
                     this.imagePreview = base64FromBytes(result.data);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async GetReturnUrlFromPageParameter() {

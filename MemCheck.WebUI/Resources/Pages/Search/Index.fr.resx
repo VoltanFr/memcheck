@@ -184,7 +184,7 @@
     <value>Passages par le tas des non apprises :</value>
   </data>
   <data name="Never" xml:space="preserve">
-    <value>&lt;jamais&gt;</value>
+    <value>Jamais</value>
   </data>
   <data name="NoCard" xml:space="preserve">
     <value>Aucune carte</value>

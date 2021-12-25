@@ -376,6 +376,7 @@
     display: block;
     width: 100%;
     resize: both;
+    height: auto;
     border-width: 1px;
     border-style: solid;
     border-color: lightgray;
@@ -624,6 +625,7 @@ br {
     border-color: lightgray;
     padding: 0px;
     color: black;
+    width: 100%;
 }
 
 .search-page-required-text-edit {
@@ -639,4 +641,5 @@ br {
     border-color: lightgray;
     padding: 0px;
     color: black;
+    width: 100%;
 }

@@ -64,7 +64,7 @@ var app = new Vue({
                     });
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
 
             for (let i = 0; i < this.images.length; i++)
@@ -73,7 +73,7 @@ var app = new Vue({
                         this.images[i].thumbnail = base64FromBytes(result.data);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
             this.loading = false;
@@ -90,7 +90,7 @@ var app = new Vue({
                     this.staticText = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         canMovePage(shift) {
@@ -142,7 +142,7 @@ var app = new Vue({
                         };
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
             }
             finally {
@@ -157,7 +157,7 @@ var app = new Vue({
             window.history.back();
         },
         copyToClipboard(text) {
-            copyToClipboardAndToast(text, this.staticText.copyToClipboardToastTitleOnSuccess, this.staticText.copyToClipboardToastTitleOnFailure, this);
+            copyToClipboardAndToast(text, this.staticText.copyToClipboardToastTitleOnSuccess, this.staticText.copyToClipboardToastTitleOnFailure);
         },
         dt(utcFromDotNet) {
             return dateTime(utcFromDotNet);
@@ -168,7 +168,7 @@ var app = new Vue({
                     this.bigSizeImageLabels = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },

@@ -30,7 +30,7 @@ var app = new Vue({
                     this.users = result.data.users;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         canMovePage(shift) {

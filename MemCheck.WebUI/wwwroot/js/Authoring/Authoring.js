@@ -1,58 +1,62 @@
-var app = new Vue({
-    el: '#AuthoringMainDiv',
-    data: {
-        card: {
-            frontSide: "",
-            backSide: "",
-            additionalInfo: "",
-            languageId: "", //Guid
-            tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-            usersWithView: [], //AuthoringController.GetUsersViewModel
-            versionDescription: "",
-            currentUserRating: 0,
-            averageRating: 0,
-            countOfUserRatings: 0,
-        },
-        originalCard: {
-            frontSide: "",
-            backSide: "",
-            additionalInfo: "",
-            languageId: "", //Guid
-            tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-            usersWithView: [] //AuthoringController.GetUsersViewModel
-        },
-        allAvailableTags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-        allAvailableLanguages: [],  //GetAllLanguages.ViewModel
-        allAvailableUsers: [],  //AuthoringController.GetUsersViewModel
-        selectedTagToAdd: "",   //AuthoringController.GetAllAvailableTagsViewModel
-        selectedUserToAdd: "",  //AuthoringController.GetUsersViewModel
-        currentUser: "", //AuthoringController.GetUsersViewModel
-        creatingNewCard: true,  //If false, we are editing an existing card, see method GetCardToEditFromPageParameter
-        editingCardId: "",  //Guid, used only if !creatingNewCard
-        editingCardCreationDate: "",  //string, used only if !creatingNewCard
-        editingCardLastChangeDate: "",  //string, used only if !creatingNewCard
-        infoAboutUsage: "",  //string, used only if !creatingNewCard
-        returnUrl: "", //string
-        mountFinished: false,
-        guiMessages: {
-            success: "",
-            failure: "",
-            sureCreateWithoutTag: "",
-        },
-        addToDeck: "",  //AuthoringController.DecksOfUserViewModel
-        decksOfUser: [],    //AuthoringController.DecksOfUserViewModel
-        imageToAddFront: "", //string (name of image)
-        imageToAddBack: "",
-        imageToAddAdditional: "",
-        frontSideImageList: [],   //"MyImageType": see loadImage
-        backSideImageList: [],   //MyImageType
-        additionalInfoImageList: [],   //MyImageType
-        originalFrontSideImageList: [],   //MyImageType
-        originalBackSideImageList: [],   //MyImageType
-        originalAdditionalInfoImageList: [],   //MyImageType
-        currentFullScreenImage: null,   //MyImageType
-        saving: false,
-        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+const authoringApp = Vue.createApp({
+    components: {
+        'markdown-editor': MarkdownEditor,
+    },
+    data() {
+        return {
+            card: {
+                frontSide: "",
+                backSide: "",
+                additionalInfo: "",
+                languageId: "", //Guid
+                tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
+                usersWithView: [], //AuthoringController.GetUsersViewModel
+                versionDescription: "",
+                currentUserRating: 0,
+                averageRating: 0,
+                countOfUserRatings: 0,
+            },
+            originalCard: {
+                frontSide: "",
+                backSide: "",
+                additionalInfo: "",
+                languageId: "", //Guid
+                tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
+                usersWithView: [] //AuthoringController.GetUsersViewModel
+            },
+            allAvailableTags: [],   //AuthoringController.GetAllAvailableTagsViewModel
+            allAvailableLanguages: [],  //GetAllLanguages.ViewModel
+            allAvailableUsers: [],  //AuthoringController.GetUsersViewModel
+            selectedTagToAdd: "",   //AuthoringController.GetAllAvailableTagsViewModel
+            selectedUserToAdd: "",  //AuthoringController.GetUsersViewModel
+            currentUser: "", //AuthoringController.GetUsersViewModel
+            creatingNewCard: true,  //If false, we are editing an existing card, see method GetCardToEditFromPageParameter
+            editingCardId: "",  //Guid, used only if !creatingNewCard
+            editingCardCreationDate: "",  //string, used only if !creatingNewCard
+            editingCardLastChangeDate: "",  //string, used only if !creatingNewCard
+            infoAboutUsage: "",  //string, used only if !creatingNewCard
+            returnUrl: "", //string
+            mountFinished: false,
+            guiMessages: {
+                success: "",
+                failure: "",
+                sureCreateWithoutTag: "",
+            },
+            addToDeck: "",  //AuthoringController.DecksOfUserViewModel
+            decksOfUser: [],    //AuthoringController.DecksOfUserViewModel
+            imageToAddFront: "", //string (name of image)
+            imageToAddBack: "",
+            imageToAddAdditional: "",
+            frontSideImageList: [],   //"MyImageType": see loadImage
+            backSideImageList: [],   //MyImageType
+            additionalInfoImageList: [],   //MyImageType
+            originalFrontSideImageList: [],   //MyImageType
+            originalBackSideImageList: [],   //MyImageType
+            originalAdditionalInfoImageList: [],   //MyImageType
+            currentFullScreenImage: null,   //MyImageType
+            saving: false,
+            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+        }
     },
     async mounted() {
         try {
@@ -107,7 +111,7 @@ var app = new Vue({
                     this.guiMessages = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async GetBigSizeImageLabels() {
@@ -116,7 +120,7 @@ var app = new Vue({
                     this.bigSizeImageLabels = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async sendCard() {
@@ -148,12 +152,12 @@ var app = new Vue({
                 await task
                     .then(result => {
                         this.clearAll();
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                         if (this.returnUrl)
                             window.location = this.returnUrl;
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
             }
             finally {
@@ -268,7 +272,7 @@ var app = new Vue({
                 })
                 .catch(error => {
                     this.clearAll();
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
 
             for (var i = 0; i < images.length; i++)
@@ -344,7 +348,7 @@ var app = new Vue({
             await axios.post('/Authoring/GetImageInfo/', request)
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
-                        tellAxiosError("This image is already in the list", this);
+                        tellAxiosError("This image is already in the list");
                         return;
                     }
 
@@ -356,7 +360,7 @@ var app = new Vue({
                     );
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         async pasteImageName(side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
@@ -380,7 +384,7 @@ var app = new Vue({
                     this.addImage(side);
                 })
                 .catch(err => {
-                    tellAxiosError(err, this);
+                    tellAxiosError(err);
                 });
         },
         onBeforeUnload(event) {
@@ -445,10 +449,10 @@ var app = new Vue({
         async updateRating() {
             await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + this.card.currentUserRating)
                 .then(response => {
-                    tellControllerSuccess(response, this);
+                    tellControllerSuccess(response);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },
@@ -467,3 +471,5 @@ var app = new Vue({
         },
     },
 });
+
+authoringApp.mount('#AuthoringMainDiv');

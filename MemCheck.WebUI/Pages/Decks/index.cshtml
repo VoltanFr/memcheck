@@ -31,7 +31,8 @@
                         <th>@Localizer["Deck"]</th>
                         <td class="deck-index-deckname-td">
                             <span class="deck-index-deckname-span">
-                                <textarea class="form-control deck-index-deckname-textarea responsive-padding-edit" v-model="activeDeck.description" readonly="readonly" rows="1"></textarea><button class="btn btn-primary toolbar-button-circle toolbar-button deck-index-deckname-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                                <textarea class="form-control deck-index-deckname-textarea responsive-padding-edit" v-model="activeDeck.description" readonly="readonly" rows="1"></textarea>
+                                <van-button class="toolbar-button-circle toolbar-button deck-index-deckname-button" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></van-button>
                             </span>
                         </td>
                     </tr>
@@ -74,5 +75,5 @@
 </div>
 
 @section scripts {
-    <script src="~/js/Decks/HeapView.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Decks/HeapView.js" asp-append-version="true"></script>
 }

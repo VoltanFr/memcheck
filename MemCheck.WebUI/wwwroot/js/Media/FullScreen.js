@@ -26,7 +26,7 @@ var app = new Vue({
                     this.imageBlob = base64FromBytes(result.data);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
     },

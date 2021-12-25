@@ -1,5 +1,11 @@
-﻿Vue.component('big-size-image', {
-    props: ['image', 'labels'],
+﻿const BigSizeImage = Vue.defineComponent({
+    components: {
+        // mention sub components, if we used in the template
+    },
+    props: {
+        image: { required: true },
+        labels: { required: true },
+    },
     template: `
         <div id="big-size-image">
             <div id="TitleAndSmallButtons" class="big-size-image-top-div">
@@ -37,7 +43,7 @@
     `,
     methods: {
         copyToClipboard() {
-            copyToClipboardAndToast(this.image.name, this.labels.copiedToClipboardToastTitleOnSuccess, this.labels.copiedToClipboardToastTitleOnFailure, this);
+            copyToClipboardAndToast(this.image.name, this.labels.copiedToClipboardToastTitleOnSuccess, this.labels.copiedToClipboardToastTitleOnFailure);
         },
         hasRemoveListener() {
             return this.$listeners && this.$listeners.remove;
@@ -49,4 +55,4 @@
             return this.$listeners && this.$listeners.versionhistory;
         },
     },
-})
+});

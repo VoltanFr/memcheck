@@ -3,7 +3,7 @@
 @inject IViewLocalizer Localizer
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -154,7 +154,7 @@
                                     <td>
                                         <div class="form-group-sm">
                                             <select class="input-group responsive-padding-edit" style="width:50%;float:left" v-model="selectedAddToDeckDateChoice"><option v-for="addToDeckDatePossibleChoice in addToDeckDatePossibleChoices" v-bind:value="addToDeckDatePossibleChoice.choiceId">{{addToDeckDatePossibleChoice.choiceText}}</option></select>
-                                            <b-datepicker class="input-group responsive-padding-edit" v-model="addToDeckDate" size="sm" style="width:50%;float:left" v-if="selectedAddToDeckDateChoice!=0"></b-datepicker>
+                                            <van-datetimepicker v-model="addToDeckDate" class="responsive-padding-edit" type="date" style="width:50%;float:left" v-bind:visible-item-count="3" v-bind:show-toolbar="false" v-if="selectedAddToDeckDateChoice!=0"></van-datetimepicker>
                                         </div>
                                     </td>
                                 </tr>
@@ -163,7 +163,7 @@
                                     <td>
                                         <div class="form-group-sm">
                                             <select class="input-group responsive-padding-edit" style="width:50%;float:left" v-model="selectedExpiryDateChoice"><option v-for="expiryDatePossibleChoice in expiryDatePossibleChoices" v-bind:value="expiryDatePossibleChoice.choiceId">{{expiryDatePossibleChoice.choiceText}}</option></select>
-                                            <b-datepicker class="input-group responsive-padding-edit" v-model="expiryDate" size="sm" style="width:50%;float:left" v-if="selectedExpiryDateChoice!=0"></b-datepicker>
+                                            <van-datetimepicker v-model="expiryDate" class="responsive-padding-edit" type="date" style="width:50%;float:left" v-bind:visible-item-count="3" v-bind:show-toolbar="false" v-if="selectedExpiryDateChoice!=0"></van-datetimepicker>
                                         </div>
                                     </td>
                                 </tr>
@@ -172,9 +172,9 @@
                                     <td>
                                         <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddReqiredTagButton" v-if="CanAddSelectedRequiredTag()">
-                                            <button type="button" class="btn btn-success toolbar-button" @@click="addRequiredTag">+</button>
+                                            <van-button class="toolbar-button" @@click="addRequiredTag">+</van-button>
                                         </span>
-                                        <button type="button" class="tag" v-for="(tag,index) in selectedRequiredTags" @@click="removeRequiredTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                        <van-button class="tag" v-for="(tag,index) in selectedRequiredTags" @@click="removeRequiredTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></van-button>
                                     </td>
                                 </tr>
                                 <tr id="EcludedTagsRow">
@@ -182,9 +182,9 @@
                                     <td>
                                         <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
-                                            <button type="button" class="btn btn-success toolbar-button" @@click="addExcludedTag">+</button>
+                                            <van-button class="toolbar-button" @@click="addExcludedTag">+</van-button>
                                         </span>
-                                        <button type="button" class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                        <van-button class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></van-button>
                                     </td>
                                 </tr>
                                 <tr id="Owner">
@@ -226,7 +226,11 @@
                                 </tr>
                                 <tr id="Run & Subscribe buttons">
                                     <td></td>
-                                    <td><button class="btn btn-info toolbar-button" @@click="runQuery()">@Localizer["Run"]</button> <button class="btn btn-info toolbar-button" @@click="subscribe()">@Localizer["Subscribe"]</button></td>
+                                    <td>
+                                        <van-button class="toolbar-button" @@click="runQuery()">@Localizer["Run"]</van-button>
+                                        &nbsp;
+                                        <van-button class="toolbar-button" @@click="subscribe()">@Localizer["Subscribe"]</van-button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -237,24 +241,19 @@
                         <input type="checkbox" style="padding:0px;vertical-align:middle" v-model="cardWithSelectionInfo.selected" />
                     </td>
                     <td id="Visibility" class="search-page-widget-td">
-                        <b-button class="btn btn-primary toolbar-button-circle toolbar-button" style="padding:0px" v-bind:id="'visi'+htmlClassForCard(cardWithSelectionInfo.card)">
-                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
-                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
-                            <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
-                        </b-button>
-                        <b-popover v-bind:target="'visi'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">{{cardWithSelectionInfo.card.popoverVisibility}}</b-popover>
+                        <van-popover v-model:show="cardWithSelectionInfo.visibilityInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                            {{cardWithSelectionInfo.card.popoverVisibility}}
+                            <template #reference>
+                                <van-button class="toolbar-button-circle toolbar-button" style="padding:0px">
+                                    <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
+                                    <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
+                                    <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
+                                </van-button>
+                            </template>
+                        </van-popover>
                     </td>
                     <td id="Heap" info class="search-page-widget-td">
-                        <b-button class="btn toolbar-button search-page-heap-info" style="width:100%" v-bind:id="'heap'+htmlClassForCard(cardWithSelectionInfo.card)">
-                            <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
-                            <span v-else>
-                                <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
-                                    <i class="fas fa-layer-group"></i> {{cardWithSelectionInfo.card.decks[0].heapId}}
-                                </span>
-                                <span v-else style="color:ButtonText"><i class="fas fa-layer-group"></i></span>
-                            </span>
-                        </b-button>
-                        <b-popover v-bind:target="'heap'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">
+                        <van-popover v-model:show="cardWithSelectionInfo.heapDetailPopover" overlay="false" close-on-click-outside close-on-click-overlay>
                             <span v-if="cardWithSelectionInfo.card.decks.length == 0">
                                 <span v-if="singleDeckDisplayOptimization">@Localizer["NotInYourDeck"]</span><span v-else>@Localizer["InNoneOfYourDecks"]</span>
                             </span>
@@ -265,7 +264,7 @@
                                     @Localizer["NbTimesInNotLearnedHeap"] {{deck.nbTimesInNotLearnedHeap}}<br />
                                     @Localizer["BiggestHeapReached"] {{deck.biggestHeapReached}}<br />
                                     @Localizer["AddedToDeckOn"] {{dt(deck.addToDeckUtcTime)}}<br />
-                                    @Localizer["LastLearnedOn"] <span v-if="!deck.lastLearnUtcTime || deck.lastLearnUtcTime == '0001-01-01T00:00:00Z'">@Localizer["Never"]</span><span v-else>{{dt(deck.lastLearnUtcTime)}}</span><br />
+                                    @Localizer["LastLearnedOn"] <span v-if="isValidDateTime(deck.lastLearnUtcTime)">{{dt(deck.lastLearnUtcTime)}}</span><span v-else>@Localizer["Never"]</span><br />
                                     <span v-if="deck.heapId > 0">
                                         <span v-if="deck.expired" style="color:orange">@Localizer["ExpiredOn"]</span><span v-else>@Localizer["WillExpireOn"]</span> {{dt(deck.expiryUtcDate)}}
                                     </span>
@@ -275,17 +274,30 @@
                                     <br />
                                 </span>
                             </span>
-                        </b-popover>
+                            <template #reference>
+                                <van-button class="toolbar-button search-page-heap-info">
+                                    <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
+                                    <span v-else>
+                                        <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
+                                            <i class="fas fa-layer-group"></i> {{cardWithSelectionInfo.card.decks[0].heapId}}
+                                        </span>
+                                        <span v-else style="color:ButtonText"><i class="fas fa-layer-group"></i></span>
+                                    </span>
+                                </van-button>
+                            </template>
+                        </van-popover>
                     </td>
                     <td id="Rating" info class="search-page-widget-td">
-                        <b-button class="btn toolbar-button search-page-rating-button" style="width:100%" v-bind:id="'rating'+htmlClassForCard(cardWithSelectionInfo.card)">
-                            <span v-if="cardWithSelectionInfo.card.averageRating == 0" style="color: InactiveCaptionText">{{cardWithSelectionInfo.card.ratingShort}}</span>
-                            <span v-else style="color:ButtonText">{{cardWithSelectionInfo.card.ratingShort}}</span>
-                        </b-button>
-                        <b-popover v-bind:target="'rating'+htmlClassForCard(cardWithSelectionInfo.card)" triggers="focus">
+                        <van-popover v-model:show="cardWithSelectionInfo.ratingInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
                             @Localizer["YourRating"] {{cardWithSelectionInfo.card.userRatingAsStars}}<br />
                             @Localizer["Average"] ({{cardWithSelectionInfo.card.countOfUserRatings}} <span v-if="cardWithSelectionInfo.card.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>) {{cardWithSelectionInfo.card.averageRatingAsStars}} {{cardWithSelectionInfo.card.averageRating}}
-                        </b-popover>
+                            <template #reference>
+                                <van-button class="toolbar-button search-page-rating-button">
+                                    <span v-if="cardWithSelectionInfo.card.averageRating == 0" style="color: InactiveCaptionText">{{cardWithSelectionInfo.card.ratingShort}}</span>
+                                    <span v-else style="color:ButtonText">{{cardWithSelectionInfo.card.ratingShort}}</span>
+                                </van-button>
+                            </template>
+                        </van-popover>
                     </td>
                     <td id="Front side" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:0">
                         <a v-bind:href="'/Authoring?CardId='+cardWithSelectionInfo.card.cardId">{{cardWithSelectionInfo.card.frontSide}}</a>
@@ -307,5 +319,5 @@
 </div>
 
 @section scripts {
-    <script src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
 }

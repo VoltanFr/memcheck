@@ -1,65 +1,76 @@
-var app = new Vue({
-    el: '#SearchRootDiv',
-    data: {
-        mountFinished: false,
-        singleDeckDisplayOptimization: false,
-        allStaticData: "",   //SearchController.GetAllStaticDataViewModel - We never mute this field after mounted has finished
-        possibleDecks: [],   //SearchController.GetAllStaticDataDeckViewModel - This array changes according to the selected deck. It contains in first position a fake deck named "Not filtering" with Guid zero.
-        selectedDeck: "",  //SearchController.GetAllStaticDataDeckViewModel - See selectedDeckIsForInclusion
-        possibleTargetDecksForAdd: [], //SearchController.GetAllStaticDataDeckForAddViewModel
-        possibleDecksInclusionChoices: [],   //{selectedDeckIsInclusive: bool, choiceText: string}. This field only makes sense when selectedDeck is not null. Tells if the query will report the cards of selectedDeckor exclude the cards of the selected deck
-        deckSelectionIsInclusive: true,
-        possibleHeaps: [],  //SearchController.GetAllStaticDataHeapViewModel. Available only when filtering inclusive on a deck, this shows the heaps which exist in the deck. There is a first heap named "ignore" with id -1.
-        selectedHeap: "",  //int. Available only when filtering inclusive on a deck, the heap in which all cards must be. -1 means no filtering on heap
-        addToDeckDatePossibleChoices: [],  //{choiceId: int, choiceText: string}. Only when filtering inclusive on a deck. 0 = ignore date on which cards were added to the deck, 1 = before the selected date, 2 = on the day, 3 = after
-        addToDeckDate: "",  //Date. Available only when filtering inclusive on a deck, date considered for filtering on date on which the card was added to the deck
-        selectedAddToDeckDateChoice: 0, //choiceId: int
-        expiryDatePossibleChoices: [],  //{choiceId: int, choiceText: string}. Only when filtering inclusive on a deck. 0 = ignore date on which cards expire, 1 = expiry before the selected date, 2 = on the day, 3 = after
-        expiryDate: "",  //Date. Available only when filtering inclusive on a deck, date considered for filtering on date on which the card expires
-        selectedExpiryDateChoice: 0, //choiceId: int
-        possibleRequiredTags: [], /* SearchController.GetAllStaticDataTagViewModel - The tags we *currently* display in the required tags combo box. 
+import * as vant from '../../lib/vant/vant.js';
+
+const searchApp = Vue.createApp({
+    components: {
+        'van-button': globalThis.vant.Button,
+        'van-popover': globalThis.vant.Popover,
+        'van-datetimepicker': globalThis.vant.DatetimePicker,
+    },
+    data() {
+        return {
+            mountFinished: false,
+            singleDeckDisplayOptimization: false,
+            allStaticData: "",   //SearchController.GetAllStaticDataViewModel - We never mute this field after mounted has finished
+            possibleDecks: [],   //SearchController.GetAllStaticDataDeckViewModel - This array changes according to the selected deck. It contains in first position a fake deck named "Not filtering" with Guid zero.
+            selectedDeck: "",  //SearchController.GetAllStaticDataDeckViewModel - See selectedDeckIsForInclusion
+            possibleTargetDecksForAdd: [], //SearchController.GetAllStaticDataDeckForAddViewModel
+            possibleDecksInclusionChoices: [],   //{selectedDeckIsInclusive: bool, choiceText: string}. This field only makes sense when selectedDeck is not null. Tells if the query will report the cards of selectedDeckor exclude the cards of the selected deck
+            deckSelectionIsInclusive: true,
+            possibleHeaps: [],  //SearchController.GetAllStaticDataHeapViewModel. Available only when filtering inclusive on a deck, this shows the heaps which exist in the deck. There is a first heap named "ignore" with id -1.
+            selectedHeap: "",  //int. Available only when filtering inclusive on a deck, the heap in which all cards must be. -1 means no filtering on heap
+            addToDeckDatePossibleChoices: [],  //{choiceId: int, choiceText: string}. Only when filtering inclusive on a deck. 0 = ignore date on which cards were added to the deck, 1 = before the selected date, 2 = on the day, 3 = after
+            addToDeckDate: new Date(),  //Date. Available only when filtering inclusive on a deck, date considered for filtering on date on which the card was added to the deck
+            selectedAddToDeckDateChoice: 0, //choiceId: int
+            expiryDatePossibleChoices: [],  //{choiceId: int, choiceText: string}. Only when filtering inclusive on a deck. 0 = ignore date on which cards expire, 1 = expiry before the selected date, 2 = on the day, 3 = after
+            expiryDate: new Date(),  //Date. Available only when filtering inclusive on a deck, date considered for filtering on date on which the card expires
+            selectedExpiryDateChoice: 0, //choiceId: int
+            possibleRequiredTags: [], /* SearchController.GetAllStaticDataTagViewModel - The tags we *currently* display in the required tags combo box. 
                             * Depending on the choices on the deck, this can be all the tags of the database, or all the tags which appear in selectedDeck.
                             * Contains in first position a fake tag named "Not filtering" which has for effect the emptying of selectedRequiredTags */
-        selectedRequiredTags: [],   //SearchController.GetAllStaticDataTagViewModel
-        selectedRequiredTagToAdd: "",   //SearchController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
-        possibleExcludedTags: [], /* SearchController.GetAllStaticDataTagViewModel - The tags we *currently* display in the excluded tags combo box. 
+            selectedRequiredTags: [],   //SearchController.GetAllStaticDataTagViewModel
+            selectedRequiredTagToAdd: "",   //SearchController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
+            possibleExcludedTags: [], /* SearchController.GetAllStaticDataTagViewModel - The tags we *currently* display in the excluded tags combo box. 
                             * Depending on the choices on the deck, this can be all the tags of the database, or all the tags which appear in selectedDeck.
                             * Contains in first position a fake tag named "Not filtering" which has for effect the emptying of selectedExcludedTags
                             * And in second position a fake tag named "All": when the user selects this fake tag, it is pushed alone in selectedExcludedTags */
-        selectedExcludedTags: [],   //SearchController.GetAllStaticDataTagViewModel
-        selectedExcludedTagToAdd: "",   //SearchController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
-        possibleOwners: [],  //SearchController.GetAllStaticDataUserViewModel. Contains in first position a fake deck named "Ignore" with Guid zero.
-        selectedOwner: "",  //Guid
-        visibilityFilteringPossibleChoices: [], //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards which can be seen by more than their owner, 3 = cards visible to their owner only
-        selectedVisibilityFilteringChoice: 1,  //choiceId: int
-        possibleRatingFilteringKind: [],   //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards with the selected rating and above, 3 = cards with the selected rating and below
-        selectedAverageRatingFilteringKind: 1,
-        possibleRatingFilteringValues: [],  //{choiceId: int, 1 to 5, choiceText: string}
-        selectedAverageRatingFilteringValue: 5, //1 to 5
-        selectedNotificationFilteringId: 1,  //choiceId: int
-        possibleSelectedNotificationFiltering: [],   //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
-        textFilter: "", //string
-        pageNo: 1, //int. First page is number 1
-        pageSize: 50,   //int
-        offeredPageSizes: [10, 25, 50, 100, 500],
-        runResult: {
-            pageCount: 0,
-            totalNbCard: 0,
-            cardsWithSelectionInfo: [], //{selected: bool, card: result of cardFromControllerResult}
-        },
-        guidNoCurrentUser: '00000000-0000-0000-0000-000000000000',
-        guidNoDeckFiltering: '00000000-0000-0000-0000-000000000000',
-        guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
-        guidExcludeAllTagFiltering: '11111111-1111-1111-1111-111111111111',
-        guidNoUserFiltering: '00000000-0000-0000-0000-000000000000',
-        loadingQuery: false,
-        addTagDropDownButtonDisabledReason: "", //string
-        possibleHeapsForMove: [],  //SearchController.GetAllStaticDataHeapViewModel
-        mountDebugInfo: "",
-        lastQueryDebugInfo: "",
+            selectedExcludedTags: [],   //SearchController.GetAllStaticDataTagViewModel
+            selectedExcludedTagToAdd: "",   //SearchController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
+            possibleOwners: [],  //SearchController.GetAllStaticDataUserViewModel. Contains in first position a fake deck named "Ignore" with Guid zero.
+            selectedOwner: "",  //Guid
+            visibilityFilteringPossibleChoices: [], //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards which can be seen by more than their owner, 3 = cards visible to their owner only
+            selectedVisibilityFilteringChoice: 1,  //choiceId: int
+            possibleRatingFilteringKind: [],   //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards with the selected rating and above, 3 = cards with the selected rating and below
+            selectedAverageRatingFilteringKind: 1,
+            possibleRatingFilteringValues: [],  //{choiceId: int, 1 to 5, choiceText: string}
+            selectedAverageRatingFilteringValue: 5, //1 to 5
+            selectedNotificationFilteringId: 1,  //choiceId: int
+            possibleSelectedNotificationFiltering: [],   //{choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
+            textFilter: "", //string
+            pageNo: 1, //int. First page is number 1
+            pageSize: 50,   //int
+            offeredPageSizes: [10, 25, 50, 100, 500],
+            runResult: {
+                pageCount: 0,
+                totalNbCard: 0,
+                cardsWithSelectionInfo: [], //{selected: bool, card: result of cardFromControllerResult, visibilityInfoPopover, heapDetailPopover, ratingInfoPopover}
+            },
+            guidNoCurrentUser: '00000000-0000-0000-0000-000000000000',
+            guidNoDeckFiltering: '00000000-0000-0000-0000-000000000000',
+            guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
+            guidExcludeAllTagFiltering: '11111111-1111-1111-1111-111111111111',
+            guidNoUserFiltering: '00000000-0000-0000-0000-000000000000',
+            loadingQuery: false,
+            addTagDropDownButtonDisabledReason: "", //string
+            possibleHeapsForMove: [],  //SearchController.GetAllStaticDataHeapViewModel
+            mountDebugInfo: "",
+            lastQueryDebugInfo: "",
+        }
+    },
+    beforeCreate() {
+        this.isValidDateTime = isValidDateTime;
     },
     async mounted() {
-        start = performance.now();
+        const start = performance.now();
         try {
             await this.getAllStaticData();
             this.getFieldsFromPageParameters();
@@ -91,23 +102,23 @@ var app = new Vue({
                     this.updateFieldsAccordingToDeck();
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         getFieldsFromPageParameters() {
-            deckParam = document.getElementById("DeckIdInput").value;
+            const deckParam = document.getElementById("DeckIdInput").value;
             for (let i = 0; i < this.possibleDecks.length; i++)
                 if (this.possibleDecks[i].deckId == deckParam)
                     this.selectedDeck = this.possibleDecks[i];
             this.updateFieldsAccordingToDeck();
 
-            wantedHeap = document.getElementById("HeapIdInput").value;
+            const wantedHeap = document.getElementById("HeapIdInput").value;
             if (wantedHeap) {
                 this.selectedHeap = parseInt(wantedHeap);
                 this.resetSelectedHeapIfNotValid();
             }
 
-            wantedTag = document.getElementById("TagFilterInput").value;
+            const wantedTag = document.getElementById("TagFilterInput").value;
             if (wantedTag) {
                 for (let i = 0; i < this.possibleRequiredTags.length; i++)
                     if (this.possibleRequiredTags[i].tagId == wantedTag)
@@ -138,9 +149,9 @@ var app = new Vue({
             this.runResult.pageCount = 0;
             this.runResult.cardsWithSelectionInfo = [];
 
-            request = this.getRequest();
+            const request = this.getRequest();
 
-            start = performance.now();
+            const start = performance.now();
             await axios.post('/Search/RunQuery/', request)
                 .then(result => {
                     this.lastQueryDebugInfo = "Query run time: " + ((performance.now() - start) / 1000).toFixed(1) + " seconds";
@@ -150,12 +161,15 @@ var app = new Vue({
                     for (let i = 0; i < result.data.cards.length; i++) {
                         this.runResult.cardsWithSelectionInfo.push({
                             selected: false,
-                            card: this.cardFromControllerResult(result.data.cards[i])
+                            card: this.cardFromControllerResult(result.data.cards[i]),
+                            visibilityInfoPopover: false,
+                            heapDetailPopover: false,
+                            ratingInfoPopover: false,
                         });
                     };
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
 
             this.loadingQuery = false;
@@ -167,11 +181,11 @@ var app = new Vue({
             }
         },
         filteringOnDeckInclusive() {
-            result = this.selectedDeck && (this.selectedDeck.deckId != this.possibleDecks[0].deckId) && this.deckSelectionIsInclusive;
+            const result = this.selectedDeck && (this.selectedDeck.deckId != this.possibleDecks[0].deckId) && this.deckSelectionIsInclusive;
             return result;
         },
         cardFromControllerResult(controllerResultCard) {    //controllerResultCard a SearchController.RunQueryCardViewModel
-            result = controllerResultCard;
+            const result = controllerResultCard;
             result.ratingShort = "\u2606" + controllerResultCard.averageRating;
             result.userRatingAsStars = ratingAsStars(controllerResultCard.currentUserRating);
             const truncatedAverage = Math.trunc(controllerResultCard.averageRating);
@@ -203,7 +217,7 @@ var app = new Vue({
             return this.selectedRequiredTags.some(t => t.tagId == tagId);
         },
         CanAddSelectedRequiredTag() {
-            result = this.selectedRequiredTagToAdd && !this.requestContainsRequiredTag(this.selectedRequiredTagToAdd);
+            const result = this.selectedRequiredTagToAdd && !this.requestContainsRequiredTag(this.selectedRequiredTagToAdd);
             return result;
         },
         addRequiredTag() {
@@ -226,7 +240,7 @@ var app = new Vue({
             return this.selectedExcludedTags.some(t => t.tagId == tagId);
         },
         CanAddSelectedExcludedTag() {
-            result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
+            const result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
             return result;
         },
         addExcludedTag() {
@@ -304,18 +318,18 @@ var app = new Vue({
             return true;
         },
         deckActionDropDownButtonEnabled() {
-            result = this.atLeastOneCardSelected();
+            const result = this.atLeastOneCardSelected();
             return result;
         },
         getSelectedCardIds() {
-            result = [];
+            const result = [];
             for (let i = 0; i < this.runResult.cardsWithSelectionInfo.length; i++)
                 if (this.runResult.cardsWithSelectionInfo[i].selected)
                     result.push(this.runResult.cardsWithSelectionInfo[i].card.cardId);
             return result;
         },
         async addTagToSelectedCards(tag) {
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -330,10 +344,10 @@ var app = new Vue({
 
                 await axios.post('/Search/AddTagToCards/' + tag.tagId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
                 this.loadingQuery = false;
@@ -349,7 +363,7 @@ var app = new Vue({
                 this.runResult.cardsWithSelectionInfo[i].selected = false;
         },
         onSelectAllCheckBoxClick() {
-            check = document.getElementById("selectAllCheckBox").checked;
+            const check = document.getElementById("selectAllCheckBox").checked;
             if (check)
                 this.selectAll();
             else
@@ -359,7 +373,7 @@ var app = new Vue({
             return dateTime(utcFromDotNet);
         },
         async addSelectedCardsToDeck(deck) {     //deck is SearchController.GetAllStaticDataDeckForAddViewModel
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -371,22 +385,19 @@ var app = new Vue({
                     nbCardsAlreadyInDeck++;
 
             if (selectedCardIds.length == nbCardsAlreadyInDeck) {
-                if (selectedCardIds.length == 1)
-                    mesg = this.allStaticData.localizedText.cardAlreadyInDeck;
-                else
-                    mesg = this.allStaticData.localizedText.cardsAlreadyInDeck;
+                    const mesg = selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAlreadyInDeck: this.allStaticData.localizedText.cardsAlreadyInDeck;
                 alert(mesg + " " + deck.deckName);
                 return;
             }
 
             if (selectedCardIds.length == 1)
-                mesg = this.allStaticData.localizedText.alertAddOneCardToDeck + ' ' + deck.deckName;
+                var mesg = this.allStaticData.localizedText.alertAddOneCardToDeck + ' ' + deck.deckName;
             else {
                 cardsToAddCount = selectedCardIds.length - nbCardsAlreadyInDeck;
                 if (cardsToAddCount == 1)
-                    mesg = this.allStaticData.localizedText.alertAddCardToDeckPart1;
+                    var mesg = this.allStaticData.localizedText.alertAddCardToDeckPart1;
                 else
-                    mesg = this.allStaticData.localizedText.alertAddCardsToDeckPart1 + ' ' + cardsToAddCount + ' ' + this.allStaticData.localizedText.alertAddCardsToDeckPart2;
+                    var mesg = this.allStaticData.localizedText.alertAddCardsToDeckPart1 + ' ' + cardsToAddCount + ' ' + this.allStaticData.localizedText.alertAddCardsToDeckPart2;
                 mesg = mesg + ' ' + deck.deckName;
 
                 if (nbCardsAlreadyInDeck == 1)
@@ -402,7 +413,7 @@ var app = new Vue({
 
                 await axios.post('/Search/AddCardsToDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
                         alert(error.response.data.detail);
@@ -420,7 +431,7 @@ var app = new Vue({
             return false;
         },
         async removeSelectedCardsFromDeck(deck) {     //deck is SearchController.GetAllStaticDataDeckForAddViewModel
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -463,10 +474,10 @@ var app = new Vue({
 
                 await axios.post('/Search/RemoveCardsFromDeck/' + deck.deckId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
                 this.loadingQuery = false;
@@ -534,10 +545,10 @@ var app = new Vue({
 
                 await axios.post('/Search/MoveCardsToHeap/' + this.selectedDeck.deckId + '/' + targetHeap.heapId, { cardIds: selectedCardIds })
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
                 this.loadingQuery = false;
@@ -574,10 +585,10 @@ var app = new Vue({
 
                 await axios.post('/Search/DeleteCards', { cardIds: selectedCardIds })
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
 
                 this.loadingQuery = false;
@@ -608,10 +619,10 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/RegisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    tellControllerSuccess(result, this);
+                    tellControllerSuccess(result);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
             this.loadingQuery = false;
             if (this.selectedNotificationFilteringId != 1)
@@ -630,10 +641,10 @@ var app = new Vue({
             this.loadingQuery = true;
             await axios.post('/Search/UnregisterForNotifications', { cardIds: selectedCardIds })
                 .then(result => {
-                    tellControllerSuccess(result, this);
+                    tellControllerSuccess(result);
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
             this.loadingQuery = false;
             if (this.selectedNotificationFilteringId != 1)
@@ -646,36 +657,38 @@ var app = new Vue({
 
                 await axios.post('/Search/SubscribeToSearch/', request)
                     .then(result => {
-                        tellControllerSuccess(result, this);
+                        tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, this);
+                        tellAxiosError(error);
                     });
             }
         },
     },
     watch: {
         selectedDeck: {
-            handler() {
+            handler: function (newValue) {
                 this.updateFieldsAccordingToDeck();
             },
         },
         deckSelectionIsInclusive: {
-            handler() {
+            handler: function (newValue) {
                 this.updateFieldsAccordingToDeck();
             },
         },
         selectedRequiredTagToAdd: {
-            handler() {
+            handler: function (newValue) {
                 this.addRequiredTag();
                 this.selectedRequiredTagToAdd = "";
             }
         },
         selectedExcludedTagToAdd: {
-            handler() {
+            handler: function (newValue) {
                 this.addExcludedTag();
                 this.selectedExcludedTagToAdd = "";
             }
         },
     },
 });
+
+searchApp.mount('#SearchRootDiv');

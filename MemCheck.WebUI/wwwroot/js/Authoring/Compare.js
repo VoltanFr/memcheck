@@ -33,7 +33,7 @@ var app = new Vue({
                     this.error = null;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.cardId = null;
                     this.versionId = null;
                     this.error = "Failed to load data";

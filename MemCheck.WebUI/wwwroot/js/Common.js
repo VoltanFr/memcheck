@@ -31,15 +31,15 @@ function dateIsTomorrow(d) {
     return tomorrow.toDateString() == d.toDateString();
 }
 
-function tellAxiosError(result, vueObject) {
-    toastAxiosResult(result.response, false, vueObject);
+function tellAxiosError(result) {
+    toastAxiosResult(result.response, false);
 }
 
-function tellControllerSuccess(result, vueObject) {
-    toastAxiosResult(result, true, vueObject);
+function tellControllerSuccess(result) {
+    toastAxiosResult(result, true);
 }
 
-function toastAxiosResult(controllerResultWithToast, success, vueObject) {
+function toastAxiosResult(controllerResultWithToast, success) {
     //Code is meant to support ControllerResult
     var title = success ? "Success" : "Failure";
     if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastTitle)
@@ -49,20 +49,14 @@ function toastAxiosResult(controllerResultWithToast, success, vueObject) {
     if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastText)
         text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? ("\r\n" + text) : "");
 
-    var variant = success ? 'success' : 'danger';
-    var autoHideDelay = success ? 3000 : 10000;
-
-    toast(text, title, variant, autoHideDelay, vueObject);
+    toast(text, title, success);
 }
 
-function toast(mesg, title, variant, autoHideDelay, vueObject) {
-    vueObject.$bvToast.toast(mesg, {
-        title: title,
-        variant: variant,
-        toaster: 'b-toaster-top-center',
-        solid: false,
-        autoHideDelay: autoHideDelay,
-    });
+function toast(mesg, title, success) {
+    const actualMesg = "<strong>" + title + "</strong><br/>" + mesg;
+    const icon = success ? "success" : "fail";
+    const duration = success ? 4000 : 10000;
+    globalThis.vant.Toast({ message: actualMesg, type: "html", icon: icon, iconSize: 20, duration: duration });
 }
 
 function base64FromBytes(bytes) {
@@ -82,12 +76,14 @@ function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure, vueObject) {
-    navigator.clipboard.writeText(text).then(function () {
-        toast(text, toastTitleOnSuccess, 'success', 3000, vueObject);
-    }, function (err) {
-        toast(err, toastTitleOnFailure, 'danger', 10000, vueObject);
-    });
+function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure) {
+    navigator.clipboard.writeText(text)
+        .then(function () {
+            toast(text, toastTitleOnSuccess, true);
+        }
+            , function (err) {
+                toast(err, toastTitleOnFailure, false);
+            });
 }
 
 function beautifyTextForFrench(src) {

@@ -25,7 +25,7 @@ var app = new Vue({
                         window.location = "/";
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                 });
         },
         GetReturnUrlFromPageParameter() {
@@ -42,7 +42,7 @@ var app = new Vue({
                     this.subscription = result.data;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.subscription = "";
                 });
         },

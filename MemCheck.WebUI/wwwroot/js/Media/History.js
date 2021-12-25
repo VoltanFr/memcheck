@@ -31,7 +31,7 @@ var app = new Vue({
                     this.error = null;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.imageId = null;
                     this.error = "Image not found: " + error;
                     this.loading = false;

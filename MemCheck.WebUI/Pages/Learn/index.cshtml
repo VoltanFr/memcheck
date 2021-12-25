@@ -9,7 +9,7 @@
 }
 @section scripts {
     <script src="~/js/big-size-image.js" asp-append-version="true"></script>
-    <script src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -17,7 +17,7 @@
 <input type="text" asp-for="LearnMode" id="LearnModeInput" hidden="hidden" />
 
 <div id="LearnMainDiv" class="page-responsive-padding" v-cloak>
-    <div id="WaitingOrLoading" v-if="!mountFinished || loading">
+<div id="WaitingOrLoading" v-if="!mountFinished || loading">
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
     <div id="FilteringDisplayDiv" v-if="mountFinished && filteringDisplay && !userQuitAttemptDisplay" class="learn-filtering-display-div">
@@ -55,14 +55,13 @@
                 <div id="Small buttons" class="card-header" style="padding:1px">
                     <ul class="nav small text-decoration-none" style="align-items:center">
                         <li id="Edit button" style="padding-right:5px">
-                            <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></button>
+                            <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></van-button>
                         </li>
                         <li id="Remove button" style="padding-right:5px">
-                            <button class="btn btn-primary toolbar-button toolbar-button-circle" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></button>
+                            <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></van-button>
                         </li>
-                        <li id="Info button" data-bs-toggle="tooltip" style="padding-right:5px" data-placement="top" title=@Localizer["Info"]>
-                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" id="infoPopover"><i class="fas fa-info"></i></b-button>
-                            <b-popover target="infoPopover" triggers="focus">
+                        <li id="Info button" style="padding-right:5px" title=@Localizer["Info"]>
+                            <van-popover v-model:show="showInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay >
                                 @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}
                                 <hr class="menu-separation-line" />
                                 @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}
@@ -72,42 +71,58 @@
                                 @Localizer["OnDate"] {{dateTime(currentCard.lastChangeUtcTime)}}
                                 <hr class="menu-separation-line" />
                                 <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a><a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
-                            </b-popover>
+                                <template #reference>
+                                    <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>
+                                </template>
+                            </van-popover>
                         </li>
-                        <li id="Visibility button" style="padding-right:5px" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Visibility"]>
-                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 0" id="visibilityPopover0" key="public"><i class="far fa-eye"></i></b-button>
-                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount == 1" id="visibilityPopover1" key="private"><i class="far fa-eye-slash"></i></b-button>
-                            <b-button class="btn btn-primary toolbar-button toolbar-button-circle" v-if="currentCard.visibleToCount > 1" id="visibilityPopover2" key="selectedvisi"><i class="fas fa-users"></i></b-button>
-                            <b-popover v-bind:target="visibilityPopoverTarget()" v-bind:key="visibilityPopoverTarget()" triggers="focus">@Localizer["Visibility"]: {{currentCard.visibleTo}}</b-popover>
+                        <li id="Visibility button" style="padding-right:5px" title=@Localizer["Visibility"]>
+                            <van-popover v-model:show="showVisibilityPopover" overlay="false" close-on-click-outside close-on-click-overlay >
+                                @Localizer["Visibility"]: {{currentCard.visibleTo}}
+                                <template #reference>
+                                    <van-button class="toolbar-button-circle toolbar-button" v-if="currentCard.visibleToCount == 0"><i class="far fa-eye"></i></van-button>
+                                    <van-button class="toolbar-button-circle toolbar-button" v-if="currentCard.visibleToCount == 1"><i class="far fa-eye-slash"></i></van-button>
+                                    <van-button class="toolbar-button-circle toolbar-button" v-if="currentCard.visibleToCount > 1"><i class="fas fa-users"></i></van-button>
+                                </template>
+                            </van-popover>
                         </li>
                         <li id="FilteringButton" style="padding-right:5px">
-                            <button type="button" class="btn btn-primary toolbar-button toolbar-button-circle" @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></button>
+                            <van-button class="toolbar-button toolbar-button-circle" title=@Localizer["FilterThisLearningSession"] @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></van-button>
                         </li>
-                        <li id="Heap info" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["Heap"] style="padding-right:5px">
-                            <b-button class="btn btn-primary toolbar-button" id="heapPopover"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</b-button>
-                            <b-popover target="heapPopover" triggers="focus">
+                        <li id="Heap info" style="padding-right:5px" title=@Localizer["Heap"]>
+                            <van-popover v-model:show="heapInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
                                 @Localizer["CurrentlyInHeap"] {{currentCard.heap}}<br />
                                 @Localizer["TimesInNotLearnedHeap"] {{currentCard.nbTimesInNotLearnedHeap}}<br />
-                                @Localizer["BiggestHeapReached"] {{currentCard.biggestHeapReached}}<br />
+                                @Localizer["BiggestHeapReached"] {{currentCard.biggestHeapReached}}
                                 <hr class="menu-separation-line" />
-                                <a href="#" id="MoveToHeapDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["MoveToHeap"] class="learning-popover-menu"><i class="far fa-caret-square-down"></i> @Localizer["MoveToHeap"]</a>
-                                <span class="dropdown-menu" role="menu">
-                                    <a v-for="targetHeap in currentCard.moveToHeapTargets" class="dropdown-item" @@click="moveToHeap(targetHeap)">
-                                        <span v-if="targetHeap.heapId < currentCard.heapId"><i class="fas fa-angle-left"></i></span><span v-else><i class="fas fa-angle-right"></i></span>
+                                <van-popover v-model:show="showMoveToHeapMenuPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                                    <van-button class="toolbar-button dropdown-item" v-for="targetHeap in currentCard.moveToHeapTargets" @@click="moveToHeap(targetHeap)">
+                                         <span v-if="targetHeap.heapId < currentCard.heapId"><i class="fas fa-angle-left"></i></span><span v-else><i class="fas fa-angle-right"></i></span>
                                         {{targetHeap.heapName}}
-                                    </a>
-                                </span>
-                            </b-popover>
+                                    </van-button>
+                                    <template #reference>
+                                        <van-button class="toolbar-button">@Localizer["MoveToHeap"]</van-button>
+                                    </template>
+                                </van-popover>
+                                <template #reference>
+                                    <van-button class="toolbar-button"><i class="fas fa-layer-group"></i> {{currentCard.heap}}</van-button>
+                                </template>
+                            </van-popover>
                         </li>
-                        <li id="Rating" data-bs-toggle="tooltip" data-placement="top">
-                            <b-button class="btn btn-primary toolbar-button" id="ratingPopover">
-                                {{currentUserRatingAsStars()}}<br />
-                                {{averageRatingAsStars()}}
-                            </b-button>
-                            <b-popover id="ratingPop" target="ratingPopover" triggers="focus">
-                                @Localizer["YourRating"] <b-form-rating inline v-model="currentCard.currentUserRating" @@change="enqueueRatingUpload()"></b-form-rating><br />
-                                @Localizer["Average"] ({{currentCard.countOfUserRatings}} <span v-if="currentCard.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>)<b-form-rating inline readonly show-value v-model="currentCard.averageRating"></b-form-rating>
-                            </b-popover>
+                        <li id="Rating">
+                            <van-popover v-model:show="ratingPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                                @Localizer["YourRating"] <van-rate v-model="currentCard.currentUserRating" @@change="enqueueRatingUpload()"></van-rate><br />
+                                @Localizer["Average"] ({{currentCard.countOfUserRatings}}
+                                <span v-if="currentCard.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>
+                                )
+                                <van-rate readonly v-model="currentCard.averageRating"></van-rate>
+                                <template #reference>
+                                    <van-button class="toolbar-button">
+                                        {{currentUserRatingAsStars()}}<br />
+                                        {{averageRatingAsStars()}}
+                                    </van-button>
+                                </template>
+                            </van-popover>
                         </li>
                         <li id="Last learn date" v-if="!learningUnknowns" class="ms-auto" data-bs-toggle="tooltip" data-placement="top" v-bind:title="'@Localizer["LastLearnDate"] ' + dateTimeWithTime(currentCard.lastLearnUtcTime)">
                             <i class="fas fa-clock"></i> {{dateTime(currentCard.lastLearnUtcTime)}}
@@ -172,7 +187,7 @@
                 <div v-else>
                     <p class="wait-message" v-if="preventQuittingPage()">@Localizer["PleaseWaitSavingData"]</p>
                     <div v-else>
-                        <p class="wait-message" v-else>@Localizer["NoMoreCardTo"] <span v-if="learningUnknowns">@Localizer["Learn"]</span><span v-else>@Localizer["Repeat"]</span></p>
+                        <p class="wait-message">@Localizer["NoMoreCardTo"] <span v-if="learningUnknowns">@Localizer["Learn"]</span><span v-else>@Localizer["Repeat"]</span></p>
                         <a href="/" class="wait-message">@Localizer["BackToHomePage"]</a>
                     </div>
                 </div>

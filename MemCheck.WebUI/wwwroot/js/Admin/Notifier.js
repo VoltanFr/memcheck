@@ -16,11 +16,11 @@ var app = new Vue({
             this.running = true;
             axios.post('/Admin/LaunchNotifier')
                 .then(result => {
-                    tellControllerSuccess(result, this);
+                    tellControllerSuccess(result);
                     this.running = false;
                 })
                 .catch(error => {
-                    tellAxiosError(error, this);
+                    tellAxiosError(error);
                     this.running = false;
                 });
         },
