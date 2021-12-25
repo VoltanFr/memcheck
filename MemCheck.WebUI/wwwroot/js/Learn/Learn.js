@@ -440,7 +440,8 @@ const learnApp = Vue.createApp({
         },
         cardDownloadOperation: {
             handler: function (newValue) {
-                this.downloadCardsIfNeeded();
+                if (!this.lastDownloadIsEmpty)
+                    this.downloadCardsIfNeeded();
             },
         },
         currentImageLoadingPromise: {
