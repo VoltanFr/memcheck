@@ -1,6 +1,12 @@
+import * as vant from '../../lib/vant/vant.js';
+
 const authoringApp = Vue.createApp({
     components: {
+        'van-button': globalThis.vant.Button,
+        'van-popover': globalThis.vant.Popover,
+        'van-rate': globalThis.vant.Rate,
         'markdown-editor': MarkdownEditor,
+        'big-size-image': BigSizeImage,
     },
     data() {
         return {
@@ -56,22 +62,25 @@ const authoringApp = Vue.createApp({
             currentFullScreenImage: null,   //MyImageType
             saving: false,
             bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+            showInfoPopover: false,
+            ratingPopover: false,
+            showAdditionalInfo: false,
         }
     },
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
-            task1 = this.getCurrentUser();
-            task2 = this.getAllAvailableTags();
-            task3 = this.getAllAvailableLanguages();
-            task4 = this.getUsers();
-            task5 = this.GetCardToEditFromPageParameter();
-            task6 = this.GetGuiMessages();
-            task6 = this.GetDecksOfUser();
-            task7 = this.GetBigSizeImageLabels();
+            const task1 = this.getCurrentUser();
+            const task2 = this.getAllAvailableTags();
+            const task3 = this.getAllAvailableLanguages();
+            const task4 = this.getUsers();
+            const task5 = this.GetCardToEditFromPageParameter();
+            const task6 = this.GetGuiMessages();
+            const task7 = this.GetDecksOfUser();
+            const task8 = this.GetBigSizeImageLabels();
             this.GetReturnUrlFromPageParameter();
-            await Promise.all([task1, task2, task3, task4, task5, task6, task7]);
+            await Promise.all([task1, task2, task3, task4, task5, task6, task7, task8]);
             if (this.creatingNewCard)
                 this.makePrivate();
             this.CopyAllInfoToOriginalCard();
@@ -86,7 +95,7 @@ const authoringApp = Vue.createApp({
     },
     methods: {
         async getCurrentUser() {
-            user = (await axios.get('/Authoring/GetCurrentUser')).data;
+            const user = (await axios.get('/Authoring/GetCurrentUser')).data;
             this.currentUser = { userId: user.userId, userName: user.userName };
             this.card.languageId = user.preferredCardCreationLanguageId;
         },
@@ -131,7 +140,7 @@ const authoringApp = Vue.createApp({
             this.saving = true;
 
             try {
-                postCard = {
+                const postCard = {
                     FrontSide: this.card.frontSide,
                     FrontSideImageList: this.frontSideImageList.map(img => img.imageId),
                     BackSide: this.card.backSide,
@@ -145,7 +154,7 @@ const authoringApp = Vue.createApp({
                     VersionDescription: this.card.versionDescription,
                 };
 
-                task = this.creatingNewCard
+                const task = this.creatingNewCard
                     ? axios.post('/Authoring/CardsOfUser/', postCard)
                     : axios.put('/Authoring/UpdateCard/' + this.editingCardId, postCard);
 
@@ -175,6 +184,7 @@ const authoringApp = Vue.createApp({
             this.makePrivate();
             this.creatingNewCard = true;
             this.CopyAllInfoToOriginalCard();
+            this.showAdditionalInfo = false;
         },
         CopyAllInfoToOriginalCard() {
             this.originalCard.frontSide = this.card.frontSide;
@@ -244,7 +254,7 @@ const authoringApp = Vue.createApp({
         },
         async GetCardToEditFromPageParameter() {
             //There has to be a better way, but here's how I get a parameter passed to a page
-            cardId = document.getElementById("CardIdInput").value;
+            const cardId = document.getElementById("CardIdInput").value;
             if (!cardId) {
                 this.creatingNewCard = true;
                 return;
@@ -268,6 +278,7 @@ const authoringApp = Vue.createApp({
                     this.editingCardLastChangeDate = dateTime(result.data.lastChangeUtcDate);
                     this.infoAboutUsage = result.data.infoAboutUsage;
                     this.creatingNewCard = false;
+                    this.showAdditionalInfo = this.card.additionalInfo != "";
                     images = result.data.images;
                 })
                 .catch(error => {
@@ -277,18 +288,6 @@ const authoringApp = Vue.createApp({
 
             for (var i = 0; i < images.length; i++)
                 await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
-        },
-        classForAdditionalInfo() {
-            if (this.card.additionalInfo || this.additionalInfoImageList.length > 0)
-                return "show";
-            else
-                return "collapse";
-        },
-        classForImages() {
-            if ((this.frontSideImageList.length > 0) || (this.backSideImageList.length > 0) || (this.additionalInfoImageList.length > 0))
-                return "show";
-            else
-                return "collapse";
         },
         imageIsInCard(imageId) {
             for (var i = 0; i < this.frontSideImageList.length; i++)
@@ -310,8 +309,8 @@ const authoringApp = Vue.createApp({
                     var len = bytes.byteLength;
                     for (var j = 0; j < len; j++)
                         xml += String.fromCharCode(bytes[j]);
-                    base64 = 'data:image/jpeg;base64,' + window.btoa(xml);
-                    var img = {
+                    const base64 = 'data:image/jpeg;base64,' + window.btoa(xml);
+                    const img = {
                         imageId: imageId,
                         blob: base64,
                         name: name,
@@ -333,6 +332,7 @@ const authoringApp = Vue.createApp({
                 });
         },
         async addImage(side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
+            var request;
             switch (side) {
                 case 1:
                     request = { imageName: this.imageToAddFront };
@@ -454,6 +454,9 @@ const authoringApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                 });
+        },
+        toggleShowAdditionalInfo() {
+            this.showAdditionalInfo = !this.showAdditionalInfo;
         },
     },
     watch: {
