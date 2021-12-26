@@ -6,16 +6,19 @@
         image: { required: true },
         labels: { required: true },
     },
+    beforeCreate() {
+        this.dateTime = dateTime;
+    },
     template: `
         <div id="big-size-image">
             <div id="TitleAndSmallButtons" class="big-size-image-top-div">
                 <ul class="big-size-image-top-ul">
                     <li class="big-size-image-top-li big-size-image-name">{{image.name}}</li>
-                    <li class="big-size-image-top-li"><button class="btn btn-primary toolbar-button-circle toolbar-button" v-bind:title="labels.copyToClipboardButtonTitle" v-on:click="copyToClipboard()"><i class="far fa-copy"></i></button></li>
-                    <li class="big-size-image-top-li" v-if="hasEditListener()"><button class="btn btn-primary toolbar-button-circle toolbar-button" v-bind:title="labels.editButtonTitle" v-on:click="$emit('edit')"><i class="fas fa-pen"></i></button></li>
-                    <li class="big-size-image-top-li" v-if="hasVersionHistoryListener()"><button class="btn btn-primary toolbar-button-circle toolbar-button" v-bind:title="labels.versionHistoryButtonTitle" v-on:click="$emit('versionhistory')"><i class="fas fa-history"></i></button></li>
-                    <li class="big-size-image-top-li" v-if="hasRemoveListener()"><button class="btn btn-primary toolbar-button-circle toolbar-button" v-bind:title="labels.removeButtonTitle" v-on:click="$emit('remove')"><i class="fas fa-trash-alt"></i></button></li>
-                    <li class="big-size-image-top-li"><button class="btn btn-primary toolbar-button-circle toolbar-button" v-bind:title="labels.closeButtonTitle" v-on:click="$emit('close')"><i class="far fa-times-circle"></i></button></li>
+                    <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labels.copyToClipboardButtonTitle" v-on:click="copyToClipboard()"><i class="far fa-copy"></i></button></li>
+                    <li class="big-size-image-top-li" v-if="hasEditListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labels.editButtonTitle" v-on:click="$emit('edit')"><i class="fas fa-pen"></i></button></li>
+                    <li class="big-size-image-top-li" v-if="hasVersionHistoryListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labels.versionHistoryButtonTitle" v-on:click="$emit('versionhistory')"><i class="fas fa-history"></i></button></li>
+                    <li class="big-size-image-top-li" v-if="hasRemoveListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labels.removeButtonTitle" v-on:click="$emit('remove')"><i class="fas fa-trash-alt"></i></button></li>
+                    <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labels.closeButtonTitle" v-on:click="$emit('close')"><i class="far fa-times-circle"></i></button></li>
                 </ul>
             </div>
             <div id="FullScreenImage" class="big-size-image-middle-div">
@@ -46,13 +49,13 @@
             copyToClipboardAndToast(this.image.name, this.labels.copiedToClipboardToastTitleOnSuccess, this.labels.copiedToClipboardToastTitleOnFailure);
         },
         hasRemoveListener() {
-            return this.$listeners && this.$listeners.remove;
+            return this.$attrs && this.$attrs.onRemove;
         },
         hasEditListener() {
-            return this.$listeners && this.$listeners.edit;
+            return this.$attrs && this.$attrs.onEdit;
         },
         hasVersionHistoryListener() {
-            return this.$listeners && this.$listeners.versionhistory;
+            return this.$attrs && this.$attrs.onVersionhistory;
         },
     },
 });

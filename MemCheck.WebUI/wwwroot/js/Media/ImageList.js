@@ -1,31 +1,35 @@
-var app = new Vue({
-    el: '#MediaMainDiv',
-    data: {
-        request: {
-            filter: "", //string
-            pageNo: 1, //int. First page is number 1
-            pageSize: 10,   //int
-        },
-        totalCount: -1, //int
-        pageCount: 0,   //int
-        offeredPageSizes: [10, 50, 100],
-        images: [],
-        mountFinished: false,
-        loading: false,
-        currentFullScreenImage: null,   //Medium sized
-        TableFormat: false,
-        staticText: {
-            copyToClipboardToastTitleOnSuccess: "",
-            copyToClipboardToastTitleOnFailure: "",
-        },
-        bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+const imageListApp = Vue.createApp({
+    components: {
+        'big-size-image': BigSizeImage,
+    },
+    data() {
+        return {
+            request: {
+                filter: "", //string
+                pageNo: 1, //int. First page is number 1
+                pageSize: 10,   //int
+            },
+            totalCount: -1, //int
+            pageCount: 0,   //int
+            offeredPageSizes: [10, 50, 100],
+            images: [],
+            mountFinished: false,
+            loading: false,
+            currentFullScreenImage: null,   //Medium sized
+            TableFormat: false,
+            staticText: {
+                copyToClipboardToastTitleOnSuccess: "",
+                copyToClipboardToastTitleOnFailure: "",
+            },
+            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+        }
     },
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
-            task1 = this.getImages();
-            task2 = this.getStaticText();
-            task3 = this.GetBigSizeImageLabels();
+            const task1 = this.getImages();
+            const task2 = this.getStaticText();
+            const task3 = this.GetBigSizeImageLabels();
             await Promise.all([task1, task2, task3]);
         }
         finally {
@@ -159,9 +163,6 @@ var app = new Vue({
         copyToClipboard(text) {
             copyToClipboardAndToast(text, this.staticText.copyToClipboardToastTitleOnSuccess, this.staticText.copyToClipboardToastTitleOnFailure);
         },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
         async GetBigSizeImageLabels() {
             await axios.get('/Media/GetBigSizeImageLabels')
                 .then(result => {
@@ -173,3 +174,5 @@ var app = new Vue({
         },
     },
 });
+
+imageListApp.mount('#MediaMainDiv');
