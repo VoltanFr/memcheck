@@ -43,7 +43,7 @@
     },
     methods: {
         onInput(event) {
-            this.$emit('input', this.content);
+            this.$emit('update:modelValue', this.content);
             const textarea = this.$refs.text_area_control;
             textarea.style.height = (textarea.scrollHeight) + "px";
         },
