@@ -278,7 +278,6 @@ const authoringApp = Vue.createApp({
                     this.editingCardLastChangeDate = dateTime(result.data.lastChangeUtcDate);
                     this.infoAboutUsage = result.data.infoAboutUsage;
                     this.creatingNewCard = false;
-                    this.showAdditionalInfo = this.card.additionalInfo != "";
                     images = result.data.images;
                 })
                 .catch(error => {
@@ -288,6 +287,8 @@ const authoringApp = Vue.createApp({
 
             for (var i = 0; i < images.length; i++)
                 await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
+
+            this.showAdditionalInfo = this.card.additionalInfo != "" || this.additionalInfoImageList.length > 0;
         },
         imageIsInCard(imageId) {
             for (var i = 0; i < this.frontSideImageList.length; i++)
