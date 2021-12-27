@@ -23,7 +23,7 @@ namespace MemCheck.Application.Decks
         {
             public async Task CheckValidityAsync(CallContext callContext)
             {
-                await QueryValidationHelper.CheckCanUpdateDeckAsync(UserId, Name, HeapingAlgorithmId, callContext.DbContext, callContext.Localized);
+                await QueryValidationHelper.CheckCanCreateDeckAsync(UserId, Name, HeapingAlgorithmId, callContext.DbContext, callContext.Localized);
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }
         }
