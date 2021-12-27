@@ -1,10 +1,16 @@
-var app = new Vue({
-    el: '#EditSearchSubscriptionDiv',
-    data: {
-        subscription: "",  //AccountController.SearchSubscriptionViewModel. Null if page param not valid
-        newName: "",    //string
-        mountFinished: false,
-        returnUrl: "", //string
+const editSearchSubscriptionApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            subscription: "",  //AccountController.SearchSubscriptionViewModel. Null if page param not valid
+            newName: "",    //string
+            mountFinished: false,
+            returnUrl: "", //string
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
     },
     async mounted() {
         try {
@@ -32,7 +38,7 @@ var app = new Vue({
             this.returnUrl = document.getElementById("ReturnUrlInput").value;
         },
         async GetSubscriptionFromPageParameter() {
-            subscriptionId = document.getElementById("SubscriptionIdInput").value;
+            const subscriptionId = document.getElementById("SubscriptionIdInput").value;
             if (!subscriptionId) {
                 this.subscription = "";
                 return;
@@ -48,3 +54,5 @@ var app = new Vue({
         },
     },
 });
+
+editSearchSubscriptionApp.mount('#EditSearchSubscriptionDiv');

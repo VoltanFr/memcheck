@@ -1,10 +1,13 @@
-var app = new Vue({
-    el: '#SubscriptionsMainDiv',
-    data: {
-        totalSearchSubscriptionCount: -1, //int
-        searchSubscriptions: [],    //AccountController.SearchSubscriptionViewModel
-        mountFinished: false,
-        loading: false,
+const subscriptionsApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            totalSearchSubscriptionCount: -1, //int
+            searchSubscriptions: [],    //AccountController.SearchSubscriptionViewModel
+            mountFinished: false,
+            loading: false,
+        }
     },
     async mounted() {
         try {
@@ -48,3 +51,5 @@ var app = new Vue({
         },
     },
 });
+
+subscriptionsApp.mount('#SubscriptionsMainDiv');

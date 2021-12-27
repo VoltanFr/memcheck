@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model EditSearchSubscriptionModel
-
+@section scripts {
+    <script type="module" src="~/js/Account/EditSearchSubscriptions.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -59,7 +61,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Account/EditSearchSubscriptions.js" asp-append-version="true"></script>
-}
