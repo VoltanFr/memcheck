@@ -385,19 +385,21 @@ const searchApp = Vue.createApp({
                     nbCardsAlreadyInDeck++;
 
             if (selectedCardIds.length == nbCardsAlreadyInDeck) {
-                    const mesg = selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAlreadyInDeck: this.allStaticData.localizedText.cardsAlreadyInDeck;
+                const mesg = selectedCardIds.length == 1 ? this.allStaticData.localizedText.cardAlreadyInDeck : this.allStaticData.localizedText.cardsAlreadyInDeck;
                 alert(mesg + " " + deck.deckName);
                 return;
             }
 
+            var mesg;
+
             if (selectedCardIds.length == 1)
-                var mesg = this.allStaticData.localizedText.alertAddOneCardToDeck + ' ' + deck.deckName;
+                mesg = this.allStaticData.localizedText.alertAddOneCardToDeck + ' ' + deck.deckName;
             else {
                 cardsToAddCount = selectedCardIds.length - nbCardsAlreadyInDeck;
                 if (cardsToAddCount == 1)
-                    var mesg = this.allStaticData.localizedText.alertAddCardToDeckPart1;
+                    mesg = this.allStaticData.localizedText.alertAddCardToDeckPart1;
                 else
-                    var mesg = this.allStaticData.localizedText.alertAddCardsToDeckPart1 + ' ' + cardsToAddCount + ' ' + this.allStaticData.localizedText.alertAddCardsToDeckPart2;
+                    mesg = this.allStaticData.localizedText.alertAddCardsToDeckPart1 + ' ' + cardsToAddCount + ' ' + this.allStaticData.localizedText.alertAddCardsToDeckPart2;
                 mesg = mesg + ' ' + deck.deckName;
 
                 if (nbCardsAlreadyInDeck == 1)
@@ -424,7 +426,7 @@ const searchApp = Vue.createApp({
             }
         },
         cardIsInDeck(card, deckId) {    //card is SearchController.RunQueryCardViewModel
-            var cardDecks = card.decks;
+            const cardDecks = card.decks;
             for (let decksIndex = 0; decksIndex < cardDecks.length; decksIndex++)
                 if (cardDecks[decksIndex].deckId == deckId)
                     return true;
@@ -437,24 +439,23 @@ const searchApp = Vue.createApp({
                 return;
             }
 
-            nbCardsNotInDeck = 0;
+            var nbCardsNotInDeck = 0;
             for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
                 if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && !this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deck.deckId))
                     nbCardsNotInDeck++;
 
             if (selectedCardIds.length == nbCardsNotInDeck) {
-                if (selectedCardIds.length == 1)
-                    mesg = this.allStaticData.localizedText.cardAlreadyNotInDeck;
-                else
-                    mesg = this.allStaticData.localizedText.cardsAlreadyNotInDeck;
+                const mesg = (selectedCardIds.length == 1) ? this.allStaticData.localizedText.cardAlreadyNotInDeck : this.allStaticData.localizedText.cardsAlreadyNotInDeck;
                 alert(mesg + " " + deck.deckName);
                 return;
             }
 
+            var mesg;
+
             if (selectedCardIds.length == 1)
                 mesg = this.allStaticData.localizedText.alertRemoveOneCardFromDeck + ' ' + deck.deckName;
             else {
-                cardsToRemoveCount = selectedCardIds.length - nbCardsNotInDeck;
+                const cardsToRemoveCount = selectedCardIds.length - nbCardsNotInDeck;
                 if (cardsToRemoveCount == 1)
                     mesg = this.allStaticData.localizedText.alertRemoveCardFromDeckPart1;
                 else
@@ -496,8 +497,8 @@ const searchApp = Vue.createApp({
                 return;
             }
 
-            selectedCardIds = [];
-            nbSelectedCardsAlreadyInTargetHeap = 0;
+            var selectedCardIds = [];
+            var nbSelectedCardsAlreadyInTargetHeap = 0;
 
             for (let i = 0; i < this.runResult.cardsWithSelectionInfo.length; i++) {
                 const cardWithSelectionInfo = this.runResult.cardsWithSelectionInfo[i];
@@ -514,18 +515,17 @@ const searchApp = Vue.createApp({
             }
 
             if (selectedCardIds.length == nbSelectedCardsAlreadyInTargetHeap) {
-                if (selectedCardIds.length == 1)
-                    mesg = this.allStaticData.localizedText.cardAlreadyInTargetHeap;
-                else
-                    mesg = this.allStaticData.localizedText.cardsAlreadyInTargetHeap;
+                var mesg = (selectedCardIds.length == 1) ? this.allStaticData.localizedText.cardAlreadyInTargetHeap : this.allStaticData.localizedText.cardsAlreadyInTargetHeap;
                 alert(mesg + " " + targetHeap.heapName);
                 return;
             }
 
+            var mesg;
+
             if (selectedCardIds.length == 1)
                 mesg = this.allStaticData.localizedText.alertMoveOneCardToHeap + ' ' + targetHeap.heapName;
             else {
-                cardsToMoveCount = selectedCardIds.length - nbSelectedCardsAlreadyInTargetHeap;
+                const cardsToMoveCount = selectedCardIds.length - nbSelectedCardsAlreadyInTargetHeap;
                 if (cardsToMoveCount == 1)
                     mesg = this.allStaticData.localizedText.alertMoveOneCardToHeap;
                 else
@@ -570,12 +570,12 @@ const searchApp = Vue.createApp({
             return this.filteringOnOwnerCurrentUser();
         },
         async deletedSelectedCards() {
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
             }
-            mesg = this.allStaticData.localizedText.alertDeleteCardsPart1;
+            var mesg = this.allStaticData.localizedText.alertDeleteCardsPart1;
             if (selectedCardIds.length == 1)
                 mesg += " " + this.allStaticData.localizedText.alertDeleteCardsPart2Single;
             else
@@ -596,7 +596,7 @@ const searchApp = Vue.createApp({
             }
         },
         openSelectedCardsInTabs() {
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -611,7 +611,7 @@ const searchApp = Vue.createApp({
             return this.selectedNotificationFilteringId != 2;
         },
         async registerForNotifications() {
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -633,7 +633,7 @@ const searchApp = Vue.createApp({
             return this.selectedNotificationFilteringId != 3;
         },
         async unRegisterForNotifications() {
-            selectedCardIds = this.getSelectedCardIds();
+            const selectedCardIds = this.getSelectedCardIds();
             if (selectedCardIds.length == 0) {
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
@@ -653,7 +653,7 @@ const searchApp = Vue.createApp({
         },
         async subscribe() {
             if (confirm(this.allStaticData.localizedText.confirmSubscription)) {
-                request = this.getRequest();
+                const request = this.getRequest();
 
                 await axios.post('/Search/SubscribeToSearch/', request)
                     .then(result => {
