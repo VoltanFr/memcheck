@@ -67,6 +67,7 @@ const searchApp = Vue.createApp({
         }
     },
     beforeCreate() {
+        this.dateTime = dateTime;
         this.isValidDateTime = isValidDateTime;
     },
     async mounted() {
@@ -334,7 +335,7 @@ const searchApp = Vue.createApp({
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
             }
-            mesg = this.allStaticData.localizedText.alertAddTagToCardsPart1 + ' ' + tag.tagName + ' ' + this.allStaticData.localizedText.alertAddTagToCardsPart2 + ' ' + selectedCardIds.length + ' ';
+            var mesg = this.allStaticData.localizedText.alertAddTagToCardsPart1 + ' ' + tag.tagName + ' ' + this.allStaticData.localizedText.alertAddTagToCardsPart2 + ' ' + selectedCardIds.length + ' ';
             if (selectedCardIds.length == 1)
                 mesg += this.allStaticData.localizedText.alertAddTagToCardsPart3Single;
             else
@@ -368,9 +369,6 @@ const searchApp = Vue.createApp({
                 this.selectAll();
             else
                 this.unselectAll();
-        },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
         },
         async addSelectedCardsToDeck(deck) {     //deck is SearchController.GetAllStaticDataDeckForAddViewModel
             const selectedCardIds = this.getSelectedCardIds();

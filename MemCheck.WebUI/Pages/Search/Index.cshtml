@@ -263,10 +263,10 @@
                                     @Localizer["Heap"] {{deck.heapName}}<br />
                                     @Localizer["NbTimesInNotLearnedHeap"] {{deck.nbTimesInNotLearnedHeap}}<br />
                                     @Localizer["BiggestHeapReached"] {{deck.biggestHeapReached}}<br />
-                                    @Localizer["AddedToDeckOn"] {{dt(deck.addToDeckUtcTime)}}<br />
-                                    @Localizer["LastLearnedOn"] <span v-if="isValidDateTime(deck.lastLearnUtcTime)">{{dt(deck.lastLearnUtcTime)}}</span><span v-else>@Localizer["Never"]</span><br />
+                                    @Localizer["AddedToDeckOn"] {{dateTime(deck.addToDeckUtcTime)}}<br />
+                                    @Localizer["LastLearnedOn"] <span v-if="isValidDateTime(deck.lastLearnUtcTime)">{{dateTime(deck.lastLearnUtcTime)}}</span><span v-else>@Localizer["Never"]</span><br />
                                     <span v-if="deck.heapId > 0">
-                                        <span v-if="deck.expired" style="color:orange">@Localizer["ExpiredOn"]</span><span v-else>@Localizer["WillExpireOn"]</span> {{dt(deck.expiryUtcDate)}}
+                                        <span v-if="deck.expired" style="color:orange">@Localizer["ExpiredOn"]</span><span v-else>@Localizer["WillExpireOn"]</span> {{dateTime(deck.expiryUtcDate)}}
                                     </span>
                                     <span v-else>
                                         <span style="color:orange">{{deck.heapName}}</span>
