@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model SettingsModel
-
+@section scripts {
+    <script type="module" src="~/js/Decks/Settings.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -43,7 +45,3 @@
         <button type="button" class="btn btn-success btn-md" @@click="save">@Localizer["Save"]</button>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Decks/Settings.js" asp-append-version="true"></script>
-}

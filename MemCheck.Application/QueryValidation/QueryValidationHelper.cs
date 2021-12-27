@@ -156,6 +156,19 @@ namespace MemCheck.Application.QueryValidation
             await CheckUserExistsAsync(dbContext, userId);
             await CheckUserDoesNotHaveDeckWithNameAsync(dbContext, userId, deckName, localizer);
         }
+        public static async Task CheckCanUpdateDeckAsync(Guid userId, string deckName, int heapingAlgorithmId, MemCheckDbContext dbContext, ILocalized localizer)
+        {
+            if (deckName != deckName.Trim())
+                throw new InvalidOperationException("Invalid Name: not trimmed");
+
+            if (deckName.Length < DeckMinNameLength || deckName.Length > DeckMaxNameLength)
+                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {deckName.Length}" + localizer.Get("MustBeBetween") + $" {DeckMinNameLength} " + localizer.Get("And") + $" {DeckMaxNameLength}");
+
+            if (!HeapingAlgorithms.Instance.Ids.Contains(heapingAlgorithmId))
+                throw new InvalidOperationException($"Invalid heaping algorithm: {heapingAlgorithmId}");
+
+            await CheckUserExistsAsync(dbContext, userId);
+        }
         public static async Task CheckCanCreateImageWithNameAsync(string name, MemCheckDbContext dbContext, ILocalized localizer)
         {
             if (name != name.Trim())

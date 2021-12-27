@@ -1,10 +1,13 @@
-var app = new Vue({
-    el: '#CreateDeck',
-    data: {
-        heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
-        description: "",
-        heapingAlgorithm: "",   //DecksController.HeapingAlgorithmViewModel
-        mountFinished: false,
+const createDeckApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
+            description: "",
+            heapingAlgorithm: "",   //DecksController.HeapingAlgorithmViewModel
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
@@ -25,7 +28,7 @@ var app = new Vue({
                 });
         },
         async create() {
-            newDeck = { description: this.description, heapingAlgorithmId: this.heapingAlgorithm.id };
+            const newDeck = { description: this.description, heapingAlgorithmId: this.heapingAlgorithm.id };
             await axios.post('/Decks/Create/', newDeck)
                 .then(result => {
                     window.location.href = '/';
@@ -36,3 +39,5 @@ var app = new Vue({
         },
     },
 });
+
+            createDeckApp.mount('#CreateDeck');

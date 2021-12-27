@@ -1,6 +1,9 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@section scripts {
+    <script type="module" src="~/js/Decks/Create.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -33,7 +36,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Decks/Create.js" asp-append-version="true"></script>
-}

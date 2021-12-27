@@ -1,16 +1,19 @@
-var app = new Vue({
-    el: '#DeckSettingsMainDiv',
-    data: {
-        userDecks: [],  //DecksController.GetUserDecksViewModel
-        activeDeck: "",  //DecksController.GetUserDecksViewModel
-        singleDeckDisplay: false,
-        heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
-        mountFinished: false,
+const deckSettingsApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            userDecks: [],  //DecksController.GetUserDecksViewModel
+            activeDeck: "",  //DecksController.GetUserDecksViewModel
+            singleDeckDisplay: false,
+            heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
-            task1 = this.GetUserDecks();
-            task2 = this.GetHeapingAlgorithms();
+            const task1 = this.GetUserDecks();
+            const task2 = this.GetHeapingAlgorithms();
             await Promise.all([task1, task2]);
             this.GetActiveDeckFromPageParameter();
         }
@@ -22,7 +25,7 @@ var app = new Vue({
         GetActiveDeckFromPageParameter() {
             if (!this.singleDeckDisplay) {
                 //There has to be a better way, but here's how I get a parameter passed to a page
-                wantedDeck = document.getElementById("DeckIdInput").value;
+                const wantedDeck = document.getElementById("DeckIdInput").value;
                 if (!wantedDeck)
                     return;
                 for (let i = 0; i < this.userDecks.length; i++) {
@@ -67,7 +70,7 @@ var app = new Vue({
             return "";
         },
         async save() {
-            newDeck = { deckId: this.activeDeck.deckId, description: this.activeDeck.description, heapingAlgorithmId: this.activeDeck.heapingAlgorithmId };
+            const newDeck = { deckId: this.activeDeck.deckId, description: this.activeDeck.description, heapingAlgorithmId: this.activeDeck.heapingAlgorithmId };
             await axios.post('/Decks/Update/', newDeck)
                 .then(result => {
                     window.location.href = '/Decks/';
@@ -79,3 +82,5 @@ var app = new Vue({
         },
     },
 });
+
+deckSettingsApp.mount('#DeckSettingsMainDiv');

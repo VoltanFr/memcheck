@@ -1,10 +1,13 @@
-var app = new Vue({
-    el: '#DeckDeleteMainDiv',
-    data: {
-        userDecks: [],  //DecksController.GetUserDecksForDeletionViewModel
-        activeDeck: "",  //DecksController.GetUserDecksForDeletionViewModel
-        singleDeckDisplay: false,
-        mountFinished: false,
+const deleteDeckApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            userDecks: [],  //DecksController.GetUserDecksForDeletionViewModel
+            activeDeck: "",  //DecksController.GetUserDecksForDeletionViewModel
+            singleDeckDisplay: false,
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
@@ -46,3 +49,5 @@ var app = new Vue({
         },
     },
 });
+
+deleteDeckApp.mount('#DeckDeleteMainDiv');
