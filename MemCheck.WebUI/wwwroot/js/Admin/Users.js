@@ -1,16 +1,19 @@
-var app = new Vue({
-    el: '#UsersMainDiv',
-    data: {
-        request: {
-            filter: "", //string
-            pageNo: 1, //int. First page is number 1
-            pageSize: 100,   //int
-        },
-        totalUserCount: -1, //int
-        pageCount: 0,   //int
-        offeredPageSizes: [10, 50, 100, 500],
-        users: [],    //AdminController.GetUsersUserViewModel
-        mountFinished: false,
+const usersApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            request: {
+                filter: "", //string
+                pageNo: 1, //int. First page is number 1
+                pageSize: 100,   //int
+            },
+            totalUserCount: -1, //int
+            pageCount: 0,   //int
+            offeredPageSizes: [10, 50, 100, 500],
+            users: [],    //AdminController.GetUsersUserViewModel
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
@@ -50,3 +53,5 @@ var app = new Vue({
         },
     },
 });
+
+usersApp.mount('#UsersMainDiv');

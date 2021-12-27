@@ -1,6 +1,9 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@section scripts {
+    <script type="module" src="~/js/Admin/Notifier.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = "Notifier";
 }
@@ -19,7 +22,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Admin/Notifier.js" asp-append-version="true"></script>
-}

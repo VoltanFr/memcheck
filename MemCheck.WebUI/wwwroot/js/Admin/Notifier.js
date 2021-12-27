@@ -1,8 +1,11 @@
-var app = new Vue({
-    el: '#NotifierMainDiv',
-    data: {
-        mountFinished: false,
-        running: false,
+const notifierMainApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            running: false,
+        }
     },
     mounted() {
         try {
@@ -26,3 +29,5 @@ var app = new Vue({
         },
     },
 });
+
+notifierMainApp.mount('#NotifierMainDiv');

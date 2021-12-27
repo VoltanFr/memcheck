@@ -4,6 +4,9 @@
 @section head {
     <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
 }
+@section scripts {
+    <script type="module" src="~/js/Admin/Users.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["ActivePage"] = ManageNavPages.Users;
@@ -65,7 +68,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Admin/Users.js" asp-append-version="true"></script>
-}

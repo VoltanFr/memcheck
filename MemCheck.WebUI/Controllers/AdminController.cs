@@ -27,19 +27,29 @@ namespace MemCheck.WebUI.Controllers
         #region Fields
         private readonly CallContext callContext;
         private readonly IEmailSender emailSender;
+        private readonly LinkGenerator linkGenerator;
         private readonly UserManager<MemCheckUser> userManager;
-        private readonly string authoringPageLink;
-        private readonly string comparePageLink;
-        private readonly string historyPageLink;
+        #endregion
+        #region Private methods
+        private  string GetAuthoringPageLink()
+        {
+            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Index")!;
+        }
+        private string GetComparePageLink()
+        {
+            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Compare")!;
+        }
+        private string GetHistoryPageLink()
+        {
+            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/History")!;
+        }
         #endregion
         public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
         {
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.emailSender = emailSender;
+            this.linkGenerator = linkGenerator;
             this.userManager = userManager;
-            authoringPageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Index")!;
-            comparePageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Compare")!;
-            historyPageLink = linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/History")!;
         }
         #region GetUsers
         [HttpPost("GetUsers")]
@@ -102,13 +112,13 @@ namespace MemCheck.WebUI.Controllers
                 foreach (var card in cardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
                 {
                     mailBody.Append("<li>");
-                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
                     mailBody.Append($"By {card.VersionCreator}<br/>");
                     mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
                     mailBody.Append($"Version description: '{card.VersionDescription}'<br/>");
-                    mailBody.Append($"<a href={historyPageLink}?CardId={card.CardId}>History</a> - ");
+                    mailBody.Append($"<a href={GetHistoryPageLink()}?CardId={card.CardId}>History</a> - ");
                     if (card.VersionIdOnLastNotification != null)
-                        mailBody.Append($"<a href={comparePageLink}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
+                        mailBody.Append($"<a href={GetComparePageLink()}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
                     else
                         mailBody.Append("Did not exist on your previous notifications");
                     mailBody.Append("</li>");
@@ -151,7 +161,7 @@ namespace MemCheck.WebUI.Controllers
                 foreach (var card in searchNotifications.NewlyFoundCards.OrderBy(card => card.VersionUtcDate))
                 {
                     mailBody.Append("<li>");
-                    mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
                     mailBody.Append($"Changed by '{card.VersionCreator}'<br/>");
                     mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
                     mailBody.Append($"Version description: '{card.VersionDescription}'");
@@ -174,7 +184,7 @@ namespace MemCheck.WebUI.Controllers
                     foreach (var card in searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.OrderBy(card => card.VersionUtcDate))
                     {
                         mailBody.Append("<li>");
-                        mailBody.Append($"<a href={authoringPageLink}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                        mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
                         mailBody.Append($"Changed by user '{card.VersionCreator}' and not reported anymore by this search<br/>");
                         mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
                         mailBody.Append($"Version description: '{card.VersionDescription}'");
