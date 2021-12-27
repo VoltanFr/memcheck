@@ -4,19 +4,11 @@
   "libraries": [
     {
       "library": "showdown@1.9.1",
-      "destination": "wwwroot/lib/showdown/",
-      "files": [
-        "showdown.min.js",
-        "showdown.min.js.map"
-      ]
+      "destination": "wwwroot/lib/showdown/"
     },
     {
       "library": "axios@0.24.0",
-      "destination": "wwwroot/lib/axios/",
-      "files": [
-        "axios.min.js",
-        "axios.min.map"
-      ]
+      "destination": "wwwroot/lib/axios/"
     },
     {
       "provider": "jsdelivr",
@@ -50,10 +42,12 @@
       "destination": "wwwroot/lib/jquery/"
     },
     {
-      "library": "font-awesome@5.15.1",
+      "library": "font-awesome@5.15.4",
       "destination": "wwwroot/lib/font-awesome/",
       "files": [
         "css/all.min.css",
+        "css/all.css",
+        "js/all.js",
         "js/all.min.js",
         "webfonts/fa-solid-900.ttf",
         "webfonts/fa-solid-900.woff",
@@ -69,6 +63,6 @@
     {
       "library": "vant@3.3.7",
       "destination": "wwwroot/lib/vant/"
-    }
+    },
   ]
 }

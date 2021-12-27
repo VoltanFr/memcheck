@@ -29,6 +29,19 @@ namespace MemCheck.WebUI
         private readonly bool prodEnvironment;
         private readonly IConfiguration configuration;
         #endregion
+        #region Private methods
+        private ILogger<AppSettings> CreateLogger()
+        {
+            using ILoggerFactory? loggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder.SetMinimumLevel(LogLevel.Trace);
+                builder.AddConsole();
+                builder.AddEventSourceLogger();
+            });
+
+            return loggerFactory.CreateLogger<AppSettings>();
+        }
+        #endregion
         public Startup(IConfiguration configuration, IWebHostEnvironment currentEnvironment)
         {
             this.configuration = configuration;
@@ -36,13 +49,6 @@ namespace MemCheck.WebUI
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            using var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.SetMinimumLevel(LogLevel.Trace);
-                builder.AddConsole();
-                builder.AddEventSourceLogger();
-            });
-
             services.AddLocalization(option => option.ResourcesPath = "Resources");
             services.AddMvc(option =>
             {
@@ -53,7 +59,7 @@ namespace MemCheck.WebUI
                 options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
             });
 
-            var appSettings = new AppSettings(configuration, prodEnvironment, loggerFactory.CreateLogger<AppSettings>());
+            var appSettings = new AppSettings(configuration, prodEnvironment, CreateLogger());
 
             if (!prodEnvironment)
                 services.AddDatabaseDeveloperPageExceptionFilter();

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MemCheck.WebUI
 {
@@ -9,12 +10,12 @@ namespace MemCheck.WebUI
         {
             CreateHostBuilder(args).Build().Run();
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            IHostBuilder result = Host.CreateDefaultBuilder(args);
+            result = result.ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+            result = result.ConfigureLogging((context, builder) => builder.AddFilter("", context.HostingEnvironment.IsProduction() ? LogLevel.Warning : LogLevel.Debug));
+            return result;
+        }
     }
 }
