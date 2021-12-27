@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model AuthoringHistoryModel
+@section scripts {
+<script type="module" src="~/js/Authoring/History.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -24,8 +27,8 @@
         </div>
         <ul class="card-history-ul">
             <li v-for="(version, index) in versions" class="card-history-li">
-                <span v-if="index==0"><a v-bind:href="'/Authoring/Index?CardId='+cardId"><strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong></a><br /></span>
-                <span v-if="index!=0"><strong>{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong><br /></span>
+                <span v-if="index==0"><a v-bind:href="'/Authoring/Index?CardId='+cardId"><strong>{{dateTime(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong></a><br /></span>
+                <span v-if="index!=0"><strong>{{dateTime(version.versionUtcDate)}} @Localizer["by"] {{version.versionCreator}}, "{{version.versionDescription}}"</strong><br /></span>
                 @Localizer["ModifiedFields"] {{version.changedFieldList}}
                 <span v-if="version.versionId">
                     <br />
@@ -35,7 +38,3 @@
         </ul>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Authoring/History.js" asp-append-version="true"></script>
-}

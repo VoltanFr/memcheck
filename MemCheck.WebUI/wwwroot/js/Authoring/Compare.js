@@ -1,12 +1,19 @@
-var app = new Vue({
-    el: '#CompareMainDiv',
-    data: {
-        mountFinished: false,
-        loading: false,
-        error: "",
-        cardId: null,
-        selectedVersionId: null,
-        diffResult: null,   //AuthoringController.CardSelectedVersionDiffWithCurrentResult
+const cardCompareApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            loading: false,
+            error: "",
+            cardId: null,
+            selectedVersionId: null,
+            diffResult: null,   //AuthoringController.CardSelectedVersionDiffWithCurrentResult
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
+        this.dateTimeWithTime = dateTimeWithTime;
     },
     async mounted() {
         try {
@@ -25,7 +32,6 @@ var app = new Vue({
                 this.error = "Expected values not found in page parameters)";
                 return;
             }
-
             await axios.get('/Authoring/CardSelectedVersionDiffWithCurrent/' + this.cardId + '/' + this.versionId)
                 .then(result => {
                     this.diffResult = result.data;
@@ -41,11 +47,7 @@ var app = new Vue({
                     return;
                 });
         },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
-        dtWithTime(utcFromDotNet) {
-            return dateTimeWithTime(utcFromDotNet);
-        },
     },
 });
+
+cardCompareApp.mount('#CompareMainDiv');

@@ -1,11 +1,17 @@
-var app = new Vue({
-    el: '#HistoryMainDiv',
-    data: {
-        mountFinished: false,
-        loading: false,
-        cardId: null,
-        error: "",
-        versions: [],   //AuthoringController.CardVersion
+const cardHistoryApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            loading: false,
+            cardId: null,
+            error: "",
+            versions: [],   //AuthoringController.CardVersion
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
     },
     async mounted() {
         try {
@@ -41,8 +47,7 @@ var app = new Vue({
         showDebugInfo() {
             return true;
         },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
     },
 });
+
+cardHistoryApp.mount('#HistoryMainDiv');

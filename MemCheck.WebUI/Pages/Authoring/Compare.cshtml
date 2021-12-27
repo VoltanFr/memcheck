@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model CompareModel
+@section scripts {
+<script type="module" src="~/js/Authoring/Compare.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -23,9 +26,9 @@
         <div id="Title">
             <h1 class="title">@Localizer["Comparison"]</h1>
             <p>
-                @Localizer["CardCreatedOn"] {{dt(diffResult.firstVersionUtcDate)}}<br />
-                @Localizer["SelectedVersionCreatedOn"] {{dtWithTime(diffResult.selectedVersionUtcDate)}} @Localizer["By"] {{diffResult.selectedVersionCreatorName}}, @Localizer["Description"] {{diffResult.selectedVersionDescription}}<br />
-                <a v-bind:href="'/Authoring/Index?CardId='+cardId">@Localizer["LastVersion"]</a> @Localizer["CreatedOn"] {{dtWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
+                @Localizer["CardCreatedOn"] {{dateTime(diffResult.firstVersionUtcDate)}}<br />
+                @Localizer["SelectedVersionCreatedOn"] {{dateTimeWithTime(diffResult.selectedVersionUtcDate)}} @Localizer["By"] {{diffResult.selectedVersionCreatorName}}, @Localizer["Description"] {{diffResult.selectedVersionDescription}}<br />
+                <a v-bind:href="'/Authoring/Index?CardId='+cardId">@Localizer["LastVersion"]</a> @Localizer["CreatedOn"] {{dateTimeWithTime(diffResult.lastVersionUtcDate)}} @Localizer["By"] {{diffResult.lastVersionCreatorName}}, @Localizer["Description"] {{diffResult.lastVersionDescription}}<br />
                 {{diffResult.infoAboutUsage}}<br />
                 <span v-if="diffResult.averageRating>0">@Localizer["AverageRating"] {{diffResult.averageRating}}, @Localizer["By"] {{diffResult.countOfUserRatings}} <span v-if="diffResult.countOfUserRatings==1">@Localizer["User"]</span><span v-if="diffResult.countOfUserRatings>1">@Localizer["Users"]</span></span>
             </p>
@@ -44,7 +47,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Authoring/Compare.js" asp-append-version="true"></script>
-}
