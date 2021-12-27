@@ -1,11 +1,17 @@
-var app = new Vue({
-    el: '#HistoryMainDiv',
-    data: {
-        mountFinished: false,
-        loading: false,
-        imageId: null,
-        error: "",
-        versions: [],   //MediaController.ImageVersion
+const mediaHistoryApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            loading: false,
+            imageId: null,
+            error: "",
+            versions: [],   //MediaController.ImageVersion
+        }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
     },
     async mounted() {
         try {
@@ -41,8 +47,7 @@ var app = new Vue({
         showDebugInfo() {
             return true;
         },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
     },
 });
+
+mediaHistoryApp.mount('#HistoryMainDiv');

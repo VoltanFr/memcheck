@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model HistoryModel
+@section scripts {
+<script type="module" src="~/js/Media/History.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -23,11 +26,7 @@
             <h1 class="title">@Localizer["VersionHistory"]</h1>
         </div>
         <ul>
-            <li class="image-history-li" v-for="version in versions">{{dt(version.versionUtcDate)}} @Localizer["by"] {{version.author}} "{{version.versionDescription}}" [{{version.changedFieldList}}]</li>
+            <li class="image-history-li" v-for="version in versions">{{dateTime(version.versionUtcDate)}} @Localizer["by"] {{version.author}} "{{version.versionDescription}}" [{{version.changedFieldList}}]</li>
         </ul>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Media/History.js" asp-append-version="true"></script>
-}
