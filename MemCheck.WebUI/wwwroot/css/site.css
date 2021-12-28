@@ -58,7 +58,14 @@
     border: 5px solid red;
 }
 
+.memcheck-markdown {
+    white-space: normal;
+}
 
+    .memcheck-markdown ul,
+    .memcheck-markdown ol {
+        list-style: initial;
+    }
 
 [v-cloak] > * {
     display: none

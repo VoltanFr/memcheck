@@ -12,10 +12,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MemCheck - @ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/lib/vant/index.css" />
-    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/vant/index.css" type="text/css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.min.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/vant/index.min.css" type="text/css" asp-append-version="true" />
+    </environment>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" type="text/css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" type="text/css" asp-append-version="true" />
     @RenderSection("head", required: false)
 </head>
 <body>

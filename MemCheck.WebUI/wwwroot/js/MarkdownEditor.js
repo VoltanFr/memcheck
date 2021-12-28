@@ -28,7 +28,7 @@
                     </tr>
                     <tr class="markdown-edit-row" v-if="previewVisible">
                         <td class="markdown-edit-td">
-                            <span class="markdown-render" v-html="renderedHtml()" ></span>
+                            <span class="memcheck-markdown markdown-body" v-html="renderedHtml()" ></span>
                         </td>
                     </tr>
                 </tbody>

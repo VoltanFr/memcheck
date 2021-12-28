@@ -4,7 +4,6 @@
 @model LearnViewModel
 @section head {
     <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/css/markdown.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
@@ -134,7 +133,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["FrontSide"]</p>
                         </div>
-                        <div class="card-body markdown-render">
+                        <div class="card-body memcheck-markdown markdown-body">
                             <span v-html="currentCardFrontSide()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
@@ -150,7 +149,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["BackSide"]</p>
                         </div>
-                        <div class="card-body markdown-render">
+                        <div class="card-body memcheck-markdown markdown-body">
                             <span v-html="currentCardBackSide()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
@@ -169,7 +168,7 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["AdditionalInfo"]</p>
                         </div>
-                        <div class="card-body markdown-render">
+                        <div class="card-body memcheck-markdown markdown-body">
                             <span v-html="currentCardAdditionalInfo()"></span>
                         </div>
                         <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">

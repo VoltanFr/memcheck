@@ -64,5 +64,13 @@
       "library": "vant@3.3.7",
       "destination": "wwwroot/lib/vant/"
     },
+    {
+      "library": "github-markdown-css@5.1.0",
+      "destination": "wwwroot/lib/github-markdown-css/",
+      "files": [
+        "github-markdown-light.css",
+        "github-markdown-light.min.css"
+      ]
+    }
   ]
 }
