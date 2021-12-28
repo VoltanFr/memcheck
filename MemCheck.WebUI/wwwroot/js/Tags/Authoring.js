@@ -1,27 +1,30 @@
-var app = new Vue({
-    el: '#TagAuthoringDiv',
-    data: {
-        editedTag: "",  //A TagsController.GetTagViewModel if we are editing a tag, otherwise null (we are creating)
-        existingTagNames: "",    //Set of string
-        newName: "",    //string
-        newNameProblem: "", //string
-        newDescription: "",    //string
-        mountFinished: false,
-        returnUrl: "", //string
-        guiMessages: {
-            alreadyExistsErr: "",
-            nameLengthErr: "",
-        },
-        toastVisible: false,
+const tagAuthoringApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            editedTag: "",  //A TagsController.GetTagViewModel if we are editing a tag, otherwise null (we are creating)
+            existingTagNames: "",    //Set of string
+            newName: "",    //string
+            newNameProblem: "", //string
+            newDescription: "",    //string
+            mountFinished: false,
+            returnUrl: "", //string
+            guiMessages: {
+                alreadyExistsErr: "",
+                nameLengthErr: "",
+            },
+            toastVisible: false,
+        }
     },
     async mounted() {
         try {
-            task1 = this.GetTagNames();
-            task2 = this.GetEditedTagFromPageParameter();
-            task3 = this.GetGuiMessages();
+            const task1 = this.GetTagNames();
+            const task2 = this.GetEditedTagFromPageParameter();
+            const task3 = this.GetGuiMessages();
             this.GetReturnUrlFromPageParameter();
             await Promise.all([task1, task2, task3]);
-            this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
+            //this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
         }
         finally {
             this.mountFinished = true;
@@ -96,7 +99,7 @@ var app = new Vue({
         },
         async GetEditedTagFromPageParameter() {
             //There has to be a better way, but here's how I get a parameter passed to a page
-            tagId = document.getElementById("TagIdInput").value;
+            const tagId = document.getElementById("TagIdInput").value;
             if (!tagId) {
                 this.editedTag = "";
                 return;
@@ -137,9 +140,11 @@ var app = new Vue({
     },
     watch: {
         newName: {
-            handler() {
+            handler: function (newValue) {
                 this.onNameChanged();
             },
         },
     },
 });
+
+tagAuthoringApp.mount('#TagAuthoringDiv');

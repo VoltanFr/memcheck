@@ -1,16 +1,19 @@
-var app = new Vue({
-    el: '#TagsMainDiv',
-    data: {
-        request: {
-            filter: "", //string
-            pageNo: 1, //int. First page is number 1
-            pageSize: 100,   //int
-        },
-        totalTagCount: -1, //int
-        pageCount: 0,   //int
-        offeredPageSizes: [10, 50, 100, 500],
-        tags: [],    //TagsController.GetTagsTagViewModel
-        mountFinished: false,
+const tagListingApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            request: {
+                filter: "", //string
+                pageNo: 1, //int. First page is number 1
+                pageSize: 100,   //int
+            },
+            totalTagCount: -1, //int
+            pageCount: 0,   //int
+            offeredPageSizes: [10, 50, 100, 500],
+            tags: [],    //TagsController.GetTagsTagViewModel
+            mountFinished: false,
+        }
     },
     async mounted() {
         try {
@@ -56,3 +59,5 @@ var app = new Vue({
         },
     },
 });
+
+tagListingApp.mount('#TagsMainDiv');

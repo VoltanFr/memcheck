@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model AuthoringViewModel
-
+@section scripts {
+<script type="module" src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -41,7 +43,7 @@
                     </tr>
                     <tr>
                         <th><span v-if="editedTag">@Localizer["NewDescription"]</span><span v-else>@Localizer["Description"]</span></th>
-                        <td><b-form-textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15" /></td>
+                        <td><textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15"></textarea></td>
                     </tr>
                     <tr>
                         <th></th>
@@ -56,7 +58,3 @@
         <button type="button" class="btn btn-success btn-md" @@click="save" v-else>@Localizer["Save"]</button>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
-}
