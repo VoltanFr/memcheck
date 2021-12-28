@@ -1,24 +1,27 @@
-var app = new Vue({
-    el: '#DeleteMainDiv',
-    data: {
-        mountFinished: false,
-        deleting: false,
-        returnUrl: "", //string
-        error: "",
-        deletionDescription: "",
-        image: {
-            imageId: null,
-            imageName: "",
-            cardCount: 1,
-            currentVersionUserName: "",
-            currentVersionDescription: "",
-            description: "",
-            source: "",
-            initialUploadUtcDate: null,
-            deletionAlertMessage: "",
-            lastChangeUtcDate: null,
-            blob: null,
-        },
+const deleteMediaApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            deleting: false,
+            returnUrl: "", //string
+            error: "",
+            deletionDescription: "",
+            image: {
+                imageId: null,
+                imageName: "",
+                cardCount: 1,
+                currentVersionUserName: "",
+                currentVersionDescription: "",
+                description: "",
+                source: "",
+                initialUploadUtcDate: null,
+                deletionAlertMessage: "",
+                lastChangeUtcDate: null,
+                blob: null,
+            },
+        }
     },
     async mounted() {
         try {
@@ -31,7 +34,7 @@ var app = new Vue({
     },
     methods: {
         async GetImageFromPageParameter() {
-            imageId = document.getElementById("ImageIdInput").value;
+            const imageId = document.getElementById("ImageIdInput").value;
             if (!imageId) {
                 this.error = "Image not found (this page expects an image id parameter)";
                 return;
@@ -96,3 +99,5 @@ var app = new Vue({
         },
     },
 });
+
+deleteMediaApp.mount('#DeleteMainDiv');

@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @model UploadModel
 @inject IViewLocalizer Localizer
+@section scripts {
+<script type="module" src="~/js/Media/Upload.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -61,7 +64,3 @@
         <button id="UploadButton" type="button" class="btn btn-success btn-lg" @@click="upload">@Localizer["Upload"]</button>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Media/Upload.js" asp-append-version="true"></script>
-}

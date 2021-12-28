@@ -1,19 +1,22 @@
-var app = new Vue({
-    el: '#UploadMainDiv',
-    data: {
-        mountFinished: false,
-        name: "",  //string
-        description: "",  //string
-        versionDescription: "", //string
-        source: "",  //string
-        selectedFile: null, //File
-        imagePreview: null, //blob
-        uploading: false,
-        editingImageId: null,   //Guid
-        returnUrl: "", //string
-        originalName: "",
-        originalDescription: "",  //string
-        originalSource: "",  //string
+const uploadMediaApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            name: "",  //string
+            description: "",  //string
+            versionDescription: "", //string
+            source: "",  //string
+            selectedFile: null, //File
+            imagePreview: null, //blob
+            uploading: false,
+            editingImageId: null,   //Guid
+            returnUrl: "", //string
+            originalName: "",
+            originalDescription: "",  //string
+            originalSource: "",  //string
+        }
     },
     async mounted() {
         try {
@@ -42,7 +45,7 @@ var app = new Vue({
         },
         async uploadNew() {
             this.uploading = true;
-            f = new FormData();
+            const f = new FormData();
             f.set("Name", this.name);
             f.set("Description", this.description);
             f.set("Source", this.source);
@@ -60,7 +63,7 @@ var app = new Vue({
         async uploadEdited() {
             this.uploading = true;
 
-            data = { imageName: this.name, source: this.source, description: this.description, versionDescription: this.versionDescription };
+            const data = { imageName: this.name, source: this.source, description: this.description, versionDescription: this.versionDescription };
 
             await axios.post('/Media/Update/' + this.editingImageId, data)
                 .then((result) => {
@@ -95,7 +98,7 @@ var app = new Vue({
             }
         },
         async GetImageToEditFromPageParameter() {
-            imageId = document.getElementById("ImageIdInput").value;
+            const imageId = document.getElementById("ImageIdInput").value;
             if (!imageId)
                 return;
 
@@ -142,5 +145,4 @@ var app = new Vue({
     },
 });
 
-
-//Possibilité d'afficher une info de progress pendant l'upload, voir 7:30 : https://www.youtube.com/watch?v=VqnJwh6E9ak
+uploadMediaApp.mount('#UploadMainDiv');

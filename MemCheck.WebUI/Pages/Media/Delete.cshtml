@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @model DeleteModel
 @inject IViewLocalizer Localizer
+@section scripts {
+<script type="module" src="~/js/Media/Delete.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -73,7 +76,3 @@
     </div>
 
 </div>
-
-@section scripts {
-    <script src="~/js/Media/Delete.js" asp-append-version="true"></script>
-}

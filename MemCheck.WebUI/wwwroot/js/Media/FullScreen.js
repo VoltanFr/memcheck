@@ -1,9 +1,12 @@
-var app = new Vue({
-    el: '#FullScreenMainDiv',
-    data: {
-        mountFinished: false,
-        invalidRequest: false,
-        imageBlob: null,   //Medium sized
+const fullScreenImageApp = Vue.createApp({
+    components: {
+    },
+    data() {
+        return {
+            mountFinished: false,
+            invalidRequest: false,
+            imageBlob: null,   //Medium sized
+        }
     },
     async mounted() {
         try {
@@ -15,7 +18,7 @@ var app = new Vue({
     },
     methods: {
         async getImage() {
-            imageId = document.getElementById("ImageIdInput").value;
+            const imageId = document.getElementById("ImageIdInput").value;
             if (!imageId) {
                 this.invalidRequest = true;
                 return;
@@ -31,3 +34,5 @@ var app = new Vue({
         },
     },
 });
+
+fullScreenImageApp.mount('#FullScreenMainDiv');

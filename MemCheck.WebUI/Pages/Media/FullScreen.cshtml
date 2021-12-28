@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model FullScreenModel
+@section scripts {
+<script type="module" src="~/js/Media/FullScreen.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -22,7 +25,3 @@
         <img class="fullscreen-image" :src="imageBlob" />
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Media/FullScreen.js" asp-append-version="true"></script>
-}
