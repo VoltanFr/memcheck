@@ -6,6 +6,7 @@ const learnApp = Vue.createApp({
         'van-popover': globalThis.vant.Popover,
         'van-rate': globalThis.vant.Rate,
         'big-size-image': BigSizeImage,
+        'card-rating': CardRating,
     },
     data() {
         return {
@@ -13,7 +14,6 @@ const learnApp = Vue.createApp({
             showVisibilityPopover: false,
             heapInfoPopover: false,
             showMoveToHeapMenuPopover: false,
-            ratingPopover: false,
             userDecks: [],  //LearnController.UserDecksViewModel
             activeDeck: null,  //LearnController.UserDecksViewModel
             singleDeckDisplay: false,
@@ -365,17 +365,6 @@ const learnApp = Vue.createApp({
         currentCardAdditionalInfo() {
             return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench);
         },
-        currentUserRatingAsStars() {
-            if (!this.currentCard)
-                return "";
-            return ratingAsStars(this.currentCard.currentUserRating);
-        },
-        averageRatingAsStars() {
-            if (!this.currentCard)
-                return "";
-            const truncated = Math.trunc(this.currentCard.averageRating);
-            return ratingAsStars(truncated);
-        },
         unregisterForNotif() {
             this.currentCard.registeredForNotifications = false;
             this.enqueueNotificationRegistrationChange();
@@ -418,6 +407,9 @@ const learnApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
+        onRatingChange(newValue, oldValue) {
+            this.enqueueRatingUpload(newValue);
+        }
     },
     watch: {
         pendingMoveOperations: {

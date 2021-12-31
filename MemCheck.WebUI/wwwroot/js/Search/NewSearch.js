@@ -98,7 +98,7 @@ const searchApp = Vue.createApp({
                     this.visibilityFilteringPossibleChoices = [{ choiceId: 1, choiceText: this.allStaticData.localizedText.ignore }, { choiceId: 2, choiceText: this.allStaticData.localizedText.cardVisibleToMoreThanOwner }, { choiceId: 3, choiceText: this.allStaticData.localizedText.cardVisibleToOwnerOnly }];
                     this.possibleTargetDecksForAdd = result.data.allDecksForAddingCards;
                     this.possibleRatingFilteringKind = [{ choiceId: 1, choiceText: this.allStaticData.localizedText.ignore }, { choiceId: 2, choiceText: this.allStaticData.localizedText.selectedRatingAndAbove }, { choiceId: 3, choiceText: this.allStaticData.localizedText.selectedRatingAndBelow }, { choiceId: 4, choiceText: this.allStaticData.localizedText.noRating }];
-                    this.possibleRatingFilteringValues = [{ choiceId: 1, choiceText: ratingAsStars(1) }, { choiceId: 2, choiceText: ratingAsStars(2) }, { choiceId: 3, choiceText: ratingAsStars(3) }, { choiceId: 4, choiceText: ratingAsStars(4) }, { choiceId: 5, choiceText: ratingAsStars(5) },];
+                    this.possibleRatingFilteringValues = [{ choiceId: 1, choiceText: this.ratingAsStars(1) }, { choiceId: 2, choiceText: this.ratingAsStars(2) }, { choiceId: 3, choiceText: this.ratingAsStars(3) }, { choiceId: 4, choiceText: this.ratingAsStars(4) }, { choiceId: 5, choiceText: this.ratingAsStars(5) },];
                     this.possibleSelectedNotificationFiltering = [{ choiceId: 1, choiceText: this.allStaticData.localizedText.ignore }, { choiceId: 2, choiceText: this.allStaticData.localizedText.cardsRegisteredForNotif }, { choiceId: 3, choiceText: this.allStaticData.localizedText.cardsNotRegisteredForNotif }];
                     this.updateFieldsAccordingToDeck();
                 })
@@ -188,9 +188,17 @@ const searchApp = Vue.createApp({
         cardFromControllerResult(controllerResultCard) {    //controllerResultCard a SearchController.RunQueryCardViewModel
             const result = controllerResultCard;
             result.ratingShort = "\u2606" + controllerResultCard.averageRating;
-            result.userRatingAsStars = ratingAsStars(controllerResultCard.currentUserRating);
+            result.userRatingAsStars = this.ratingAsStars(controllerResultCard.currentUserRating);
             const truncatedAverage = Math.trunc(controllerResultCard.averageRating);
-            result.averageRatingAsStars = ratingAsStars(truncatedAverage);
+            result.averageRatingAsStars = this.ratingAsStars(truncatedAverage);
+            return result;
+        },
+        ratingAsStars(rating) {    //rating is an int
+            var result = "";
+            for (let i = 0; i < rating; i++)
+                result = result + "\u2605";
+            for (let i = 0; i < 5 - rating; i++)
+                result = result + "\u2606";
             return result;
         },
         possibleDecksInclusionChoicesEnabled() {

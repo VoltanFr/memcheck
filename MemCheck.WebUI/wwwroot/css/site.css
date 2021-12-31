@@ -650,15 +650,3 @@ br {
 .search-page-required-text-edit {
     width: 100%
 }
-
-.search-page-rating-button {
-    white-space: nowrap;
-    text-align: center;
-    vertical-align: middle;
-    background-color: ButtonFace;
-    border-width: thin;
-    border-color: lightgray;
-    padding: 0px;
-    color: black;
-    width: 100%;
-}

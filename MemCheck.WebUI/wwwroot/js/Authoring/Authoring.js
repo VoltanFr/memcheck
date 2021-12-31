@@ -7,6 +7,7 @@ const authoringApp = Vue.createApp({
         'van-rate': globalThis.vant.Rate,
         'markdown-editor': MarkdownEditor,
         'big-size-image': BigSizeImage,
+        'card-rating': CardRating,
     },
     data() {
         return {
@@ -63,7 +64,6 @@ const authoringApp = Vue.createApp({
             saving: false,
             bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
             showInfoPopover: false,
-            ratingPopover: false,
             showAdditionalInfo: false,
         }
     },
@@ -440,15 +440,8 @@ const authoringApp = Vue.createApp({
                 }
             return false;
         },
-        currentUserRatingAsStars() {
-            return ratingAsStars(this.card.currentUserRating);
-        },
-        averageRatingAsStars() {
-            const truncated = Math.trunc(this.card.averageRating);
-            return ratingAsStars(truncated);
-        },
-        async updateRating() {
-            await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + this.card.currentUserRating)
+        async updateRating(newValue) {
+            await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + newValue)
                 .then(response => {
                     tellControllerSuccess(response);
                 })
@@ -459,6 +452,9 @@ const authoringApp = Vue.createApp({
         toggleShowAdditionalInfo() {
             this.showAdditionalInfo = !this.showAdditionalInfo;
         },
+        async onRatingChange(newValue, oldValue) {
+            await this.updateRating(newValue);
+        }
     },
     watch: {
         selectedTagToAdd: {

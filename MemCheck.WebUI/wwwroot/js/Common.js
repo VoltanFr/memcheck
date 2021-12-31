@@ -103,15 +103,6 @@ function convertMarkdown(src, beautifyForFrench) {
     return converter.makeHtml(acutalText);
 }
 
-function ratingAsStars(rating) {    //rating is an int
-    var result = "";
-    for (let i = 0; i < rating; i++)
-        result = result + "\u2605";
-    for (let i = 0; i < 5 - rating; i++)
-        result = result + "\u2606";
-    return result;
-}
-
 async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
