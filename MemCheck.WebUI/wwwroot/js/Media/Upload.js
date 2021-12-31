@@ -1,5 +1,6 @@
 const uploadMediaApp = Vue.createApp({
     components: {
+        'markdown-editor': MarkdownEditor,
     },
     data() {
         return {

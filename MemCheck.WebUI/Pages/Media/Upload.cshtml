@@ -3,6 +3,8 @@
 @model UploadModel
 @inject IViewLocalizer Localizer
 @section scripts {
+<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+<script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
 <script type="module" src="~/js/Media/Upload.js" asp-append-version="true"></script>
 }
 @{
@@ -36,7 +38,7 @@
                     </tr>
                     <tr>
                         <th>@Localizer["Description"]</th>
-                        <td><b-form-textarea class="form-control responsive-padding-edit" v-model="description" rows="2" max-rows="15"></b-form-textarea></td>
+                        <td><markdown-editor v-model="description" class="form-control responsive-padding-edit" isinfrench title="" /></td>
                     </tr>
                     <tr>
                         <th>@Localizer["Source"]</th>
