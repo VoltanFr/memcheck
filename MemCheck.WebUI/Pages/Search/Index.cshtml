@@ -5,6 +5,9 @@
 @section head {
 <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
 }
+@section scripts {
+<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
@@ -317,7 +320,3 @@
         </ul>
     </div>
 </div>
-
-@section scripts {
-<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
-}
