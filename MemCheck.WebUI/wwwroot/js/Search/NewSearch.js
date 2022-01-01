@@ -5,6 +5,7 @@ const searchApp = Vue.createApp({
         'van-button': globalThis.vant.Button,
         'van-popover': globalThis.vant.Popover,
         'van-datetimepicker': globalThis.vant.DatetimePicker,
+        'card-rating': CardRating,
     },
     data() {
         return {
@@ -52,7 +53,7 @@ const searchApp = Vue.createApp({
             runResult: {
                 pageCount: 0,
                 totalNbCard: 0,
-                cardsWithSelectionInfo: [], //{selected: bool, card: result of cardFromControllerResult, visibilityInfoPopover, heapDetailPopover, ratingInfoPopover}
+                cardsWithSelectionInfo: [], //{selected: bool, card: result of SearchController.RunQueryCardViewModel, visibilityInfoPopover, heapDetailPopover}
             },
             guidNoCurrentUser: '00000000-0000-0000-0000-000000000000',
             guidNoDeckFiltering: '00000000-0000-0000-0000-000000000000',
@@ -162,10 +163,9 @@ const searchApp = Vue.createApp({
                     for (let i = 0; i < result.data.cards.length; i++) {
                         this.runResult.cardsWithSelectionInfo.push({
                             selected: false,
-                            card: this.cardFromControllerResult(result.data.cards[i]),
+                            card: result.data.cards[i],
                             visibilityInfoPopover: false,
                             heapDetailPopover: false,
-                            ratingInfoPopover: false,
                         });
                     };
                 })
@@ -183,14 +183,6 @@ const searchApp = Vue.createApp({
         },
         filteringOnDeckInclusive() {
             const result = this.selectedDeck && (this.selectedDeck.deckId != this.possibleDecks[0].deckId) && this.deckSelectionIsInclusive;
-            return result;
-        },
-        cardFromControllerResult(controllerResultCard) {    //controllerResultCard a SearchController.RunQueryCardViewModel
-            const result = controllerResultCard;
-            result.ratingShort = "\u2606" + controllerResultCard.averageRating;
-            result.userRatingAsStars = this.ratingAsStars(controllerResultCard.currentUserRating);
-            const truncatedAverage = Math.trunc(controllerResultCard.averageRating);
-            result.averageRatingAsStars = this.ratingAsStars(truncatedAverage);
             return result;
         },
         ratingAsStars(rating) {    //rating is an int

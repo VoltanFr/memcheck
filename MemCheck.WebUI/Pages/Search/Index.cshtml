@@ -4,8 +4,11 @@
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
 @section head {
 <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
+<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script>
 <script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
 }
 @{
@@ -291,16 +294,8 @@
                         </van-popover>
                     </td>
                     <td id="Rating" info class="search-page-widget-td">
-                        <van-popover v-model:show="cardWithSelectionInfo.ratingInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
-                            @Localizer["YourRating"] {{cardWithSelectionInfo.card.userRatingAsStars}}<br />
-                            @Localizer["Average"] ({{cardWithSelectionInfo.card.countOfUserRatings}} <span v-if="cardWithSelectionInfo.card.countOfUserRatings > 1">@Localizer["Users"]</span><span v-else>@Localizer["User"]</span>) {{cardWithSelectionInfo.card.averageRatingAsStars}} {{cardWithSelectionInfo.card.averageRating}}
-                            <template #reference>
-                                <van-button class="toolbar-button search-page-rating-button">
-                                    <span v-if="cardWithSelectionInfo.card.averageRating == 0" style="color: InactiveCaptionText">{{cardWithSelectionInfo.card.ratingShort}}</span>
-                                    <span v-else style="color:ButtonText">{{cardWithSelectionInfo.card.ratingShort}}</span>
-                                </van-button>
-                            </template>
-                        </van-popover>
+                        <card-rating v-model="cardWithSelectionInfo.card.currentUserRating" micro readonly v-bind:average="cardWithSelectionInfo.card.averageRating" v-bind:countinaverage="cardWithSelectionInfo.card.countOfUserRatings"
+                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' />
                     </td>
                     <td id="Front side" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:0">
                         <a v-bind:href="'/Authoring?CardId='+cardWithSelectionInfo.card.cardId">{{cardWithSelectionInfo.card.frontSide}}</a>
