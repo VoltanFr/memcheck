@@ -2,3 +2,24 @@
     padding: 10px;
     margin: 0px;
 }
+
+@media (max-width: 550px) {
+    .rating-button {
+        line-height: 0px;
+        font-size:9px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .rating-button {
+        line-height: 5px;
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 979px) {
+    .rating-button {
+        line-height: 10px;
+        font-size: 14px;
+    }
+}

@@ -23,7 +23,7 @@
                     {{averagestr}} ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>): <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
                 </p>
                 <template #reference>
-                    <van-button class="toolbar-button rating-button">
+                    <van-button class="toolbar-button rating-button" >
                         <div v-if="micro">
                             <i class='fas fa-star fa-xs'></i> {{Math.trunc(average)}}
                         </div>
@@ -51,15 +51,15 @@
 
             const truncated = Math.trunc(rating);
             for (let i = 0; i < truncated; i++)
-                result = result + "<i class='fas fa-star' style='font-size: 0.5em;'></i>";
+                result = result + "<i class='fas fa-star'></i>";
 
             const ceil = Math.ceil(rating);
             for (let i = truncated; i < ceil; i++)
-                result = result + "<i class='fas fa-star-half-alt' style='font-size: 0.5em;'></i>";
+                result = result + "<i class='fas fa-star-half-alt'></i>";
 
 
             for (let i = ceil; i < 5; i++)
-                result = result + "<i class='far fa-star' style='font-size: 0.5em;'></i>";
+                result = result + "<i class='far fa-star'></i>";
             return result;
         },
         currentUserRatingAsStars() {
