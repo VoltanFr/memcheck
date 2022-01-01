@@ -27,9 +27,9 @@
                         <div v-if="micro">
                             <i class='fas fa-star fa-xs'></i> {{Math.trunc(average)}}
                         </div>
-                        <div v-else>
+                        <div v-else>                
                             <span v-html="currentUserRatingAsStars()" /><br />
-                            <span v-html="averageRatingAsStars()" />
+                            <span v-html="averageRatingAsStars()" />                            
                         </div>
                     </van-button>
                 </template>
@@ -51,15 +51,15 @@
 
             const truncated = Math.trunc(rating);
             for (let i = 0; i < truncated; i++)
-                result = result + "<i class='fas fa-star'></i>";
+                result = result + "<i class='fas fa-star' style='font-size: 0.5em;'></i>";
 
             const ceil = Math.ceil(rating);
             for (let i = truncated; i < ceil; i++)
-                result = result + "<i class='fas fa-star-half-alt'></i>";
+                result = result + "<i class='fas fa-star-half-alt' style='font-size: 0.5em;'></i>";
 
 
             for (let i = ceil; i < 5; i++)
-                result = result + "<i class='far fa-star'></i>";
+                result = result + "<i class='far fa-star' style='font-size: 0.5em;'></i>";
             return result;
         },
         currentUserRatingAsStars() {
