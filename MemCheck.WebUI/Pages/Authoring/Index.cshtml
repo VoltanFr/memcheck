@@ -36,7 +36,7 @@
                     <span id="Title" v-if="creatingNewCard">@Localizer["Create"]</span><span v-else>@Localizer["Edit"]</span>
                     &nbsp;
                     <span id="Info button" v-if="!creatingNewCard">
-                        <van-popover v-model:show="showInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                        <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
                             <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
                             <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
                             <span>{{infoAboutUsage}}</span><br />

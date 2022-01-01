@@ -247,7 +247,7 @@
                         <input type="checkbox" style="padding:0px;vertical-align:middle" v-model="cardWithSelectionInfo.selected" />
                     </td>
                     <td id="Visibility" class="search-page-widget-td">
-                        <van-popover v-model:show="cardWithSelectionInfo.visibilityInfoPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                        <van-popover v-model:show="cardWithSelectionInfo.visibilityInfoPopover" overlay close-on-click-outside close-on-click-overlay>
                             {{cardWithSelectionInfo.card.popoverVisibility}}
                             <template #reference>
                                 <van-button class="toolbar-button-circle toolbar-button" style="padding:0px">
@@ -259,7 +259,7 @@
                         </van-popover>
                     </td>
                     <td id="Heap" info class="search-page-widget-td">
-                        <van-popover v-model:show="cardWithSelectionInfo.heapDetailPopover" overlay="false" close-on-click-outside close-on-click-overlay>
+                        <van-popover v-model:show="cardWithSelectionInfo.heapDetailPopover" overlay close-on-click-outside close-on-click-overlay>
                             <span v-if="cardWithSelectionInfo.card.decks.length == 0">
                                 <span v-if="singleDeckDisplayOptimization">@Localizer["NotInYourDeck"]</span><span v-else>@Localizer["InNoneOfYourDecks"]</span>
                             </span>
