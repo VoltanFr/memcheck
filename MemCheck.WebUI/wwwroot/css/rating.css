@@ -6,13 +6,19 @@
 @media (max-width: 550px) {
     .rating-button {
         line-height: 0px;
-        font-size:9px;
+    }
+
+    .rating-star {
+        font-size: 10px;
     }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
     .rating-button {
         line-height: 5px;
+    }
+
+    .rating-star {
         font-size: 12px;
     }
 }
@@ -20,6 +26,9 @@
 @media (min-width: 979px) {
     .rating-button {
         line-height: 10px;
+    }
+
+    .rating-star {
         font-size: 14px;
     }
 }
