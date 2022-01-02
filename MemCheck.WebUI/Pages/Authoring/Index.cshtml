@@ -48,17 +48,19 @@
                     <span id="Additional details toggle button">
                         <button class="toolbar-button-circle toolbar-button" @@click="toggleShowAdditionalInfo()"><i class="fas fa-plus"></i></button>
                     </span>
-                    <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
-                    </span>
-                    <span id="VisibilityToggleButton_1" v-if="card.usersWithView.length == 1">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
-                    </span>
-                    <span id="VisibilityToggleButton_2" v-if="card.usersWithView.length > 1">
-                        <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
+                    <span id="Visibility button">
+                        <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
+                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
+                        </span>
+                        <span id="VisibilityToggleButton_1" v-if="card.usersWithView.length == 1">
+                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
+                        </span>
+                        <span id="VisibilityToggleButton_2" v-if="card.usersWithView.length > 1">
+                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
+                        </span>
                     </span>
                     <span id="HistoryButton" v-if="!creatingNewCard">
-                        <button type="button" class="btn btn-primary toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
+                        <button class="toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
                     </span>
                     <span id="Rating" v-if="!creatingNewCard">
                         <card-rating v-model="card.currentUserRating" v-bind:average="card.averageRating" v-bind:countinaverage="card.countOfUserRatings" v-on:update:model-value="onRatingChange"
@@ -78,7 +80,7 @@
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span class="small-screen-text">@Localizer["ImageName_SmallScreen"]</span><span class="medium-screen-text">@Localizer["ImageName_MediumScreen"]</span><span class="big-screen-text">@Localizer["ImageName_BigScreen"]</span>
                                         <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddFront" />
-                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary toolbar-button-circle toolbar-button" @@click="pasteImageName(1)"><i class="fas fa-paste"></i></button>
+                                        <button id="PasteImageNameButton" class="toolbar-button-circle toolbar-button" @@click="pasteImageName(1)"><i class="fas fa-paste"></i></button>
                                         <button id="AddImageButton" class="toolbar-button-circle toolbar-button" @@click="addImage(1)"><i class="fas fa-plus"></i></button>
                                     </div>
                                     <div id="FrontImagesDisplay" class="authoring-image-show" v-for="image in frontSideImageList">
@@ -96,7 +98,7 @@
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>
                                         <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddBack" />
-                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary toolbar-button-circle toolbar-button" @@click="pasteImageName(2)"><i class="fas fa-paste"></i></button>
+                                        <button id="PasteImageNameButton" class="toolbar-button-circle toolbar-button" @@click="pasteImageName(2)"><i class="fas fa-paste"></i></button>
                                         <button id="AddImageButton" class="toolbar-button-circle toolbar-button" @@click="addImage(2)"><i class="fas fa-plus"></i></button>
                                     </div>
                                     <div id="BackImagesDisplay" class="authoring-image-show" v-for="image in backSideImageList">
@@ -114,7 +116,7 @@
                                     <div id="ImageChoiceDiv" class="d-flex authoring-image-choice">
                                         <span>@Localizer["ImageName"]</span>
                                         <input class="authoring-image-choice-input flex-fill responsive-padding-edit" v-model="imageToAddAdditional" />
-                                        <button id="PasteImageNameButton" type="button" class="btn btn-primary toolbar-button-circle toolbar-button" @@click="pasteImageName(3)"><i class="fas fa-paste"></i></button>
+                                        <button id="PasteImageNameButton" class="toolbar-button-circle toolbar-button" @@click="pasteImageName(3)"><i class="fas fa-paste"></i></button>
                                         <button id="AddImageButton" class="toolbar-button-circle toolbar-button" @@click="addImage(3)"><i class="fas fa-plus"></i></button>
                                     </div>
                                     <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
@@ -141,9 +143,9 @@
                                 <div style="flex-flow:row wrap; width:100%">
                                     <select v-model="selectedTagToAdd" class="authoring-select"><option v-for="tag in allAvailableTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                     <span v-if="CanAddSelectedTag()">
-                                        <button type="button" class="btn btn-success toolbar-button" @@click="addTag">+</button>
+                                        <button class="btn-success toolbar-button" @@click="addTag">+</button>
                                     </span>
-                                    <button type="button" class="tag" v-for="(tag,index) in card.tags" @@click="removeTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
+                                    <button class="tag" v-for="(tag,index) in card.tags" @@click="removeTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
                                 </div>
                             </td>
                         </tr>
@@ -155,15 +157,15 @@
                                 <div style="flex-flow:row wrap; width:100%">
                                     <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
                                     <span v-if="CanAddSelectedUser()">
-                                        <button type="button" class="btn btn-success toolbar-button" @@click="addUser">+</button>
+                                        <button class="btn-success toolbar-button" @@click="addUser">+</button>
                                     </span>
-                                    <button type="button" class="tag" v-if="card.usersWithView.length == 0" style="background-color:orange" @@click="makePrivate()">@Localizer["Public"]</button>
+                                    <button class="tag" v-if="card.usersWithView.length == 0" style="background-color:orange" @@click="makePrivate()">@Localizer["Public"]</button>
                                     <span v-for="(user,index) in card.usersWithView">
                                         <span v-if="user.userId==currentUser.userId && card.usersWithView.length > 1">
                                             <span class="tag">{{user.userName}}</span>
                                         </span>
                                         <span v-else>
-                                            <button type="button" class="tag" @@click="removeUser(index)"><span aria-hidden="true">{{user.userName}} &times;</span></button>
+                                            <button class="tag" @@click="removeUser(index)"><span aria-hidden="true">{{user.userName}} &times;</span></button>
                                         </span>
                                     </span>
                                 </div>
@@ -190,7 +192,7 @@
                     </tbody>
                 </table>
             </div>
-            <button id="Send card button" type="button" class="btn btn-success btn-lg authoring-send-button" @@click="sendCard">
+            <button id="Send card button" class="btn-success btn-lg authoring-send-button" @@click="sendCard">
                 <span v-if="creatingNewCard">@Localizer["Add"]</span>
                 <span v-else>@Localizer["Update"]</span>
             </button>

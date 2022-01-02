@@ -17,14 +17,15 @@
         <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.css" type="text/css" asp-append-version="true" />
         <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" type="text/css" asp-append-version="true" />
         <link rel="stylesheet" href="~/lib/vant/index.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" type="text/css" asp-append-version="true" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.min.css" type="text/css" asp-append-version="true" />
         <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" type="text/css" asp-append-version="true" />
         <link rel="stylesheet" href="~/lib/vant/index.min.css" type="text/css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" type="text/css" asp-append-version="true" />
     </environment>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" type="text/css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" type="text/css" asp-append-version="true" />
     @RenderSection("head", required: false)
 </head>
@@ -32,7 +33,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent border-bottom box-shadow">
             <div class="container">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                     <span class="navbar-brand">MemCheck</span>
                 </button>
@@ -137,15 +138,15 @@
     </footer>
 
     <div id="scripts">
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
-
         <environment include="Development">
+            <script src="~/lib/bootstrap/js/bootstrap.bundle.js" asp-append-version="true"></script>
             <script src="~/lib/vue/vue.global.min.js" asp-append-version="true"></script>
             <script src="~/lib/axios/axios.js" asp-append-version="true"></script>
             <script src="~/lib/font-awesome/js/all.min.js" asp-append-version="true"></script>
             <script src="~/lib/showdown/showdown.js" asp-append-version="true"></script>
         </environment>
         <environment exclude="Development">
+            <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
             <script src="~/lib/vue/vue.global.prod.min.js" asp-append-version="true"></script>
             <script src="~/lib/axios/axios.min.js" asp-append-version="true"></script>
             <script src="~/lib/font-awesome/js/all.js" asp-append-version="true"></script>

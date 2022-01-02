@@ -37,7 +37,7 @@
                     <th id="Front side header"></th>
                     <th id="Tags header" style="width:20%"></th>
                 </tr>
-                <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:lightgray">
+                <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:darkgray">
                     <td id="Select all checkbox" class="search-page-widget-td" style="text-align:left">
                         <input type="checkbox" id="selectAllCheckBox" @@change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-bs-toggle="dropdown"></a>
                         <span class="dropdown-menu" role="menu">
@@ -46,7 +46,7 @@
                         </span>
                     </td>
                     <td id="Request row toggler" class="search-page-widget-td">
-                        <button type="button" class="btn btn-default" style="padding:0px" data-bs-toggle="collapse" href="#QueryRow" data-placement="top" title=@Localizer["Request"]><i class="fas fa-ellipsis-v"></i></button>
+                        <button class="toolbar-button" style="padding:0px" data-bs-toggle="collapse" href="#QueryRow" data-placement="top" title=@Localizer["Request"]><i class="fas fa-ellipsis-v"></i></button>
                     </td>
                     <td id="DeckActionButton" class="search-page-widget-td">
                         <span v-if="deckActionDropDownButtonEnabled()">

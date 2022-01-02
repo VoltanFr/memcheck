@@ -55,11 +55,11 @@
         <div id="BottomButton">
             <div v-if="image.cardCount == 0">
                 <p class="image-delete-alert-mesg">@Localizer["WarningYouAreAboutToDelete"]</p>
-                <button id="DeleteButton" type="button" class="btn btn-danger btn-lg" @@click="deleteImage">@Localizer["Delete"]</button>
+                <button id="DeleteButton" class="btn btn-danger btn-lg" @@click="deleteImage">@Localizer["Delete"]</button>
             </div>
             <div v-else>
                 <p class="image-delete-alert-mesg">@Localizer["CanNotDeleteImageUsedInCards"]</p>
-                <button id="GoBackButton" type="button" class="btn btn-warning btn-lg" @@click="goBack">@Localizer["GoBack"]</button>
+                <button id="GoBackButton" class="btn btn-warning btn-lg" @@click="goBack">@Localizer["GoBack"]</button>
             </div>
         </div>
     </div>

@@ -24,7 +24,7 @@
                         <th>@Localizer["Deck"]</th>
                         <td>
                             <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
-                            <button class="btn btn-primary toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
+                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openSettingsPage()"><i class="fas fa-pen"></i></button>
                         </td>
                     </tr>
                     <tr id="Deck name" v-if="singleDeckDisplay">

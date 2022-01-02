@@ -331,6 +331,7 @@
 
     .markdown-edit-button:hover {
         background-color: ButtonFace;
+        border-color: ButtonHighlight;
     }
 
 .markdown-edit-table {

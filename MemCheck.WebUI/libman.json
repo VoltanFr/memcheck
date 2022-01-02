@@ -11,14 +11,17 @@
       "destination": "wwwroot/lib/axios/"
     },
     {
-      "provider": "jsdelivr",
       "library": "bootstrap@5.1.3",
       "destination": "wwwroot/lib/bootstrap/",
       "files": [
-        "dist/css/bootstrap.min.css",
-        "dist/js/bootstrap.bundle.min.js",
-        "dist/css/bootstrap.min.css.map",
-        "dist/js/bootstrap.bundle.min.js.map"
+        "css/bootstrap.css",
+        "css/bootstrap.css.map",
+        "css/bootstrap.min.css",
+        "css/bootstrap.min.css.map",
+        "js/bootstrap.bundle.js",
+        "js/bootstrap.bundle.js.map",
+        "js/bootstrap.bundle.min.js",
+        "js/bootstrap.bundle.min.js.map"
       ]
     },
     {

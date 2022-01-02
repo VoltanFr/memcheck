@@ -12,7 +12,7 @@
 {
     <div id="cookieConsent" class="alert alert-info alert-dismissible fade show" role="alert">
         @Localizer["MemCheckNeedsYourAuthorization"] <a asp-page="/Privacy">@Localizer["LearnMore"]</a>
-        <button type="button" class="accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
+        <button class="accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
             <span aria-hidden="true">@Localizer["Accept"]</span>
         </button>
     </div>

@@ -54,7 +54,7 @@
         </div>
 
         <p v-if="newNameProblem" class="alert alert-danger">{{newNameProblem}}</p>
-        <button type="button" class="btn btn-success btn-md" disabled v-if="newNameProblem">@Localizer["Save"]</button>
-        <button type="button" class="btn btn-success btn-md" @@click="save" v-else>@Localizer["Save"]</button>
+        <button class="btn btn-success" disabled v-if="newNameProblem">@Localizer["Save"]</button>
+        <button class="btn btn-success" @@click="save" v-else>@Localizer["Save"]</button>
     </div>
 </div>

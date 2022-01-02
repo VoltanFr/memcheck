@@ -11,10 +11,19 @@
     vertical-align: middle;
     color: ButtonText;
     background-color: ButtonFace;
-    border-color: ButtonFace;
+    border-color: ButtonShadow;
     border-width: 2px;
     border-style: outset;
 }
+
+    .toolbar-button:hover {
+        background-color: ButtonHighlight;
+    }
+
+    .toolbar-button:disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
 
 .toolbar-button-circle {
     border-radius: 18px;
