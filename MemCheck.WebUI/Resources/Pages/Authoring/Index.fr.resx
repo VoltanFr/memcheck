@@ -175,10 +175,10 @@
     <value>Description de vos modifications</value>
   </data>
   <data name="ImageName_BigScreen" xml:space="preserve">
-    <value>Nom d'image</value>
+    <value>Nom d&amp;rsquo;image</value>
   </data>
   <data name="ImageName_MediumScreen" xml:space="preserve">
-    <value>Nom d'image</value>
+    <value>Nom d&amp;rsquo;image</value>
   </data>
   <data name="ImageName_SmallScreen" xml:space="preserve">
     <value>Image</value>
