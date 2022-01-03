@@ -8,6 +8,7 @@ const authoringApp = Vue.createApp({
         'markdown-editor': MarkdownEditor,
         'big-size-image': BigSizeImage,
         'card-rating': CardRating,
+        'image-choice': ImageChoice,
     },
     data() {
         return {
@@ -330,23 +331,20 @@ const authoringApp = Vue.createApp({
                     }
                 })
                 .catch(error => {
+                    tellAxiosError("Failed to load image");
                 });
         },
-        async addImage(side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
-            var request;
-            switch (side) {
-                case 1:
-                    request = { imageName: this.imageToAddFront };
-                    break;
-                case 2:
-                    request = { imageName: this.imageToAddBack };
-                    break;
-                case 3:
-                    request = { imageName: this.imageToAddAdditional };
-                    break;
-            }
-
-            await axios.post('/Authoring/GetImageInfo/', request)
+        async addFrontImage(imageName) {
+            await this.addImage(imageName, 1);
+        },
+        async addBackImage(imageName) {
+            await this.addImage(imageName, 2);
+        },
+        async addAdditionalImage(imageName) {
+            await this.addImage(imageName, 3);
+        },
+        async addImage(imageName, side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
+            await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
                         tellAxiosError("This image is already in the list");

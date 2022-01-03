@@ -1,0 +1,11 @@
+﻿.authoring-image-choice {
+}
+
+.authoring-image-choice-input {
+    width: 100px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+}

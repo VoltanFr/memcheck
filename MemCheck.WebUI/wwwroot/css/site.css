@@ -94,35 +94,32 @@
 }
 
 .authoring-row-caption {
-    border-top-width: 1px;
-    border-top-style: solid;
     font-weight: bold;
-    display: table-row;
+    padding: 0px;
+    margin: 0px;
 }
 
 .authoring-row-input {
     display: table-row;
-    padding-bottom: 10px;
-    padding-left: 0px;
+    padding: 0px;
+    border-width: 1px;
 }
 
 .authoring-td {
     display: table-cell;
-    padding: 0px;
+}
+
+.card-authoring-blank-row {
+    display: table-row;
+    height: 5px;
 }
 
 .authoring-select {
     display: block;
-    width: 100%
-}
-
-.authoring-image-choice {
-}
-
-.authoring-image-choice-input {
-    width: 100px;
-    margin-left: 5px;
-    margin-right: 5px;
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
 }
 
 .authoring-image-show {
