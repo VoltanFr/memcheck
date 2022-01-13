@@ -9,6 +9,7 @@ const authoringApp = Vue.createApp({
         'big-size-image': BigSizeImage,
         'card-rating': CardRating,
         'image-choice': ImageChoice,
+        'tag-button': TagButton,
     },
     data() {
         return {
@@ -210,7 +211,13 @@ const authoringApp = Vue.createApp({
         CanAddSelectedTag() {
             return this.selectedTagToAdd && !this.cardContainsTag(this.selectedTagToAdd.tagId);
         },
-        removeTag(index) {
+        removeTag(tagId) {
+            const index = this.card.tags.findIndex(tag => tag.tagId === tagId);
+            if (index > -1) {
+                this.card.tags.splice(index, 1);
+            }
+        },
+        removeTagByIndex(index) {
             this.card.tags.splice(index, 1);
         },
         cardContainsUserWithView(userId) {
@@ -456,7 +463,7 @@ const authoringApp = Vue.createApp({
     },
     watch: {
         selectedTagToAdd: {
-            handler() {
+            handler: function (newValue) {
                 this.addTag();
                 this.selectedTagToAdd = "";
             },

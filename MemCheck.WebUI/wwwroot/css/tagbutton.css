@@ -1,0 +1,50 @@
+﻿.tag-button-div {
+    display: inline-block;
+    height: fit-content;
+}
+
+.tag-button {
+    border-radius: 10px;
+    background-color: blue;
+    color: white;
+}
+
+@media (max-width: 550px) {
+    .tag-button {
+        margin-right: 1px;
+        font-size: 75%;
+        line-height: 11px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 2px;
+        padding-right: 2px;
+        height: 19px;
+        border-width: 1px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .tag-button {
+        margin-right: 3px;
+        font-size: 80%;
+        line-height: 13px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 3px;
+        padding-right: 3px;
+        height: 23px;
+        border-width: 2px;
+    }
+}
+
+@media (min-width: 979px) {
+    .tag-button {
+        margin-right: 5px;
+        font-size: 85%;
+        line-height: 15px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        height: 26px;
+        border-width: 2px;
+    }
+}
