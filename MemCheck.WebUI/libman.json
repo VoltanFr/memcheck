@@ -64,7 +64,7 @@
       "destination": "wwwroot/lib/vue/"
     },
     {
-      "library": "vant@3.3.7",
+      "library": "vant@3.4.1",
       "destination": "wwwroot/lib/vant/"
     },
     {
