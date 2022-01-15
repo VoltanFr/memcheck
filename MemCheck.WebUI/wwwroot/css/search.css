@@ -1,0 +1,91 @@
+﻿.search-page-table {
+    width: 100%;
+    border-spacing: 0px;
+}
+
+    .search-page-table td,
+    .search-page-table tr {
+        vertical-align: middle;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        border-top-width: thin;
+        border-top-color: lightgray;
+        border-top-style: dashed;
+        border-bottom-style: none;
+    }
+
+.search-page-widget-td {
+    width: 1% !important;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.search-page-tag {
+    display: inline-block;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 1px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10px;
+    background-color: blue;
+    color: white;
+}
+
+.search-page-tag-column {
+    max-width: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: table-cell;
+}
+
+.search-page-nav-column {
+    font-size: x-small;
+}
+
+.search-page-tag-button-column {
+    float: right;
+    padding-right: 10px;
+    font-size: initial;
+}
+
+.search-page-heap-info {
+    white-space: nowrap;
+    text-align: left;
+    vertical-align: middle;
+    background-color: ButtonFace;
+    border-width: thin;
+    border-color: lightgray;
+    padding: 0px;
+}
+
+.search-page-required-text-edit {
+    width: 100%
+}
+
+@media (max-width: 550px) {
+    .search-page-heap-info {
+        width: 34px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .search-page-heap-info {
+        width: 38px;
+    }
+}
+
+@media (min-width: 979px) {
+    .search-page-heap-info {
+        width: 42px;
+    }
+}
