@@ -6,6 +6,7 @@ const searchApp = Vue.createApp({
         'van-popover': globalThis.vant.Popover,
         'van-datetimepicker': globalThis.vant.DatetimePicker,
         'card-rating': CardRating,
+        'tag-button': TagButton,
     },
     data() {
         return {
@@ -231,8 +232,11 @@ const searchApp = Vue.createApp({
                 sortTagArray(this.selectedRequiredTags);
             }
         },
-        removeRequiredTag(index) {
-            this.selectedRequiredTags.splice(index, 1);
+        removeRequiredTag(tagId) {
+            const index = this.selectedRequiredTags.findIndex(tag => tag.tagId === tagId);
+            if (index > -1) {
+                this.selectedRequiredTags.splice(index, 1);
+            }
         },
         requestContainsExcludedTag(tag) {
             return this.selectedExcludedTags.some(t => t == tag);
@@ -261,8 +265,11 @@ const searchApp = Vue.createApp({
                 sortTagArray(this.selectedExcludedTags);
             }
         },
-        removeExcludedTag(index) {
-            this.selectedExcludedTags.splice(index, 1);
+        removeExcludedTag(tagId) {
+            const index = this.selectedExcludedTags.findIndex(tag => tag.tagId === tagId);
+            if (index > -1) {
+                this.selectedExcludedTags.splice(index, 1);
+            }
         },
         resetSelectedHeapIfNotValid() {
             for (let i = 0; i < this.possibleHeaps.length; i++)

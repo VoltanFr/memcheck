@@ -3,13 +3,15 @@
 @inject IViewLocalizer Localizer
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
 @section head {
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
-<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
-<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
-<script src="~/js/CardRating.js" asp-append-version="true"></script>
-<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+    <script src="~/js/CardRating.js" asp-append-version="true"></script>
+    <script src="~/js/TagButton.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -180,7 +182,7 @@
                                         <span id="AddReqiredTagButton" v-if="CanAddSelectedRequiredTag()">
                                             <van-button class="toolbar-button" @@click="addRequiredTag">+</van-button>
                                         </span>
-                                        <van-button class="tag" v-for="(tag,index) in selectedRequiredTags" @@click="removeRequiredTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></van-button>
+                                        <tag-button v-for="(tag,index) in selectedRequiredTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeRequiredTag"></tag-button>
                                     </td>
                                 </tr>
                                 <tr id="EcludedTagsRow">
@@ -190,7 +192,7 @@
                                         <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
                                             <van-button class="toolbar-button" @@click="addExcludedTag">+</van-button>
                                         </span>
-                                        <van-button class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></van-button>
+                                        <tag-button v-for="(tag,index) in selectedExcludedTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeExcludedTag"></tag-button>
                                     </td>
                                 </tr>
                                 <tr id="Owner">
