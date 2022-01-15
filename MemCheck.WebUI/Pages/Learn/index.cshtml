@@ -3,15 +3,17 @@
 @inject IViewLocalizer Localizer
 @model LearnViewModel
 @section head {
-<link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
-<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" />
 }
 @section scripts {
-<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
-<script src="~/js/CardRating.js" asp-append-version="true"></script>
-<script src="~/js/big-size-image.js" asp-append-version="true"></script>
-<script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+    <script src="~/js/CardRating.js" asp-append-version="true"></script>
+    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
+    <script src="~/js/TagButton.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -52,7 +54,6 @@
                     </tbody>
                 </table>
             </div>
-
             <div id="The card" class="card learning-card" v-if="currentCard">
                 <div id="Small buttons" class="card-header" style="padding:1px">
                     <ul class="nav small text-decoration-none" style="align-items:center">
@@ -169,10 +170,9 @@
                     </div>
                 </div>
                 <div id="Tags" v-if="currentCard.tags.length > 0" class="card-footer learning-card-tags">
-                    <span v-for="tag in currentCard.tags" class="tag">{{tag}}&nbsp;</span>
+                    <tag-button v-for="tag in currentCard.tags" v-bind:name="tag"></tag-button>
                 </div>
             </div>
-
             <div id="No more card" class="card border-primary" v-if="!currentCard">
                 <p class="wait-message" v-if="currentImageLoadingPromise">@Localizer["PleaseWaitForImageLoad"]</p>
                 <div v-else>

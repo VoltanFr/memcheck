@@ -7,6 +7,7 @@ const learnApp = Vue.createApp({
         'van-rate': globalThis.vant.Rate,
         'big-size-image': BigSizeImage,
         'card-rating': CardRating,
+        'tag-button': TagButton,
     },
     data() {
         return {
