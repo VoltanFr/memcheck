@@ -19,10 +19,12 @@ namespace MemCheck.WebUI.Pages.Admin
         [BindProperty] public string ApplicationName { get; set; } = null!;
         [BindProperty] public string EntryAssembly { get; set; } = null!;
         [BindProperty] public string EnvironmentName { get; set; } = null!;
+        [BindProperty] public string SendGridEmailSender { get; set; } = null!;
         [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
-        public IndexModel(IWebHostEnvironment currentEnvironment)
+        public IndexModel(IWebHostEnvironment currentEnvironment, SendGridEmailSender sendGridEmailSender)
         {
             this.currentEnvironment = currentEnvironment;
+            SendGridEmailSender = sendGridEmailSender.Sender;
         }
         private static string GetDisplayInfoForAssembly(Assembly? a)
         {

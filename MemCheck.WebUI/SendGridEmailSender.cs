@@ -32,5 +32,6 @@ namespace MemCheck.WebUI
             msg.SetClickTracking(false, false);
             await client.SendEmailAsync(msg);
         }
+        public string Sender => settings.SendGridSender;
     }
 }
