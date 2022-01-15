@@ -304,8 +304,7 @@
                         <a v-bind:href="'/Authoring?CardId='+cardWithSelectionInfo.card.cardId">{{cardWithSelectionInfo.card.frontSide}}</a>
                     </td>
                     <td id="Tags" class="search-page-tag-column">
-                        @* There is a problem with the ellipsis here, related to the v-for. Don't know how to fix that *@
-                        <span v-for="tag in cardWithSelectionInfo.card.tags" class="search-page-tag">{{tag}}</span>
+                        <tag-button v-for="tag in cardWithSelectionInfo.card.tags" v-bind:name="tag"></tag-button>
                     </td>
                 </tr>
             </tbody>
