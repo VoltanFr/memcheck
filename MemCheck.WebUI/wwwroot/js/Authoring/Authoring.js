@@ -248,8 +248,11 @@ const authoringApp = Vue.createApp({
             this.removeImageFromArray(this.currentFullScreenImage, this.additionalInfoImageList);
             this.currentFullScreenImage = null;
         },
-        removeUser(index) {
-            this.card.usersWithView.splice(index, 1);
+        removeUser(userId) {
+            const index = this.card.usersWithView.findIndex(user => user.userId === userId);
+            if (index > -1) {
+                this.card.usersWithView.splice(index, 1);
+            }
         },
         makePrivate() {
             this.card.usersWithView = [this.currentUser];

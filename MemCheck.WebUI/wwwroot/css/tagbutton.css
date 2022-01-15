@@ -9,6 +9,10 @@
     color: white;
 }
 
+.warning {
+    background-color: orange;
+}
+
 @media (max-width: 550px) {
     .tag-button {
         margin-right: 1px;

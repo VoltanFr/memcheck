@@ -143,15 +143,18 @@
                                 <p class="authoring-row-caption">@Localizer["Users"]</p>
                                 <div style="flex-flow:row wrap; width:100%">
                                     <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
-                                    <button class="tag" v-if="card.usersWithView.length == 0" style="background-color:orange" @@click="makePrivate()">@Localizer["Public"]</button>
-                                    <span v-for="(user,index) in card.usersWithView">
-                                        <span v-if="user.userId==currentUser.userId && card.usersWithView.length > 1">
-                                            <span class="tag">{{user.userName}}</span>
+                                    <div id="Public" v-if="card.usersWithView.length == 0">
+                                        <tag-button additionalbuttonclass="warning" name='@Localizer["Public"]' id="notused" v-on:click="makePrivate"></tag-button>
+                                    </div>
+                                    <div id="Private" v-if="card.usersWithView.length == 1">
+                                        <tag-button v-bind:name="card.usersWithView[0].userName" v-bind:id="card.usersWithView[0].userId" v-on:click="removeUser"></tag-button>
+                                    </div>
+                                    <div id="Restricted" v-if="card.usersWithView.length > 1">
+                                        <span v-for="user in card.usersWithView">
+                                            <tag-button v-if="user.userId == currentUser.userId" v-bind:name="user.userName"></tag-button>
+                                            <tag-button v-if="user.userId !== currentUser.userId" v-bind:name="user.userName" v-bind:id="user.userId" v-on:click="removeUser"></tag-button>
                                         </span>
-                                        <span v-else>
-                                            <button class="tag" @@click="removeUser(index)"><span aria-hidden="true">{{user.userName}} &times;</span></button>
-                                        </span>
-                                    </span>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
