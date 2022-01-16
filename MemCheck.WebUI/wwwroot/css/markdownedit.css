@@ -1,0 +1,80 @@
+﻿.markdown-edit-textarea {
+    display: block;
+    width: 100%;
+    resize: both;
+    height: auto;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+    border-radius: 0px;
+    border-spacing: 0px;
+    padding: 1px;
+    margin: 0px;
+}
+
+.markdown-edit-div {
+    padding: 0px;
+    border-radius: 4px;
+    color: ButtonText;
+    background-color: transparent;
+    border-style: none;
+    margin: 0px;
+    width: 100%;
+}
+
+.markdown-edit-button {
+    height: 20px;
+    width: 20px;
+    padding: 0px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-align: center;
+    vertical-align: middle;
+    color: ButtonText;
+    background-color: transparent;
+    border-color: ButtonFace;
+    border-width: 1px;
+    box-sizing: unset;
+}
+
+    .markdown-edit-button:hover {
+        background-color: ButtonFace;
+        border-color: ButtonHighlight;
+    }
+
+.markdown-edit-table {
+    display: table;
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+}
+
+.markdown-edit-table-body {
+    display: table;
+    width: 100%;
+    padding: 0px;
+}
+
+.markdown-edit-caption-row {
+    padding-left: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-style: none;
+    font-weight: bold;
+    display: table-row;
+    vertical-align: middle;
+}
+
+.markdown-edit-row {
+    padding: 0px;
+    border-style: none;
+    font-weight: normal;
+    vertical-align: middle;
+    display: table-row;
+}
+
+.markdown-edit-td {
+    border-style: none;
+    display: table-cell;
+    vertical-align: middle;
+}
