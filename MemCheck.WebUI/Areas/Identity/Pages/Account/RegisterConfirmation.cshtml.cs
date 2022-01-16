@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -10,9 +11,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
     {
-        public RegisterConfirmationModel(SendGridEmailSender sendGridEmailSender)
+        public RegisterConfirmationModel(IEmailSender emailSender)
         {
-            SendGridEmailSender = sendGridEmailSender.Sender;
+            var sendGrid = emailSender as SendGridEmailSender;
+            SendGridEmailSender = sendGrid != null ? sendGrid.Sender : "Unknown";
         }
         [BindProperty] public string SendGridEmailSender { get; set; } = null!;
         [BindProperty(SupportsGet = true)] public string UserAddress { get; set; } = null!;

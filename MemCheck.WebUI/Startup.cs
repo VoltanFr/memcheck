@@ -85,7 +85,7 @@ namespace MemCheck.WebUI
                 options.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
             });
 
-            services.AddSingleton<SendGridEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
+            services.AddSingleton<IEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
 
             services.AddRazorPages().AddRazorPagesOptions(config =>
                 {
