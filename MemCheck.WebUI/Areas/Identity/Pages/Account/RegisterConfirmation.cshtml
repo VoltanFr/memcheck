@@ -1,12 +1,17 @@
 ﻿@page
+
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
 @model RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Register confirmation";
+    ViewData["Title"] = @Localizer["PageTitle"];
 }
 
 <h1>@ViewData["Title"]</h1>
 @{
-    <p>
-        Please check your email to confirm your account.
-    </p>
+    <p>@Localizer["Paragraph1BeforeUserAddress"] <i>@Model.UserAddress</i> @Localizer["Paragraph1AfterUserAddress"]</p>
+    <p>@Localizer["Paragraph2BeforeSenderAddress"] <i>@Model.SendGridEmailSender</i> @Localizer["Paragraph2AfterSenderAddress"]</p>
+    <p>@Localizer["Paragraph3"]</p>
+    <p>@Localizer["Final"]</p>
 }

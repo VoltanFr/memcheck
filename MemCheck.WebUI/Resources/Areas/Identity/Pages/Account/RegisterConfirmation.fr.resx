@@ -117,22 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AfterHyperLink" xml:space="preserve">
-    <value>This will open the web site and allow you to validate the creation of your account, giving you full access to MemCheck.</value>
-  </data>
-  <data name="BeforeHyperLink" xml:space="preserve">
-    <value>You have requested the creation of your MemCheck account.</value>
-  </data>
   <data name="Final" xml:space="preserve">
-    <value>Thank you!</value>
+    <value>Merci !</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hello</value>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Création de votre compte MemCheck : plus qu'une étape !</value>
   </data>
-  <data name="HyperLinkText" xml:space="preserve">
-    <value>Please click here to validate</value>
+  <data name="Paragraph1AfterUserAddress" xml:space="preserve">
+    <value>pour confirmer qu'il s'agit bien de votre compte de messagerie.</value>
   </data>
-  <data name="MailSubject" xml:space="preserve">
-    <value>MemCheck: Confirm your email address</value>
+  <data name="Paragraph1BeforeUserAddress" xml:space="preserve">
+    <value>Nous avons envoyé un courrier électronique à l'adresse </value>
+  </data>
+  <data name="Paragraph2AfterSenderAddress" xml:space="preserve">
+    <value>. Si vous ne trouvez pas le message, il pourrait avoir été classé comme indésirable : jetez un coup d'œil dans le dossier spam.</value>
+  </data>
+  <data name="Paragraph2BeforeSenderAddress" xml:space="preserve">
+    <value>Nous vous invitons à clicker sur le lien dans le mail. L'adresse d'expédition est </value>
+  </data>
+  <data name="Paragraph3" xml:space="preserve">
+    <value>Vous aurez ensuite accès à tout MemCheck !</value>
   </data>
 </root>

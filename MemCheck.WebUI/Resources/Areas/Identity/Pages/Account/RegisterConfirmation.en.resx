@@ -117,22 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AfterHyperLink" xml:space="preserve">
-    <value>This will open the web site and allow you to validate the creation of your account, giving you full access to MemCheck.</value>
-  </data>
-  <data name="BeforeHyperLink" xml:space="preserve">
-    <value>You have requested the creation of your MemCheck account.</value>
-  </data>
   <data name="Final" xml:space="preserve">
     <value>Thank you!</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hello</value>
+  <data name="PageTitle" xml:space="preserve">
+    <value>MemCheck account creation: one last step</value>
   </data>
-  <data name="HyperLinkText" xml:space="preserve">
-    <value>Please click here to validate</value>
+  <data name="Paragraph1AfterUserAddress" xml:space="preserve">
+    <value> to confirm that the email address is truely yours.</value>
   </data>
-  <data name="MailSubject" xml:space="preserve">
-    <value>MemCheck: Confirm your email address</value>
+  <data name="Paragraph1BeforeUserAddress" xml:space="preserve">
+    <value>We have sent you an email to </value>
+  </data>
+  <data name="Paragraph2AfterSenderAddress" xml:space="preserve">
+    <value>. If you don't find the email in your inbox, it may have been considered spam, so have a look there.</value>
+  </data>
+  <data name="Paragraph2BeforeSenderAddress" xml:space="preserve">
+    <value>Please check your email account and follow the link. The sending address is </value>
+  </data>
+  <data name="Paragraph3" xml:space="preserve">
+    <value>After that step, you will have full access to MemCheck.</value>
   </data>
 </root>

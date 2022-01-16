@@ -90,13 +90,15 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
                     var mailBody = new StringBuilder();
                     mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-                    mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
-                    mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
+                    mailBody.Append($"<p>{localizer["BeforeHyperLink"].Value}</p>");
+                    mailBody.Append($"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
+                    mailBody.Append($"<p>{localizer["AfterHyperLink"].Value}</p>");
+                    mailBody.Append($"<p>{localizer["Final"].Value}</p>");
 
-                    await _emailSender.SendEmailAsync(Input.Email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
+                    await _emailSender.SendEmailAsync(Input.Email, localizer["MailSubject"].Value, mailBody.ToString());
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        return RedirectToPage("RegisterConfirmation");
+                        return RedirectToPage("RegisterConfirmation", new { UserAddress = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(Input.Email)) });
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);

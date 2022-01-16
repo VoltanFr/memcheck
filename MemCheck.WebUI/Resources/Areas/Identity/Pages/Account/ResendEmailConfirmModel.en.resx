@@ -117,13 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ConfirmYourEmail" xml:space="preserve">
-    <value>Confirm your email</value>
+  <data name="AfterHyperLink" xml:space="preserve">
+    <value>This will open the web site and allow you to validate the creation of your account, giving you full access to MemCheck.</value>
+  </data>
+  <data name="BeforeHyperLink" xml:space="preserve">
+    <value>You have requested that this confirmation email is sent again.</value>
+  </data>
+  <data name="Final" xml:space="preserve">
+    <value>Thank you!</value>
   </data>
   <data name="Hello" xml:space="preserve">
     <value>Hello</value>
   </data>
-  <data name="PleaseConfirmYourAccount" xml:space="preserve">
-    <value>Please confirm your account</value>
+  <data name="HyperLinkText" xml:space="preserve">
+    <value>Please click here to validate</value>
+  </data>
+  <data name="MailSubject" xml:space="preserve">
+    <value>MemCheck: Confirm your email address</value>
   </data>
 </root>
