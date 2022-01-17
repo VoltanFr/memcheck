@@ -1,15 +1,16 @@
 ﻿.markdown-edit-textarea {
     display: block;
     width: 100%;
-    resize: both;
-    height: auto;
+    resize: none;
     border-width: 1px;
     border-style: solid;
     border-color: lightgray;
     border-radius: 0px;
     border-spacing: 0px;
     padding: 1px;
+    box-sizing: border-box;
     margin: 0px;
+    overflow: hidden;
 }
 
 .markdown-edit-div {

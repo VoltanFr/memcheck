@@ -8,6 +8,9 @@
         title: { required: true, type: String },
         isinfrench: { required: true, type: Boolean },
     },
+    mounted() {
+        this.adaptTextAreaSize();
+    },
     template: `
         <div class="markdown-edit-div">
             <table class="table-responsive markdown-edit-table">
@@ -44,8 +47,16 @@
     methods: {
         onInput(event) {
             this.$emit('update:modelValue', this.content);
+            this.adaptTextAreaSize();
+        },
+        adaptTextAreaSize() {
             const textarea = this.$refs.text_area_control;
-            textarea.style.height = (textarea.scrollHeight) + "px";
+            var scrollHeightBeforeUpdate = 0;
+            do {
+                scrollHeightBeforeUpdate = textarea.scrollHeight;
+                const newHeight = Math.max(50, textarea.scrollHeight);
+                textarea.style.height = newHeight + "px";
+            } while (scrollHeightBeforeUpdate !== textarea.scrollHeight);
         },
         onKeyDown(event) {
             if (event.ctrlKey) {
