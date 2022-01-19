@@ -127,10 +127,10 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["FrontSide"]</p>
                         </div>
-                        <div class="card-body memcheck-markdown markdown-body">
+                        <div class="markdown-render markdown-body">
                             <span v-html="currentCardFrontSide()"></span>
                         </div>
-                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
                             <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="learn-image" :src="image.blob" /></a>
                         </div>
                         <div v-if="!backSideVisible" class="card-footer learning-card-footer">
@@ -143,10 +143,10 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["BackSide"]</p>
                         </div>
-                        <div class="card-body memcheck-markdown markdown-body">
+                        <div class="markdown-render markdown-body">
                             <span v-html="currentCardBackSide()"></span>
                         </div>
-                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
                             <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="learn-image" :src="image.blob" /></a>
                         </div>
                     </div>
@@ -162,10 +162,10 @@
                         <div class="card-header learning-card-header">
                             <p>@Localizer["AdditionalInfo"]</p>
                         </div>
-                        <div class="card-body memcheck-markdown markdown-body">
+                        <div class="markdown-render markdown-body">
                             <span v-html="currentCardAdditionalInfo()"></span>
                         </div>
-                        <div class="card-body learning-card-body-image-div" v-for="image in currentCard.images">
+                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
                             <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="learn-image" :src="image.blob" /></a>
                         </div>
                     </div>

@@ -31,7 +31,7 @@
                     </tr>
                     <tr class="markdown-edit-row" v-if="previewVisible">
                         <td class="markdown-edit-td">
-                            <span class="memcheck-markdown markdown-body" v-html="renderedHtml()" ></span>
+                            <span class="markdown-render markdown-body markdown-edit-preview" v-html="renderedHtml()" ></span>
                         </td>
                     </tr>
                 </tbody>

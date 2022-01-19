@@ -75,7 +75,13 @@
 }
 
 .markdown-edit-td {
-    border-style: none;
     display: table-cell;
-    vertical-align: middle;
+}
+
+.markdown-edit-preview {
+    display: block;
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
 }

@@ -1,27 +1,29 @@
-﻿.memcheck-markdown ul,
-.memcheck-markdown ol {
+﻿.markdown-render ul {
     list-style: initial;
 }
 
-.memcheck-markdown {
+.markdown-render ol {
+    list-style: decimal;
+}
+
+.markdown-render {
     white-space: normal;
 }
 
 @media (max-width: 550px) {
-    .memcheck-markdown {
+    .markdown-render {
         padding: 0px;
     }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
-    .memcheck-markdown {
+    .markdown-render {
         padding: 10px;
     }
 }
 
 @media (min-width: 979px) {
-    .memcheck-markdown {
+    .markdown-render {
         padding: 20px;
     }
 }
-
