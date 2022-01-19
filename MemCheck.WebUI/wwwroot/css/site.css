@@ -301,15 +301,6 @@
     vertical-align: middle;
 }
 
-.memcheck-markdown ul,
-.memcheck-markdown ol {
-    list-style: initial;
-}
-
-.memcheck-markdown {
-    white-space: normal;
-}
-
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
@@ -393,10 +384,6 @@
         font-size: .7rem;
         border-width: 1px;
     }
-
-    .memcheck-markdown {
-        padding: 0px;
-    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -454,10 +441,6 @@
         position: relative;
         left: 10px;
     }
-
-    .memcheck-markdown {
-        padding: 10px;
-    }
 }
 
 @media (min-width: 979px) {
@@ -471,10 +454,6 @@
 
     .big-screen-text {
         display: inline-block;
-    }
-
-    .memcheck-markdown {
-        padding: 20px;
     }
 }
 
