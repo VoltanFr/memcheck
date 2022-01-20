@@ -1,29 +1,57 @@
-﻿.markdown-render ul {
-    list-style: initial;
-}
-
-.markdown-render ol {
-    list-style: decimal;
-}
-
-.markdown-render {
+﻿.markdown-render {
     white-space: normal;
 }
+
+    .markdown-render ul {
+        list-style: initial;
+    }
+
+    .markdown-render ol {
+        list-style: decimal;
+    }
+
+    .markdown-render table {
+        width: 100%;
+    }
 
 @media (max-width: 550px) {
     .markdown-render {
         padding: 0px;
     }
+
+        .markdown-render table th {
+            padding: 1px;
+        }
+
+        .markdown-render table td {
+            padding: 1px;
+        }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
     .markdown-render {
         padding: 10px;
     }
+
+        .markdown-render table th {
+            padding: 5px;
+        }
+
+        .markdown-render table td {
+            padding: 5px;
+        }
 }
 
 @media (min-width: 979px) {
     .markdown-render {
         padding: 20px;
     }
+
+        .markdown-render table th {
+            padding: 10px;
+        }
+
+        .markdown-render table td {
+            padding: 10px;
+        }
 }

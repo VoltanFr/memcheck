@@ -21,6 +21,7 @@
                             <button class="markdown-edit-button" v-on:click="bold()" title="Gras"><i class="fas fa-bold"></i></button>
                             <button class="markdown-edit-button" v-on:click="italic()" title="Italique"><i class="fas fa-italic"></i></button>
                             <button class="markdown-edit-button" v-on:click="insertNbsp()" title="Espace insécable">_</button>
+                            <button class="markdown-edit-button" v-on:click="insertTable()" title="Modèle de table"><i class="fas fa-table"></i></button>
                             <button class="markdown-edit-button" v-on:click="togglePreview()" title="Apperçu du rendu Markdown"><i class="fab fa-markdown"></i></button>
                         </td>
                     </tr>
@@ -74,18 +75,27 @@
                 }
             }
         },
-        insertNbsp() {
+        insertText(text) {
             const textarea = this.$refs.text_area_control;
             let cursorStartPosition = textarea.selectionStart;
             let cursorEndPosition = textarea.selectionEnd;
             let tmpStr = textarea.value;
-            const nbsp = '&nbsp;';
-            this.content = tmpStr.substring(0, cursorStartPosition) + nbsp + tmpStr.substring(cursorEndPosition, tmpStr.length);
+            this.content = tmpStr.substring(0, cursorStartPosition) + text + tmpStr.substring(cursorEndPosition, tmpStr.length);
             textarea.value = this.content;
             this.onInput();
             textarea.focus();
-            textarea.selectionStart = cursorStartPosition + nbsp.length;
-            textarea.selectionEnd = cursorStartPosition + nbsp.length;
+            textarea.selectionStart = cursorStartPosition + text.length;
+            textarea.selectionEnd = cursorStartPosition + text.length;
+        },
+        insertNbsp() {
+            this.insertText('&nbsp;');
+        },
+        insertTable() {
+            var text = `| Aligné à gauche | Centré | Aligné à droite |
+|:---|:----:|---:|
+| Contenu | Contenu | Contenu |
+| Contenu | Contenu | Contenu |`;
+            this.insertText(text);
         },
         addMarkup(markup) {
             const textarea = this.$refs.text_area_control;
