@@ -13,8 +13,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     {
         public RegisterConfirmationModel(IEmailSender emailSender)
         {
-            var sendGrid = emailSender as SendGridEmailSender;
-            SendGridEmailSender = sendGrid != null ? sendGrid.Sender : "Unknown";
+            SendGridEmailSender = WebUI.SendGridEmailSender.SenderFromInterface(emailSender);
         }
         [BindProperty] public string SendGridEmailSender { get; set; } = null!;
         [BindProperty(SupportsGet = true)] public string UserAddress { get; set; } = null!;

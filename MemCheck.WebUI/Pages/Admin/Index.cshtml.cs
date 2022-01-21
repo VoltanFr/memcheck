@@ -1,6 +1,7 @@
 using MemCheck.Application.QueryValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
@@ -21,10 +22,10 @@ namespace MemCheck.WebUI.Pages.Admin
         [BindProperty] public string EnvironmentName { get; set; } = null!;
         [BindProperty] public string SendGridEmailSender { get; set; } = null!;
         [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
-        public IndexModel(IWebHostEnvironment currentEnvironment, SendGridEmailSender sendGridEmailSender)
+        public IndexModel(IWebHostEnvironment currentEnvironment, IEmailSender emailSender)
         {
             this.currentEnvironment = currentEnvironment;
-            SendGridEmailSender = sendGridEmailSender.Sender;
+            SendGridEmailSender = WebUI.SendGridEmailSender.SenderFromInterface(emailSender);
         }
         private static string GetDisplayInfoForAssembly(Assembly? a)
         {

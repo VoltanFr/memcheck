@@ -33,5 +33,10 @@ namespace MemCheck.WebUI
             await client.SendEmailAsync(msg);
         }
         public string Sender => settings.SendGridSender;
+        public static string SenderFromInterface(IEmailSender emailSender)
+        {
+            var sendGrid = emailSender as SendGridEmailSender;
+            return sendGrid != null ? sendGrid.Sender : "Unknown";
+        }
     }
 }
