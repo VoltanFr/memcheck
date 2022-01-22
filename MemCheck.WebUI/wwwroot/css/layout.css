@@ -1,18 +1,28 @@
-﻿.layout-header {
+﻿:root {
+    --header-color: snow;
+}
+
+.navbar-container {
+}
+
+.layout-header {
     border-bottom: solid;
     border-bottom-width: 1px;
-    border-bottom-color: lightgray;
+    border-bottom-color: var(--header-color);
     padding: 0px;
     display: block;
+    background-color: snow;
 }
 
 .layout-navbar {
     padding: 0px;
     height: 100%;
     width: 100%;
+    background-color: var(--header-color);
 }
 
     .layout-navbar ul {
+        background-color: var(--header-color);
         padding: 0px;
         vertical-align: middle;
         width: 100%;
@@ -24,9 +34,14 @@
         padding: 2px;
         align-content: center;
         vertical-align: middle;
-        align-items:center;
+        align-items: center;
         display: flex;
+        background-color: var(--header-color);
     }
+
+.navbar-memcheck-link {
+    background-color: var(--header-color);
+}
 
 .hamburger-menu-text {
     padding-top: 0px;
@@ -37,18 +52,11 @@
 
 .navbar-part {
     height: 100%;
-    background-color:white;
-}
-
-.right-part-ul {
-    align-items: center;
+    background-color: var(--header-color);
 }
 
 .site-body {
-    height: 80vh;
     margin: 0;
-    display: flex;
-    flex-direction:column;
 }
 
 .site-main {
@@ -57,28 +65,52 @@
 }
 
 .layout-footer {
-    width: 100%;
-    min-height: 30px;
-    margin-top:auto;
+    margin-top: auto;
 }
 
-@media (max-width: 550px) {
+@media (max-width: 575.98px) {
     .layout-header {
         margin-bottom: 5px;
-        height: 30px;
+        height: 45px;
+        align-items: start;
+    }
+
+    .layout-navbar {
+        padding: 0px;
+        width: 100%;
+    }
+
+    .navbar-container {
+        width: 200px;
+        align-content: start;
+        align-items: start;
+    }
+
+    .layout-navbar ul {
+        border-style: solid;
+        border-color: lightgray;
+        border-width: 1px;
     }
 }
 
-@media (min-width: 551px) and (max-width: 978px) {
+@media (min-width: 575.99px) and (max-width: 978px) {
     .layout-header {
         margin-bottom: 20px;
-        height: 40px;
+        height: 50px;
+    }
+
+    .right-part-ul {
+        align-items: center;
     }
 }
 
 @media (min-width: 979px) {
     .layout-header {
         margin-bottom: 30px;
-        height: 50px;
+        height: 55px;
+    }
+
+    .right-part-ul {
+        align-items: center;
     }
 }
