@@ -1,0 +1,83 @@
+﻿.layout-header {
+    border-bottom: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: lightgray;
+    padding: 0px;
+    display: block;
+}
+
+.layout-navbar {
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+    .layout-navbar ul {
+        padding: 0px;
+        vertical-align: middle;
+        width: 100%;
+        height: 100%;
+    }
+
+    .layout-navbar button {
+        height: 28px;
+        padding: 2px;
+        align-content: center;
+        vertical-align: middle;
+        align-items:center;
+        display: flex;
+    }
+
+.hamburger-menu-text {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.navbar-part {
+    height: 100%;
+}
+
+.right-part-ul {
+    align-items: center;
+}
+
+.site-body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction:column;
+}
+
+.site-main {
+    padding: 0px; /*Don't forget that we don't want padding on the card search page */
+    margin-bottom: 10px;
+}
+
+.layout-footer {
+    width: 100%;
+    min-height: 30px;
+    margin-top:auto;
+}
+
+@media (max-width: 550px) {
+    .layout-header {
+        margin-bottom: 5px;
+        height: 30px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .layout-header {
+        margin-bottom: 20px;
+        height: 40px;
+    }
+}
+
+@media (min-width: 979px) {
+    .layout-header {
+        margin-bottom: 30px;
+        height: 50px;
+    }
+}

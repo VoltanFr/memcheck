@@ -274,10 +274,6 @@
     height: auto;
 }
 
-.main-body {
-    padding: 0px; /*Don't forget that we don't want padding on the card search page */
-}
-
 .wait-message {
     font-weight: bolder;
 }

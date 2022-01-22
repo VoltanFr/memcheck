@@ -27,19 +27,19 @@
     </environment>
 
     <link rel="stylesheet" href="~/css/site.css" type="text/css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/layout.css" type="text/css" asp-append-version="true" />
     @RenderSection("head", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-transparent border-bottom box-shadow">
+<body class="site-body">
+    <header class="layout-header">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light layout-navbar">
             <div class="container">
                 <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    <span class="navbar-brand">MemCheck</span>
+                    <i class="fas fa-bars"></i>&nbsp;<span class="hamburger-menu-text">MemCheck</span>
                 </button>
-                <div id="Left part" class="navbar-collapse collapse bg-transparent">
+                <div id="Left part" class="navbar-collapse collapse navbar-part">
+                    <a class="navbar-brand" asp-page="/Index">MemCheck</a>
                     <ul class="navbar-nav mr-auto">
-                        <li class="nav-item"><a class="navbar-brand" asp-page="/Index">MemCheck</a></li>
                         <li id="Learn" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
                             <div class="dropdown-menu" aria-labelledby="LearnDropdown">
@@ -76,10 +76,10 @@
                         </li>
                     </ul>
                 </div>
-                <div id="Right part" class="navbar-collapse collapse bg-transparent">
-                    <ul class="navbar-nav ms-auto" style="align-items:center">
+                <div id="Right part" class="navbar-collapse collapse navbar-part">
+                    <ul class="navbar-nav ms-auto right-part-ul">
                         <li id="User" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="UserDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle " href="#" id="UserDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 @if (SignInManager.IsSignedIn(User))
                                 {
                                     <i class="fas fa-user"></i>
@@ -110,7 +110,6 @@
                                     {{language}}
                                 </option>
                             </select>
-
                         </li>
                     </ul>
                 </div>
@@ -118,14 +117,14 @@
         </nav>
     </header>
 
-    <main role="main" class="main-body">
+    <main role="main" class="site-main">
         <partial name="CookieConsentPartial" />
         @RenderBody()
     </main>
 
-    <footer class="footer" style="padding-top:100px">
+    <footer class="footer layout-footer">
         <div class="container">
-            <nav class="navbar navbar-expand-sm navbar-light bg-white border-top box-shadow nav-fill nav-justified">
+            <nav class="navbar navbar-expand-sm navbar-light bg-white border-top box-shadow nav-fill nav-justified layout-navbar">
                 <a class="nav-item nav-link text-primary" asp-page="/Index">@Localizer["Home"]</a>
                 @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
                 <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>

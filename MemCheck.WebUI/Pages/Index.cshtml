@@ -4,6 +4,9 @@
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
+@section head {
+    <link href="@Url.Content("~/css/homepage.css")" rel="stylesheet" type="text/css" />
+}
 
 <div id="HomeDiv" class="page-responsive-padding" v-cloak>
     <div id="WaitingForData" v-if="!allData">
