@@ -384,7 +384,7 @@ const searchApp = Vue.createApp({
                 return;
             }
 
-            nbCardsAlreadyInDeck = 0;
+            var nbCardsAlreadyInDeck = 0;
             for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
                 if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deck.deckId))
                     nbCardsAlreadyInDeck++;
