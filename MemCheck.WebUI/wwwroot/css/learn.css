@@ -106,7 +106,17 @@
     text-align: left;
 }
 
+.small-buttons-ul {
+    display: flex;
+    padding-left: 0;
+    margin-bottom: 0;
+    align-items: center;
+}
+
 @media (max-width: 550px) {
+    .small-buttons-ul {
+        font-size: 14px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -118,5 +128,13 @@
     .learning-card {
         margin-top: 4px;
         margin-bottom: 4px;
+    }
+    .small-buttons-ul {
+        font-size: 15px;
+    }
+}
+@media (min-width: 979px) {
+    .small-buttons-ul {
+        font-size: 16px;
     }
 }
