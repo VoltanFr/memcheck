@@ -1,5 +1,6 @@
 ﻿:root {
     --header-color: snow;
+    --menu-hover-color: lightpink;
     --z-index-menu: 1000;
 }
 
@@ -32,6 +33,10 @@
         z-index: var(--z-index-menu);
     }
 
+    .layout-navbar a:hover {
+        background-color: var(--menu-hover-color);
+    }
+
     .layout-navbar button {
         height: 28px;
         padding: 2px;
@@ -43,10 +48,26 @@
         z-index: var(--z-index-menu);
     }
 
+        .layout-navbar button:hover {
+            background-color: var(--menu-hover-color);
+        }
+
+    .layout-navbar select:hover {
+        background-color: var(--menu-hover-color);
+    }
+
+    .layout-navbar option:hover {
+        background-color: var(--menu-hover-color);
+    }
+
 .navbar-memcheck-link {
-    background-color: var(--header-color);
     z-index: var(--z-index-menu);
+    padding: 0px;
 }
+
+    .navbar-memcheck-link:hover {
+        background-color: var(--menu-hover-color);
+    }
 
 .hamburger-menu-text {
     padding-top: 0px;
