@@ -8,6 +8,7 @@
     <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
     <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
@@ -131,7 +132,7 @@
                             <span v-html="currentCardFrontSide()"></span>
                         </div>
                         <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="learn-image" :src="image.blob" /></a>
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="imageincard" :src="image.blob" /></a>
                         </div>
                         <div v-if="!backSideVisible" class="card-footer learning-card-footer">
                             <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
@@ -147,7 +148,7 @@
                             <span v-html="currentCardBackSide()"></span>
                         </div>
                         <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="learn-image" :src="image.blob" /></a>
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="imageincard" :src="image.blob" /></a>
                         </div>
                     </div>
                 </div>
@@ -166,7 +167,7 @@
                             <span v-html="currentCardAdditionalInfo()"></span>
                         </div>
                         <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="learn-image" :src="image.blob" /></a>
+                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="imageincard" :src="image.blob" /></a>
                         </div>
                     </div>
                 </div>

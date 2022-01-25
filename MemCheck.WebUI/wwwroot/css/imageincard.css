@@ -1,0 +1,23 @@
+﻿.imageincard {
+    height: auto;
+    padding-bottom: 25px;
+    aspect-ratio: initial;
+}
+
+@media (max-width: 550px) {
+    .imageincard {
+        width : 60%;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    .imageincard {
+        width: 50%;
+    }
+}
+
+@media (min-width: 979px) {
+    .imageincard {
+        width: 40%;
+    }
+}

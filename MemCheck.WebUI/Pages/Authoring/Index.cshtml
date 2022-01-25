@@ -9,6 +9,7 @@
     <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
     <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
@@ -85,7 +86,7 @@
                                 <div id="FrontSideRowImageDiv">
                                     <image-choice v-on:add="addFrontImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
                                     <div id="FrontImagesDisplay" class="authoring-image-show" v-for="image in frontSideImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
                                     </div>
                                 </div>
                             </td>
@@ -99,7 +100,7 @@
                                 <div id="BackSideRowImageDiv">
                                     <image-choice v-on:add="addBackImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
                                     <div id="BackImagesDisplay" class="authoring-image-show" v-for="image in backSideImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
                                     </div>
                                 </div>
                             </td>
@@ -113,7 +114,7 @@
                                 <div id="AdditionalSideRowImageDiv">
                                     <image-choice v-on:add="addAdditionalImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
                                     <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="preview-image" :src="image.blob" /></a>
+                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
                                     </div>
                                 </div>
                             </td>

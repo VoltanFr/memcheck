@@ -5,6 +5,7 @@
 @section head {
     <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
 <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
@@ -62,7 +63,7 @@
                     </tr>
                     <tr v-if="imagePreview">
                         <th>@Localizer["Preview"]</th>
-                        <td><img class="preview-image" :src="imagePreview" /></td>
+                        <td><img class="imageincard" :src="imagePreview" /></td>
                     </tr>
                 </tbody>
             </table>
