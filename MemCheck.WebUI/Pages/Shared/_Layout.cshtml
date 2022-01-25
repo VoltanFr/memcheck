@@ -105,11 +105,13 @@
                             </div>
                         </li>
                         <li id="Language" class="nav-item">
-                            <select id="SelectLanguageDiv" class="nav-item" v-model="activeLanguage" style="border-radius: 10px;width:auto">
-                                <option v-for="language in availableLanguages">
-                                    {{language}}
-                                </option>
-                            </select>
+                            <div id="SelectLanguageDiv">
+                                <select class="nav-item" v-model="activeLanguage" style="border-radius: 10px;width:auto">
+                                    <option v-for="language in availableLanguages">
+                                        {{language}}
+                                    </option>
+                                </select>
+                            </div>
                         </li>
                     </ul>
                 </div>

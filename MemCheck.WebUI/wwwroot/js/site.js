@@ -65,10 +65,12 @@ const layoutApp = Vue.createApp({
         },
     },
     watch: {
-       async activeLanguage() {
-            if (this.mountFinished)
-            await    this.activeLanguageChange();
-        }
+        activeLanguage: {
+            handler: function () {
+                if (this.mountFinished)
+                    this.activeLanguageChange();
+            }
+        },
     },
 });
 
