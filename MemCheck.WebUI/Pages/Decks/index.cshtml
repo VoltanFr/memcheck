@@ -3,7 +3,7 @@
 @inject IViewLocalizer Localizer
 @model SettingsModel
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];

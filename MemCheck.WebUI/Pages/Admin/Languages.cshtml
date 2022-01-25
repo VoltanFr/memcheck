@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @{
     ViewData["Title"] = "Languages page";
