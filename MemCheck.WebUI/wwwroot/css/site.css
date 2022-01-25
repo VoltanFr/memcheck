@@ -238,6 +238,10 @@
     height: auto;
 }
 
+.toast-mesg {
+    padding: 5px;
+    width: fit-content;
+}
 
 .deck-index-deckname-td {
     display: block;

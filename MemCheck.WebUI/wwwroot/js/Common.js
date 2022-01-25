@@ -54,9 +54,9 @@ function toastAxiosResult(controllerResultWithToast, success) {
 
 function toast(mesg, title, success) {
     const actualMesg = "<strong>" + title + "</strong><br/>" + mesg;
-    const icon = success ? "success" : "fail";
+    const icon = success ? "thumb-circle" : "fire";
     const duration = success ? 4000 : 10000;
-    globalThis.vant.Toast({ message: actualMesg, type: "html", icon: icon, iconSize: 20, duration: duration });
+    globalThis.vant.Toast({ message: actualMesg, type: "html", icon: icon, iconSize: 30, duration: duration, className: "toast-mesg", position: "top" });
 }
 
 function base64FromBytes(bytes) {
