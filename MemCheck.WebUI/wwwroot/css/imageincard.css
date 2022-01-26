@@ -1,23 +1,27 @@
-﻿.imageincard {
-    height: auto;
-    padding-bottom: 25px;
+﻿/* Height can not be proportional since the size of the parent is determined by the size of its content.
+    Don't forget that images displayed with this class come with a fixed width of 600px (set by class StoreImage).
+*/
+
+.imageincard {
+    padding-bottom: 20px;
     aspect-ratio: initial;
+    max-width: 100%;
 }
 
 @media (max-width: 550px) {
     .imageincard {
-        width : 60%;
+        max-height: 400px;
     }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
     .imageincard {
-        width: 50%;
+        max-height: 500px; 
     }
 }
 
 @media (min-width: 979px) {
     .imageincard {
-        width: 40%;
+        max-height: 600px
     }
 }
