@@ -4,9 +4,6 @@
     --z-index-menu: 1000;
 }
 
-.navbar-container {
-}
-
 .layout-header {
     border-bottom: solid;
     border-bottom-width: 1px;
@@ -29,14 +26,14 @@
         display: none;
     }
 
-.layout-navbar {
+.layout-header-navbar {
     padding: 0px;
     height: 100%;
     width: 100%;
     background-color: var(--header-color);
 }
 
-    .layout-navbar ul {
+    .layout-header-navbar ul {
         background-color: var(--header-color);
         padding: 0px;
         vertical-align: middle;
@@ -45,11 +42,11 @@
         z-index: var(--z-index-menu);
     }
 
-    .layout-navbar a:hover {
+    .layout-header-navbar a:hover {
         background-color: var(--menu-hover-color);
     }
 
-    .layout-navbar button {
+    .layout-header-navbar button {
         height: 28px;
         padding: 2px;
         align-content: center;
@@ -60,15 +57,32 @@
         z-index: var(--z-index-menu);
     }
 
-        .layout-navbar button:hover {
+        .layout-header-navbar button:hover {
             background-color: var(--menu-hover-color);
         }
 
-    .layout-navbar select:hover {
+    .layout-header-navbar select:hover {
         background-color: var(--menu-hover-color);
     }
 
-    .layout-navbar option:hover {
+    .layout-header-navbar option:hover {
+        background-color: var(--menu-hover-color);
+    }
+
+.layout-footer {
+    margin-top: auto;
+}
+
+.layout-footer-navbar {
+    padding-top: 0px;
+    margin-top: 0px;
+}
+
+    .layout-footer-navbar a {
+        color: rgba(0, 0, 0, 0.55);
+    }
+
+    .layout-footer-navbar a:hover {
         background-color: var(--menu-hover-color);
     }
 
@@ -104,10 +118,6 @@
     margin-bottom: 10px;
 }
 
-.layout-footer {
-    margin-top: auto;
-}
-
 @media (max-width: 575.98px) {
     .layout-header {
         margin-bottom: 5px;
@@ -115,7 +125,7 @@
         align-items: start;
     }
 
-    .layout-navbar {
+    .layout-header-navbar {
         padding: 0px;
         width: 100%;
     }
@@ -126,7 +136,7 @@
         align-items: start;
     }
 
-    .layout-navbar ul {
+    .layout-header-navbar ul {
         border-style: solid;
         border-color: lightgray;
         border-width: 1px;

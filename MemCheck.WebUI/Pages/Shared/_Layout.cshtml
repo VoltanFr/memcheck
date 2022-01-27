@@ -33,7 +33,7 @@
 <body class="site-body">
     <header class="layout-header">
         <a class="close-navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#Collapsable" aria-controls="Collapsable" aria-expanded="false" aria-label="Toggle navigation"></a>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light layout-navbar">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light layout-header-navbar">
             <div class="container navbar-container">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#Collapsable" aria-controls="Collapsable" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>&nbsp;<span class="hamburger-menu-text">MemCheck</span>
@@ -127,13 +127,13 @@
 
     <footer class="footer layout-footer">
         <div class="container">
-            <nav class="navbar navbar-expand-sm navbar-light bg-white border-top box-shadow nav-fill nav-justified layout-navbar">
-                <a class="nav-item nav-link text-primary" asp-page="/Index">@Localizer["Home"]</a>
+            <nav class="navbar navbar-expand-sm navbar-light border-top nav-fill nav-justified layout-footer-navbar">
+                <a class="nav-item nav-link" asp-page="/Index">@Localizer["Home"]</a>
                 @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
-                <a class="nav-item nav-link text-primary" href="/Doc">@Localizer["Doc"]</a>
+                <a class="nav-item nav-link" href="/Doc">@Localizer["Doc"]</a>
                 @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
                 {
-                    <a class="nav-item nav-link text-primary" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+                    <a class="nav-item nav-link" asp-page="/Admin/Index">@Localizer["Admin"]</a>
                 }
             </nav>
         </div>
