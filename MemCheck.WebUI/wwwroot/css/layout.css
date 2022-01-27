@@ -17,6 +17,18 @@
     z-index: var(--z-index-menu);
 }
 
+.close-navbar-toggler {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+    .close-navbar-toggler.collapsed {
+        display: none;
+    }
+
 .layout-navbar {
     padding: 0px;
     height: 100%;
