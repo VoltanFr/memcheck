@@ -134,6 +134,9 @@
                 @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
                 {
                     <a class="nav-item nav-link" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+                    <button class="debug-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#DebugInfo" aria-controls="DebugInfo" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fas fa-bug debug-toggler"></i>
+                    </button>
                 }
             </nav>
         </div>

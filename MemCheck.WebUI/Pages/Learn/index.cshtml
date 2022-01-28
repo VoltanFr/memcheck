@@ -194,7 +194,7 @@
     <div id="Processing info">
         <p v-if="preventQuittingPage()"><i class="fas fa-save"></i></p>
     </div>
-    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+    <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
         <ul>
             <li v-if="!downloadedCards">downloadedCards is null</li>
             <li v-if="downloadedCards">downloadedCards.length: {{downloadedCards.length}}</li>

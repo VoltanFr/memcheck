@@ -26,6 +26,12 @@
         display: none;
     }
 
+.debug-toggler {
+    color: red;
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+
 .layout-header-navbar {
     padding: 0px;
     height: 100%;
@@ -82,9 +88,9 @@
         color: rgba(0, 0, 0, 0.55);
     }
 
-    .layout-footer-navbar a:hover {
-        background-color: var(--menu-hover-color);
-    }
+        .layout-footer-navbar a:hover {
+            background-color: var(--menu-hover-color);
+        }
 
 .navbar-memcheck-link {
     z-index: var(--z-index-menu);
