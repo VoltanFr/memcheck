@@ -145,20 +145,20 @@
                                     <th width="10%"></th>
                                     <th width="90%"></th>
                                 </tr>
-                                <tr id="Deck">
+                                <tr id="Deck" class="memcheck-input-div">
                                     <th>@Localizer["Deck"]</th>
                                     <td>
                                         <select v-model="selectedDeck" class="responsive-padding-edit"><option v-for="deck in possibleDecks" v-bind:value="deck">{{deck.deckName}}</option></select>
                                         <select v-model="deckSelectionIsInclusive" class="responsive-padding-edit" v-if="possibleDecksInclusionChoicesEnabled()"><option v-for="possibleDecksInclusionChoice in possibleDecksInclusionChoices" v-bind:value="possibleDecksInclusionChoice.selectedDeckIsInclusive">{{possibleDecksInclusionChoice.choiceText}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Heap" v-if="filteringOnDeckInclusive()">
+                                <tr id="Heap" class="memcheck-input-div" v-if="filteringOnDeckInclusive()">
                                     <th style="text-align:right">@Localizer["Heap"]</th>
                                     <td>
                                         <select v-model="selectedHeap" class="responsive-padding-edit"><option v-for="heap in possibleHeaps" v-bind:value="heap.heapId">{{heap.heapName}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Add to deck date" v-if="filteringOnDeckInclusive()">
+                                <tr id="Add to deck date" class="memcheck-input-div" v-if="filteringOnDeckInclusive()">
                                     <th style="text-align:right">@Localizer["AddToDeckDate"]</th>
                                     <td>
                                         <div class="form-group-sm">
@@ -167,7 +167,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr id="Expiry date" v-if="filteringOnDeckInclusive()">
+                                <tr id="Expiry date" class="memcheck-input-div" v-if="filteringOnDeckInclusive()">
                                     <th style="text-align:right">@Localizer["ExpiryDate"]</th>
                                     <td>
                                         <div class="form-group-sm">
@@ -176,7 +176,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr id="RequiredTagsRow">
+                                <tr id="RequiredTagsRow" class="memcheck-input-div">
                                     <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["RequiredTags"]</th>
                                     <td>
                                         <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
@@ -186,7 +186,7 @@
                                         <tag-button v-for="(tag,index) in selectedRequiredTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeRequiredTag"></tag-button>
                                     </td>
                                 </tr>
-                                <tr id="EcludedTagsRow">
+                                <tr id="EcludedTagsRow" class="memcheck-input-div">
                                     <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["ExcludedTags"]</th>
                                     <td>
                                         <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
@@ -196,36 +196,36 @@
                                         <tag-button v-for="(tag,index) in selectedExcludedTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeExcludedTag"></tag-button>
                                     </td>
                                 </tr>
-                                <tr id="Owner">
+                                <tr id="Owner" class="memcheck-input-div">
                                     <th>@Localizer["Owner"]</th>
                                     <td>
                                         <select v-model="selectedOwner" class="responsive-padding-edit"><option v-for="owner in possibleOwners" v-bind:value="owner.userId">{{owner.userName}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Visibility">
+                                <tr id="Visibility" class="memcheck-input-div">
                                     <th>@Localizer["Visibility"]</th>
                                     <td>
                                         <select v-model="selectedVisibilityFilteringChoice" class="responsive-padding-edit"><option v-for="visibilityFilteringPossibleChoice in visibilityFilteringPossibleChoices" v-bind:value="visibilityFilteringPossibleChoice.choiceId">{{visibilityFilteringPossibleChoice.choiceText}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Text">
+                                <tr id="Text" class="memcheck-input-div">
                                     <th>@Localizer["Text"]</th>
                                     <td><input class="form-control-sm responsive-padding-edit search-page-required-text-edit" v-model="textFilter" v-on:keyup.enter="runQuery()" /></td>
                                 </tr>
-                                <tr id="Rating">
+                                <tr id="Rating" class="memcheck-input-div">
                                     <th>@Localizer["AverageRating"]</th>
                                     <td>
                                         <select v-model="selectedAverageRatingFilteringKind" class="responsive-padding-edit"><option v-for="ratingF in possibleRatingFilteringKind" v-bind:value="ratingF.choiceId">{{ratingF.choiceText}}</option></select>
                                         <select v-model="selectedAverageRatingFilteringValue" class="responsive-padding-edit" v-if="averageRatingFilteringEnabled()"><option v-for="ratingF in possibleRatingFilteringValues" v-bind:value="ratingF.choiceId">{{ratingF.choiceText}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Notifications">
+                                <tr id="Notifications" class="memcheck-input-div">
                                     <th>@Localizer["Notifications"]</th>
                                     <td>
                                         <select v-model="selectedNotificationFilteringId" class="responsive-padding-edit"><option v-for="notif in possibleSelectedNotificationFiltering" v-bind:value="notif.choiceId">{{notif.choiceText}}</option></select>
                                     </td>
                                 </tr>
-                                <tr id="Page size">
+                                <tr id="Page size" class="memcheck-input-div">
                                     <th>@Localizer["PageSize"]</th>
                                     <td>
                                         <select v-model="pageSize" class="responsive-padding-edit">
@@ -233,7 +233,7 @@
                                         </select>
                                     </td>
                                 </tr>
-                                <tr id="Run & Subscribe buttons">
+                                <tr id="Run & Subscribe buttons" class="memcheck-bottom-button-div">
                                     <td></td>
                                     <td>
                                         <van-button class="toolbar-button" @@click="runQuery()">@Localizer["Run"]</van-button>
@@ -310,7 +310,7 @@
             </tbody>
         </table>
     </div>
-    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+    <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
         <ul>
             <li v-if="mountDebugInfo">{{mountDebugInfo}}</li>
             <li v-if="lastQueryDebugInfo">{{lastQueryDebugInfo}}</li>
