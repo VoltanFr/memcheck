@@ -16,27 +16,27 @@
     <form asp-route-returnUrl="/" method="post">
         <h1>@Localizer["CreateNewAccount"]</h1>
         <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="form-group account-creation-input-div">
+        <div class="form-group memcheck-input-div">
             <label>@Localizer["EMailAddress"]</label>
             <input asp-for="Input.Email" class="form-control" />
             <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
-        <div class="form-group account-creation-input-div">
+        <div class="form-group memcheck-input-div">
             <label>@Localizer["UserName"]</label>
             <input asp-for="Input.UserName" class="form-control" />
             <span asp-validation-for="Input.UserName" class="text-danger"></span>
         </div>
-        <div class="form-group account-creation-input-div">
+        <div class="form-group memcheck-input-div">
             <label>@Localizer["Password"]</label>
             <input asp-for="Input.Password" class="form-control" />
             <span asp-validation-for="Input.Password" class="text-danger"></span>
         </div>
-        <div class="form-group account-creation-input-div">
+        <div class="form-group memcheck-input-div">
             <label>@Localizer["ConfirmPassword"]</label>
             <input asp-for="Input.ConfirmPassword" class="form-control" />
             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
         </div>
-        <div class="form-group account-creation-button-div">
+        <div class="form-group memcheck-bottom-button-div">
             <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
         </div>
     </form>

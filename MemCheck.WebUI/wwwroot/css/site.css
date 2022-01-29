@@ -246,6 +246,14 @@
     vertical-align: middle;
 }
 
+.memcheck-input-div {
+    background-color: var(--input-area-background-color);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--input-area-border-color);
+    padding: 1px;
+}
+
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
@@ -325,6 +333,14 @@
         font-size: .7rem;
         border-width: 1px;
     }
+
+    .memcheck-input-div {
+        margin-bottom: 10px;
+    }
+
+    .memcheck-bottom-button-div {
+        margin-bottom: 10px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -378,6 +394,14 @@
         position: relative;
         left: 10px;
     }
+
+    .memcheck-input-div {
+        margin-bottom: 20px;
+    }
+
+    .memcheck-bottom-button-div {
+        margin-bottom: 20px;
+    }
 }
 
 @media (min-width: 979px) {
@@ -391,6 +415,14 @@
 
     .big-screen-text {
         display: inline-block;
+    }
+
+    .memcheck-input-div {
+        margin-bottom: 30px;
+    }
+
+    .memcheck-bottom-button-div {
+        margin-bottom: 30px;
     }
 }
 
