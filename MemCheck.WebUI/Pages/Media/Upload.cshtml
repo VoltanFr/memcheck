@@ -3,9 +3,9 @@
 @model UploadModel
 @inject IViewLocalizer Localizer
 @section head {
-    <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
 <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
@@ -30,44 +30,37 @@
         <div id="Title">
             <h1 class="title"><span v-if="editingImageId">@Localizer["EditMedia"]</span><span v-else>@Localizer["AddMedia"]</span></h1>
         </div>
-        <div id="Table">
-            <table class="table table-sm table-authoring" width="100%">
-                <tbody>
-                    <tr id="Headers for column size" style="visibility:hidden">
-                        <th width="10%"></th>
-                        <th width="90%"></th>
-                    </tr>
-                    <tr>
-                        <th>@Localizer["Name"]</th>
-                        <td><input class="form-control responsive-padding-edit" v-model="name" /></td>
-                    </tr>
-                    <tr>
-                        <th>@Localizer["Description"]</th>
-                        <td><markdown-editor v-model="description" class="form-control responsive-padding-edit" isinfrench title="" /></td>
-                    </tr>
-                    <tr>
-                        <th>@Localizer["Source"]</th>
-                        <td><input class="form-control responsive-padding-edit" v-model="source" /></td>
-                    </tr>
-                    <tr v-if="editingImageId">
-                        <th>@Localizer["VersionDescription"]</th>
-                        <td><input class="form-control responsive-padding-edit" v-model="versionDescription" /></td>
-                    </tr>
-                    <tr v-if="!editingImageId">
-                        <th>@Localizer["FilePath"]</th>
-                        <td>
-                            <input type="file" @@change="onFileSelected" style="display:none" ref="fileInput" />
-                            <span v-if="selectedFile">{{selectedFile.name}}</span>
-                            <button @@click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
-                        </td>
-                    </tr>
-                    <tr v-if="imagePreview">
-                        <th>@Localizer["Preview"]</th>
-                        <td><img class="imageincard" :src="imagePreview" /></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="memcheck-input-div">
+            <label>@Localizer["Name"]</label>
+            <input class="form-control responsive-padding-edit" v-model="name" />
         </div>
+        <div class="memcheck-input-div">
+            <label>@Localizer["Description"]</label>
+            <markdown-editor v-model="description" isinfrench title="" />
+        </div>
+        <div class="memcheck-input-div">
+            <label>@Localizer["Source"]</label>
+            <input class="form-control" v-model="source" />
+        </div>
+        <div class="memcheck-input-div" v-if="editingImageId">
+            <label>@Localizer["VersionDescription"]</label>
+            <input class="form-control" v-model="versionDescription" />
+        </div>
+        <div class="memcheck-input-div" v-if="!editingImageId">
+            <label>@Localizer["FilePath"]</label>
+            <br/>
+            <input type="file" @@change="onFileSelected" style="display:none" ref="fileInput" />
+            <br/>
+            <span v-if="selectedFile">{{selectedFile.name}}</span>
+            <br/>
+            <button @@click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
+        </div>
+        <div class="memcheck-input-div" v-if="imagePreview">
+            <label>@Localizer["Preview"]</label>
+            <img class="imageincard" :src="imagePreview" />
+        </div>
+    </div>
+    <div class="memcheck-bottom-button-div">
         <button id="UploadButton" class="btn btn-success btn-lg" @@click="upload">@Localizer["Upload"]</button>
     </div>
 </div>

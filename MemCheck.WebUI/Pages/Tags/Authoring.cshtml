@@ -37,11 +37,11 @@
                         <th>@Localizer["CardsWithThisTag"]</th>
                         <td>{{editedTag.cardCount}}</td>
                     </tr>
-                    <tr>
+                    <tr class="memcheck-input-div">
                         <th><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></th>
                         <td><input class="form-control responsive-padding-edit" v-model="newName" /></td>
                     </tr>
-                    <tr>
+                    <tr class="memcheck-input-div">
                         <th><span v-if="editedTag">@Localizer["NewDescription"]</span><span v-else>@Localizer["Description"]</span></th>
                         <td><textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15"></textarea></td>
                     </tr>
