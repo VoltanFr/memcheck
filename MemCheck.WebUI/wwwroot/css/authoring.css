@@ -1,8 +1,4 @@
-﻿:root {
-    --background-area-color: snow;
-}
-
-.authoring-card-div {
+﻿.authoring-card-div {
     padding: 0px;
     margin-bottom: 0px;
 }
@@ -21,13 +17,6 @@
     font-weight: bold;
     padding: 0px;
     margin: 0px;
-}
-
-.authoring-row-input {
-    display: table-row;
-    padding: 0px;
-    border-width: 1px;
-    background-color: var(--background-area-color);
 }
 
 .authoring-td {

@@ -79,7 +79,7 @@
             <div id="The card" class="authoring-card-div">
                 <table class="table-responsive authoring-table">
                     <tbody class="authoring-table-body">
-                        <tr id="FrontSideRow" class="authoring-row-input">
+                        <tr id="FrontSideRow" class="memcheck-input-div">
                             <td class="authoring-td">
                                 <div id="FrontSideRowMarkdownEditor">
                                     <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" />
@@ -93,7 +93,7 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row"></tr>
-                        <tr id="BackSideRow" class="authoring-row-input">
+                        <tr id="BackSideRow" class="memcheck-input-div">
                             <td class="authoring-td">
                                 <div id="BackSideRowMarkdownEditor">
                                     <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" />
@@ -107,7 +107,7 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row"></tr>
-                        <tr id="AdditionalInfoRow" class="authoring-row-input" v-if="showAdditionalInfo">
+                        <tr id="AdditionalInfoRow" class="memcheck-input-div" v-if="showAdditionalInfo">
                             <td class="authoring-td">
                                 <div id="AdditionalSideRowMarkdownEditor">
                                     <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" />
@@ -121,7 +121,7 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row" v-if="showAdditionalInfo"></tr>
-                        <tr id="LanguageInputRow" class="collapse authoring-row-input TogglableAdditionalInfo">
+                        <tr id="LanguageInputRow" class="collapse memcheck-input-div TogglableAdditionalInfo">
                             <td class="authoring-td">
                                 <p class="authoring-row-caption">@Localizer["Language"]</p>
                                 <select v-model="card.languageId" class="authoring-select">
@@ -130,7 +130,7 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row TogglableAdditionalInfo"></tr>
-                        <tr id="TagsInputRow" class="authoring-row-input">
+                        <tr id="TagsInputRow" class="memcheck-input-div">
                             <td class="authoring-td">
                                 <p class="authoring-row-caption">@Localizer["Tags"]</p>
                                 <div style="flex-flow:row wrap; width:100%">
@@ -142,7 +142,7 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row"></tr>
-                        <tr id="VisibilityInputRow" class="collapse authoring-row-input TogglableVisibility show">
+                        <tr id="VisibilityInputRow" class="collapse memcheck-input-div TogglableVisibility show">
                             <td class="authoring-td">
                                 <p class="authoring-row-caption">@Localizer["Users"]</p>
                                 <div style="flex-flow:row wrap; width:100%">
@@ -163,14 +163,14 @@
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row TogglableVisibility show"></tr>
-                        <tr id="VersionDescriptionInputRow" class="authoring-row-input" v-if="!creatingNewCard">
+                        <tr id="VersionDescriptionInputRow" class="memcheck-input-div" v-if="!creatingNewCard">
                             <td class="authoring-td">
                                 <p class="authoring-row-caption">@Localizer["VersionDescription"]</p>
                                 <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
                             </td>
                         </tr>
                         <tr class="card-authoring-blank-row" v-if="!creatingNewCard"></tr>
-                        <tr id="AddToDeckInputRow" v-if="creatingNewCard" class="authoring-row-input">
+                        <tr id="AddToDeckInputRow" v-if="creatingNewCard" class="memcheck-input-div">
                             <td class="authoring-td">
                                 <p class="authoring-row-caption">@Localizer["AddToDeck"]</p>
                                 <div style="flex-flow:row wrap; width:100%">
