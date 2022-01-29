@@ -252,6 +252,7 @@
     border-style: solid;
     border-color: var(--input-area-border-color);
     padding: 1px;
+    border-radius: 4px;
 }
 
 @media (max-width: 550px) {

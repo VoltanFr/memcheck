@@ -1,5 +1,6 @@
 ﻿.markdown-render {
     white-space: normal;
+    border-radius:4px;
 }
 
     .markdown-render ul {
@@ -16,7 +17,7 @@
 
 @media (max-width: 550px) {
     .markdown-render {
-        padding: 0px;
+        padding: 1px;
     }
 
         .markdown-render table th {

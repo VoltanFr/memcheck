@@ -3,19 +3,19 @@
 @inject IViewLocalizer Localizer
 @model LearnViewModel
 @section head {
-    <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
-    <script src="~/js/CardRating.js" asp-append-version="true"></script>
-    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
-    <script src="~/js/TagButton.js" asp-append-version="true"></script>
-    <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script>
+<script src="~/js/big-size-image.js" asp-append-version="true"></script>
+<script src="~/js/TagButton.js" asp-append-version="true"></script>
+<script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -57,7 +57,7 @@
                 </table>
             </div>
             <div id="The card" class="card learning-card" v-if="currentCard">
-                <div id="Small buttons" class="card-header" style="padding:1px">
+                <div id="Small buttons" class="small-buttons-div" style="padding:1px">
                     <ul class="small-buttons-ul">
                         <li id="Edit button" style="padding-right:5px">
                             <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></van-button>
@@ -123,55 +123,49 @@
                         </li>
                     </ul>
                 </div>
-                <div id="Front side" class="learning-card">
-                    <div class="card" v-if="currentCard">
-                        <div class="card-header learning-card-header">
-                            <p>@Localizer["FrontSide"]</p>
-                        </div>
-                        <div class="markdown-render markdown-body">
-                            <span v-html="currentCardFrontSide()"></span>
-                        </div>
-                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="imageincard" :src="image.blob" /></a>
-                        </div>
-                        <div v-if="!backSideVisible" class="card-footer learning-card-footer">
-                            <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
-                        </div>
+                <div id="Front side" class="memcheck-input-div card-side-div" v-if="currentCard">
+                    <div class="learning-card-header">
+                        <p>@Localizer["FrontSide"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="currentCardFrontSide()"></span>
+                    </div>
+                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
+                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="imageincard" :src="image.blob" /></a>
+                    </div>
+                    <div v-if="!backSideVisible" class="learning-card-footer">
+                        <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
                     </div>
                 </div>
-                <div id="Back side" v-if="backSideVisible" class="learning-card">
-                    <div class="card" v-if="currentCard">
-                        <div class="card-header learning-card-header">
-                            <p>@Localizer["BackSide"]</p>
-                        </div>
-                        <div class="markdown-render markdown-body">
-                            <span v-html="currentCardBackSide()"></span>
-                        </div>
-                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="imageincard" :src="image.blob" /></a>
-                        </div>
+                <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div card-side-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["BackSide"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="currentCardBackSide()"></span>
+                    </div>
+                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
+                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="imageincard" :src="image.blob" /></a>
                     </div>
                 </div>
-                <div id="Knew Forgot" v-if="backSideVisible" class="card-footer learning-card-footer">
+                <div id="Knew Forgot" v-if="backSideVisible" class="memcheck-bottom-button-div">
                     <ul class="nav small">
                         <li><button class="btn btn-success btn-md" @@click="knew">@Localizer["Knew"]</button></li>
                         <li class="ms-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learningUnknowns">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
-                <div id="Additional info" v-if="backSideVisible && currentCardHasAdditionalSide()" class="learning-card">
-                    <div class="card" v-if="currentCard">
-                        <div class="card-header learning-card-header">
-                            <p>@Localizer["AdditionalInfo"]</p>
-                        </div>
-                        <div class="markdown-render markdown-body">
-                            <span v-html="currentCardAdditionalInfo()"></span>
-                        </div>
-                        <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                            <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="imageincard" :src="image.blob" /></a>
-                        </div>
+                <div id="Additional info" v-if="currentCard&&backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div card-side-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["AdditionalInfo"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="currentCardAdditionalInfo()"></span>
+                    </div>
+                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
+                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="imageincard" :src="image.blob" /></a>
                     </div>
                 </div>
-                <div id="Tags" v-if="currentCard.tags.length > 0" class="card-footer learning-card-tags">
+                <div id="Tags" v-if="currentCard.tags.length > 0" class="learning-card-tags">
                     <tag-button v-for="tag in currentCard.tags" v-bind:name="tag"></tag-button>
                 </div>
             </div>
