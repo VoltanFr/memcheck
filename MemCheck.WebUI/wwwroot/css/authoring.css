@@ -1,0 +1,63 @@
+﻿.authoring-card-div {
+    padding: 0px;
+    margin-bottom: 0px;
+}
+
+.authoring-table {
+    display: table;
+    width: 100%;
+}
+
+.authoring-table-body {
+    display: table;
+    width: 100%;
+}
+
+.authoring-row-caption {
+    font-weight: bold;
+    padding: 0px;
+    margin: 0px;
+}
+
+.authoring-row-input {
+    display: table-row;
+    padding: 0px;
+    border-width: 1px;
+}
+
+.authoring-td {
+    display: table-cell;
+}
+
+.card-authoring-blank-row {
+    display: table-row;
+    height: 5px;
+}
+
+.authoring-select {
+    display: block;
+    width: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+}
+
+.authoring-image-show {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.authoring-send-button {
+    margin-top: 20px;
+}
+
+.authoring-textarea {
+    display: block;
+    width: 100%;
+    resize: both;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    border-style: solid;
+    border-color: lightgray;
+}
