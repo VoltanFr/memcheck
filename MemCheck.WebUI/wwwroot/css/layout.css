@@ -116,15 +116,22 @@
 }
 
 .site-body {
-    margin: 0;
+    margin: 0px;
 }
 
 .site-main {
-    padding: 0px; /*Don't forget that we don't want padding on the card search page */
-    margin-bottom: 10px;
+    padding: 0px;
 }
 
 @media (max-width: 575.98px) {
+    .site-body {
+        padding: 1px;
+    }
+
+    .site-main {
+        margin-bottom: 5px;
+    }
+
     .layout-header {
         margin-bottom: 5px;
         height: 45px;
@@ -150,6 +157,14 @@
 }
 
 @media (min-width: 575.99px) and (max-width: 978px) {
+    .site-body {
+        padding: 5px;
+    }
+
+    .site-main {
+        margin-bottom: 10px;
+    }
+
     .layout-header {
         margin-bottom: 20px;
         height: 50px;
@@ -161,6 +176,14 @@
 }
 
 @media (min-width: 979px) {
+    .site-body {
+        padding: 10px;
+    }
+
+    .site-main {
+        margin-bottom: 20px;
+    }
+
     .layout-header {
         margin-bottom: 30px;
         height: 55px;

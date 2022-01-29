@@ -10,30 +10,18 @@
 }
 
 @media (max-width: 550px) {
-    .account-creation-maindiv {
-        padding: 5px;
-    }
-
     .account-creation-input-div {
         margin-bottom: 10px;
     }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
-    .account-creation-maindiv {
-        padding: 10px;
-    }
-
     .account-creation-input-div {
         margin-bottom: 20px;
     }
 }
 
 @media (min-width: 979px) {
-    .account-creation-maindiv {
-        padding: 20px;
-    }
-
     .account-creation-input-div {
         margin-bottom: 30px;
     }
