@@ -1,44 +1,43 @@
 ﻿@page
-
 @using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-
 @model RegisterModel
+@inject IViewLocalizer Localizer
+@section head {
+    <link href="@Url.Content("~/css/accountcreation.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 @{
     ViewData["Title"] = @Localizer["Register"];
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div>
+<div class="account-creation-maindiv">
     <form asp-route-returnUrl="/" method="post">
-        <h4>@Localizer["CreateNewAccount"]</h4>
-        <hr />
+        <h1>@Localizer["CreateNewAccount"]</h1>
         <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="form-group">
+        <div class="form-group account-creation-input-div">
             <label>@Localizer["EMailAddress"]</label>
             <input asp-for="Input.Email" class="form-control" />
             <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="form-group account-creation-input-div">
             <label>@Localizer["UserName"]</label>
             <input asp-for="Input.UserName" class="form-control" />
             <span asp-validation-for="Input.UserName" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="form-group account-creation-input-div">
             <label>@Localizer["Password"]</label>
             <input asp-for="Input.Password" class="form-control" />
             <span asp-validation-for="Input.Password" class="text-danger"></span>
         </div>
-        <div class="form-group">
+        <div class="form-group account-creation-input-div">
             <label>@Localizer["ConfirmPassword"]</label>
             <input asp-for="Input.ConfirmPassword" class="form-control" />
             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
+        <div class="form-group account-creation-button-div">
+            <button type="submit" class="btn btn-primary">@Localizer["Register"]</button>
+        </div>
     </form>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

@@ -1,4 +1,9 @@
-﻿.big-size-image-top-div {
+﻿:root {
+    --input-area-background-color: snow;
+    --input-area-border-color: darkgray;
+}
+
+.big-size-image-top-div {
     padding-bottom: 10px;
 }
 
