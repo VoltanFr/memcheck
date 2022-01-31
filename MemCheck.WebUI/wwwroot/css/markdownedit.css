@@ -4,13 +4,14 @@
     resize: none;
     border-width: 1px;
     border-style: solid;
-    border-color: lightgray;
     border-radius: 0px;
     border-spacing: 0px;
     padding: 1px;
     box-sizing: border-box;
     margin: 0px;
     overflow: hidden;
+    border-color: var(--input-field-border-color);
+    background-color: var(--input-field-background-color);
 }
 
 .markdown-edit-div {
