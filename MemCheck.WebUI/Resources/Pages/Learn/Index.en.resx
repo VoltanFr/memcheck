@@ -120,6 +120,12 @@
   <data name="AdditionalInfo" xml:space="preserve">
     <value>Additional info</value>
   </data>
+  <data name="AfterInQueueCountMoreThanOne" xml:space="preserve">
+    <value>cards in queue</value>
+  </data>
+  <data name="AfterInQueueCountOne" xml:space="preserve">
+    <value>card in queue</value>
+  </data>
   <data name="Average" xml:space="preserve">
     <value>Average</value>
   </data>
@@ -128,6 +134,9 @@
   </data>
   <data name="BackToHomePage" xml:space="preserve">
     <value>Back to home page</value>
+  </data>
+  <data name="BeforeInQueueCount" xml:space="preserve">
+    <value />
   </data>
   <data name="BiggestHeapReached" xml:space="preserve">
     <value>Biggest heap reached in this deck:</value>
@@ -216,6 +225,9 @@
   <data name="Learn" xml:space="preserve">
     <value>learn</value>
   </data>
+  <data name="Learning" xml:space="preserve">
+    <value>Learning</value>
+  </data>
   <data name="MoveToHeap" xml:space="preserve">
     <value>Move to heap</value>
   </data>
@@ -245,6 +257,9 @@
   </data>
   <data name="RegisteredForNotif" xml:space="preserve">
     <value>Registered for alerts (click to unregister)</value>
+  </data>
+  <data name="Rehearsing" xml:space="preserve">
+    <value>Rehearsing</value>
   </data>
   <data name="RemoveFromDeck" xml:space="preserve">
     <value>Remove from deck</value>

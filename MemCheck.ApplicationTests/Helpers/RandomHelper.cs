@@ -69,5 +69,9 @@ namespace MemCheck.Application.Tests.Helpers
             Randomizer.NextBytes(b);
             return b;
         }
+        public static bool Bool()
+        {
+            return Randomizer.Next(0, 1) == 1;
+        }
     }
 }

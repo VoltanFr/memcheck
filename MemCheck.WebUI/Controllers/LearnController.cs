@@ -304,6 +304,33 @@ namespace MemCheck.WebUI.Controllers
         }
         #endregion
         #endregion
+        #region GetRemainingCardsInLesson
+        [HttpPost("GetRemainingCardsInLesson")]
+        public async Task<IActionResult> GetRemainingCardsInLessonAsync([FromBody] GetRemainingCardsInLessonRequest request)
+        {
+            CheckBodyParameter(request);
+            var user = await userManager.GetUserAsync(HttpContext.User);
+            var remainingCardsInLesson = await new GetRemainingCardsInLesson(callContext).RunAsync(new GetRemainingCardsInLesson.Request(user.Id, request.DeckId, request.LearnModeIsUnknown, request.ExcludedTagIds));
+            var result = new GetRemainingCardsInLessonResult(remainingCardsInLesson.Count);
+            return Ok(result);
+        }
+        #region Request and result classes
+        public sealed class GetRemainingCardsInLessonRequest
+        {
+            public Guid DeckId { get; set; }
+            public bool LearnModeIsUnknown { get; set; }
+            public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
+        }
+        public sealed class GetRemainingCardsInLessonResult
+        {
+            public GetRemainingCardsInLessonResult(int remainingCardsInLesson)
+            {
+                RemainingCardsInLesson = remainingCardsInLesson;
+            }
+            public int RemainingCardsInLesson { get; }
+        }
+        #endregion
+        #endregion
         #region UserDecks
         [HttpGet("UserDecks")]
         public async Task<IActionResult> UserDecks()

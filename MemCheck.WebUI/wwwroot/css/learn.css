@@ -89,6 +89,15 @@
     background-color: WhiteSmoke;
 }
 
+.lesson-info-div {
+    background-color: WhiteSmoke;
+}
+
+.lesson-mode-span {
+    font-weight: bold;
+    font-size: 150%;
+}
+
 .card-side-div {
     background-color: white;
 }
@@ -100,6 +109,11 @@
 
     .small-buttons-div {
         margin-bottom: 20px;
+    }
+
+    .lesson-info-div {
+        margin-bottom: 2px;
+        font-size: 14px;
     }
 
     .learning-card-footer {
@@ -116,6 +130,11 @@
         margin-bottom: 10px;
     }
 
+    .lesson-info-div {
+        margin-bottom: 4px;
+        font-size: 15px;
+    }
+
     .learning-card-footer {
         padding-top: 10px;
     }
@@ -128,6 +147,11 @@
 
     .small-buttons-div {
         margin-bottom: 30px;
+    }
+
+    .lesson-info-div {
+        margin-bottom: 6px;
+        font-size: 16px;
     }
 
     .learning-card-footer {

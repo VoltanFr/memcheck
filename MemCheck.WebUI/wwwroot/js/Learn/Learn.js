@@ -32,6 +32,7 @@ const learnApp = Vue.createApp({
             pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
             currentNotificationRegistrationPromise: null, //promise
             downloadedCards: [],    //LearnController.GetCardsCardViewModel
+            remainingCardsInLesson: 0,
             cardDownloadOperation: null,
             currentImageLoadingPromise: null,
             filteringDisplay: false,
@@ -171,6 +172,8 @@ const learnApp = Vue.createApp({
                         this.currentMovingCard = null;
                         if (this.timeToExitPage())
                             window.location.href = '/';
+                        else
+                            this.updateRemainingCardsInLesson();
                     })
                     .catch(error => {
                         this.additionalMoveDebugInfo = "Move failed, will retry in 1 sec (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
@@ -212,12 +215,9 @@ const learnApp = Vue.createApp({
                         for (let i = 0; i < result.data.cards.length; i++)
                             this.downloadedCards.push(result.data.cards[i]);
                         this.cardDownloadOperation = null;
+                        this.updateRemainingCardsInLesson();
                     })
                     .catch(error => {
-                        const sleep = (milliseconds) => {
-                            return new Promise(resolve => setTimeout(resolve, milliseconds))
-                        }
-
                         sleep(1000).then(() => {
                             this.cardDownloadOperation = null;
                         })
@@ -388,10 +388,6 @@ const learnApp = Vue.createApp({
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        const sleep = (milliseconds) => {
-                            return new Promise(resolve => setTimeout(resolve, milliseconds))
-                        }
-
                         sleep(1000).then(() => {
                             this.currentNotificationRegistrationPromise = null;
                             this.pendingNotificationRegistrations.push(operation);
@@ -410,6 +406,22 @@ const learnApp = Vue.createApp({
         },
         onRatingChange(newValue, oldValue) {
             this.enqueueRatingUpload(newValue);
+        },
+        updateRemainingCardsInLesson() {
+            if (this.activeDeck) {
+                const query = {
+                    deckId: this.activeDeck.deckId,
+                    learnModeIsUnknown: this.learningUnknowns,
+                    excludedTagIds: this.selectedExcludedTags.map(tag => tag.tagId),
+                };
+
+                axios.post('/Learn/GetRemainingCardsInLesson', query)
+                    .then(result => {
+                        this.remainingCardsInLesson = result.data.remainingCardsInLesson;
+                    })
+                    .catch(error => {
+                    });
+            }
         }
     },
     watch: {

@@ -120,6 +120,12 @@
   <data name="AdditionalInfo" xml:space="preserve">
     <value>Infos supplémentaires</value>
   </data>
+  <data name="AfterInQueueCountMoreThanOne" xml:space="preserve">
+    <value>cartes</value>
+  </data>
+  <data name="AfterInQueueCountOne" xml:space="preserve">
+    <value>carte</value>
+  </data>
   <data name="Average" xml:space="preserve">
     <value>Moyenne</value>
   </data>
@@ -128,6 +134,9 @@
   </data>
   <data name="BackToHomePage" xml:space="preserve">
     <value>Retour à l'accueil</value>
+  </data>
+  <data name="BeforeInQueueCount" xml:space="preserve">
+    <value>encore </value>
   </data>
   <data name="BiggestHeapReached" xml:space="preserve">
     <value>Tas maxi atteint dans ce paquet :</value>
@@ -217,6 +226,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="Learn" xml:space="preserve">
     <value>apprendre</value>
   </data>
+  <data name="Learning" xml:space="preserve">
+    <value>Apprentissage</value>
+  </data>
   <data name="MoveToHeap" xml:space="preserve">
     <value>Changer de tas</value>
   </data>
@@ -246,6 +258,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   </data>
   <data name="RegisteredForNotif" xml:space="preserve">
     <value>Alertes actives (cliquez pour désactiver)</value>
+  </data>
+  <data name="Rehearsing" xml:space="preserve">
+    <value>Révision</value>
   </data>
   <data name="RemoveFromDeck" xml:space="preserve">
     <value>Enlever du paquet</value>

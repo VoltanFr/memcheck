@@ -57,7 +57,11 @@
                 </table>
             </div>
             <div id="The card" class="card learning-card" v-if="currentCard">
-                <div id="Small buttons" class="small-buttons-div" style="padding:1px">
+                <div id="Lesson info" class="lesson-info-div">
+                    <span class="lesson-mode-span"><span v-if="learningUnknowns">@Localizer["Learning"]</span><span v-else>@Localizer["Rehearsing"]</span></span>
+                    (@Localizer["BeforeInQueueCount"]{{remainingCardsInLesson}} <span v-if="remainingCardsInLesson > 1">@Localizer["AfterInQueueCountMoreThanOne"]</span><span v-else>@Localizer["AfterInQueueCountOne"]</span>)
+                </div>
+                <div id="Small buttons" class="small-buttons-div">
                     <ul class="small-buttons-ul">
                         <li id="Edit button" style="padding-right:5px">
                             <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></van-button>

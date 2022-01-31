@@ -4,6 +4,7 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,6 +55,16 @@ namespace MemCheck.Application.Tests.Helpers
             };
             dbContext.CardsInDecks.Add(cardForUser);
             await dbContext.SaveChangesAsync();
+        }
+        public static async Task AddNewCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null, IEnumerable<Guid>? tagIds = null)
+        {
+            Guid owner;
+            using (var dbContext = new MemCheckDbContext(testDB))
+                owner = (await dbContext.Decks.Include(d => d.Owner).SingleAsync(d => d.Id == deck)).Owner.Id;
+
+            var card = await CardHelper.CreateIdAsync(testDB, owner,tagIds: tagIds);
+
+            await AddCardAsync(testDB, deck, card, heap, lastLearnUtcTime, addToDeckUtcTime);
         }
         public static async Task AddNeverLearntCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, DateTime? addToDeckUtcTime = null)
         {
