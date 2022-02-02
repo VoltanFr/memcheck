@@ -250,7 +250,7 @@
 
 .memcheck-input-div {
     background-color: var(--input-area-background-color);
-    border-width: 1px;
+    border-width: 2px;
     border-style: solid;
     border-color: var(--input-area-border-color);
     padding: 1px;
@@ -399,11 +399,11 @@
     }
 
     .memcheck-input-div {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 
     .memcheck-bottom-button-div {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     }
 }
 
@@ -421,11 +421,11 @@
     }
 
     .memcheck-input-div {
-        margin-bottom: 30px;
+        margin-bottom: 50px;
     }
 
     .memcheck-bottom-button-div {
-        margin-bottom: 30px;
+        margin-bottom: 50px;
     }
 }
 

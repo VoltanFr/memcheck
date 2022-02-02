@@ -3,22 +3,22 @@
 @model IndexModel
 @inject IViewLocalizer Localizer
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/imagechoice.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/authoring.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/imagechoice.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/authoring.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
-    <script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
-    <script src="~/js/CardRating.js" asp-append-version="true"></script><script src="~/js/big-size-image.js" asp-append-version="true"></script>
-    <script src="~/js/ImageChoice.js" asp-append-version="true"></script>
-    <script src="~/js/TagButton.js" asp-append-version="true"></script>
-    <script type="module" src="~/js/Authoring/Authoring.js" asp-append-version="true"></script>
+<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+<script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script><script src="~/js/big-size-image.js" asp-append-version="true"></script>
+<script src="~/js/ImageChoice.js" asp-append-version="true"></script>
+<script src="~/js/TagButton.js" asp-append-version="true"></script>
+<script type="module" src="~/js/Authoring/Authoring.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -77,109 +77,82 @@
                 </h1>
             </div>
             <div id="The card" class="authoring-card-div">
-                <table class="table-responsive authoring-table">
-                    <tbody class="authoring-table-body">
-                        <tr id="FrontSideRow" class="memcheck-input-div">
-                            <td class="authoring-td">
-                                <div id="FrontSideRowMarkdownEditor">
-                                    <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" />
-                                </div>
-                                <div id="FrontSideRowImageDiv">
-                                    <image-choice v-on:add="addFrontImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
-                                    <div id="FrontImagesDisplay" class="authoring-image-show" v-for="image in frontSideImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row"></tr>
-                        <tr id="BackSideRow" class="memcheck-input-div">
-                            <td class="authoring-td">
-                                <div id="BackSideRowMarkdownEditor">
-                                    <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" />
-                                </div>
-                                <div id="BackSideRowImageDiv">
-                                    <image-choice v-on:add="addBackImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
-                                    <div id="BackImagesDisplay" class="authoring-image-show" v-for="image in backSideImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row"></tr>
-                        <tr id="AdditionalInfoRow" class="memcheck-input-div" v-if="showAdditionalInfo">
-                            <td class="authoring-td">
-                                <div id="AdditionalSideRowMarkdownEditor">
-                                    <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" />
-                                </div>
-                                <div id="AdditionalSideRowImageDiv">
-                                    <image-choice v-on:add="addAdditionalImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
-                                    <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
-                                        <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row" v-if="showAdditionalInfo"></tr>
-                        <tr id="LanguageInputRow" class="collapse memcheck-input-div TogglableAdditionalInfo">
-                            <td class="authoring-td">
-                                <p class="authoring-row-caption">@Localizer["Language"]</p>
-                                <select v-model="card.languageId" class="authoring-select">
-                                    <option v-for="language in allAvailableLanguages" v-bind:value="language.id">{{language.name}}</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row TogglableAdditionalInfo"></tr>
-                        <tr id="TagsInputRow" class="memcheck-input-div">
-                            <td class="authoring-td">
-                                <p class="authoring-row-caption">@Localizer["Tags"]</p>
-                                <div style="flex-flow:row wrap; width:100%">
-                                    <select v-model="selectedTagToAdd" class="authoring-select">
-                                        <option v-for="tag in allAvailableTags" v-bind:value="tag">{{tag.tagName}}</option>
-                                    </select>
-                                    <tag-button v-for="(tag,index) in card.tags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeTag"></tag-button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row"></tr>
-                        <tr id="VisibilityInputRow" class="collapse memcheck-input-div TogglableVisibility show">
-                            <td class="authoring-td">
-                                <p class="authoring-row-caption">@Localizer["Users"]</p>
-                                <div style="flex-flow:row wrap; width:100%">
-                                    <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
-                                    <div id="Public" v-if="card.usersWithView.length == 0">
-                                        <tag-button additionalbuttonclass="warning" name='@Localizer["Public"]' id="notused" v-on:click="makePrivate"></tag-button>
-                                    </div>
-                                    <div id="Private" v-if="card.usersWithView.length == 1">
-                                        <tag-button v-bind:name="card.usersWithView[0].userName" v-bind:id="card.usersWithView[0].userId" v-on:click="removeUser"></tag-button>
-                                    </div>
-                                    <div id="Restricted" v-if="card.usersWithView.length > 1">
-                                        <span v-for="user in card.usersWithView">
-                                            <tag-button v-if="user.userId == currentUser.userId" v-bind:name="user.userName"></tag-button>
-                                            <tag-button v-if="user.userId !== currentUser.userId" v-bind:name="user.userName" v-bind:id="user.userId" v-on:click="removeUser"></tag-button>
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row TogglableVisibility show"></tr>
-                        <tr id="VersionDescriptionInputRow" class="memcheck-input-div" v-if="!creatingNewCard">
-                            <td class="authoring-td">
-                                <p class="authoring-row-caption">@Localizer["VersionDescription"]</p>
-                                <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
-                            </td>
-                        </tr>
-                        <tr class="card-authoring-blank-row" v-if="!creatingNewCard"></tr>
-                        <tr id="AddToDeckInputRow" v-if="creatingNewCard" class="memcheck-input-div">
-                            <td class="authoring-td">
-                                <p class="authoring-row-caption">@Localizer["AddToDeck"]</p>
-                                <div style="flex-flow:row wrap; width:100%">
-                                    <select v-model="addToDeck" class="authoring-select"><option v-for="deck in decksOfUser" v-bind:value="deck">{{deck.deckName}}</option></select>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="FrontSideRow" class="memcheck-input-div">
+                    <div id="FrontSideRowMarkdownEditor">
+                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" />
+                    </div>
+                    <div id="FrontSideRowImageDiv">
+                        <image-choice v-on:add="addFrontImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
+                        <div id="FrontImagesDisplay" class="authoring-image-show" v-for="image in frontSideImageList">
+                            <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="BackSideRow" class="memcheck-input-div">
+                    <div id="BackSideRowMarkdownEditor">
+                        <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" />
+                    </div>
+                    <div id="BackSideRowImageDiv">
+                        <image-choice v-on:add="addBackImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
+                        <div id="BackImagesDisplay" class="authoring-image-show" v-for="image in backSideImageList">
+                            <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="AdditionalInfoRow" class="memcheck-input-div" v-if="showAdditionalInfo">
+                    <div id="AdditionalSideRowMarkdownEditor">
+                        <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" />
+                    </div>
+                    <div id="AdditionalSideRowImageDiv">
+                        <image-choice v-on:add="addAdditionalImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
+                        <div id="AdditionalInfoImagesDisplay" class="authoring-image-show" v-for="image in additionalInfoImageList">
+                            <a href="#" @@click="showImageFull(image)"><img class="imageincard" :src="image.blob" /></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="LanguageInputRow" class="collapse memcheck-input-div TogglableAdditionalInfo">
+                    <p class="authoring-row-caption">@Localizer["Language"]</p>
+                    <select v-model="card.languageId" class="authoring-select">
+                        <option v-for="language in allAvailableLanguages" v-bind:value="language.id">{{language.name}}</option>
+                    </select>
+                </div>
+                <div id="TagsInputRow" class="memcheck-input-div">
+                    <p class="authoring-row-caption">@Localizer["Tags"]</p>
+                    <div style="flex-flow:row wrap; width:100%">
+                        <select v-model="selectedTagToAdd" class="authoring-select">
+                            <option v-for="tag in allAvailableTags" v-bind:value="tag">{{tag.tagName}}</option>
+                        </select>
+                        <tag-button v-for="(tag,index) in card.tags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeTag"></tag-button>
+                    </div>
+                </div>
+                <div id="VisibilityInputRow" class="collapse memcheck-input-div TogglableVisibility show">
+                    <p class="authoring-row-caption">@Localizer["Users"]</p>
+                    <div style="flex-flow:row wrap; width:100%">
+                        <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
+                        <div id="Public" v-if="card.usersWithView.length == 0">
+                            <tag-button additionalbuttonclass="warning" name='@Localizer["Public"]' id="notused" v-on:click="makePrivate"></tag-button>
+                        </div>
+                        <div id="Private" v-if="card.usersWithView.length == 1">
+                            <tag-button v-bind:name="card.usersWithView[0].userName" v-bind:id="card.usersWithView[0].userId" v-on:click="removeUser"></tag-button>
+                        </div>
+                        <div id="Restricted" v-if="card.usersWithView.length > 1">
+                            <span v-for="user in card.usersWithView">
+                                <tag-button v-if="user.userId == currentUser.userId" v-bind:name="user.userName"></tag-button>
+                                <tag-button v-if="user.userId !== currentUser.userId" v-bind:name="user.userName" v-bind:id="user.userId" v-on:click="removeUser"></tag-button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="VersionDescriptionInputRow" class="memcheck-input-div" v-if="!creatingNewCard">
+                    <p class="authoring-row-caption">@Localizer["VersionDescription"]</p>
+                    <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
+                </div>
+                <div id="AddToDeckInputRow" v-if="creatingNewCard" class="memcheck-input-div">
+                    <p class="authoring-row-caption">@Localizer["AddToDeck"]</p>
+                    <div style="flex-flow:row wrap; width:100%">
+                        <select v-model="addToDeck" class="authoring-select"><option v-for="deck in decksOfUser" v-bind:value="deck">{{deck.deckName}}</option></select>
+                    </div>
+                </div>
             </div>
             <button id="Send card button" class="btn-success btn-lg authoring-send-button" @@click="sendCard">
                 <span v-if="creatingNewCard">@Localizer["Add"]</span>

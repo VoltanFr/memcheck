@@ -3,29 +3,10 @@
     margin-bottom: 0px;
 }
 
-.authoring-table {
-    display: table;
-    width: 100%;
-}
-
-.authoring-table-body {
-    display: table;
-    width: 100%;
-}
-
 .authoring-row-caption {
     font-weight: bold;
     padding: 0px;
     margin: 0px;
-}
-
-.authoring-td {
-    display: table-cell;
-}
-
-.card-authoring-blank-row {
-    display: table-row;
-    height: 5px;
 }
 
 .authoring-select {
