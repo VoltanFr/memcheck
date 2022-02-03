@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29905.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8FEE693-1245-42F1-B44F-0A752165B612}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,9 +22,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.ApplicationTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.DatabaseTests", "MemCheck.DatabaseTests\MemCheck.DatabaseTests.csproj", "{A940A7E4-AF77-4B08-ADC2-AB314E6D3F91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemCheck.Basics", "MemCheck.Basics\MemCheck.Basics.csproj", "{E3DA29AA-F257-44A3-B77E-AFF63730D50E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.Basics", "MemCheck.Basics\MemCheck.Basics.csproj", "{E3DA29AA-F257-44A3-B77E-AFF63730D50E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemCheck.BasicsTests", "MemCheck.BasicsTests\MemCheck.BasicsTests.csproj", "{B9C2613B-2CB9-42B5-870F-6E68CEC480EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.BasicsTests", "MemCheck.BasicsTests\MemCheck.BasicsTests.csproj", "{B9C2613B-2CB9-42B5-870F-6E68CEC480EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemCheck.Notifier.AzureFunc", "MemCheck.Notifier.AzureFunc\MemCheck.Notifier.AzureFunc.csproj", "{D577FD06-4EEB-480F-AD21-A7DCF58AD459}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{B9C2613B-2CB9-42B5-870F-6E68CEC480EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9C2613B-2CB9-42B5-870F-6E68CEC480EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9C2613B-2CB9-42B5-870F-6E68CEC480EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D577FD06-4EEB-480F-AD21-A7DCF58AD459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D577FD06-4EEB-480F-AD21-A7DCF58AD459}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D577FD06-4EEB-480F-AD21-A7DCF58AD459}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D577FD06-4EEB-480F-AD21-A7DCF58AD459}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

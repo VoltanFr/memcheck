@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "storage1": {
+      "restored": true,
+      "restoreTime": "2022-02-02T18:27:49.3399476Z"
+    },
+    "appInsights1": {
+      "restored": true,
+      "restoreTime": "2022-02-02T18:27:48.6879433Z"
+    }
+  },
+  "parameters": {
+    "storage1.resourceGroupName": {
+      "Name": "storage1.resourceGroupName",
+      "Type": "resourceGroup",
+      "Value": "MemCheck"
+    },
+    "storage1.subscriptionId": {
+      "Name": "storage1.subscriptionId",
+      "Type": "subscription",
+      "Value": "ThisIsSecret"
+    }
+  }
+}

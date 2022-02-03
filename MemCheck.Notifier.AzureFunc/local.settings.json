@@ -1,0 +1,7 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "ThisIsSecret",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+    }
+}
