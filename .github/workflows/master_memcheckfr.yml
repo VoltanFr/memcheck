@@ -14,7 +14,7 @@ jobs:
     env:
       NETCORE_VERSION: "6.0"
       COMPIL_CONFIG: "Release"
-      PUBLISH_FOLDER_PATH: "./Published"
+      WEBUI_PUBLISH_FOLDER: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
       AZURE_FUNCTION_NAME: "memcheck-notifier"
 
@@ -62,29 +62,29 @@ jobs:
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
-    - name: "Publish: prepare the projects for deployment"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER_PATH}} --no-self-contained MemCheck.WebUI
+    - name: "Publish: prepare the project WebUI for deployment"
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.WEBUI_PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
 
-    - name: "Telling size of publish folder"
-      run: du -sh ${{env.PUBLISH_FOLDER_PATH}}
+    - name: "Telling size of WebUI publish folder"
+      run: du -sh ${{env.WEBUI_PUBLISH_FOLDER}}
 
     # - name: Upload published version as Artifact
     #   uses: actions/upload-artifact@v2
     #   with:
     #     name: MemCheck
-    #     path: ${{env.PUBLISH_FOLDER_PATH}}
+    #     path: ${{env.WEBUI_PUBLISH_FOLDER}}
 
-    - name: "Deploy to MemCheck Azure Web App"
+    - name: "Deploy WebUI to MemCheck Azure Web App"
       uses: azure/webapps-deploy@v2.2.3
       with:
         app-name: '${{env.AZURE_WEBAPP_NAME}}'
         slot-name: 'production'
         publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
-        package: ${{env.PUBLISH_FOLDER_PATH}}
+        package: ${{env.WEBUI_PUBLISH_FOLDER}}
 
     # - name: "Deploy to MemCheck Azure function"
     #   uses: azure/functions-action@v1.1.6
     #   with:
     #     app-name: '${{env.AZURE_FUNCTION_NAME}}'
     #     publish-profile: ${{secrets.MEMCHECK_AZFUNC_NOTIFIER_PUBLISH_PROFILE}}
-    #     package: ${{env.PUBLISH_FOLDER_PATH}}
+    #     package: ${{env.WEBUI_PUBLISH_FOLDER}}
