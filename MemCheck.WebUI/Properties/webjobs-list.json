@@ -2,7 +2,6 @@
   "$schema": "http://schemastore.org/schemas/json/webjobs-list.json",
   "WebJobs": [
     {
-      "filePath": "../MemCheck.NotifierWebjob/MemCheck.NotifierWebjob.csproj"
     }
   ]
 }
