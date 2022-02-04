@@ -49,7 +49,13 @@ namespace MemCheck.Notifier.AzureFunc
             var sendGridSender = config["SendGridSender"];
             var sendGridUser = config["SendGridUser"];
 
-            log.LogInformation($"SendGridKey is {(sendGridKey == "ThisIsSecret" ? "NOT " : "")} set");
+            if (sendGridKey == "ThisIsSecret")
+                log.LogInformation("SendGridKey is not set");
+            else
+            if (sendGridKey == null)
+                log.LogInformation("SendGridKey is null");
+            else
+                log.LogInformation("SendGridKey is set");
 
             var sendgridClient = new SendGridClient(sendGridKey);
             var senderEmail = new EmailAddress(sendGridSender, sendGridUser);
