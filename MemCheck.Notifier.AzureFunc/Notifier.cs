@@ -10,6 +10,10 @@ using Microsoft.Extensions.Logging;
 using System.Reflection;
 using MemCheck.Basics;
 using System.Linq;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MemCheck.Notifier.AzureFunc
 {
@@ -23,47 +27,48 @@ namespace MemCheck.Notifier.AzureFunc
             telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
         [FunctionName(nameof(Notifier))]
-        public void Run([TimerTrigger("0 */1 * * * *", RunOnStartup = true)] TimerInfo myTimer, ExecutionContext context, ILogger log)
+        public async Task Run([TimerTrigger("0 */1 * * * *", RunOnStartup = true)] TimerInfo myTimer, ExecutionContext context, ILogger log)
         {
-            log.LogInformation($"{nameof(Notifier)} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
-            log.LogInformation($"Entry assembly: {AssemblyServices.GetDisplayInfoForAssembly(Assembly.GetEntryAssembly())}");
+            telemetryClient.TrackEvent($"{nameof(Notifier)} Azure func start");
+
+            var mailLines = new List<string>();
+
+            mailLines.Add($"{nameof(Notifier)} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
+            mailLines.Add($"Entry assembly: {AssemblyServices.GetDisplayInfoForAssembly(Assembly.GetEntryAssembly())}");
             var memCheckAssemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName!.StartsWith("MemCheck"));
             var memCheckAssemblyDescriptions = memCheckAssemblies.Select(a => AssemblyServices.GetDisplayInfoForAssembly(a)).OrderBy(a => a);
             foreach (string asm in memCheckAssemblyDescriptions)
-                log.LogInformation($"Assembly: {asm}");
+                mailLines.Add($"Assembly: {asm}");
 
-            telemetryClient.TrackEvent($"{nameof(Notifier)} Azure func");
+            foreach (string mailLine in mailLines)
+                log.LogInformation(mailLine);
+
+            var config = new ConfigurationBuilder().SetBasePath(context.FunctionAppDirectory).AddEnvironmentVariables().Build();
+
+            var sendGridKey = config["SendGridKey"];
+            var sendGridSender = config["SendGridSender"];
+            var sendGridUser = config["SendGridUser"];
+
+            log.LogInformation($"SendGridKey is {(sendGridKey == "ThisIsSecret" ? "NOT " : "")} set");
+
+            var sendgridClient = new SendGridClient(sendGridKey);
+            var senderEmail = new EmailAddress(sendGridSender, sendGridUser);
+            var msg = new SendGridMessage()
+            {
+                From = senderEmail,
+                Subject = $"Mail sent from {nameof(Notifier)} Azure func",
+                HtmlContent = string.Join("<br/>", mailLines)
+            };
+            msg.AddTo(new EmailAddress("VoltanFr@gmail.com"));
+            msg.AddBcc(new EmailAddress(sendGridSender));
+            msg.SetClickTracking(false, false);
+
+            var response = await sendgridClient.SendEmailAsync(msg);
+
+            log.LogInformation($"Mail sent, status code {response.StatusCode}");
+            log.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
 
             log.LogInformation($"Function '{nameof(Notifier)}' ending, {DateTime.Now}");
         }
     }
 }
-
-
-
-//            var config = new ConfigurationBuilder().SetBasePath(context.FunctionAppDirectory).AddEnvironmentVariables().Build();
-
-//            string sendGridKey = config["SendGridKey"];
-//            string sendGridSender = config["SendGridSender"];
-//            string sendGridUser = config["SendGridUser"];
-
-//            var client = new SendGridClient(sendGridKey);
-//            var senderEmail = new EmailAddress(sendGridSender, sendGridUser);
-//            var msg = new SendGridMessage()
-//            {
-//                From = senderEmail,
-//                Subject = "Mail sent from Azure function",
-//                HtmlContent = $"Time here: {DateTime.Now}, running on machine '{Environment.MachineName}', assembly: {executingAssemblyName}"
-//            };
-//            msg.AddTo(new EmailAddress("VoltanFr@gmail.com"));
-//            msg.AddBcc(new EmailAddress(sendGridSender));
-//            msg.SetClickTracking(false, false);
-
-//            var response = await client.SendEmailAsync(msg);
-
-//            log.LogInformation($"Mail sent, status code {response.StatusCode}");
-//            log.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
-
-//        }
-//    }
-//}
