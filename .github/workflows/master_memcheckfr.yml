@@ -16,8 +16,9 @@ jobs:
       COMPIL_CONFIG: "Release"
       WEBUI_PUBLISH_FOLDER: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
-      NOTIFIER_AZURE_FUNCTION_PUBLISH_FOLDER: "./NotifierAzureFuncPublished"
-      NOTIFIER_AZURE_FUNCTION_NAME: "memcheck-notifier-azurefunc"
+      AZURE_FUNCTIONS_PUBLISH_FOLDER: "./AzFuncPublished"
+      AZURE_FUNCTIONS_NAME_IN_AZURE: "MemCheckAzureFunctions"
+      AZURE_FUNCTIONS_PROJECT_NAME: "MemCheck.AzureFunctions"
 
     steps:
     - uses: actions/checkout@v2.4.0
@@ -69,11 +70,11 @@ jobs:
     - name: "Telling size of WebUI publish folder"
       run: du -sh ${{env.WEBUI_PUBLISH_FOLDER}}
 
-    - name: "Publish: prepare the project MemCheck.Notifier.AzureFunc for deployment"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.NOTIFIER_AZURE_FUNCTION_PUBLISH_FOLDER}} --no-self-contained MemCheck.Notifier.AzureFunc
+    - name: "Publish: prepare the project ${{env.AZURE_FUNCTIONS_PROJECT_NAME}} for deployment"
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.AZURE_FUNCTIONS_PUBLISH_FOLDER}} --no-self-contained ${{env.AZURE_FUNCTIONS_PROJECT_NAME}}
 
-    - name: "Telling size of MemCheck.Notifier.AzureFunc publish folder"
-      run: du -sh ${{env.NOTIFIER_AZURE_FUNCTION_PUBLISH_FOLDER}}
+    - name: "Telling size of ${{env.AZURE_FUNCTIONS_PROJECT_NAME}} publish folder"
+      run: du -sh ${{env.AZURE_FUNCTIONS_PUBLISH_FOLDER}}
 
     # - name: Upload published version as Artifact
     #   uses: actions/upload-artifact@v2
@@ -89,9 +90,9 @@ jobs:
         publish-profile: ${{secrets.MEMCHECK_PUBLISH_PROFILE}}
         package: ${{env.WEBUI_PUBLISH_FOLDER}}
 
-    - name: "Deploy to MemCheck.Notifier.AzureFunc Azure function"
+    - name: "Deploy to ${{env.AZURE_FUNCTIONS_NAME_IN_AZURE}} Azure function"
       uses: azure/functions-action@v1.4.4
       with:
-        app-name: '${{env.NOTIFIER_AZURE_FUNCTION_NAME}}'
-        publish-profile: ${{secrets.MEMCHECK_NOTIFIER_AZUREFUNC_PUBLISH_PROFILE}}
-        package: ${{env.NOTIFIER_AZURE_FUNCTION_PUBLISH_FOLDER}}
+        app-name: '${{env.AZURE_FUNCTIONS_NAME_IN_AZURE}}'
+        publish-profile: ${{secrets.MEMCHECK_AZUREFUNC_PUBLISH_PROFILE}}
+        package: ${{env.AZURE_FUNCTIONS_PUBLISH_FOLDER}}

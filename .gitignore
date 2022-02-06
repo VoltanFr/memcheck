@@ -23,5 +23,8 @@
 /MemCheck.Basics/bin/
 /MemCheck.BasicsTests/bin/
 /MemCheck.BasicsTests/obj/
+/MemCheck.AzureFunctions/bin/
+/MemCheck.AzureFunctions/obj/
+/MemCheck.AzureFunctions/local.settings.json
 /MemCheck.Notifier.AzureFunc/bin/
 /MemCheck.Notifier.AzureFunc/obj/
