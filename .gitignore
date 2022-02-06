@@ -15,8 +15,6 @@
 /.vs/
 /MemCheck.NotifierWebjob/bin/
 /MemCheck.NotifierWebjob/obj/
-/MemCheck.AzFunc.Notifier/bin/
-/MemCheck.AzFunc.Notifier/obj/
 /MemCheck.DatabaseTests/obj/
 /MemCheck.DatabaseTests/bin/
 /MemCheck.Basics/obj/
@@ -26,5 +24,3 @@
 /MemCheck.AzureFunctions/bin/
 /MemCheck.AzureFunctions/obj/
 /MemCheck.AzureFunctions/local.settings.json
-/MemCheck.Notifier.AzureFunc/bin/
-/MemCheck.Notifier.AzureFunc/obj/
