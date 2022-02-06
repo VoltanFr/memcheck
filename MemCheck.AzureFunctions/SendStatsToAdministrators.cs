@@ -79,9 +79,9 @@ public class SendStatsToAdministrators
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger("1 0 * * *"
         #if DEBUG
-        , RunOnStartup = true)
+        , RunOnStartup = true
         #endif
-        ] TimerInfo myTimer, ExecutionContext context, ILogger log)
+        )] TimerInfo myTimer, ExecutionContext context, ILogger log)
     {
         telemetryClient.TrackEvent($"{FunctionName} Azure func start");
         log.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
