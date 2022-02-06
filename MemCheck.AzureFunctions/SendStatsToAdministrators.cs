@@ -77,7 +77,11 @@ public class SendStatsToAdministrators
         startTime = DateTime.UtcNow;
     }
     [FunctionName(FunctionName)]
-    public async Task Run([TimerTrigger("1 0 * * *", RunOnStartup = true)] TimerInfo myTimer, ExecutionContext context, ILogger log)
+    public async Task Run([TimerTrigger("1 0 * * *"
+        #if DEBUG
+        , RunOnStartup = true)
+        #endif
+        ] TimerInfo myTimer, ExecutionContext context, ILogger log)
     {
         telemetryClient.TrackEvent($"{FunctionName} Azure func start");
         log.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
@@ -85,7 +89,7 @@ public class SendStatsToAdministrators
         var mailSender = GetSenderEmail();
         var admins = await GetAdminsAsync();
         var allUsers = await GetAllUsersAsync();
-        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime, admins, allUsers). GetMailBody();
+        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime, admins, allUsers).GetMailBody();
 
         var msg = new SendGridMessage()
         {
