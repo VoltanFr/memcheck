@@ -77,7 +77,7 @@ public class SendStatsToAdministrators
         startTime = DateTime.UtcNow;
     }
     [FunctionName(FunctionName)]
-    public async Task Run([TimerTrigger("1 0 * * *"
+    public async Task Run([TimerTrigger("*/5 * * * *"
         #if DEBUG
         , RunOnStartup = true
         #endif
