@@ -22,7 +22,7 @@ public class SendStatsToAdministrators
 {
     #region Fields
     private const string FunctionName = nameof(SendStatsToAdministrators);
-    private readonly TelemetryClient telemetryClient;
+    //private readonly TelemetryClient telemetryClient;
     //private readonly MemCheckDbContext memCheckDbContext;
     //private readonly MemCheckUserManager userManager;
     //private readonly IRoleChecker roleChecker;
@@ -69,7 +69,7 @@ public class SendStatsToAdministrators
     #endregion
     public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration)//, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
     {
-        telemetryClient = new TelemetryClient(telemetryConfiguration);
+        //telemetryClient = new TelemetryClient(telemetryConfiguration);
         //this.memCheckDbContext = memCheckDbContext;
         //this.userManager = userManager;
         //roleChecker = new ProdRoleChecker(userManager); ;
@@ -83,7 +83,7 @@ public class SendStatsToAdministrators
         #endif
         )] TimerInfo myTimer, ExecutionContext context, ILogger log)
     {
-        telemetryClient.TrackEvent($"{FunctionName} Azure func start");
+        //telemetryClient.TrackEvent($"{FunctionName} Azure func start");
         log.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
 
         var mailSender = GetSenderEmail();
