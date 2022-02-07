@@ -23,9 +23,9 @@ public class SendStatsToAdministrators
     #region Fields
     private const string FunctionName = nameof(SendStatsToAdministrators);
     private readonly TelemetryClient telemetryClient;
-    private readonly MemCheckDbContext memCheckDbContext;
-    private readonly MemCheckUserManager userManager;
-    private readonly IRoleChecker roleChecker;
+    //private readonly MemCheckDbContext memCheckDbContext;
+    //private readonly MemCheckUserManager userManager;
+    //private readonly IRoleChecker roleChecker;
     private readonly Guid runningUserId;
     private readonly DateTime startTime;
     #endregion
@@ -42,37 +42,37 @@ public class SendStatsToAdministrators
         return new EmailAddress(sendGridSender, sendGridUser);
 
     }
-    private async Task<ImmutableList<GetAdminEmailAddesses.ResultUserModel>> GetAdminsAsync()
-    {
-        var getter = new GetAdminEmailAddesses(new Application.CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker));
-        var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(runningUserId));
-        return getterResult.Users.ToImmutableList();
-    }
-    private async Task<ImmutableList<GetAllUsers.ResultUserModel>> GetAllUsersAsync()
-    {
-        var getter = new GetAllUsers(new Application.CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker));
-        var page = 1;
-        var result = new List<GetAllUsers.ResultUserModel>();
-        while (true)
-        {
-            var getterResult = await getter.RunAsync(new GetAllUsers.Request(runningUserId, 2, page, ""));
-            if (getterResult.Users.Any())
-            {
-                result.AddRange(getterResult.Users);
-                page++;
-            }
-            else
-                break;
-        }
-        return result.ToImmutableList();
-    }
+    //private async Task<ImmutableList<GetAdminEmailAddesses.ResultUserModel>> GetAdminsAsync()
+    //{
+    //    var getter = new GetAdminEmailAddesses(new Application.CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker));
+    //    var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(runningUserId));
+    //    return getterResult.Users.ToImmutableList();
+    //}
+    //private async Task<ImmutableList<GetAllUsers.ResultUserModel>> GetAllUsersAsync()
+    //{
+    //    var getter = new GetAllUsers(new Application.CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker));
+    //    var page = 1;
+    //    var result = new List<GetAllUsers.ResultUserModel>();
+    //    while (true)
+    //    {
+    //        var getterResult = await getter.RunAsync(new GetAllUsers.Request(runningUserId, 2, page, ""));
+    //        if (getterResult.Users.Any())
+    //        {
+    //            result.AddRange(getterResult.Users);
+    //            page++;
+    //        }
+    //        else
+    //            break;
+    //    }
+    //    return result.ToImmutableList();
+    //}
     #endregion
-    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
+    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration)//, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
     {
         telemetryClient = new TelemetryClient(telemetryConfiguration);
-        this.memCheckDbContext = memCheckDbContext;
-        this.userManager = userManager;
-        roleChecker = new ProdRoleChecker(userManager); ;
+        //this.memCheckDbContext = memCheckDbContext;
+        //this.userManager = userManager;
+        //roleChecker = new ProdRoleChecker(userManager); ;
         runningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
         startTime = DateTime.UtcNow;
     }
@@ -87,9 +87,9 @@ public class SendStatsToAdministrators
         log.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
 
         var mailSender = GetSenderEmail();
-        var admins = await GetAdminsAsync();
-        var allUsers = await GetAllUsersAsync();
-        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime, admins, allUsers).GetMailBody();
+        //var admins = await GetAdminsAsync();
+        //var allUsers = await GetAllUsersAsync();
+        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime/*, admins, allUsers*/).GetMailBody();
 
         var msg = new SendGridMessage()
         {
@@ -98,7 +98,7 @@ public class SendStatsToAdministrators
             HtmlContent = mailBody
         };
 
-        admins.ForEach(e => msg.AddTo(e.Email, e.Name));
+        //admins.ForEach(e => msg.AddTo(e.Email, e.Name));
         msg.AddBcc(mailSender);
         msg.SetClickTracking(false, false);
 
