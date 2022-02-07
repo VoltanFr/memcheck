@@ -99,6 +99,7 @@ public class SendStatsToAdministrators
         };
 
         //admins.ForEach(e => msg.AddTo(e.Email, e.Name));
+        msg.AddTo("mahonv@gmail.com");
         msg.AddBcc(mailSender);
         msg.SetClickTracking(false, false);
 
