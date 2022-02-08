@@ -22,10 +22,10 @@ public class SendStatsToAdministrators
 {
     #region Fields
     private const string FunctionName = nameof(SendStatsToAdministrators);
-    //private readonly TelemetryClient telemetryClient;
-    //private readonly MemCheckDbContext memCheckDbContext;
-    //private readonly MemCheckUserManager userManager;
-    //private readonly IRoleChecker roleChecker;
+    private readonly TelemetryClient telemetryClient;
+    private readonly MemCheckDbContext memCheckDbContext;
+    private readonly MemCheckUserManager userManager;
+    private readonly IRoleChecker roleChecker;
     private readonly Guid runningUserId;
     private readonly DateTime startTime;
     #endregion
@@ -69,10 +69,10 @@ public class SendStatsToAdministrators
     #endregion
     public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
     {
-        //telemetryClient = new TelemetryClient(telemetryConfiguration);
-        //this.memCheckDbContext = memCheckDbContext;
-        //this.userManager = userManager;
-        //roleChecker = new ProdRoleChecker(userManager); ;
+        telemetryClient = new TelemetryClient(telemetryConfiguration);
+        this.memCheckDbContext = memCheckDbContext;
+        this.userManager = userManager;
+        roleChecker = new ProdRoleChecker(userManager); ;
         runningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
         startTime = DateTime.UtcNow;
     }
