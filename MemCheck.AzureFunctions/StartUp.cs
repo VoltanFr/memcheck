@@ -15,13 +15,13 @@ public class Startup : FunctionsStartup
     {
         builder.Services.AddDbContext<MemCheckDbContext>(options => SqlServerDbContextOptionsExtensions.UseSqlServer(options, Environment.GetEnvironmentVariable("MemCheckDbConnectionString")));
 
-        //builder.Services.AddIdentity<MemCheckUser, MemCheckUserRole>(
-        //    options =>
-        //        {
-        //            options.SignIn.RequireConfirmedAccount = true;
-        //            options.User.RequireUniqueEmail = false;
-        //        })
-        //    .AddEntityFrameworkStores<MemCheckDbContext>()
-        //    .AddUserManager<MemCheckUserManager>();
+        builder.Services.AddIdentity<MemCheckUser, MemCheckUserRole>(
+            options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = true;
+                    options.User.RequireUniqueEmail = false;
+                })
+            .AddEntityFrameworkStores<MemCheckDbContext>()
+            .AddUserManager<MemCheckUserManager>();
     }
 }
