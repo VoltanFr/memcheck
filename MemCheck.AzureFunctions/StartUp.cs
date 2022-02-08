@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-[assembly: FunctionsStartup(typeof(MemCheck.AzureFunctions.StartUp))]
+[assembly: FunctionsStartup(typeof(MemCheck.AzureFunctions.Startup))]
 
 namespace MemCheck.AzureFunctions;
-public class StartUp : FunctionsStartup
+public class Startup : FunctionsStartup
 {
     public override void Configure(IFunctionsHostBuilder builder)
     {
-        //builder.Services.AddDbContext<MemCheckDbContext>(options => SqlServerDbContextOptionsExtensions.UseSqlServer(options, Environment.GetEnvironmentVariable("MemCheckDbConnectionString")));
+        builder.Services.AddDbContext<MemCheckDbContext>(options => SqlServerDbContextOptionsExtensions.UseSqlServer(options, Environment.GetEnvironmentVariable("MemCheckDbConnectionString")));
 
         //builder.Services.AddIdentity<MemCheckUser, MemCheckUserRole>(
         //    options =>
