@@ -67,7 +67,7 @@ public class SendStatsToAdministrators
     //    return result.ToImmutableList();
     //}
     #endregion
-    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration)//, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
+    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
     {
         //telemetryClient = new TelemetryClient(telemetryConfiguration);
         //this.memCheckDbContext = memCheckDbContext;
