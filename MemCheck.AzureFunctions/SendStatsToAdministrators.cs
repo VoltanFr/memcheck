@@ -77,7 +77,7 @@ public class SendStatsToAdministrators
         startTime = DateTime.UtcNow;
     }
     [FunctionName(FunctionName)]
-    public async Task Run([TimerTrigger("*/5 * * * *"
+    public async Task Run([TimerTrigger("0 0 * * *"
         #if DEBUG
         , RunOnStartup = true
         #endif
@@ -89,7 +89,7 @@ public class SendStatsToAdministrators
         var mailSender = GetSenderEmail();
         var admins = await GetAdminsAsync();
         var allUsers = await GetAllUsersAsync();
-        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime/*, admins, allUsers*/).GetMailBody();
+        var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime, admins, allUsers).GetMailBody();
 
         var msg = new SendGridMessage()
         {

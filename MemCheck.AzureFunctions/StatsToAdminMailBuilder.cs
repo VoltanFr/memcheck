@@ -13,8 +13,8 @@ public sealed class StatsToAdminMailBuilder
     #region Fields
     private readonly string azureFunctionName;
     private readonly DateTime azureFunctionStartTime;
-    //private readonly ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins;
-    //private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
+    private readonly ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins;
+    private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
     #endregion
     #region Private methods
     private string GetUsersPart()
@@ -24,8 +24,8 @@ public sealed class StatsToAdminMailBuilder
         writer.Append("<thead><tr><th>Name</th></tr></thead>");
         writer.Append("<body>");
 
-        //foreach (var user in allUsers)
-        //    writer.Append("<tr style='nth-child(odd) {background: lightgray}'><td>"+user.UserName+"</td></tr>");
+        foreach (var user in allUsers)
+            writer.Append("<tr style='nth-child(odd) {background: lightgray}'><td>" + user.UserName + "</td></tr>");
 
         writer.Append("</body>");
         writer.Append("</table></p>");
@@ -38,23 +38,19 @@ public sealed class StatsToAdminMailBuilder
         var listItems = new List<string>();
         var version = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {version} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
-        //listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
-
-
-        var conn = Environment.GetEnvironmentVariable("MemCheckDbConnectionString");
-        listItems.Add($"<li>Connection string '{conn}'</li>");
+        listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
 
         writer.Append($"<ul>{string.Join("", listItems)}</ul>");
 
         return writer.ToString();
     }
     #endregion
-    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime/*, ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins, ImmutableList <GetAllUsers.ResultUserModel> allUsers*/)
+    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins, ImmutableList <GetAllUsers.ResultUserModel> allUsers)
     {
         this.azureFunctionName = azureFunctionName;
         this.azureFunctionStartTime = azureFunctionStartTime;
-        //this.admins = admins;
-        //this.allUsers = allUsers;
+        this.admins = admins;
+        this.allUsers = allUsers;
     }
     public string GetMailBody()
     {
@@ -77,6 +73,5 @@ public sealed class StatsToAdminMailBuilder
         writer.Append(GetMailFooter());
 
         return writer.ToString();
-        //mailLines.Add($"There are {memCheckDbContext.Users.Count()} users");
     }
 }
