@@ -13,8 +13,8 @@ public sealed class StatsToAdminMailBuilder
     #region Fields
     private readonly string azureFunctionName;
     private readonly DateTime azureFunctionStartTime;
-    //private readonly ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins;
-    //private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
+    private readonly ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins;
+    private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
     #endregion
     #region Private methods
     private string GetUsersPart()
@@ -38,19 +38,19 @@ public sealed class StatsToAdminMailBuilder
         var listItems = new List<string>();
         var version = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
         listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {version} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
-        //listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
+        listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
 
         writer.Append($"<ul>{string.Join("", listItems)}</ul>");
 
         return writer.ToString();
     }
     #endregion
-    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime/*, ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins, ImmutableList <GetAllUsers.ResultUserModel> allUsers*/)
+    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins, ImmutableList<GetAllUsers.ResultUserModel> allUsers)
     {
         this.azureFunctionName = azureFunctionName;
         this.azureFunctionStartTime = azureFunctionStartTime;
-        //this.admins = admins;
-        //this.allUsers = allUsers;
+        this.admins = admins;
+        this.allUsers = allUsers;
     }
     public string GetMailBody()
     {
