@@ -24,8 +24,8 @@ public sealed class StatsToAdminMailBuilder
         writer.Append("<thead><tr><th>Name</th></tr></thead>");
         writer.Append("<body>");
 
-        //foreach (var user in allUsers)
-        //    writer.Append("<tr style='nth-child(odd) {background: lightgray}'><td>" + user.UserName + "</td></tr>");
+        foreach (var user in allUsers)
+            writer.Append("<tr style='nth-child(odd) {background: lightgray}'><td>" + user.UserName + "</td></tr>");
 
         writer.Append("</body>");
         writer.Append("</table></p>");
