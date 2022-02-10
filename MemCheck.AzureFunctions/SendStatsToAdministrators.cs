@@ -70,7 +70,7 @@ public sealed class SendStatsToAdministrators
     }
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger(
-        Constants.CronEvery5Min
+        Constants.CronAt3Daily
         #if DEBUG
         , RunOnStartup = true
         #endif
