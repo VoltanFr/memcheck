@@ -22,7 +22,7 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly string senderEmailAddress;
+        private readonly string globalReportToAddress;
         private readonly IMemCheckMailSender emailSender;
         private readonly IMemCheckLinkGenerator linkGenerator;
         #endregion
@@ -235,10 +235,10 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public NotificationMailer(CallContext callContext, string senderEmailAddress, IMemCheckMailSender emailSender, IMemCheckLinkGenerator linkGenerator)
+        public NotificationMailer(CallContext callContext, string globalReportToAddress, IMemCheckMailSender emailSender, IMemCheckLinkGenerator linkGenerator)
         {
             this.callContext = callContext;
-            this.senderEmailAddress = senderEmailAddress;
+            this.globalReportToAddress = globalReportToAddress;
             this.emailSender = emailSender;
             this.linkGenerator = linkGenerator;
         }
@@ -257,7 +257,7 @@ namespace MemCheck.Application.Notifying
                     sentEmailCount++;
                 }
 
-            mailSendingsToWaitFor.Add(emailSender.SendAsync(senderEmailAddress, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
+            mailSendingsToWaitFor.Add(emailSender.SendAsync(globalReportToAddress, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
             Task.WaitAll(mailSendingsToWaitFor.ToArray());
         }
     }

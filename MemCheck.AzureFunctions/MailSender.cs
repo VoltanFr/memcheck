@@ -17,7 +17,6 @@ internal sealed class MailSender
     private readonly string functionName;
     private readonly ILogger logger;
     private readonly DateTime functionStartTime;
-    private readonly EmailAddress senderEmail;
     private readonly string sendGridKey;
     #endregion
     public MailSender(string functionName, DateTime functionStartTime, ILogger logger)
@@ -26,7 +25,7 @@ internal sealed class MailSender
         this.logger = logger;
         var sendGridSender = Environment.GetEnvironmentVariable("SendGridSender");
         var sendGridUser = Environment.GetEnvironmentVariable("SendGridUser");
-        senderEmail = new EmailAddress(sendGridSender, sendGridUser);
+        SenderEmail = new EmailAddress(sendGridSender, sendGridUser);
         sendGridKey = Environment.GetEnvironmentVariable("SendGridKey");
         this.functionStartTime = functionStartTime;
     }
@@ -40,19 +39,19 @@ internal sealed class MailSender
         body.Append($"<p>Message: {e.Message}</p>");
         body.Append($"<p>Call stack: {e.StackTrace}</p>");
 
-        await SendAsync("MemCheck Azure function failure", body.ToString(), senderEmail.AsArray());
+        await SendAsync("MemCheck Azure function failure", body.ToString(), SenderEmail.AsArray());
     }
     public async Task SendAsync(string subject, string body, IEnumerable<EmailAddress> to)
     {
         var msg = new SendGridMessage()
         {
-            From = senderEmail,
+            From = SenderEmail,
             Subject = subject,
             HtmlContent = body
         };
 
         to.ToList().ForEach(address => msg.AddTo(address.Email, address.Name));
-        msg.AddTo(senderEmail);
+        msg.AddTo(SenderEmail);
         msg.SetClickTracking(false, false);
 
         var sendGridClient = new SendGridClient(sendGridKey);
@@ -61,6 +60,7 @@ internal sealed class MailSender
         logger.LogInformation($"Mail sent, status code {response.StatusCode}");
         logger.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
     }
+    public EmailAddress SenderEmail { get; }
     public static string GetAssemblyVersion()
     {
         return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
