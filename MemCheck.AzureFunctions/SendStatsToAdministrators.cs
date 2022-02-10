@@ -16,6 +16,7 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
+
 public sealed class SendStatsToAdministrators
 {
     #region Fields
@@ -69,7 +70,7 @@ public sealed class SendStatsToAdministrators
     }
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger(
-        "0 3 * * *"
+        Constants.CronEvery5Min
         #if DEBUG
         , RunOnStartup = true
         #endif
