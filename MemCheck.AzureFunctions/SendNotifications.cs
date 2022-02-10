@@ -97,7 +97,7 @@ public sealed class SendNotifications
     }
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger(
-        Constants.CronEvery5Min
+        Constants.CronAt4Daily
         #if DEBUG
         , RunOnStartup = true
         #endif
