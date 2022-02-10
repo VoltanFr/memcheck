@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using MemCheck.Application.Users;
+using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
@@ -13,7 +14,7 @@ internal sealed class StatsToAdminMailBuilder
     #region Fields
     private readonly string azureFunctionName;
     private readonly DateTime azureFunctionStartTime;
-    private readonly ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins;
+    private readonly ImmutableList<EmailAddress> admins;
     private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
     #endregion
     #region Private methods
@@ -36,8 +37,7 @@ internal sealed class StatsToAdminMailBuilder
         var writer = new StringBuilder();
 
         var listItems = new List<string>();
-        var version = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-        listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {version} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
+        listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {MailSender.GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
         listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
 
         writer.Append($"<ul>{string.Join("", listItems)}</ul>");
@@ -45,7 +45,7 @@ internal sealed class StatsToAdminMailBuilder
         return writer.ToString();
     }
     #endregion
-    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<GetAdminEmailAddesses.ResultUserModel> admins, ImmutableList<GetAllUsers.ResultUserModel> allUsers)
+    public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins, ImmutableList<GetAllUsers.ResultUserModel> allUsers)
     {
         this.azureFunctionName = azureFunctionName;
         this.azureFunctionStartTime = azureFunctionStartTime;

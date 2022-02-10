@@ -3,13 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
-using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -19,7 +16,6 @@ using SendGrid;
 using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
-
 public sealed class SendStatsToAdministrators
 {
     #region Fields
@@ -27,22 +23,19 @@ public sealed class SendStatsToAdministrators
     private readonly TelemetryClient telemetryClient;
     private readonly MemCheckDbContext memCheckDbContext;
     private readonly MemCheckUserManager userManager;
+    private readonly ILogger logger;
     private readonly IRoleChecker roleChecker;
     private readonly Guid runningUserId;
     private readonly DateTime startTime;
-    private readonly EmailAddress senderEmail;
+    private readonly MailSender mailSender;
     #endregion
     #region Private methods
-    private SendGridClient GetSendGridClient()
-    {
-        var sendGridKey = Environment.GetEnvironmentVariable("SendGridKey");
-        return new SendGridClient(sendGridKey);
-    }
-    private async Task<ImmutableList<GetAdminEmailAddesses.ResultUserModel>> GetAdminsAsync()
+    private async Task<ImmutableList<EmailAddress>> GetAdminsAsync()
     {
         var getter = new GetAdminEmailAddesses(new Application.CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker));
         var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(runningUserId));
-        return getterResult.Users.ToImmutableList();
+        var result = getterResult.Users;
+        return result.Select(address => new EmailAddress(address.Email, address.Name)).ToImmutableList();
     }
     private async Task<ImmutableList<GetAllUsers.ResultUserModel>> GetAllUsersAsync()
     {
@@ -62,41 +55,17 @@ public sealed class SendStatsToAdministrators
         }
         return result.ToImmutableList();
     }
-    private async Task SendFailureInfoMailAsync(Exception e)
-    {
-        var writer = new StringBuilder();
-
-        writer.Append($"<h1>MemCheck function '{FunctionName}' failure</h1>");
-        var version = GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
-        writer.Append($"<p>Sent by Azure func '{FunctionName}' {version} running on {Environment.MachineName}, started on {startTime}, mail constructed at {DateTime.UtcNow}</p>");
-        writer.Append($"<p>Caught {e.GetType().Name}</p>");
-        writer.Append($"<p>Message: {e.Message}</p>");
-        writer.Append($"<p>Call stack: {e.StackTrace}</p>");
-
-        var msg = new SendGridMessage()
-        {
-            From = senderEmail,
-            Subject = $"MemCheck Azure function failure",
-            HtmlContent = writer.ToString()
-        };
-
-        msg.AddTo(senderEmail);
-        msg.SetClickTracking(false, false);
-
-        await GetSendGridClient().SendEmailAsync(msg);
-    }
     #endregion
-    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager)
+    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
     {
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         this.memCheckDbContext = memCheckDbContext;
         this.userManager = userManager;
+        this.logger = logger;
         roleChecker = new ProdRoleChecker(userManager); ;
         runningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
-        var sendGridSender = Environment.GetEnvironmentVariable("SendGridSender");
-        var sendGridUser = Environment.GetEnvironmentVariable("SendGridUser");
-        senderEmail = new EmailAddress(sendGridSender, sendGridUser);
         startTime = DateTime.UtcNow;
+        mailSender = new MailSender(FunctionName, startTime, logger);
     }
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger(
@@ -104,38 +73,26 @@ public sealed class SendStatsToAdministrators
         #if DEBUG
         , RunOnStartup = true
         #endif
-        )] TimerInfo myTimer, ExecutionContext context, ILogger log)
+        )] TimerInfo myTimer, ExecutionContext context)
     {
         try
         {
+            logger.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
             telemetryClient.TrackEvent($"{FunctionName} Azure func start");
-            log.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
 
             var admins = await GetAdminsAsync();
             var allUsers = await GetAllUsersAsync();
             var mailBody = new StatsToAdminMailBuilder(FunctionName, startTime, admins, allUsers).GetMailBody();
 
-            var msg = new SendGridMessage()
-            {
-                From = senderEmail,
-                Subject = $"MemCheck stats",
-                HtmlContent = mailBody
-            };
-
-            admins.ForEach(e => msg.AddTo(e.Email, e.Name));
-            msg.AddBcc(senderEmail);
-            msg.SetClickTracking(false, false);
-
-            var response = await GetSendGridClient().SendEmailAsync(msg);
-
-            log.LogInformation($"Mail sent, status code {response.StatusCode}");
-            log.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
-
-            log.LogInformation($"Function '{FunctionName}' ending, {DateTime.Now}");
+            await mailSender.SendAsync("MemCheck stats", mailBody, admins);
         }
         catch (Exception ex)
         {
-            await SendFailureInfoMailAsync(ex);
+            await mailSender.SendFailureInfoMailAsync(ex);
+        }
+        finally
+        {
+            logger.LogInformation($"Function '{FunctionName}' ending, {DateTime.Now}");
         }
     }
 }
