@@ -100,8 +100,7 @@ public sealed class SendStatsToAdministrators
     }
     [FunctionName(FunctionName)]
     public async Task Run([TimerTrigger(
-        //"0 */8 * * *"
-        "*/5 * * * *"
+        "0 3 * * *"
         #if DEBUG
         , RunOnStartup = true
         #endif

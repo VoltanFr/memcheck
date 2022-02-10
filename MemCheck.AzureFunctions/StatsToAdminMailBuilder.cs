@@ -8,7 +8,7 @@ using MemCheck.Application.Users;
 
 namespace MemCheck.AzureFunctions;
 
-public sealed class StatsToAdminMailBuilder
+internal sealed class StatsToAdminMailBuilder
 {
     #region Fields
     private readonly string azureFunctionName;
