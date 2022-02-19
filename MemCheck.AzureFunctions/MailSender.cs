@@ -24,7 +24,7 @@ internal sealed class MailSender
     {
         body.Append($"<p>Caught {e.GetType().Name}</p>");
         body.Append($"<p>Message: {e.Message}</p>");
-        body.Append($"<p>Call stack: {e.StackTrace}</p>");
+        body.Append($"<p>Call stack: {e.StackTrace.Replace("\n","<br/>")}</p>");
 
         if (e.InnerException != null)
         {
