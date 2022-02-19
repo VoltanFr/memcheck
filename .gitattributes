@@ -1,1 +1,1 @@
-MemCheck.WebUI/wwwroot/lib/* linguist-vendored
+MemCheck.WebUI/wwwroot/lib/**/* linguist-vendored
