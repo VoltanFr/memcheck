@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿syntax error
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Text.Json;
