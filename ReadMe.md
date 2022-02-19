@@ -1,3 +1,5 @@
+[![MemCheck build, test and deploy to Azure](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml/badge.svg)](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml)
+
 # MemCheck
 
 This repo holds the source code for the [MemCheck web site](https://memcheckfr.azurewebsites.net/).
