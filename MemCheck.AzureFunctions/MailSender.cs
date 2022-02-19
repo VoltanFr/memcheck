@@ -19,6 +19,20 @@ internal sealed class MailSender
     private readonly DateTime functionStartTime;
     private readonly string sendGridKey;
     #endregion
+    #region Private methods
+    private void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
+    {
+        body.Append($"<p>Caught {e.GetType().Name}</p>");
+        body.Append($"<p>Message: {e.Message}</p>");
+        body.Append($"<p>Call stack: {e.StackTrace}</p>");
+
+        if (e.InnerException != null)
+        {
+            body.Append($"<p>-------- Inner ---------</p>");
+            AddExceptionDetailsToMailBody(body, e.InnerException);
+        }
+    }
+    #endregion
     public MailSender(string functionName, DateTime functionStartTime, ILogger logger)
     {
         this.functionName = functionName;
@@ -35,9 +49,8 @@ internal sealed class MailSender
 
         body.Append($"<h1>MemCheck function '{functionName}' failure</h1>");
         body.Append($"<p>Sent by Azure func '{functionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {functionStartTime}, mail constructed at {DateTime.UtcNow}</p>");
-        body.Append($"<p>Caught {e.GetType().Name}</p>");
-        body.Append($"<p>Message: {e.Message}</p>");
-        body.Append($"<p>Call stack: {e.StackTrace}</p>");
+
+        AddExceptionDetailsToMailBody(body, e);
 
         await SendAsync("MemCheck Azure function failure", body.ToString(), SenderEmail.AsArray());
     }
