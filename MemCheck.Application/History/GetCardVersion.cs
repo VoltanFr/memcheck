@@ -62,7 +62,7 @@ namespace MemCheck.Application.History
                 var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
                 var cardVersion = await callContext.DbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == VersionId);
-                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, cardVersion.UsersWithView.Select(uwv => uwv.AllowedUserId)))
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, cardVersion))
                     throw new InvalidOperationException("Original not visible to user");
             }
         }

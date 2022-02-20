@@ -174,7 +174,7 @@ namespace MemCheck.Application.History
                 var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
                 var card = await callContext.DbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CardId);
-                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, card.UsersWithView))
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, card))
                     throw new InvalidOperationException("Current not visible to user");
             }
         }

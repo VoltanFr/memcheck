@@ -84,11 +84,11 @@ namespace MemCheck.Application.History
                 var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
 
                 var currentCard = await callContext.DbContext.Cards.Include(v => v.UsersWithView).SingleAsync(v => v.Id == CurrentCardId);
-                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, currentCard.UsersWithView))
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, currentCard))
                     throw new InvalidOperationException("Current not visible to user");
 
                 var originalCard = await callContext.DbContext.CardPreviousVersions.Include(v => v.UsersWithView).SingleAsync(v => v.Id == OriginalVersionId);
-                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, originalCard.UsersWithView.Select(uwv => uwv.AllowedUserId)))
+                if (!CardVisibilityHelper.CardIsVisibleToUser(UserId, originalCard))
                     throw new InvalidOperationException("Original not visible to user");
             }
         }

@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Searching;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -133,10 +132,10 @@ namespace MemCheck.Application.Notifying
                     .Where(c => c.Id == notFoundId).SingleOrDefaultAsync();
                 if (card != null)
                 {
-                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView))
+                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card))
                     {
                         countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
-                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card.UsersWithView), null));
+                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card), null));
                     }
                     else
                         countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;
@@ -153,11 +152,10 @@ namespace MemCheck.Application.Notifying
                         countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
                     else
                     {
-                        var userWithViewIds = previousVersion.UsersWithView.Select(uwv => uwv.AllowedUserId);
-                        if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, userWithViewIds))
+                        if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, previousVersion))
                         {
                             countOfCardsNotFoundAnymore_Deleted_UserAllowedToView++;
-                            cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, userWithViewIds)));
+                            cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, previousVersion)));
                         }
                         else
                             countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;

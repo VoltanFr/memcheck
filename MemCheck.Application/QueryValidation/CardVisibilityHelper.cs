@@ -9,16 +9,16 @@ namespace MemCheck.Application.QueryValidation
 {
     internal static class CardVisibilityHelper
     {
-        public static bool CardIsVisibleToUser(Guid userId, IEnumerable<UserWithViewOnCard> usersWithView)
+        public static bool CardIsVisibleToUser(Guid userId, Card card)
         {
-            return CardIsVisibleToUser(userId, usersWithView.Select(uwv => uwv.UserId));
+            return CardIsVisibleToUser(userId, card.UsersWithView.Select(uwv => uwv.UserId));
+        }
+        public static bool CardIsVisibleToUser(Guid userId, CardPreviousVersion card)
+        {
+            return CardIsVisibleToUser(userId, card.UsersWithView.Select(uwv => uwv.AllowedUserId));
         }
         public static bool CardIsVisibleToUser(Guid userId, IEnumerable<Guid> usersWithView)
         {
-            if (QueryValidationHelper.IsReservedGuid(userId))
-                throw new InvalidOperationException("Invalid user id");
-            if (usersWithView.Any(uwv => QueryValidationHelper.IsReservedGuid(uwv)))
-                throw new InvalidOperationException("Invalid user with view id");
             return !usersWithView.Any() || usersWithView.Any(userWithView => userWithView == userId);
         }
         public static bool CardIsPublic(IEnumerable<Guid> usersWithView)
@@ -49,7 +49,7 @@ namespace MemCheck.Application.QueryValidation
                 .Include(card => card.VersionCreator)
                 .Where(card => cardIds.Contains(card.Id));
             foreach (var card in cards)
-                if (!CardIsVisibleToUser(userId, card.UsersWithView))
+                if (!CardIsVisibleToUser(userId, card))
                     throw new InvalidOperationException("User not allowed to view card");
         }
         public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)

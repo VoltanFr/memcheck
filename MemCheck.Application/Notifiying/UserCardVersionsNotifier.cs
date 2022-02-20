@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -64,7 +63,7 @@ namespace MemCheck.Application.Notifying
                                   cardToReport.card.VersionCreator.UserName,
                                   cardToReport.card.VersionUtcDate,
                                   cardToReport.card.VersionDescription,
-                                  CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card.UsersWithView),
+                                  CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card),
                                   GetCardVersionOn(cardToReport.card.Id, cardToReport.cardNotif.LastNotificationUtcDate)
                               )
                         ).ToImmutableArray();
