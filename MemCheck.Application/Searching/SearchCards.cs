@@ -1,12 +1,10 @@
-﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Ratings;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -44,9 +42,15 @@ namespace MemCheck.Application.Searching
         }
         #endregion
         #region private methods
-        private static ResultCardDeckInfo GetCardDeckInfo(CardInDeck cardInDeck)
+        private async Task<ImmutableArray<ResultCardDeckInfo>> GetCardDeckInfoAsync(ResultCardBeforeDeckInfo card, Guid userId)
         {
-            return new ResultCardDeckInfo(
+            var cardsInDecksForThisUserAndThisCard = await DbContext.CardsInDecks
+                .AsNoTracking()
+                .Include(card => card.Deck)
+                .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && cardInDeck.CardId == card.CardId)
+                .ToArrayAsync();
+
+            var result = cardsInDecksForThisUserAndThisCard.Select(cardInDeck => new ResultCardDeckInfo(
                 cardInDeck.DeckId,
                 cardInDeck.Deck.Description,
                 cardInDeck.CurrentHeap,
@@ -55,21 +59,54 @@ namespace MemCheck.Application.Searching
                 cardInDeck.AddToDeckUtcTime,
                 cardInDeck.LastLearnUtcTime,
                 cardInDeck.CurrentHeap == 0 || cardInDeck.ExpiryUtcTime <= DateTime.UtcNow,
-                cardInDeck.ExpiryUtcTime);
-        }
-        private IEnumerable<ResultCardDeckInfo> GetCardDeckInfo(ResultCardBeforeDeckInfo card, Guid userId)
-        {
-            var cardsInDecksForThisUserAndThisCard = DbContext.CardsInDecks
-                .AsNoTracking()
-                .Include(card => card.Deck)
-                .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && cardInDeck.CardId == card.CardId)
-                .ToArray();
+                cardInDeck.ExpiryUtcTime));
 
-            return cardsInDecksForThisUserAndThisCard.Select(cardInDeck => GetCardDeckInfo(cardInDeck));
+            return result.ToImmutableArray();
         }
-        private IEnumerable<ResultCard> AddDeckInfo(Guid userId, IEnumerable<ResultCardBeforeDeckInfo> resultCards)
+        private async Task<ImmutableArray<ResultCard>> AddDeckInfosAsync(Guid userId, ImmutableArray<ResultCardBeforeDeckInfo> resultCards)
         {
-            return resultCards.Select(card => new ResultCard(card.CardId, card.FrontSide, card.Tags, card.VisibleTo, GetCardDeckInfo(card, userId), card.CurrentUserRating, card.AverageRating, card.CountOfUserRatings, card.VersionCreator, card.VersionUtcDate, card.VersionDescription));
+            var cardDeckInfos = new Dictionary<Guid, IEnumerable<ResultCardDeckInfo>>();
+            foreach (var card in resultCards)
+            {
+                var deckInfo = await GetCardDeckInfoAsync(card, userId);
+                cardDeckInfos.Add(card.CardId, deckInfo);
+            }
+
+            var result = resultCards.Select(card => new ResultCard(
+                card.CardId,
+                card.FrontSide,
+                card.Tags,
+                card.VisibleTo,
+                cardDeckInfos[card.CardId],
+                card.CurrentUserRating,
+                card.AverageRating,
+                card.CountOfUserRatings,
+                card.VersionCreator,
+                card.VersionUtcDate,
+                card.VersionDescription)
+            );
+
+            return result.ToImmutableArray();
+        }
+        private async Task<ImmutableArray<ResultCardBeforeDeckInfo>> AddUserRatings(Guid userId, ImmutableArray<Card> cards)
+        {
+            var allUserRatings = (await DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating)).ToImmutableDictionary();
+
+            var resultCards = cards.Select(card => new ResultCardBeforeDeckInfo(
+                card.Id,
+                card.FrontSide,
+                card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
+                card.UsersWithView,
+                card.VersionCreator,
+                card.VersionUtcDate,
+                card.VersionDescription,
+                allUserRatings.ContainsKey(card.Id) ? allUserRatings[card.Id] : 0,
+                card.AverageRating,
+                card.RatingCount
+                )
+            );
+
+            return resultCards.ToImmutableArray();
         }
         #endregion
         public SearchCards(CallContext callContext) : base(callContext)
@@ -85,11 +122,7 @@ namespace MemCheck.Application.Searching
                 .Include(card => card.UsersWithView)
                 .AsSingleQuery();
 
-            var cardsViewableByUser = allCards.Where(card =>
-                card.VersionCreator.Id == request.UserId
-                || !card.UsersWithView.Any()    //card is public
-                || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any()
-                );
+            var cardsViewableByUser = allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any());
 
             var cardsFilteredWithDate = request.MinimumUtcDateOfCards == null ? cardsViewableByUser : cardsViewableByUser.Where(card => card.VersionUtcDate >= request.MinimumUtcDateOfCards.Value);
 
@@ -129,10 +162,12 @@ namespace MemCheck.Application.Searching
             if (request.Visibility == Request.VibilityFiltering.CardsVisibleByMoreThanOwner)
                 cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() != 1);
             else
-            if (request.Visibility == Request.VibilityFiltering.PrivateToOwner)
-                cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() == 1);
-            else
-                cardsFilteredWithVisibility = cardsFilteredWithText;
+            {
+                if (request.Visibility == Request.VibilityFiltering.PrivateToOwner)
+                    cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() == 1);
+                else
+                    cardsFilteredWithVisibility = cardsFilteredWithText;
+            }
 
             IQueryable<Card> cardsFilteredWithAverageRating;
             if (request.RatingFiltering == Request.RatingFilteringMode.Ignore)
@@ -165,26 +200,11 @@ namespace MemCheck.Application.Searching
             var totalNbCards = finalResult.Count();
             var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-            var pageCards = await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync();
+            var pageCards = (await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync()).ToImmutableArray();
 
-            //The following line could be improved with a joint. Not sure this would perform better, to be checked
-            var userRatings = await DbContext.UserCardRatings.Where(r => r.UserId == request.UserId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating);
+            var resultCards = await AddUserRatings(request.UserId, pageCards);
+            var withUserDeckInfo = await AddDeckInfosAsync(request.UserId, resultCards);
 
-            var resultCards = pageCards.Select(card => new ResultCardBeforeDeckInfo(
-                card.Id,
-                card.FrontSide,
-                card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
-                card.UsersWithView,
-                card.VersionCreator,
-                card.VersionUtcDate,
-                card.VersionDescription,
-                userRatings.ContainsKey(card.Id) ? userRatings[card.Id] : 0,
-                card.AverageRating,
-                card.RatingCount
-                )
-            );
-
-            var withUserDeckInfo = AddDeckInfo(request.UserId, resultCards);
             var result = new Result(totalNbCards, totalPageCount, withUserDeckInfo);
             return new ResultWithMetrologyProperties<Result>(result,
                 ("DeckMode", request.Deck == Guid.Empty ? "Ignore" : request.DeckIsInclusive ? "Inclusive" : "Exclusive"),
