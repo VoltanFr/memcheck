@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Searching;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,6 +10,10 @@ namespace MemCheck.Application.QueryValidation
 {
     internal static class CardVisibilityHelper
     {
+        public static bool CardIsVisibleToUser(Guid userId, SearchCards.ResultCard card)
+        {
+            return CardIsVisibleToUser(userId, card.VisibleTo.Select(uwv => uwv.UserId));
+        }
         public static bool CardIsVisibleToUser(Guid userId, Card card)
         {
             return CardIsVisibleToUser(userId, card.UsersWithView.Select(uwv => uwv.UserId));

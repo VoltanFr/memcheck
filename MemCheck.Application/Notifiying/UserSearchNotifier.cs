@@ -31,6 +31,16 @@ namespace MemCheck.Application.Notifying
         private readonly int maxCountToReport;
         private readonly List<string> performanceIndicators;
         #endregion
+        #region private sealed record DetailsFromCardsNotFoundAnymore
+        private sealed record DetailsFromCardsNotFoundAnymore(
+             int CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
+             ImmutableArray<CardVersion> CardsNotFoundAnymore_StillExists_UserAllowedToView,
+             int CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
+             ImmutableArray<CardDeletion> CardsNotFoundAnymore_Deleted_UserAllowedToView,
+             int CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
+             int CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView
+        );
+        #endregion
         #region Private methods
         private static SearchCards.Request GetRequest(SearchSubscription subscription)
         {
@@ -53,6 +63,138 @@ namespace MemCheck.Application.Notifying
 
             return request;
         }
+        private async Task<SearchSubscription> GetSearchSubscriptionAsync(Guid searchSubscriptionId)
+        {
+            var chrono = Stopwatch.StartNew();
+            SearchSubscription subscription = await callContext.DbContext.SearchSubscriptions
+                .Include(s => s.ExcludedTags)
+                .Include(s => s.RequiredTags)
+                .Include(s => s.CardsInLastRun)
+                .SingleAsync(s => s.Id == searchSubscriptionId);
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to get a search subscription");
+            return subscription;
+        }
+        private ImmutableHashSet<Guid> GetIdsOfCardsInLastRun(SearchSubscription subscription)
+        {
+            var chrono = Stopwatch.StartNew();
+            var result = subscription.CardsInLastRun.Select(c => c.CardId).ToImmutableHashSet();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {result.Count} card ids in last run");
+            return result;
+        }
+        private async Task<ImmutableHashSet<CardVersion>> GetAllCardsFromSearchAsync(SearchSubscription subscription)
+        {
+            var chrono = Stopwatch.StartNew();
+            var result = new HashSet<CardVersion>();
+            SearchCards.Request request = GetRequest(subscription);
+            SearchCards.Result searchResult;
+            do
+            {
+                request = request with { PageNo = request.PageNo + 1 };
+                var searcher = new SearchCards(callContext);
+                searchResult = await searcher.RunAsync(request);
+                result.UnionWith(
+                    searchResult.Cards.Select(card => new CardVersion(
+                        card.CardId,
+                        card.FrontSide,
+                        card.VersionCreator.UserName,
+                        card.VersionUtcDate,
+                        card.VersionDescription,
+                        CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, card),
+                        null
+                        )
+                    )
+                );
+            }
+            while (searchResult.TotalNbCards > result.Count);
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {result.Count} card versions from search (in {searchResult.PageCount} pages)");
+            return result.ToImmutableHashSet();
+        }
+        private (ImmutableArray<Guid> cardsNotFoundAnymore, ImmutableArray<CardVersion> newFoundCards) FilterCardsFromSearchResult(ImmutableHashSet<CardVersion> allCardsFromSearchHashSet, ImmutableHashSet<Guid> cardsInLastRun)
+        {
+            var chrono = Stopwatch.StartNew();
+            var allCardsFromSearchHashSetIds = new HashSet<Guid>(allCardsFromSearchHashSet.Select(cardVersion => cardVersion.CardId));
+            ImmutableArray<Guid> cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
+            ImmutableArray<CardVersion> newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to filter in memory data");
+            return (cardsNotFoundAnymore, newFoundCards);
+        }
+        private async Task RemoveCardsNotFoundAnymoreFromResultsInDbAsync(ImmutableArray<Guid> cardsNotFoundAnymore, Guid searchSubscriptionId)
+        {
+            var chrono = Stopwatch.StartNew();
+            foreach (var cardNotFoundAnymore in cardsNotFoundAnymore)
+            {
+                var entity = await callContext.DbContext.CardsInSearchResults.SingleAsync(c => c.SearchSubscriptionId == searchSubscriptionId && c.CardId == cardNotFoundAnymore);
+                callContext.DbContext.CardsInSearchResults.Remove(entity);
+            }
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {cardsNotFoundAnymore.Length} search result cards for deletion in DB");
+        }
+        private async Task AddNewFoundCardToResultsInDbAsync(ImmutableArray<CardVersion> newFoundCards, Guid searchSubscriptionId)
+        {
+            var chrono = Stopwatch.StartNew();
+            foreach (var addedCard in newFoundCards)
+                await callContext.DbContext.CardsInSearchResults.AddAsync(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {newFoundCards.Length} search result cards for add to DB");
+        }
+        private async Task<DetailsFromCardsNotFoundAnymore> GetDetailsFromCardsNotFoundAnymoreAsync(ImmutableArray<Guid> cardsNotFoundAnymore, SearchSubscription subscription)
+        {
+            var countOfCardsNotFoundAnymore_StillExists_UserAllowedToView = 0;
+            var cardsNotFoundAnymore_StillExists_UserAllowedToView = new List<CardVersion>();
+            var countOfCardsNotFoundAnymore_Deleted_UserAllowedToView = 0;
+            var cardsNotFoundAnymore_Deleted_UserAllowedToView = new List<CardDeletion>();
+            var countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView = 0;
+            var countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView = 0;
+
+            var chrono = Stopwatch.StartNew();
+            foreach (Guid notFoundId in cardsNotFoundAnymore)
+            {
+                var card = await callContext.DbContext.Cards
+                    .Include(c => c.UsersWithView)
+                    .Include(c => c.VersionCreator)
+                    .Where(c => c.Id == notFoundId)
+                    .SingleOrDefaultAsync();
+
+                if (card != null)
+                {
+                    if (CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, card))
+                    {
+                        countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
+                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, true, null));
+                    }
+                    else
+                        countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;
+                }
+                else
+                {
+                    var previousVersion = await callContext.DbContext.CardPreviousVersions
+                        .Include(previousVersion => previousVersion.UsersWithView)
+                        .Include(previousVersion => previousVersion.VersionCreator)
+                        .Where(previousVersion => previousVersion.Card == notFoundId && previousVersion.VersionType == CardPreviousVersionType.Deletion)
+                        .SingleOrDefaultAsync();
+                    if (previousVersion == null)
+                        //Strange! Has the card been purged from previous versions?
+                        countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
+                    else
+                    {
+                        if (CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, previousVersion))
+                        {
+                            countOfCardsNotFoundAnymore_Deleted_UserAllowedToView++;
+                            cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, true));
+                        }
+                        else
+                            countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
+                    }
+                }
+            }
+            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to work on cards not found anymore");
+            return new DetailsFromCardsNotFoundAnymore(
+                countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
+                cardsNotFoundAnymore_StillExists_UserAllowedToView.ToImmutableArray(),
+                countOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
+                cardsNotFoundAnymore_Deleted_UserAllowedToView.ToImmutableArray(),
+                countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
+                countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView
+             );
+        }
         #endregion
         public UserSearchNotifier(CallContext callContext, int maxCountToReport, List<string> performanceIndicators)
         {
@@ -72,109 +214,26 @@ namespace MemCheck.Application.Notifying
         }
         public async Task<UserSearchNotifierResult> RunAsync(Guid searchSubscriptionId)
         {
-            var chrono = Stopwatch.StartNew();
-            var subscription = await callContext.DbContext.SearchSubscriptions
-                .Include(s => s.ExcludedTags)
-                .Include(s => s.RequiredTags)
-                .Include(s => s.CardsInLastRun)
-                .SingleAsync(s => s.Id == searchSubscriptionId);
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to get a search subscriptions");
-            chrono.Restart();
-            var cardsInLastRun = subscription.CardsInLastRun.Select(c => c.CardId).ToImmutableHashSet();
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {cardsInLastRun.Count} card ids in last run");
-
-            chrono.Restart();
-            var allCardsFromSearchHashSet = new HashSet<CardVersion>();
-            SearchCards.Request request = GetRequest(subscription);
-            SearchCards.Result searchResult;
-            do
-            {
-                request = request with { PageNo = request.PageNo + 1 };
-                var searcher = new SearchCards(callContext);
-                searchResult = await searcher.RunAsync(request);
-                allCardsFromSearchHashSet.UnionWith(searchResult.Cards.Select(card => new CardVersion(card.CardId, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, !card.VisibleTo.Any() || card.VisibleTo.Any(u => u.UserId == subscription.UserId), null)));
-            }
-            while (searchResult.TotalNbCards > allCardsFromSearchHashSet.Count);
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to load all {allCardsFromSearchHashSet.Count} card versions from search (in {searchResult.PageCount} pages)");
-
-            chrono.Restart();
-            var allCardsFromSearchHashSetIds = new HashSet<Guid>(allCardsFromSearchHashSet.Select(cardVersion => cardVersion.CardId));
-            var cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
-            var newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to filter in memory data");
-
-            chrono.Restart();
-            foreach (var cardNotFoundAnymore in cardsNotFoundAnymore)
-            {
-                var entity = await callContext.DbContext.CardsInSearchResults.SingleAsync(c => c.SearchSubscriptionId == searchSubscriptionId && c.CardId == cardNotFoundAnymore);
-                callContext.DbContext.CardsInSearchResults.Remove(entity);
-            }
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {cardsNotFoundAnymore.Length} search result cards for deletion in DB");
-
-            chrono.Restart();
-            foreach (var addedCard in newFoundCards)
-                callContext.DbContext.CardsInSearchResults.Add(new CardInSearchResult { SearchSubscriptionId = searchSubscriptionId, CardId = addedCard.CardId });
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to mark {newFoundCards.Length} search result cards for add to DB");
-
-            var countOfCardsNotFoundAnymore_StillExists_UserAllowedToView = 0;
-            var cardsNotFoundAnymore_StillExists_UserAllowedToView = new List<CardVersion>();
-            var countOfCardsNotFoundAnymore_Deleted_UserAllowedToView = 0;
-            var cardsNotFoundAnymore_Deleted_UserAllowedToView = new List<CardDeletion>();
-            var countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView = 0;
-            var countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView = 0;
-
-            chrono.Restart();
-            foreach (Guid notFoundId in cardsNotFoundAnymore)
-            {
-                var card = await callContext.DbContext.Cards
-                    .Include(c => c.UsersWithView)
-                    .Include(c => c.VersionCreator)
-                    .Where(c => c.Id == notFoundId).SingleOrDefaultAsync();
-                if (card != null)
-                {
-                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card))
-                    {
-                        countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
-                        cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, card), null));
-                    }
-                    else
-                        countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;
-                }
-                else
-                {
-                    var previousVersion = await callContext.DbContext.CardPreviousVersions
-                        .Include(previousVersion => previousVersion.UsersWithView)
-                        .Include(previousVersion => previousVersion.VersionCreator)
-                        .Where(previousVersion => previousVersion.Card == notFoundId && previousVersion.VersionType == CardPreviousVersionType.Deletion)
-                        .SingleOrDefaultAsync();
-                    if (previousVersion == null)
-                        //Strange! Has the card been purged from previous versions?
-                        countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
-                    else
-                    {
-                        if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, previousVersion))
-                        {
-                            countOfCardsNotFoundAnymore_Deleted_UserAllowedToView++;
-                            cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, CardVisibilityHelper.CardIsVisibleToUser(request.UserId, previousVersion)));
-                        }
-                        else
-                            countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;
-                    }
-                }
-            }
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to work on cards not found anymore");
-
+            var subscription = await GetSearchSubscriptionAsync(searchSubscriptionId);
+            var cardsInLastRun = GetIdsOfCardsInLastRun(subscription);
+            var allCardsFromSearchHashSet = await GetAllCardsFromSearchAsync(subscription);
+            (ImmutableArray<Guid> cardsNotFoundAnymore, ImmutableArray<CardVersion> newFoundCards) = FilterCardsFromSearchResult(allCardsFromSearchHashSet, cardsInLastRun);
+            await RemoveCardsNotFoundAnymoreFromResultsInDbAsync(cardsNotFoundAnymore, searchSubscriptionId);
+            await AddNewFoundCardToResultsInDbAsync(newFoundCards, searchSubscriptionId);
+            var detailsFromCardsNotFoundAnymore = await GetDetailsFromCardsNotFoundAnymoreAsync(cardsNotFoundAnymore, subscription);
             subscription.LastRunUtcDate = runningUtcDate;
             await callContext.DbContext.SaveChangesAsync();
+
             var result = new UserSearchNotifierResult(subscription.Name,
-                            newFoundCards.Length,
-                            newFoundCards.Take(maxCountToReport),
-                            countOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
-                            cardsNotFoundAnymore_StillExists_UserAllowedToView,
-                            countOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
-                            cardsNotFoundAnymore_Deleted_UserAllowedToView,
-                            countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
-                            countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                newFoundCards.Length,
+                newFoundCards.Take(maxCountToReport),
+                detailsFromCardsNotFoundAnymore.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView,
+                detailsFromCardsNotFoundAnymore.CardsNotFoundAnymore_StillExists_UserAllowedToView,
+                detailsFromCardsNotFoundAnymore.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView,
+                detailsFromCardsNotFoundAnymore.CardsNotFoundAnymore_Deleted_UserAllowedToView,
+                detailsFromCardsNotFoundAnymore.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView,
+                detailsFromCardsNotFoundAnymore.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+
             callContext.TelemetryClient.TrackEvent("UserSearchNotifier",
                 ("searchSubscriptionId", searchSubscriptionId.ToString()),
                 ("SubscriptionName", result.SubscriptionName.ToString()),
@@ -186,6 +245,7 @@ namespace MemCheck.Application.Notifying
                 ("CardsNotFoundAnymore_Deleted_UserAllowedToViewCount", result.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length.ToString()),
                 ("CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView", result.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView.ToString()),
                 ("CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToViewCount", result.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView.ToString()));
+
             return result;
         }
     }
