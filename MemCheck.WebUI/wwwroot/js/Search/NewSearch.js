@@ -400,7 +400,7 @@ const searchApp = Vue.createApp({
             if (selectedCardIds.length == 1)
                 mesg = this.allStaticData.localizedText.alertAddOneCardToDeck + ' ' + deck.deckName;
             else {
-                cardsToAddCount = selectedCardIds.length - nbCardsAlreadyInDeck;
+                const cardsToAddCount = selectedCardIds.length - nbCardsAlreadyInDeck;
                 if (cardsToAddCount == 1)
                     mesg = this.allStaticData.localizedText.alertAddCardToDeckPart1;
                 else
