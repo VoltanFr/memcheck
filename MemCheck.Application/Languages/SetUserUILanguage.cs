@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Languages
@@ -13,22 +14,19 @@ namespace MemCheck.Application.Languages
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
             var user = await DbContext.Users.SingleAsync(user => user.Id == request.UserId);
-            user.UILanguage = request.CultureName;
+            var cultureId = MemCheckSupportedCultures.IdFromCulture(request.Culture)!;
+            user.UILanguage = cultureId;
             DbContext.SaveChanges();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("CultureName", request.CultureName));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CultureId", cultureId));
         }
         #region Request & Result
-        public sealed record Request(Guid UserId, string CultureName) : IRequest
+        public sealed record Request(Guid UserId, CultureInfo Culture) : IRequest
         {
-            public const int MinNameLength = 5;
-            public const int MaxNameLength = 5;
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
-                if (CultureName != CultureName.Trim())
-                    throw new InvalidOperationException("Invalid Name: not trimmed");
-                if (CultureName.Length < MinNameLength || CultureName.Length > MaxNameLength)
-                    throw new InvalidOperationException($"Invalid culture name '{CultureName}'");
+                if (MemCheckSupportedCultures.IdFromCulture(Culture)==null)
+                    throw new InvalidOperationException($"Unknown culture '{Culture}'");
             }
         }
         public sealed record Result();

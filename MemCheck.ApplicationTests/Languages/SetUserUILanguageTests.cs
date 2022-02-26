@@ -14,56 +14,23 @@ namespace MemCheck.Application.Languages
         public async Task UserNotLoggedIn()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.Empty, RandomHelper.CultureName())));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.Empty, MemCheckSupportedCultures.French)));
         }
         [TestMethod()]
         public async Task UserDoesNotExist()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.NewGuid(), RandomHelper.CultureName())));
-        }
-        [TestMethod()]
-        public async Task NameTooShort()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var user = await UserHelper.CreateInDbAsync(db);
-            using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, RandomHelper.String(SetUserUILanguage.Request.MinNameLength - 1))));
-        }
-        [TestMethod()]
-        public async Task NameTooLong()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var user = await UserHelper.CreateInDbAsync(db);
-            using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, RandomHelper.String(SetUserUILanguage.Request.MaxNameLength + 1))));
-        }
-        [TestMethod()]
-        public async Task NameNotTrimmedAtBegining()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var user = await UserHelper.CreateInDbAsync(db);
-            using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, '\t' + RandomHelper.CultureName())));
-        }
-        [TestMethod()]
-        public async Task NameNotTrimmedAtEnd()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var user = await UserHelper.CreateInDbAsync(db);
-            using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, RandomHelper.CultureName() + ' ')));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.NewGuid(), MemCheckSupportedCultures.French)));
         }
         [TestMethod()]
         public async Task Success()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var name = RandomHelper.CultureName();
             using (var dbContext = new MemCheckDbContext(db))
-                await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, name));
+                await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(user, MemCheckSupportedCultures.French));
             using (var dbContext = new MemCheckDbContext(db))
-                Assert.AreEqual(name, dbContext.Users.Single(u => u.Id == user).UILanguage);
+                Assert.AreEqual(MemCheckSupportedCultures.IdFromCulture(MemCheckSupportedCultures.French), dbContext.Users.Single(u => u.Id == user).UILanguage);
         }
     }
 }

@@ -1,9 +1,8 @@
+using MemCheck.Application.Languages;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
-using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -142,10 +141,13 @@ namespace MemCheck.WebUI
 
             app.UseRequestLocalization(options =>
             {
-                options.DefaultRequestCulture = new RequestCulture(MemCheckRequestCultureProvider.English);
-                options.SupportedCultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray();    //Culture is used for numbers, dates, etc.
-                options.SupportedUICultures = MemCheckRequestCultureProvider.SupportedCultures.ToArray(); //UI culture is used for looking up translations from resource files
-                options.RequestCultureProviders = new MemCheckRequestCultureProvider(logger).AsArray();
+                options.DefaultRequestCulture = new RequestCulture(MemCheckSupportedCultures.English);
+                options.SupportedCultures = MemCheckSupportedCultures.All;    //Culture is used for numbers, dates, etc.
+                options.SupportedUICultures = MemCheckSupportedCultures.All; //UI culture is used for looking up translations from resource files
+                options.RequestCultureProviders = new IRequestCultureProvider[] {
+                    new MemCheckRequestCultureProvider(logger),
+                    new AcceptLanguageHeaderRequestCultureProvider()
+                };
             });
 
             app.UseMvc();

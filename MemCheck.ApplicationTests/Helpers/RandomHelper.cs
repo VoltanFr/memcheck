@@ -46,10 +46,6 @@ namespace MemCheck.Application.Tests.Helpers
                 result.Length = length.Value;
             return result.ToString();
         }
-        public static string CultureName()
-        {
-            return String(SetUserUILanguage.Request.MinNameLength);
-        }
         public static DateTime Date(DateTime? after = null)
         {
             var start = after == null ? new DateTime(1995, 1, 1) : after.Value;

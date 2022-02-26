@@ -1,24 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MemCheck.Application.Languages;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI
 {
-    //We want to use the culture from the user's profile when available. This is done by using a claim (created by MemCheckClaimsFactory). In other words, we don't use a culture cookie (this is done by the JavaScript).
-    //If not available, use the culture passed by the browser header (not implemented yet)
-    //In case of error, default to french
-    //See also UILanguagesController.SetCultureAsync
-    //MS Documentation: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0
-    public class MemCheckRequestCultureProvider : RequestCultureProvider
+    //We want to use the culture from the user's profile when available. This is done by using a claim (created by MemCheckClaimsFactory).
+    //If no user is logged in, we try to read the cookie.
+    //If not available, we use the culture passed by the browser.
+    public sealed class MemCheckRequestCultureProvider : RequestCultureProvider
     {
         #region Fields
-        private static readonly CultureInfo english = new("en-US");
-        private static readonly CultureInfo french = new("fr-FR");
         private readonly ILogger logger;
         #endregion
         public MemCheckRequestCultureProvider(ILogger logger)
@@ -27,25 +21,36 @@ namespace MemCheck.WebUI
         }
         public async override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
-            logger.LogDebug($"Http request path: {httpContext.Request.Path}");
-
             if (httpContext.User.Identity != null && httpContext.User.Identity.IsAuthenticated)
             {
-                var result = httpContext.User.FindFirstValue(MemCheckClaims.UICulture);
-                if (result != null && IsValidCulture(result))
-                    return new ProviderCultureResult(result);
+                var cultureIdFromClaim = httpContext.User.FindFirstValue(MemCheckClaims.UICulture);
+                if (cultureIdFromClaim != null && MemCheckSupportedCultures.CultureFromId(cultureIdFromClaim) != null)
+                {
+                    var cultureFromClaim = MemCheckSupportedCultures.CultureFromId(cultureIdFromClaim);
+                    if (cultureFromClaim != null)
+                    {
+                        var resultFromClaim = new ProviderCultureResult(cultureFromClaim.Name);
+                        logger.LogInformation($"Request: {httpContext.Request.Path} (using culture {cultureIdFromClaim} thanks to claim)");
+                        return resultFromClaim;
+                    }
+                }
             }
 
-            //To do: use the browser's requested culture instead of defaulting to French. See https://stackoverflow.com/questions/49381843/get-browser-language-in-aspnetcore2-0
+            if (httpContext.Request.Cookies.TryGetValue("usrLang", out var cookieValue))
+                if (cookieValue != null)
+                {
+                    var cultureFromCookie = MemCheckSupportedCultures.CultureFromId(cookieValue);
+                    if (cultureFromCookie != null)
+                    {
+                        logger.LogInformation($"Request: {httpContext.Request.Path} (using culture {cookieValue} thanks to cookie)");
+                        return new ProviderCultureResult(cultureFromCookie.Name);
+                    }
+                }
 
-            return await Task.FromResult(new ProviderCultureResult(french.Name));
-        }
-        public static CultureInfo English => english;
-        public static CultureInfo French => french;
-        public static IEnumerable<CultureInfo> SupportedCultures => new[] { English, French };
-        public static bool IsValidCulture(string cultureName)
-        {
-            return SupportedCultures.Any(c => c.Name == cultureName);
+            //We will then use AcceptLanguageHeaderRequestCultureProvider (as configured in Startup)
+            logger.LogInformation($"Request: {httpContext.Request.Path} (will use browser default culture)");
+            await Task.CompletedTask;
+            return null;
         }
     }
 }

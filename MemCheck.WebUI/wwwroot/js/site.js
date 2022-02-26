@@ -6,6 +6,8 @@ const layoutApp = Vue.createApp({
             activeLanguage: "",
             availableLanguages: [],
             mountFinished: false,
+            userLanguageCookieName: "usrLang",
+            allLanguagesCookieName: "allLangs",
         }
     },
     async mounted() {
@@ -19,7 +21,7 @@ const layoutApp = Vue.createApp({
     },
     methods: {
         async getAvailableLanguages() {
-            const fromCookie = getCookie("AvailableLanguages");
+            const fromCookie = getCookie(this.allLanguagesCookieName);
 
             if (fromCookie) {
                 this.availableLanguages = fromCookie.split(',');
@@ -29,14 +31,15 @@ const layoutApp = Vue.createApp({
             await axios.get('/UILanguages/getAvailableLanguages')
                 .then(result => {
                     this.availableLanguages = result.data;
-                    setCookie("AvailableLanguages", result.data.toString(), 1);
+                    setCookie(this.allLanguagesCookieName, result.data.toString(), 1);
                 })
                 .catch(error => {
                     tellAxiosError(error);
+                    deleteCookie(this.allLanguagesCookieName);
                 });
         },
         async getActiveLanguage() {
-            const fromCookie = getCookie("ActiveLanguage");
+            const fromCookie = getCookie(this.userLanguageCookieName);
 
             if (fromCookie) {
                 this.activeLanguage = fromCookie;
@@ -46,28 +49,28 @@ const layoutApp = Vue.createApp({
             await axios.get('/UILanguages/getActiveLanguage')
                 .then(result => {
                     this.activeLanguage = result.data;
-                    setCookie("ActiveLanguage", result.data, 1);
+                    setCookie(this.userLanguageCookieName, this.activeLanguage, 1);
                 })
                 .catch(error => {
                     tellAxiosError(error);
                 });
         },
         async activeLanguageChange() {
-            deleteCookie("ActiveLanguage");
             await axios.post('/UILanguages/SetCulture/' + this.activeLanguage)
                 .then(result => {
-                    if (result.data)    //Culture actually changed
-                        window.location.reload(false);
+                    window.location.reload(false);
+                    setCookie(this.userLanguageCookieName, this.activeLanguage, 1);
                 })
                 .catch(error => {
                     tellAxiosError(error);
+                    deleteCookie(this.userLanguageCookieName);
                 });
         },
     },
     watch: {
         activeLanguage: {
-            handler: function () {
-                if (this.mountFinished)
+            handler: function (newValue, oldValue) {
+                if (newValue != oldValue && this.mountFinished)
                     this.activeLanguageChange();
             }
         },

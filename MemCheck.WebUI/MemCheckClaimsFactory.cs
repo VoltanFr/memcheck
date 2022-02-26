@@ -15,7 +15,8 @@ namespace MemCheck.WebUI
         public async override Task<ClaimsPrincipal> CreateAsync(MemCheckUser user)
         {
             var principal = await base.CreateAsync(user);
-            ((ClaimsIdentity)principal.Identity!).AddClaims(new[] { new Claim(MemCheckClaims.UICulture, user.UILanguage ?? MemCheckRequestCultureProvider.French.Name) });
+            if (user.UILanguage != null)
+                ((ClaimsIdentity)principal.Identity!).AddClaims(new[] { new Claim(MemCheckClaims.UICulture, user.UILanguage) });
             return principal;
         }
     }

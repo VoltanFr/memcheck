@@ -8,7 +8,7 @@ namespace MemCheck.Domain
     //But the user id always remains valid
     public sealed class MemCheckUser : IdentityUser<Guid>
     {
-        public string? UILanguage { get; set; } = null;
+        public string? UILanguage { get; set; } = null; //This is the value returned by MemCheckSupportedCultures.IdFromCulture for one of the MemCheckSupportedCultures.All
         public CardLanguage? PreferredCardCreationLanguage { get; set; } = null;
         public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0;   //A number of days. <= 0 means never send any email
         public DateTime LastNotificationUtcDate { get; set; }
