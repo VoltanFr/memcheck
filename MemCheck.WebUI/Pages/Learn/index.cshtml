@@ -70,7 +70,7 @@
                             <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></van-button>
                         </li>
                         <li id="Info button" style="padding-right:5px" title=@Localizer["Info"]>
-                            <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
+                            <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay placement="right">
                                 @Localizer["LastLearnDate"] {{dateTime(currentCard.lastLearnUtcTime)}}
                                 <hr class="menu-separation-line" />
                                 @Localizer["DateAddedInDeck"] {{dateTime(currentCard.addToDeckUtcTime)}}
