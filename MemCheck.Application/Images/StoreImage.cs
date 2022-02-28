@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
@@ -90,6 +92,7 @@ namespace MemCheck.Application.Images
             image.OriginalContentType = request.ContentType;
             image.OriginalSize = request.Blob.Length;
             image.OriginalBlob = request.Blob;
+            image.OriginalBlobSha1 = CryptoServices.GetSHA1(request.Blob);
 
             using var sourceStream = new MemoryStream(request.Blob);
             using var originalImage = GetBitmap(sourceStream, request.ContentType);
@@ -143,6 +146,11 @@ namespace MemCheck.Application.Images
                 await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);
                 QueryValidationHelper.CheckCanCreateImageWithDescription(Description, callContext.Localized);
                 QueryValidationHelper.CheckCanCreateImageWithSource(Source, callContext.Localized);
+
+                var sha1 = CryptoServices.GetSHA1(Blob);
+                var existing = await callContext.DbContext.Images.Where(img => img.OriginalBlobSha1.SequenceEqual(sha1)).SingleOrDefaultAsync();
+                if (existing != null)
+                    throw new IOException($"This image is already in the database, with name '{existing.Name}'");
             }
         }
         public sealed record Result();

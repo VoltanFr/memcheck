@@ -22,6 +22,7 @@ namespace MemCheck.Domain
         public string OriginalContentType { get; set; } = null!; //eg "image/svg+xml" or "image/jpeg". But the three blobs below are always "image/jpeg"
         public int OriginalSize { get; set; }   //In bytes
         public byte[] OriginalBlob { get; set; } = null!;
+        public byte[] OriginalBlobSha1 { get; set; } = null!;
 
         public byte[] SmallBlob { get; set; } = null!;    //Width=100px
         public int SmallBlobSize { get; set; }

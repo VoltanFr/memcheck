@@ -224,6 +224,7 @@ namespace MemCheck.Application.Images
                 Assert.AreEqual(StoreImage.pngImageContentType, image.OriginalContentType);
                 Assert.AreEqual(pngImage.Length, image.OriginalSize);
                 Assert.IsTrue(pngImage.SequenceEqual(image.OriginalBlob));
+                Assert.AreEqual(20, image.OriginalBlobSha1.Length);
                 Assert.IsTrue(image.SmallBlobSize > 0);
                 Assert.AreEqual(image.SmallBlobSize, image.SmallBlob.Length);
                 Assert.IsTrue(image.MediumBlobSize > 0);
@@ -239,7 +240,8 @@ namespace MemCheck.Application.Images
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            await ImageHelper.CreateAsync(db, user);
+
+            var firstImageGuid = await ImageHelper.CreateAsync(db, user);
 
             var name = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
@@ -249,7 +251,35 @@ namespace MemCheck.Application.Images
             }
 
             using (var dbContext = new MemCheckDbContext(db))
-                Assert.IsTrue(dbContext.Images.Any(img => img.Owner.Id == user));
+            {
+                var secondImage = await dbContext.Images.Include(img => img.Owner).Where(img => img.Name == name).SingleAsync();
+                Assert.AreEqual(user, secondImage.Owner.Id);
+
+                var firstImage = await dbContext.Images.Where(img => img.Id == firstImageGuid).SingleAsync();
+
+                Assert.IsFalse(firstImage.OriginalBlobSha1.SequenceEqual(secondImage.OriginalBlobSha1));
+            }
+        }
+        [TestMethod()]
+        public async Task FailureOnReAdding()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+
+            var firstImageName = RandomHelper.String();
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new StoreImage.Request(user, firstImageName, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
+                await new StoreImage(dbContext.AsCallContext()).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new StoreImage.Request(user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
+                var e = await Assert.ThrowsExceptionAsync<IOException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
+                StringAssert.Contains(e.Message, firstImageName);
+            }
         }
     }
 }
