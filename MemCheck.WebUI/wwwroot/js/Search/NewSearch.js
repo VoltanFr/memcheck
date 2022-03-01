@@ -606,6 +606,10 @@ const searchApp = Vue.createApp({
                 alert(this.allStaticData.localizedText.operationIsForSelectedCards);
                 return;
             }
+            if (selectedCardIds.length > 50) {
+                alert(this.allStaticData.localizedText.tooManySelectedCards);
+                return;
+            }
             for (let i = 0; i < selectedCardIds.length; i++)
                 window.open("/Authoring?CardId=" + selectedCardIds[i], '_blank');
         },

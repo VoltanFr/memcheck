@@ -169,6 +169,7 @@ namespace MemCheck.WebUI.Controllers
                 IncludeCards = localizer.Get("IncludeCards");
                 ExcludeCards = localizer.Get("ExcludeCards");
                 OperationIsForSelectedCards = localizer.Get("OperationIsForSelectedCards");
+                TooManySelectedCards = localizer.Get("TooManySelectedCards");
                 AlertAddTagToCardsPart1 = localizer.Get("AlertAddTagToCardsPart1");
                 AlertAddTagToCardsPart2 = localizer.Get("AlertAddTagToCardsPart2");
                 AlertAddTagToCardsPart3Single = localizer.Get("AlertAddTagToCardsPart3Single");
@@ -224,6 +225,7 @@ namespace MemCheck.WebUI.Controllers
             public string IncludeCards { get; }
             public string ExcludeCards { get; }
             public string OperationIsForSelectedCards { get; }
+            public string TooManySelectedCards { get; }
             public string AlertAddTagToCardsPart1 { get; }
             public string AlertAddTagToCardsPart2 { get; }
             public string AlertAddTagToCardsPart3Single { get; }

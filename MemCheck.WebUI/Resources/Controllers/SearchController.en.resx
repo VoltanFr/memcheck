@@ -339,6 +339,9 @@
   <data name="TagAdded" xml:space="preserve">
     <value>Tag added</value>
   </data>
+  <data name="TooManySelectedCards" xml:space="preserve">
+    <value>Too many selected cards (max: 50)</value>
+  </data>
   <data name="UnknownCardsHeap" xml:space="preserve">
     <value>Unknown cards</value>
   </data>
