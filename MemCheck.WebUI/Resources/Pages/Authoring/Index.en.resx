@@ -180,4 +180,7 @@
   <data name="ImageName_SmallScreen" xml:space="preserve">
     <value>Image</value>
   </data>
+  <data name="AddToYourDeck" xml:space="preserve">
+    <value>Add to your deck</value>
+  </data>
 </root>

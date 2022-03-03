@@ -52,7 +52,9 @@ const authoringApp = Vue.createApp({
                 sureCreateWithoutTag: "",
             },
             addToDeck: "",  //AuthoringController.DecksOfUserViewModel
+            addToSingleDeck: true,  //meaningful only if singleDeckDisplay
             decksOfUser: [],    //AuthoringController.DecksOfUserViewModel
+            singleDeckDisplay: false,
             imageToAddFront: "", //string (name of image)
             imageToAddBack: "",
             imageToAddAdditional: "",
@@ -106,8 +108,10 @@ const authoringApp = Vue.createApp({
         },
         async GetDecksOfUser() {
             this.decksOfUser = (await axios.get('/Authoring/DecksOfUser')).data;
-            if (this.decksOfUser.length == 1)
+            if (this.decksOfUser.length == 1) {
                 this.addToDeck = this.decksOfUser[0];
+                this.singleDeckDisplay = true;
+            }
             this.decksOfUser.splice(0, 0, "");
         },
         async getAllAvailableTags() {
@@ -142,6 +146,7 @@ const authoringApp = Vue.createApp({
             this.saving = true;
 
             try {
+                const deckToAddTo = this.singleDeckDisplay ? (this.addToSingleDeck ? this.decksOfUser[1].deckId : undefined) : this.addToDeck.deckId;
                 const postCard = {
                     FrontSide: this.card.frontSide,
                     FrontSideImageList: this.frontSideImageList.map(img => img.imageId),
@@ -152,7 +157,7 @@ const authoringApp = Vue.createApp({
                     LanguageId: this.card.languageId,
                     Tags: this.card.tags.map(tag => tag.tagId),
                     UsersWithVisibility: this.card.usersWithView.map(user => user.userId),
-                    AddToDeck: this.addToDeck.deckId,
+                    AddToDeck: deckToAddTo,
                     VersionDescription: this.card.versionDescription,
                 };
 

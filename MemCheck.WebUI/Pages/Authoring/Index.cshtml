@@ -148,9 +148,14 @@
                     <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
                 </div>
                 <div id="AddToDeckInputRow" v-if="creatingNewCard" class="memcheck-input-div">
-                    <p class="authoring-row-caption">@Localizer["AddToDeck"]</p>
-                    <div style="flex-flow:row wrap; width:100%">
-                        <select v-model="addToDeck" class="authoring-select"><option v-for="deck in decksOfUser" v-bind:value="deck">{{deck.deckName}}</option></select>
+                    <div v-if="singleDeckDisplay">
+                        <input type="checkbox" v-model="addToSingleDeck" /> @Localizer["AddToYourDeck"]
+                    </div>
+                    <div v-else>
+                        <p class="authoring-row-caption">@Localizer["AddToDeck"]</p>
+                        <div style="flex-flow:row wrap; width:100%">
+                            <select v-model="addToDeck" class="authoring-select"><option v-for="deck in decksOfUser" v-bind:value="deck">{{deck.deckName}}</option></select>
+                        </div>
                     </div>
                 </div>
             </div>

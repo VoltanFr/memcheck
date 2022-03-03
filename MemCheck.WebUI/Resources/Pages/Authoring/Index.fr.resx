@@ -183,4 +183,7 @@
   <data name="ImageName_SmallScreen" xml:space="preserve">
     <value>Image</value>
   </data>
+  <data name="AddToYourDeck" xml:space="preserve">
+    <value>Ajouter à votre paquet</value>
+  </data>
 </root>
