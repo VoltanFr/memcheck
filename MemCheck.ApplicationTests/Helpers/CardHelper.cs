@@ -13,7 +13,7 @@ namespace MemCheck.Application.Tests.Helpers
     {
         public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB,
             Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
-            string? frontSide = null, string? backSide = null, string? additionalInfo = null,
+            string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null,
             IEnumerable<Guid>? frontSideImages = null, IEnumerable<Guid>? additionalSideImages = null,
             string? versionDescription = null)
         {
@@ -28,6 +28,7 @@ namespace MemCheck.Application.Tests.Helpers
                 FrontSide = frontSide ?? RandomHelper.String(),
                 BackSide = backSide ?? RandomHelper.String(),
                 AdditionalInfo = additionalInfo ?? RandomHelper.String(),
+                References = references ?? RandomHelper.String(),
                 VersionDescription = versionDescription ?? RandomHelper.String(),
                 VersionType = CardVersionType.Creation
             };
@@ -90,11 +91,11 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
             Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
-            string? frontSide = null, string? backSide = null, string? additionalInfo = null,
+            string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null,
             IEnumerable<Guid>? frontSideImages = null, IEnumerable<Guid>? additionalSideImages = null,
             string? versionDescription = null)
         {
-            return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, frontSideImages, additionalSideImages, versionDescription)).Id;
+            return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, references, frontSideImages, additionalSideImages, versionDescription)).Id;
         }
         public static async Task AssertCardHasFrontSide(DbContextOptions<MemCheckDbContext> testDB, Guid cardId, string expected)
         {

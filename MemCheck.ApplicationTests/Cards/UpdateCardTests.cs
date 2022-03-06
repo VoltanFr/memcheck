@@ -48,7 +48,7 @@ namespace MemCheck.Application.Cards
             var user = await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
-            var r = new UpdateCard.Request(Guid.NewGuid(), user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
+            var r = new UpdateCard.Request(Guid.NewGuid(), user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
             await Assert.ThrowsExceptionAsync<ApplicationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         }
         [TestMethod()]
@@ -154,6 +154,7 @@ namespace MemCheck.Application.Cards
             var frontSide = RandomHelper.String();
             var backSide = RandomHelper.String();
             var additionalInfo = RandomHelper.String();
+            var references = RandomHelper.String();
             var versionDescription = RandomHelper.String();
             var newLanguageId = await CardLanguagHelper.CreateAsync(db);
             var imageOnFrontSideId = await ImageHelper.CreateAsync(db, cardCreator);
@@ -173,6 +174,7 @@ namespace MemCheck.Application.Cards
                     new Guid[] { imageOnBackSide1Id, imageOnBackSide2Id },
                     additionalInfo,
                     new Guid[] { imageOnAdditionalInfoId },
+                    references,
                     languageId,
                     new Guid[] { tagId },
                     new Guid[] { cardCreator, newVersionCreator },
@@ -193,6 +195,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(frontSide, updatedCard.FrontSide);
                 Assert.AreEqual(backSide, updatedCard.BackSide);
                 Assert.AreEqual(additionalInfo, updatedCard.AdditionalInfo);
+                Assert.AreEqual(references, updatedCard.References);
                 Assert.AreEqual(versionDescription, updatedCard.VersionDescription);
                 Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
                 Assert.AreEqual(ImageInCard.FrontSide, updatedCard.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
@@ -226,6 +229,7 @@ namespace MemCheck.Application.Cards
                 card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
                 card.AdditionalInfo,
                 card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
+                card.References,
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),
                 card.UsersWithView.Select(uwv => uwv.UserId),
@@ -481,6 +485,21 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(1, loaded.RatingCount);
                 Assert.AreEqual(rating, loaded.AverageRating);
             }
+        }
+        [TestMethod()]
+        public async Task ReferencesTooLong()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var originalCard = await CardHelper.CreateAsync(testDB, creatorId);
+
+            var request = UpdateCardHelper.RequestForReferencesChange(originalCard, RandomHelper.String(CardInputValidator.MaxReferencesLength + 1));
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+            StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString());
+            StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString());
+            StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString());
         }
     }
 }

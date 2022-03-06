@@ -256,6 +256,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="PleaseWaitSavingData" xml:space="preserve">
     <value>Enregistrement en cours...</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>Références</value>
+  </data>
   <data name="RegisteredForNotif" xml:space="preserve">
     <value>Alertes actives (cliquez pour désactiver)</value>
   </data>

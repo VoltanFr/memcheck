@@ -27,7 +27,7 @@ namespace MemCheck.Application.Tests.Notifying
         private static async Task<CardPreviousVersion> CreateDeletedCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, DateTime versionDate, IEnumerable<Guid>? userWithViewIds = null)
         {
             //userWithViewIds null means public card
-            
+
             var cardLanguageId = await CardLanguagHelper.CreateAsync(testDB);
 
             using var dbContext = new MemCheckDbContext(testDB);
@@ -39,10 +39,11 @@ namespace MemCheck.Application.Tests.Notifying
                 Card = Guid.NewGuid(),
                 CardLanguage = cardLanguage,
                 VersionCreator = creator,
-                FrontSide = Guid.NewGuid().ToString(),
-                BackSide = Guid.NewGuid().ToString(),
-                AdditionalInfo = Guid.NewGuid().ToString(),
-                VersionDescription = Guid.NewGuid().ToString(),
+                FrontSide = RandomHelper.String(),
+                BackSide = RandomHelper.String(),
+                AdditionalInfo = RandomHelper.String(),
+                References = RandomHelper.String(),
+                VersionDescription = RandomHelper.String(),
                 VersionType = CardPreviousVersionType.Deletion,
                 VersionUtcDate = versionDate
             };

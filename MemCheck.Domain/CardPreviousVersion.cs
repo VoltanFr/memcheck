@@ -16,6 +16,7 @@ namespace MemCheck.Domain
         public string FrontSide { get; set; } = null!;
         public string BackSide { get; set; } = null!;
         public string AdditionalInfo { get; set; } = null!;
+        public string References { get; set; } = null!;
         public IEnumerable<TagInPreviousCardVersion> Tags { get; set; } = null!;
         public DateTime VersionUtcDate { get; set; } //In case of deletion, this is the deletion date
         public IEnumerable<UserWithViewOnCardPreviousVersion> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)

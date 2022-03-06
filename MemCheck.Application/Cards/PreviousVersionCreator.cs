@@ -67,6 +67,7 @@ namespace MemCheck.Application.Cards
                 FrontSide = card.FrontSide,
                 BackSide = card.BackSide,
                 AdditionalInfo = card.AdditionalInfo,
+                References = card.References,
                 VersionUtcDate = versionUtcDate ?? card.VersionUtcDate,
                 VersionType = CardPreviousVersionTypeFromCard(card),
                 VersionDescription = card.VersionDescription,

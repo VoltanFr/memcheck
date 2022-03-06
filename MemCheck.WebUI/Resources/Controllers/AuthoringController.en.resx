@@ -177,6 +177,12 @@
   <data name="InitialCardVersionCreation" xml:space="preserve">
     <value>Initial version</value>
   </data>
+  <data name="InvalidAdditionalInfoLength" xml:space="preserve">
+    <value>Invalid additional information length:</value>
+  </data>
+  <data name="InvalidBackSideLength" xml:space="preserve">
+    <value>Invalid back side length:</value>
+  </data>
   <data name="InvalidCardEmptyBackSide" xml:space="preserve">
     <value>Back side can not be empty.</value>
   </data>
@@ -185,6 +191,12 @@
   </data>
   <data name="InvalidCardEmptyVersionDescription" xml:space="preserve">
     <value>Version description can not be empty</value>
+  </data>
+  <data name="InvalidFrontSideLength" xml:space="preserve">
+    <value>Invalid front side length:</value>
+  </data>
+  <data name="InvalidReferencesLength" xml:space="preserve">
+    <value>Invalid references length:</value>
   </data>
   <data name="InvalidVersionDescriptionLength" xml:space="preserve">
     <value>Invalid version description length:</value>

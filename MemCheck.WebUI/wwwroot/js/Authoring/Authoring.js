@@ -17,6 +17,7 @@ const authoringApp = Vue.createApp({
                 frontSide: "",
                 backSide: "",
                 additionalInfo: "",
+                references: "",
                 languageId: "", //Guid
                 tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
                 usersWithView: [], //AuthoringController.GetUsersViewModel
@@ -29,6 +30,7 @@ const authoringApp = Vue.createApp({
                 frontSide: "",
                 backSide: "",
                 additionalInfo: "",
+                references: "",
                 languageId: "", //Guid
                 tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
                 usersWithView: [] //AuthoringController.GetUsersViewModel
@@ -153,6 +155,7 @@ const authoringApp = Vue.createApp({
                     BackSide: this.card.backSide,
                     BackSideImageList: this.backSideImageList.map(img => img.imageId),
                     AdditionalInfo: this.card.additionalInfo,
+                    References: this.card.references,
                     AdditionalInfoImageList: this.additionalInfoImageList.map(img => img.imageId),
                     LanguageId: this.card.languageId,
                     Tags: this.card.tags.map(tag => tag.tagId),
@@ -184,6 +187,7 @@ const authoringApp = Vue.createApp({
             this.card.frontSide = "";
             this.card.backSide = "";
             this.card.additionalInfo = "";
+            this.card.references = "";
             this.card.tags = [];
             this.frontSideImageList = [];
             this.backSideImageList = [];
@@ -197,6 +201,7 @@ const authoringApp = Vue.createApp({
             this.originalCard.frontSide = this.card.frontSide;
             this.originalCard.backSide = this.card.backSide;
             this.originalCard.additionalInfo = this.card.additionalInfo;
+            this.originalCard.references = this.card.references;
             this.originalCard.languageId = this.card.languageId;
             this.originalCard.tags = this.card.tags.slice();
             this.originalCard.usersWithView = this.card.usersWithView.slice();
@@ -284,6 +289,7 @@ const authoringApp = Vue.createApp({
                     this.card.frontSide = result.data.frontSide;
                     this.card.backSide = result.data.backSide;
                     this.card.additionalInfo = result.data.additionalInfo;
+                    this.card.references = result.data.references;
                     this.card.languageId = result.data.languageId;
                     this.card.tags = result.data.tags;
                     this.card.usersWithView = result.data.usersWithVisibility;
@@ -411,6 +417,7 @@ const authoringApp = Vue.createApp({
             var result = this.card.frontSide != this.originalCard.frontSide;
             result = result || (this.card.backSide != this.originalCard.backSide);
             result = result || (this.card.additionalInfo != this.originalCard.additionalInfo);
+            result = result || (this.card.references != this.originalCard.references);
             result = result || (this.card.languageId != this.originalCard.languageId);
             result = result || (!this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId)));
             result = result || (!this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId)));

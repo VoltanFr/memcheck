@@ -17,6 +17,8 @@ namespace MemCheck.Application.QueryValidation
         #endregion
         public const int MinVersionDescriptionLength = 3;
         public const int MaxVersionDescriptionLength = 1000;
+        public const int MinReferencesLength = 0;
+        public const int MaxReferencesLength = 4000;
         public static void Run(ICardInput input, ILocalized localizer)
         {
             if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
@@ -42,6 +44,11 @@ namespace MemCheck.Application.QueryValidation
                 throw new RequestInputException(localizer.Get("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + localizer.Get("MustBeBetween") + $" {minAdditionalInfoLength} " + localizer.Get("And") + $" {maxAdditionalInfoLength}");
             if (input.AdditionalInfoImageList.Count() > maxImageCountPerSide)
                 throw new RequestInputException(localizer.Get("InvalidAdditionalInfoImageCount") + $" {input.AdditionalInfoImageList.Count()}" + localizer.Get("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
+
+            if (input.References != input.References.Trim())
+                throw new InvalidOperationException("Invalid References: not trimmed");
+            if (input.References.Length < MinReferencesLength || input.References.Length > MaxReferencesLength)
+                throw new RequestInputException(localizer.Get("InvalidReferencesLength") + $" {input.References.Length}" + localizer.Get("MustBeBetween") + $" {MinReferencesLength} " + localizer.Get("And") + $" {MaxReferencesLength}");
 
             if (input.VersionDescription != input.VersionDescription.Trim())
                 throw new InvalidOperationException("Invalid VersionDescription: not trimmed");

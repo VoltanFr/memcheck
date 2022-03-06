@@ -85,12 +85,13 @@ namespace MemCheck.Application.Cards
             var frontSide = RandomHelper.String();
             var backSide = RandomHelper.String();
             var additionalInfo = RandomHelper.String();
+            var references = RandomHelper.String();
             var tagName = RandomHelper.String();
             var tag = await TagHelper.CreateAsync(db, tagName);
             var otherUserName = RandomHelper.String();
             var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
             var versionDescription = RandomHelper.String();
-            var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, tagIds: tag.AsArray(), userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
+            var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, references: references, tagIds: tag.AsArray(), userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
 
             var deck = await DeckHelper.CreateAsync(db, otherUserId);
             await DeckHelper.AddCardAsync(db, deck, card.Id);
@@ -101,6 +102,7 @@ namespace MemCheck.Application.Cards
             Assert.AreEqual(frontSide, loaded.FrontSide);
             Assert.AreEqual(backSide, loaded.BackSide);
             Assert.AreEqual(additionalInfo, loaded.AdditionalInfo);
+            Assert.AreEqual(references, loaded.References);
             Assert.AreEqual(language, loaded.LanguageId);
             Assert.AreEqual(languageName, loaded.LanguageName);
             Assert.AreEqual(tag, loaded.Tags.Single().TagId);

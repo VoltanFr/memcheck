@@ -89,14 +89,17 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
-            var card = await CardHelper.CreateAsync(db, user);
+            var references = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, user, references: references);
             var addDate = RandomHelper.Date();
             await DeckHelper.AddCardAsync(db, deck, card.Id, 1, addDate);
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
             var cards = await new GetCardsToRepeat(dbContext.AsCallContext(), addDate.AddDays(1)).RunAsync(request);
-            Assert.AreEqual(card.Id, cards.Cards.Single().CardId);
+            var loadedCard = cards.Cards.Single();
+            Assert.AreEqual(card.Id, loadedCard.CardId);
+            Assert.AreEqual(references, loadedCard.References);
         }
         [TestMethod()]
         public async Task RequestedCount()

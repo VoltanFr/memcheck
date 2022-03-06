@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,6 +15,7 @@ namespace MemCheck.Domain
         public string FrontSide { get; set; } = null!;
         public string BackSide { get; set; } = null!;
         public string AdditionalInfo { get; set; } = null!;
+        public string References { get; set; } = null!;
         public IEnumerable<CardInDeck> CardInDecks { get; set; } = null!;
         public IEnumerable<TagInCard> TagsInCards { get; set; } = null!;
         public DateTime InitialCreationUtcDate { get; set; } //This field is immutable accross versions, but keeping it avoids the need to walk all the versions to find the initial creation date

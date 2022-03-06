@@ -41,8 +41,7 @@ namespace MemCheck.WebUI.Controllers
         {
             static GetImage.Request.ImageSize AppSizeFromWebParam(int size)
             {
-                return size switch
-                {
+                return size switch {
                     1 => GetImage.Request.ImageSize.Small,
                     2 => GetImage.Request.ImageSize.Medium,
                     3 => GetImage.Request.ImageSize.Big,
@@ -160,6 +159,7 @@ namespace MemCheck.WebUI.Controllers
                 FrontSide = RenderMarkdown(applicationResult.FrontSide);
                 BackSide = RenderMarkdown(applicationResult.BackSide);
                 AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
+                References = RenderMarkdown(applicationResult.References);
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
                 RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
@@ -201,6 +201,7 @@ namespace MemCheck.WebUI.Controllers
                 FrontSide = RenderMarkdown(applicationResult.FrontSide);
                 BackSide = RenderMarkdown(applicationResult.BackSide);
                 AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
+                References = RenderMarkdown(applicationResult.References);
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
                 RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
@@ -240,6 +241,7 @@ namespace MemCheck.WebUI.Controllers
             public string FrontSide { get; }
             public string BackSide { get; }
             public string AdditionalInfo { get; }
+            public string References { get; }
             public string Owner { get; }
             public IEnumerable<string> Tags { get; }
             public IEnumerable<GetCardsHeapModel> MoveToHeapTargets { get; }

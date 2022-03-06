@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.Languages;
 using MemCheck.Basics;
 using MemCheck.Domain;
 using System;
@@ -34,7 +33,7 @@ namespace MemCheck.Application.Tests.Helpers
         {
             return Entry(HeapingAlgorithms.Instance.Ids);
         }
-        public static string String(int? length = null)
+        public static string String(int? length = null) //if length is null, result will be 36 chars
         {
             var result = new StringBuilder();
             do

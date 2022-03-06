@@ -12,6 +12,7 @@ namespace MemCheck.Application.Cards
         public IEnumerable<Guid> BackSideImageList { get; }
         public string AdditionalInfo { get; }
         public IEnumerable<Guid> AdditionalInfoImageList { get; }
+        public string References { get; }
         public Guid LanguageId { get; }
         public IEnumerable<Guid> Tags { get; }
         public IEnumerable<Guid> UsersWithVisibility { get; }

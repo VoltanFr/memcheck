@@ -51,7 +51,66 @@ namespace MemCheck.Application.History
             }
         }
         [TestMethod()]
-        public async Task MultipleVersions()
+        public async Task SingleVersion()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(db);
+            var versionDate = RandomHelper.Date();
+            var versionDescription = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, userId, versionDate, frontSide: "", backSide: "", additionalInfo: "", references: "", versionDescription: versionDescription);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
+                Assert.AreEqual(1, versions.Count());
+
+                var version = versions.Single();
+
+                Assert.AreEqual(versionDate, version.VersionUtcDate);
+                Assert.AreEqual(versionDescription, version.VersionDescription);
+                Assert.AreEqual(2, version.ChangedFieldNames.Count());
+                CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.LanguageName);
+                CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.UsersWithView);
+            }
+        }
+        [TestMethod()]
+        public async Task TwoVersions()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(db);
+            var initialVersionDate = RandomHelper.Date();
+            var initialVersionDescription = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, userId, versionDate: initialVersionDate, versionDescription: initialVersionDescription);
+
+            var lastVersionDate = RandomHelper.Date();
+            var lastVersionDescription = RandomHelper.String();
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = UpdateCardHelper.RequestForReferencesChange(card, RandomHelper.String(), versionDescription: lastVersionDescription);
+                await new UpdateCard(dbContext.AsCallContext(), lastVersionDate).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
+
+                Assert.AreEqual(2, versions.Count());
+
+                var initialVersion = versions.Last();
+                Assert.IsNotNull(initialVersion.VersionId);
+                Assert.AreEqual(initialVersionDate, initialVersion.VersionUtcDate);
+                Assert.AreEqual(initialVersionDescription, initialVersion.VersionDescription);
+
+                var lastVersion = versions.First();
+                Assert.IsNull(lastVersion.VersionId);
+                Assert.AreEqual(lastVersionDate, lastVersion.VersionUtcDate);
+                Assert.AreEqual(lastVersionDescription, lastVersion.VersionDescription);
+                Assert.AreEqual(1, lastVersion.ChangedFieldNames.Count());
+                Assert.AreEqual(GetCardVersions.References, lastVersion.ChangedFieldNames.Single());
+            }
+        }
+        [TestMethod()]
+        public async Task ThreeVersions()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userName = RandomHelper.String();
@@ -95,7 +154,7 @@ namespace MemCheck.Application.History
                 Assert.AreEqual(oldestDate, versions[2].VersionUtcDate);
                 Assert.AreEqual(userName, versions[2].VersionCreator);
                 Assert.AreEqual(oldestDescription, versions[2].VersionDescription);
-                Assert.AreEqual(5, versions[2].ChangedFieldNames.Count());
+                Assert.AreEqual(6, versions[2].ChangedFieldNames.Count());
 
                 Assert.AreEqual((await dbContext.CardPreviousVersions.SingleAsync(c => c.VersionUtcDate == intermediaryDate)).Id, versions[1].VersionId);
                 Assert.AreEqual(intermediaryDate, versions[1].VersionUtcDate);

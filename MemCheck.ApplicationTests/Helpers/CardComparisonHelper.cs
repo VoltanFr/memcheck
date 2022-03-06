@@ -20,6 +20,7 @@ namespace MemCheck.Application.Tests.Helpers
             Assert.AreEqual(card.FrontSide, firstVersion.FrontSide);
             Assert.AreEqual(card.BackSide, firstVersion.BackSide);
             Assert.AreEqual(card.AdditionalInfo, firstVersion.AdditionalInfo);
+            Assert.AreEqual(card.References, firstVersion.References);
             AssertSameTagSet(card.TagsInCards, firstVersion.Tags);
             AssertSameUserWithViewSet(card.UsersWithView, firstVersion.UsersWithView);
             AssertSameImageSet(card.Images, firstVersion.Images);

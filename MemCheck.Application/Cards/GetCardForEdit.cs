@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -43,6 +42,7 @@ namespace MemCheck.Application.Cards
                             card.FrontSide,
                             card.BackSide,
                             card.AdditionalInfo,
+                            card.References,
                             card.CardLanguage.Id,
                             card.CardLanguage.Name,
                             card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
@@ -68,7 +68,7 @@ namespace MemCheck.Application.Cards
                 ("AgeOfCardInDays", (DateTime.UtcNow - card.InitialCreationUtcDate).TotalDays.ToString()),
                 ("CardLanguage", card.CardLanguage.Name));
         }
-        #region Result classes
+        #region Request & Result classes
         public sealed class Request : IRequest
         {
             public Request(Guid currentUserId, Guid cardId)
@@ -88,12 +88,13 @@ namespace MemCheck.Application.Cards
         }
         public sealed class ResultModel
         {
-            public ResultModel(string frontSide, string backSide, string additionalInfo, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
+            public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
                 DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings)
             {
                 FrontSide = frontSide;
                 BackSide = backSide;
                 AdditionalInfo = additionalInfo;
+                References = references;
                 LanguageId = languageId;
                 LanguageName = languageName;
                 Tags = tags;
@@ -111,6 +112,7 @@ namespace MemCheck.Application.Cards
             public string FrontSide { get; }
             public string BackSide { get; }
             public string AdditionalInfo { get; }
+            public string References { get; }
             public Guid LanguageId { get; }
             public string LanguageName { get; }
             public IEnumerable<ResultTagModel> Tags { get; }

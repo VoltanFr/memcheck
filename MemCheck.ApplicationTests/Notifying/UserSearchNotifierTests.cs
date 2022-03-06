@@ -89,7 +89,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card2.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
+                var updateRequest = new UpdateCard.Request(card2.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
@@ -138,7 +138,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var updateRequest = new UpdateCard.Request(card1.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
+                var updateRequest = new UpdateCard.Request(card1.Id, user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 
@@ -193,7 +193,7 @@ namespace MemCheck.Application.Tests.Notifying
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                UpdateCard.Request updateRequest = new(card1.Id, user, someText, Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
+                UpdateCard.Request updateRequest = new(card1.Id, user, someText, Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), language, Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext(), new DateTime(2050, 05, 02)).RunAsync(updateRequest);
             }
 

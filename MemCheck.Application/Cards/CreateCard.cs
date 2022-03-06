@@ -33,6 +33,7 @@ namespace MemCheck.Application.Cards
                 FrontSide = request.FrontSide,
                 BackSide = request.BackSide,
                 AdditionalInfo = request.AdditionalInfo,
+                References = request.References,
                 CardLanguage = language,
                 VersionCreator = versionCreator,
                 InitialCreationUtcDate = DateTime.Now.ToUniversalTime(),
@@ -82,12 +83,13 @@ namespace MemCheck.Application.Cards
         #region Request class
         public sealed class Request : ICardInput
         {
-            public Request(Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+            public Request(Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
                 VersionCreatorId = versionCreatorId;
                 FrontSide = frontSide.Trim();
                 BackSide = backSide.Trim();
                 AdditionalInfo = additionalInfo.Trim();
+                References = references.Trim();
                 FrontSideImageList = frontSideImageList;
                 BackSideImageList = backSideImageList;
                 AdditionalInfoImageList = additionalInfoImageList;
@@ -103,6 +105,7 @@ namespace MemCheck.Application.Cards
             public IEnumerable<Guid> BackSideImageList { get; }
             public string AdditionalInfo { get; }
             public IEnumerable<Guid> AdditionalInfoImageList { get; }
+            public string References { get; }
             public Guid LanguageId { get; }
             public IEnumerable<Guid> Tags { get; }
             public IEnumerable<Guid> UsersWithVisibility { get; }

@@ -27,8 +27,17 @@ namespace MemCheck.Application.Cards
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var previousVersion = await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
+                var previousVersion = await dbContext.CardPreviousVersions
+                    .Include(card => card.VersionCreator)
+                    .Include(card => card.CardLanguage)
+                    .Include(card => card.Tags)
+                    .Include(card => card.UsersWithView)
+                    .Include(card => card.Images)
+                    .Where(previous => previous.Card == card.Id)
+                    .SingleAsync();
                 Assert.AreNotEqual(card.Id, previousVersion.Id);
+                CardComparisonHelper.AssertSameContent(card, previousVersion, true);
+
             }
         }
         [TestMethod()]
@@ -49,8 +58,16 @@ namespace MemCheck.Application.Cards
 
             using (var dbContext = new MemCheckDbContext(testDB))
             {
-                var previousVersion = await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
+                var previousVersion = await dbContext.CardPreviousVersions
+                    .Include(card => card.VersionCreator)
+                    .Include(card => card.CardLanguage)
+                    .Include(card => card.Tags)
+                    .Include(card => card.UsersWithView)
+                    .Include(card => card.Images)
+                    .Where(previous => previous.Card == card.Id)
+                    .SingleAsync();
                 Assert.AreNotEqual(card.Id, previousVersion.Id);
+                CardComparisonHelper.AssertSameContent(card, previousVersion, true);
             }
             Assert.IsTrue(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, newVersionCreatorId, card.Id));
         }

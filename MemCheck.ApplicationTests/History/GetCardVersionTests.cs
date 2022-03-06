@@ -95,5 +95,36 @@ namespace MemCheck.Application.History
                 Assert.AreEqual(intermediaryVersionFrontSide, intermediaryVersion.FrontSide);
             }
         }
+        [TestMethod()]
+        public async Task NewVersionHasChangeInReferences()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+
+            var initialVersionReferences = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, user, references: initialVersionReferences);
+
+            var newVersionReferences = RandomHelper.String();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForReferencesChange(card, newVersionReferences));
+
+            //Add another version so that we have two previous versions
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var previousVersionIds = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(user, card.Id))).Where(cardVersion => cardVersion.VersionId != null).Select(cardVersion => cardVersion.VersionId);
+                Assert.AreEqual(2, previousVersionIds.Count());
+
+                var initialVersionId = previousVersionIds.Last();
+                var initialVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(user, initialVersionId!.Value));
+                Assert.AreEqual(initialVersionReferences, initialVersion.References);
+
+                var newVersionId = previousVersionIds.First();
+                var newVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(user, newVersionId!.Value));
+                Assert.AreEqual(newVersionReferences, newVersion.References);
+            }
+        }
     }
 }

@@ -386,5 +386,53 @@ namespace MemCheck.Application.Searching
                 Assert.AreEqual(4, result.Cards.Single().AverageRating);
             }
         }
+        [TestMethod()]
+        public async Task TestFindNoWithRef()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            await CardHelper.CreateAsync(testDB, userId);
+            await CardHelper.CreateAsync(testDB, userId);
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SearchCards.Request { RequiredText = RandomHelper.String() };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(0, result.TotalNbCards);
+        }
+        [TestMethod()]
+        public async Task TestFindOneCardWithRef()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            var searchedString = RandomHelper.String();
+            await CardHelper.CreateAsync(testDB, userId);
+            var cardWithRef = await CardHelper.CreateAsync(testDB, userId, references: RandomHelper.String() + searchedString + RandomHelper.String());
+            await CardHelper.CreateAsync(testDB, userId);
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SearchCards.Request { RequiredText = searchedString };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(1, result.TotalNbCards);
+            Assert.AreEqual(cardWithRef.Id, result.Cards.Single().CardId);
+        }
+        [TestMethod()]
+        public async Task TestFindTwoCardsWithRef()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var userId = await UserHelper.CreateInDbAsync(testDB);
+            var searchedString = RandomHelper.String();
+            var card1 = await CardHelper.CreateAsync(testDB, userId, references: RandomHelper.String() + searchedString + RandomHelper.String());
+            await CardHelper.CreateAsync(testDB, userId);
+            await CardHelper.CreateAsync(testDB, userId);
+            await CardHelper.CreateAsync(testDB, userId);
+            var card2 = await CardHelper.CreateAsync(testDB, userId, references: searchedString);
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SearchCards.Request { RequiredText = searchedString };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(2, result.TotalNbCards);
+            Assert.IsNotNull(result.Cards.SingleOrDefault(card => card.CardId == card1.Id));
+            Assert.IsNotNull(result.Cards.SingleOrDefault(card => card.CardId == card2.Id));
+        }
     }
 }

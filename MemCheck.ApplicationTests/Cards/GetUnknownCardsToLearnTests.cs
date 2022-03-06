@@ -78,13 +78,16 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
-            var card = await CardHelper.CreateAsync(db, user);
+            var references = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, user, references: references);
             await DeckHelper.AddNeverLearntCardAsync(db, deck, card.Id);
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
             var cards = await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(1, cards.Cards.Count());
+            var loadedCard = cards.Cards.Single();
+            Assert.AreEqual(references, loadedCard.References);
         }
         [TestMethod()]
         public async Task OneLearnt()

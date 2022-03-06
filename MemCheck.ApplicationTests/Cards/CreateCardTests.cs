@@ -34,6 +34,7 @@ namespace MemCheck.Application.Cards
                     new Guid[0],
                     RandomHelper.String(),
                     new Guid[0],
+                    RandomHelper.String(),
                     languageId,
                     new Guid[0],
                     new Guid[0],
@@ -58,6 +59,7 @@ namespace MemCheck.Application.Cards
             var frontSide = RandomHelper.String();
             var backSide = RandomHelper.String();
             var additionalInfo = RandomHelper.String();
+            var references = RandomHelper.String();
             var versionDescription = RandomHelper.String();
 
             var languageId = await CardLanguagHelper.CreateAsync(testDB);
@@ -78,6 +80,7 @@ namespace MemCheck.Application.Cards
                     new Guid[] { imageOnBackSide1Id, imageOnBackSide2Id },
                     additionalInfo,
                     new Guid[] { imageOnAdditionalInfoId },
+                    references,
                     languageId,
                     new Guid[] { tagId },
                     new Guid[] { ownerId, userWithViewId },
@@ -99,6 +102,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(frontSide, card.FrontSide);
                 Assert.AreEqual(backSide, card.BackSide);
                 Assert.AreEqual(additionalInfo, card.AdditionalInfo);
+                Assert.AreEqual(references, card.References);
                 Assert.AreEqual(versionDescription, card.VersionDescription);
                 Assert.AreEqual(languageId, card.CardLanguage.Id);
                 Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == ownerId));
@@ -132,6 +136,7 @@ namespace MemCheck.Application.Cards
                     Array.Empty<Guid>(),
                     RandomHelper.String(),
                     Array.Empty<Guid>(),
+                    RandomHelper.String(),
                     languageId,
                     Array.Empty<Guid>(),
                     Array.Empty<Guid>(),
@@ -160,6 +165,7 @@ namespace MemCheck.Application.Cards
                 Array.Empty<Guid>(),
                 RandomHelper.String(),
                 Array.Empty<Guid>(),
+                RandomHelper.String(),
                 languageId,
                 Array.Empty<Guid>(),
                 new Guid[] { otherUser },
@@ -187,6 +193,7 @@ namespace MemCheck.Application.Cards
                 Array.Empty<Guid>(),
                 RandomHelper.String(),
                 new Guid[] { image1, image2 },
+                RandomHelper.String(),
                 language,
                 Array.Empty<Guid>(),
                 Array.Empty<Guid>(),
@@ -231,6 +238,7 @@ namespace MemCheck.Application.Cards
                 image.AsArray(),
                 RandomHelper.String(),
                 image.AsArray(),
+                RandomHelper.String(),
                 language,
                 Array.Empty<Guid>(),
                 Array.Empty<Guid>(),
@@ -238,6 +246,33 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext()).RunAsync(request));
+        }
+        [TestMethod()]
+        public async Task ReferencesTooLong()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+
+            var request = new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(CardInputValidator.MaxReferencesLength + 1),
+                languageId,
+                Array.Empty<Guid>(),
+                new Guid[0],
+                RandomHelper.String());
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+            StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString());
+            StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString());
+            StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString());
         }
     }
 }

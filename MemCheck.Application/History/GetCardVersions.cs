@@ -12,12 +12,13 @@ namespace MemCheck.Application.History
     public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEnumerable<GetCardVersions.IResultCardVersion>>
     {
         #region Fields
-        private const string LanguageName = nameof(LanguageName);
+        public const string LanguageName = nameof(LanguageName);
         private const string FrontSide = nameof(FrontSide);
         private const string BackSide = nameof(BackSide);
         private const string AdditionalInfo = nameof(AdditionalInfo);
+        public const string References = nameof(References);
         private const string Tags = nameof(Tags);
-        private const string UsersWithView = nameof(UsersWithView);
+        public const string UsersWithView = nameof(UsersWithView);
         private const string FrontSideImages = nameof(FrontSideImages);
         private const string BackSideImages = nameof(BackSideImages);
         private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
@@ -25,7 +26,7 @@ namespace MemCheck.Application.History
         #region Private classes
         private sealed class CardVersionFromDb
         {
-            public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
+            public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo,string references, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
             {
                 Id = id;
                 IsCurrent = isCurrent;
@@ -37,6 +38,7 @@ namespace MemCheck.Application.History
                 FrontSide = frontSide;
                 BackSide = backSide;
                 AdditionalInfo = additionalInfo;
+                References = references;
                 TagIds = tagIds;
                 UserWithViewIds = userWithViewIds;
                 FrontSideImages = frontSideImages;
@@ -53,6 +55,7 @@ namespace MemCheck.Application.History
             public string FrontSide { get; }
             public string BackSide { get; }
             public string AdditionalInfo { get; }
+            public string References { get; }
             public IEnumerable<Guid> TagIds { get; }
             public IEnumerable<Guid> UserWithViewIds { get; }
             public IEnumerable<Guid> FrontSideImages { get; }
@@ -74,6 +77,7 @@ namespace MemCheck.Application.History
                     if (!string.IsNullOrEmpty(dbVersion.FrontSide)) changedFieldNames.Add(FrontSide);
                     if (!string.IsNullOrEmpty(dbVersion.BackSide)) changedFieldNames.Add(BackSide);
                     if (!string.IsNullOrEmpty(dbVersion.AdditionalInfo)) changedFieldNames.Add(AdditionalInfo);
+                    if (!string.IsNullOrEmpty(dbVersion.References)) changedFieldNames.Add(References);
                     if (dbVersion.TagIds.Any()) changedFieldNames.Add(Tags);
                     if (dbVersion.BackSideImages.Any()) changedFieldNames.Add(BackSideImages);
                     if (dbVersion.AdditionalInfoImages.Any()) changedFieldNames.Add(AdditionalInfoImages);
@@ -84,6 +88,7 @@ namespace MemCheck.Application.History
                     if (dbVersion.FrontSide != preceedingVersion.FrontSide) changedFieldNames.Add(FrontSide);
                     if (dbVersion.BackSide != preceedingVersion.BackSide) changedFieldNames.Add(BackSide);
                     if (dbVersion.AdditionalInfo != preceedingVersion.AdditionalInfo) changedFieldNames.Add(AdditionalInfo);
+                    if (dbVersion.References != preceedingVersion.References) changedFieldNames.Add(References);
                     if (!Enumerable.SequenceEqual(dbVersion.TagIds, preceedingVersion.TagIds)) changedFieldNames.Add(Tags);
                     if (!Enumerable.SequenceEqual(dbVersion.UserWithViewIds, preceedingVersion.UserWithViewIds)) changedFieldNames.Add(UsersWithView);
                     if (!Enumerable.SequenceEqual(dbVersion.FrontSideImages, preceedingVersion.FrontSideImages)) changedFieldNames.Add(FrontSideImages);
@@ -117,6 +122,7 @@ namespace MemCheck.Application.History
                     card.FrontSide,
                     card.BackSide,
                     card.AdditionalInfo,
+                    card.References,
                     card.TagsInCards.Select(tag => tag.TagId),
                     card.UsersWithView.Select(user => user.UserId),
                     card.Images.Where(img => img.CardSide == ImageInCard.FrontSide).Select(img => img.ImageId),
@@ -138,6 +144,7 @@ namespace MemCheck.Application.History
                     card.FrontSide,
                     card.BackSide,
                     card.AdditionalInfo,
+                    card.References,
                     card.Tags.Select(tag => tag.TagId),
                     card.UsersWithView.Select(u => u.AllowedUserId),
                     card.Images.Where(img => img.CardSide == 1).Select(img => img.ImageId),

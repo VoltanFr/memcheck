@@ -303,6 +303,48 @@ namespace MemCheck.Application.History
             }
         }
         [TestMethod()]
+        public async Task ReferencesDiff()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = RandomHelper.String();
+            var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+            var originalVersionDate = RandomHelper.Date();
+            var originalReferences = RandomHelper.String();
+            var originalVersionDescription = RandomHelper.String();
+            var language = await CardLanguagHelper.CreateAsync(db);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, references: originalReferences, language: language, versionDescription: originalVersionDescription);
+            var additionalInfo = RandomHelper.String();
+            var newReferences = RandomHelper.String();
+            var newVersionDate = RandomHelper.Date(originalVersionDate);
+            var newVersionDescription = RandomHelper.String();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForReferencesChange(card, newReferences, versionDescription: newVersionDescription));
+            Guid previousVersionId;
+            using (var dbContext = new MemCheckDbContext(db))
+                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
+                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
+                Assert.AreEqual(userName, result.CurrentVersionCreator);
+                Assert.AreEqual(userName, result.OriginalVersionCreator);
+                Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
+                Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
+                Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
+                Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
+                Assert.AreEqual(new(newReferences, originalReferences), result.References);
+                Assert.IsNull(result.FrontSide);
+                Assert.IsNull(result.BackSide);
+                Assert.IsNull(result.Language);
+                Assert.IsNull(result.AdditionalInfo);
+                Assert.IsNull(result.Tags);
+                Assert.IsNull(result.UsersWithView);
+                Assert.IsNull(result.ImagesOnFrontSide);
+                Assert.IsNull(result.ImagesOnBackSide);
+                Assert.IsNull(result.ImagesOnAdditionalSide);
+            }
+        }
+        [TestMethod()]
         public async Task TagsDiff()
         {
             var db = DbHelper.GetEmptyTestDB();
@@ -518,52 +560,52 @@ namespace MemCheck.Application.History
             var originalVersionImage = await ImageHelper.CreateAsync(db, userId, originalVersionImageName);
             var originalFrontSide = RandomHelper.String();
             var originalBackSide = RandomHelper.String();
+            var originalReferences = RandomHelper.String();
             var originalTagName1 = RandomHelper.String();
             var originalTagId1 = await TagHelper.CreateAsync(db, originalTagName1);
             var originalTagName2 = RandomHelper.String();
             var originalTagId2 = await TagHelper.CreateAsync(db, originalTagName2);
-            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSide: originalFrontSide, backSide: originalBackSide, tagIds: new[] { originalTagId1, originalTagId2 }, additionalSideImages: originalVersionImage.AsArray(), versionDescription: originalVersionDescription);
+            var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSide: originalFrontSide, backSide: originalBackSide, references: originalReferences, tagIds: new[] { originalTagId1, originalTagId2 }, additionalSideImages: originalVersionImage.AsArray(), versionDescription: originalVersionDescription);
 
             var newVersionDescription = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newFrontSide = RandomHelper.String();
             var newBackSide = RandomHelper.String();
+            var newReferences = RandomHelper.String();
             var newVersionImageName = RandomHelper.String();
             var newVersionImage = await ImageHelper.CreateAsync(db, userId, newVersionImageName);
-            using (var dbContext = new MemCheckDbContext(db))
+            using (var dbContextForUpdate = new MemCheckDbContext(db))
             {
-                var r = UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, versionDescription: newVersionDescription);
-                r = r with { BackSide = newBackSide };
-                r = r with { AdditionalInfoImageList = newVersionImage.AsArray() };
-                r = r with { Tags = originalTagId1.AsArray() };
-                await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(r);
+                var request = UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, versionDescription: newVersionDescription)
+                    with { BackSide = newBackSide }
+                    with { AdditionalInfoImageList = newVersionImage.AsArray() }
+                    with { Tags = originalTagId1.AsArray() }
+                    with { References = newReferences };
+                await new UpdateCard(dbContextForUpdate.AsCallContext(), newVersionDate).RunAsync(request);
             }
 
-            Guid previousVersionId;
-            using (var dbContext = new MemCheckDbContext(db))
-                previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
+            using var dbContext = new MemCheckDbContext(db);
+            var previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-                var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
-                Assert.AreEqual(userName, result.CurrentVersionCreator);
-                Assert.AreEqual(userName, result.OriginalVersionCreator);
-                Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
-                Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
-                Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
-                Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-                Assert.AreEqual(new(newVersionImageName, originalVersionImageName), result.ImagesOnAdditionalSide);
-                Assert.AreEqual(new(newFrontSide, originalFrontSide), result.FrontSide);
-                Assert.AreEqual(new(newBackSide, originalBackSide), result.BackSide);
-                var expectedTagDiffString = string.Join(",", new[] { originalTagName1, originalTagName2 }.OrderBy(s => s));
-                Assert.AreEqual(new(originalTagName1, expectedTagDiffString), result.Tags);
-                Assert.IsNull(result.Language);
-                Assert.IsNull(result.AdditionalInfo);
-                Assert.IsNull(result.UsersWithView);
-                Assert.IsNull(result.ImagesOnFrontSide);
-                Assert.IsNull(result.ImagesOnBackSide);
-            }
+            var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
+            var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
+            Assert.AreEqual(userName, result.CurrentVersionCreator);
+            Assert.AreEqual(userName, result.OriginalVersionCreator);
+            Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
+            Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
+            Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
+            Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
+            Assert.AreEqual(new(newVersionImageName, originalVersionImageName), result.ImagesOnAdditionalSide);
+            Assert.AreEqual(new(newFrontSide, originalFrontSide), result.FrontSide);
+            Assert.AreEqual(new(newBackSide, originalBackSide), result.BackSide);
+            Assert.AreEqual(new(newReferences, originalReferences), result.References);
+            var expectedTagDiffString = string.Join(",", new[] { originalTagName1, originalTagName2 }.OrderBy(s => s));
+            Assert.AreEqual(new(originalTagName1, expectedTagDiffString), result.Tags);
+            Assert.IsNull(result.Language);
+            Assert.IsNull(result.AdditionalInfo);
+            Assert.IsNull(result.UsersWithView);
+            Assert.IsNull(result.ImagesOnFrontSide);
+            Assert.IsNull(result.ImagesOnBackSide);
         }
         [TestMethod()]
         public async Task MultipleVersions()
@@ -574,13 +616,15 @@ namespace MemCheck.Application.History
             var intialVersionDescription = RandomHelper.String();
             var language = await CardLanguagHelper.CreateAsync(db);
             var initialFrontSide = RandomHelper.String();
-            var card = await CardHelper.CreateAsync(db, userId, initialVersionDate, language: language, frontSide: initialFrontSide, versionDescription: intialVersionDescription);
+            var initialReferences = RandomHelper.String();
+            var card = await CardHelper.CreateAsync(db, userId, initialVersionDate, language: language, frontSide: initialFrontSide, references: initialReferences, versionDescription: intialVersionDescription);
 
             var intermediaryVersionDescription = RandomHelper.String();
             var intermediaryVersionDate = RandomHelper.Date(initialVersionDate);
             var intermediaryFrontSide = RandomHelper.String();
+            var intermediaryReferences = RandomHelper.String();
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext(), intermediaryVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryFrontSide, versionDescription: intermediaryVersionDescription));
+                await new UpdateCard(dbContext.AsCallContext(), intermediaryVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryFrontSide, versionDescription: intermediaryVersionDescription) with { References = intermediaryReferences });
 
             Guid initialVersionId;
             using (var dbContext = new MemCheckDbContext(db))
@@ -589,7 +633,7 @@ namespace MemCheck.Application.History
             var currentVersionDescription = RandomHelper.String();
             var currentVersionDate = RandomHelper.Date(initialVersionDate);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext(), currentVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, initialFrontSide, versionDescription: currentVersionDescription));
+                await new UpdateCard(dbContext.AsCallContext(), currentVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, initialFrontSide, versionDescription: currentVersionDescription) with { References = initialReferences });
 
             Guid intermediaryVersionId;
             using (var dbContext = new MemCheckDbContext(db))
@@ -604,6 +648,7 @@ namespace MemCheck.Application.History
                 Assert.AreEqual(currentVersionDescription, result.CurrentVersionDescription);
                 Assert.AreEqual(intermediaryVersionDescription, result.OriginalVersionDescription);
                 Assert.AreEqual(new(initialFrontSide, intermediaryFrontSide), result.FrontSide);
+                Assert.AreEqual(new(initialReferences, intermediaryReferences), result.References);
                 Assert.IsNull(result.Language);
                 Assert.IsNull(result.BackSide);
                 Assert.IsNull(result.Tags);
@@ -625,6 +670,7 @@ namespace MemCheck.Application.History
                 Assert.IsNull(result.Language);
                 Assert.IsNull(result.FrontSide);
                 Assert.IsNull(result.BackSide);
+                Assert.IsNull(result.References);
                 Assert.IsNull(result.Tags);
                 Assert.IsNull(result.AdditionalInfo);
                 Assert.IsNull(result.UsersWithView);

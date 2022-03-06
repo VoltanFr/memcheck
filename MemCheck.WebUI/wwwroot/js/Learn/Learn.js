@@ -298,6 +298,9 @@ const learnApp = Vue.createApp({
         currentCardHasAdditionalSide() {
             return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide == 3);
         },
+        currentCardHasReferences() {
+            return this.currentCard.references;
+        },
         visibilityPopoverTarget() {
             if (this.currentCard.visibleToCount == 0)
                 return "visibilityPopover0";
@@ -365,6 +368,9 @@ const learnApp = Vue.createApp({
         },
         currentCardAdditionalInfo() {
             return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench);
+        },
+        currentCardReferences() {
+            return convertMarkdown(this.currentCard.references, this.currentCard.isInFrench);
         },
         unregisterForNotif() {
             this.currentCard.registeredForNotifications = false;

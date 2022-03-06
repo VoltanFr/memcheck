@@ -84,6 +84,7 @@ namespace MemCheck.Application.Cards
             card.FrontSide = request.FrontSide;
             card.BackSide = request.BackSide;
             card.AdditionalInfo = request.AdditionalInfo;
+            card.References = request.References;
             await UpdateTagsAsync(request, card);
             await UpdateUsersWithViewAsync(request, card);
             await UpdateImagesAsync(request, card);
@@ -110,6 +111,7 @@ namespace MemCheck.Application.Cards
                     card.FrontSide,
                     card.BackSide,
                     card.AdditionalInfo,
+                    card.References,
                     TagIds = card.TagsInCards.Select(tag => tag.TagId),
                     UserWithVisibilityIds = card.UsersWithView.Select(u => u.UserId),
                     card.Images
@@ -119,6 +121,7 @@ namespace MemCheck.Application.Cards
                     && (dataBeforeUpdate.FrontSide == FrontSide)
                     && (dataBeforeUpdate.BackSide == BackSide)
                     && (dataBeforeUpdate.AdditionalInfo == AdditionalInfo)
+                    && (dataBeforeUpdate.References == References)
                     && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
                     && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
                     && SameImageLists(dataBeforeUpdate.Images))
@@ -157,7 +160,7 @@ namespace MemCheck.Application.Cards
                 await CheckVisibilityForUsersAsync(userIds, localizer, "HeHasThisCardInADeck", dbContext);
             }
             #endregion
-            public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+            public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
                 CardId = cardId;
                 VersionCreatorId = versionCreatorId;
@@ -167,6 +170,7 @@ namespace MemCheck.Application.Cards
                 FrontSideImageList = frontSideImageList;
                 BackSideImageList = backSideImageList;
                 AdditionalInfoImageList = additionalInfoImageList;
+                References = references;
                 LanguageId = languageId;
                 Tags = tags;
                 UsersWithVisibility = usersWithVisibility;
@@ -180,6 +184,7 @@ namespace MemCheck.Application.Cards
             public IEnumerable<Guid> BackSideImageList { get; }
             public string AdditionalInfo { get; init; }
             public IEnumerable<Guid> AdditionalInfoImageList { get; init; }
+            public string References { get; init; }
             public Guid LanguageId { get; }
             public IEnumerable<Guid> Tags { get; init; }
             public IEnumerable<Guid> UsersWithVisibility { get; }

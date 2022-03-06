@@ -3,7 +3,6 @@ using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -51,6 +50,7 @@ namespace MemCheck.Application.Cards
                 cardInDeck.Card.FrontSide,
                 cardInDeck.Card.BackSide,
                 cardInDeck.Card.AdditionalInfo,
+                cardInDeck.Card.References,
                 cardInDeck.Card.VersionUtcDate,
                 VersionCreator = cardInDeck.Card.VersionCreator.Id,
                 tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
@@ -76,6 +76,7 @@ namespace MemCheck.Application.Cards
                 cardInDeck.FrontSide,
                 cardInDeck.BackSide,
                 cardInDeck.AdditionalInfo,
+                cardInDeck.References,
                 cardInDeck.VersionUtcDate,
                 userNames[cardInDeck.VersionCreator],
                 cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
@@ -150,7 +151,7 @@ namespace MemCheck.Application.Cards
         public sealed class ResultCard
         {
             public ResultCard(Guid cardId, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
-                string frontSide, string backSide, string additionalInfo, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
+                string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
                 IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings,
                 bool registeredForNotifications, bool isInFrench)
             {
@@ -165,6 +166,7 @@ namespace MemCheck.Application.Cards
                 FrontSide = frontSide;
                 BackSide = backSide;
                 AdditionalInfo = additionalInfo;
+                References = references;
                 Tags = tags;
                 VisibleTo = visibleTo;
                 Images = images;
@@ -186,6 +188,7 @@ namespace MemCheck.Application.Cards
             public string FrontSide { get; }
             public string BackSide { get; }
             public string AdditionalInfo { get; }
+            public string References { get; }
             public string Owner { get; }
             public int UserRating { get; }
             public double AverageRating { get; }

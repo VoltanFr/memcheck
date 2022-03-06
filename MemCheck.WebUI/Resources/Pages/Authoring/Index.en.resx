@@ -183,4 +183,7 @@
   <data name="AddToYourDeck" xml:space="preserve">
     <value>Add to your deck</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>References</value>
+  </data>
 </root>

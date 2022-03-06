@@ -156,6 +156,7 @@ namespace MemCheck.Application.Searching
                     EF.Functions.Like(card.FrontSide, $"%{request.RequiredText}%")
                     || EF.Functions.Like(card.BackSide, $"%{request.RequiredText}%")
                     || EF.Functions.Like(card.AdditionalInfo, $"%{request.RequiredText}%")
+                    || EF.Functions.Like(card.References, $"%{request.RequiredText}%")
                 );
 
             IQueryable<Card> cardsFilteredWithVisibility;

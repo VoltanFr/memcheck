@@ -186,4 +186,7 @@
   <data name="AddToYourDeck" xml:space="preserve">
     <value>Ajouter à votre paquet</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>Références</value>
+  </data>
 </root>

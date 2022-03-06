@@ -39,6 +39,7 @@ namespace MemCheck.Application.History
                 version.FrontSide,
                 version.BackSide,
                 version.AdditionalInfo,
+                version.References,
                 version.CardLanguage.Id,
                 version.CardLanguage.Name,
                 tagNames,
@@ -66,7 +67,7 @@ namespace MemCheck.Application.History
                     throw new InvalidOperationException("Original not visible to user");
             }
         }
-        public sealed record Result(string FrontSide, string BackSide, string AdditionalInfo, Guid LanguageId, string LanguageName, IEnumerable<string> Tags, IEnumerable<string> UsersWithVisibility, DateTime VersionUtcDate,
+        public sealed record Result(string FrontSide, string BackSide, string AdditionalInfo, string References, Guid LanguageId, string LanguageName, IEnumerable<string> Tags, IEnumerable<string> UsersWithVisibility, DateTime VersionUtcDate,
                 IEnumerable<string> FrontSideImageNames, IEnumerable<string> BackSideImageNames, IEnumerable<string> AdditionalInfoImageNames, string VersionDescription, string CreatorName);
         #endregion
     }

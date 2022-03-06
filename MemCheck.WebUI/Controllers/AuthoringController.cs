@@ -80,7 +80,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(card);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var versionDescription = Get("InitialCardVersionCreation");
-            var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo!, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+            var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
             var cardId = (await new CreateCard(callContext).RunAsync(request)).CardId;
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
@@ -93,6 +93,7 @@ namespace MemCheck.WebUI.Controllers
             public string BackSide { get; set; } = null!;
             public IEnumerable<Guid> BackSideImageList { get; set; } = null!;
             public string AdditionalInfo { get; set; } = null!;
+            public string References { get; set; } = null!;
             public IEnumerable<Guid> AdditionalInfoImageList { get; set; } = null!;
             public Guid LanguageId { get; set; }
             public Guid AddToDeck { get; set; }
@@ -106,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(card);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
+            var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
             await new UpdateCard(callContext).RunAsync(request);
             return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
         }
@@ -118,6 +119,7 @@ namespace MemCheck.WebUI.Controllers
             public IEnumerable<Guid> BackSideImageList { get; set; } = null!;
             public string AdditionalInfo { get; set; } = null!;
             public IEnumerable<Guid> AdditionalInfoImageList { get; set; } = null!;
+            public string References { get; set; } = null!;
             public Guid LanguageId { get; set; }
             public Guid AddToDeck { get; set; }
             public IEnumerable<Guid> Tags { get; set; } = null!;
@@ -148,8 +150,8 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetCardForEdit(Guid cardId)
         {
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = new GetCardForEdit(callContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
-            return Ok(new GetCardForEditViewModel(await result, this));
+            var result = await new GetCardForEdit(callContext).RunAsync(new GetCardForEdit.Request(userId, cardId));
+            return Ok(new GetCardForEditViewModel(result, this));
         }
         #region Request and view model classes
         internal sealed class GetCardForEditViewModel
@@ -159,6 +161,7 @@ namespace MemCheck.WebUI.Controllers
                 FrontSide = applicationResult.FrontSide;
                 BackSide = applicationResult.BackSide;
                 AdditionalInfo = applicationResult.AdditionalInfo;
+                References = applicationResult.References;
                 LanguageId = applicationResult.LanguageId;
                 Tags = applicationResult.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName));
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
@@ -173,6 +176,7 @@ namespace MemCheck.WebUI.Controllers
             public string FrontSide { get; }
             public string BackSide { get; }
             public string AdditionalInfo { get; }
+            public string References { get; }
             public Guid LanguageId { get; }
             public IEnumerable<GetAllAvailableTagsViewModel> Tags { get; }
             public IEnumerable<GetUsersViewModel> UsersWithVisibility { get; }

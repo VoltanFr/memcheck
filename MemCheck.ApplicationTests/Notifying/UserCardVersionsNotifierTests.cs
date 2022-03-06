@@ -33,6 +33,7 @@ namespace MemCheck.Application.Tests.Notifying
                 FrontSide = RandomHelper.String(),
                 BackSide = RandomHelper.String(),
                 AdditionalInfo = RandomHelper.String(),
+                References = RandomHelper.String(),
                 VersionDescription = RandomHelper.String()
             };
             dbContext.CardPreviousVersions.Add(result);
@@ -60,6 +61,7 @@ namespace MemCheck.Application.Tests.Notifying
                 FrontSide = RandomHelper.String(),
                 BackSide = RandomHelper.String(),
                 AdditionalInfo = RandomHelper.String(),
+                References = RandomHelper.String(),
                 VersionDescription = RandomHelper.String()
             };
             dbContext.CardPreviousVersions.Add(result);

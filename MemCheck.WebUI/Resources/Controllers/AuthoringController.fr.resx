@@ -177,6 +177,12 @@
   <data name="InitialCardVersionCreation" xml:space="preserve">
     <value>Première version</value>
   </data>
+  <data name="InvalidAdditionalInfoLength" xml:space="preserve">
+    <value>Infos supplémentaires invalides, longueur :</value>
+  </data>
+  <data name="InvalidBackSideLength" xml:space="preserve">
+    <value>Face arrière invalide, longueur :</value>
+  </data>
   <data name="InvalidCardEmptyBackSide" xml:space="preserve">
     <value>L'arrière ne peut pas être vide</value>
   </data>
@@ -185,6 +191,12 @@
   </data>
   <data name="InvalidCardEmptyVersionDescription" xml:space="preserve">
     <value>La description de version ne peut pas être vide</value>
+  </data>
+  <data name="InvalidFrontSideLength" xml:space="preserve">
+    <value>Face avant invalide, longueur :</value>
+  </data>
+  <data name="InvalidReferencesLength" xml:space="preserve">
+    <value>Références invalides, longueur :</value>
   </data>
   <data name="InvalidVersionDescriptionLength" xml:space="preserve">
     <value>Description de version invalide, longueur :</value>

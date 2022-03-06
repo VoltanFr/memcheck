@@ -255,6 +255,9 @@
   <data name="PleaseWaitSavingData" xml:space="preserve">
     <value>Please wait, saving data...</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>References</value>
+  </data>
   <data name="RegisteredForNotif" xml:space="preserve">
     <value>Registered for alerts (click to unregister)</value>
   </data>

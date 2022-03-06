@@ -38,6 +38,8 @@ namespace MemCheck.Application.History
                 result = result with { BackSide = new(current.BackSide, original.BackSide) };
             if (current.AdditionalInfo != original.AdditionalInfo)
                 result = result with { AdditionalInfo = new(current.AdditionalInfo, original.AdditionalInfo) };
+            if (current.References != original.References)
+                result = result with { References = new(current.References, original.References) };
             if (current.CardLanguage != original.CardLanguage)
                 result = result with { Language = new(current.CardLanguage.Name, original.CardLanguage.Name) };
             if (!Enumerable.SequenceEqual(current.TagsInCards.Select(t => t.Tag.Name).OrderBy(tagName => tagName), original.Tags.Select(t => t.Tag.Name).OrderBy(tagName => tagName)))
@@ -114,6 +116,7 @@ namespace MemCheck.Application.History
             public (string currentFrontSide, string originalFrontSide)? FrontSide;
             public (string currentBackSide, string originalBackSide)? BackSide;
             public (string currentAdditionalInfo, string originalAdditionalInfo)? AdditionalInfo;
+            public (string currentReferences, string originalReferences)? References;
             public (string currentTags, string originalTags)? Tags;
             public (string currentUsersWithView, string originalUsersWithView)? UsersWithView;
             public (string currentImagesOnFrontSide, string originalImagesOnFrontSide)? ImagesOnFrontSide;

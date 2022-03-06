@@ -110,6 +110,9 @@
                         </div>
                     </div>
                 </div>
+                <div id="ReferencesRow" class="memcheck-input-div">
+                    <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" />
+                </div>
                 <div id="LanguageInputRow" class="collapse memcheck-input-div TogglableAdditionalInfo">
                     <p class="authoring-row-caption">@Localizer["Language"]</p>
                     <select v-model="card.languageId" class="authoring-select">

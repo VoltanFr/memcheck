@@ -158,7 +158,7 @@
                         <li class="ms-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learningUnknowns">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
-                <div id="Additional info" v-if="currentCard&&backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div card-side-div">
+                <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div card-side-div">
                     <div class="learning-card-header">
                         <p>@Localizer["AdditionalInfo"]</p>
                     </div>
@@ -168,6 +168,14 @@
                     <div class="learning-card-body-image-div" v-for="image in currentCard.images">
                         <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="imageincard" :src="image.blob" /></a>
                     </div>
+                </div>
+                <div id="References" v-if="currentCard && backSideVisible && currentCardHasReferences()" class="memcheck-input-div card-side-div">
+                    <details>
+                        <summary class="learning-card-header">@Localizer["References"]</summary>
+                        <div class="markdown-render markdown-body">
+                            <span v-html="currentCardReferences()"></span>
+                        </div>
+                    </details>
                 </div>
                 <div id="Tags" v-if="currentCard.tags.length > 0" class="learning-card-tags">
                     <tag-button v-for="tag in currentCard.tags" v-bind:name="tag"></tag-button>
