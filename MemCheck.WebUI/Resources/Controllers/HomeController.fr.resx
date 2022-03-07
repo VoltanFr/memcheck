@@ -120,8 +120,8 @@
   <data name="AmongThe" xml:space="preserve">
     <value>Parmi les</value>
   </data>
-  <data name="CardsOfYourDeck" xml:space="preserve">
-    <value>cartes de votre paquet</value>
+  <data name="CardsOf" xml:space="preserve">
+    <value>cartes de</value>
   </data>
   <data name="CardsWillExpireInTheFollowing24h" xml:space="preserve">
     <value>cartes vont expirer dans les 24 h suivantes.</value>
@@ -182,5 +182,8 @@
   </data>
   <data name="UnknownCards" xml:space="preserve">
     <value>cartes non apprises.</value>
+  </data>
+  <data name="YourDeck" xml:space="preserve">
+    <value>votre paquet</value>
   </data>
 </root>

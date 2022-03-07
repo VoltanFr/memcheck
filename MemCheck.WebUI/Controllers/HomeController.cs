@@ -38,7 +38,7 @@ namespace MemCheck.WebUI.Controllers
             var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
             var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, this)), DateTime.UtcNow));
+            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, userDecks.Count() == 1, this)), DateTime.UtcNow));
         }
         #region Result classes
         public sealed class GetAllViewModel
@@ -74,7 +74,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetAllDeckViewModel
         {
-            public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, ILocalized localizer)
+            public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, bool isTheOnlyDeck, ILocalized localizer)
             {
                 NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
 
@@ -87,7 +87,10 @@ namespace MemCheck.WebUI.Controllers
                 }
                 else
                 {
-                    HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOfYourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
+                    if (isTheOnlyDeck)
+                        HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOf")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{localizer.Get("YourDeck")}</a>...";
+                    else
+                        HeadLine = $"{localizer.Get("AmongThe")} {applicationDeck.CardCount} {localizer.Get("CardsOf")} {localizer.Get("YourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
                     if (applicationDeck.UnknownCardCount == 0)
                         lines.Add(localizer.Get("NoUnknownCard"));
                     else

@@ -120,8 +120,8 @@
   <data name="AmongThe" xml:space="preserve">
     <value>Among the</value>
   </data>
-  <data name="CardsOfYourDeck" xml:space="preserve">
-    <value>cards of your deck</value>
+  <data name="CardsOf" xml:space="preserve">
+    <value>cards of</value>
   </data>
   <data name="CardsWillExpireInTheFollowing24h" xml:space="preserve">
     <value>cards will expire in the following 24h.</value>
@@ -182,5 +182,8 @@
   </data>
   <data name="UnknownCards" xml:space="preserve">
     <value>unknown cards.</value>
+  </data>
+  <data name="YourDeck" xml:space="preserve">
+    <value>your deck</value>
   </data>
 </root>
