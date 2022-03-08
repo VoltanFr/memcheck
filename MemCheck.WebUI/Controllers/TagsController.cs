@@ -97,10 +97,12 @@ namespace MemCheck.WebUI.Controllers
             {
                 TagId = tag.TagId;
                 TagName = tag.TagName;
+                TagDescription = tag.TagDescription;
                 CardCount = tag.CardCount;
             }
             public Guid TagId { get; }
             public string TagName { get; } = null!;
+            public string TagDescription { get; } = null!;
             public int CardCount { get; }
         }
         #endregion

@@ -18,7 +18,7 @@ namespace MemCheck.Application.Tags
             var totalCount = await tags.CountAsync();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var pageTags = tags.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
-            var result = new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.TagsInCards.Count)));
+            var result = new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.Description, tag.TagsInCards.Count)));
             return new ResultWithMetrologyProperties<Result>(result,
                 ("PageSize", request.PageSize.ToString()),
                 ("PageNo", request.PageNo.ToString()),
@@ -57,14 +57,16 @@ namespace MemCheck.Application.Tags
         }
         public sealed class ResultTag
         {
-            public ResultTag(Guid tagId, string tagName, int cardCount)
+            public ResultTag(Guid tagId, string tagName, string tagDescription, int cardCount)
             {
                 TagId = tagId;
                 TagName = tagName;
+                TagDescription = tagDescription;
                 CardCount = cardCount;
             }
             public Guid TagId { get; }
-            public string TagName { get; } = null!;
+            public string TagName { get; }
+            public string TagDescription { get; }
             public int CardCount { get; }
         }
         #endregion

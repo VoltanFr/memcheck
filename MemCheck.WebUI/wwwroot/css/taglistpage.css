@@ -1,0 +1,75 @@
+﻿.inputs-div {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.table-div {
+    width: 100%;
+}
+
+.tag-list-table {
+    width: 100%;
+}
+
+.tag-list-table-row {
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--input-field-border-color);
+}
+
+    .tag-list-table-row:nth-child(odd) {
+        background-color: var(--table-dark-row);
+    }
+
+    .tag-list-table-row:nth-child(even) {
+        background-color: var(--table-light-row);
+    }
+
+    .tag-list-table-row:hover {
+        background-color: var(--table-row-hover);
+    }
+
+.tag-list-header-row {
+    border-style: solid;
+    border-width: 1px;
+    background-color: var(--header-color);
+    font-weight: 700;
+}
+
+.tag-list-column-header-name {
+    width: 100%;
+}
+
+.tag-list-column-header-count {
+    width: 500px;
+    min-inline-size: 50px;
+}
+
+.tag-list-column-header-edit {
+    min-inline-size: 50px;
+    padding-right: 5px;
+}
+
+.tag-list-column-data-name {
+    font-weight: 700;
+    width: 100%
+}
+
+.tag-list-column-data-edit {
+    text-align: right;
+    padding-right: 10px;
+}
+
+.tag-list-column-data-count {
+}
+
+.data-count-button {
+    width: 50px;
+}
+
+.tag-list-in-row-table {
+    width:100%;
+}
+
+.tag-list-in-row-row {
+}

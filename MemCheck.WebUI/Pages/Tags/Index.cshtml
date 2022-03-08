@@ -3,6 +3,8 @@
 @inject IViewLocalizer Localizer
 @section head {
 <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/taglistpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
 <script type="module" src="~/js/Tags/Tags.js" asp-append-version="true"></script>
@@ -19,28 +21,48 @@
         <div id="Inputs" class="container">
             <h1 class="title">@Localizer["PageTitle"]</h1>
         </div>
-        <div id="Inputs" class="container" style="border: 1px solid black;padding:5px">
-            <label>@Localizer["Filter"]</label><textarea class="form-control responsive-padding-edit" v-model="request.filter" rows="1"></textarea>
-            <span id="Page size">
-                <label>@Localizer["PageSize"]</label>&nbsp;
-                <select v-model="request.pageSize" class="responsive-padding-edit">
-                    <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
-                </select><br />
-            </span>
-            <button class="toolbar-button" @@click="getTags">@Localizer["Run"]</button>
-            <span v-if="totalTagCount != -1">
-                {{totalTagCount}}&nbsp;<label>@Localizer["PageTitle"]</label>
-            </span>
+        <div id="Inputs" class="inputs-div" style="border: 1px solid black;padding:5px">
+            <details>
+                <summary>@Localizer["Filter"]</summary>
+                <textarea class="form-control responsive-padding-edit" v-model="request.filter" rows="1"></textarea>
+                <span id="Page size">
+                    <label>@Localizer["PageSize"]</label>&nbsp;
+                    <select v-model="request.pageSize" class="responsive-padding-edit">
+                        <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
+                    </select><br />
+                </span>
+                <button class="toolbar-button" @@click="getTags">@Localizer["Run"]</button>
+                <span v-if="totalTagCount != -1">
+                    {{totalTagCount}}&nbsp;<label>@Localizer["PageTitle"]</label>
+                </span>
+            </details>
         </div>
-        <div id="List" class="container">
-            <table class="table table-responsive" width="100%">
-                <tr>
-                    <th>@Localizer["Name"]</th>
-                    <th>@Localizer["CardCount"]</th>
+        <div id="List" class="table-div">
+            <table class="tag-list-table">
+                <tr class="tag-list-header-row">
+                    <td>
+                        <table class="tag-list-in-row-table">
+                            <tr class="tag-list-in-row-row">
+                                <td class="tag-list-column-header-name">@Localizer["Name"]</td>
+                                <td class="tag-list-column-header-edit">@Localizer["Edit"]</td>
+                                <td class="tag-list-column-header-count">@Localizer["CardCount"]</td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
-                <tr v-for="tag in tags">
-                    <td>{{tag.tagName}} <button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)"><i class="fas fa-pen"></i></button></td>
-                    <td><button class="toolbar-button" style="min-width:50px" @@click="showCardsWithTag(tag.tagId)">{{tag.cardCount}}</button></td>
+                <tr class="tag-list-table-row" v-for="tag in tags">
+                    <td>
+                        <table class="tag-list-in-row-table">
+                            <tr class="tag-list-in-row-row">
+                                <td class="tag-list-column-data-name">{{tag.tagName}}</td>
+                                <td class="tag-list-column-data-edit"><button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)"><i class="fas fa-pen"></i></button></td>
+                                <td class="tag-list-column-data-count"><button class="toolbar-button data-count-button" @@click="showCardsWithTag(tag.tagId)">{{tag.cardCount}}</button></td>
+                            </tr>
+                        </table>
+                        <div class="markdown-render markdown-body" v-if="tag.tagDescription.length > 0">
+                            <span v-html="tagMarkdownDescription(tag)"></span>
+                        </div>
+                    </td>
                 </tr>
             </table>
         </div>

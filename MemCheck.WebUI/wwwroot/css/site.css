@@ -1,8 +1,13 @@
 ﻿:root {
+    --header-color: snow;
+    --menu-hover-color: lightpink;
     --input-area-background-color: snow;
     --input-area-border-color: darkgray;
     --input-field-border-color: darkgray;
     --input-field-background-color: white;
+    --table-dark-row: lightgray;
+    --table-light-row: white;
+    --table-row-hover: var(--menu-hover-color);
 }
 
 .big-size-image-top-div {

@@ -18,13 +18,13 @@ namespace MemCheck.Application.Tags
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 0, "")));
         }
         [TestMethod()]
-        public async Task PagSize0()
+        public async Task PageSize0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, 1, "")));
         }
         [TestMethod()]
-        public async Task PagSizeTooBig()
+        public async Task PageSizeTooBig()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, GetAllTags.Request.MaxPageSize + 1, "")));
@@ -42,8 +42,9 @@ namespace MemCheck.Application.Tags
         public async Task OneTagInDb()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var tagName = RandomHelper.String();
-            var tag = await TagHelper.CreateAsync(db, tagName);
+            var name = RandomHelper.String();
+            var description = RandomHelper.String();
+            var tag = await TagHelper.CreateAsync(db, name, description);
             var user = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
             using var dbContext = new MemCheckDbContext(db);
@@ -52,7 +53,8 @@ namespace MemCheck.Application.Tags
             Assert.AreEqual(1, result.TotalCount);
             Assert.AreEqual(1, result.Tags.Count());
             Assert.AreEqual(tag, result.Tags.Single().TagId);
-            Assert.AreEqual(tagName, result.Tags.Single().TagName);
+            Assert.AreEqual(name, result.Tags.Single().TagName);
+            Assert.AreEqual(description, result.Tags.Single().TagDescription);
             Assert.AreEqual(1, result.Tags.Single().CardCount);
         }
         [TestMethod()]

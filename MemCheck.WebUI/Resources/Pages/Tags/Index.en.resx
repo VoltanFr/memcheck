@@ -138,4 +138,7 @@
   <data name="PleaseWaitForMount" xml:space="preserve">
     <value>Please wait, initializing data...</value>
   </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
 </root>

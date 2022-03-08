@@ -57,7 +57,10 @@ const tagListingApp = Vue.createApp({
         edit(tagId) {
             window.location.href = "/Tags/Authoring?TagId=" + tagId + "&ReturnUrl=" + window.location;
         },
-    },
+        tagMarkdownDescription(tag) {
+            return convertMarkdown(tag.tagDescription, true);
+        },
+},
 });
 
 tagListingApp.mount('#TagsMainDiv');

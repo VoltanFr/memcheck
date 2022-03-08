@@ -1,6 +1,7 @@
 ﻿.markdown-render {
     white-space: normal;
     border-radius:4px;
+    background-color: transparent;
 }
 
     .markdown-render ul {
