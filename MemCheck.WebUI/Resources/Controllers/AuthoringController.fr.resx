@@ -165,6 +165,9 @@
   <data name="HeHasThisCardInADeck" xml:space="preserve">
     <value>il a cette carte dans un paquet.</value>
   </data>
+  <data name="ImageAlreadyInCard" xml:space="preserve">
+    <value>Cette image est déjà dans la carte (vous ne pouvez pas l'utiliser plus d'une fois).</value>
+  </data>
   <data name="ImageName" xml:space="preserve">
     <value>Nom de l'image :</value>
   </data>

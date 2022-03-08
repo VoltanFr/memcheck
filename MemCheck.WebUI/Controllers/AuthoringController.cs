@@ -211,20 +211,23 @@ namespace MemCheck.WebUI.Controllers
             return Ok(new GetGuiMessagesViewModel(
             Get("Success"),
             Get("Failure"),
-            Get("SureCreateWithoutTag")
+            Get("SureCreateWithoutTag"),
+            Get("ImageAlreadyInCard")
             ));
         }
         public sealed class GetGuiMessagesViewModel
         {
-            public GetGuiMessagesViewModel(string success, string failure, string sureCreateWithoutTag)
+            public GetGuiMessagesViewModel(string success, string failure, string sureCreateWithoutTag, string imageAlreadyInCard)
             {
                 Success = success;
                 Failure = failure;
                 SureCreateWithoutTag = sureCreateWithoutTag;
+                ImageAlreadyInCard = imageAlreadyInCard;
             }
-            public string Success { get; } = null!;
-            public string Failure { get; } = null!;
-            public string SureCreateWithoutTag { get; } = null!;
+            public string Success { get; }
+            public string Failure { get; }
+            public string SureCreateWithoutTag { get; }
+            public string ImageAlreadyInCard { get; }
         }
         #endregion
         #region DecksOfUser, returns IEnumerable<GetUsersViewModel>

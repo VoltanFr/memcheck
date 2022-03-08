@@ -52,6 +52,7 @@ const authoringApp = Vue.createApp({
                 success: "",
                 failure: "",
                 sureCreateWithoutTag: "",
+                imageAlreadyInCard: "",
             },
             addToDeck: "",  //AuthoringController.DecksOfUserViewModel
             addToSingleDeck: true,  //meaningful only if singleDeckDisplay
@@ -368,7 +369,7 @@ const authoringApp = Vue.createApp({
             await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
-                        tellAxiosError("This image is already in the list");
+                        toast(this.guiMessages.imageAlreadyInCard, this.guiMessages.failure, false);
                         return;
                     }
 
