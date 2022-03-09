@@ -73,3 +73,8 @@
 
 .tag-list-in-row-row {
 }
+
+.fold-button{
+    background-color:transparent;
+    border-style:none;
+}

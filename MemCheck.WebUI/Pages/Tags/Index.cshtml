@@ -54,12 +54,17 @@
                     <td>
                         <table class="tag-list-in-row-table">
                             <tr class="tag-list-in-row-row">
-                                <td class="tag-list-column-data-name">{{tag.tagName}}</td>
+                                <td class="tag-list-column-data-name">
+                                    <span v-if="tagIsUnfoldable(tag)">
+                                        <span v-if="tagIsFolded(tag)"><button class="fold-button" @@click="unfold(tag)"><i class="fas fa-caret-right"></i></button></span>
+                                        <span v-else><button class="fold-button" @@click="fold(tag)"><i class="fas fa-caret-down"></i></button></span>
+                                    </span> {{tag.tagName}}
+                                </td>
                                 <td class="tag-list-column-data-edit"><button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)"><i class="fas fa-pen"></i></button></td>
                                 <td class="tag-list-column-data-count"><button class="toolbar-button data-count-button" @@click="showCardsWithTag(tag.tagId)">{{tag.cardCount}}</button></td>
                             </tr>
                         </table>
-                        <div class="markdown-render markdown-body" v-if="tag.tagDescription.length > 0">
+                        <div class="markdown-render markdown-body" v-if="!tagIsFolded(tag)">
                             <span v-html="tagMarkdownDescription(tag)"></span>
                         </div>
                     </td>

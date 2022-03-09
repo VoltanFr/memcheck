@@ -11,7 +11,7 @@ const tagListingApp = Vue.createApp({
             totalTagCount: -1, //int
             pageCount: 0,   //int
             offeredPageSizes: [10, 50, 100, 500],
-            tags: [],    //TagsController.GetTagsTagViewModel
+            tags: [],    //TagsController.GetTagsTagViewModel, but we add a "folded" boolean
             mountFinished: false,
         }
     },
@@ -26,11 +26,22 @@ const tagListingApp = Vue.createApp({
     methods: {
         async getTags() {
             this.tags = [];
+            this.tagVisibility = [];
             await axios.post("/Tags/GetTags", this.request)
                 .then(result => {
                     this.totalTagCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;
-                    this.tags = result.data.tags;
+
+                    for (var i = 0; i < result.data.tags.length; i++) {
+                        const tagWithVisibility = {
+                            tagId: result.data.tags[i].tagId,
+                            tagName: result.data.tags[i].tagName,
+                            tagDescription: result.data.tags[i].tagDescription,
+                            cardCount: result.data.tags[i].cardCount,
+                            folded: true
+                        };
+                        this.tags.push(tagWithVisibility);
+                    }
                 })
                 .catch(error => {
                     tellAxiosError(error);
@@ -60,7 +71,19 @@ const tagListingApp = Vue.createApp({
         tagMarkdownDescription(tag) {
             return convertMarkdown(tag.tagDescription, true);
         },
-},
+        tagIsUnfoldable(tag) {
+            return tag.tagDescription.length > 0;
+        },
+        tagIsFolded(tag) {
+            return tag.folded;
+        },
+        fold(tag) {
+            tag.folded = true;
+        },
+        unfold(tag) {
+            tag.folded = false;
+        },
+    },
 });
 
 tagListingApp.mount('#TagsMainDiv');
