@@ -44,7 +44,9 @@
                         <table class="tag-list-in-row-table">
                             <tr class="tag-list-in-row-row">
                                 <td class="tag-list-column-header-name">@Localizer["Name"]</td>
-                                <td class="tag-list-column-header-edit">@Localizer["Edit"]</td>
+                                <td class="tag-list-column-header-edit">
+                                    <span v-if="userLoggedIn">@Localizer["Edit"]</span>
+                                </td>
                                 <td class="tag-list-column-header-count">@Localizer["CardCount"]</td>
                             </tr>
                         </table>
@@ -60,7 +62,9 @@
                                         <span v-else><button class="fold-button" @@click="fold(tag)"><i class="fas fa-caret-down"></i></button></span>
                                     </span> {{tag.tagName}}
                                 </td>
-                                <td class="tag-list-column-data-edit"><button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)"><i class="fas fa-pen"></i></button></td>
+                                <td class="tag-list-column-data-edit">
+                                    <button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)" v-if="userLoggedIn"><i class="fas fa-pen"></i></button>
+                                </td>
                                 <td class="tag-list-column-data-count"><button class="toolbar-button data-count-button" @@click="showCardsWithTag(tag.tagId)">{{tag.cardCount}}</button></td>
                             </tr>
                         </table>

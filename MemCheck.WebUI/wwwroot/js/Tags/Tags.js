@@ -10,6 +10,7 @@ const tagListingApp = Vue.createApp({
             },
             totalTagCount: -1, //int
             pageCount: 0,   //int
+            userLoggedIn: false,
             offeredPageSizes: [10, 50, 100, 500],
             tags: [],    //TagsController.GetTagsTagViewModel, but we add a "folded" boolean
             mountFinished: false,
@@ -31,6 +32,7 @@ const tagListingApp = Vue.createApp({
                 .then(result => {
                     this.totalTagCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;
+                    this.userLoggedIn = result.data.userLoggedIn;
 
                     for (var i = 0; i < result.data.tags.length; i++) {
                         const tagWithVisibility = {

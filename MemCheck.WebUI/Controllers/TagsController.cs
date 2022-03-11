@@ -71,7 +71,8 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
-            return Ok(new GetTagsViewModel(result));
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            return Ok(new GetTagsViewModel(result, userId != Guid.Empty));
         }
         public sealed class GetTagsRequest
         {
@@ -81,12 +82,14 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetTagsViewModel
         {
-            public GetTagsViewModel(GetAllTags.Result applicationResult)
+            public GetTagsViewModel(GetAllTags.Result applicationResult, bool userLoggedIn)
             {
+                UserLoggedIn = userLoggedIn;
                 TotalCount = applicationResult.TotalCount;
                 PageCount = applicationResult.PageCount;
                 Tags = applicationResult.Tags.Select(tag => new GetTagsTagViewModel(tag));
             }
+            public bool UserLoggedIn { get; }
             public int TotalCount { get; }
             public int PageCount { get; }
             public IEnumerable<GetTagsTagViewModel> Tags { get; }
