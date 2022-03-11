@@ -7,7 +7,7 @@
       "destination": "wwwroot/lib/showdown/"
     },
     {
-      "library": "axios@0.24.0",
+      "library": "axios@0.26.1",
       "destination": "wwwroot/lib/axios/"
     },
     {
