@@ -38,7 +38,7 @@ namespace MemCheck.Application.Tests.Helpers
             var result = new StringBuilder();
             do
             {
-                result.Append(Guid.NewGuid().ToString());
+                result.Append(Guid().ToString());
             }
             while (length != null && result.Length < length);
             if (length != null)
@@ -67,6 +67,10 @@ namespace MemCheck.Application.Tests.Helpers
         public static bool Bool()
         {
             return Randomizer.Next(0, 1) == 1;
+        }
+        public static Guid Guid()
+        {
+            return System.Guid.NewGuid();
         }
     }
 }

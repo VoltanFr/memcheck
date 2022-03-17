@@ -1,4 +1,6 @@
-﻿function isValidDateTime(utcFromDotNet) {
+﻿const emptyGuid = '00000000-0000-0000-0000-000000000000';
+
+function isValidDateTime(utcFromDotNet) {
     return utcFromDotNet && (utcFromDotNet != "0001-01-01T00:00:00Z") && (utcFromDotNet != "9999-12-31T23:59:59.9999999");  //matches DateTime.MinValue and Max
 }
 
@@ -52,11 +54,11 @@ function toastAxiosResult(controllerResultWithToast, success) {
     toast(text, title, success);
 }
 
-function toast(mesg, title, success) {
+function toast(mesg, title, success, duration) {
     const actualMesg = "<strong>" + title + "</strong><br/>" + mesg;
     const icon = success ? "thumb-circle" : "fire";
-    const duration = success ? 4000 : 10000;
-    globalThis.vant.Toast({ message: actualMesg, type: "html", icon: icon, iconSize: 30, duration: duration, className: "toast-mesg", position: "top" });
+    const actualDuration = duration ? duration : (success ? 4000 : 10000);
+    globalThis.vant.Toast({ message: actualMesg, type: "html", icon: icon, iconSize: 30, duration: actualDuration, className: "toast-mesg", position: "top", closeOnClick: true });
 }
 
 function base64FromBytes(bytes) {

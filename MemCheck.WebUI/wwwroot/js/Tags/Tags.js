@@ -70,6 +70,9 @@ const tagListingApp = Vue.createApp({
         edit(tagId) {
             window.location.href = "/Tags/Authoring?TagId=" + tagId + "&ReturnUrl=" + window.location;
         },
+        demo(tagId) {
+            window.location.href = `/Learn/Index?LearnMode=Demo&TagId=${tagId}`;
+        },
         tagMarkdownDescription(tag) {
             return convertMarkdown(tag.tagDescription, true);
         },

@@ -117,31 +117,86 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CardCount" xml:space="preserve">
-    <value>Cartes</value>
+  <data name="ADeckWithName" xml:space="preserve">
+    <value>A deck with name</value>
   </data>
-  <data name="Filter" xml:space="preserve">
-    <value>Filtre</value>
+  <data name="AllUsers" xml:space="preserve">
+    <value>Public</value>
   </data>
-  <data name="Name" xml:space="preserve">
-    <value>Nom</value>
+  <data name="AlreadyExists" xml:space="preserve">
+    <value>already exists (this is case insensitive)</value>
   </data>
-  <data name="PageSize" xml:space="preserve">
-    <value>Taille de la page</value>
+  <data name="And" xml:space="preserve">
+    <value>and</value>
   </data>
-  <data name="PageTitle" xml:space="preserve">
-    <value>Labels</value>
+  <data name="AndLose" xml:space="preserve">
+    <value>and lose</value>
   </data>
-  <data name="Run" xml:space="preserve">
-    <value>Exécuter</value>
+  <data name="CardLearningInfo" xml:space="preserve">
+    <value>selected card and their learning info?</value>
   </data>
-  <data name="PleaseWaitForMount" xml:space="preserve">
-    <value>Chargement des données...</value>
+  <data name="CardRemovedFromDeck" xml:space="preserve">
+    <value>Card removed from deck</value>
   </data>
-  <data name="Edit" xml:space="preserve">
-    <value>Modif</value>
+  <data name="CardWithFrontSideHead" xml:space="preserve">
+    <value>Card with front side</value>
   </data>
-  <data name="Demo" xml:space="preserve">
-    <value>Démo</value>
+  <data name="DateAddedToDeck" xml:space="preserve">
+    <value>It was added to the deck on</value>
+  </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Invalid name: length is</value>
+  </data>
+  <data name="ItWillBeExpired" xml:space="preserve">
+    <value>It will be expired.</value>
+  </data>
+  <data name="ItWillExpireOn" xml:space="preserve">
+    <value>Expiration in that heap:</value>
+  </data>
+  <data name="MoveThisCardToHeap" xml:space="preserve">
+    <value>Move this card to heap</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>, must be between</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>&lt;None&gt;</value>
+  </data>
+  <data name="NoUndo" xml:space="preserve">
+    <value>This can not be undone!</value>
+  </data>
+  <data name="OnDidNotKnowToastMessage" xml:space="preserve">
+    <value>If you were using MemCheck with an account, you would learn that card again in your next learning session.</value>
+  </data>
+  <data name="OnDidNotKnowToastTitle" xml:space="preserve">
+    <value>You did not know</value>
+  </data>
+  <data name="OnKnewToastMessage" xml:space="preserve">
+    <value>If you were using MemCheck with an account, you would rehearse that card in 2 days (a delay which increases as you rehearse).</value>
+  </data>
+  <data name="OnKnewToastTitle" xml:space="preserve">
+    <value>You knew</value>
+  </data>
+  <data name="RemoveAlertMessage" xml:space="preserve">
+    <value>Are you sure you want to remove this card from the deck?
+It is currently in heap</value>
+  </data>
+  <data name="RemovedFromDeck" xml:space="preserve">
+    <value>removed from deck</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="SureYouWantToDelete" xml:space="preserve">
+    <value>Sure you want to delete</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="UnknownCardsHeap" xml:space="preserve">
+    <value>Unknown cards</value>
+  </data>
+  <data name="YouOnly" xml:space="preserve">
+    <value>You only</value>
   </data>
 </root>

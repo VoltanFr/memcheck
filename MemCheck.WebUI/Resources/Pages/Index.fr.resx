@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BrowseTheCards" xml:space="preserve">
-    <value>parcourir les cartes</value>
-  </data>
   <data name="CardsOfYourMultipleDecks" xml:space="preserve">
     <value>cartes de vos</value>
   </data>
@@ -180,12 +177,6 @@
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue</value>
   </data>
-  <data name="WithoutLoggingIn" xml:space="preserve">
-    <value>sans vous connecter</value>
-  </data>
-  <data name="YouCan" xml:space="preserve">
-    <value>Vous pouvez</value>
-  </data>
   <data name="YouCanCreateOneOn" xml:space="preserve">
     <value>Vous pouvez en créer un sur</value>
   </data>
@@ -233,5 +224,17 @@
   </data>
   <data name="YouShouldAddCardsEitherFrom" xml:space="preserve">
     <value>Vous pouvez ajouter des cartes depuis</value>
+  </data>
+  <data name="OnThe" xml:space="preserve">
+    <value>Sur la</value>
+  </data>
+  <data name="TagListPage" xml:space="preserve">
+    <value>page des labels</value>
+  </data>
+  <data name="UseTheDemoButtonOnTheLabelOfYourChoice" xml:space="preserve">
+    <value>vous pouvez utiliser le bouton Démo sur le label de votre choix</value>
+  </data>
+  <data name="WantADemo" xml:space="preserve">
+    <value>Vous voulez un apperçu de MemCheck ?</value>
   </data>
 </root>

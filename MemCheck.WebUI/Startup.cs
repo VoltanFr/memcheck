@@ -52,12 +52,8 @@ namespace MemCheck.WebUI
             services.AddMvc(option =>
             {
                 option.EnableEndpointRouting = false;
-            }).AddRazorPagesOptions(options =>
-            {
-                options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-                options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
             });
-
+            
             var appSettings = new AppSettings(configuration, prodEnvironment, CreateLogger());
 
             if (!prodEnvironment)
@@ -89,7 +85,6 @@ namespace MemCheck.WebUI
             services.AddRazorPages().AddRazorPagesOptions(config =>
                 {
                     config.Conventions.AuthorizeFolder("/Decks");
-                    config.Conventions.AuthorizeFolder("/Learn");
                     config.Conventions.AuthorizeFolder("/RepeatExpired");
                     config.Conventions.AuthorizeFolder("/Authoring");
                     config.Conventions.AuthorizeFolder("/Media");

@@ -10,7 +10,6 @@ using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -22,15 +21,18 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
 {
-    [Route("[controller]"), Authorize]
+    [Route("[controller]")]
     public class LearnController : MemCheckController
     {
         #region Fields
         private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         private static readonly Guid noTagFakeGuid = Guid.Empty;
+        private const int learnModeExpired = 1;
+        private const int learnModeUnknown = 2;
+        private const int learnModeDemo = 3;
         #endregion
-        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<DecksController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
+        public LearnController(MemCheckDbContext dbContext, IStringLocalizer<LearnController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
         {
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
@@ -78,28 +80,42 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
-            if (request.LearnModeIsUnknown)
+
+            switch (request.learnMode)
             {
-                var cardsToDownload = 30;
-                var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
-                var result = new GetCardsViewModel(applicationResult, this, user.UserName);
-                return Ok(result);
-            }
-            else
-            {
-                var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
-                var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
-                var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
-                var result = new GetCardsViewModel(applicationResult, this, user.UserName);
-                return Ok(result);
+                case learnModeUnknown:
+                    {
+                        var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, 30);
+                        var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
+                        var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                        return Ok(result);
+                    }
+                case learnModeExpired:
+                    {
+                        var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
+                        var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
+                        var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
+                        var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                        return Ok(result);
+                    }
+                case learnModeDemo:
+                    {
+                        if (user != null)
+                            return BadRequest();
+                        var applicationRequest = new GetCardsForDemo.Request(request.DeckId, request.ExcludedCardIds, 30);
+                        var applicationResult = (await new GetCardsForDemo(callContext).RunAsync(applicationRequest)).Cards;
+                        var result = new GetCardsViewModel(applicationResult, this);
+                        return Ok(result);
+                    }
+                default:
+                    return BadRequest();
             }
         }
         #region Request and result classes
         public sealed class GetCardsRequest
         {
-            public Guid DeckId { get; set; }
-            public bool LearnModeIsUnknown { get; set; }
+            public Guid DeckId { get; set; }    //When learnMode == learnModeDemo, this is not a deck but a tag
+            public int learnMode { get; set; } //can be learnModeExpired, learnModeUnknown, learnModeDemo
             public IEnumerable<Guid> ExcludedCardIds { get; set; } = null!;
             public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
             public int CurrentCardCount { get; set; }
@@ -113,6 +129,10 @@ namespace MemCheck.WebUI.Controllers
             public GetCardsViewModel(IEnumerable<GetCardsToRepeat.ResultCard> applicationResultCards, ILocalized localizer, string currentUser)
             {
                 Cards = applicationResultCards.Select(card => new GetCardsCardViewModel(card, localizer, currentUser));
+            }
+            public GetCardsViewModel(IEnumerable<GetCardsForDemo.ResultCard> applicationResultCards, ILocalized localizer)
+            {
+                Cards = applicationResultCards.Select(card => new GetCardsCardViewModel(card, localizer));
             }
             public IEnumerable<GetCardsCardViewModel> Cards { get; }
         }
@@ -231,6 +251,33 @@ namespace MemCheck.WebUI.Controllers
                     ).OrderBy(heapModel => heapModel.HeapId);
                 RegisteredForNotifications = applicationResult.RegisteredForNotifications;
             }
+            public GetCardsCardViewModel(GetCardsForDemo.ResultCard applicationResult, ILocalized localizer)
+            {
+                CardId = applicationResult.CardId;
+                HeapId = 0;
+                Heap = DisplayServices.HeapName(0, localizer);
+                LastLearnUtcTime = CardInDeck.NeverLearntLastLearnTime;
+                LastChangeUtcTime = applicationResult.LastChangeUtcTime;
+                BiggestHeapReached = CardInDeck.UnknownHeap;
+                NbTimesInNotLearnedHeap = 1;
+                FrontSide = RenderMarkdown(applicationResult.FrontSide);
+                BackSide = RenderMarkdown(applicationResult.BackSide);
+                AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
+                References = RenderMarkdown(applicationResult.References);
+                Owner = applicationResult.VersionCreator;
+                Tags = applicationResult.Tags.OrderBy(tag => tag);
+                RemoveAlertMessage = "ERROR";
+                VisibleToCount = 0;
+                AddToDeckUtcTime = CardInDeck.NeverLearntLastLearnTime;
+                CurrentUserRating = 0;
+                AverageRating = Math.Round(applicationResult.AverageRating, 1);
+                CountOfUserRatings = applicationResult.CountOfUserRatings;
+                IsInFrench = applicationResult.IsInFrench;
+                VisibleTo = localizer.Get("AllUsers");
+                Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
+                MoveToHeapTargets = new GetCardsHeapModel[0];
+                RegisteredForNotifications = false;
+            }
             public Guid CardId { get; }
             public int HeapId { get; }
             public string Heap { get; }
@@ -265,6 +312,12 @@ namespace MemCheck.WebUI.Controllers
                 CardSide = appResult.CardSide;
             }
             public GetCardsImageViewModel(GetCardsToRepeat.ResultImageModel appResult)
+            {
+                ImageId = appResult.ImageId;
+                Name = appResult.Name;
+                CardSide = appResult.CardSide;
+            }
+            public GetCardsImageViewModel(GetCardsForDemo.ResultImageModel appResult)
             {
                 ImageId = appResult.ImageId;
                 Name = appResult.Name;
@@ -338,14 +391,27 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> UserDecks()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
-            var userId = (user == null) ? Guid.Empty : user.Id;
-            var decks = await new GetUserDecksWithTags(callContext).RunAsync(new GetUserDecksWithTags.Request(userId));
-            var result = decks.Select(deck => new UserDecksViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
+            if (user == null)
+                return base.Ok(new UserDecksViewModel(false, new UserDecksDeckViewModel[0]));
+
+            var decks = await new GetUserDecksWithTags(callContext).RunAsync(new GetUserDecksWithTags.Request(user.Id));
+            var resultDecks = decks.Select(deck => new UserDecksDeckViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
+            var result = new UserDecksViewModel(user != null, resultDecks);
             return base.Ok(result);
         }
         public sealed class UserDecksViewModel
         {
-            public UserDecksViewModel(Guid deckId, string description, bool showDebugInfo, IEnumerable<GetUserDecksWithTags.ResultTag> tags, ILocalized localizer)
+            public UserDecksViewModel(bool userLoggedIn, IEnumerable<UserDecksDeckViewModel> decks)
+            {
+                UserLoggedIn = userLoggedIn;
+                Decks = decks;
+            }
+            public bool UserLoggedIn { get; }
+            public IEnumerable<UserDecksDeckViewModel> Decks { get; }
+        }
+        public sealed class UserDecksDeckViewModel
+        {
+            public UserDecksDeckViewModel(Guid deckId, string description, bool showDebugInfo, IEnumerable<GetUserDecksWithTags.ResultTag> tags, ILocalized localizer)
             {
                 DeckId = deckId;
                 Description = description;
@@ -394,6 +460,32 @@ namespace MemCheck.WebUI.Controllers
                 await new RemoveCardSubscriptions(callContext).RunAsync(request);
             }
             return Ok();
+        }
+        #endregion
+        #region GetDemoMessages
+        [HttpGet("GetDemoMessages")]
+        public IActionResult GetDemoMessages()
+        {
+            return Ok(new GetDemoMessagesViewModel(
+            Get("OnKnewToastTitle"),
+            Get("OnKnewToastMessage"),
+            Get("OnDidNotKnowToastTitle"),
+            Get("OnDidNotKnowToastMessage")
+            ));
+        }
+        public sealed class GetDemoMessagesViewModel
+        {
+            public GetDemoMessagesViewModel(string onKnewToastTitle, string onKnewToastMessage, string onDidNotKnowToastTitle, string onDidNotKnowToastMessage)
+            {
+                OnKnewToastTitle = onKnewToastTitle;
+                OnKnewToastMessage = onKnewToastMessage;
+                OnDidNotKnowToastTitle = onDidNotKnowToastTitle;
+                OnDidNotKnowToastMessage = onDidNotKnowToastMessage;
+            }
+            public string OnKnewToastTitle { get; }
+            public string OnKnewToastMessage { get; }
+            public string OnDidNotKnowToastTitle { get; }
+            public string OnDidNotKnowToastMessage { get; }
         }
         #endregion
     }

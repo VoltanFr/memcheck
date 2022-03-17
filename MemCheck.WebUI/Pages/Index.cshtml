@@ -35,7 +35,7 @@
         <div id="User not loggedin" v-else>
             <p>@Localizer["Welcome"] !</p>
             <p>@Localizer["YouNeedTo"] <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["LogIn"]</a> @Localizer["ToUseMemCheck"] (<a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a> @Localizer["IfYouDontHaveAnAccount"]).</p>
-            <p>@Localizer["YouCan"] <a asp-page="/Search/Index">@Localizer["BrowseTheCards"]</a> @Localizer["WithoutLoggingIn"].</p>
+            <p>@Localizer["WantADemo"] @Localizer["OnThe"] <a asp-page="/Tags/Index">@Localizer["TagListPage"]</a>, @Localizer["UseTheDemoButtonOnTheLabelOfYourChoice"].</p>
             <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
         </div>
     </div>

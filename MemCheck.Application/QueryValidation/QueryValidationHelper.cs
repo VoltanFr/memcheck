@@ -96,6 +96,11 @@ namespace MemCheck.Application.QueryValidation
             if (await dbContext.Decks.AsNoTracking().Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
                 throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
         }
+        public static async Task CheckTagExistsAsync(Guid tagId, MemCheckDbContext dbContext)
+        {
+            if (!await dbContext.Tags.AsNoTracking().AnyAsync(tag => tag.Id == tagId))
+                throw new RequestInputException("Tag not found");
+        }
         public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer)
         {
             if (name != name.Trim())

@@ -117,31 +117,89 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CardCount" xml:space="preserve">
-    <value>Cartes</value>
+  <data name="ADeckWithName" xml:space="preserve">
+    <value>Un paquet existe déjà avec le nom</value>
   </data>
-  <data name="Filter" xml:space="preserve">
-    <value>Filtre</value>
+  <data name="AllUsers" xml:space="preserve">
+    <value>Publique</value>
   </data>
-  <data name="Name" xml:space="preserve">
-    <value>Nom</value>
+  <data name="AlreadyExists" xml:space="preserve">
+    <value>(cette vérification n'est pas sensible à la casse).</value>
   </data>
-  <data name="PageSize" xml:space="preserve">
-    <value>Taille de la page</value>
+  <data name="And" xml:space="preserve">
+    <value>et</value>
   </data>
-  <data name="PageTitle" xml:space="preserve">
-    <value>Labels</value>
+  <data name="AndLose" xml:space="preserve">
+    <value>et perdre la sélection de</value>
   </data>
-  <data name="Run" xml:space="preserve">
-    <value>Exécuter</value>
+  <data name="CardLearningInfo" xml:space="preserve">
+    <value>cartes et leurs informations d'apprentissage ?</value>
   </data>
-  <data name="PleaseWaitForMount" xml:space="preserve">
-    <value>Chargement des données...</value>
+  <data name="CardRemovedFromDeck" xml:space="preserve">
+    <value>Carte enlevée du paquet</value>
   </data>
-  <data name="Edit" xml:space="preserve">
-    <value>Modif</value>
+  <data name="CardWithFrontSideHead" xml:space="preserve">
+    <value>La carte avec face avant</value>
   </data>
-  <data name="Demo" xml:space="preserve">
-    <value>Démo</value>
+  <data name="DateAddedToDeck" xml:space="preserve">
+    <value>Elle a été ajoutée au paquet le</value>
+  </data>
+  <data name="InvalidNameLength" xml:space="preserve">
+    <value>Nom incorrect, longueur :</value>
+  </data>
+  <data name="ItWillBeExpired" xml:space="preserve">
+    <value>Elle sera expirée.</value>
+  </data>
+  <data name="ItWillExpireOn" xml:space="preserve">
+    <value>Expiration dans ce tas :</value>
+  </data>
+  <data name="MoveThisCardToHeap" xml:space="preserve">
+    <value>Déplacer cette carte vers le tas</value>
+  </data>
+  <data name="MustBeBetween" xml:space="preserve">
+    <value>, doit être entre</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>&lt;Aucun&gt;</value>
+  </data>
+  <data name="NoUndo" xml:space="preserve">
+    <value>Opération irrévocable !</value>
+  </data>
+  <data name="OnDidNotKnowToastMessage" xml:space="preserve">
+    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans votre prochaine session d'apprentissage.</value>
+  </data>
+  <data name="OnDidNotKnowToastTitle" xml:space="preserve">
+    <value>Vous ne saviez pas</value>
+  </data>
+  <data name="OnKnewToastMessage" xml:space="preserve">
+    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans deux jours (cet intervalle augmentant au fur et à mesure de vos répétitions).</value>
+  </data>
+  <data name="OnKnewToastTitle" xml:space="preserve">
+    <value>Vous saviez</value>
+  </data>
+  <data name="RemoveAlertMessage" xml:space="preserve">
+    <value>Êtes-vous sûr de vouloir enlever cette carte du paquet ?
+Elle est actuellement dans le tas</value>
+  </data>
+  <data name="RemovedFromDeck" xml:space="preserve">
+    <value>a été enlevée du paquet</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="SureYouWantToDelete" xml:space="preserve">
+    <value>Sûr de vouloir effacer</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="UnknownCardsHeap" xml:space="preserve">
+    <value>Cartes non apprises</value>
+  </data>
+  <data name="UnknownCardsHeap1" xml:space="preserve">
+    <value>Cartes non apprises</value>
+  </data>
+  <data name="YouOnly" xml:space="preserve">
+    <value>Vous seulement</value>
   </data>
 </root>
