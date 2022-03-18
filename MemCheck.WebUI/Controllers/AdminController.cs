@@ -122,6 +122,7 @@ namespace MemCheck.WebUI.Controllers
                 Email = user.Email;
                 NotifInterval = user.NotifInterval;
                 LastNotifUtcDate = user.LastNotifUtcDate;
+                LastSeenUtcDate = user.LastSeenUtcDate;
             }
             public string UserName { get; }
             public string UserId { get; }
@@ -129,6 +130,7 @@ namespace MemCheck.WebUI.Controllers
             public string Email { get; }
             public int NotifInterval { get; }
             public DateTime LastNotifUtcDate { get; }
+            public DateTime LastSeenUtcDate { get; }
         }
         #endregion
         #endregion

@@ -13,7 +13,9 @@ namespace MemCheck.Domain
         public int MinimumCountOfDaysBetweenNotifs { get; set; } = 0;   //A number of days. <= 0 means never send any email
         public DateTime LastNotificationUtcDate { get; set; }
         public bool SubscribeToCardOnEdit { get; set; }
-        public DateTime? DeletionDate { get; set; } = null;
+        public DateTime RegistrationUtcDate { get; set; }
+        public DateTime LastSeenUtcDate { get; set; }
+        public DateTime? DeletionDate { get; set; } = null; //UTC
         public IEnumerable<UserCardRating> UserCardRating { get; set; } = null!;
         public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
         public IEnumerable<UserWithViewOnCardPreviousVersion> UsersWithViewOnPreviousVersion { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)

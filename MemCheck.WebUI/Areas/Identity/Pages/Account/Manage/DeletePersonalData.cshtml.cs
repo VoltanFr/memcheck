@@ -7,9 +7,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -73,13 +71,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             _logger.LogInformation("User with ID '{UserId}' deleted themselves.", user.Id);
 
             return Redirect("~/");
-        }
-        private sealed class FakeStringLocalizer : ILocalized
-        {
-            public string Get(string resourceName)
-            {
-                return "no translation";
-            }
         }
     }
 }

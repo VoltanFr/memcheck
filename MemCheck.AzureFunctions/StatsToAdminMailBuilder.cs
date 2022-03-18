@@ -22,11 +22,15 @@ internal sealed class StatsToAdminMailBuilder
     {
         var writer = new StringBuilder();
         writer.Append("<p><table>");
-        writer.Append("<thead><tr><th>Name</th></tr></thead>");
+        writer.Append("<thead><tr><th>Name</th><th>Last seen</th></tr></thead>");
         writer.Append("<body>");
 
         foreach (var user in allUsers)
-            writer.Append("<tr style='nth-child(odd) {background: lightgray}'><td>" + user.UserName + "</td></tr>");
+        {
+            writer.Append("<tr style='nth-child(odd) {background: lightgray}'>");
+            writer.Append($"<td>{user.UserName}</td><td>{user.LastSeenUtcDate}</td>");
+            writer.Append("</tr>");
+        }
 
         writer.Append("</body>");
         writer.Append("</table></p>");
@@ -66,7 +70,7 @@ internal sealed class StatsToAdminMailBuilder
 
         writer.Append("<h1>MemCheck stats</h1>");
 
-        writer.Append("<h2>Users</h2>");
+        writer.Append($"<h2>{allUsers.Count} Users</h2>");
         writer.Append(GetUsersPart());
 
         writer.Append("<h2>Info</h2>");

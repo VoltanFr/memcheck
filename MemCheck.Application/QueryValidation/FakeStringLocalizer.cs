@@ -1,6 +1,4 @@
-﻿using MemCheck.Application.QueryValidation;
-
-namespace MemCheck.CommandLineDbClient
+﻿namespace MemCheck.Application.QueryValidation
 {
     public sealed class FakeStringLocalizer : ILocalized
     {

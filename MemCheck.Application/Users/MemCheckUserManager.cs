@@ -18,13 +18,6 @@ namespace MemCheck.Application.Users
     public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     {
         #region Private stuff
-        private sealed class FakeStringLocalizer : ILocalized
-        {
-            public string Get(string resourceName)
-            {
-                return "no translation";
-            }
-        }
         private readonly CallContext callContext;
         #endregion
         public const int MinUserNameLength = 3;

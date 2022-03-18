@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 
 namespace MemCheck.WebUI
 {
@@ -53,7 +52,7 @@ namespace MemCheck.WebUI
             {
                 option.EnableEndpointRouting = false;
             });
-            
+
             var appSettings = new AppSettings(configuration, prodEnvironment, CreateLogger());
 
             if (!prodEnvironment)
@@ -120,7 +119,8 @@ namespace MemCheck.WebUI
             app.UseExceptionHandler(a => a.Run(async context =>
             {
                 var e = context.Features.Get<IExceptionHandlerPathFeature>()!.Error;
-                var cultureName = context.Features.Get<IRequestCultureFeature>()!.RequestCulture.Culture.Name;
+                var requestCultureFeature = context.Features.Get<IRequestCultureFeature>();
+                var cultureName = requestCultureFeature == null ? "EN" : requestCultureFeature!.RequestCulture.Culture.Name;
                 var ToastTitle = cultureName.Equals("FR", StringComparison.OrdinalIgnoreCase) ? "Échec" : "Failure";
                 var ShowStatus = !(e is RequestInputException);
                 var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
