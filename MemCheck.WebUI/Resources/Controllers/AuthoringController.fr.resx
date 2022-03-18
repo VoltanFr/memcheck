@@ -237,6 +237,9 @@
   <data name="RatingSavedOk" xml:space="preserve">
     <value>Évaluation enregistrée:</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>Références</value>
+  </data>
   <data name="RequestStatus" xml:space="preserve">
     <value>Statut de la requête</value>
   </data>

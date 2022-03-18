@@ -360,6 +360,7 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "FrontSide", card.FrontSide, selectedVersion.FrontSide, localizer);
                 AddField(changedFields, unChangedFields, "BackSide", card.BackSide, selectedVersion.BackSide, localizer);
                 AddField(changedFields, unChangedFields, "AdditionalInfo", card.AdditionalInfo, selectedVersion.AdditionalInfo, localizer);
+                AddField(changedFields, unChangedFields, "References", card.References, selectedVersion.References, localizer);
                 AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
 
                 var cardTags = card.Tags.Any() ? string.Join(",", card.Tags.Select(t => t.TagName).OrderBy(name => name)) : localizer.Get("NoneMasc");

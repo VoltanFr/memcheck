@@ -237,6 +237,9 @@
   <data name="RatingSavedOk" xml:space="preserve">
     <value>Rating saved successfully:</value>
   </data>
+  <data name="References" xml:space="preserve">
+    <value>References</value>
+  </data>
   <data name="RequestStatus" xml:space="preserve">
     <value>Request status</value>
   </data>
