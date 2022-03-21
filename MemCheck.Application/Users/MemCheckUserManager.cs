@@ -21,7 +21,7 @@ namespace MemCheck.Application.Users
         private readonly CallContext callContext;
         #endregion
         public const int MinUserNameLength = 3;
-        public const int MaxUserNameLength = 30;
+        public const int MaxUserNameLength = 50;
         public const string BadUserNameLengthErrorCode = "BadUserNameLength";
         public const string DefaultDeckName = "Auto";
 
@@ -35,19 +35,21 @@ namespace MemCheck.Application.Users
         public override Task<IdentityResult> DeleteAsync(MemCheckUser user)
         {
             //In MemCheck, a user account is never deleted, but anonymized (with class DeleteUserAccount)
-            throw new NotImplementedException("This is not meant to be called");
+            throw new InvalidOperationException("This is not meant to be called");
         }
         public async override Task<IdentityResult> CreateAsync(MemCheckUser user)
         {
             if (user.UserName.Length > MaxUserNameLength || user.UserName.Length < MinUserNameLength)
                 return IdentityResult.Failed(new IdentityError() { Code = BadUserNameLengthErrorCode, Description = $"User name must contain between {MinUserNameLength} and {MaxUserNameLength} chars" }.AsArray());
 
+            user.RegistrationUtcDate = DateTime.UtcNow;
             var result = await base.CreateAsync(user);
+
             callContext.TelemetryClient.TrackEvent("UserAccountCreated", ("UserName", user.UserName), ("Email", user.Email), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
+
             if (result.Succeeded)
             {
-                var createDeck = new CreateDeck(callContext);
-                await createDeck.RunAsync(new CreateDeck.Request(user.Id, DefaultDeckName, HeapingAlgorithms.DefaultAlgoId));
+                await new CreateDeck(callContext).RunAsync(new CreateDeck.Request(user.Id, DefaultDeckName, HeapingAlgorithms.DefaultAlgoId));
             }
             return result;
         }

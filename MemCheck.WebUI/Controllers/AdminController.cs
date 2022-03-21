@@ -123,6 +123,7 @@ namespace MemCheck.WebUI.Controllers
                 NotifInterval = user.NotifInterval;
                 LastNotifUtcDate = user.LastNotifUtcDate;
                 LastSeenUtcDate = user.LastSeenUtcDate;
+                RegistrationUtcDate = user.RegistrationUtcDate;
             }
             public string UserName { get; }
             public string UserId { get; }
@@ -131,6 +132,7 @@ namespace MemCheck.WebUI.Controllers
             public int NotifInterval { get; }
             public DateTime LastNotifUtcDate { get; }
             public DateTime LastSeenUtcDate { get; }
+            public DateTime RegistrationUtcDate { get; }
         }
         #endregion
         #endregion

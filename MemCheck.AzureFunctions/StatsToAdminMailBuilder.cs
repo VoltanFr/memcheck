@@ -28,7 +28,7 @@ internal sealed class StatsToAdminMailBuilder
         foreach (var user in allUsers)
         {
             writer.Append("<tr style='nth-child(odd) {background: lightgray}'>");
-            writer.Append($"<td>{user.UserName}</td><td>{user.LastSeenUtcDate}</td>");
+            writer.Append($"<td>{user.UserName}</td><td>{user.LastSeenUtcDate}</td><td>{user.RegistrationUtcDate}</td>");
             writer.Append("</tr>");
         }
 

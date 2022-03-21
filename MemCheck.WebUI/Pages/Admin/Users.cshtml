@@ -42,6 +42,7 @@
                     <th>@Localizer["Last notif"]</th>
                     <th>@Localizer["Roles"]</th>
                     <th>@Localizer["Email"]</th>
+                    <th>@Localizer["Created"]</th>
                     <th>@Localizer["Id"]</th>
                 </tr>
                 <tr v-for="user in users">
@@ -51,6 +52,7 @@
                     <td>{{new Date(user.lastNotifUtcDate).toLocaleString([], { year: "numeric", month: "numeric", day: "numeric", hour: '2-digit', minute: '2-digit' })}}</td>
                     <td>{{user.roles}}</td>
                     <td>{{user.email}}</td>
+                    <td>{{new Date(user.registrationUtcDate).toLocaleString([], { year: "numeric", month: "numeric", day: "numeric", hour: '2-digit', minute: '2-digit' })}}</td>
                     <td>{{user.userId}}</td>
                 </tr>
             </table>

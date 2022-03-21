@@ -1,5 +1,4 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Users;
+﻿using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -33,7 +32,6 @@ namespace MemCheck.Application.Tests.Helpers
             var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
             var serviceProvider = services.BuildServiceProvider();
             var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
-            //var roleChecker = new TestRoleChecker();
             return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
         }
         public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
@@ -51,8 +49,7 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
         {
-            return new MemCheckUser
-            {
+            return new MemCheckUser {
                 MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
                 LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
                 SubscribeToCardOnEdit = subscribeToCardOnEdit,

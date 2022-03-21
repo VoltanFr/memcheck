@@ -24,7 +24,7 @@ namespace MemCheck.Application.Users
             foreach (var user in pageEntries)
             {
                 var roles = await RoleChecker.GetRolesAsync(user);
-                resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate));
+                resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate));
             }
             var result = new ResultModel(totalCount, pageCount, resultUsers);
             return new ResultWithMetrologyProperties<ResultModel>(result,
@@ -66,7 +66,7 @@ namespace MemCheck.Application.Users
         }
         public sealed class ResultUserModel
         {
-            public ResultUserModel(string userName, Guid userId, string roles, string email, int notifInterval, DateTime lastNotifUtcDate, DateTime lastSeenUtcDate)
+            public ResultUserModel(string userName, Guid userId, string roles, string email, int notifInterval, DateTime lastNotifUtcDate, DateTime lastSeenUtcDate, DateTime registrationUtcDate)
             {
                 UserName = userName;
                 UserId = userId;
@@ -75,6 +75,7 @@ namespace MemCheck.Application.Users
                 NotifInterval = notifInterval;
                 LastNotifUtcDate = lastNotifUtcDate;
                 LastSeenUtcDate = lastSeenUtcDate;
+                RegistrationUtcDate = registrationUtcDate;
             }
             public string UserName { get; }
             public Guid UserId { get; }
@@ -83,6 +84,7 @@ namespace MemCheck.Application.Users
             public int NotifInterval { get; }
             public DateTime LastNotifUtcDate { get; }
             public DateTime LastSeenUtcDate { get; }
+            public DateTime RegistrationUtcDate { get; }
         }
         #endregion
     }
