@@ -142,7 +142,7 @@ namespace MemCheck.Application.Cards
                 await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
             using var dbContext = new MemCheckDbContext(db);
-            var countRequested = Randomizer.Next(createdCount - 2);
+            var countRequested = Randomizer.Next(1, createdCount - 2);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), countRequested);
             var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
             Assert.AreEqual(countRequested, result.Cards.Count());
