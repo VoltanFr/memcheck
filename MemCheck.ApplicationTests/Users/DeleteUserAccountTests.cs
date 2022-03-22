@@ -4,6 +4,7 @@ using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -84,6 +85,7 @@ namespace MemCheck.Application.Users
             {
                 MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
                 Assert.AreEqual(userToDeleteName, userToDelete.UserName);
+                Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
                 Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
                 Assert.IsTrue(userToDelete.EmailConfirmed);
                 Assert.IsFalse(userToDelete.LockoutEnabled);
@@ -102,6 +104,7 @@ namespace MemCheck.Application.Users
             {
                 var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
+                Assert.AreEqual(userToDeleteName.ToUpperInvariant(), deletedUser.NormalizedUserName);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
                 Assert.IsFalse(deletedUser.EmailConfirmed);
                 Assert.IsTrue(deletedUser.LockoutEnabled);
@@ -126,6 +129,7 @@ namespace MemCheck.Application.Users
             {
                 MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
                 Assert.AreEqual(userToDeleteName, userToDelete.UserName);
+                Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
                 Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
                 Assert.IsTrue(userToDelete.EmailConfirmed);
                 Assert.IsFalse(userToDelete.LockoutEnabled);
@@ -144,6 +148,7 @@ namespace MemCheck.Application.Users
             {
                 var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
+                Assert.AreEqual(userToDeleteName.ToUpperInvariant(), deletedUser.NormalizedUserName);
                 Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
                 Assert.IsFalse(deletedUser.EmailConfirmed);
                 Assert.IsTrue(deletedUser.LockoutEnabled);
@@ -491,6 +496,42 @@ namespace MemCheck.Application.Users
             {
                 Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser));
                 Assert.AreEqual(0, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == userToDelete));
+            }
+        }
+        [TestMethod()]
+        public async Task UserNameCanNotBeReused()
+        {
+            //See comment on class DeleteUserAccount about why I don't want user names to be reused
+
+            var db = DbHelper.GetEmptyTestDB();
+
+            var userName = RandomHelper.String();
+            var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userName);
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(userToDeleteId, userToDeleteId));
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(1, dbContext.Users.Count());
+
+                var user = dbContext.Users.Single();
+                Assert.AreEqual(userToDeleteId, user.Id);
+                Assert.AreNotEqual(userName, user.UserName);
+                Assert.AreEqual(DeleteUserAccount.DeletedUserName, user.UserName);
+                Assert.AreEqual(userName.ToUpperInvariant(), user.NormalizedUserName);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                using var userManager = UserHelper.GetUserManager(dbContext);
+                var user = new MemCheckUser();
+                user.UserName = userName;
+                var creationResult = await userManager.CreateAsync(user);
+                Assert.AreNotEqual(IdentityResult.Success, creationResult);
             }
         }
     }

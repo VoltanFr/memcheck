@@ -10,6 +10,8 @@ namespace MemCheck.Application.Users
 {
     /// <summary>
     /// We don't really delete a user account, we just mark it as deleted and anonymize it.
+    /// Anonymize means that we replace the user name with DeleteUserAccount.DeletedUserName.
+    /// Note that we don't replace the NormalizedUserName, so that the user name may not be reused (I prefer to forbid the reusing of a user name because I think it would be error prone for users: one could think another user is a person he is not).
     /// This is because the user id is used in many places, such as card version creator, image uploader, or tag creator.
     /// </summary>
     public sealed class DeleteUserAccount : RequestRunner<DeleteUserAccount.Request, DeleteUserAccount.Result>
