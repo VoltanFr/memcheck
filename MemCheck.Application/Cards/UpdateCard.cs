@@ -170,7 +170,7 @@ namespace MemCheck.Application.Cards
                 FrontSideImageList = frontSideImageList;
                 BackSideImageList = backSideImageList;
                 AdditionalInfoImageList = additionalInfoImageList;
-                References = references;
+                References = references.Trim();
                 LanguageId = languageId;
                 Tags = tags;
                 UsersWithVisibility = usersWithVisibility;

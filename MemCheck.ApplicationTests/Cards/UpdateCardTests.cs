@@ -501,5 +501,103 @@ namespace MemCheck.Application.Cards
             StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString());
             StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString());
         }
+        [TestMethod()]
+        public async Task UpdateFrontSideWithValueNotTrimmed()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var originalCard = await CardHelper.CreateAsync(db, cardCreator, language: languageId);
+
+            var newFrontSide = RandomHelper.String();
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new UpdateCard.Request(
+                    originalCard.Id,
+                    cardCreator,
+                    newFrontSide + ' ',
+                    new Guid[0],
+                    originalCard.BackSide,
+                    new Guid[0],
+                    originalCard.AdditionalInfo,
+                    new Guid[0],
+                    originalCard.References,
+                    languageId,
+                    new Guid[0],
+                    new Guid[0],
+                    RandomHelper.String());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var updatedCard = dbContext.Cards
+                    .Include(c => c.VersionCreator)
+                    .Include(c => c.CardLanguage)
+                    .Include(c => c.UsersWithView)
+                    .Include(c => c.Images)
+                    .Include(c => c.TagsInCards)
+                    .Single();
+                Assert.AreEqual(cardCreator, updatedCard.VersionCreator.Id);
+                Assert.AreEqual(newFrontSide, updatedCard.FrontSide);
+                Assert.AreEqual(originalCard.BackSide, updatedCard.BackSide);
+                Assert.AreEqual(originalCard.AdditionalInfo, updatedCard.AdditionalInfo);
+                Assert.AreEqual(originalCard.References, updatedCard.References);
+                Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
+                Assert.IsFalse(updatedCard.Images.Any());
+                Assert.IsFalse(updatedCard.TagsInCards.Any());
+                Assert.IsFalse(updatedCard.UsersWithView.Any());
+            }
+        }
+        [TestMethod()]
+        public async Task UpdateReferencesWithValueNotTrimmed()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreator = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var originalCard = await CardHelper.CreateAsync(db, cardCreator, language: languageId);
+
+            var newReferences = RandomHelper.String();
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var request = new UpdateCard.Request(
+                    originalCard.Id,
+                    cardCreator,
+                    originalCard.FrontSide,
+                    new Guid[0],
+                    originalCard.BackSide,
+                    new Guid[0],
+                    originalCard.AdditionalInfo,
+                    new Guid[0],
+                    " " + newReferences,
+                    languageId,
+                    new Guid[0],
+                    new Guid[0],
+                    RandomHelper.String());
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
+            }
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var updatedCard = dbContext.Cards
+                    .Include(c => c.VersionCreator)
+                    .Include(c => c.CardLanguage)
+                    .Include(c => c.UsersWithView)
+                    .Include(c => c.Images)
+                    .Include(c => c.TagsInCards)
+                    .Single();
+                Assert.AreEqual(cardCreator, updatedCard.VersionCreator.Id);
+                Assert.AreEqual(originalCard.FrontSide, updatedCard.FrontSide);
+                Assert.AreEqual(originalCard.BackSide, updatedCard.BackSide);
+                Assert.AreEqual(originalCard.AdditionalInfo, updatedCard.AdditionalInfo);
+                Assert.AreEqual(newReferences, updatedCard.References);
+                Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
+                Assert.IsFalse(updatedCard.Images.Any());
+                Assert.IsFalse(updatedCard.TagsInCards.Any());
+                Assert.IsFalse(updatedCard.UsersWithView.Any());
+            }
+        }
     }
 }
