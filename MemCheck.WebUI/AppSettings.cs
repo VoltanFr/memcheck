@@ -19,7 +19,7 @@ namespace MemCheck.WebUI
             if (debuggingDb == "Azure")
             {
                 logger.LogWarning("Using Azure prod DB from private file");
-                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
+                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureConnectionString.txt").Trim();
             }
             logger.LogInformation($"Using DB '{debuggingDb}'");
             return configuration[$"ConnectionStrings:{debuggingDb}"];
@@ -34,7 +34,7 @@ namespace MemCheck.WebUI
             var debuggingDb = configuration["ConnectionStrings:DebuggingDb"];
             if (debuggingDb == "AlternativeProdDbConnection" || debuggingDb == "Azure")
             {
-                var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\SendGridSecrets.json"));
+                var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\SendGridSecrets.json"));
                 logger.LogWarning("Using prod SendGrid settings from private file");
                 return new SendGridSettings(secrets!.SendGridUser, secrets.SendGridKey, secrets.SendGridSender);
             }
