@@ -15,29 +15,46 @@ namespace MemCheck.Application.Tags
         }
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            var tags = DbContext.Tags
-                .AsNoTracking()
-                .Include(tag => tag.TagsInCards)
-                .ThenInclude(tagInCard => tagInCard.Card)
-                .ThenInclude(card => card.UsersWithView)
-                .Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%"))
-                .OrderBy(tag => tag.Name);
-            var totalCount = await tags.CountAsync();
-            var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
-            var pageTags = tags.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
-            var resultTagsWithoutCardCount = pageTags.Select(tag => new { tag.Id, tag.Name, tag.Description, tag.TagsInCards }).ToImmutableArray();
+            //Code tuned for perf. Understand and use GetAllTagsPerfTests before making changes
+
+            var allTagsForDetails = DbContext.Tags.AsNoTracking();
+            var allTagsForDetailsFiltered = request.Filter.Length > 0
+                ? allTagsForDetails.Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%"))
+                : allTagsForDetails;
+            var allTagDetails = allTagsForDetailsFiltered
+                .Select(tag => new { tag.Id, tag.Name, tag.Description })
+                .ToImmutableArray();
+
+            var allTags = DbContext.TagsInCards.AsNoTracking();
+            var forUser = request.UserId == Guid.Empty
+                ? allTags.Where(tagInCard => !tagInCard.Card.UsersWithView.Any())
+                : allTags.Where(tagInCard => !tagInCard.Card.UsersWithView.Any() || tagInCard.Card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));
+            var filtered = request.Filter.Length > 0
+                ? forUser.Where(tagInCard => EF.Functions.Like(tagInCard.Tag.Name, $"%{request.Filter}%"))
+                : forUser;
+            var countOfPublicCardsPerTag = filtered
+                .GroupBy(tagInCard => tagInCard.TagId)
+                .Select(group => new { TagId = group.Key, Count = group.Count() })
+                .ToImmutableDictionary(keyAndCount => keyAndCount.TagId, keyAndCount => keyAndCount.Count);
 
             var resultTags = new List<ResultTag>();
-            foreach (var tagWithoutCardCount in resultTagsWithoutCardCount)
+            foreach (var tag in allTagDetails)
             {
-                var cardCount = 0;
-                foreach (var tagInCard in tagWithoutCardCount.TagsInCards)
-                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, tagInCard.Card))
-                        cardCount++;
-                resultTags.Add(new ResultTag(tagWithoutCardCount.Id, tagWithoutCardCount.Name, tagWithoutCardCount.Description, cardCount));
+                countOfPublicCardsPerTag.TryGetValue(tag.Id, out var cardCount);
+                resultTags.Add(new ResultTag(tag.Id, tag.Name, tag.Description, cardCount));
             }
 
-            var result = new Result(totalCount, pageCount, resultTags);
+            var totalCount = allTagDetails.Length;
+            var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
+            var pageTags = resultTags
+                .OrderBy(tag => tag.TagName)
+                .Skip((request.PageNo - 1) * request.PageSize)
+                .Take(request.PageSize);
+
+            var result = new Result(totalCount, pageCount, pageTags);
+
+            await Task.CompletedTask;
+
             return new ResultWithMetrologyProperties<Result>(result,
                 ("PageSize", request.PageSize.ToString()),
                 ("PageNo", request.PageNo.ToString()),
@@ -46,7 +63,6 @@ namespace MemCheck.Application.Tags
                 ("PageCount", result.PageCount.ToString()),
                 ("TagCount", result.Tags.Count().ToString()));
         }
-
         #region Request & Result
         public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter) : IRequest
         {

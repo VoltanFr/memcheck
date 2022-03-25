@@ -85,7 +85,7 @@ namespace MemCheck.Application.Tags
             }
         }
         [TestMethod()]
-        public async Task Filtering()
+        public async Task NoUser_Filtering()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tagName = RandomHelper.String(10);
