@@ -20,7 +20,7 @@ namespace MemCheck.CommandLineDbClient
             if (config["ConnectionStrings:DebuggingDb"] == "Azure")
             {
                 Log.Warning("Using Azure DB");
-                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck private info\AzureConnectionString.txt").Trim();
+                return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureConnectionString.txt").Trim();
             }
 
 

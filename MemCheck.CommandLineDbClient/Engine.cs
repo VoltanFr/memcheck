@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.Images;
+﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient
         #region Private method
         private ICmdLinePlugin GetPlugin()
         {
-            return new RecomputeAllSHA1(serviceProvider);
+            return new GetAllTagsPerfTests(serviceProvider);
         }
         #endregion
         public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,11 +15,29 @@ namespace MemCheck.Application.Tags
         }
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            var tags = DbContext.Tags.Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%")).OrderBy(tag => tag.Name);
+            var tags = DbContext.Tags
+                .AsNoTracking()
+                .Include(tag => tag.TagsInCards)
+                .ThenInclude(tagInCard => tagInCard.Card)
+                .ThenInclude(card => card.UsersWithView)
+                .Where(tag => EF.Functions.Like(tag.Name, $"%{request.Filter}%"))
+                .OrderBy(tag => tag.Name);
             var totalCount = await tags.CountAsync();
             var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
             var pageTags = tags.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize);
-            var result = new Result(totalCount, pageCount, pageTags.Select(tag => new ResultTag(tag.Id, tag.Name, tag.Description, tag.TagsInCards.Count)));
+            var resultTagsWithoutCardCount = pageTags.Select(tag => new { tag.Id, tag.Name, tag.Description, tag.TagsInCards }).ToImmutableArray();
+
+            var resultTags = new List<ResultTag>();
+            foreach (var tagWithoutCardCount in resultTagsWithoutCardCount)
+            {
+                var cardCount = 0;
+                foreach (var tagInCard in tagWithoutCardCount.TagsInCards)
+                    if (CardVisibilityHelper.CardIsVisibleToUser(request.UserId, tagInCard.Card))
+                        cardCount++;
+                resultTags.Add(new ResultTag(tagWithoutCardCount.Id, tagWithoutCardCount.Name, tagWithoutCardCount.Description, cardCount));
+            }
+
+            var result = new Result(totalCount, pageCount, resultTags);
             return new ResultWithMetrologyProperties<Result>(result,
                 ("PageSize", request.PageSize.ToString()),
                 ("PageNo", request.PageNo.ToString()),
@@ -29,11 +48,13 @@ namespace MemCheck.Application.Tags
         }
 
         #region Request & Result
-        public sealed record Request(int PageSize, int PageNo, string Filter) : IRequest
+        public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter) : IRequest
         {
             public const int MaxPageSize = 500;
             public async Task CheckValidityAsync(CallContext callContext)
             {
+                if (UserId != Guid.Empty)
+                    await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 if (PageNo < 1)
                     throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
                 if (PageSize < 1)

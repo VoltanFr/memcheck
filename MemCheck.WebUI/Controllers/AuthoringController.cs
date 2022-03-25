@@ -131,7 +131,8 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("AllAvailableTags")]
         public async Task<IActionResult> GetAllAvailableTagsAsync()
         {
-            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(userId, GetAllTags.Request.MaxPageSize, 1, ""));
             return Ok(result.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName)));
         }
         public sealed class GetAllAvailableTagsViewModel
