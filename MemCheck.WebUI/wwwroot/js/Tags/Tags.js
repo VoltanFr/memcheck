@@ -1,5 +1,6 @@
 const tagListingApp = Vue.createApp({
     components: {
+        'card-rating': CardRating,
     },
     data() {
         return {
@@ -40,6 +41,7 @@ const tagListingApp = Vue.createApp({
                             tagName: result.data.tags[i].tagName,
                             tagDescription: result.data.tags[i].tagDescription,
                             cardCount: result.data.tags[i].cardCount,
+                            averageRating: result.data.tags[i].averageRating,
                             folded: true
                         };
                         this.tags.push(tagWithVisibility);

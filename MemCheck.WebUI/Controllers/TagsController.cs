@@ -102,11 +102,13 @@ namespace MemCheck.WebUI.Controllers
                 TagName = tag.TagName;
                 TagDescription = tag.TagDescription;
                 CardCount = tag.CardCount;
+                AverageRating = tag.AverageRating;
             }
             public Guid TagId { get; }
             public string TagName { get; } = null!;
             public string TagDescription { get; } = null!;
             public int CardCount { get; }
+            public double AverageRating { get; }
         }
         #endregion
         #region GetTagNames

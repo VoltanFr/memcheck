@@ -46,7 +46,7 @@ namespace MemCheck.Application.Tags
             Assert.AreEqual(0, result.Tags.Count());
         }
         [TestMethod()]
-        public async Task OneTagInDb()
+        public async Task OneTagInDbWithOneCardWithoutRating()
         {
             var db = DbHelper.GetEmptyTestDB();
             var name = RandomHelper.String();
@@ -54,15 +54,46 @@ namespace MemCheck.Application.Tags
             var tag = await TagHelper.CreateAsync(db, name, description);
             var user = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+
             using var dbContext = new MemCheckDbContext(db);
             var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, ""));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
             Assert.AreEqual(1, result.Tags.Count());
-            Assert.AreEqual(tag, result.Tags.Single().TagId);
-            Assert.AreEqual(name, result.Tags.Single().TagName);
-            Assert.AreEqual(description, result.Tags.Single().TagDescription);
-            Assert.AreEqual(1, result.Tags.Single().CardCount);
+            var resultTag = result.Tags.Single();
+            Assert.AreEqual(tag, resultTag.TagId);
+            Assert.AreEqual(name, resultTag.TagName);
+            Assert.AreEqual(description, resultTag.TagDescription);
+            Assert.AreEqual(1, resultTag.CardCount);
+            Assert.AreEqual(0, resultTag.AverageRating);
+        }
+        [TestMethod()]
+        public async Task OneTagInDbWithOneCardWithRating()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var name = RandomHelper.String();
+            var description = RandomHelper.String();
+            var tag = await TagHelper.CreateAsync(db, name, description);
+            var user = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+            var rating = RandomHelper.Rating();
+            await RatingHelper.RecordForUserAsync(db, user, card.Id, rating);
+
+            using var dbContext = new MemCheckDbContext(db);
+
+            var cardFromDb = dbContext.Cards.Single();
+            Assert.AreEqual(rating, cardFromDb.AverageRating);
+
+            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, ""));
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(1, result.TotalCount);
+            Assert.AreEqual(1, result.Tags.Count());
+            var resultTag = result.Tags.Single();
+            Assert.AreEqual(tag, resultTag.TagId);
+            Assert.AreEqual(name, resultTag.TagName);
+            Assert.AreEqual(description, resultTag.TagDescription);
+            Assert.AreEqual(1, resultTag.CardCount);
+            Assert.AreEqual(rating, resultTag.AverageRating);
         }
         [TestMethod()]
         public async Task Paging()
@@ -318,7 +349,7 @@ namespace MemCheck.Application.Tags
             Assert.AreEqual(0, result.Tags.Single().CardCount);
         }
         [TestMethod()]
-        public async Task CardCount_ComplexCase()
+        public async Task CardStats_ComplexCase()
         {
             var db = DbHelper.GetEmptyTestDB();
 
@@ -331,24 +362,50 @@ namespace MemCheck.Application.Tags
             var user3 = await UserHelper.CreateInDbAsync(db);
 
             //public cards
-            await CardHelper.CreateAsync(db, user1);
-            await CardHelper.CreateAsync(db, user1, tagIds: tag1.AsArray());
-            await CardHelper.CreateAsync(db, user1, tagIds: new[] { tag1, tag2 });
-            await CardHelper.CreateAsync(db, user1, tagIds: new[] { tag1, tag2, tag3 });
+            var card1 = await CardHelper.CreateIdAsync(db, user1);
+            var card2 = await CardHelper.CreateIdAsync(db, user1, tagIds: tag1.AsArray());
+            await RatingHelper.RecordForUserAsync(db, user1, card2, 1);
+            var card3 = await CardHelper.CreateIdAsync(db, user1, tagIds: new[] { tag1, tag2 });
+            await RatingHelper.RecordForUserAsync(db, user1, card3, 1);
+            await RatingHelper.RecordForUserAsync(db, user2, card3, 3);
+            var card4 = await CardHelper.CreateIdAsync(db, user1, tagIds: new[] { tag1, tag2, tag3 });
+            await RatingHelper.RecordForUserAsync(db, user2, card4, 2);
+            await RatingHelper.RecordForUserAsync(db, user3, card4, 4);
 
             //Cards visible to user2 only
-            await CardHelper.CreateAsync(db, user2, userWithViewIds: new[] { user2 });
-            await CardHelper.CreateAsync(db, user2, tagIds: tag1.AsArray(), userWithViewIds: new[] { user2 });
-            await CardHelper.CreateAsync(db, user2, tagIds: new[] { tag1, tag2 }, userWithViewIds: new[] { user2 });
-            await CardHelper.CreateAsync(db, user2, tagIds: new[] { tag1, tag2, tag3 }, userWithViewIds: new[] { user2 });
+            var card5 = await CardHelper.CreateIdAsync(db, user2, userWithViewIds: new[] { user2 });
+            await RatingHelper.RecordForUserAsync(db, user2, card5, 1);
+            var card6 = await CardHelper.CreateIdAsync(db, user2, tagIds: tag1.AsArray(), userWithViewIds: new[] { user2 });
+            await RatingHelper.RecordForUserAsync(db, user2, card6, 2);
+            var card7 = await CardHelper.CreateIdAsync(db, user2, tagIds: new[] { tag1, tag2 }, userWithViewIds: new[] { user2 });
+            await RatingHelper.RecordForUserAsync(db, user2, card7, 3);
+            var card8 = await CardHelper.CreateIdAsync(db, user2, tagIds: new[] { tag1, tag2, tag3 }, userWithViewIds: new[] { user2 });
+            await RatingHelper.RecordForUserAsync(db, user2, card8, 4);
 
             //Cards visible to user3 only
-            await CardHelper.CreateAsync(db, user3, userWithViewIds: new[] { user3 });
+            var card9 = await CardHelper.CreateIdAsync(db, user3, userWithViewIds: new[] { user3 });
+            await RatingHelper.RecordForUserAsync(db, user2, card9, 5);
 
             //Cards visible to user2 and user3
-            await CardHelper.CreateAsync(db, user2, tagIds: tag1.AsArray(), userWithViewIds: new[] { user2, user3 });
-            await CardHelper.CreateAsync(db, user2, tagIds: new[] { tag1, tag2 }, userWithViewIds: new[] { user2, user3 });
-            await CardHelper.CreateAsync(db, user2, tagIds: new[] { tag1, tag2, tag3 }, userWithViewIds: new[] { user2, user3 });
+            var card10 = await CardHelper.CreateIdAsync(db, user2, tagIds: tag1.AsArray(), userWithViewIds: new[] { user2, user3 });
+            await RatingHelper.RecordForUserAsync(db, user2, card10, 1);
+            var card11 = await CardHelper.CreateIdAsync(db, user2, tagIds: new[] { tag1, tag2 }, userWithViewIds: new[] { user2, user3 });
+            await RatingHelper.RecordForUserAsync(db, user2, card11, 2);
+            var card12 = await CardHelper.CreateIdAsync(db, user2, tagIds: new[] { tag1, tag2, tag3 }, userWithViewIds: new[] { user2, user3 });
+            await RatingHelper.RecordForUserAsync(db, user2, card12, 3);
+
+            //Query by no user
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
+                Assert.AreEqual(3, result.Tags.Count());
+                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
+                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag2).CardCount);
+                Assert.AreEqual(2.5, result.Tags.Single(t => t.TagId == tag2).AverageRating);
+                Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag3).CardCount);
+                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
+            }
 
             //Query by user1
             using (var dbContext = new MemCheckDbContext(db))
@@ -356,8 +413,11 @@ namespace MemCheck.Application.Tags
                 var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user1, 10, 1, ""));
                 Assert.AreEqual(3, result.Tags.Count());
                 Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
                 Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag2).CardCount);
+                Assert.AreEqual(2.5, result.Tags.Single(t => t.TagId == tag2).AverageRating);
                 Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag3).CardCount);
+                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
             }
 
             //Query by user2
@@ -366,8 +426,11 @@ namespace MemCheck.Application.Tags
                 var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user2, 10, 1, ""));
                 Assert.AreEqual(3, result.Tags.Count());
                 Assert.AreEqual(9, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(21.0 / 9, result.Tags.Single(t => t.TagId == tag1).AverageRating);
                 Assert.AreEqual(6, result.Tags.Single(t => t.TagId == tag2).CardCount);
+                Assert.AreEqual(17.0 / 6, result.Tags.Single(t => t.TagId == tag2).AverageRating);
                 Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).CardCount);
+                Assert.AreEqual(10.0 / 3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
             }
 
             //Query by user3
@@ -376,8 +439,11 @@ namespace MemCheck.Application.Tags
                 var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user3, 10, 1, ""));
                 Assert.AreEqual(3, result.Tags.Count());
                 Assert.AreEqual(6, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
                 Assert.AreEqual(4, result.Tags.Single(t => t.TagId == tag2).CardCount);
+                Assert.AreEqual(10.0 / 4, result.Tags.Single(t => t.TagId == tag2).AverageRating);
                 Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag3).CardCount);
+                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
             }
         }
     }

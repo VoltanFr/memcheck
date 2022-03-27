@@ -1,4 +1,34 @@
-﻿.inputs-div {
+﻿@media (max-width: 550px) {
+    :root {
+        --edit-column-width: 50px;
+        --count-column-width: 50px;
+        --rating-column-width: 40px;
+        --rating-component-width: 32px;
+        --count-button-width: 34px;
+    }
+}
+
+@media (min-width: 551px) and (max-width: 978px) {
+    :root {
+        --edit-column-width: 60px;
+        --count-column-width: 60px;
+        --rating-column-width: 60px;
+        --rating-component-width: 40px;
+        --count-button-width: 42px;
+    }
+}
+
+@media (min-width: 979px) {
+    :root {
+        --edit-column-width: 70px;
+        --count-column-width: 70px;
+        --rating-column-width: 70px;
+        --rating-component-width: 50px;
+        --count-button-width: 50px;
+    }
+}
+
+.inputs-div {
     width: 100%;
     margin-bottom: 30px;
 }
@@ -40,41 +70,60 @@
     width: 100%;
 }
 
-.tag-list-column-header-count {
-    width: 500px;
-    min-inline-size: 50px;
+.tag-list-column-data-name {
+    font-weight: 700;
+    width: 100%;
 }
 
 .tag-list-column-header-edit {
-    min-inline-size: 50px;
-    padding-right: 5px;
-}
-
-.tag-list-column-data-name {
-    font-weight: 700;
-    width: 100%
+    min-width: var(--edit-column-width);
+    text-align: center;
 }
 
 .tag-list-column-data-edit {
-    text-align: right;
-    padding-right: 10px;
+    min-width: var(--edit-column-width);
+    text-align: center;
+    vertical-align:middle;
+}
+
+.tag-list-column-header-count {
+    min-width: var(--count-column-width);
+    text-align: center;
 }
 
 .tag-list-column-data-count {
+    min-width: var(--count-column-width);
+    text-align: center;
+}
+
+.tag-list-column-header-rating {
+    min-width: var(--rating-column-width);
+    text-align: center;
+}
+
+.tag-list-column-data-rating {
+    min-width: var(--rating-column-width);
+    text-align: center;
+    padding: 0px;
+}
+
+.rating-component {
+    width: var(--rating-component-width);
+    padding: 0px;
 }
 
 .data-count-button {
-    width: 50px;
+    width: var(--count-button-width);
 }
 
 .tag-list-in-row-table {
-    width:100%;
+    width: 100%;
 }
 
 .tag-list-in-row-row {
 }
 
-.fold-button{
-    background-color:transparent;
-    border-style:none;
+.fold-button {
+    background-color: transparent;
+    border-style: none;
 }

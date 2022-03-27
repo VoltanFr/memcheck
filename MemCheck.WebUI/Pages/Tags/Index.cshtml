@@ -2,12 +2,15 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @section head {
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/taglistpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/taglistpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-<script type="module" src="~/js/Tags/Tags.js" asp-append-version="true"></script>
+    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+    <script src="~/js/CardRating.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Tags/Tags.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -49,6 +52,7 @@
                                     <span v-else>@Localizer["Demo"]</span>
                                 </td>
                                 <td class="tag-list-column-header-count">@Localizer["CardCount"]</td>
+                                <td class="tag-list-column-header-rating">@Localizer["Rating"]</td>
                             </tr>
                         </table>
                     </td>
@@ -68,6 +72,10 @@
                                     <button class="toolbar-button-circle toolbar-button" @@click="demo(tag.tagId)" v-else><i class="far fa-eye"></i></button>
                                 </td>
                                 <td class="tag-list-column-data-count"><button class="toolbar-button data-count-button" @@click="showCardsWithTag(tag.tagId)">{{tag.cardCount}}</button></td>
+                                <td class="tag-list-column-data-rating">
+                                    <card-rating class="rating-component" micro readonly v-bind:average="tag.averageRating" v-bind:countinaverage="tag.cardCount"
+                                                 yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' />
+                                </td>
                             </tr>
                         </table>
                         <div class="markdown-render markdown-body" v-if="!tagIsFolded(tag)">

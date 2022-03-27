@@ -25,23 +25,23 @@ namespace MemCheck.Application.Tags
                 .Select(tag => new { tag.Id, tag.Name, tag.Description })
                 .ToImmutableArray();
 
-            var allTags = DbContext.TagsInCards.AsNoTracking();
+            var allTags = DbContext.TagsInCards.Include(tagInCard => tagInCard.Card).AsNoTracking();
             var forUser = request.UserId == Guid.Empty
                 ? allTags.Where(tagInCard => !tagInCard.Card.UsersWithView.Any())
                 : allTags.Where(tagInCard => !tagInCard.Card.UsersWithView.Any() || tagInCard.Card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));
             var filtered = request.Filter.Length > 0
                 ? forUser.Where(tagInCard => EF.Functions.Like(tagInCard.Tag.Name, $"%{request.Filter}%"))
                 : forUser;
-            var countOfPublicCardsPerTag = filtered
+            var statsOfTagCards = filtered
                 .GroupBy(tagInCard => tagInCard.TagId)
-                .Select(group => new { TagId = group.Key, Count = group.Count() })
-                .ToImmutableDictionary(keyAndCount => keyAndCount.TagId, keyAndCount => keyAndCount.Count);
+                .Select(group => new { TagId = group.Key, Count = group.Count(), AverageRating = group.Average(tagInCard => tagInCard.Card.AverageRating) })
+                .ToImmutableDictionary(tagStats => tagStats.TagId, keyAndCount => new { keyAndCount.Count, keyAndCount.AverageRating });
 
             var resultTags = new List<ResultTag>();
             foreach (var tag in allTagDetails)
             {
-                countOfPublicCardsPerTag.TryGetValue(tag.Id, out var cardCount);
-                resultTags.Add(new ResultTag(tag.Id, tag.Name, tag.Description, cardCount));
+                statsOfTagCards.TryGetValue(tag.Id, out var tagStats);
+                resultTags.Add(new ResultTag(tag.Id, tag.Name, tag.Description, tagStats == null ? 0 : tagStats.Count, tagStats == null ? 0 : tagStats.AverageRating));
             }
 
             var totalCount = allTagDetails.Length;
@@ -92,20 +92,7 @@ namespace MemCheck.Application.Tags
             public int PageCount { get; }
             public IEnumerable<ResultTag> Tags { get; }
         }
-        public sealed class ResultTag
-        {
-            public ResultTag(Guid tagId, string tagName, string tagDescription, int cardCount)
-            {
-                TagId = tagId;
-                TagName = tagName;
-                TagDescription = tagDescription;
-                CardCount = cardCount;
-            }
-            public Guid TagId { get; }
-            public string TagName { get; }
-            public string TagDescription { get; }
-            public int CardCount { get; }
-        }
+        public sealed record ResultTag(Guid TagId, string TagName, string TagDescription, int CardCount, double AverageRating);
         #endregion
     }
 }

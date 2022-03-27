@@ -6,6 +6,8 @@
 @media (max-width: 550px) {
     .rating-button {
         line-height: 0px;
+        padding-left: 1px;
+        padding-right: 1px;
     }
 
     .rating-star {
@@ -16,6 +18,8 @@
 @media (min-width: 551px) and (max-width: 978px) {
     .rating-button {
         line-height: 5px;
+        padding-left: 3px;
+        padding-right: 3px;
     }
 
     .rating-star {
@@ -26,9 +30,20 @@
 @media (min-width: 979px) {
     .rating-button {
         line-height: 10px;
+        padding-left: 5px;
+        padding-right: 5px;
     }
 
     .rating-star {
         font-size: 14px;
     }
+}
+
+.rating-component-div {
+    display: inline-block;
+    padding: 0px;
+}
+
+.rating-button {
+    width: 100%;
 }

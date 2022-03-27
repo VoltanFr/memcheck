@@ -144,4 +144,7 @@
   <data name="Demo" xml:space="preserve">
     <value>Démo</value>
   </data>
+  <data name="Rating" xml:space="preserve">
+    <value>Éval</value>
+  </data>
 </root>

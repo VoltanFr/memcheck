@@ -5,7 +5,7 @@
         'van-rate': globalThis.vant.Rate,
     },
     props: {
-        modelValue: { required: true, type: Number },
+        modelValue: { required: false, type: Number },
         average: { required: true, type: Number },
         countinaverage: { required: true, type: Number },
         micro: { required: false, type: Boolean, default: false },
@@ -16,10 +16,12 @@
         userstr: { required: true, type: String },
     },
     template: `
-        <div style="display: inline-block" >
+        <div class="rating-component-div" >
             <van-popover v-model:show="ratingPopover" overlay close-on-click-outside close-on-click-overlay >
                 <p class="rating-paragraph" >
-                    {{yourratingstr}} <van-rate v-bind:modelValue="modelValue" v-bind:readonly="readonly" @change="onChange" color="black"></van-rate><br />
+                    <div v-if="modelValue != null">
+                        {{yourratingstr}} <van-rate v-bind:modelValue="modelValue" v-bind:readonly="readonly" @change="onChange" color="black"></van-rate><br />
+                    </div>
                     {{averagestr}} ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>): <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
                 </p>
                 <template #reference>
@@ -28,7 +30,9 @@
                             <i class='fas fa-star rating-star'></i> {{Math.trunc(average)}}
                         </div>
                         <div v-else>                
-                            <span v-html="currentUserRatingAsStars()" /><br />
+                            <div v-if="modelValue != null">
+                                <span v-html="currentUserRatingAsStars()" /><br />
+                            </div>
                             <span v-html="averageRatingAsStars()" />                            
                         </div>
                     </van-button>
