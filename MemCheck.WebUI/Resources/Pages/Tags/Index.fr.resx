@@ -147,4 +147,7 @@
   <data name="Rating" xml:space="preserve">
     <value>Éval</value>
   </data>
+  <data name="Average" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
 </root>

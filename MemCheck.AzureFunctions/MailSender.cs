@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -24,7 +25,7 @@ internal sealed class MailSender
     {
         body.Append($"<p>Caught {e.GetType().Name}</p>");
         body.Append($"<p>Message: {e.Message}</p>");
-        body.Append($"<p>Call stack: {e.StackTrace.Replace("\n","<br/>")}</p>");
+        body.Append($"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>")}</p>");
 
         if (e.InnerException != null)
         {
@@ -56,8 +57,7 @@ internal sealed class MailSender
     }
     public async Task SendAsync(string subject, string body, IEnumerable<EmailAddress> to)
     {
-        var msg = new SendGridMessage()
-        {
+        var msg = new SendGridMessage() {
             From = SenderEmail,
             Subject = subject,
             HtmlContent = body
@@ -77,5 +77,18 @@ internal sealed class MailSender
     public static string GetAssemblyVersion()
     {
         return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+    }
+    public static string GetMailFooter(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
+    {
+        var writer = new StringBuilder();
+
+        var listItems = new List<string>();
+        listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {MailSender.GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
+        listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
+
+        writer.Append("<h2>Info</h2>");
+        writer.Append($"<ul>{string.Join("", listItems)}</ul>");
+
+        return writer.ToString();
     }
 }

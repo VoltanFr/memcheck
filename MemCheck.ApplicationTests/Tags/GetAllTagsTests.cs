@@ -3,7 +3,6 @@ using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,34 +12,28 @@ namespace MemCheck.Application.Tags
     public class GetAllTagsTests
     {
         [TestMethod()]
-        public async Task InvalidUser()
-        {
-            using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(RandomHelper.Guid(), 1, 1, "")));
-        }
-        [TestMethod()]
         public async Task Page0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 0, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 0, "")));
         }
         [TestMethod()]
         public async Task PageSize0()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 0, 1, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, 1, "")));
         }
         [TestMethod()]
         public async Task PageSizeTooBig()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 0, GetAllTags.Request.MaxPageSize + 1, "")));
+            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, GetAllTags.Request.MaxPageSize + 1, "")));
         }
         [TestMethod()]
         public async Task None()
         {
             using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 10, ""));
+            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 10, ""));
             Assert.AreEqual(0, result.PageCount);
             Assert.AreEqual(0, result.TotalCount);
             Assert.AreEqual(0, result.Tags.Count());
@@ -55,17 +48,22 @@ namespace MemCheck.Application.Tags
             var user = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, ""));
-            Assert.AreEqual(1, result.PageCount);
-            Assert.AreEqual(1, result.TotalCount);
-            Assert.AreEqual(1, result.Tags.Count());
-            var resultTag = result.Tags.Single();
-            Assert.AreEqual(tag, resultTag.TagId);
-            Assert.AreEqual(name, resultTag.TagName);
-            Assert.AreEqual(description, resultTag.TagDescription);
-            Assert.AreEqual(1, resultTag.CardCount);
-            Assert.AreEqual(0, resultTag.AverageRating);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
+                Assert.AreEqual(1, result.PageCount);
+                Assert.AreEqual(1, result.TotalCount);
+                Assert.AreEqual(1, result.Tags.Count());
+                var resultTag = result.Tags.Single();
+                Assert.AreEqual(tag, resultTag.TagId);
+                Assert.AreEqual(name, resultTag.TagName);
+                Assert.AreEqual(description, resultTag.TagDescription);
+                Assert.AreEqual(1, resultTag.CardCount);
+                Assert.AreEqual(0, resultTag.AverageRating);
+            }
         }
         [TestMethod()]
         public async Task OneTagInDbWithOneCardWithRating()
@@ -79,21 +77,28 @@ namespace MemCheck.Application.Tags
             var rating = RandomHelper.Rating();
             await RatingHelper.RecordForUserAsync(db, user, card.Id, rating);
 
-            using var dbContext = new MemCheckDbContext(db);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var cardFromDb = dbContext.Cards.Single();
+                Assert.AreEqual(rating, cardFromDb.AverageRating);
+            }
 
-            var cardFromDb = dbContext.Cards.Single();
-            Assert.AreEqual(rating, cardFromDb.AverageRating);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
 
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, ""));
-            Assert.AreEqual(1, result.PageCount);
-            Assert.AreEqual(1, result.TotalCount);
-            Assert.AreEqual(1, result.Tags.Count());
-            var resultTag = result.Tags.Single();
-            Assert.AreEqual(tag, resultTag.TagId);
-            Assert.AreEqual(name, resultTag.TagName);
-            Assert.AreEqual(description, resultTag.TagDescription);
-            Assert.AreEqual(1, resultTag.CardCount);
-            Assert.AreEqual(rating, resultTag.AverageRating);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
+                Assert.AreEqual(1, result.PageCount);
+                Assert.AreEqual(1, result.TotalCount);
+                Assert.AreEqual(1, result.Tags.Count());
+                var resultTag = result.Tags.Single();
+                Assert.AreEqual(tag, resultTag.TagId);
+                Assert.AreEqual(name, resultTag.TagName);
+                Assert.AreEqual(description, resultTag.TagDescription);
+                Assert.AreEqual(1, resultTag.CardCount);
+                Assert.AreEqual(rating, resultTag.AverageRating);
+            }
         }
         [TestMethod()]
         public async Task Paging()
@@ -102,14 +107,14 @@ namespace MemCheck.Application.Tags
             await TagHelper.CreateAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, ""));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Tags.Count());
             }
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 2, ""));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 2, ""));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.IsFalse(result.Tags.Any());
@@ -125,7 +130,7 @@ namespace MemCheck.Application.Tags
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, RandomHelper.String()));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, RandomHelper.String()));
                 Assert.AreEqual(0, result.PageCount);
                 Assert.AreEqual(0, result.TotalCount);
                 Assert.AreEqual(0, result.Tags.Count());
@@ -133,7 +138,7 @@ namespace MemCheck.Application.Tags
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 1, 1, tagName.Substring(3, 5)));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, tagName.Substring(3, 5)));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Tags.Count());
@@ -146,11 +151,10 @@ namespace MemCheck.Application.Tags
             var tagName = RandomHelper.String(10);
             await TagHelper.CreateAsync(db, tagName);
             await TagHelper.CreateAsync(db);
-            var user = await UserHelper.CreateInDbAsync(db);
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user, 1, 1, RandomHelper.String()));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, RandomHelper.String()));
                 Assert.AreEqual(0, result.PageCount);
                 Assert.AreEqual(0, result.TotalCount);
                 Assert.AreEqual(0, result.Tags.Count());
@@ -158,48 +162,63 @@ namespace MemCheck.Application.Tags
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user, 1, 1, tagName.Substring(3, 5)));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, tagName.Substring(3, 5)));
                 Assert.AreEqual(1, result.PageCount);
                 Assert.AreEqual(1, result.TotalCount);
                 Assert.AreEqual(1, result.Tags.Count());
             }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_OneTagWithNoCard()
+        public async Task CardCount_OneTagWithNoCard()
         {
             var db = DbHelper.GetEmptyTestDB();
             await TagHelper.CreateAsync(db);
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_OneTagWithOnePublicCardWithTag()
+        public async Task CardCount_OneTagWithOnePublicCardWithTag()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tagId = await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(1, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(1, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_OneTagWithOnePrivateCardWithTag()
+        public async Task CardCount_OneTagWithOnePrivateCardWithTag()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tagId = await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_TwoTagsWithOnePublicCardWithOneTag()
+        public async Task CardCount_TwoTagsWithOnePublicCardWithOneTag()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tag1 = await TagHelper.CreateAsync(db);
@@ -207,14 +226,19 @@ namespace MemCheck.Application.Tags
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tag1.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(2, result.Tags.Count());
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
-            Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag2).CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(2, result.Tags.Count());
+                Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag2).CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_ThreeTagsWithOnePublicCardWithTwoTags()
+        public async Task CardCount_ThreeTagsWithOnePublicCardWithTwoTags()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tag1 = await TagHelper.CreateAsync(db);
@@ -223,130 +247,113 @@ namespace MemCheck.Application.Tags
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId, tagIds: new[] { tag1, tag2 });
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(3, result.Tags.Count());
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag2).CardCount);
-            Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag3).CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(3, result.Tags.Count());
+                Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
+                Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag2).CardCount);
+                Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag3).CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_NoUser_OneTagWithOnePublicCardWithoutTag()
+        public async Task CardCount_OneTagWithOnePublicCardWithoutTag()
         {
             var db = DbHelper.GetEmptyTestDB();
             await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId);
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
-        }
-        [TestMethod()]
-        public async Task CardCount_User_OneTagWithNoCard()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            await TagHelper.CreateAsync(db);
-            var user = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_User_OneTagWithOnePublicCardWithTag()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var tagId = await TagHelper.CreateAsync(db);
-            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-            await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray());
-
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(cardCreatorId, 10, 1, ""));
-            Assert.AreEqual(1, result.Tags.Single().CardCount);
-        }
-        [TestMethod()]
-        public async Task CardCount_User_OneTagWithOneNotOwnedPrivateCardWithTag()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            var tagId = await TagHelper.CreateAsync(db);
-            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-            await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
-            var otherUser = await UserHelper.CreateInDbAsync(db);
-
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(otherUser, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
-        }
-        [TestMethod()]
-        public async Task CardCount_User_OneTagWithOneOwnedPrivateCardWithTag()
+        public async Task CardCount_OneTagWithOneNotOwnedPrivateCardWithTag()
         {
             var db = DbHelper.GetEmptyTestDB();
             var tagId = await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(cardCreatorId, 10, 1, ""));
-            Assert.AreEqual(1, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_User_TwoTagsWithOnePublicCardWithOneTag()
+        public async Task CardCount_OneTagWithOneOwnedPrivateCardWithTag()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var tag1 = await TagHelper.CreateAsync(db);
-            var tag2 = await TagHelper.CreateAsync(db);
+            var tagName = RandomHelper.String();
+            var tagDescription = RandomHelper.String();
+            var tagId = await TagHelper.CreateAsync(db, tagName, tagDescription);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-            await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tag1.AsArray());
-            var user = await UserHelper.CreateInDbAsync(db);
+            await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user, 10, 1, ""));
-            Assert.AreEqual(2, result.Tags.Count());
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
-            Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag2).CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(1, result.TotalCount);
+                var resultTag = result.Tags.Single();
+                Assert.AreEqual(tagId, resultTag.TagId);
+                Assert.AreEqual(tagName, resultTag.TagName);
+                Assert.AreEqual(tagDescription, resultTag.TagDescription);
+                Assert.AreEqual(0, resultTag.CardCount); //Private cards are not counted
+                Assert.AreEqual(0, resultTag.AverageRating);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_User_ThreeTagsWithOnePublicCardWithTwoTags()
+        public async Task CardCount_OneTagWithOnePublicCardWithoutTag_CanView()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var tag1 = await TagHelper.CreateAsync(db);
-            var tag2 = await TagHelper.CreateAsync(db);
-            var tag3 = await TagHelper.CreateAsync(db);
+            await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-            await CardHelper.CreateAsync(db, cardCreatorId, tagIds: new[] { tag1, tag2 });
+            await CardHelper.CreateAsync(db, cardCreatorId);
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(cardCreatorId, 10, 1, ""));
-            Assert.AreEqual(3, result.Tags.Count());
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag1).CardCount);
-            Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag2).CardCount);
-            Assert.AreEqual(0, result.Tags.Single(t => t.TagId == tag3).CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
-        public async Task CardCount_User_OneTagWithOnePublicCardWithoutTag_CanView()
+        public async Task CardCount_OneTagWithOnePublicCardWithoutTag_CantView()
         {
             var db = DbHelper.GetEmptyTestDB();
             await TagHelper.CreateAsync(db);
             var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, cardCreatorId);
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(cardCreatorId, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
-        }
-        [TestMethod()]
-        public async Task CardCount_User_OneTagWithOnePublicCardWithoutTag_CantView()
-        {
-            var db = DbHelper.GetEmptyTestDB();
-            await TagHelper.CreateAsync(db);
-            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-            await CardHelper.CreateAsync(db, cardCreatorId);
-            var user1 = await UserHelper.CreateInDbAsync(db);
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
 
-            using var dbContext = new MemCheckDbContext(db);
-            var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user1, 10, 1, ""));
-            Assert.AreEqual(0, result.Tags.Single().CardCount);
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
+                Assert.AreEqual(0, result.Tags.Single().CardCount);
+            }
         }
         [TestMethod()]
         public async Task CardStats_ComplexCase()
@@ -394,55 +401,18 @@ namespace MemCheck.Application.Tags
             var card12 = await CardHelper.CreateIdAsync(db, user2, tagIds: new[] { tag1, tag2, tag3 }, userWithViewIds: new[] { user2, user3 });
             await RatingHelper.RecordForUserAsync(db, user2, card12, 3);
 
-            //Query by no user
+            using (var dbContext = new MemCheckDbContext(db))
+                await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
+
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(Guid.Empty, 10, 1, ""));
+                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(10, 1, ""));
                 Assert.AreEqual(3, result.Tags.Count());
                 Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag1).CardCount);
                 Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
                 Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag2).CardCount);
                 Assert.AreEqual(2.5, result.Tags.Single(t => t.TagId == tag2).AverageRating);
                 Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag3).CardCount);
-                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
-            }
-
-            //Query by user1
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user1, 10, 1, ""));
-                Assert.AreEqual(3, result.Tags.Count());
-                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag1).CardCount);
-                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
-                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag2).CardCount);
-                Assert.AreEqual(2.5, result.Tags.Single(t => t.TagId == tag2).AverageRating);
-                Assert.AreEqual(1, result.Tags.Single(t => t.TagId == tag3).CardCount);
-                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
-            }
-
-            //Query by user2
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user2, 10, 1, ""));
-                Assert.AreEqual(3, result.Tags.Count());
-                Assert.AreEqual(9, result.Tags.Single(t => t.TagId == tag1).CardCount);
-                Assert.AreEqual(21.0 / 9, result.Tags.Single(t => t.TagId == tag1).AverageRating);
-                Assert.AreEqual(6, result.Tags.Single(t => t.TagId == tag2).CardCount);
-                Assert.AreEqual(17.0 / 6, result.Tags.Single(t => t.TagId == tag2).AverageRating);
-                Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).CardCount);
-                Assert.AreEqual(10.0 / 3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
-            }
-
-            //Query by user3
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(user3, 10, 1, ""));
-                Assert.AreEqual(3, result.Tags.Count());
-                Assert.AreEqual(6, result.Tags.Single(t => t.TagId == tag1).CardCount);
-                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag1).AverageRating);
-                Assert.AreEqual(4, result.Tags.Single(t => t.TagId == tag2).CardCount);
-                Assert.AreEqual(10.0 / 4, result.Tags.Single(t => t.TagId == tag2).AverageRating);
-                Assert.AreEqual(2, result.Tags.Single(t => t.TagId == tag3).CardCount);
                 Assert.AreEqual(3, result.Tags.Single(t => t.TagId == tag3).AverageRating);
             }
         }

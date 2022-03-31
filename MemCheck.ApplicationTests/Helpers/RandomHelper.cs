@@ -54,9 +54,14 @@ namespace MemCheck.Application.Tests.Helpers
         {
             return d.AddDays(-Randomizer.Next(1, 3650)).ToUniversalTime();
         }
-        public static int Rating()
+        public static int Rating(int excludedValue = 0)
         {
-            return Randomizer.Next(1, 5);
+            while (true)
+            {
+                var result = Randomizer.Next(1, 5);
+                if (result != excludedValue)
+                    return result;
+            }
         }
         public static byte[] Bytes(int length)
         {

@@ -36,18 +36,6 @@ internal sealed class StatsToAdminMailBuilder
         writer.Append("</table></p>");
         return writer.ToString();
     }
-    private string GetMailFooter()
-    {
-        var writer = new StringBuilder();
-
-        var listItems = new List<string>();
-        listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {MailSender.GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
-        listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
-
-        writer.Append($"<ul>{string.Join("", listItems)}</ul>");
-
-        return writer.ToString();
-    }
     #endregion
     public StatsToAdminMailBuilder(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins, ImmutableList<GetAllUsers.ResultUserModel> allUsers)
     {
@@ -73,8 +61,7 @@ internal sealed class StatsToAdminMailBuilder
         writer.Append($"<h2>{allUsers.Count} Users</h2>");
         writer.Append(GetUsersPart());
 
-        writer.Append("<h2>Info</h2>");
-        writer.Append(GetMailFooter());
+        writer.Append(MailSender.GetMailFooter(azureFunctionName, azureFunctionStartTime, admins));
 
         return writer.ToString();
     }

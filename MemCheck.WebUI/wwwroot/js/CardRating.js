@@ -7,7 +7,7 @@
     props: {
         modelValue: { required: false, type: Number },
         average: { required: true, type: Number },
-        countinaverage: { required: true, type: Number },
+        countinaverage: { required: false, type: Number },
         micro: { required: false, type: Boolean, default: false },
         readonly: { required: false, type: Boolean, default: false },
         yourratingstr: { required: true, type: String },
@@ -22,7 +22,7 @@
                     <div v-if="modelValue != null">
                         {{yourratingstr}} <van-rate v-bind:modelValue="modelValue" v-bind:readonly="readonly" @change="onChange" color="black"></van-rate><br />
                     </div>
-                    {{averagestr}} ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>): <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
+                    {{averagestr}}<span v-if="countinaverage"> ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>) :</span> <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
                 </p>
                 <template #reference>
                     <van-button class="toolbar-button rating-button" >

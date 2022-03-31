@@ -71,7 +71,7 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(userId, request.PageSize, request.PageNo, request.Filter));
+            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
             return Ok(new GetTagsViewModel(result, userId != Guid.Empty));
         }
         public sealed class GetTagsRequest
@@ -115,7 +115,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetTagNames")]
         public async Task<IActionResult> GetTagNamesAsync()
         {
-            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(Guid.Empty, GetAllTags.Request.MaxPageSize, 1, ""));
+            var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             return Ok(result.Tags.Select(tag => tag.TagName));
         }
         #endregion

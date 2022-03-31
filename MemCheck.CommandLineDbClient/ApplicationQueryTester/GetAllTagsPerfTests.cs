@@ -63,10 +63,10 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             var userVoltan = callContext.DbContext.Users.Single(u => u.UserName == "Voltan").Id;
 
             var testDefinitions = new[] {
-                new TestDefinition("Voltan without filtering",new GetAllTags.Request(userVoltan, 200, 1, "")),
-                new TestDefinition("Voltan filtering on Marine",new GetAllTags.Request(userVoltan, 200, 1, "Marine")),
-                new TestDefinition("No user without filtering",new GetAllTags.Request(Guid.Empty, 200, 1, "")),
-                new TestDefinition("No user with filtering",new GetAllTags.Request(Guid.Empty, 200, 1, "Marine")),
+                new TestDefinition("Voltan without filtering",new GetAllTags.Request(200, 1, "")),
+                new TestDefinition("Voltan filtering on Marine",new GetAllTags.Request( 200, 1, "Marine")),
+                new TestDefinition("No user without filtering",new GetAllTags.Request( 200, 1, "")),
+                new TestDefinition("No user with filtering",new GetAllTags.Request(  200, 1, "Marine")),
             };
 
             for (int i = 0; i < 10; i++)

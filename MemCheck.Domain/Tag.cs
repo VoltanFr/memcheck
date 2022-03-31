@@ -15,6 +15,9 @@ namespace MemCheck.Domain
         [StringLength(MaxNameLength, MinimumLength = MinNameLength)] public string Name { get; set; } = null!;
         [StringLength(MaxDescriptionLength)] public string Description { get; set; } = null!;
         public IList<TagInCard> TagsInCards { get; set; } = null!;
+        public int CountOfPublicCards { get; set; }
+        public double AverageRatingOfPublicCards { get; set; }
+
         public override bool Equals(object? obj)
         {
             // If the passed object is null
