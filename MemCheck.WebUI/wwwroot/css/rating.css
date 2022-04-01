@@ -40,8 +40,8 @@
 }
 
 .rating-component-div {
-    display: inline-block;
     padding: 0px;
+    display: inline-grid;
 }
 
 .rating-button {

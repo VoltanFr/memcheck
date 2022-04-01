@@ -3,7 +3,7 @@
         --edit-column-width: 50px;
         --count-column-width: 50px;
         --rating-column-width: 40px;
-        --rating-component-width: 32px;
+        --rating-component-width: 40px;
         --count-button-width: 34px;
     }
 }
@@ -13,7 +13,7 @@
         --edit-column-width: 60px;
         --count-column-width: 60px;
         --rating-column-width: 60px;
-        --rating-component-width: 40px;
+        --rating-component-width: 50px;
         --count-button-width: 42px;
     }
 }
@@ -23,7 +23,7 @@
         --edit-column-width: 70px;
         --count-column-width: 70px;
         --rating-column-width: 70px;
-        --rating-component-width: 50px;
+        --rating-component-width: 60px;
         --count-button-width: 50px;
     }
 }
@@ -109,7 +109,6 @@
 
 .rating-component {
     width: var(--rating-component-width);
-    padding: 0px;
 }
 
 .data-count-button {

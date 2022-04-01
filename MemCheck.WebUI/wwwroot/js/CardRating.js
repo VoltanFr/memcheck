@@ -27,7 +27,7 @@
                 <template #reference>
                     <van-button class="toolbar-button rating-button" >
                         <div v-if="micro">
-                            <i class='fas fa-star rating-star'></i> {{Math.trunc(average)}}
+                            <i class='fas fa-star rating-star'></i> {{ Math.round(average * 10) / 10 }}
                         </div>
                         <div v-else>                
                             <div v-if="modelValue != null">

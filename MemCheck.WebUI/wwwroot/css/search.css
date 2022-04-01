@@ -76,16 +76,25 @@
     .search-page-heap-info {
         width: 34px;
     }
+    .rating-component {
+        width: 48px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
     .search-page-heap-info {
         width: 38px;
     }
+    .rating-component {
+        width: 50px;
+    }
 }
 
 @media (min-width: 979px) {
     .search-page-heap-info {
         width: 42px;
+    }
+    .rating-component {
+        width: 60px;
     }
 }
