@@ -32,7 +32,7 @@ internal abstract class AbstractMemCheckAzureFunction
         return result.Select(address => new EmailAddress(address.Email, address.Name)).ToImmutableList();
     }
     #endregion
-    protected AbstractMemCheckAzureFunction(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
+    protected AbstractMemCheckAzureFunction(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger logger)
     {
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         this.memCheckDbContext = memCheckDbContext;

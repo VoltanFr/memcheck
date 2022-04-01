@@ -39,7 +39,7 @@ internal sealed class SendNotifications : AbstractMemCheckAzureFunction
     #region Fields
     private const string FuncName = nameof(SendNotifications);
     #endregion
-    public SendNotifications(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
+    public SendNotifications(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendNotifications> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }

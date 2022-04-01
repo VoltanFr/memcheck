@@ -14,13 +14,13 @@ internal sealed class UpdateTagStats : AbstractMemCheckAzureFunction
     #region Fields
     private const string FuncName = nameof(UpdateTagStats);
     #endregion
-    public UpdateTagStats(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
+    public UpdateTagStats(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<UpdateTagStats> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
     [FunctionName(FuncName)]
     public async Task Run([TimerTrigger(
-        Constants.CronAt5Daily
+        Constants.CronAt2Daily
         #if DEBUG
         , RunOnStartup = true
         #endif
