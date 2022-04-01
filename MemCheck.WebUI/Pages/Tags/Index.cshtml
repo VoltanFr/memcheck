@@ -2,15 +2,15 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/taglistpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/taglistpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
-    <script src="~/js/CardRating.js" asp-append-version="true"></script>
-    <script type="module" src="~/js/Tags/Tags.js" asp-append-version="true"></script>
+<script src="~/lib/vant/vant.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script>
+<script type="module" src="~/js/Tags/Tags.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -97,6 +97,11 @@
             <button class="toolbar-button" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
             <button class="toolbar-button" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
             <button class="toolbar-button" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
+        </div>
+        <div id="DebugInfo" class="debug-info-div collapse">
+            <ul>
+                <li>Load time: {{loadTime | integer}} ms</li>
+            </ul>
         </div>
     </div>
 </div>

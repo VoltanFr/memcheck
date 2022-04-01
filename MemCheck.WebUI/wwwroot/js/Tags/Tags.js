@@ -15,6 +15,7 @@ const tagListingApp = Vue.createApp({
             offeredPageSizes: [10, 50, 100, 500],
             tags: [],    //TagsController.GetTagsTagViewModel, but we add a "folded" boolean
             mountFinished: false,
+            loadTime: 0,
         }
     },
     async mounted() {
@@ -27,6 +28,7 @@ const tagListingApp = Vue.createApp({
     },
     methods: {
         async getTags() {
+            const startTime = performance.now();
             this.tags = [];
             this.tagVisibility = [];
             await axios.post("/Tags/GetTags", this.request)
@@ -49,6 +51,9 @@ const tagListingApp = Vue.createApp({
                 })
                 .catch(error => {
                     tellAxiosError(error);
+                })
+                .finally(() => {
+                    this.loadTime = performance.now() - startTime
                 });
         },
         canMovePage(shift) {
