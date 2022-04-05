@@ -71,7 +71,6 @@ const authoringApp = Vue.createApp({
             saving: false,
             bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
             showInfoPopover: false,
-            showAdditionalInfo: false,
         }
     },
     async mounted() {
@@ -196,7 +195,6 @@ const authoringApp = Vue.createApp({
             this.makePrivate();
             this.creatingNewCard = true;
             this.CopyAllInfoToOriginalCard();
-            this.showAdditionalInfo = false;
         },
         CopyAllInfoToOriginalCard() {
             this.originalCard.frontSide = this.card.frontSide;
@@ -310,8 +308,6 @@ const authoringApp = Vue.createApp({
 
             for (var i = 0; i < images.length; i++)
                 await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
-
-            this.showAdditionalInfo = this.card.additionalInfo != "" || this.additionalInfoImageList.length > 0;
         },
         imageIsInCard(imageId) {
             for (var i = 0; i < this.frontSideImageList.length; i++)
@@ -469,9 +465,6 @@ const authoringApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                 });
-        },
-        toggleShowAdditionalInfo() {
-            this.showAdditionalInfo = !this.showAdditionalInfo;
         },
         async onRatingChange(newValue, oldValue) {
             await this.updateRating(newValue);

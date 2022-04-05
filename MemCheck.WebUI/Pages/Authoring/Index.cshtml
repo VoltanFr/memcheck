@@ -53,9 +53,6 @@
                             </template>
                         </van-popover>
                     </span>
-                    <span id="Additional details toggle button">
-                        <button class="toolbar-button-circle toolbar-button" @@click="toggleShowAdditionalInfo()"><i class="fas fa-plus"></i></button>
-                    </span>
                     <span id="Visibility button">
                         <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
                             <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
@@ -99,7 +96,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="AdditionalInfoRow" class="memcheck-input-div" v-if="showAdditionalInfo">
+                <div id="AdditionalInfoRow" class="memcheck-input-div">
                     <div id="AdditionalSideRowMarkdownEditor">
                         <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" />
                     </div>
