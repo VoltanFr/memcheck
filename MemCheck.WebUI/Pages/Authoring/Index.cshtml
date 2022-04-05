@@ -53,17 +53,6 @@
                             </template>
                         </van-popover>
                     </span>
-                    <span id="Visibility button">
-                        <span id="VisibilityToggleButton_0" v-if="card.usersWithView.length == 0">
-                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye"></i></button>
-                        </span>
-                        <span id="VisibilityToggleButton_1" v-if="card.usersWithView.length == 1">
-                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="far fa-eye-slash"></i></button>
-                        </span>
-                        <span id="VisibilityToggleButton_2" v-if="card.usersWithView.length > 1">
-                            <button class="toolbar-button-circle toolbar-button" data-bs-toggle="collapse" href=".TogglableVisibility"><i class="fas fa-users"></i></button>
-                        </span>
-                    </span>
                     <span id="HistoryButton" v-if="!creatingNewCard">
                         <button class="toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
                     </span>
@@ -125,7 +114,7 @@
                         <tag-button v-for="(tag,index) in card.tags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeTag"></tag-button>
                     </div>
                 </div>
-                <div id="VisibilityInputRow" class="collapse memcheck-input-div TogglableVisibility show">
+                <div id="VisibilityInputRow" class="memcheck-input-div">
                     <p class="authoring-row-caption">@Localizer["Users"]</p>
                     <div style="flex-flow:row wrap; width:100%">
                         <select v-model="selectedUserToAdd" class="authoring-select"><option v-for="user in allAvailableUsers" v-bind:value="user">{{user.userName}}</option></select>
