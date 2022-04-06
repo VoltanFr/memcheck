@@ -27,7 +27,7 @@
         <div id="Inputs" class="inputs-div" style="border: 1px solid black;padding:5px">
             <details>
                 <summary>@Localizer["Filter"]</summary>
-                <textarea class="form-control responsive-padding-edit" v-model="request.filter" rows="1"></textarea>
+                <input class="form-control responsive-padding-edit" v-model="request.filter" rows="1" v-on:keyup.enter="getTags()" />
                 <span id="Page size">
                     <label>@Localizer["PageSize"]</label>&nbsp;
                     <select v-model="request.pageSize" class="responsive-padding-edit">
