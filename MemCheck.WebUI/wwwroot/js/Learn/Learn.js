@@ -1,9 +1,9 @@
-import * as vant from '../../lib/vant/vant.js';
+'use strict';
 
 const learnModeExpired = 1;
 const learnModeUnknown = 2;
 const learnModeDemo = 3;
-const maxCountOfCardsForDemo = 20;  //We stop when we have this count or more cards. Due to the downloading in batches, we will in fact have more. No problem with that.
+const maxCountOfCardsForDemo = 20;  // We stop when we have this count or more cards. Due to the downloading in batches, we will in fact have more. No problem with that.
 
 const learnApp = Vue.createApp({
     components: {
@@ -20,44 +20,44 @@ const learnApp = Vue.createApp({
             showVisibilityPopover: false,
             heapInfoPopover: false,
             showMoveToHeapMenuPopover: false,
-            userDecks: [],  //LearnController.UserDecksDeckViewModel
-            activeDeck: null,  //LearnController.UserDecksViewModel
+            userDecks: [],  // LearnController.UserDecksDeckViewModel
+            activeDeck: null,  // LearnController.UserDecksViewModel
             singleDeckDisplay: false,
-            currentCard: null,    //LearnController.GetCardsCardViewModel
+            currentCard: null,    // LearnController.GetCardsCardViewModel
             backSideVisible: false,
             mountFinished: false,
             loading: false,
-            currentFullScreenImage: null,   //LearnController.GetCardsImageViewModel
-            pendingMoveOperations: [],  //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
-            currentMovingCard: null,    //{deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
-            currentMovePromise: null, //promise
-            pendingRatingOperations: [],  //{cardId: Guid, rating: int, nbAttempts: int}
-            currentRatingPromise: null, //promise
-            pendingNotificationRegistrations: [],  //{cardId: Guid, notify: bool}
-            currentNotificationRegistrationPromise: null, //promise
-            downloadedCards: [],    //LearnController.GetCardsCardViewModel
+            currentFullScreenImage: null,   // LearnController.GetCardsImageViewModel
+            pendingMoveOperations: [],  // {deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
+            currentMovingCard: null,    // {deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
+            currentMovePromise: null, // promise
+            pendingRatingOperations: [],  // {cardId: Guid, rating: int, nbAttempts: int}
+            currentRatingPromise: null, // promise
+            pendingNotificationRegistrations: [],  // {cardId: Guid, notify: bool}
+            currentNotificationRegistrationPromise: null, // promise
+            downloadedCards: [],    // LearnController.GetCardsCardViewModel
             remainingCardsInLesson: 0,
             cardDownloadOperation: null,
             currentImageLoadingPromise: null,
             filteringDisplay: false,
-            selectedExcludedTags: [],   //LearnController.GetAllStaticDataTagViewModel
-            selectedExcludedTagToAdd: "",   //LearnController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
+            selectedExcludedTags: [],   // LearnController.GetAllStaticDataTagViewModel
+            selectedExcludedTagToAdd: '',   // LearnController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
             guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
             userQuitAttemptDisplay: false,
             lastDownloadIsEmpty: false,
-            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
             additionalMoveDebugInfo: null,
             additionalRatingDebugInfo: null,
-            learnMode: 0,   //can be learnModeExpired, learnModeUnknown, learnModeDemo
+            learnMode: 0,   // can be learnModeExpired, learnModeUnknown, learnModeDemo
             tagIdForDemo: emptyGuid,
             reachedMaxCountOfCardsForDemo: false,
             demoMessages: {
-                onKnewToastTitle: "",
-                onKnewToastMessage: "",
-                onDidNotKnowToastTitle: "",
-                onDidNotKnowToastMessage: "",
+                onKnewToastTitle: '',
+                onKnewToastMessage: '',
+                onDidNotKnowToastTitle: '',
+                onDidNotKnowToastMessage: '',
             },
-        }
+        };
     },
     beforeCreate() {
         this.dateTime = dateTime;
@@ -67,18 +67,18 @@ const learnApp = Vue.createApp({
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
-            const getBigSizeImageLabelsTask = this.GetBigSizeImageLabels();
-            this.GetLearnModeFromPageParameter();
-            var downloadDemoMessagesTask = null;
+            const getBigSizeImageLabelsTask = this.getBigSizeImageLabels();
+            this.getLearnModeFromPageParameter();
+            let downloadDemoMessagesTask = null;
             if (this.demoMode())
-                downloadDemoMessagesTask = this.DownloadDemoMessages();
-            await this.GetUserDecks();
+                downloadDemoMessagesTask = this.downloadDemoMessages();
+            await this.getUserDecks();
             this.downloadCardsIfNeeded();
             if (this.cardDownloadOperation)
                 await this.cardDownloadOperation;
             this.getCard();
             await getBigSizeImageLabelsTask;
-            if (downloadDemoMessagesTask != null)
+            if (downloadDemoMessagesTask !== null)
                 await downloadDemoMessagesTask;
         }
         finally {
@@ -86,53 +86,53 @@ const learnApp = Vue.createApp({
         }
     },
     beforeDestroy() {
-        document.removeEventListener("popstate", this.onPopState);
-        document.removeEventListener("beforeunload", this.onBeforeUnload);
+        document.removeEventListener('popstate', this.onPopState);
+        document.removeEventListener('beforeunload', this.onBeforeUnload);
     },
     methods: {
-        GetLearnModeFromPageParameter() {
-            //There has to be a better way, but here's how I get a parameter passed to a page
-            const wantedLearnMode = document.getElementById("LearnModeInput").value;
-            if (wantedLearnMode == "Expired") {
+        getLearnModeFromPageParameter() {
+            // There has to be a better way, but here's how I get a parameter passed to a page
+            const wantedLearnMode = document.getElementById('LearnModeInput').value;
+            if (wantedLearnMode === 'Expired') {
                 this.learnMode = learnModeExpired;
                 return;
             }
-            if (wantedLearnMode == "Unknown") {
+            if (wantedLearnMode === 'Unknown') {
                 this.learnMode = learnModeUnknown;
                 return;
             }
-            if (wantedLearnMode == "Demo") {
-                this.tagIdForDemo = document.getElementById("TagIdInput").value;
+            if (wantedLearnMode === 'Demo') {
+                this.tagIdForDemo = document.getElementById('TagIdInput').value;
                 if (!this.tagIdForDemo) {
-                    console.error("Demo mode tag not received");
-                    window.location.href = "/Index";
+                    // Demo mode tag not received
+                    window.location.href = '/Index';
                 }
                 this.learnMode = learnModeDemo;
                 return;
             }
-            window.location.href = "/Index";
+            window.location.href = '/Index';
         },
         rehearsing() {
-            return this.learnMode == learnModeExpired;
+            return this.learnMode === learnModeExpired;
         },
         learningUnknowns() {
-            return this.learnMode == learnModeUnknown;
+            return this.learnMode === learnModeUnknown;
         },
         demoMode() {
-            return this.learnMode == learnModeDemo;
+            return this.learnMode === learnModeDemo;
         },
-        async GetUserDecks() {
+        async getUserDecks() {
             await axios.get('/Learn/UserDecks/')
                 .then(result => {
                     if (!this.demoMode() && !result.data.userLoggedIn)
-                        window.location.href = "/Identity/Account/Login";
+                        window.location.href = '/Identity/Account/Login';
                     this.userDecks = result.data.decks;
                     this.singleDeckDisplay = this.demoMode || this.userDecks.length === 1;
-                    this.activeDeck = this.userDecks.length === 1 ? this.userDecks[0] : "";
+                    this.activeDeck = this.userDecks.length === 1 ? this.userDecks[0] : '';
                 })
                 .catch(error => {
                     tellAxiosError(error);
-                    window.location.href = "/Index";
+                    window.location.href = '/Index';
                 });
         },
         getCard() {
@@ -141,12 +141,12 @@ const learnApp = Vue.createApp({
 
             for (let i = 0; !this.currentCard && i < this.downloadedCards.length; i++)
                 if (this.cardIsReady(this.downloadedCards[i])) {
-                    var spliced = this.downloadedCards.splice(i, 1);
+                    const spliced = this.downloadedCards.splice(i, 1);
                     this.currentCard = spliced[0];
                 }
         },
-        cardIsReady(card) { //card is an entry of downloadedCards
-            //A card is ready when all its images have been loaded (or it has no image)
+        cardIsReady(card) { // card is an entry of downloadedCards
+            // A card is ready when all its images have been loaded (or it has no image)
             for (let i = 0; i < card.images.length; i++)
                 if (!card.images[i].blob)
                     return false;
@@ -154,7 +154,7 @@ const learnApp = Vue.createApp({
         },
         openDeckSettingsPage() {
             if (this.activeDeck)
-                window.location.href = '/Decks/Settings?DeckId=' + this.activeDeck.deckId;
+                window.location.href = `/Decks/Settings?DeckId=${this.activeDeck.deckId}`;
         },
         showBackSide() {
             this.backSideVisible = true;
@@ -172,33 +172,34 @@ const learnApp = Vue.createApp({
             this.getCard();
         },
         editCard() {
-            window.location.href = '/Authoring?CardId=' + this.currentCard.cardId + "&ReturnUrl=" + window.location;
+            window.location.href = `/Authoring?CardId=${this.currentCard.cardId}&ReturnUrl=${window.location}`;
         },
-        spawnDownloadImage(image) {//image is LearnController.GetCardsImageViewModel
-            this.currentImageLoadingPromise = axios.get('/Learn/GetImage/' + image.imageId + "/2", { responseType: 'arraybuffer' })
+        spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
+            this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })
                 .then(result => {
                     image.blob = base64FromBytes(result.data);
                     this.currentImageLoadingPromise = null;
                     if (!this.currentCard)
                         this.getCard();
                 })
-                .catch(error => {
+                .catch(() => {
                     this.currentImageLoadingPromise = null;
                 });
         },
+        onCardRemoved() {
+            this.getCard();
+            tellControllerSuccess(result);
+        },
         async removeCard() {
             if (confirm(this.currentCard.removeAlertMessage + dateTime(this.currentCard.addToDeckUtcTime))) {
-                await axios.delete('/Decks/RemoveCardFromDeck/' + this.activeDeck.deckId + "/" + this.currentCard.cardId)
-                    .then(result => {
-                        this.getCard();
-                        tellControllerSuccess(result);
-                    })
+                await axios.delete(`/Decks/RemoveCardFromDeck/${this.activeDeck.deckId}/${this.currentCard.cardId}`)
+                    .then(() => this.onCardRemoved())
                     .catch(error => {
                         tellAxiosError(error);
-                    })
+                    });
             }
         },
-        showImageFull(image) {  //image is LearnController.GetCardsImageViewModel
+        showImageFull(image) {  // image is LearnController.GetCardsImageViewModel
             this.currentFullScreenImage = image;
         },
         handlePendingMoveOperations() {
@@ -214,29 +215,29 @@ const learnApp = Vue.createApp({
                     return;
                 }
 
-                this.additionalMoveDebugInfo = "Moving (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
-                const url = '/Learn/MoveCardToHeap/' + this.currentMovingCard.deckId + '/' + this.currentMovingCard.cardId + '/' + this.currentMovingCard.targetHeap + '/' + this.currentMovingCard.manualMove;
+                this.additionalMoveDebugInfo = `Moving (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
+                const url = `/Learn/MoveCardToHeap/${this.currentMovingCard.deckId}/${this.currentMovingCard.cardId}/${this.currentMovingCard.targetHeap}/${this.currentMovingCard.manualMove}`;
                 const timeOut = Math.min(60000, (this.currentMovingCard.nbAttempts + 1) * 1000);
 
                 this.currentMovePromise = pachAxios(url, timeOut)
-                    .then(result => {
+                    .then(() => {
                         this.currentMovePromise = null;
-                        this.additionalMoveDebugInfo = "Moved (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
+                        this.additionalMoveDebugInfo = `Moved (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
                         this.currentMovingCard = null;
                         if (this.timeToExitPage())
                             window.location.href = '/';
                         else
                             this.updateRemainingCardsInLesson();
                     })
-                    .catch(error => {
-                        this.additionalMoveDebugInfo = "Move failed, will retry in 1 sec (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
+                    .catch(() => {
+                        this.additionalMoveDebugInfo = `Move failed, will retry in 1 sec (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
 
                         sleep(1000).then(() => {
-                            this.additionalMoveDebugInfo = "Move failed, will retry asap (cardid: " + this.currentMovingCard.cardId + ", target heap: " + this.currentMovingCard.targetHeap + ", nbAttempts: " + this.currentMovingCard.nbAttempts + ")";
+                            this.additionalMoveDebugInfo = `Move failed, will retry asap (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
                             this.currentMovePromise = null;
                             this.pendingMoveOperations.push({ deckId: this.currentMovingCard.deckId, cardId: this.currentMovingCard.cardId, targetHeap: this.currentMovingCard.targetHeap, manualMove: this.currentMovingCard.manualMove, nbAttempts: this.currentMovingCard.nbAttempts + 1 });
                             this.currentMovingCard = null;
-                        })
+                        });
                     });
             }
         },
@@ -248,7 +249,7 @@ const learnApp = Vue.createApp({
             }
 
             if ((this.demoMode() || this.activeDeck) && !this.cardDownloadOperation && this.downloadedCards.length < 30) {
-                var excludedCardIds = this.downloadedCards.map(card => { return card.cardId; });
+                let excludedCardIds = this.downloadedCards.map(card => card.cardId);
                 if (this.currentMovePromise)
                     excludedCardIds.push(this.currentMovingCard.cardId);
                 if (this.currentCard)
@@ -266,7 +267,7 @@ const learnApp = Vue.createApp({
 
                 this.cardDownloadOperation = axios.post('/Learn/GetCards', query)
                     .then(result => {
-                        if (result.data.cards.length == 0) {
+                        if (result.data.cards.length === 0) {
                             if (this.timeToExitPage())
                                 window.location.href = '/';
                             this.lastDownloadIsEmpty = true;
@@ -276,22 +277,22 @@ const learnApp = Vue.createApp({
                         this.cardDownloadOperation = null;
                         this.updateRemainingCardsInLesson();
                     })
-                    .catch(error => {
+                    .catch(() => {
                         sleep(1000).then(() => {
                             this.cardDownloadOperation = null;
-                        })
+                        });
                     });
             }
         },
         downloadImagesIfNeeded() {
             for (let cardIndex = 0; !this.currentImageLoadingPromise && cardIndex < this.downloadedCards.length; cardIndex++) {
-                var card = this.downloadedCards[cardIndex];
+                const card = this.downloadedCards[cardIndex];
                 for (let imageIndex = 0; !this.currentImageLoadingPromise && imageIndex < card.images.length; imageIndex++)
                     if (!card.images[imageIndex].blob)
                         this.spawnDownloadImage(card.images[imageIndex]);
             }
         },
-        async DownloadDemoMessages() {
+        async downloadDemoMessages() {
             await axios.get('/Learn/GetDemoMessages')
                 .then(result => {
                     this.demoMessages = result.data;
@@ -321,18 +322,18 @@ const learnApp = Vue.createApp({
             this.loading = false;
         },
         requestContainsExcludedTag(tag) {
-            return this.selectedExcludedTags.some(t => t == tag);
+            return this.selectedExcludedTags.some(t => t === tag);
         },
         requestContainsExcludedTagWithId(tagId) {
-            return this.selectedExcludedTags.some(t => t.tagId == tagId);
+            return this.selectedExcludedTags.some(t => t.tagId === tagId);
         },
-        CanAddSelectedExcludedTag() {
+        canAddSelectedExcludedTag() {
             const result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
             return result;
         },
         addExcludedTag() {
-            if (this.CanAddSelectedExcludedTag()) {
-                if (this.selectedExcludedTagToAdd.tagId == this.guidNoTagFiltering) {
+            if (this.canAddSelectedExcludedTag()) {
+                if (this.selectedExcludedTagToAdd.tagId === this.guidNoTagFiltering) {
                     this.selectedExcludedTags = [];
                     return;
                 }
@@ -345,12 +346,13 @@ const learnApp = Vue.createApp({
         onBeforeUnload(event) {
             if (!this.canExitPageSafely()) {
                 this.userQuitAttemptDisplay = true;
-                (event || window.event).returnValue = "Some saving operations are not finished";
-                return "Some saving operations are not finished";   //Message will not display on modern browers, but a fixed message will be displayed
+                (event || window.event).returnValue = 'Some saving operations are not finished';
+                return 'Some saving operations are not finished';   // Message will not display on modern browers, but a fixed message will be displayed
             }
+            return null;
         },
         onPopState() {
-            //If we are in full screen image mode, a state "#" has been pushed by the browser
+            // If we are in full screen image mode, a state "#" has been pushed by the browser
             if (!document.location.href.endsWith('#'))
                 this.currentFullScreenImage = null;
         },
@@ -361,13 +363,13 @@ const learnApp = Vue.createApp({
             return this.userDecks.length > 0 && this.userDecks[0].showDebugInfo;
         },
         currentCardHasAdditionalSide() {
-            return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide == 3);
+            return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide === 3);
         },
         currentCardHasReferences() {
             return this.currentCard.references;
         },
-        moveToHeap(targetHeap) {    //GetCardsHeapModel
-            const alertMesg = targetHeap.moveToAlertMessage + ' ' + dateTime(targetHeap.expiryUtcDate) + '.';
+        moveToHeap(targetHeap) {    // GetCardsHeapModel
+            const alertMesg = `${targetHeap.moveToAlertMessage} ${dateTime(targetHeap.expiryUtcDate)}.`;
             if (confirm(alertMesg)) {
                 this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: targetHeap.heapId, manualMove: true, nbAttempts: 0 });
                 this.getCard();
@@ -375,28 +377,28 @@ const learnApp = Vue.createApp({
             this.showMoveToHeapMenuPopover = false;
             this.heapInfoPopover = false;
         },
-        enqueueRatingUpload(value) {
+        enqueueRatingUpload() {
             this.pendingRatingOperations.push({ cardId: this.currentCard.cardId, rating: this.currentCard.currentUserRating, nbAttempts: 0 });
         },
         timeToExitPage() {
-            var result = !this.currentCard;
-            result = result && this.downloadedCards.length == 0;
+            let result = !this.currentCard;
+            result = result && this.downloadedCards.length === 0;
             result = result && this.lastDownloadIsEmpty;
             result = result && this.canExitPageSafely();
             return result;
         },
         canExitPageSafely() {
-            var result = this.pendingMoveOperations.length == 0;
+            let result = this.pendingMoveOperations.length === 0;
             result = result && !this.currentMovePromise;
-            result = result && this.pendingRatingOperations.length == 0;
+            result = result && this.pendingRatingOperations.length === 0;
             result = result && !this.currentRatingPromise;
-            result = result && this.pendingNotificationRegistrations.length == 0;
+            result = result && this.pendingNotificationRegistrations.length === 0;
             result = result && !this.currentNotificationRegistrationPromise;
             return result;
         },
         handlePendingRatingOperations() {
             if (!this.currentRatingPromise && this.pendingRatingOperations.length > 0) {
-                var ratingOperation = this.pendingRatingOperations.shift();
+                const ratingOperation = this.pendingRatingOperations.shift();
 
                 if (this.demoMode()) {
                     if (this.timeToExitPage())
@@ -404,24 +406,24 @@ const learnApp = Vue.createApp({
                     return;
                 }
 
-                this.additionalRatingDebugInfo = "Recording rating (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
-                const url = '/Learn/SetCardRating/' + ratingOperation.cardId + '/' + ratingOperation.rating;
+                this.additionalRatingDebugInfo = `Recording rating (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
+                const url = `/Learn/SetCardRating/${ratingOperation.cardId}/${ratingOperation.rating}`;
                 const timeOut = Math.min(60000, (ratingOperation.nbAttempts + 1) * 1000);
 
                 this.currentRatingPromise = pachAxios(url, timeOut)
-                    .then(result => {
+                    .then(() => {
                         this.currentRatingPromise = null;
-                        this.additionalRatingDebugInfo = "Rating recorded (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                        this.additionalRatingDebugInfo = `Rating recorded (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        this.additionalRatingDebugInfo = "Rating failed, will retry in 1 sec (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")" + " - Error: " + error;
+                        this.additionalRatingDebugInfo = `Rating failed, will retry in 1 sec (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts}) - Error: ${error}`;
                         sleep(1000).then(() => {
-                            this.additionalRatingDebugInfo = "Rating failed, will retry asap (cardid: " + ratingOperation.cardId + ", rating: " + ratingOperation.rating + ", nbAttempts: " + ratingOperation.nbAttempts + ")";
+                            this.additionalRatingDebugInfo = `Rating failed, will retry asap (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
                             this.currentRatingPromise = null;
                             this.pendingRatingOperations.push({ cardId: ratingOperation.cardId, rating: ratingOperation.rating, nbAttempts: ratingOperation.nbAttempts + 1 });
-                        })
+                        });
                     });
             }
         },
@@ -450,23 +452,23 @@ const learnApp = Vue.createApp({
         },
         handlePendingNotificationRegistrations() {
             if (!this.currentNotificationRegistrationPromise && this.pendingNotificationRegistrations.length > 0) {
-                var operation = this.pendingNotificationRegistrations.shift();
+                const operation = this.pendingNotificationRegistrations.shift();
 
-                this.currentNotificationRegistrationPromise = axios.patch('/Learn/SetCardNotificationRegistration/' + operation.cardId + '/' + operation.notify)
-                    .then(result => {
+                this.currentNotificationRegistrationPromise = axios.patch(`/Learn/SetCardNotificationRegistration/${operation.cardId}/${operation.notify}`)
+                    .then(() => {
                         this.currentNotificationRegistrationPromise = null;
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
-                    .catch(error => {
+                    .catch(() => {
                         sleep(1000).then(() => {
                             this.currentNotificationRegistrationPromise = null;
                             this.pendingNotificationRegistrations.push(operation);
-                        })
+                        });
                     });
             }
         },
-        async GetBigSizeImageLabels() {
+        async getBigSizeImageLabels() {
             await axios.get('/Media/GetBigSizeImageLabels')
                 .then(result => {
                     this.bigSizeImageLabels = result.data;
@@ -475,7 +477,7 @@ const learnApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        onRatingChange(newValue, oldValue) {
+        onRatingChange(newValue) {
             this.enqueueRatingUpload(newValue);
         },
         updateRemainingCardsInLesson() {
@@ -493,8 +495,7 @@ const learnApp = Vue.createApp({
                 .then(result => {
                     this.remainingCardsInLesson = result.data.remainingCardsInLesson;
                 })
-                .catch(error => {
-                });
+                .catch(() => { });
         },
         offerDeckChoice() {
             return !this.demoMode() && !this.singleDeckDisplay;
@@ -506,7 +507,7 @@ const learnApp = Vue.createApp({
                 return localized.Learning;
             if (this.demoMode())
                 return localized.Demo;
-            return "ERROR" + this.learnMode;
+            return `ERROR ${this.learnMode}`;
         },
         showEditButton() {
             return !this.demoMode();
@@ -541,18 +542,18 @@ const learnApp = Vue.createApp({
     },
     watch: {
         pendingMoveOperations: {
-            handler: function (newValue) {
+            handler: function pendingMoveOperationsHandler() {
                 this.handlePendingMoveOperations();
             },
             deep: true
         },
         currentMovePromise: {
-            handler: function (newValue) {
+            handler: function currentMovePromiseHandler() {
                 this.handlePendingMoveOperations();
             },
         },
         downloadedCards: {
-            handler: function (newValue) {
+            handler: function downloadedCardsHandler() {
                 if (this.demoMode() && this.downloadedCards.length >= maxCountOfCardsForDemo)
                     this.reachedMaxCountOfCardsForDemo = true;
                 this.downloadCardsIfNeeded();
@@ -561,41 +562,41 @@ const learnApp = Vue.createApp({
             deep: true
         },
         cardDownloadOperation: {
-            handler: function (newValue) {
+            handler: function cardDownloadOperationHandler() {
                 if (!this.lastDownloadIsEmpty)
                     this.downloadCardsIfNeeded();
             },
         },
         currentImageLoadingPromise: {
-            handler: function (newValue) {
+            handler: function currentImageLoadingPromiseHandler() {
                 this.downloadImagesIfNeeded();
             },
         },
         selectedExcludedTagToAdd: {
-            handler: function (newValue) {
+            handler: function selectedExcludedTagToAddHandler() {
                 this.addExcludedTag();
-                this.selectedExcludedTagToAdd = "";
+                this.selectedExcludedTagToAdd = '';
             }
         },
         pendingRatingOperations: {
-            handler: function (newValue) {
+            handler: function pendingRatingOperationsHandler() {
                 this.handlePendingRatingOperations();
             },
             deep: true
         },
         currentRatingPromise: {
-            handler: function (newValue) {
+            handler: function currentRatingPromiseHandler() {
                 this.handlePendingRatingOperations();
             },
         },
         pendingNotificationRegistrations: {
-            handler: function (newValue) {
+            handler: function pendingNotificationRegistrationsHandler() {
                 this.handlePendingNotificationRegistrations();
             },
             deep: true
         },
         currentNotificationRegistrationPromise: {
-            handler: function (newValue) {
+            handler: function currentNotificationRegistrationPromiseHandler() {
                 this.handlePendingNotificationRegistrations();
             },
         },

@@ -1,3 +1,5 @@
+'use strict';
+
 const uploadMediaApp = Vue.createApp({
     components: {
         'markdown-editor': MarkdownEditor,
@@ -5,32 +7,32 @@ const uploadMediaApp = Vue.createApp({
     data() {
         return {
             mountFinished: false,
-            name: "",  //string
-            description: "",  //string
-            versionDescription: "", //string
-            source: "",  //string
-            selectedFile: null, //File
-            imagePreview: null, //blob
+            name: '',  // string
+            description: '',  // string
+            versionDescription: '', // string
+            source: '',  // string
+            selectedFile: null, // File
+            imagePreview: null, // blob
             uploading: false,
-            editingImageId: null,   //Guid
-            returnUrl: "", //string
-            originalName: "",
-            originalDescription: "",  //string
-            originalSource: "",  //string
-        }
+            editingImageId: null,   // Guid
+            returnUrl: '', // string
+            originalName: '',
+            originalDescription: '',  // string
+            originalSource: '',  // string
+        };
     },
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
-            this.GetReturnUrlFromPageParameter();
-            await this.GetImageToEditFromPageParameter();
+            this.getReturnUrlFromPageParameter();
+            await this.getImageToEditFromPageParameter();
         }
         finally {
             this.mountFinished = true;
         }
     },
     beforeDestroy() {
-        document.removeEventListener("beforeunload", this.onBeforeUnload);
+        document.removeEventListener('beforeunload', this.onBeforeUnload);
     },
     methods: {
         async upload() {
@@ -47,10 +49,10 @@ const uploadMediaApp = Vue.createApp({
         async uploadNew() {
             this.uploading = true;
             const f = new FormData();
-            f.set("Name", this.name);
-            f.set("Description", this.description);
-            f.set("Source", this.source);
-            f.set("File", this.selectedFile);
+            f.set('Name', this.name);
+            f.set('Description', this.description);
+            f.set('Source', this.source);
+            f.set('File', this.selectedFile);
 
             await axios.post('/Media/UploadImage/', f, { headers: { 'Content-Type': 'multipart/form-data' } })
                 .then((result) => {
@@ -66,7 +68,7 @@ const uploadMediaApp = Vue.createApp({
 
             const data = { imageName: this.name, source: this.source, description: this.description, versionDescription: this.versionDescription };
 
-            await axios.post('/Media/Update/' + this.editingImageId, data)
+            await axios.post(`/Media/Update/${this.editingImageId}`, data)
                 .then((result) => {
                     tellControllerSuccess(result);
                     this.clearAll();
@@ -78,10 +80,10 @@ const uploadMediaApp = Vue.createApp({
                 });
         },
         clearAll() {
-            this.name = "";
-            this.description = "";
-            this.source = "";
-            this.versionDescription = "";
+            this.name = '';
+            this.description = '';
+            this.source = '';
+            this.versionDescription = '';
             this.selectedFile = null;
             this.imagePreview = null;
             this.originalName = this.name;
@@ -98,12 +100,12 @@ const uploadMediaApp = Vue.createApp({
                 fileReader.readAsDataURL(this.selectedFile);
             }
         },
-        async GetImageToEditFromPageParameter() {
-            const imageId = document.getElementById("ImageIdInput").value;
+        async getImageToEditFromPageParameter() {
+            const imageId = document.getElementById('ImageIdInput').value;
             if (!imageId)
                 return;
 
-            await axios.get('/Media/GetImageMetadata/' + imageId)
+            await axios.get(`/Media/GetImageMetadata/${imageId}`)
                 .then(result => {
                     this.editingImageId = imageId;
                     this.name = result.data.imageName;
@@ -119,7 +121,7 @@ const uploadMediaApp = Vue.createApp({
                     return;
                 });
 
-            await axios.get('/Learn/GetImage/' + imageId + '/2', { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/2`, { responseType: 'arraybuffer' })
                 .then(result => {
                     this.imagePreview = base64FromBytes(result.data);
                 })
@@ -127,20 +129,21 @@ const uploadMediaApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async GetReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById("ReturnUrlInput").value;
+        async getReturnUrlFromPageParameter() {
+            this.returnUrl = document.getElementById('ReturnUrlInput').value;
         },
         onBeforeUnload(event) {
             if (this.isDirty()) {
-                (event || window.event).returnValue = "Sure you want to lose your edits?";
-                return "Sure you want to lose your edits?";   //Message will not display on modern browers, but a fixed message will be displayed
+                (event || window.event).returnValue = 'Sure you want to lose your edits?';
+                return 'Sure you want to lose your edits?';   // Message will not display on modern browers, but a fixed message will be displayed
             }
+            return null;
         },
         isDirty() {
-            var result = this.name != this.originalName;
-            result = result || (this.description != this.originalDescription);
-            result = result || (this.source != this.originalSource);
-            result = result || (this.versionDescription != "");
+            let result = this.name !== this.originalName;
+            result = result || (this.description !== this.originalDescription);
+            result = result || (this.source !== this.originalSource);
+            result = result || (this.versionDescription !== '');
             return result;
         },
     },

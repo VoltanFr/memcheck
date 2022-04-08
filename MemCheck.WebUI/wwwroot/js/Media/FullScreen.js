@@ -1,3 +1,5 @@
+'use strict';
+
 const fullScreenImageApp = Vue.createApp({
     components: {
     },
@@ -5,8 +7,8 @@ const fullScreenImageApp = Vue.createApp({
         return {
             mountFinished: false,
             invalidRequest: false,
-            imageBlob: null,   //Medium sized
-        }
+            imageBlob: null,   // Medium sized
+        };
     },
     async mounted() {
         try {
@@ -18,13 +20,13 @@ const fullScreenImageApp = Vue.createApp({
     },
     methods: {
         async getImage() {
-            const imageId = document.getElementById("ImageIdInput").value;
+            const imageId = document.getElementById('ImageIdInput').value;
             if (!imageId) {
                 this.invalidRequest = true;
                 return;
             }
 
-            await axios.get('/Learn/GetImage/' + imageId + '/3', { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/3`, { responseType: 'arraybuffer' })
                 .then(result => {
                     this.imageBlob = base64FromBytes(result.data);
                 })

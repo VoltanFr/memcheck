@@ -9,7 +9,6 @@
     <link href="@Url.Content("~/css/search.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/lib/vant/vant.js" asp-append-version="true"></script>
     <script src="~/js/CardRating.js" asp-append-version="true"></script>
     <script src="~/js/TagButton.js" asp-append-version="true"></script>
     <script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
@@ -180,7 +179,7 @@
                                     <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["RequiredTags"]</th>
                                     <td>
                                         <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
-                                        <span id="AddReqiredTagButton" v-if="CanAddSelectedRequiredTag()">
+                                        <span id="AddReqiredTagButton" v-if="canAddSelectedRequiredTag()">
                                             <van-button class="toolbar-button" @@click="addRequiredTag">+</van-button>
                                         </span>
                                         <tag-button v-for="(tag,index) in selectedRequiredTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeRequiredTag"></tag-button>
@@ -190,7 +189,7 @@
                                     <th v-bind:style="'text-align:' + (filteringOnDeckInclusive() ? 'right' : 'left')">@Localizer["ExcludedTags"]</th>
                                     <td>
                                         <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
-                                        <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
+                                        <span id="AddExcludedTagButton" v-if="canAddSelectedExcludedTag()">
                                             <van-button class="toolbar-button" @@click="addExcludedTag">+</van-button>
                                         </span>
                                         <tag-button v-for="(tag,index) in selectedExcludedTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeExcludedTag"></tag-button>

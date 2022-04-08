@@ -1,3 +1,5 @@
+'use strict';
+
 const cardHistoryApp = Vue.createApp({
     components: {
     },
@@ -6,31 +8,31 @@ const cardHistoryApp = Vue.createApp({
             mountFinished: false,
             loading: false,
             cardId: null,
-            error: "",
-            versions: [],   //AuthoringController.CardVersion
-        }
+            error: '',
+            versions: [],   // AuthoringController.CardVersion
+        };
     },
     beforeCreate() {
         this.dateTime = dateTime;
     },
     async mounted() {
         try {
-            await this.GetEntriesFromPageParameter();
+            await this.getEntriesFromPageParameter();
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        async GetEntriesFromPageParameter() {
+        async getEntriesFromPageParameter() {
             this.loading = true;
-            this.cardId = document.getElementById("CardIdInput").value;
+            this.cardId = document.getElementById('CardIdInput').value;
             if (!this.cardId) {
-                this.error = "Card not found (this page expects a card id parameter)";
+                this.error = 'Card not found (this page expects a card id parameter)';
                 return;
             }
 
-            await axios.get('/Authoring/CardVersions/' + this.cardId)
+            await axios.get(`/Authoring/CardVersions/${this.cardId}`)
                 .then(result => {
                     this.versions = result.data;
                     this.loading = false;
@@ -39,7 +41,7 @@ const cardHistoryApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                     this.cardId = null;
-                    this.error = "Card not found: " + error;
+                    this.error = `"Card not found: ${error}`;
                     this.loading = false;
                     return;
                 });

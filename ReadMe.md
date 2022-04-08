@@ -24,6 +24,11 @@ The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRo
 - [Entity Framework .NET CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet): install by running this command: `dotnet tool install --global dotnet-ef`.
 - To run the web site, you will need to trust the local issued certificate. For that, run this command: `dotnet dev-certs https --trust`. Again, **Visual Studio will deal with that on the first launch of the web site project**.
 
+### Tests
+
+- To restore Node packages, run `npm install`
+- To run [eslint](https://eslint.org/), run `npx eslint MemCheck.WebUI/wwwroot/js`
+
 ### On Linux or Mac
 
 I plan to check that but did not have time yet: development on a Mac or Linux machine should work. Feedback welcome.

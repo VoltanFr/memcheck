@@ -1,0 +1,28 @@
+{
+  "name": "memcheck",
+  "version": "1.0.0",
+  "description": "[![MemCheck build, test and deploy to Azure](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml/badge.svg)](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml)",
+  "main": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "eslint-plugin-vue": "^8.5.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VoltanFr/memcheck.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VoltanFr/memcheck/issues"
+  },
+  "homepage": "https://github.com/VoltanFr/memcheck#readme"
+}

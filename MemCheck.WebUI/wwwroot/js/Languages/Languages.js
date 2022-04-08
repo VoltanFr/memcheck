@@ -1,11 +1,14 @@
-var app = new Vue({
-    el: '#LanguagesMainDiv',
-    data: {
-        newLanguage: {
-            name
-        },
-        allLanguages: [],
-        mountFinished: false,
+'use strict';
+
+const languagesApp = Vue.createApp({
+    data() {
+        return {
+            newLanguage: {
+                name
+            },
+            allLanguages: [],
+            mountFinished: false,
+        };
     },
     mounted() {
         try {
@@ -35,7 +38,9 @@ var app = new Vue({
                 });
         },
         showCardsWithLanguage(languageName) {
-            window.location.href = '/Search/?tagFilterInput=' + languageName;
+            window.location.href = `/Search/?tagFilterInput=${languageName}`;
         }
     },
 });
+
+languagesApp.mount('#LanguagesMainDiv');

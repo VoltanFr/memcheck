@@ -1,4 +1,4 @@
-import * as vant from '../../lib/vant/vant.js';
+'use strict';
 
 const authoringApp = Vue.createApp({
     components: {
@@ -14,64 +14,64 @@ const authoringApp = Vue.createApp({
     data() {
         return {
             card: {
-                frontSide: "",
-                backSide: "",
-                additionalInfo: "",
-                references: "",
-                languageId: "", //Guid
-                tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-                usersWithView: [], //AuthoringController.GetUsersViewModel
-                versionDescription: "",
+                frontSide: '',
+                backSide: '',
+                additionalInfo: '',
+                references: '',
+                languageId: '', // Guid
+                tags: [],   // AuthoringController.GetAllAvailableTagsViewModel
+                usersWithView: [], // AuthoringController.GetUsersViewModel
+                versionDescription: '',
                 currentUserRating: 0,
                 averageRating: 0,
                 countOfUserRatings: 0,
             },
             originalCard: {
-                frontSide: "",
-                backSide: "",
-                additionalInfo: "",
-                references: "",
-                languageId: "", //Guid
-                tags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-                usersWithView: [] //AuthoringController.GetUsersViewModel
+                frontSide: '',
+                backSide: '',
+                additionalInfo: '',
+                references: '',
+                languageId: '', // Guid
+                tags: [],   // AuthoringController.GetAllAvailableTagsViewModel
+                usersWithView: [] // AuthoringController.GetUsersViewModel
             },
-            allAvailableTags: [],   //AuthoringController.GetAllAvailableTagsViewModel
-            allAvailableLanguages: [],  //GetAllLanguages.ViewModel
-            allAvailableUsers: [],  //AuthoringController.GetUsersViewModel
-            selectedTagToAdd: "",   //AuthoringController.GetAllAvailableTagsViewModel
-            selectedUserToAdd: "",  //AuthoringController.GetUsersViewModel
-            currentUser: "", //AuthoringController.GetUsersViewModel
-            creatingNewCard: true,  //If false, we are editing an existing card, see method GetCardToEditFromPageParameter
-            editingCardId: "",  //Guid, used only if !creatingNewCard
-            editingCardCreationDate: "",  //string, used only if !creatingNewCard
-            editingCardLastChangeDate: "",  //string, used only if !creatingNewCard
-            infoAboutUsage: "",  //string, used only if !creatingNewCard
-            returnUrl: "", //string
+            allAvailableTags: [],   // AuthoringController.GetAllAvailableTagsViewModel
+            allAvailableLanguages: [],  // GetAllLanguages.ViewModel
+            allAvailableUsers: [],  // AuthoringController.GetUsersViewModel
+            selectedTagToAdd: '',   // AuthoringController.GetAllAvailableTagsViewModel
+            selectedUserToAdd: '',  // AuthoringController.GetUsersViewModel
+            currentUser: '', // AuthoringController.GetUsersViewModel
+            creatingNewCard: true,  // If false, we are editing an existing card, see method getCardToEditFromPageParameter
+            editingCardId: '',  // Guid, used only if !creatingNewCard
+            editingCardCreationDate: '',  // string, used only if !creatingNewCard
+            editingCardLastChangeDate: '',  // string, used only if !creatingNewCard
+            infoAboutUsage: '',  // string, used only if !creatingNewCard
+            returnUrl: '', // string
             mountFinished: false,
             guiMessages: {
-                success: "",
-                failure: "",
-                sureCreateWithoutTag: "",
-                imageAlreadyInCard: "",
+                success: '',
+                failure: '',
+                sureCreateWithoutTag: '',
+                imageAlreadyInCard: '',
             },
-            addToDeck: "",  //AuthoringController.DecksOfUserViewModel
-            addToSingleDeck: true,  //meaningful only if singleDeckDisplay
-            decksOfUser: [],    //AuthoringController.DecksOfUserViewModel
+            addToDeck: '',  // AuthoringController.DecksOfUserViewModel
+            addToSingleDeck: true,  // meaningful only if singleDeckDisplay
+            decksOfUser: [],    // AuthoringController.DecksOfUserViewModel
             singleDeckDisplay: false,
-            imageToAddFront: "", //string (name of image)
-            imageToAddBack: "",
-            imageToAddAdditional: "",
-            frontSideImageList: [],   //"MyImageType": see loadImage
-            backSideImageList: [],   //MyImageType
-            additionalInfoImageList: [],   //MyImageType
-            originalFrontSideImageList: [],   //MyImageType
-            originalBackSideImageList: [],   //MyImageType
-            originalAdditionalInfoImageList: [],   //MyImageType
-            currentFullScreenImage: null,   //MyImageType
+            imageToAddFront: '', // string (name of image)
+            imageToAddBack: '',
+            imageToAddAdditional: '',
+            frontSideImageList: [],   // 'MyImageType': see loadImage
+            backSideImageList: [],   // MyImageType
+            additionalInfoImageList: [],   // MyImageType
+            originalFrontSideImageList: [],   // MyImageType
+            originalBackSideImageList: [],   // MyImageType
+            originalAdditionalInfoImageList: [],   // MyImageType
+            currentFullScreenImage: null,   // MyImageType
             saving: false,
-            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
+            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
             showInfoPopover: false,
-        }
+        };
     },
     async mounted() {
         try {
@@ -81,23 +81,23 @@ const authoringApp = Vue.createApp({
             const task2 = this.getAllAvailableTags();
             const task3 = this.getAllAvailableLanguages();
             const task4 = this.getUsers();
-            const task5 = this.GetCardToEditFromPageParameter();
-            const task6 = this.GetGuiMessages();
-            const task7 = this.GetDecksOfUser();
-            const task8 = this.GetBigSizeImageLabels();
-            this.GetReturnUrlFromPageParameter();
+            const task5 = this.getCardToEditFromPageParameter();
+            const task6 = this.getGuiMessages();
+            const task7 = this.getDecksOfUser();
+            const task8 = this.getBigSizeImageLabels();
+            this.getReturnUrlFromPageParameter();
             await Promise.all([task1, task2, task3, task4, task5, task6, task7, task8]);
             if (this.creatingNewCard)
                 this.makePrivate();
-            this.CopyAllInfoToOriginalCard();
+            this.copyAllInfoToOriginalCard();
         }
         finally {
             this.mountFinished = true;
         }
     },
     beforeDestroy() {
-        document.removeEventListener("popstate", this.onPopState);
-        document.removeEventListener("beforeunload", this.onBeforeUnload);
+        document.removeEventListener('popstate', this.onPopState);
+        document.removeEventListener('beforeunload', this.onBeforeUnload);
     },
     methods: {
         async getCurrentUser() {
@@ -108,13 +108,13 @@ const authoringApp = Vue.createApp({
         async getUsers() {
             this.allAvailableUsers = (await axios.get('/Authoring/GetUsers')).data;
         },
-        async GetDecksOfUser() {
+        async getDecksOfUser() {
             this.decksOfUser = (await axios.get('/Authoring/DecksOfUser')).data;
-            if (this.decksOfUser.length == 1) {
+            if (this.decksOfUser.length === 1) {
                 this.addToDeck = this.decksOfUser[0];
                 this.singleDeckDisplay = true;
             }
-            this.decksOfUser.splice(0, 0, "");
+            this.decksOfUser.splice(0, 0, '');
         },
         async getAllAvailableTags() {
             this.allAvailableTags = (await axios.get('/Authoring/AllAvailableTags')).data;
@@ -122,7 +122,7 @@ const authoringApp = Vue.createApp({
         async getAllAvailableLanguages() {
             this.allAvailableLanguages = (await axios.get('/Languages/GetAllLanguages')).data;
         },
-        async GetGuiMessages() {
+        async getGuiMessages() {
             await axios.get('/Authoring/GetGuiMessages')
                 .then(result => {
                     this.guiMessages = result.data;
@@ -131,7 +131,7 @@ const authoringApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async GetBigSizeImageLabels() {
+        async getBigSizeImageLabels() {
             await axios.get('/Media/GetBigSizeImageLabels')
                 .then(result => {
                     this.bigSizeImageLabels = result.data;
@@ -141,7 +141,7 @@ const authoringApp = Vue.createApp({
                 });
         },
         async sendCard() {
-            if (this.card.tags.length == 0)
+            if (this.card.tags.length === 0)
                 if (!confirm(this.guiMessages.sureCreateWithoutTag))
                     return;
 
@@ -166,7 +166,7 @@ const authoringApp = Vue.createApp({
 
                 const task = this.creatingNewCard
                     ? axios.post('/Authoring/CardsOfUser/', postCard)
-                    : axios.put('/Authoring/UpdateCard/' + this.editingCardId, postCard);
+                    : axios.put(`/Authoring/UpdateCard/${this.editingCardId}`, postCard);
 
                 await task
                     .then(result => {
@@ -184,19 +184,19 @@ const authoringApp = Vue.createApp({
             }
         },
         clearAll() {
-            this.card.frontSide = "";
-            this.card.backSide = "";
-            this.card.additionalInfo = "";
-            this.card.references = "";
+            this.card.frontSide = '';
+            this.card.backSide = '';
+            this.card.additionalInfo = '';
+            this.card.references = '';
             this.card.tags = [];
             this.frontSideImageList = [];
             this.backSideImageList = [];
             this.additionalInfoImageList = [];
             this.makePrivate();
             this.creatingNewCard = true;
-            this.CopyAllInfoToOriginalCard();
+            this.copyAllInfoToOriginalCard();
         },
-        CopyAllInfoToOriginalCard() {
+        copyAllInfoToOriginalCard() {
             this.originalCard.frontSide = this.card.frontSide;
             this.originalCard.backSide = this.card.backSide;
             this.originalCard.additionalInfo = this.card.additionalInfo;
@@ -209,15 +209,15 @@ const authoringApp = Vue.createApp({
             this.originalAdditionalInfoImageList = this.additionalInfoImageList.slice();
         },
         cardContainsTag(tagId) {
-            return this.card.tags.some(t => t.tagId == tagId);
+            return this.card.tags.some(t => t.tagId === tagId);
         },
         addTag() {
-            if (this.CanAddSelectedTag()) {
+            if (this.canAddSelectedTag()) {
                 this.card.tags.push(this.selectedTagToAdd);
                 sortTagArray(this.card.tags);
             }
         },
-        CanAddSelectedTag() {
+        canAddSelectedTag() {
             return this.selectedTagToAdd && !this.cardContainsTag(this.selectedTagToAdd.tagId);
         },
         removeTag(tagId) {
@@ -230,20 +230,20 @@ const authoringApp = Vue.createApp({
             this.card.tags.splice(index, 1);
         },
         cardContainsUserWithView(userId) {
-            return this.card.usersWithView.some(user => user.userId == userId);
+            return this.card.usersWithView.some(user => user.userId === userId);
         },
         addUser() {
-            if (this.CanAddSelectedUser()) {
+            if (this.canAddSelectedUser()) {
                 this.card.usersWithView.push(this.selectedUserToAdd);
 
                 if (!this.cardContainsUserWithView(this.currentUser.userId))
                     this.card.usersWithView.push(this.currentUser);
             }
         },
-        CanAddSelectedUser() {
+        canAddSelectedUser() {
             return this.selectedUserToAdd && !this.cardContainsUserWithView(this.selectedUserToAdd.userId);
         },
-        showImageFull(image) {  //MyImageType
+        showImageFull(image) {  // MyImageType
             this.currentFullScreenImage = image;
         },
         removeImageFromArray(image, array) {
@@ -269,20 +269,20 @@ const authoringApp = Vue.createApp({
         makePublic() {
             this.card.usersWithView = [];
         },
-        async GetReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById("ReturnUrlInput").value;
+        async getReturnUrlFromPageParameter() {
+            this.returnUrl = document.getElementById('ReturnUrlInput').value;
         },
-        async GetCardToEditFromPageParameter() {
-            //There has to be a better way, but here's how I get a parameter passed to a page
-            const cardId = document.getElementById("CardIdInput").value;
+        async getCardToEditFromPageParameter() {
+            // There has to be a better way, but here's how I get a parameter passed to a page
+            const cardId = document.getElementById('CardIdInput').value;
             if (!cardId) {
                 this.creatingNewCard = true;
                 return;
             }
 
-            var images = [];
+            let images = [];
 
-            await axios.get('/Authoring/GetCardForEdit/' + cardId)
+            await axios.get(`/Authoring/GetCardForEdit/${cardId}`)
                 .then(result => {
                     this.editingCardId = cardId;
                     this.card.frontSide = result.data.frontSide;
@@ -306,30 +306,29 @@ const authoringApp = Vue.createApp({
                     tellAxiosError(error);
                 });
 
-            for (var i = 0; i < images.length; i++)
+            for (let i = 0; i < images.length; i++)
                 await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
         },
         imageIsInCard(imageId) {
-            for (var i = 0; i < this.frontSideImageList.length; i++)
-                if (this.frontSideImageList[i].imageId == imageId)
+            for (let i = 0; i < this.frontSideImageList.length; i++)
+                if (this.frontSideImageList[i].imageId === imageId)
                     return true;
-            for (var i = 0; i < this.backSideImageList.length; i++)
-                if (this.backSideImageList[i].imageId == imageId)
+            for (let i = 0; i < this.backSideImageList.length; i++)
+                if (this.backSideImageList[i].imageId === imageId)
                     return true;
-            for (var i = 0; i < this.additionalInfoImageList.length; i++)
-                if (this.additionalInfoImageList[i].imageId == imageId)
+            for (let i = 0; i < this.additionalInfoImageList.length; i++)
+                if (this.additionalInfoImageList[i].imageId === imageId)
                     return true;
             return false;
         },
         async loadImage(imageId, name, source, side) {
-            await axios.get('/Learn/GetImage/' + imageId + "/2", { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/2`, { responseType: 'arraybuffer' })
                 .then(result => {
-                    var xml = '';
-                    var bytes = new Uint8Array(result.data);
-                    var len = bytes.byteLength;
-                    for (var j = 0; j < len; j++)
+                    let xml = '';
+                    const bytes = new Uint8Array(result.data);
+                    for (let j = 0; j < bytes.byteLength; j++)
                         xml += String.fromCharCode(bytes[j]);
-                    const base64 = 'data:image/jpeg;base64,' + window.btoa(xml);
+                    const base64 = `data:image/jpeg;base64,${window.btoa(xml)}`;
                     const img = {
                         imageId: imageId,
                         blob: base64,
@@ -346,10 +345,12 @@ const authoringApp = Vue.createApp({
                         case 3:
                             this.additionalInfoImageList.push(img);
                             break;
+                        default:
+                            return;
                     }
                 })
-                .catch(error => {
-                    tellAxiosError("Failed to load image");
+                .catch(() => {
+                    tellAxiosError('Failed to load image');
                 });
         },
         async addFrontImage(imageName) {
@@ -361,7 +362,7 @@ const authoringApp = Vue.createApp({
         async addAdditionalImage(imageName) {
             await this.addImage(imageName, 3);
         },
-        async addImage(imageName, side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
+        async addImage(imageName, side) {  // 1 = front side ; 2 = back side ; 3 = AdditionalInfo
             await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
@@ -380,7 +381,7 @@ const authoringApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async pasteImageName(side) {  //1 = front side ; 2 = back side ; 3 = AdditionalInfo
+        async pasteImageName(side) {  // 1 = front side ; 2 = back side ; 3 = AdditionalInfo
             await navigator.clipboard.readText()
                 .then(text => {
                     if (!text)
@@ -396,6 +397,8 @@ const authoringApp = Vue.createApp({
                         case 3:
                             this.imageToAddAdditional = text;
                             break;
+                        default:
+                            return;
                     }
 
                     this.addImage(side);
@@ -406,16 +409,17 @@ const authoringApp = Vue.createApp({
         },
         onBeforeUnload(event) {
             if (this.isDirty()) {
-                (event || window.event).returnValue = "Sure you want to lose your edits?";
-                return "Sure you want to lose your edits?";   //Message will not display on modern browers, but a fixed message will be displayed
+                (event || window.event).returnValue = 'Sure you want to lose your edits?';
+                return 'Sure you want to lose your edits?';   // Message will not display on modern browers, but a fixed message will be displayed
             }
+            return null;
         },
         isDirty() {
-            var result = this.card.frontSide != this.originalCard.frontSide;
-            result = result || (this.card.backSide != this.originalCard.backSide);
-            result = result || (this.card.additionalInfo != this.originalCard.additionalInfo);
-            result = result || (this.card.references != this.originalCard.references);
-            result = result || (this.card.languageId != this.originalCard.languageId);
+            let result = this.card.frontSide !== this.originalCard.frontSide;
+            result = result || (this.card.backSide !== this.originalCard.backSide);
+            result = result || (this.card.additionalInfo !== this.originalCard.additionalInfo);
+            result = result || (this.card.references !== this.originalCard.references);
+            result = result || (this.card.languageId !== this.originalCard.languageId);
             result = result || (!this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId)));
             result = result || (!this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId)));
             result = result || (!this.sameSetOfIds(this.frontSideImageList.map(img => img.imageId), this.originalFrontSideImageList.map(img => img.imageId)));
@@ -429,13 +433,13 @@ const authoringApp = Vue.createApp({
             const setA = new Set(arrayA);
             const setB = new Set(arrayB);
 
-            for (var id of setA)
+            for (let id of setA)
                 if (!setB.has(id))
                     return false;
             return true;
         },
         onPopState() {
-            //If we are in full screen image mode, a state "#" has been pushed by the browser
+            // If we are in full screen image mode, a state '#' has been pushed by the browser
             if (!document.location.href.endsWith('#'))
                 this.currentFullScreenImage = null;
         },
@@ -443,22 +447,21 @@ const authoringApp = Vue.createApp({
             window.history.back();
         },
         showDebugInfo() {
-            return (this.currentUser.userName == "Voltan") || (this.currentUser.userName == "Toto1");
+            return (this.currentUser.userName === 'Voltan') || (this.currentUser.userName === 'Toto1');
         },
         cardHistory() {
-            window.location.href = "/Authoring/History?CardId=" + this.editingCardId;
+            window.location.href = `/Authoring/History?CardId=${this.editingCardId}`;
         },
         isInFrench() {
-            for (var i = 0; i < this.allAvailableLanguages.length; i++)
-                if (this.allAvailableLanguages[i].id == this.card.languageId) {
-                    var currentLanguageName = this.allAvailableLanguages[i].name;
-                    var result = currentLanguageName.startsWith('Fr'); //This hardcoding is questionable
-                    return result;
+            for (let i = 0; i < this.allAvailableLanguages.length; i++)
+                if (this.allAvailableLanguages[i].id === this.card.languageId) {
+                    const currentLanguageName = this.allAvailableLanguages[i].name;
+                    return currentLanguageName.startsWith('Fr'); // This hardcoding is questionable
                 }
             return false;
         },
         async updateRating(newValue) {
-            await axios.patch('/Authoring/SetCardRating/' + this.editingCardId + '/' + newValue)
+            await axios.patch(`/Authoring/SetCardRating/${this.editingCardId}/${newValue}`)
                 .then(response => {
                     tellControllerSuccess(response);
                 })
@@ -466,21 +469,21 @@ const authoringApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async onRatingChange(newValue, oldValue) {
+        async onRatingChange(newValue) {
             await this.updateRating(newValue);
         }
     },
     watch: {
         selectedTagToAdd: {
-            handler: function (newValue) {
+            handler: function selectedTagToAddHandler() {
                 this.addTag();
-                this.selectedTagToAdd = "";
+                this.selectedTagToAdd = '';
             },
         },
         selectedUserToAdd: {
             handler() {
                 this.addUser();
-                this.selectedUserToAdd = "";
+                this.selectedUserToAdd = '';
             },
         },
     },

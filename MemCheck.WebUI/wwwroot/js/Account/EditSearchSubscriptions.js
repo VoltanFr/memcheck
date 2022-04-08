@@ -1,21 +1,23 @@
+'use strict';
+
 const editSearchSubscriptionApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            subscription: "",  //AccountController.SearchSubscriptionViewModel. Null if page param not valid
-            newName: "",    //string
+            subscription: '',  // AccountController.SearchSubscriptionViewModel. Null if page param not valid
+            newName: '',    // string
             mountFinished: false,
-            returnUrl: "", //string
-        }
+            returnUrl: '', // string
+        };
     },
     beforeCreate() {
         this.dateTime = dateTime;
     },
     async mounted() {
         try {
-            this.GetReturnUrlFromPageParameter();
-            await this.GetSubscriptionFromPageParameter();
+            this.getReturnUrlFromPageParameter();
+            await this.getSubscriptionFromPageParameter();
         }
         finally {
             this.mountFinished = true;
@@ -23,33 +25,33 @@ const editSearchSubscriptionApp = Vue.createApp({
     },
     methods: {
         async save() {
-            await axios.put('/Account/SetSearchSubscriptionName/' + this.subscription.id, { NewName: this.newName })
-                .then(result => {
+            await axios.put(`/Account/SetSearchSubscriptionName/${this.subscription.id}`, { NewName: this.newName })
+                .then(() => {
                     if (this.returnUrl)
                         window.location = this.returnUrl;
                     else
-                        window.location = "/";
+                        window.location = '/';
                 })
                 .catch(error => {
                     tellAxiosError(error);
                 });
         },
-        GetReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById("ReturnUrlInput").value;
+        getReturnUrlFromPageParameter() {
+            this.returnUrl = document.getElementById('ReturnUrlInput').value;
         },
-        async GetSubscriptionFromPageParameter() {
-            const subscriptionId = document.getElementById("SubscriptionIdInput").value;
+        async getSubscriptionFromPageParameter() {
+            const subscriptionId = document.getElementById('SubscriptionIdInput').value;
             if (!subscriptionId) {
-                this.subscription = "";
+                this.subscription = '';
                 return;
             }
-            await axios.get('/Account/GetSearchSubscription/' + subscriptionId)
+            await axios.get(`/Account/GetSearchSubscription/${subscriptionId}`)
                 .then(result => {
                     this.subscription = result.data;
                 })
                 .catch(error => {
                     tellAxiosError(error);
-                    this.subscription = "";
+                    this.subscription = '';
                 });
         },
     },

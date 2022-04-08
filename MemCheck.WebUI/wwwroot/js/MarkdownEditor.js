@@ -1,4 +1,7 @@
-﻿const MarkdownEditor = Vue.defineComponent({
+﻿'use strict';
+
+/* exported MarkdownEditor */
+const MarkdownEditor = Vue.defineComponent({
     components: {
         // mention sub components, if we used in the template
     },
@@ -46,30 +49,30 @@
         };
     },
     methods: {
-        onInput(event) {
+        onInput() {
             this.$emit('update:modelValue', this.content);
             this.adaptTextAreaSize();
         },
         adaptTextAreaSize() {
             const textarea = this.$refs.text_area_control;
-            var scrollHeightBeforeUpdate = 0;
+            let scrollHeightBeforeUpdate = 0;
             do {
                 scrollHeightBeforeUpdate = textarea.scrollHeight;
                 const newHeight = Math.max(50, textarea.scrollHeight);
-                textarea.style.height = newHeight + "px";
+                textarea.style.height = `${newHeight}px`;
             } while (scrollHeightBeforeUpdate !== textarea.scrollHeight);
         },
         onKeyDown(event) {
             if (event.ctrlKey) {
-                if (event.key == ' ') {
+                if (event.key === ' ') {
                     this.insertNbsp();
                     return;
                 }
-                if (event.key == 'i' || event.key == 'I') {
+                if (event.key === 'i' || event.key === 'I') {
                     this.italic();
                     return;
                 }
-                if (event.key == 'b' || event.key == 'B') {
+                if (event.key === 'b' || event.key === 'B') {
                     this.bold();
                     return;
                 }
@@ -91,7 +94,7 @@
             this.insertText('&nbsp;');
         },
         insertTable() {
-            var text = `| Aligné à gauche | Centré | Aligné à droite |
+            const text = `| Aligné à gauche | Centré | Aligné à droite |
 |:---|:----:|---:|
 | Contenu | Contenu | Contenu |
 | Contenu | Contenu | Contenu |`;
@@ -102,12 +105,12 @@
             let cursorStartPosition = textarea.selectionStart;
             let cursorEndPosition = textarea.selectionEnd;
             const initialValue = textarea.value;
-            const selectionIsEmpty = cursorStartPosition == cursorEndPosition;
+            const selectionIsEmpty = cursorStartPosition === cursorEndPosition;
             if (!selectionIsEmpty) {
                 // Don't include spaces in the modified area
-                while (initialValue.charAt(cursorStartPosition) == ' ')
+                while (initialValue.charAt(cursorStartPosition) === ' ')
                     cursorStartPosition++;
-                while (initialValue.charAt(cursorEndPosition - 1) == ' ')
+                while (initialValue.charAt(cursorEndPosition - 1) === ' ')
                     cursorEndPosition--;
             }
             this.content = initialValue.substring(0, cursorStartPosition) + markup + initialValue.substring(cursorStartPosition, cursorEndPosition) + markup + initialValue.substring(cursorEndPosition);

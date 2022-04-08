@@ -1,4 +1,7 @@
-﻿const CardRating = Vue.defineComponent({
+﻿'use strict';
+
+/* exported CardRating */
+const CardRating = Vue.defineComponent({
     components: {
         'van-button': globalThis.vant.Button,
         'van-popover': globalThis.vant.Popover,
@@ -46,24 +49,24 @@
         };
     },
     methods: {
-        onChange(newValue, oldValue) {
+        onChange(newValue) {
             this.$emit('update:modelValue', newValue);
             this.ratingPopover = false;
         },
         ratingAsStars(rating) {
-            var result = "";
+            let result = '';
 
             const truncated = Math.trunc(rating);
             for (let i = 0; i < truncated; i++)
-                result = result + "<i class='fas fa-star rating-star'></i>";
+                result = `${result}<i class='fas fa-star rating-star'></i>`;
 
             const ceil = Math.ceil(rating);
             for (let i = truncated; i < ceil; i++)
-                result = result + "<i class='fas fa-star-half-alt rating-star'></i>";
+                result = `${result}<i class='fas fa-star-half-alt rating-star'></i>`;
 
 
             for (let i = ceil; i < 5; i++)
-                result = result + "<i class='far fa-star rating-star'></i>";
+                result = `${result}<i class='far fa-star rating-star'></i>`;
             return result;
         },
         currentUserRatingAsStars() {

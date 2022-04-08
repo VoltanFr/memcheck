@@ -1,13 +1,15 @@
+'use strict';
+
 const createDeckApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
-            description: "",
-            heapingAlgorithm: "",   //DecksController.HeapingAlgorithmViewModel
+            heapingAlgorithms: [],  // IEnumerable<DecksController.HeapingAlgorithmViewModel>
+            description: '',
+            heapingAlgorithm: '',   // DecksController.HeapingAlgorithmViewModel
             mountFinished: false,
-        }
+        };
     },
     async mounted() {
         try {
@@ -30,7 +32,7 @@ const createDeckApp = Vue.createApp({
         async create() {
             const newDeck = { description: this.description, heapingAlgorithmId: this.heapingAlgorithm.id };
             await axios.post('/Decks/Create/', newDeck)
-                .then(result => {
+                .then(() => {
                     window.location.href = '/';
                 })
                 .catch(error => {
@@ -40,4 +42,4 @@ const createDeckApp = Vue.createApp({
     },
 });
 
-            createDeckApp.mount('#CreateDeck');
+createDeckApp.mount('#CreateDeck');

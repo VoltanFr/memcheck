@@ -1,13 +1,15 @@
+'use strict';
+
 const subscriptionsApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            totalSearchSubscriptionCount: -1, //int
-            searchSubscriptions: [],    //AccountController.SearchSubscriptionViewModel
+            totalSearchSubscriptionCount: -1, // int
+            searchSubscriptions: [],    // AccountController.SearchSubscriptionViewModel
             mountFinished: false,
             loading: false,
-        }
+        };
     },
     async mounted() {
         try {
@@ -21,7 +23,7 @@ const subscriptionsApp = Vue.createApp({
         async getSearchSubscriptions() {
             this.loading = true;
             this.searchSubscriptions = [];
-            await axios.post("/Account/GetSearchSubscriptions", this.request)
+            await axios.post('/Account/GetSearchSubscriptions', this.request)
                 .then(result => {
                     this.searchSubscriptions = result.data;
                 })
@@ -31,13 +33,13 @@ const subscriptionsApp = Vue.createApp({
             this.loading = false;
         },
         edit(searchSubscriptionId) {
-            window.location.href = "/Identity/Account/Manage/EditSearchSubscription?Id=" + searchSubscriptionId + "&ReturnUrl=" + window.location;
+            window.location.href = `/Identity/Account/Manage/EditSearchSubscription?Id=${searchSubscriptionId}&ReturnUrl=${window.location}`;
         },
         async deleteSubscription(subscription) {
             if (confirm(subscription.deleteConfirmMessage)) {
                 this.loading = true;
 
-                await axios.delete('/Account/DeleteSearchSubscription/' + subscription.id)
+                await axios.delete(`/Account/DeleteSearchSubscription/${subscription.id}`)
                     .then(result => {
                         tellControllerSuccess(result);
                     })

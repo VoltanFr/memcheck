@@ -1,40 +1,42 @@
+'use strict';
+
 const deckSettingsApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            userDecks: [],  //DecksController.GetUserDecksViewModel
-            activeDeck: "",  //DecksController.GetUserDecksViewModel
+            userDecks: [],  // DecksController.GetUserDecksViewModel
+            activeDeck: '',  // DecksController.GetUserDecksViewModel
             singleDeckDisplay: false,
-            heapingAlgorithms: [],  //IEnumerable<DecksController.HeapingAlgorithmViewModel>
+            heapingAlgorithms: [],  // IEnumerable<DecksController.HeapingAlgorithmViewModel>
             mountFinished: false,
-        }
+        };
     },
     async mounted() {
         try {
-            const task1 = this.GetUserDecks();
-            const task2 = this.GetHeapingAlgorithms();
+            const task1 = this.getUserDecks();
+            const task2 = this.getHeapingAlgorithms();
             await Promise.all([task1, task2]);
-            this.GetActiveDeckFromPageParameter();
+            this.getActiveDeckFromPageParameter();
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        GetActiveDeckFromPageParameter() {
+        getActiveDeckFromPageParameter() {
             if (!this.singleDeckDisplay) {
-                //There has to be a better way, but here's how I get a parameter passed to a page
-                const wantedDeck = document.getElementById("DeckIdInput").value;
+                // There has to be a better way, but here's how I get a parameter passed to a page
+                const wantedDeck = document.getElementById('DeckIdInput').value;
                 if (!wantedDeck)
                     return;
                 for (let i = 0; i < this.userDecks.length; i++) {
-                    if (this.userDecks[i].deckId == wantedDeck)
+                    if (this.userDecks[i].deckId === wantedDeck)
                         this.activeDeck = this.userDecks[i];
                 }
             }
         },
-        async GetHeapingAlgorithms() {
+        async getHeapingAlgorithms() {
             await axios.get('/Decks/GetHeapingAlgorithms/')
                 .then(result => {
                     this.heapingAlgorithms = result.data;
@@ -43,7 +45,7 @@ const deckSettingsApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async GetUserDecks() {
+        async getUserDecks() {
             await axios.get('/Decks/GetUserDecks/')
                 .then(result => {
                     this.userDecks = result.data;
@@ -52,7 +54,7 @@ const deckSettingsApp = Vue.createApp({
                         this.singleDeckDisplay = true;
                     }
                     else {
-                        this.activeDeck = "";
+                        this.activeDeck = '';
                         this.singleDeckDisplay = false;
                     }
                 })
@@ -62,17 +64,17 @@ const deckSettingsApp = Vue.createApp({
         },
         currentHeapingAlgorithmDescription() {
             if (!this.activeDeck)
-                return "";
+                return '';
             for (let i = 0; i < this.heapingAlgorithms.length; i++) {
-                if (this.heapingAlgorithms[i].id == this.activeDeck.heapingAlgorithmId)
+                if (this.heapingAlgorithms[i].id === this.activeDeck.heapingAlgorithmId)
                     return this.heapingAlgorithms[i].descriptionInCurrentLanguage;
             }
-            return "";
+            return '';
         },
         async save() {
             const newDeck = { deckId: this.activeDeck.deckId, description: this.activeDeck.description, heapingAlgorithmId: this.activeDeck.heapingAlgorithmId };
             await axios.post('/Decks/Update/', newDeck)
-                .then(result => {
+                .then(() => {
                     window.location.href = '/Decks/';
                     return;
                 })

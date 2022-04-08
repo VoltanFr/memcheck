@@ -1,14 +1,14 @@
-﻿import * as vant from '../../lib/vant/vant.js';
+﻿'use strict';
 
 const layoutApp = Vue.createApp({
     data() {
         return {
-            activeLanguage: "",
+            activeLanguage: '',
             availableLanguages: [],
             mountFinished: false,
-            userLanguageCookieName: "usrLang",
-            allLanguagesCookieName: "allLangs",
-        }
+            userLanguageCookieName: 'usrLang',
+            allLanguagesCookieName: 'allLangs',
+        };
     },
     async mounted() {
         try {
@@ -56,8 +56,8 @@ const layoutApp = Vue.createApp({
                 });
         },
         async activeLanguageChange() {
-            await axios.post('/UILanguages/SetCulture/' + this.activeLanguage)
-                .then(result => {
+            await axios.post(`/UILanguages/SetCulture/${this.activeLanguage}`)
+                .then(() => {
                     window.location.reload(false);
                     setCookie(this.userLanguageCookieName, this.activeLanguage, 1);
                 })
@@ -69,10 +69,10 @@ const layoutApp = Vue.createApp({
     },
     watch: {
         activeLanguage: {
-            handler: function (newValue, oldValue) {
-                if (newValue != oldValue && this.mountFinished)
+            handler: function handleActiveLanguageChange(newValue, oldValue) {
+                if (newValue !== oldValue && this.mountFinished)
                     this.activeLanguageChange();
-            }
+            },
         },
     },
 });

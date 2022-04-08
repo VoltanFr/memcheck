@@ -1,4 +1,7 @@
-﻿const ImageChoice = Vue.defineComponent({
+﻿'use strict';
+
+/* exported ImageChoice */
+const ImageChoice = Vue.defineComponent({
     components: {
     },
     props: {
@@ -16,7 +19,7 @@
     `,
     data() {
         return {
-            imageName: "",
+            imageName: '',
         };
     },
     methods: {

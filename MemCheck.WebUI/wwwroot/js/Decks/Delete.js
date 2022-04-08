@@ -1,24 +1,26 @@
+'use strict';
+
 const deleteDeckApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            userDecks: [],  //DecksController.GetUserDecksForDeletionViewModel
-            activeDeck: "",  //DecksController.GetUserDecksForDeletionViewModel
+            userDecks: [],  // DecksController.GetUserDecksForDeletionViewModel
+            activeDeck: '',  // DecksController.GetUserDecksForDeletionViewModel
             singleDeckDisplay: false,
             mountFinished: false,
-        }
+        };
     },
     async mounted() {
         try {
-            await this.GetUserDecks();
+            await this.getUserDecks();
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        async GetUserDecks() {
+        async getUserDecks() {
             await axios.get('/Decks/GetUserDecksForDeletion/')
                 .then(result => {
                     this.userDecks = result.data;
@@ -27,7 +29,7 @@ const deleteDeckApp = Vue.createApp({
                         this.singleDeckDisplay = true;
                     }
                     else {
-                        this.activeDeck = "";
+                        this.activeDeck = '';
                         this.singleDeckDisplay = false;
                     }
                 })
@@ -37,14 +39,14 @@ const deleteDeckApp = Vue.createApp({
         },
         async deleteDeck() {
             if (confirm(this.activeDeck.alertMessage)) {
-                await axios.delete('/Decks/DeleteDeck/' + this.activeDeck.deckId)
-                    .then(result => {
+                await axios.delete(`/Decks/DeleteDeck/${this.activeDeck.deckId}`)
+                    .then(() => {
                         window.location.href = '/';
                         return;
                     })
                     .catch(error => {
                         tellAxiosError(error);
-                    })
+                    });
             }
         },
     },

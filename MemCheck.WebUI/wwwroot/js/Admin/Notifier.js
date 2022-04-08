@@ -1,3 +1,5 @@
+'use strict';
+
 const notifierMainApp = Vue.createApp({
     components: {
     },
@@ -5,14 +7,10 @@ const notifierMainApp = Vue.createApp({
         return {
             mountFinished: false,
             running: false,
-        }
+        };
     },
     mounted() {
-        try {
-        }
-        finally {
-            this.mountFinished = true;
-        }
+        this.mountFinished = true;
     },
     methods: {
         launch() {

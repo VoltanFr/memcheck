@@ -1,37 +1,39 @@
+'use strict';
+
 const tagAuthoringApp = Vue.createApp({
     components: {
     },
     data() {
         return {
-            editedTag: "",  //A TagsController.GetTagViewModel if we are editing a tag, otherwise null (we are creating)
-            existingTagNames: "",    //Set of string
-            newName: "",    //string
-            newNameProblem: "", //string
-            newDescription: "",    //string
+            editedTag: '',  // A TagsController.GetTagViewModel if we are editing a tag, otherwise null (we are creating)
+            existingTagNames: '',    // Set of string
+            newName: '',    // string
+            newNameProblem: '', // string
+            newDescription: '',    // string
             mountFinished: false,
-            returnUrl: "", //string
+            returnUrl: '', // string
             guiMessages: {
-                alreadyExistsErr: "",
-                nameLengthErr: "",
+                alreadyExistsErr: '',
+                nameLengthErr: '',
             },
             toastVisible: false,
-        }
+        };
     },
     async mounted() {
         try {
-            const task1 = this.GetTagNames();
-            const task2 = this.GetEditedTagFromPageParameter();
-            const task3 = this.GetGuiMessages();
-            this.GetReturnUrlFromPageParameter();
+            const task1 = this.getTagNames();
+            const task2 = this.getEditedTagFromPageParameter();
+            const task3 = this.getGuiMessages();
+            this.getReturnUrlFromPageParameter();
             await Promise.all([task1, task2, task3]);
-            //this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
+            // this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        async GetTagNames() {
+        async getTagNames() {
             await axios.get('/Tags/GetTagNames')
                 .then(result => {
                     this.existingTagNames = new Set(result.data);
@@ -41,7 +43,7 @@ const tagAuthoringApp = Vue.createApp({
                     this.existingTagNames = new Set();
                 });
         },
-        async GetGuiMessages() {
+        async getGuiMessages() {
             await axios.get('/Tags/GetGuiMessages')
                 .then(result => {
                     this.guiMessages = result.data;
@@ -73,7 +75,7 @@ const tagAuthoringApp = Vue.createApp({
                 await this.postNewTag();
         },
         async updateTagName() {
-            await axios.put('/Tags/Update/' + this.editedTag.tagId, { NewName: this.newName, NewDescription: this.newDescription })
+            await axios.put(`/Tags/Update/${this.editedTag.tagId}`, { NewName: this.newName, NewDescription: this.newDescription })
                 .then(result => {
                     this.afterSave(result);
                 })
@@ -85,27 +87,27 @@ const tagAuthoringApp = Vue.createApp({
         async afterSave(axiosResult) {
             tellControllerSuccess(axiosResult);
             this.toastVisible = true;
-            this.editedTag = "";
-            this.newName = "";
-            this.newDescription = "";
-            this.newNameProblem = "";
+            this.editedTag = '';
+            this.newName = '';
+            this.newDescription = '';
+            this.newNameProblem = '';
             if (this.returnUrl)
                 window.location = this.returnUrl;
             else
-                await this.GetTagNames();
+                await this.getTagNames();
         },
-        GetReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById("ReturnUrlInput").value;
+        getReturnUrlFromPageParameter() {
+            this.returnUrl = document.getElementById('ReturnUrlInput').value;
         },
-        async GetEditedTagFromPageParameter() {
-            //There has to be a better way, but here's how I get a parameter passed to a page
-            const tagId = document.getElementById("TagIdInput").value;
+        async getEditedTagFromPageParameter() {
+            // There has to be a better way, but here's how I get a parameter passed to a page
+            const tagId = document.getElementById('TagIdInput').value;
             if (!tagId) {
-                this.editedTag = "";
+                this.editedTag = '';
                 return;
             }
 
-            await axios.get('/Tags/GetTag/' + tagId)
+            await axios.get(`/Tags/GetTag/${tagId}`)
                 .then(result => {
                     this.editedTag = result.data;
                     this.newName = this.editedTag.tagName;
@@ -113,21 +115,21 @@ const tagAuthoringApp = Vue.createApp({
                 })
                 .catch(error => {
                     tellAxiosError(error);
-                    this.editedTag = "";
+                    this.editedTag = '';
                 });
         },
         renderedDescription() {
-            return convertMarkdown(this.editedTag.description, true); //Questionable hardcoding of French
+            return convertMarkdown(this.editedTag.description, true); // Questionable hardcoding of French
         },
         renderedNewDescription() {
-            return convertMarkdown(this.newDescription, true); //Questionable hardcoding of French
+            return convertMarkdown(this.newDescription, true); // Questionable hardcoding of French
         },
         onNameChanged() {
             if (this.toastVisible) {
-                this.newNameProblem = "";
+                this.newNameProblem = '';
                 return;
             }
-            if (this.newName != this.editedTag.tagName && this.existingTagNames.has(this.newName)) {
+            if (this.newName !== this.editedTag.tagName && this.existingTagNames.has(this.newName)) {
                 this.newNameProblem = this.guiMessages.alreadyExistsErr;
                 return;
             }
@@ -135,12 +137,12 @@ const tagAuthoringApp = Vue.createApp({
                 this.newNameProblem = this.guiMessages.nameLengthErr;
                 return;
             }
-            this.newNameProblem = "";
+            this.newNameProblem = '';
         },
     },
     watch: {
         newName: {
-            handler: function (newValue) {
+            handler: function newNameChangedHandler() {
                 this.onNameChanged();
             },
         },

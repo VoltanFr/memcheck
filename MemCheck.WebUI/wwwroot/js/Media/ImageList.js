@@ -1,3 +1,5 @@
+'use strict';
+
 const imageListApp = Vue.createApp({
     components: {
         'big-size-image': BigSizeImage,
@@ -5,31 +7,31 @@ const imageListApp = Vue.createApp({
     data() {
         return {
             request: {
-                filter: "", //string
-                pageNo: 1, //int. First page is number 1
-                pageSize: 10,   //int
+                filter: '', // string
+                pageNo: 1, // int. First page is number 1
+                pageSize: 10,   // int
             },
-            totalCount: -1, //int
-            pageCount: 0,   //int
+            totalCount: -1, // int
+            pageCount: 0,   // int
             offeredPageSizes: [10, 50, 100],
             images: [],
             mountFinished: false,
             loading: false,
-            currentFullScreenImage: null,   //Medium sized
+            currentFullScreenImage: null,   // Medium sized
             TableFormat: false,
             staticText: {
-                copyToClipboardToastTitleOnSuccess: "",
-                copyToClipboardToastTitleOnFailure: "",
+                copyToClipboardToastTitleOnSuccess: '',
+                copyToClipboardToastTitleOnFailure: '',
             },
-            bigSizeImageLabels: null,   //MediaController.GetBigSizeImageLabels
-        }
+            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
+        };
     },
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
             const task1 = this.getImages();
             const task2 = this.getStaticText();
-            const task3 = this.GetBigSizeImageLabels();
+            const task3 = this.getBigSizeImageLabels();
             await Promise.all([task1, task2, task3]);
         }
         finally {
@@ -37,13 +39,19 @@ const imageListApp = Vue.createApp({
         }
     },
     beforeDestroy() {
-        document.removeEventListener("popstate", this.onPopState);
+        document.removeEventListener('popstate', this.onPopState);
     },
     methods: {
+        setImageThumbnail(index, data) {
+            this.images[index].thumbnail = base64FromBytes(data);
+        },
+        onAxiosError(error) {
+            tellAxiosError(error);
+        },
         async getImages() {
             this.loading = true;
             this.images = [];
-            await axios.post("/Media/GetImageList", this.request)
+            await axios.post('/Media/GetImageList', this.request)
                 .then(result => {
                     this.totalCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;
@@ -72,13 +80,9 @@ const imageListApp = Vue.createApp({
                 });
 
             for (let i = 0; i < this.images.length; i++)
-                await axios.get('/Learn/GetImage/' + this.images[i].imageId + '/1', { responseType: 'arraybuffer' })
-                    .then(result => {
-                        this.images[i].thumbnail = base64FromBytes(result.data);
-                    })
-                    .catch(error => {
-                        tellAxiosError(error);
-                    });
+                await axios.get(`/Learn/GetImage/${this.images[i].imageId}/1`, { responseType: 'arraybuffer' })
+                    .then(result => this.setImageThumbnail(i, result.data))
+                    .catch(error => this.onAxiosError(error));
 
             this.loading = false;
 
@@ -89,7 +93,7 @@ const imageListApp = Vue.createApp({
             }
         },
         async getStaticText() {
-            await axios.get("/Media/GetStaticText")
+            await axios.get('/Media/GetStaticText')
                 .then(result => {
                     this.staticText = result.data;
                 })
@@ -113,18 +117,18 @@ const imageListApp = Vue.createApp({
             await this.getImages();
         },
         edit(imageId) {
-            window.location.href = "/Media/Upload?ImageId=" + imageId + "&ReturnUrl=" + window.location;
+            window.location.href = `/Media/Upload?ImageId=${imageId}&ReturnUrl=${window.location}`;
         },
         deleteImage(imageId) {
-            window.location.href = "/Media/Delete?ImageId=" + imageId + "&ReturnUrl=" + window.location;
+            window.location.href = `/Media/Delete?ImageId=${imageId}&ReturnUrl=${window.location}`;
         },
         imageHistory(imageId) {
-            window.location.href = "/Media/History?ImageId=" + imageId;
+            window.location.href = `/Media/History?ImageId=${imageId}`;
         },
-        async showImageFull(image) {  //{imageName: string, imageId: Guid, cardCount: int, thumbnail: base64 string}
+        async showImageFull(image) {  // {imageName: string, imageId: Guid, cardCount: int, thumbnail: base64 string}
             this.loading = true;
             try {
-                await axios.get('/Learn/GetImage/' + image.imageId + '/2', { responseType: 'arraybuffer' })
+                await axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })
                     .then(result => {
                         this.currentFullScreenImage = {
                             imageId: image.imageId,
@@ -154,7 +158,7 @@ const imageListApp = Vue.createApp({
             }
         },
         onPopState() {
-            //If we are in full screen image mode, a state "#" has been pushed by the browser
+            // If we are in full screen image mode, a state "#" has been pushed by the browser
             this.currentFullScreenImage = null;
         },
         closeFullScreenImage() {
@@ -163,7 +167,7 @@ const imageListApp = Vue.createApp({
         copyToClipboard(text) {
             copyToClipboardAndToast(text, this.staticText.copyToClipboardToastTitleOnSuccess, this.staticText.copyToClipboardToastTitleOnFailure);
         },
-        async GetBigSizeImageLabels() {
+        async getBigSizeImageLabels() {
             await axios.get('/Media/GetBigSizeImageLabels')
                 .then(result => {
                     this.bigSizeImageLabels = result.data;

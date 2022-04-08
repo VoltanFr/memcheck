@@ -1,9 +1,12 @@
-﻿const TagButton = Vue.defineComponent({
+﻿'use strict';
+
+/* exported TagButton */
+const TagButton = Vue.defineComponent({
     components: {
     },
     props: {
         name: { required: true, type: String },
-        id: { required: false, type: String, default: null }, //When no idea is given, the button is readonly (can not be clicked)
+        id: { required: false, type: String, default: null }, // When no idea is given, the button is readonly (can not be clicked)
         additionalbuttonclass: { required: false, type: String, default: null },
     },
     template: `
@@ -13,9 +16,9 @@
     `,
     methods: {
         getButtonClass() {
-            var result = "tag-button";
+            let result = 'tag-button';
             if (this.additionalbuttonclass !== null)
-                result = result + ' ' + this.additionalbuttonclass;
+                result = `${result} ${this.additionalbuttonclass}`;
             return result;
         },
         canBeClicked() {

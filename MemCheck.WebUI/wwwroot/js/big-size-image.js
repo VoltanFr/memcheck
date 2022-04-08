@@ -1,4 +1,7 @@
-﻿const BigSizeImage = Vue.defineComponent({
+﻿'use strict';
+
+/* exported BigSizeImage */
+const BigSizeImage = Vue.defineComponent({
     components: {
         // mention sub components, if we used in the template
     },

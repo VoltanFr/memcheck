@@ -1,3 +1,5 @@
+'use strict';
+
 const cardCompareApp = Vue.createApp({
     components: {
     },
@@ -5,11 +7,11 @@ const cardCompareApp = Vue.createApp({
         return {
             mountFinished: false,
             loading: false,
-            error: "",
+            error: '',
             cardId: null,
             selectedVersionId: null,
-            diffResult: null,   //AuthoringController.CardSelectedVersionDiffWithCurrentResult
-        }
+            diffResult: null,   // AuthoringController.CardSelectedVersionDiffWithCurrentResult
+        };
     },
     beforeCreate() {
         this.dateTime = dateTime;
@@ -17,22 +19,22 @@ const cardCompareApp = Vue.createApp({
     },
     async mounted() {
         try {
-            await this.GeValuesFromPageParameter();
+            await this.geValuesFromPageParameter();
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        async GeValuesFromPageParameter() {
+        async geValuesFromPageParameter() {
             this.loading = true;
-            this.cardId = document.getElementById("CardIdInput").value;
-            this.versionId = document.getElementById("VersionIdInput").value;
+            this.cardId = document.getElementById('CardIdInput').value;
+            this.versionId = document.getElementById('VersionIdInput').value;
             if (!this.cardId || !this.versionId) {
-                this.error = "Expected values not found in page parameters)";
+                this.error = 'Expected values not found in page parameters';
                 return;
             }
-            await axios.get('/Authoring/CardSelectedVersionDiffWithCurrent/' + this.cardId + '/' + this.versionId)
+            await axios.get($`/Authoring/CardSelectedVersionDiffWithCurrent/${this.cardId}/${this.versionId}`)
                 .then(result => {
                     this.diffResult = result.data;
                     this.loading = false;
@@ -42,7 +44,7 @@ const cardCompareApp = Vue.createApp({
                     tellAxiosError(error);
                     this.cardId = null;
                     this.versionId = null;
-                    this.error = "Failed to load data";
+                    this.error = 'Failed to load data';
                     this.loading = false;
                     return;
                 });

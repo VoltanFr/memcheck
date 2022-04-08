@@ -1,4 +1,4 @@
-import * as vant from '../../lib/vant/vant.js';
+'use strict';
 
 const heapViewApp = Vue.createApp({
     components: {
@@ -6,11 +6,11 @@ const heapViewApp = Vue.createApp({
     },
     data() {
         return {
-            userDecks: [],  //DecksController.GetUserDecksWithHeapsViewModel
-            activeDeck: "",  //DecksController.GetUserDecksWithHeapsViewModel
+            userDecks: [],  // DecksController.GetUserDecksWithHeapsViewModel
+            activeDeck: '',  // DecksController.GetUserDecksWithHeapsViewModel
             singleDeckDisplay: false,
             mountFinished: false,
-        }
+        };
     },
     beforeCreate() {
         this.dateTime = dateTime;
@@ -18,27 +18,27 @@ const heapViewApp = Vue.createApp({
     },
     async mounted() {
         try {
-            await this.GetUserDecks();
-            this.GetActiveDeckFromPageParameter();
+            await this.getUserDecks();
+            this.getActiveDeckFromPageParameter();
         }
         finally {
             this.mountFinished = true;
         }
     },
     methods: {
-        GetActiveDeckFromPageParameter() {
-            //There has to be a better way, but here's how I get a parameter passed to a page
+        getActiveDeckFromPageParameter() {
+            // There has to be a better way, but here's how I get a parameter passed to a page
             if (!this.singleDeckDisplay) {
-                const wantedDeck = document.getElementById("DeckIdInput").value;
+                const wantedDeck = document.getElementById('DeckIdInput').value;
                 if (!wantedDeck)
                     return;
                 for (let i = 0; i < this.userDecks.length; i++) {
-                    if (this.userDecks[i].deckId == wantedDeck)
+                    if (this.userDecks[i].deckId === wantedDeck)
                         this.activeDeck = this.userDecks[i];
                 }
             }
         },
-        async GetUserDecks() {
+        async getUserDecks() {
             await axios.get('/Decks/GetUserDecksWithHeaps/')
                 .then(result => {
                     this.userDecks = result.data;
@@ -47,7 +47,7 @@ const heapViewApp = Vue.createApp({
                         this.singleDeckDisplay = true;
                     }
                     else {
-                        this.activeDeck = "";
+                        this.activeDeck = '';
                         this.singleDeckDisplay = false;
                     }
                 })
@@ -60,7 +60,7 @@ const heapViewApp = Vue.createApp({
         },
         openSettingsPage() {
             if (this.activeDeck)
-                window.location.href = '/Decks/Settings?DeckId=' + this.activeDeck.deckId;
+                window.location.href = `/Decks/Settings?DeckId=${this.activeDeck.deckId}`;
         },
     },
 });

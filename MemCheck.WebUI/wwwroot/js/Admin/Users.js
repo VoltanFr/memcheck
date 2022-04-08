@@ -1,19 +1,21 @@
+'use strict';
+
 const usersApp = Vue.createApp({
     components: {
     },
     data() {
         return {
             request: {
-                filter: "", //string
-                pageNo: 1, //int. First page is number 1
-                pageSize: 100,   //int
+                filter: '', // string
+                pageNo: 1, // int. First page is number 1
+                pageSize: 100,   // int
             },
-            totalUserCount: -1, //int
-            pageCount: 0,   //int
+            totalUserCount: -1, // int
+            pageCount: 0,   // int
             offeredPageSizes: [10, 50, 100, 500],
-            users: [],    //AdminController.GetUsersUserViewModel
+            users: [],    // AdminController.GetUsersUserViewModel
             mountFinished: false,
-        }
+        };
     },
     async mounted() {
         try {
@@ -26,7 +28,7 @@ const usersApp = Vue.createApp({
     methods: {
         async getUsers() {
             this.users = [];
-            await axios.post("/Admin/GetUsers", this.request)
+            await axios.post('/Admin/GetUsers', this.request)
                 .then(result => {
                     this.totalTagCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;

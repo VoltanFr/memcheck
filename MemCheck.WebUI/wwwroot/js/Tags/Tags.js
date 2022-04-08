@@ -1,3 +1,5 @@
+'use strict';
+
 const tagListingApp = Vue.createApp({
     components: {
         'card-rating': CardRating,
@@ -5,18 +7,18 @@ const tagListingApp = Vue.createApp({
     data() {
         return {
             request: {
-                filter: "", //string
-                pageNo: 1, //int. First page is number 1
-                pageSize: 100,   //int
+                filter: '', // string
+                pageNo: 1, // int. First page is number 1
+                pageSize: 100,   // int
             },
-            totalTagCount: -1, //int
-            pageCount: 0,   //int
+            totalTagCount: -1, // int
+            pageCount: 0,   // int
             userLoggedIn: false,
             offeredPageSizes: [10, 50, 100, 500],
-            tags: [],    //TagsController.GetTagsTagViewModel, but we add a "folded" boolean
+            tags: [],    // TagsController.GetTagsTagViewModel, but we add a "folded" boolean
             mountFinished: false,
             loadTime: 0,
-        }
+        };
     },
     async mounted() {
         try {
@@ -31,13 +33,13 @@ const tagListingApp = Vue.createApp({
             const startTime = performance.now();
             this.tags = [];
             this.tagVisibility = [];
-            await axios.post("/Tags/GetTags", this.request)
+            await axios.post('/Tags/GetTags', this.request)
                 .then(result => {
                     this.totalTagCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;
                     this.userLoggedIn = result.data.userLoggedIn;
 
-                    for (var i = 0; i < result.data.tags.length; i++) {
+                    for (let i = 0; i < result.data.tags.length; i++) {
                         const tagWithVisibility = {
                             tagId: result.data.tags[i].tagId,
                             tagName: result.data.tags[i].tagName,
@@ -53,11 +55,11 @@ const tagListingApp = Vue.createApp({
                     tellAxiosError(error);
                 })
                 .finally(() => {
-                    this.loadTime = performance.now() - startTime
+                    this.loadTime = performance.now() - startTime;
                 });
         },
         canMovePage(shift) {
-            return (this.request.pageNo + shift > 0) && (this.request.pageNo + shift <= this.pageCount);
+            return this.request.pageNo + shift > 0 && this.request.pageNo + shift <= this.pageCount;
         },
         async moveToFirstPage() {
             this.request.pageNo = 1;
@@ -72,10 +74,10 @@ const tagListingApp = Vue.createApp({
             await this.getTags();
         },
         showCardsWithTag(tagId) {
-            window.location.href = "/Search?TagFilter=" + tagId;
+            window.location.href = `/Search?TagFilter=${tagId}`;
         },
         edit(tagId) {
-            window.location.href = "/Tags/Authoring?TagId=" + tagId + "&ReturnUrl=" + window.location;
+            window.location.href = `/Tags/Authoring?TagId=${tagId}&ReturnUrl=${window.location}`;
         },
         demo(tagId) {
             window.location.href = `/Learn/Index?LearnMode=Demo&TagId=${tagId}`;
