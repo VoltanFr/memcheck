@@ -45,6 +45,12 @@ jobs:
     - name: "Clean with dotnet"
       run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
 
+    - name: "Install JavaScript modules"
+      run: yarn
+
+    - name: "Run ESLint"
+      run: yarn eslint MemCheck.WebUI/wwwroot/js
+
     - name: "Restore NuGet packages"
       run: dotnet restore
 
@@ -63,12 +69,6 @@ jobs:
 
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
-
-    - name: "Install JavaScript modules"
-      run: yarn
-
-    - name: "Run ESLint"
-      run: eslint MemCheck.WebUI/wwwroot/js
 
     - name: "Publish: prepare the project WebUI for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.WEBUI_PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
