@@ -1,4 +1,5 @@
 'use strict';
+//bad comment on purpose
 
 const notifierMainApp = Vue.createApp({
     components: {
