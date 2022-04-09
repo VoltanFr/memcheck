@@ -1,9 +1,9 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Basics;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MemCheck.Application.Tests.Helpers
@@ -11,27 +11,27 @@ namespace MemCheck.Application.Tests.Helpers
     internal static class RandomHelper
     {
         #region Private methods
-        private static T Entry<T>(IEnumerable<T> values)
+        private static T EntryOfEnumerable<T>(IEnumerable<T> values)
         {
             var array = values.ToImmutableArray();
-            return array[Randomizer.Next(array.Length)];
+            return array[RandomNumberGenerator.GetInt32(array.Length)];
         }
         #endregion
         public static int ValueNotInSet(IEnumerable<int> excludedPossibilities)
         {
             var excl = excludedPossibilities.ToImmutableHashSet();
-            var result = Randomizer.Next();
+            var result = RandomNumberGenerator.GetInt32(int.MaxValue);
             while (excl.Contains(result))
-                result = Randomizer.Next();
+                result = RandomNumberGenerator.GetInt32(int.MaxValue);
             return result;
         }
         public static int Heap(bool notUnknown = false)
         {
-            return Randomizer.Next(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
+            return RandomNumberGenerator.GetInt32(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
         }
         public static int HeapingAlgorithm()
         {
-            return Entry(HeapingAlgorithms.Instance.Ids);
+            return EntryOfEnumerable(HeapingAlgorithms.Instance.Ids);
         }
         public static string String(int? length = null) //if length is null, result will be 36 chars
         {
@@ -48,30 +48,28 @@ namespace MemCheck.Application.Tests.Helpers
         public static DateTime Date(DateTime? after = null)
         {
             var start = after == null ? new DateTime(1995, 1, 1) : after.Value;
-            return start.AddDays(Randomizer.Next(3650)).ToUniversalTime();
+            return start.AddDays(RandomNumberGenerator.GetInt32(3650)).ToUniversalTime();
         }
         public static DateTime DateBefore(DateTime d)
         {
-            return d.AddDays(-Randomizer.Next(1, 3650)).ToUniversalTime();
+            return d.AddDays(-RandomNumberGenerator.GetInt32(1, 3650)).ToUniversalTime();
         }
         public static int Rating(int excludedValue = 0)
         {
             while (true)
             {
-                var result = Randomizer.Next(1, 5);
+                var result = RandomNumberGenerator.GetInt32(1, 5);
                 if (result != excludedValue)
                     return result;
             }
         }
         public static byte[] Bytes(int length)
         {
-            var b = new byte[length];
-            Randomizer.NextBytes(b);
-            return b;
+            return RandomNumberGenerator.GetBytes(length);
         }
         public static bool Bool()
         {
-            return Randomizer.Next(0, 1) == 1;
+            return RandomNumberGenerator.GetInt32(0, 1) == 1;
         }
         public static Guid Guid()
         {

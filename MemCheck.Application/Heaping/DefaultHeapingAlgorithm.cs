@@ -1,6 +1,6 @@
-﻿using MemCheck.Basics;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using System;
+using System.Security.Cryptography;
 
 namespace MemCheck.Application.Heaping
 {
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Heaping
         protected override DateTime GetExpiryUtcDate(int currentHeap, DateTime lastLearnUtcTime)
         {
             var nbDaysForExpiration = (int)Math.Pow(2, currentHeap);
-            var salt = Randomizer.Next(nbDaysForExpiration * 10);
+            var salt = RandomNumberGenerator.GetInt32(nbDaysForExpiration * 10);
             return lastLearnUtcTime.AddDays(nbDaysForExpiration).AddMinutes(salt);
         }
     }

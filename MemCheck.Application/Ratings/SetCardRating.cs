@@ -1,13 +1,10 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Basics;
-using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Ratings
@@ -36,7 +33,8 @@ namespace MemCheck.Application.Ratings
                         {
                             //Production metrics (Azure Application Insights) show that we are sometimes in this case. My analysis is that this happens because of the JavaScript retries (in Learn.js/handlePendingRatingOperations)
                             attempts++;
-                            await Task.Delay(TimeSpan.FromMilliseconds(Randomizer.Next(50, 1000)));
+                            var waitTimeBeforeRetry = TimeSpan.FromMilliseconds(RandomNumberGenerator.GetInt32(10, 1000));
+                            await Task.Delay(waitTimeBeforeRetry);
                         }
                         else
                             throw;
