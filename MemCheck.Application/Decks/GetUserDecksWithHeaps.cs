@@ -70,7 +70,7 @@ namespace MemCheck.Application.Decks
                     );
             }
 
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("DeckCount", result.Count));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest

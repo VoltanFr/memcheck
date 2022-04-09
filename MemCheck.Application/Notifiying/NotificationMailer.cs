@@ -1,9 +1,7 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
-using Microsoft.ApplicationInsights;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,11 +10,11 @@ namespace MemCheck.Application.Notifying
 {
     public interface IMemCheckLinkGenerator
     {
-        string GetAbsoluteUri(string relativeUri);  //For example GetAbsoluteUri("/Learn/Index") returns "https://memcheckfr.azurewebsites.net/Learn/Index"
+        string GetAbsoluteAddress(string relativeAddress);  //For example GetAbsoluteUri("/Learn/Index") returns "https://memcheckfr.azurewebsites.net/Learn/Index"
     }
     public interface IMemCheckMailSender
     {
-        Task SendAsync(string to, string subject, string body);
+        Task SendAsync(string toAddress, string subject, string body);
     }
     public sealed class NotificationMailer
     {
@@ -29,15 +27,15 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private string GetAuthoringPageLink()
         {
-            return linkGenerator.GetAbsoluteUri("/Authoring/Index")!;
+            return linkGenerator.GetAbsoluteAddress("/Authoring/Index")!;
         }
         private string GetComparePageLink()
         {
-            return linkGenerator.GetAbsoluteUri("/Authoring/Compare")!;
+            return linkGenerator.GetAbsoluteAddress("/Authoring/Compare")!;
         }
         private string GetHistoryPageLink()
         {
-            return linkGenerator.GetAbsoluteUri("/Authoring/History")!;
+            return linkGenerator.GetAbsoluteAddress("/Authoring/History")!;
         }
         private void AddCardVersions(ImmutableArray<CardVersion> cardVersions, StringBuilder mailBody)
         {
@@ -45,18 +43,18 @@ namespace MemCheck.Application.Notifying
                 mailBody.Append("<h1>No card with new version</h1>");
             else
             {
-                mailBody.Append($"<h1>{cardVersions.Length} Cards with new versions</h1>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<h1>{cardVersions.Length} Cards with new versions</h1>");
                 mailBody.Append("<ul>");
                 foreach (var card in cardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
                 {
                     mailBody.Append("<li>");
-                    mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                    mailBody.Append($"By {card.VersionCreator}<br/>");
-                    mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Version description: '{card.VersionDescription}'<br/>");
-                    mailBody.Append($"<a href={GetHistoryPageLink()}?CardId={card.CardId}>History</a> - ");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"By {card.VersionCreator}<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"On {card.VersionUtcDate} (UTC)<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Version description: '{card.VersionDescription}'<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetHistoryPageLink()}?CardId={card.CardId}>History</a> - ");
                     if (card.VersionIdOnLastNotification != null)
-                        mailBody.Append($"<a href={GetComparePageLink()}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetComparePageLink()}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>");
                     else
                         mailBody.Append("Did not exist on your previous notifications");
                     mailBody.Append("</li>");
@@ -70,15 +68,15 @@ namespace MemCheck.Application.Notifying
                 mailBody.Append("<h1>No deleted card</h1>");
             else
             {
-                mailBody.Append($"<h1>{deletedCards.Length} Deleted cards</h1>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<h1>{deletedCards.Length} Deleted cards</h1>");
                 mailBody.Append("<ul>");
                 foreach (var card in deletedCards.OrderBy(card => card.DeletionUtcDate))
                 {
                     mailBody.Append("<li>");
-                    mailBody.Append($"{card.FrontSide}<br/>");
-                    mailBody.Append($"By {card.DeletionAuthor}<br/>");
-                    mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Deletion description: '{card.DeletionDescription}'");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"{card.FrontSide}<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"By {card.DeletionAuthor}<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"On {card.DeletionUtcDate} (UTC)<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Deletion description: '{card.DeletionDescription}'");
                     mailBody.Append("</li>");
                 }
                 mailBody.Append("</ul>");
@@ -86,92 +84,92 @@ namespace MemCheck.Application.Notifying
         }
         private void AddSearchNotifications(UserSearchNotifierResult searchNotifications, StringBuilder mailBody)
         {
-            mailBody.Append($"<h1>{searchNotifications.SubscriptionName} search</h1>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<h1>{searchNotifications.SubscriptionName} search</h1>");
 
             if (searchNotifications.TotalNewlyFoundCardCount == 0)
                 mailBody.Append("<h2>No newly found card</h2>");
             else
             {
-                mailBody.Append($"<h2>{searchNotifications.TotalNewlyFoundCardCount} newly found cards</h2>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<h2>{searchNotifications.TotalNewlyFoundCardCount} newly found cards</h2>");
                 if (searchNotifications.TotalNewlyFoundCardCount > searchNotifications.NewlyFoundCards.Length)
-                    mailBody.Append($"<p>Showing {searchNotifications.NewlyFoundCards.Length} first cards.</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>Showing {searchNotifications.NewlyFoundCards.Length} first cards.</p>");
                 mailBody.Append("<ul>");
                 foreach (var card in searchNotifications.NewlyFoundCards.OrderBy(card => card.VersionUtcDate))
                 {
                     mailBody.Append("<li>");
-                    mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                    mailBody.Append($"Changed by '{card.VersionCreator}'<br/>");
-                    mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                    mailBody.Append($"Version description: '{card.VersionDescription}'");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Changed by '{card.VersionCreator}'<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"On {card.VersionUtcDate} (UTC)<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Version description: '{card.VersionDescription}'");
                     mailBody.Append("</li>");
                 }
                 mailBody.Append("</ul>");
             }
 
-            if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0
-                || searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0
-                || searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0
-                || searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0
+            if (searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView > 0
+                || searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView > 0
                 )
             {
                 mailBody.Append("<h2>Cards no more reported by this search</h2>");
 
-                if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0)
+                if (searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView > 0)
                 {
                     mailBody.Append("<ul>");
-                    foreach (var card in searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.OrderBy(card => card.VersionUtcDate))
+                    foreach (var card in searchNotifications.CardsNotFoundAnymoreStillExistsUserAllowedToView.OrderBy(card => card.VersionUtcDate))
                     {
                         mailBody.Append("<li>");
-                        mailBody.Append($"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
-                        mailBody.Append($"Changed by user '{card.VersionCreator}' and not reported anymore by this search<br/>");
-                        mailBody.Append($"On {card.VersionUtcDate} (UTC)<br/>");
-                        mailBody.Append($"Version description: '{card.VersionDescription}'");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"Changed by user '{card.VersionCreator}' and not reported anymore by this search<br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"On {card.VersionUtcDate} (UTC)<br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"Version description: '{card.VersionDescription}'");
                         mailBody.Append("</li>");
                     }
-                    if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length)
+                    if (searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView > searchNotifications.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length)
                     {
                         mailBody.Append("<li>");
-                        mailBody.Append($"And {searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView - searchNotifications.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length} more");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"And {searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView - searchNotifications.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length} more");
                         mailBody.Append("</li>");
                     }
                     mailBody.Append("</ul>");
                 }
 
-                if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0)
+                if (searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView > 0)
                 {
                     mailBody.Append("<ul>");
-                    foreach (var card in searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView)
+                    foreach (var card in searchNotifications.CardsNotFoundAnymoreDeletedUserAllowedToView)
                     {
                         mailBody.Append("<li>");
-                        mailBody.Append($"{card.FrontSide}<br/>");
-                        mailBody.Append($"Deleted by user '{card.DeletionAuthor}'<br/>");
-                        mailBody.Append($"On {card.DeletionUtcDate} (UTC)<br/>");
-                        mailBody.Append($"With description: '{card.DeletionDescription}'");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"{card.FrontSide}<br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"Deleted by user '{card.DeletionAuthor}'<br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"On {card.DeletionUtcDate} (UTC)<br/>");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"With description: '{card.DeletionDescription}'");
                         mailBody.Append("</li>");
                     }
-                    if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length)
+                    if (searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView > searchNotifications.CardsNotFoundAnymoreDeletedUserAllowedToView.Length)
                     {
                         mailBody.Append("<li>");
-                        mailBody.Append($"And {searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView - searchNotifications.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length} more");
+                        mailBody.Append(CultureInfo.InvariantCulture, $"And {searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView - searchNotifications.CardsNotFoundAnymoreDeletedUserAllowedToView.Length} more");
                         mailBody.Append("</li>");
                     }
                     mailBody.Append("</ul>");
                 }
 
-                if (searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0)
+                if (searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView > 0)
                 {
                     mailBody.Append("<ul>");
                     mailBody.Append("<li>");
-                    mailBody.Append($"{searchNotifications.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView} cards have been modified and made private, preventing you from seeing them");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"{searchNotifications.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView} cards have been modified and made private, preventing you from seeing them");
                     mailBody.Append("</li>");
                     mailBody.Append("</ul>");
                 }
 
-                if (searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0)
+                if (searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView > 0)
                 {
                     mailBody.Append("<ul>");
                     mailBody.Append("<li>");
-                    mailBody.Append($"{searchNotifications.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView} cards have been made private and deleted, can not show any detail");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"{searchNotifications.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView} cards have been made private and deleted, can not show any detail");
                     mailBody.Append("</li>");
                     mailBody.Append("</ul>");
                 }
@@ -184,11 +182,11 @@ namespace MemCheck.Application.Notifying
             var mailBody = new StringBuilder();
             mailBody.Append("<html>");
             mailBody.Append("<body>");
-            mailBody.Append($"<p>Hello {userNotifications.UserName}</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>Hello {userNotifications.UserName}</p>");
             mailBody.Append("<h1>Summary</h1>");
             mailBody.Append("<p>");
-            mailBody.Append($"{userNotifications.SubscribedCardCount} registered cards<br/>");
-            mailBody.Append($"Search finished at {DateTime.UtcNow}<br/>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"{userNotifications.SubscribedCardCount} registered cards<br/>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"Search finished at {DateTime.UtcNow}<br/>");
             mailBody.Append("</p>");
 
             AddCardVersions(userNotifications.CardVersions, mailBody);
@@ -208,13 +206,13 @@ namespace MemCheck.Application.Notifying
             mailBody.Append("<body>");
 
 
-            mailBody.Append($"<p>Sent {sentEmailCount} emails.</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>Sent {sentEmailCount} emails.</p>");
             mailBody.Append($"<p>Perf indicators...</p>");
             mailBody.Append("<ul>");
             foreach (var performanceIndicator in performanceIndicators)
-                mailBody.Append($"<li>{performanceIndicator}</li>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<li>{performanceIndicator}</li>");
             mailBody.Append("</ul>");
-            mailBody.Append($"<p>Finished at {DateTime.UtcNow} (UTC)</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>Finished at {DateTime.UtcNow} (UTC)</p>");
 
             mailBody.Append("</body>");
             mailBody.Append("</html>");
@@ -228,10 +226,10 @@ namespace MemCheck.Application.Notifying
                 return true;
             return userNotifications.SearchNotificactions.Any(searchNotificaction =>
                 searchNotificaction.TotalNewlyFoundCardCount > 0
-                || searchNotificaction.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView > 0
-                || searchNotificaction.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView > 0
-                || searchNotificaction.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView > 0
-                || searchNotificaction.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView > 0
+                || searchNotificaction.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView > 0
                 );
         }
         #endregion
@@ -258,7 +256,7 @@ namespace MemCheck.Application.Notifying
                 }
 
             mailSendingsToWaitFor.Add(emailSender.SendAsync(globalReportToAddress, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
-            Task.WaitAll(mailSendingsToWaitFor.ToArray());
+            await Task.WhenAll(mailSendingsToWaitFor);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Searching;
+using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,11 @@ namespace MemCheck.Application.QueryValidation
         {
             return CardIsPrivateToSingleUser(userId, usersWithView.Select(uwv => uwv.UserId));
         }
-        public static void CheckUserIsAllowedToViewCards(MemCheckDbContext dbContext, Guid userId, params Guid[] cardIds)
+        public static void CheckUserIsAllowedToViewCard(MemCheckDbContext dbContext, Guid userId, Guid cardId)
+        {
+            CheckUserIsAllowedToViewCards(dbContext, userId, cardId.AsArray());
+        }
+        public static void CheckUserIsAllowedToViewCards(MemCheckDbContext dbContext, Guid userId, IEnumerable<Guid> cardIds)
         {
             var cards = dbContext.Cards
                 .AsNoTracking()

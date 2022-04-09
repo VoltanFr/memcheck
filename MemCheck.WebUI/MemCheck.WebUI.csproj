@@ -1,121 +1,121 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <Nullable>enable</Nullable>
-    <TargetFramework>net6.0</TargetFramework>
-    <VersionPrefix>0.76.1</VersionPrefix>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<TargetFramework>net6.0</TargetFramework>
+		<VersionPrefix>0.76.2</VersionPrefix>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningLevel>5</WarningLevel>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningLevel>5</WarningLevel>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Markdig" Version="0.26.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Web.WebJobs.Publish" Version="2.0.0" />
-    <PackageReference Include="SendGrid" Version="9.25.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Markdig" Version="0.26.0" />
+		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Web.WebJobs.Publish" Version="2.0.0" />
+		<PackageReference Include="SendGrid" Version="9.25.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
-    <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+		<ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="img\" />
-    <Folder Include="wwwroot\lib\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="img\" />
+		<Folder Include="wwwroot\lib\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Pages\Privacy.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Privacy.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Authoring\History.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Authoring\History.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Learn\Index.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Learn\Index.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Delete.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\FullScreen.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\FullScreen.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Delete.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\History.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\History.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Upload.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Upload.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Index.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Media\Index.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Shared\CookieConsentPartial.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Shared\CookieConsentPartial.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Tags\Authoring.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Tags\Authoring.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Tags\Index.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Tags\Index.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Admin\Users.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Admin\Users.en.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\Pages\Privacy.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Privacy.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Authoring\History.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Authoring\History.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Learn\Index.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Learn\Index.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Delete.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\FullScreen.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\FullScreen.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Delete.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\History.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\History.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Upload.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Upload.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Index.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Media\Index.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Shared\CookieConsentPartial.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Shared\CookieConsentPartial.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Tags\Authoring.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Tags\Authoring.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Tags\Index.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Tags\Index.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Admin\Users.fr.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Pages\Admin\Users.en.resx">
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+	</ItemGroup>
 
 
 

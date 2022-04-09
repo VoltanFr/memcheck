@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,7 @@ namespace MemCheck.Application.Notifying
             }
 
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request & Result
         public sealed class Request : IRequest

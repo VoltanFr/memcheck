@@ -18,9 +18,9 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         #endregion
-        public UsersToNotifyGetter(CallContext callContext, List<string>? performanceIndicators = null)
+        public UsersToNotifyGetter(CallContext callContext, ICollection<string>? performanceIndicators = null)
         {
             this.callContext = callContext;
             this.performanceIndicators = performanceIndicators ?? new List<string>();
@@ -34,7 +34,7 @@ namespace MemCheck.Application.Notifying
             //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
             var result = userList.ToImmutableArray();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
-            callContext.TelemetryClient.TrackEvent("UsersToNotifyGetter", ("ResultCount", result.Length.ToString()));
+            callContext.TelemetryClient.TrackEvent("UsersToNotifyGetter", ClassWithMetrics.IntMetric("ResultCount", result.Length));
             return result;
         }
     }

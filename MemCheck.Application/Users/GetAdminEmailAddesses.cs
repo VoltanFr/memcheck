@@ -17,7 +17,7 @@ namespace MemCheck.Application.Users
             var users = await DbContext.Users.AsNoTracking().ToListAsync();
             var admins = users.Where(u => RoleChecker.UserIsAdminAsync(u).Result).Select(u => new ResultUserModel(u.UserName, u.Email));
             var result = new ResultModel(admins);
-            return new ResultWithMetrologyProperties<ResultModel>(result, ("LoggedUser", request.UserId.ToString()), ("ResultCount", result.Users.Count().ToString()));
+            return new ResultWithMetrologyProperties<ResultModel>(result, ("LoggedUser", request.UserId.ToString()), IntMetric("ResultCount", result.Users.Count()));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest
@@ -42,4 +42,3 @@ namespace MemCheck.Application.Users
         #endregion
     }
 }
-

@@ -10,5 +10,8 @@ namespace MemCheck.Application.QueryValidation
         public RequestInputException(string message, Exception innerException) : base(message, innerException)
         {
         }
+        public RequestInputException()
+        {
+        }
     }
 }

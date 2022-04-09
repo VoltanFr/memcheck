@@ -41,7 +41,7 @@ namespace MemCheck.Application.Heaping
                 }
 
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardCount", request.CardIds.Count().ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), IntMetric("TargetHeap", request.TargetHeap), IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request & result
         public sealed record Request(Guid UserId, Guid DeckId, int TargetHeap, IEnumerable<Guid> CardIds) : IRequest

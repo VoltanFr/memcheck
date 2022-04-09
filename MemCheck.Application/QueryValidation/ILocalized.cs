@@ -2,6 +2,6 @@
 {
     public interface ILocalized
     {
-        public string Get(string resourceName);
+        string GetLocalized(string resourceName);
     }
 }

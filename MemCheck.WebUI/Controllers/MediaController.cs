@@ -49,7 +49,7 @@ namespace MemCheck.WebUI.Controllers
             var fileContent = reader.ReadBytes((int)request.File.Length);
             var applicationRequest = new StoreImage.Request(userId, request.Name.Trim(), request.Description.Trim(), request.Source.Trim(), request.File.ContentType, fileContent);
             await new StoreImage(callContext).RunAsync(applicationRequest);
-            return ControllerResultWithToast.Success($"{Get("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
+            return ControllerResultWithToast.Success($"{GetLocalized("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
         }
         public sealed class UploadImageRequest
         {
@@ -102,7 +102,7 @@ namespace MemCheck.WebUI.Controllers
                 BigSize = img.BigSize;
                 InitialUploadUtcDate = img.InitialUploadUtcDate;
                 LastChangeUtcDate = img.LastChangeUtcDate;
-                RemoveAlertMessage = $"{localizer.Get("SureYouWantToDeletePart1")} '{ImageName}' ? {localizer.Get("SureYouWantToDeletePart2")} {UploaderUserName} {localizer.Get("SureYouWantToDeletePart3")} ";
+                RemoveAlertMessage = $"{localizer.GetLocalized("SureYouWantToDeletePart1")} '{ImageName}' ? {localizer.GetLocalized("SureYouWantToDeletePart2")} {UploaderUserName} {localizer.GetLocalized("SureYouWantToDeletePart3")} ";
                 CurrentVersionDescription = img.CurrentVersionDescription;
             }
             public Guid ImageId { get; }
@@ -151,7 +151,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName, request.Source, request.Description, request.VersionDescription);
             await new UpdateImageMetadata(callContext).RunAsync(applicationRequest);
-            var toastText = $"{Get("SuccessfullyUpdatedImage")} '{request.ImageName}'";
+            var toastText = $"{GetLocalized("SuccessfullyUpdatedImage")} '{request.ImageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
         public sealed class UpdateRequestModel
@@ -166,7 +166,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetStaticText")]
         public IActionResult GetStaticText()
         {
-            return Ok(new { copyToClipboardToastTitleOnSuccess = Get("CopyToClipboardToastTitleOnSuccess"), copyToClipboardToastTitleOnFailure = Get("CopyToClipboardToastTitleOnFailure") });
+            return Ok(new { copyToClipboardToastTitleOnSuccess = GetLocalized("CopyToClipboardToastTitleOnSuccess"), copyToClipboardToastTitleOnFailure = GetLocalized("CopyToClipboardToastTitleOnFailure") });
         }
         #endregion
         #region Delete
@@ -177,7 +177,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var applicationRequest = new DeleteImage.Request(userId, imageId, request.DeletionDescription);
             var imageName = await new DeleteImage(callContext).RunAsync(applicationRequest);
-            var toastText = $"{Get("SuccessfullyDeletedImage")} '{imageName}'";
+            var toastText = $"{GetLocalized("SuccessfullyDeletedImage")} '{imageName}'";
             return ControllerResultWithToast.Success(toastText, this);
         }
         public sealed class DeleteRequest
@@ -210,7 +210,7 @@ namespace MemCheck.WebUI.Controllers
                 Description = appResult.Description;
                 Source = appResult.Source;
                 InitialUploadUtcDate = appResult.InitialUploadUtcDate;
-                DeletionAlertMessage = localizer.Get("AreYouSure");
+                DeletionAlertMessage = localizer.GetLocalized("AreYouSure");
                 LastChangeUtcDate = appResult.LastChangeUtcDate;
                 CurrentVersionDescription = appResult.CurrentVersionDescription;
             }
@@ -240,7 +240,7 @@ namespace MemCheck.WebUI.Controllers
                 VersionUtcDate = appResult.VersionUtcDate;
                 Author = appResult.Author;
                 VersionDescription = appResult.VersionDescription;
-                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.Get(fieldName));
+                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.GetLocalized(fieldName));
                 ChangedFieldList = string.Join(',', fieldsDisplayNames);
             }
             public DateTime VersionUtcDate { get; }
@@ -256,31 +256,31 @@ namespace MemCheck.WebUI.Controllers
             return Ok(new
             {
                 //Labels for fields
-                name = Get("BigSizeImageLabel_Name"),
-                description = Get("BigSizeImageLabel_Description"),
-                source = Get("BigSizeImageLabel_Source"),
-                initialVersionCreatedOn = Get("BigSizeImageLabel_InitialVersionCreatedOn"),
-                initialVersionCreatedBy = Get("BigSizeImageLabel_InitialVersionCreatedBy"),
-                currentVersionCreatedOn = Get("BigSizeImageLabel_CurrentVersionCreatedOn"),
-                currentVersionDescription = Get("BigSizeImageLabel_CurrentVersionDescription"),
-                numberOfCards = Get("BigSizeImageLabel_NumberOfCards"),
-                originalImageContentType = Get("BigSizeImageLabel_originalImageContentType"),
-                originalImageSize = Get("BigSizeImageLabel_OriginalImageSize"),
-                smallSize = Get("BigSizeImageLabel_SmallSize"),
-                mediumSize = Get("BigSizeImageLabel_MediumSize"),
-                bigSize = Get("BigSizeImageLabel_BigSize"),
+                name = GetLocalized("BigSizeImageLabel_Name"),
+                description = GetLocalized("BigSizeImageLabel_Description"),
+                source = GetLocalized("BigSizeImageLabel_Source"),
+                initialVersionCreatedOn = GetLocalized("BigSizeImageLabel_InitialVersionCreatedOn"),
+                initialVersionCreatedBy = GetLocalized("BigSizeImageLabel_InitialVersionCreatedBy"),
+                currentVersionCreatedOn = GetLocalized("BigSizeImageLabel_CurrentVersionCreatedOn"),
+                currentVersionDescription = GetLocalized("BigSizeImageLabel_CurrentVersionDescription"),
+                numberOfCards = GetLocalized("BigSizeImageLabel_NumberOfCards"),
+                originalImageContentType = GetLocalized("BigSizeImageLabel_originalImageContentType"),
+                originalImageSize = GetLocalized("BigSizeImageLabel_OriginalImageSize"),
+                smallSize = GetLocalized("BigSizeImageLabel_SmallSize"),
+                mediumSize = GetLocalized("BigSizeImageLabel_MediumSize"),
+                bigSize = GetLocalized("BigSizeImageLabel_BigSize"),
 
                 //Labels for Buttons
-                removeButtonTitle = Get("BigSizeImageLabel_Remove"),
-                copyToClipboardButtonTitle = Get("BigSizeImageLabel_CopyToClipboard"),
-                closeButtonTitle = Get("BigSizeImageLabel_CloseButtonTitle"),
-                editButtonTitle = Get("BigSizeImageLabel_EditButtonTitle"),
-                versionHistoryButtonTitle = Get("BigSizeImageLabel_VersionHistoryButtonTitle"),
+                removeButtonTitle = GetLocalized("BigSizeImageLabel_Remove"),
+                copyToClipboardButtonTitle = GetLocalized("BigSizeImageLabel_CopyToClipboard"),
+                closeButtonTitle = GetLocalized("BigSizeImageLabel_CloseButtonTitle"),
+                editButtonTitle = GetLocalized("BigSizeImageLabel_EditButtonTitle"),
+                versionHistoryButtonTitle = GetLocalized("BigSizeImageLabel_VersionHistoryButtonTitle"),
 
                 //Labels for Messages
-                copiedToClipboardToastTitleOnSuccess = Get("BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"),
-                copiedToClipboardToastTitleOnFailure = Get("BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure"),
-                downloadBiggestSize = Get("BigSizeImageLabel_DownloadBiggestSize"),
+                copiedToClipboardToastTitleOnSuccess = GetLocalized("BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"),
+                copiedToClipboardToastTitleOnFailure = GetLocalized("BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure"),
+                downloadBiggestSize = GetLocalized("BigSizeImageLabel_DownloadBiggestSize"),
             });
         }
         #endregion

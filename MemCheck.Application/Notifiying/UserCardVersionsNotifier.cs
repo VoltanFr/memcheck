@@ -17,7 +17,7 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
         #region Private methods
@@ -30,7 +30,7 @@ namespace MemCheck.Application.Notifying
             return resultVersion?.Id;
         }
         #endregion
-        public UserCardVersionsNotifier(CallContext callContext, List<string> performanceIndicators)
+        public UserCardVersionsNotifier(CallContext callContext, ICollection<string> performanceIndicators)
         {
             //Prod constructor
             this.callContext = callContext;
@@ -74,7 +74,7 @@ namespace MemCheck.Application.Notifying
                 cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;
             await callContext.DbContext.SaveChangesAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to update user's registered cards last notif date");
-            callContext.TelemetryClient.TrackEvent("UserCardVersionsNotifier", ("ResultCount", result.Length.ToString()));
+            callContext.TelemetryClient.TrackEvent("UserCardVersionsNotifier", ClassWithMetrics.IntMetric("ResultCount", result.Length));
             return result;
         }
     }

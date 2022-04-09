@@ -1,12 +1,29 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
+using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application
 {
-    public abstract class RequestRunner<TRequest, TResult> where TRequest : IRequest
+    public abstract class ClassWithMetrics
+    {
+        public static (string key, string value) IntMetric(string key, int value)
+        {
+            return (key, value.ToString(CultureInfo.InvariantCulture));
+        }
+        protected static (string key, string value) DoubleMetric(string key, double value)
+        {
+            return (key, value.ToString(CultureInfo.InvariantCulture));
+        }
+        protected static (string key, string value) DurationMetric(string key, TimeSpan value)
+        {
+            return (key, value.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
+        }
+    }
+    public abstract class RequestRunner<TRequest, TResult> : ClassWithMetrics where TRequest : IRequest
     {
         #region Fields
         private readonly CallContext callContext;
@@ -27,8 +44,8 @@ namespace MemCheck.Application
             runChrono.Stop();
 
             var metrologyProperties = result.Properties.ToList();
-            metrologyProperties.Add(("CheckValidityDuration", checkValidityChrono.ElapsedMilliseconds.ToString()));
-            metrologyProperties.Add(("RunDuration", runChrono.ElapsedMilliseconds.ToString()));
+            metrologyProperties.Add(DurationMetric("CheckValidityDuration", checkValidityChrono.Elapsed));
+            metrologyProperties.Add(DurationMetric("RunDuration", runChrono.Elapsed));
 
             callContext.TelemetryClient.TrackEvent(GetType().Name, metrologyProperties.ToArray());
 

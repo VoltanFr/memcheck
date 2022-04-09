@@ -15,7 +15,7 @@ namespace MemCheck.Application.Tags
             Tag tag = new() { Name = request.Name, Description = request.Description };
             DbContext.Tags.Add(tag);
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(tag.Id), ("NameLength", request.Name.Length.ToString()), ("DescriptionLength", request.Description.Length.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(tag.Id), IntMetric("NameLength", request.Name.Length), IntMetric("DescriptionLength", request.Description.Length));
         }
         #region Request & Result
         public sealed record Request(Guid UserId, string Name, string Description) : IRequest

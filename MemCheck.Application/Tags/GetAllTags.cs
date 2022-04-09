@@ -34,12 +34,12 @@ namespace MemCheck.Application.Tags
             await Task.CompletedTask;
 
             return new ResultWithMetrologyProperties<Result>(result,
-                ("PageSize", request.PageSize.ToString()),
-                ("PageNo", request.PageNo.ToString()),
-                ("FilterLength", request.Filter.Length.ToString()),
-                ("TotalCount", result.TotalCount.ToString()),
-                ("PageCount", result.PageCount.ToString()),
-                ("TagCount", result.Tags.Count().ToString()));
+                IntMetric("PageSize", request.PageSize),
+                IntMetric("PageNo", request.PageNo),
+                IntMetric("FilterLength", request.Filter.Length),
+                IntMetric("TotalCount", result.TotalCount),
+                IntMetric("PageCount", result.PageCount),
+                IntMetric("TagCount", result.Tags.Count()));
         }
         #region Request & Result
         public sealed record Request(int PageSize, int PageNo, string Filter) : IRequest

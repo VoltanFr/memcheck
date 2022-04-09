@@ -29,12 +29,12 @@ namespace MemCheck.Application.Users
             var result = new ResultModel(totalCount, pageCount, resultUsers);
             return new ResultWithMetrologyProperties<ResultModel>(result,
                 ("LoggedUser", request.UserId.ToString()),
-                ("PageSize", request.PageSize.ToString()),
-                ("PageNo", request.PageNo.ToString()),
-                ("FilterLength", request.Filter.Length.ToString()),
-                ("TotalCount", result.TotalCount.ToString()),
-                ("PageCount", result.PageCount.ToString()),
-                ("ResultCount", result.Users.Count().ToString()));
+                IntMetric("PageSize", request.PageSize),
+                IntMetric("PageNo", request.PageNo),
+                IntMetric("FilterLength", request.Filter.Length),
+                IntMetric("TotalCount", result.TotalCount),
+                IntMetric("PageCount", result.PageCount),
+                IntMetric("ResultCount", result.Users.Count()));
         }
         #region Request & Result
         public sealed record Request(Guid UserId, int PageSize, int PageNo, string Filter) : IRequest

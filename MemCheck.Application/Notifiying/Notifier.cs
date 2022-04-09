@@ -17,7 +17,7 @@ namespace MemCheck.Application.Notifying
         private readonly IUsersToNotifyGetter usersToNotifyGetter;
         private readonly IUserLastNotifDateUpdater userLastNotifDateUpdater;
         private readonly IUserSearchNotifier userSearchNotifier;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         private readonly DateTime? runDate;
         public const int MaxLengthForTextFields = 150;
         public const int MaxCardsToReportPerSearch = 100;
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Notifying
                 );
         }
         #endregion
-        public Notifier(CallContext callContext, List<string> performanceIndicators)
+        public Notifier(CallContext callContext, ICollection<string> performanceIndicators)
             : this(
                   callContext,
                   new UserCardSubscriptionCounter(callContext, performanceIndicators),
@@ -59,7 +59,7 @@ namespace MemCheck.Application.Notifying
                   performanceIndicators)
         {
         }
-        internal Notifier(CallContext callContext, IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, List<string> performanceIndicators, DateTime? runDate = null)
+        internal Notifier(CallContext callContext, IUserCardSubscriptionCounter userCardSubscriptionCounter, IUserCardVersionsNotifier userCardVersionsNotifier, IUserCardDeletionsNotifier userCardDeletionsNotifier, IUsersToNotifyGetter usersToNotifyGetter, IUserLastNotifDateUpdater userLastNotifDateUpdater, IUserSearchSubscriptionLister userSearchSubscriptionLister, IUserSearchNotifier userSearchNotifier, ICollection<string> performanceIndicators, DateTime? runDate = null)
              : base(callContext)
         {
             this.userCardSubscriptionCounter = userCardSubscriptionCounter;
@@ -82,7 +82,7 @@ namespace MemCheck.Application.Notifying
                 userNotifications.Add(await GetUserNotificationsAsync(user));
             performanceIndicators.Add($"Total Notifier execution time: {chrono.Elapsed}");
             var result = userNotifications.ToImmutableArray();
-            return new ResultWithMetrologyProperties<NotifierResult>(new NotifierResult(result), ("ResultCount", result.Length.ToString()));
+            return new ResultWithMetrologyProperties<NotifierResult>(new NotifierResult(result), IntMetric("ResultCount", result.Length));
         }
         #region Request & Result
         public sealed record Request() : IRequest

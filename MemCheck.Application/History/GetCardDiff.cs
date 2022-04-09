@@ -113,15 +113,15 @@ namespace MemCheck.Application.History
             public string CurrentVersionDescription { get; }
             public string OriginalVersionDescription { get; }
             public (string currentLanguage, string originalLanguage)? Language { get; init; }
-            public (string currentFrontSide, string originalFrontSide)? FrontSide;
-            public (string currentBackSide, string originalBackSide)? BackSide;
-            public (string currentAdditionalInfo, string originalAdditionalInfo)? AdditionalInfo;
-            public (string currentReferences, string originalReferences)? References;
-            public (string currentTags, string originalTags)? Tags;
-            public (string currentUsersWithView, string originalUsersWithView)? UsersWithView;
-            public (string currentImagesOnFrontSide, string originalImagesOnFrontSide)? ImagesOnFrontSide;
-            public (string currentImagesOnBackSide, string originalImagesOnBackSide)? ImagesOnBackSide;
-            public (string currentImagesOnAdditionalSide, string originalImagesOnAdditionalSide)? ImagesOnAdditionalSide;
+            public (string currentFrontSide, string originalFrontSide)? FrontSide { get; set; }
+            public (string currentBackSide, string originalBackSide)? BackSide { get; set; }
+            public (string currentAdditionalInfo, string originalAdditionalInfo)? AdditionalInfo { get; set; }
+            public (string currentReferences, string originalReferences)? References { get; set; }
+            public (string currentTags, string originalTags)? Tags { get; set; }
+            public (string currentUsersWithView, string originalUsersWithView)? UsersWithView { get; set; }
+            public (string currentImagesOnFrontSide, string originalImagesOnFrontSide)? ImagesOnFrontSide { get; set; }
+            public (string currentImagesOnBackSide, string originalImagesOnBackSide)? ImagesOnBackSide { get; set; }
+            public (string currentImagesOnAdditionalSide, string originalImagesOnAdditionalSide)? ImagesOnAdditionalSide { get; set; }
         }
         #endregion
     }

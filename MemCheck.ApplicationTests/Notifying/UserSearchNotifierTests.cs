@@ -28,12 +28,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -55,12 +55,12 @@ namespace MemCheck.Application.Tests.Notifying
 
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
 
                 var foundCard = searchResult.NewlyFoundCards.Single();
                 Assert.AreEqual(card.Id, foundCard.CardId);
@@ -100,12 +100,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -128,12 +128,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, new DateTime(2050, 05, 01)).RunAsync(subscription.Id);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -150,14 +150,14 @@ namespace MemCheck.Application.Tests.Notifying
 
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(1, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
 
-                Assert.AreEqual(card1.Id, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Single().CardId);
+                Assert.AreEqual(card1.Id, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Single().CardId);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -183,12 +183,12 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(subscriptionName, searchResult.SubscriptionName);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -206,12 +206,12 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(subscriptionName, searchResult.SubscriptionName);
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
 
                 Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.Single().CardId);
             }
@@ -246,12 +246,12 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.Single().CardId);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -268,12 +268,12 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(card1.Id, searchResult.NewlyFoundCards.Single().CardId);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -309,12 +309,12 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(1, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(card2.Id, searchResult.NewlyFoundCards.Single().CardId);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -336,13 +336,13 @@ namespace MemCheck.Application.Tests.Notifying
                 Assert.AreEqual(2, searchResult.NewlyFoundCards.Length);
                 Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c.CardId == card1.Id));
                 Assert.IsTrue(searchResult.NewlyFoundCards.Any(c => c.CardId == card3.Id));
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(1, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(card2.Id, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Single().CardId);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(card2.Id, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Single().CardId);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -373,12 +373,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 2, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
                 Assert.AreEqual(SearchCards.Request.MaxPageSize * 2 + 1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(2, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             var deletionDate = new DateTime(2050, 05, 02);
@@ -396,18 +396,18 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 2, runDate).RunAsync(subscriptionId);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(1, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                var deletedCard = searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Single();
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                var deletedCard = searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Single();
                 Assert.IsNotNull(deletedCard.FrontSide);
                 Assert.AreEqual(card.FrontSide, deletedCard.FrontSide!);
                 Assert.AreEqual(userName, deletedCard.DeletionAuthor);
                 Assert.IsTrue(deletedCard.CardIsViewable);
                 Assert.AreEqual(deletionDate, deletedCard.DeletionUtcDate);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -443,13 +443,13 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(1, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(card.Id, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Single().CardId);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(card.Id, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Single().CardId);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -487,12 +487,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -531,16 +531,16 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(1, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                var deletedCard = searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Single();
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                var deletedCard = searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Single();
                 Assert.IsTrue(deletedCard.CardIsViewable);
                 Assert.AreEqual(card.FrontSide, deletedCard.FrontSide);
                 Assert.AreEqual(cardCreatorUserName, deletedCard.DeletionAuthor);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -576,12 +576,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, new DateTime(2050, 05, 03)).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             //Create a previous version which prevents subscriber from seing the card
@@ -606,12 +606,12 @@ namespace MemCheck.Application.Tests.Notifying
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 100, runDate).RunAsync(subscription.Id);
                 Assert.AreEqual(0, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(0, searchResult.NewlyFoundCards.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView);
-                Assert.AreEqual(0, searchResult.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length);
-                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView);
-                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView);
+                Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
+                Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
+                Assert.AreEqual(1, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
             }
 
             using (var dbContext = new MemCheckDbContext(db))

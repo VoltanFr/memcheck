@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,12 +46,12 @@ namespace MemCheck.Application.Images
                             )
                         );
             return new ResultWithMetrologyProperties<Result>(result,
-            ("PageSize", request.PageSize.ToString()),
-                ("PageNo", request.PageNo.ToString()),
+                IntMetric("PageSize", request.PageSize),
+                IntMetric("PageNo", request.PageNo),
                 ("Filter", request.Filter),
-                ("ResultTotalCount", result.TotalCount.ToString()),
-                ("ResultPageCount", result.PageCount.ToString()),
-                ("ResultImageCount", result.Images.Count().ToString()));
+                IntMetric("ResultTotalCount", result.TotalCount),
+                IntMetric("ResultPageCount", result.PageCount),
+                IntMetric("ResultImageCount", result.Images.Count()));
         }
         #region Request & Result types
         public sealed record Request(int PageSize, int PageNo, string Filter) : IRequest

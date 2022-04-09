@@ -94,7 +94,7 @@ namespace MemCheck.Application.QueryValidation
         public static async Task CheckUserDoesNotHaveDeckWithNameAsync(MemCheckDbContext dbContext, Guid userId, string name, ILocalized localizer)
         {
             if (await dbContext.Decks.AsNoTracking().Where(deck => (deck.Owner.Id == userId) && EF.Functions.Like(deck.Description, name)).AnyAsync())
-                throw new RequestInputException($"{localizer.Get("ADeckWithName")} '{name}' {localizer.Get("AlreadyExists")}");
+                throw new RequestInputException($"{localizer.GetLocalized("ADeckWithName")} '{name}' {localizer.GetLocalized("AlreadyExists")}");
         }
         public static async Task CheckTagExistsAsync(Guid tagId, MemCheckDbContext dbContext)
         {
@@ -108,12 +108,12 @@ namespace MemCheck.Application.QueryValidation
             if (description != description.Trim())
                 throw new InvalidOperationException("Invalid Description: not trimmed");
             if (name.Length < Tag.MinNameLength || name.Length > Tag.MaxNameLength)
-                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.Get("And") + $" {Tag.MaxNameLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.GetLocalized("And") + $" {Tag.MaxNameLength}");
             if (description.Length > Tag.MaxDescriptionLength)
-                throw new RequestInputException(localizer.Get("InvalidDescriptionLength") + $" {name.Length}, " + localizer.Get("MustBeNoMoreThan") + $" {Tag.MaxDescriptionLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeNoMoreThan") + $" {Tag.MaxDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInTags)
-                if (name.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
             if (updatingId != null)
             {
                 var current = await dbContext.Tags.AsNoTracking().SingleAsync(tag => tag.Id == updatingId.Value);
@@ -121,18 +121,18 @@ namespace MemCheck.Application.QueryValidation
                 if (current.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
                     if (current.Description == description)
-                        throw new RequestInputException(localizer.Get("NoDifference"));
+                        throw new RequestInputException(localizer.GetLocalized("NoDifference"));
                 }
                 else
                 {
                     if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
-                        throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+                        throw new RequestInputException(localizer.GetLocalized("ATagWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
                 }
             }
             else
             {
                 if (await dbContext.Tags.AsNoTracking().Where(tag => EF.Functions.Like(tag.Name, name)).AnyAsync())
-                    throw new RequestInputException(localizer.Get("ATagWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+                    throw new RequestInputException(localizer.GetLocalized("ATagWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
             }
         }
         public static async Task CheckCanCreateLanguageWithName(string name, MemCheckDbContext dbContext, ILocalized localizer)
@@ -140,12 +140,12 @@ namespace MemCheck.Application.QueryValidation
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
             if (name.Length < LanguageMinNameLength || name.Length > LanguageMaxNameLength)
-                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {LanguageMinNameLength} " + localizer.Get("And") + $" {LanguageMaxNameLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {LanguageMinNameLength} " + localizer.GetLocalized("And") + $" {LanguageMaxNameLength}");
             foreach (var forbiddenChar in ForbiddenCharsInLanguages)
-                if (name.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidLanguageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidLanguageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
             if (await dbContext.CardLanguages.AsNoTracking().Where(language => EF.Functions.Like(language.Name, name)).AnyAsync())
-                throw new RequestInputException(localizer.Get("ALanguageWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+                throw new RequestInputException(localizer.GetLocalized("ALanguageWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
         }
         public static async Task CheckCanCreateDeckAsync(Guid userId, string deckName, int heapingAlgorithmId, MemCheckDbContext dbContext, ILocalized localizer)
         {
@@ -153,7 +153,7 @@ namespace MemCheck.Application.QueryValidation
                 throw new InvalidOperationException("Invalid Name: not trimmed");
 
             if (deckName.Length < DeckMinNameLength || deckName.Length > DeckMaxNameLength)
-                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {deckName.Length}" + localizer.Get("MustBeBetween") + $" {DeckMinNameLength} " + localizer.Get("And") + $" {DeckMaxNameLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {deckName.Length}" + localizer.GetLocalized("MustBeBetween") + $" {DeckMinNameLength} " + localizer.GetLocalized("And") + $" {DeckMaxNameLength}");
 
             if (!HeapingAlgorithms.Instance.Ids.Contains(heapingAlgorithmId))
                 throw new InvalidOperationException($"Invalid heaping algorithm: {heapingAlgorithmId}");
@@ -166,42 +166,42 @@ namespace MemCheck.Application.QueryValidation
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
             if (name.Length < ImageMinNameLength || name.Length > ImageMaxNameLength)
-                throw new RequestInputException(localizer.Get("InvalidNameLength") + $" {name.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinNameLength} " + localizer.Get("And") + $" {ImageMaxNameLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinNameLength} " + localizer.GetLocalized("And") + $" {ImageMaxNameLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageNames)
-                if (name.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidImageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
             if (await dbContext.Images.AsNoTracking().Where(img => EF.Functions.Like(img.Name, name)).AnyAsync())
-                throw new RequestInputException(localizer.Get("AnImageWithName") + " '" + name + "' " + localizer.Get("AlreadyExistsCaseInsensitive"));
+                throw new RequestInputException(localizer.GetLocalized("AnImageWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
         }
         public static void CheckCanCreateImageWithSource(string source, ILocalized localizer)
         {
             if (source != source.Trim())
                 throw new InvalidOperationException("Invalid source: not trimmed");
             if (source.Length < ImageMinSourceLength || source.Length > ImageMaxSourceLength)
-                throw new RequestInputException(localizer.Get("InvalidSourceLength") + $" {source.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinSourceLength} " + localizer.Get("And") + $" {ImageMaxSourceLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidSourceLength") + $" {source.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinSourceLength} " + localizer.GetLocalized("And") + $" {ImageMaxSourceLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageSource)
-                if (source.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidImageSource") + " '" + source + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (source.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidImageSource") + " '" + source + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
         }
         public static void CheckCanCreateImageWithDescription(string description, ILocalized localizer)
         {
             if (description != description.Trim())
                 throw new InvalidOperationException("Invalid description: not trimmed");
             if (description.Length < ImageMinDescriptionLength || description.Length > ImageMaxDescriptionLength)
-                throw new RequestInputException(localizer.Get("InvalidDescriptionLength") + $" {description.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.Get("And") + $" {ImageMaxDescriptionLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {description.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageDescription)
-                if (description.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidImageDescription") + " '" + description + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (description.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidImageDescription") + " '" + description + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
         }
         public static void CheckCanCreateImageWithVersionDescription(string versionDescription, ILocalized localizer)
         {
             if (versionDescription != versionDescription.Trim())
                 throw new InvalidOperationException("Invalid version description: not trimmed");
             if (versionDescription.Length < ImageMinVersionDescriptionLength || versionDescription.Length > ImageMaxVersionDescriptionLength)
-                throw new RequestInputException(localizer.Get("InvalidVersionDescriptionLength") + $" {versionDescription.Length}, " + localizer.Get("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.Get("And") + $" {ImageMaxVersionDescriptionLength}");
+                throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {versionDescription.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxVersionDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageVersionDescription)
-                if (versionDescription.Contains(forbiddenChar))
-                    throw new RequestInputException(localizer.Get("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.Get("IsForbidden") + ")");
+                if (versionDescription.Contains(forbiddenChar, StringComparison.Ordinal))
+                    throw new RequestInputException(localizer.GetLocalized("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
         }
     }
 }

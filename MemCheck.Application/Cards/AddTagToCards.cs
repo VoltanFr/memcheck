@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,7 +20,7 @@ namespace MemCheck.Application.Cards
             foreach (var cardId in request.CardIds)
                 if (!DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, Localized.Get("AddTag") + $" '{tagName}'");
+                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, Localized.GetLocalized("AddTag") + $" '{tagName}'");
                     card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
                     DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }
@@ -30,7 +29,7 @@ namespace MemCheck.Application.Cards
             return new ResultWithMetrologyProperties<Result>(new Result(),
                 ("TagId", request.TagId.ToString()),
                 ("TagName", tagName),
-                ("CardCount", request.CardIds.Count().ToString()));
+           IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request class
         public sealed class Request : IRequest
@@ -53,7 +52,7 @@ namespace MemCheck.Application.Cards
                 if (QueryValidationHelper.IsReservedGuid(TagId))
                     throw new RequestInputException("Reserved tag id");
                 foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, VersionCreator.Id, cardId);
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, VersionCreator.Id, cardId);
                 if (!await callContext.DbContext.Tags.Where(tag => tag.Id == TagId).AnyAsync())
                     throw new RequestInputException("Invalid tag id");
             }

@@ -65,7 +65,7 @@ namespace MemCheck.Application.Decks
             var now = runDate == null ? DateTime.UtcNow : runDate;
             var decks = await DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
             var result = decks.Select(deck => GetDeck(DbContext, deck.Id, deck.Description, now.Value));
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count().ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("DeckCount", result.Count()));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest

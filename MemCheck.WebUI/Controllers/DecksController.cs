@@ -27,11 +27,11 @@ namespace MemCheck.WebUI.Controllers
         #region Private methods
         private string HeapingAlgoNameFromId(int id)
         {
-            return Get("HeapingAlgoNameForId" + id);
+            return GetLocalized("HeapingAlgoNameForId" + id);
         }
         private string HeapingAlgoDescriptionFromId(int id)
         {
-            return Get("HeapingAlgoDescriptionForId" + id);
+            return GetLocalized("HeapingAlgoDescriptionForId" + id);
         }
         #endregion
         public DecksController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<DecksController> localizer, TelemetryClient telemetryClient) : base(localizer)
@@ -71,7 +71,7 @@ namespace MemCheck.WebUI.Controllers
             var query = new RemoveCardFromDeck.Request(currentUserId, deckId, cardId);
             var applicationResult = await new RemoveCardFromDeck(callContext).RunAsync(query);
             var frontSide = $" '{applicationResult.FrontSideText.Truncate(30)}'";
-            var mesgBody = Get("CardWithFrontSideHead") + frontSide + ' ' + Get("RemovedFromDeck") + ' ' + applicationResult.DeckName;
+            var mesgBody = GetLocalized("CardWithFrontSideHead") + frontSide + ' ' + GetLocalized("RemovedFromDeck") + ' ' + applicationResult.DeckName;
             return ControllerResultWithToast.Success(mesgBody, this);
         }
         #endregion
@@ -193,7 +193,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var decks = await new GetUserDecks(callContext).RunAsync(new GetUserDecks.Request(userId));
             var result = decks.Select(deck => new GetUserDecksForDeletionViewModel(deck.DeckId, deck.Description, deck.CardCount,
-                Get("SureYouWantToDelete") + " " + deck.Description + " " + Get("AndLose") + " " + deck.CardCount + " " + Get("CardLearningInfo") + " " + Get("NoUndo")));
+                GetLocalized("SureYouWantToDelete") + " " + deck.Description + " " + GetLocalized("AndLose") + " " + deck.CardCount + " " + GetLocalized("CardLearningInfo") + " " + GetLocalized("NoUndo")));
             return base.Ok(result);
         }
         public sealed class GetUserDecksForDeletionViewModel

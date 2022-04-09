@@ -17,9 +17,9 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         #endregion
-        public UserSearchSubscriptionLister(CallContext callContext, List<string>? performanceIndicators = null)
+        public UserSearchSubscriptionLister(CallContext callContext, ICollection<string>? performanceIndicators = null)
         {
             this.callContext = callContext;
             this.performanceIndicators = performanceIndicators ?? new List<string>();
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Notifying
             var chrono = Stopwatch.StartNew();
             var result = (await callContext.DbContext.SearchSubscriptions.Where(notif => notif.UserId == userId).ToListAsync()).ToImmutableArray();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's search subscriptions");
-            callContext.TelemetryClient.TrackEvent("UserSearchSubscriptionLister", ("ResultCount", result.Length.ToString()));
+            callContext.TelemetryClient.TrackEvent("UserSearchSubscriptionLister", ClassWithMetrics.IntMetric("ResultCount", result.Length));
             return result;
         }
     }

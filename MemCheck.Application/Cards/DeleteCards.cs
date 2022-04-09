@@ -3,6 +3,7 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,15 +23,15 @@ namespace MemCheck.Application.Cards
             foreach (var cardId in request.CardIds)
             {
                 var previousVersionCreator = new PreviousVersionCreator(DbContext);
-                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.Get("Deletion"), deletionUtcDate);
+                var card = await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.GetLocalized("Deletion"), deletionUtcDate);
                 await previousVersionCreator.RunForDeletionAsync(card, deletionUtcDate);
                 await DbContext.SaveChangesAsync();
 
-                var actualCard = await DbContext.Cards.SingleAsync(card=>card.Id==cardId);
+                var actualCard = await DbContext.Cards.SingleAsync(card => card.Id == cardId);
                 DbContext.Cards.Remove(actualCard);
                 await DbContext.SaveChangesAsync();
             }
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request & Result
         public sealed class Request : IRequest
@@ -41,7 +42,7 @@ namespace MemCheck.Application.Cards
                 var cardFrontSide = await dbContext.Cards.Where(card => card.Id == cardId).Select(card => card.FrontSide).SingleAsync();
                 if (cardFrontSide.Length < 100)
                     return $" '{cardFrontSide}'";
-                return $"{localizer.Get("StartingWith")} '{cardFrontSide.Substring(0, 100)}'";
+                return $"{localizer.GetLocalized("StartingWith")} '{cardFrontSide.Substring(0, 100)}'";
             }
             private async Task CheckUsersWithCardInADeckAsync(Guid cardId, MemCheckDbContext dbContext, ILocalized localizer)
             {
@@ -54,7 +55,7 @@ namespace MemCheck.Application.Cards
 
                 if (count > 0)
                 {
-                    var msg = count == 1 ? localizer.Get("OneUserHasCardWithFrontSide") : (count.ToString() + localizer.Get("UsersHaveCardWithFrontSide"));
+                    var msg = count == 1 ? localizer.GetLocalized("OneUserHasCardWithFrontSide") : (count.ToString(CultureInfo.InvariantCulture) + localizer.GetLocalized("UsersHaveCardWithFrontSide"));
                     msg += await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer);
                     throw new RequestInputException(msg);
                 }
@@ -70,7 +71,7 @@ namespace MemCheck.Application.Cards
                 if (currentVersionCreator.Id != UserId && currentVersionCreator.DeletionDate == null)
                     //You are not the creator of the current version of the card with front side
                     //Vous n'êtes pas l'auteur de la version actuelle de la carte avec avant
-                    throw new RequestInputException(localizer.Get("YouAreNotTheCreatorOfCurrentVersion") + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
+                    throw new RequestInputException(localizer.GetLocalized("YouAreNotTheCreatorOfCurrentVersion") + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
 
                 var anyPreviousVersionHasOtherCreator = await dbContext.CardPreviousVersions
                     .Include(version => version.VersionCreator)
@@ -80,7 +81,7 @@ namespace MemCheck.Application.Cards
                 if (anyPreviousVersionHasOtherCreator)
                     //You are not the creator of all the previous versions of the card with front side
                     //Vous n'êtes pas l'auteur de toutes les versions précédentes de la carte avec avant
-                    throw new RequestInputException(localizer.Get("YouAreNotTheCreatorOfAllPreviousVersions") + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
+                    throw new RequestInputException(localizer.GetLocalized("YouAreNotTheCreatorOfAllPreviousVersions") + await CardFrontSideInfoForExceptionMessageAsync(cardId, dbContext, localizer));
             }
             #endregion
             public Request(Guid userId, IEnumerable<Guid> cardIds)
@@ -95,7 +96,7 @@ namespace MemCheck.Application.Cards
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
-                CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, CardIds.ToArray());
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, CardIds);
                 foreach (var cardId in CardIds)
                 {
                     await CheckUsersWithCardInADeckAsync(cardId, callContext.DbContext, callContext.Localized);

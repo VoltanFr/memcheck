@@ -15,7 +15,7 @@ namespace MemCheck.Application.Tests.Helpers
             values = ImmutableDictionary.CreateRange(items ?? System.Array.Empty<KeyValuePair<string, string>>());
         }
         [DebuggerStepThrough]
-        public string Get(string resourceName)
+        public string GetLocalized(string resourceName)
         {
             return values.ContainsKey(resourceName) ? values[resourceName] : "";
         }

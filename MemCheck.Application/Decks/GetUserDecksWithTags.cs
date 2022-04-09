@@ -23,7 +23,7 @@ namespace MemCheck.Application.Decks
                 var resultTags = appTags.Select(tag => new ResultTag(tag.TagId, tag.TagName));
                 result.Add(new Result(userDeck.deckId, userDeck.deckDescription, resultTags));
             }
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("DeckCount", result.Count));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest

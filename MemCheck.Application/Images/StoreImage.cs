@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Svg;
@@ -11,7 +10,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images
@@ -56,7 +54,7 @@ namespace MemCheck.Application.Images
             }
             catch
             {
-                throw new RequestInputException(Localized.Get("SvgImageCanNotBeLoaded"));
+                throw new RequestInputException(Localized.GetLocalized("SvgImageCanNotBeLoaded"));
             }
         }
         private Bitmap GetBitmap(Stream sourceStream, string contentType)
@@ -77,24 +75,24 @@ namespace MemCheck.Application.Images
         {
             var owner = await DbContext.Users.SingleAsync(u => u.Id == request.Owner);
 
-            var image = new Domain.Image
-            {
+            var image = new Domain.Image {
                 Name = request.Name,
                 Description = request.Description,
                 Source = request.Source,
                 Owner = owner,
-                VersionDescription = Localized.Get("InitialImageVersionCreation"),
+                VersionDescription = Localized.GetLocalized("InitialImageVersionCreation"),
                 VersionType = ImageVersionType.Creation,
                 InitialUploadUtcDate = runDate ?? DateTime.UtcNow
             };
             image.LastChangeUtcDate = image.InitialUploadUtcDate;
 
             image.OriginalContentType = request.ContentType;
-            image.OriginalSize = request.Blob.Length;
-            image.OriginalBlob = request.Blob;
-            image.OriginalBlobSha1 = CryptoServices.GetSHA1(request.Blob);
+            var blob = request.Blob.ToArray();
+            image.OriginalSize = blob.Length;
+            image.OriginalBlob = blob;
+            image.OriginalBlobSha1 = CryptoServices.GetSHA1(blob);
 
-            using var sourceStream = new MemoryStream(request.Blob);
+            using var sourceStream = new MemoryStream(blob);
             using var originalImage = GetBitmap(sourceStream, request.ContentType);
             image.SmallBlob = ResizeImage(originalImage, 100);
             image.SmallBlobSize = image.SmallBlob.Length;
@@ -106,12 +104,11 @@ namespace MemCheck.Application.Images
             await DbContext.SaveChangesAsync();
 
             return new ResultWithMetrologyProperties<Result>(new Result(),
-            ("ImageName", request.Name.ToString()),
-                ("DescriptionLength", request.Description.Length.ToString()),
-                ("SourceFieldLength", request.Source.Length.ToString()),
+                ("ImageName", request.Name.ToString()),
+                IntMetric("DescriptionLength", request.Description.Length),
+                IntMetric("SourceFieldLength", request.Source.Length),
                 ("ContentType", request.ContentType),
-                ("ImageSize", image.OriginalSize.ToString())
-                );
+                IntMetric("ImageSize", image.OriginalSize));
         }
         #region Request class
         public sealed class Request : IRequest
@@ -127,27 +124,27 @@ namespace MemCheck.Application.Images
                 Source = source;
                 ContentType = contentType;
                 Owner = owner;
-                Blob = blob.ToArray();
+                Blob = blob;
             }
             public Guid Owner { get; }
             public string Name { get; }
             public string Description { get; }
             public string Source { get; }
             public string ContentType { get; }
-            public byte[] Blob { get; }
+            public IEnumerable<byte> Blob { get; }
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 //ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
-                    throw new InvalidOperationException(callContext.Localized.Get("InvalidImageContentType") + $" '{ContentType}'");
-                if (Blob.Length < minBlobLength || Blob.Length > maxBlobLength)
-                    throw new RequestInputException(callContext.Localized.Get("InvalidBlobLength") + $" {Blob.Length}" + callContext.Localized.Get("MustBeBetween") + $" {minBlobLength} " + callContext.Localized.Get("And") + $" {maxBlobLength}");
+                    throw new InvalidOperationException(callContext.Localized.GetLocalized("InvalidImageContentType") + $" '{ContentType}'");
+                if (Blob.Count() < minBlobLength || Blob.Count() > maxBlobLength)
+                    throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBlobLength") + $" {Blob.Count()}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minBlobLength} " + callContext.Localized.GetLocalized("And") + $" {maxBlobLength}");
 
                 await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);
                 QueryValidationHelper.CheckCanCreateImageWithDescription(Description, callContext.Localized);
                 QueryValidationHelper.CheckCanCreateImageWithSource(Source, callContext.Localized);
 
-                var sha1 = CryptoServices.GetSHA1(Blob);
+                var sha1 = CryptoServices.GetSHA1(Blob.ToArray());
                 var existing = await callContext.DbContext.Images.Where(img => img.OriginalBlobSha1.SequenceEqual(sha1)).SingleOrDefaultAsync();
                 if (existing != null)
                     throw new IOException($"This image is already in the database, with name '{existing.Name}'");

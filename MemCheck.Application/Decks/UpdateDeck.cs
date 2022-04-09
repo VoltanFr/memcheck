@@ -16,7 +16,7 @@ namespace MemCheck.Application.Decks
             deck.Description = request.Name;
             deck.HeapingAlgorithmId = request.HeapingAlgorithmId;
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("Name", request.Name), ("NameLength", request.Name.Length.ToString()), ("HeapingAlgorithmId", request.HeapingAlgorithmId.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("Name", request.Name), IntMetric("NameLength", request.Name.Length), IntMetric("HeapingAlgorithmId", request.HeapingAlgorithmId));
         }
         #region Request type
         public sealed record Request(Guid UserId, Guid DeckId, string Name, int HeapingAlgorithmId) : IRequest

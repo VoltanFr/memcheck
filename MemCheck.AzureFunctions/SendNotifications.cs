@@ -30,7 +30,7 @@ internal sealed class SendNotifications : AbstractMemCheckAzureFunction
     }
     private sealed class MemCheckLinkGenerator : IMemCheckLinkGenerator
     {
-        public string GetAbsoluteUri(string relativeUri)
+        public string GetAbsoluteAddress(string relativeUri)
         {
             return "https://memcheckfr.azurewebsites.net" + (relativeUri.StartsWith("/") ? "" : "/") + relativeUri;
         }

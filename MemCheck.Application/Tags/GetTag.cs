@@ -14,7 +14,7 @@ namespace MemCheck.Application.Tags
         {
             var tag = await DbContext.Tags.AsNoTracking().Include(tag => tag.TagsInCards).SingleAsync(tag => tag.Id == request.TagId);
             var result = new Result(tag.Id, tag.Name, tag.Description, tag.TagsInCards == null ? 0 : tag.TagsInCards.Count);
-            return new ResultWithMetrologyProperties<Result>(result, ("TagName", result.TagName), ("CardCount", result.CardCount.ToString()));
+            return new ResultWithMetrologyProperties<Result>(result, ("TagName", result.TagName), IntMetric("CardCount", result.CardCount));
         }
         #region Request & Result
         public sealed record Request(Guid TagId) : IRequest

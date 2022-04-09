@@ -14,7 +14,7 @@ namespace MemCheck.Application.Languages
         protected override async Task<ResultWithMetrologyProperties<IEnumerable<Result>>> DoRunAsync(Request request)
         {
             var result = await DbContext.CardLanguages.Select(language => new Result(language.Id, language.Name, DbContext.Cards.Where(card => card.CardLanguage.Id == language.Id).Count())).ToListAsync();
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("ResultCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("ResultCount", result.Count));
         }
         #region Request & Result
         public sealed record Request() : IRequest

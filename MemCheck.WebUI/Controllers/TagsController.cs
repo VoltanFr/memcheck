@@ -30,7 +30,7 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetGuiMessages")]
         public IActionResult GetGuiMessages()
         {
-            return Ok(new GetGuiMessagesViewModel(Get("AlreadyExistsErrMesg"), Get("NameLengthErrMesg")));
+            return Ok(new GetGuiMessagesViewModel(GetLocalized("AlreadyExistsErrMesg"), GetLocalized("NameLengthErrMesg")));
         }
         public sealed class GetGuiMessagesViewModel
         {
@@ -126,7 +126,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             await new CreateTag(callContext).RunAsync(new CreateTag.Request(userId, request.NewName.Trim(), request.NewDescription.Trim()));
-            return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
+            return ControllerResultWithToast.Success(GetLocalized("TagRecorded") + ' ' + request.NewName, this);
 
         }
         public sealed class CreateRequestModel
@@ -142,7 +142,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim()));
-            return ControllerResultWithToast.Success(Get("TagRecorded") + ' ' + request.NewName, this);
+            return ControllerResultWithToast.Success(GetLocalized("TagRecorded") + ' ' + request.NewName, this);
 
         }
         public sealed class UpdateRequestModel

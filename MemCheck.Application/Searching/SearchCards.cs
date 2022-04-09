@@ -210,19 +210,19 @@ namespace MemCheck.Application.Searching
             return new ResultWithMetrologyProperties<Result>(result,
                 ("DeckMode", request.Deck == Guid.Empty ? "Ignore" : request.DeckIsInclusive ? "Inclusive" : "Exclusive"),
                 ("InHeap", (request.Heap != null).ToString()),
-                ("PageNo", request.PageNo.ToString()),
-                ("PageSize", request.PageSize.ToString()),
-                ("RequiredTextLength", request.RequiredText.Length.ToString()),
+                IntMetric("PageNo", request.PageNo),
+                IntMetric("PageSize", request.PageSize),
+                IntMetric("RequiredTextLength", request.RequiredText.Length),
                 ("VibilityFiltering", request.Visibility.ToString()),
                 ("RatingFilteringMode", request.RatingFiltering.ToString()),
-                ("RatingFilteringValue", request.RatingFilteringValue.ToString()),
-                ("RequiredTagCount", request.RequiredTags.Count().ToString()),
-                ("ExcludedTagCount", request.ExcludedTags == null ? "All" : request.ExcludedTags.Count().ToString()),
+                IntMetric("RatingFilteringValue", request.RatingFilteringValue),
+                IntMetric("RequiredTagCount", request.RequiredTags.Count()),
+                IntMetric("ExcludedTagCount", request.ExcludedTags == null ? 0 : request.ExcludedTags.Count()),
                 ("NotificationFiltering", request.Notification.ToString()),
                 ("WithMinimumUtcDateOfCard", (request.MinimumUtcDateOfCards != null).ToString()),
-                ("ResultTotalCardCount", result.TotalNbCards.ToString()),
-                ("ResultPageCount", result.PageCount.ToString()),
-                ("ResultCardCount", result.Cards.Count().ToString())
+                IntMetric("ResultTotalCardCount", result.TotalNbCards),
+                IntMetric("ResultPageCount", result.PageCount),
+                IntMetric("ResultCardCount", result.Cards.Count())
                 );
         }
         #region Request and result classes
@@ -236,7 +236,7 @@ namespace MemCheck.Application.Searching
             public Guid UserId { get; init; } = Guid.Empty; //Guid.Empty means no user logged in
             public Guid Deck { get; init; } = Guid.Empty; //Guid.Empty means ignore
             public bool DeckIsInclusive { get; init; } = true;   //Makes sense only if Deck is not Guid.Empty
-            public int? Heap { get; init; } = null;
+            public int? Heap { get; init; }
             public int PageNo { get; init; } = 1;
             public int PageSize { get; init; } = 10;
             public string RequiredText { get; init; } = "";
@@ -246,7 +246,7 @@ namespace MemCheck.Application.Searching
             public IEnumerable<Guid> RequiredTags { get; init; } = Array.Empty<Guid>();
             public IEnumerable<Guid>? ExcludedTags { get; init; } = Array.Empty<Guid>(); //null means that we return only cards which have no tag (we exclude all tags)
             public NotificationFiltering Notification { get; init; } = NotificationFiltering.Ignore;
-            public DateTime? MinimumUtcDateOfCards { get; init; } = null;
+            public DateTime? MinimumUtcDateOfCards { get; init; }
 
             public async Task CheckValidityAsync(CallContext callContext)
             {

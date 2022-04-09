@@ -43,27 +43,27 @@ namespace MemCheck.WebUI.Controllers
                 Name = searchSubscription.Name;
                 var details = new StringBuilder();
                 if (searchSubscription.ExcludedDeck != null)
-                    details.Append(localizer.Get("ExcludedDeck") + ' ' + searchSubscription.ExcludedDeck + ", ");
+                    details.Append(localizer.GetLocalized("ExcludedDeck") + ' ' + searchSubscription.ExcludedDeck + ", ");
                 if (searchSubscription.RequiredText.Length > 0)
-                    details.Append(localizer.Get("RequiredText") + " '" + searchSubscription.RequiredText + "', ");
+                    details.Append(localizer.GetLocalized("RequiredText") + " '" + searchSubscription.RequiredText + "', ");
                 if (searchSubscription.RequiredTags.Count() == 1)
-                    details.Append(localizer.Get("RequiredTag") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
+                    details.Append(localizer.GetLocalized("RequiredTag") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
                 if (searchSubscription.RequiredTags.Count() > 1)
-                    details.Append(localizer.Get("RequiredTags") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
+                    details.Append(localizer.GetLocalized("RequiredTags") + ' ' + string.Join(',', searchSubscription.RequiredTags) + ", ");
                 if (searchSubscription.ExcludeAllTags)
-                    details.Append(localizer.Get("OnlyCardsWithNoTag") + ", ");
+                    details.Append(localizer.GetLocalized("OnlyCardsWithNoTag") + ", ");
                 else
                 if (searchSubscription.ExcludedTags.Count() == 1)
-                    details.Append(localizer.Get("ExcludedTag") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+                    details.Append(localizer.GetLocalized("ExcludedTag") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
                 if (searchSubscription.ExcludedTags.Count() > 1)
-                    details.Append(localizer.Get("ExcludedTags") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+                    details.Append(localizer.GetLocalized("ExcludedTags") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
                 if (details.Length == 0)
-                    details.Append(localizer.Get("AllCards"));
+                    details.Append(localizer.GetLocalized("AllCards"));
                 Details = details.ToString();
                 CardCountOnLastRun = searchSubscription.CardCountOnLastRun;
                 RegistrationUtcDate = searchSubscription.RegistrationUtcDate;
                 LastRunUtcDate = searchSubscription.LastRunUtcDate;
-                DeleteConfirmMessage = localizer.Get("AreYouSureYouWantToDeleteTheSearch") + " '" + Name + "'";
+                DeleteConfirmMessage = localizer.GetLocalized("AreYouSureYouWantToDeleteTheSearch") + " '" + Name + "'";
             }
             public Guid Id { get; }
             public string Name { get; } = null!;
@@ -107,7 +107,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteSearchSubscription.Request(userId, id);
             await new DeleteSearchSubscription(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(Get("Deleted"), this);
+            return ControllerResultWithToast.Success(GetLocalized("Deleted"), this);
         }
         #endregion
     }

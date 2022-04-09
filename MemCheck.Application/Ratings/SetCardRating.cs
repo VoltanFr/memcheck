@@ -29,7 +29,7 @@ namespace MemCheck.Application.Ratings
                     }
                     catch (SqlException e)
                     {
-                        if (attempts < 5 && e.Message.Contains("Violation of PRIMARY KEY constraint"))
+                        if (attempts < 5 && e.Message.Contains("Violation of PRIMARY KEY constraint", StringComparison.Ordinal))
                         {
                             //Production metrics (Azure Application Insights) show that we are sometimes in this case. My analysis is that this happens because of the JavaScript retries (in Learn.js/handlePendingRatingOperations)
                             attempts++;
@@ -71,7 +71,7 @@ namespace MemCheck.Application.Ratings
             var previousValue = await SaveRatingByUserAsync(request);
             if (previousValue != request.Rating)
                 await UpdateCardAsync(request.CardId);
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardId", request.CardId.ToString()), ("Rating", request.Rating.ToString()), ("PreviousValue", previousValue.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardId", request.CardId.ToString()), IntMetric("Rating", request.Rating), IntMetric("PreviousValue", previousValue));
         }
         #region Request & Result
         public sealed class Request : IRequest

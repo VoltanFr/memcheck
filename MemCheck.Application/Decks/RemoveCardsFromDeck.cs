@@ -21,7 +21,7 @@ namespace MemCheck.Application.Decks
                 .Select(cardId => new CardInDeck() { CardId = cardId, DeckId = request.DeckId });
             DbContext.CardsInDecks.RemoveRange(existing);
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardCount", request.CardIds.Count().ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request type
         public sealed record Request(Guid CurrentUserId, Guid DeckId, IEnumerable<Guid> CardIds) : IRequest

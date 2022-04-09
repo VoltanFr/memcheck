@@ -4,7 +4,7 @@ namespace MemCheck.AzureFunctions;
 
 public sealed class FakeStringLocalizer : ILocalized
 {
-    public string Get(string resourceName)
+    public string GetLocalized(string resourceName)
     {
         return resourceName;
     }

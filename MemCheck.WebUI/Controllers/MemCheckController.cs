@@ -26,7 +26,7 @@ namespace MemCheck.WebUI.Controllers
                     throw new InvalidProgramException($"Property '{property.Name}' is null in body parameter of {GetType().Name}.{memberName}");
         }
         [HttpGet("Translate")] //To be reviewed: I added that to stop AmbiguousActionException, for example in the learning page
-        public string Get(string resourceName)
+        public string GetLocalized(string resourceName)
         {
             var result = localizer[resourceName];
             if (result.ResourceNotFound)

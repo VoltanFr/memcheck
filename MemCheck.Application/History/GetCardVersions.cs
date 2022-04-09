@@ -26,7 +26,7 @@ namespace MemCheck.Application.History
         #region Private classes
         private sealed class CardVersionFromDb
         {
-            public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo,string references, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
+            public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, string references, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
             {
                 Id = id;
                 IsCurrent = isCurrent;
@@ -166,7 +166,7 @@ namespace MemCheck.Application.History
                 iterationVersion = previousVersion;
             }
 
-            return new ResultWithMetrologyProperties<IEnumerable<IResultCardVersion>>(result, ("CardId", request.CardId.ToString()), ("ResultCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<IResultCardVersion>>(result, ("CardId", request.CardId.ToString()), IntMetric("ResultCount", result.Count));
         }
         #region Request and result types
         public sealed record Request(Guid UserId, Guid CardId) : IRequest

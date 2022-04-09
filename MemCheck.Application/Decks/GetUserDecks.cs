@@ -16,7 +16,7 @@ namespace MemCheck.Application.Decks
             var decks = DbContext.Decks.Where(deck => deck.Owner.Id == request.UserId).OrderBy(deck => deck.Description);
             var results = decks.Select(deck => new Result(deck.Id, deck.Description, deck.HeapingAlgorithmId, deck.CardInDecks.Count));
             await Task.CompletedTask;
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(results, ("DeckCount", results.Count().ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(results, IntMetric("DeckCount", results.Count()));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest

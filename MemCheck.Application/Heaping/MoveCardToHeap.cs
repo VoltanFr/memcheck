@@ -26,7 +26,7 @@ namespace MemCheck.Application.Heaping
             if (request.TargetHeap != CardInDeck.UnknownHeap)
             {
                 if (request.TargetHeap == card.CurrentHeap)
-                    return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardWasAlreadyInHeap", true.ToString())); //This could happen due to connection problems on client side, or to multiple sessions
+                    return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), IntMetric("TargetHeap", request.TargetHeap), ("CardWasAlreadyInHeap", true.ToString())); //This could happen due to connection problems on client side, or to multiple sessions
 
                 if (request.TargetHeap < card.CurrentHeap || request.TargetHeap - card.CurrentHeap > 1)
                     throw new InvalidOperationException($"Invalid move request (request heap: {request.TargetHeap}, current heap: {card.CurrentHeap}, card: {request.CardId}, last learn UTC time: {card.LastLearnUtcTime})");
@@ -49,7 +49,11 @@ namespace MemCheck.Application.Heaping
             card.CurrentHeap = request.TargetHeap;
 
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), ("CardId", request.CardId.ToString()), ("TargetHeap", request.TargetHeap.ToString()), ("CardWasAlreadyInHeap", false.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(),
+                ("DeckId", request.DeckId.ToString()),
+                ("CardId", request.CardId.ToString()),
+                IntMetric("TargetHeap", request.TargetHeap),
+                ("CardWasAlreadyInHeap", false.ToString()));
         }
         #region Request & result
         public sealed record Request(Guid UserId, Guid DeckId, Guid CardId, int TargetHeap) : IRequest

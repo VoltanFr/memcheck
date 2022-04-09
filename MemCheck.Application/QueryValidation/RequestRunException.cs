@@ -2,12 +2,15 @@
 
 namespace MemCheck.Application.QueryValidation
 {
-    internal sealed class RequestRunException : Exception
+    public sealed class RequestRunException : Exception
     {
         public RequestRunException(string message) : base(message)
         {
         }
         public RequestRunException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+        public RequestRunException()
         {
         }
     }

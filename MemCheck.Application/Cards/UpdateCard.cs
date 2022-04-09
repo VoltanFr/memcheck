@@ -125,7 +125,7 @@ namespace MemCheck.Application.Cards
                     && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
                     && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
                     && SameImageLists(dataBeforeUpdate.Images))
-                    throw new RequestInputException(localizer.Get("CanNotUpdateBecauseNoDifference"));
+                    throw new RequestInputException(localizer.GetLocalized("CanNotUpdateBecauseNoDifference"));
             }
             private async Task<IEnumerable<Guid>> GetAllAuthorsAsync(Card card, MemCheckDbContext dbContext)
             {
@@ -148,7 +148,7 @@ namespace MemCheck.Application.Cards
                     if (!UsersWithVisibility.Any(u => u == userId))
                     {
                         var user = await dbContext.Users.SingleAsync(u => u.Id == userId);
-                        throw new RequestInputException($"{localizer.Get("User")} {user.UserName} {localizer.Get("MustHaveVisibilityBecause")} {localizer.Get(messageSuffixId)}");
+                        throw new RequestInputException($"{localizer.GetLocalized("User")} {user.UserName} {localizer.GetLocalized("MustHaveVisibilityBecause")} {localizer.GetLocalized(messageSuffixId)}");
                     }
             }
             private async Task CheckNewVisibilityAsync(Card card, ILocalized localizer, MemCheckDbContext dbContext)
@@ -204,9 +204,9 @@ namespace MemCheck.Application.Cards
                     .Where(card => card.Id == CardId);
 
                 if (!await cards.AnyAsync())
-                    throw new ApplicationException("Unknown card id");
+                    throw new ArgumentException("Unknown card id");
 
-                CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, VersionCreatorId, CardId);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, VersionCreatorId, CardId);
 
                 Card card = cards.Single();
 

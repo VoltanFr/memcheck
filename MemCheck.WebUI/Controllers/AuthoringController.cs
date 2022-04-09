@@ -79,12 +79,12 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(card);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var versionDescription = Get("InitialCardVersionCreation");
+            var versionDescription = GetLocalized("InitialCardVersionCreation");
             var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
             var cardId = (await new CreateCard(callContext).RunAsync(request)).CardId;
             if (card.AddToDeck != Guid.Empty)
                 await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
-            return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
+            return ControllerResultWithToast.Success(GetLocalized("CardSavedOk"), this);
         }
         public sealed class PostCardOfUserRequest
         {
@@ -109,7 +109,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
             await new UpdateCard(callContext).RunAsync(request);
-            return ControllerResultWithToast.Success(Get("CardSavedOk"), this);
+            return ControllerResultWithToast.Success(GetLocalized("CardSavedOk"), this);
         }
         public sealed class UpdateCardRequest
         {
@@ -167,7 +167,7 @@ namespace MemCheck.WebUI.Controllers
                 UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
                 CreationUtcDate = applicationResult.FirstVersionUtcDate;
                 LastChangeUtcDate = applicationResult.LastVersionUtcDate;
-                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Any() ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Any() ? localizer.GetLocalized("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.GetLocalized("NotIncludedInAnyDeck");
                 Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage));
                 CurrentUserRating = applicationResult.UserRating;
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
@@ -209,10 +209,10 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetGuiMessages()
         {
             return Ok(new GetGuiMessagesViewModel(
-            Get("Success"),
-            Get("Failure"),
-            Get("SureCreateWithoutTag"),
-            Get("ImageAlreadyInCard")
+            GetLocalized("Success"),
+            GetLocalized("Failure"),
+            GetLocalized("SureCreateWithoutTag"),
+            GetLocalized("ImageAlreadyInCard")
             ));
         }
         public sealed class GetGuiMessagesViewModel
@@ -293,7 +293,7 @@ namespace MemCheck.WebUI.Controllers
                 VersionUtcDate = appResult.VersionUtcDate;
                 VersionCreator = appResult.VersionCreator;
                 VersionDescription = appResult.VersionDescription;
-                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.Get(fieldName));
+                var fieldsDisplayNames = appResult.ChangedFieldNames.Select(fieldName => localizer.GetLocalized(fieldName));
                 ChangedFieldList = string.Join(',', fieldsDisplayNames);
             }
             public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
@@ -310,7 +310,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var request = new SetCardRating.Request(userId, cardId, rating);
             await new SetCardRating(callContext).RunAsync(request);
-            return ControllerResultWithToast.Success($"{Get("RatingSavedOk")} {rating}\u2605", this);
+            return ControllerResultWithToast.Success($"{GetLocalized("RatingSavedOk")} {rating}\u2605", this);
         }
         #endregion
         #region CardVersionDiffWithCurrent
@@ -329,14 +329,14 @@ namespace MemCheck.WebUI.Controllers
             private static void AddField(List<string> changedFields, List<string> unChangedFields, string fieldNameResourceId, string fieldValueInCard, string fieldValueInSelectedVersion, ILocalized localizer)
             {
                 if (fieldValueInCard == fieldValueInSelectedVersion)
-                    unChangedFields.Add($"<strong>{localizer.Get(fieldNameResourceId)}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.Get("Empty"))}");
+                    unChangedFields.Add($"<strong>{localizer.GetLocalized(fieldNameResourceId)}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.GetLocalized("Empty"))}");
                 else
                 {
                     var html = new StringBuilder();
-                    html.Append($"<strong>{localizer.Get(fieldNameResourceId)}</strong>");
+                    html.Append($"<strong>{localizer.GetLocalized(fieldNameResourceId)}</strong>");
                     html.Append("<ul>");
-                    html.Append($"<li><strong>{localizer.Get("SelectedVersion")}</strong> {(fieldValueInSelectedVersion.Length > 0 ? fieldValueInSelectedVersion : localizer.Get("Empty"))}</li>");
-                    html.Append($"<li><strong>{localizer.Get("LastVersion")}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.Get("Empty"))}</li>");
+                    html.Append($"<li><strong>{localizer.GetLocalized("SelectedVersion")}</strong> {(fieldValueInSelectedVersion.Length > 0 ? fieldValueInSelectedVersion : localizer.GetLocalized("Empty"))}</li>");
+                    html.Append($"<li><strong>{localizer.GetLocalized("LastVersion")}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.GetLocalized("Empty"))}</li>");
                     html.Append("</ul>");
                     changedFields.Add(html.ToString());
                 }
@@ -348,7 +348,7 @@ namespace MemCheck.WebUI.Controllers
                 LastVersionUtcDate = card.LastVersionUtcDate;
                 LastVersionCreatorName = card.LastVersionCreatorName;
                 LastVersionDescription = card.LastVersionDescription;
-                InfoAboutUsage = card.UsersOwningDeckIncluding.Any() ? localizer.Get("AppearsInDecksOf") + ' ' + string.Join(',', card.UsersOwningDeckIncluding) : localizer.Get("NotIncludedInAnyDeck");
+                InfoAboutUsage = card.UsersOwningDeckIncluding.Any() ? localizer.GetLocalized("AppearsInDecksOf") + ' ' + string.Join(',', card.UsersOwningDeckIncluding) : localizer.GetLocalized("NotIncludedInAnyDeck");
                 AverageRating = card.AverageRating;
                 CountOfUserRatings = card.CountOfUserRatings;
                 SelectedVersionUtcDate = selectedVersion.VersionUtcDate;
@@ -363,27 +363,27 @@ namespace MemCheck.WebUI.Controllers
                 AddField(changedFields, unChangedFields, "References", card.References, selectedVersion.References, localizer);
                 AddField(changedFields, unChangedFields, "LanguageName", card.LanguageName, selectedVersion.LanguageName, localizer);
 
-                var cardTags = card.Tags.Any() ? string.Join(",", card.Tags.Select(t => t.TagName).OrderBy(name => name)) : localizer.Get("NoneMasc");
-                var versionTags = selectedVersion.Tags.Any() ? string.Join(",", selectedVersion.Tags.OrderBy(name => name)) : localizer.Get("NoneMasc");
+                var cardTags = card.Tags.Any() ? string.Join(",", card.Tags.Select(t => t.TagName).OrderBy(name => name)) : localizer.GetLocalized("NoneMasc");
+                var versionTags = selectedVersion.Tags.Any() ? string.Join(",", selectedVersion.Tags.OrderBy(name => name)) : localizer.GetLocalized("NoneMasc");
                 AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", cardTags, versionTags, localizer);
 
-                var cardVisibility = card.UsersWithVisibility.Any() ? string.Join(",", card.UsersWithVisibility.Select(u => u.UserName).OrderBy(name => name)) : localizer.Get("Public");
-                var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.Get("Public");
+                var cardVisibility = card.UsersWithVisibility.Any() ? string.Join(",", card.UsersWithVisibility.Select(u => u.UserName).OrderBy(name => name)) : localizer.GetLocalized("Public");
+                var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.GetLocalized("Public");
                 AddField(changedFields, unChangedFields, "Visibility", cardVisibility, versionVisibility, localizer);
 
                 var cardFrontSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Name).OrderBy(name => name);
-                var cardFrontSideImageNamesJoined = cardFrontSideImageNames.Any() ? string.Join(",", cardFrontSideImageNames) : localizer.Get("NoneFeminine");
-                var versionFrontSideImages = selectedVersion.FrontSideImageNames.Any() ? string.Join(",", selectedVersion.FrontSideImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                var cardFrontSideImageNamesJoined = cardFrontSideImageNames.Any() ? string.Join(",", cardFrontSideImageNames) : localizer.GetLocalized("NoneFeminine");
+                var versionFrontSideImages = selectedVersion.FrontSideImageNames.Any() ? string.Join(",", selectedVersion.FrontSideImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
                 AddField(changedFields, unChangedFields, "FrontSideImages", cardFrontSideImageNamesJoined, versionFrontSideImages, localizer);
 
                 var cardBackSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Name).OrderBy(name => name);
-                var cardBackSideImageNamesJoined = cardBackSideImageNames.Any() ? string.Join(",", cardBackSideImageNames) : localizer.Get("NoneFeminine");
-                var versionBackSideImages = selectedVersion.BackSideImageNames.Any() ? string.Join(",", selectedVersion.BackSideImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                var cardBackSideImageNamesJoined = cardBackSideImageNames.Any() ? string.Join(",", cardBackSideImageNames) : localizer.GetLocalized("NoneFeminine");
+                var versionBackSideImages = selectedVersion.BackSideImageNames.Any() ? string.Join(",", selectedVersion.BackSideImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
                 AddField(changedFields, unChangedFields, "BackSideImages", cardBackSideImageNamesJoined, versionBackSideImages, localizer);
 
                 var cardAdditionalImageNames = card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Name).OrderBy(name => name);
-                var cardAdditionalImageNamesJoined = cardAdditionalImageNames.Any() ? string.Join(",", cardAdditionalImageNames) : localizer.Get("NoneFeminine");
-                var versionAdditionalImages = selectedVersion.AdditionalInfoImageNames.Any() ? string.Join(",", selectedVersion.AdditionalInfoImageNames.OrderBy(name => name)) : localizer.Get("NoneFeminine");
+                var cardAdditionalImageNamesJoined = cardAdditionalImageNames.Any() ? string.Join(",", cardAdditionalImageNames) : localizer.GetLocalized("NoneFeminine");
+                var versionAdditionalImages = selectedVersion.AdditionalInfoImageNames.Any() ? string.Join(",", selectedVersion.AdditionalInfoImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
                 AddField(changedFields, unChangedFields, "AdditionalInfoImages", cardAdditionalImageNamesJoined, versionAdditionalImages, localizer);
 
                 ChangedFields = changedFields;

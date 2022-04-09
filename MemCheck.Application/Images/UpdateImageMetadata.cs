@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,8 +15,7 @@ namespace MemCheck.Application.Images
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
         {
-            return i.VersionType switch
-            {
+            return i.VersionType switch {
                 ImageVersionType.Creation => ImagePreviousVersionType.Creation,
                 ImageVersionType.Changes => ImagePreviousVersionType.Changes,
                 _ => throw new NotImplementedException(),
@@ -33,8 +31,7 @@ namespace MemCheck.Application.Images
             var image = await DbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
             var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
-            var versionFromCurrentImage = new ImagePreviousVersion()
-            {
+            var versionFromCurrentImage = new ImagePreviousVersion() {
                 Image = request.ImageId,
                 Owner = image.Owner,
                 Name = image.Name,
@@ -66,11 +63,10 @@ namespace MemCheck.Application.Images
             return new ResultWithMetrologyProperties<Result>(new Result(),
                 ("ImageId", request.ImageId.ToString()),
                 ("NewName", request.Name),
-                ("NewNameLength", request.Name.Length.ToString()),
-                ("DescriptionLength", request.Description.Length.ToString()),
-                ("SourceFieldLength", request.Source.Length.ToString()),
-                ("VersionDescriptionLength", request.VersionDescription.Length.ToString())
-                );
+                IntMetric("NewNameLength", request.Name.Length),
+                IntMetric("DescriptionLength", request.Description.Length),
+                IntMetric("SourceFieldLength", request.Source.Length),
+                IntMetric("VersionDescriptionLength", request.VersionDescription.Length));
         }
         #region Request & Result
         public sealed class Request : IRequest
@@ -104,7 +100,7 @@ namespace MemCheck.Application.Images
                     .SingleAsync();
 
                 if (imageDataBeforeUpdate.nameBeforeUpdate == Name && imageDataBeforeUpdate.sourceBeforeUpdate == Source && imageDataBeforeUpdate.descriptionBeforeUpdate == Description)
-                    throw new RequestInputException(callContext.Localized.Get("CanNotUpdateMetadataBecauseSameAsOriginal"));
+                    throw new RequestInputException(callContext.Localized.GetLocalized("CanNotUpdateMetadataBecauseSameAsOriginal"));
 
                 if (imageDataBeforeUpdate.nameBeforeUpdate != Name)
                     await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);

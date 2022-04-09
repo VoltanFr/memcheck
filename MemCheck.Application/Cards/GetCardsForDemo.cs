@@ -67,9 +67,9 @@ namespace MemCheck.Application.Cards
 
             return new ResultWithMetrologyProperties<Result>(new Result(result),
                 ("TagId", request.TagId.ToString()),
-                ("ExcludedCardCount", request.ExcludedCardIds.Count().ToString()),
-                ("RequestedCardCount", request.CardsToDownload.ToString()),
-                ("ResultCount", result.Count.ToString()));
+               IntMetric("ExcludedCardCount", request.ExcludedCardIds.Count()),
+               IntMetric("RequestedCardCount", request.CardsToDownload),
+               IntMetric("ResultCount", result.Count));
         }
         #region Request and Result
         public sealed class Request : IRequest

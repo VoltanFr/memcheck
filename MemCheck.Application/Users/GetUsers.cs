@@ -14,7 +14,7 @@ namespace MemCheck.Application.Users
         protected override async Task<ResultWithMetrologyProperties<IEnumerable<ViewModel>>> DoRunAsync(Request request)
         {
             var result = await DbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToListAsync();
-            return new ResultWithMetrologyProperties<IEnumerable<ViewModel>>(result, ("ResultCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<ViewModel>>(result, IntMetric("ResultCount", result.Count));
         }
         #region Request & Result
         public sealed record Request() : IRequest

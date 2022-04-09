@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace MemCheck.Application.Notifying
             var subscription = await DbContext.SearchSubscriptions.Where(s => s.Id == request.SubscriptionId).SingleAsync();
             subscription.Name = request.Name;
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("Name", request.Name.ToString()), ("NameLength", request.Name.Length.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("Name", request.Name.ToString()), IntMetric("NameLength", request.Name.Length));
         }
         #region Request & Result
         public sealed class Request : IRequest

@@ -62,10 +62,10 @@ namespace MemCheck.Application.Cards
                 ("CardId", request.CardId.ToString()),
                 ("CardIsPublic", CardVisibilityHelper.CardIsPublic(card.UsersWithView).ToString()),
                 ("CardIsPrivateToSingleUser", CardVisibilityHelper.CardIsPrivateToSingleUser(request.CurrentUserId, card.UsersWithView).ToString()),
-                ("CardAverageRating", card.AverageRating.ToString()),
-                ("CardUserRating", userRatingValue.ToString()),
-                ("AgeOfCurrentVersionInDays", (DateTime.UtcNow - card.VersionUtcDate).TotalDays.ToString()),
-                ("AgeOfCardInDays", (DateTime.UtcNow - card.InitialCreationUtcDate).TotalDays.ToString()),
+                DoubleMetric("CardAverageRating", card.AverageRating),
+                IntMetric("CardUserRating", userRatingValue),
+                DoubleMetric("AgeOfCurrentVersionInDays", (DateTime.UtcNow - card.VersionUtcDate).TotalDays),
+                DoubleMetric("AgeOfCardInDays", (DateTime.UtcNow - card.InitialCreationUtcDate).TotalDays),
                 ("CardLanguage", card.CardLanguage.Name));
         }
         #region Request & Result classes
@@ -78,12 +78,12 @@ namespace MemCheck.Application.Cards
             }
             public Guid CurrentUserId { get; }
             public Guid CardId { get; }
-            public async Task CheckValidityAsync(CallContext context)
+            public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
                 QueryValidationHelper.CheckNotReservedGuid(CardId);
-                await QueryValidationHelper.CheckCardExistsAsync(context.DbContext, CardId);
-                CardVisibilityHelper.CheckUserIsAllowedToViewCards(context.DbContext, CurrentUserId, CardId);
+                await QueryValidationHelper.CheckCardExistsAsync(callContext.DbContext, CardId);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, CurrentUserId, CardId);
             }
         }
         public sealed class ResultModel

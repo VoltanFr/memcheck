@@ -21,14 +21,13 @@ namespace MemCheck.Application.Notifying
                 CreateSubscription(DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
 
             await DbContext.SaveChangesAsync();
-            return new ResultWithMetrologyProperties<Result>(new Result(), ("CardCount", request.CardIds.Count().ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), IntMetric("CardCount", request.CardIds.Count()));
         }
         internal static void CreateSubscription(MemCheckDbContext dbContext, Guid userId, Guid cardId, DateTime registrationUtcDate, int registrationMethod)
         {
             if (dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.CardId == cardId).Any())
                 return;
-            CardNotificationSubscription notif = new()
-            {
+            CardNotificationSubscription notif = new() {
                 CardId = cardId,
                 UserId = userId,
                 RegistrationUtcDate = registrationUtcDate,
@@ -53,7 +52,7 @@ namespace MemCheck.Application.Notifying
                 if (CardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
                 foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, cardId);
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, UserId, cardId);
                 await Task.CompletedTask;
             }
         }

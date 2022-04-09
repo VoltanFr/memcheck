@@ -1,6 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -32,10 +30,10 @@ namespace MemCheck.Application.Images
                 if (ImageName != ImageName.Trim())
                     throw new InvalidOperationException($"Name not trimmed: '{ImageName}'");
                 if (ImageName.Length == 0)
-                    throw new RequestInputException(callContext.Localized.Get("PleaseEnterAnImageName"));
+                    throw new RequestInputException(callContext.Localized.GetLocalized("PleaseEnterAnImageName"));
 
                 if (!await callContext.DbContext.Images.AnyAsync(image => EF.Functions.Like(image.Name, $"{ImageName}")))
-                    throw new RequestInputException(callContext.Localized.Get("ImageNotFound") + ' ' + ImageName);
+                    throw new RequestInputException(callContext.Localized.GetLocalized("ImageNotFound") + ' ' + ImageName);
 
             }
         }

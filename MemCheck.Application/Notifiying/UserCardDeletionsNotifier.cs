@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,10 +17,10 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
-        public UserCardDeletionsNotifier(CallContext callContext, List<string> performanceIndicators)
+        public UserCardDeletionsNotifier(CallContext callContext, ICollection<string> performanceIndicators)
         {
             //prod constructor
             this.callContext = callContext;
@@ -65,7 +64,7 @@ namespace MemCheck.Application.Notifying
             await callContext.DbContext.SaveChangesAsync();
             performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's subscribed cards which have been deleted, and update the notification's last notif date");
 
-            callContext.TelemetryClient.TrackEvent("UserCardDeletionsNotifier", ("ResultCount", result.Length.ToString()));
+            callContext.TelemetryClient.TrackEvent("UserCardDeletionsNotifier", ClassWithMetrics.IntMetric("ResultCount", result.Length));
             return result;
         }
     }

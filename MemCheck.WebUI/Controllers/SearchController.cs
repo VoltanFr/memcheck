@@ -55,18 +55,18 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetAllStaticDataViewModel(IEnumerable<GetUserDecksWithHeapsAndTags.Result> userDecks, IEnumerable<GetAllTags.ResultTag> allTags, IEnumerable<GetUsers.ViewModel> allUsers, ILocalized localizer, MemCheckUser? currentUser)
             {
-                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer.Get("Ignore")) }
+                UserDecks = new[] { new GetAllStaticDataDeckViewModel(Guid.Empty, localizer.GetLocalized("Ignore")) }
                     .Concat(userDecks.Select(applicationResult => new GetAllStaticDataDeckViewModel(applicationResult, localizer)));
                 AllDecksForAddingCards = userDecks.Select(applicationResult => new GetAllStaticDataDeckForAddViewModel(applicationResult.DeckId, applicationResult.Description));
                 AllApplicableTags = allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName));
-                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")) }
+                AllRequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.GetLocalized("None")) }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 AllExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.Get("All"))
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.GetLocalized("None")),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.GetLocalized("All"))
                     }
                     .Concat(allTags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
-                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer.Get("Any")) }
+                AllUsers = new[] { new GetAllStaticDataUserViewModel(Guid.Empty, localizer.GetLocalized("Any")) }
                     .Concat(allUsers.Select(user => new GetAllStaticDataUserViewModel(user.UserId, user.UserName)));
                 LocalizedText = new GetAllStaticDataLocalizedTextViewModel(localizer);
                 PossibleHeapsForMove = Enumerable.Range(0, CardInDeck.MaxHeapValue).Select(heapId => new GetAllStaticDataHeapViewModel(heapId, DisplayServices.HeapName(heapId, localizer)));
@@ -90,13 +90,13 @@ namespace MemCheck.WebUI.Controllers
             {
                 DeckId = applicationResult.DeckId;
                 DeckName = applicationResult.Description;
-                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer.Get("Any")) }
+                Heaps = new[] { new GetAllStaticDataHeapViewModel(-1, localizer.GetLocalized("Any")) }
                     .Concat(applicationResult.Heaps.OrderBy(heap => heap).Select(heap => new GetAllStaticDataHeapViewModel(heap, DisplayServices.HeapName(heap, localizer))));
-                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")) }
+                RequirableTags = new[] { new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.GetLocalized("None")) }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
                 ExcludableTags = new[] {
-                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.Get("None")),
-                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.Get("All"))
+                    new GetAllStaticDataTagViewModel(noTagFakeGuid, localizer.GetLocalized("None")),
+                    new GetAllStaticDataTagViewModel(allTagsFakeGuid, localizer.GetLocalized("All"))
                     }
                     .Concat(applicationResult.Tags.Select(tag => new GetAllStaticDataTagViewModel(tag.TagId, tag.TagName)));
             }
@@ -159,61 +159,61 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetAllStaticDataLocalizedTextViewModel(ILocalized localizer)
             {
-                Any = localizer.Get("Any");
-                Ignore = localizer.Get("Ignore");
-                Before = localizer.Get("Before");
-                ThatDay = localizer.Get("On");
-                After = localizer.Get("After");
-                CardVisibleToMoreThanOwner = localizer.Get("CardVisibleToMoreThanOwner");
-                CardVisibleToOwnerOnly = localizer.Get("CardVisibleToOwnerOnly");
-                IncludeCards = localizer.Get("IncludeCards");
-                ExcludeCards = localizer.Get("ExcludeCards");
-                OperationIsForSelectedCards = localizer.Get("OperationIsForSelectedCards");
-                TooManySelectedCards = localizer.Get("TooManySelectedCards");
-                AlertAddTagToCardsPart1 = localizer.Get("AlertAddTagToCardsPart1");
-                AlertAddTagToCardsPart2 = localizer.Get("AlertAddTagToCardsPart2");
-                AlertAddTagToCardsPart3Single = localizer.Get("AlertAddTagToCardsPart3Single");
-                AlertAddTagToCardsPart3Plural = localizer.Get("AlertAddTagToCardsPart3Plural");
-                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer.Get("CantAddToDeckBecauseSomeCardsAlreadyIn");
-                AlertAddCardsToDeckPart1 = localizer.Get("AlertAddCardsToDeckPart1");
-                AlertAddCardToDeckPart1 = localizer.Get("AlertAddCardToDeckPart1");
-                AlertAddCardsToDeckPart2 = localizer.Get("AlertAddCardsToDeckPart2");
-                AlertAddCardsToDeckPart3 = localizer.Get("AlertAddCardsToDeckPart3");
-                AlertAddCardToDeckPart3 = localizer.Get("AlertAddCardToDeckPart3");
-                AlertAddOneCardToDeck = localizer.Get("AlertAddOneCardToDeck");
-                CardAlreadyInDeck = localizer.Get("CardAlreadyInDeck");
-                CardsAlreadyInDeck = localizer.Get("CardsAlreadyInDeck");
+                Any = localizer.GetLocalized("Any");
+                Ignore = localizer.GetLocalized("Ignore");
+                Before = localizer.GetLocalized("Before");
+                ThatDay = localizer.GetLocalized("On");
+                After = localizer.GetLocalized("After");
+                CardVisibleToMoreThanOwner = localizer.GetLocalized("CardVisibleToMoreThanOwner");
+                CardVisibleToOwnerOnly = localizer.GetLocalized("CardVisibleToOwnerOnly");
+                IncludeCards = localizer.GetLocalized("IncludeCards");
+                ExcludeCards = localizer.GetLocalized("ExcludeCards");
+                OperationIsForSelectedCards = localizer.GetLocalized("OperationIsForSelectedCards");
+                TooManySelectedCards = localizer.GetLocalized("TooManySelectedCards");
+                AlertAddTagToCardsPart1 = localizer.GetLocalized("AlertAddTagToCardsPart1");
+                AlertAddTagToCardsPart2 = localizer.GetLocalized("AlertAddTagToCardsPart2");
+                AlertAddTagToCardsPart3Single = localizer.GetLocalized("AlertAddTagToCardsPart3Single");
+                AlertAddTagToCardsPart3Plural = localizer.GetLocalized("AlertAddTagToCardsPart3Plural");
+                CantAddToDeckBecauseSomeCardsAlreadyIn = localizer.GetLocalized("CantAddToDeckBecauseSomeCardsAlreadyIn");
+                AlertAddCardsToDeckPart1 = localizer.GetLocalized("AlertAddCardsToDeckPart1");
+                AlertAddCardToDeckPart1 = localizer.GetLocalized("AlertAddCardToDeckPart1");
+                AlertAddCardsToDeckPart2 = localizer.GetLocalized("AlertAddCardsToDeckPart2");
+                AlertAddCardsToDeckPart3 = localizer.GetLocalized("AlertAddCardsToDeckPart3");
+                AlertAddCardToDeckPart3 = localizer.GetLocalized("AlertAddCardToDeckPart3");
+                AlertAddOneCardToDeck = localizer.GetLocalized("AlertAddOneCardToDeck");
+                CardAlreadyInDeck = localizer.GetLocalized("CardAlreadyInDeck");
+                CardsAlreadyInDeck = localizer.GetLocalized("CardsAlreadyInDeck");
 
-                CardAlreadyNotInDeck = localizer.Get("CardAlreadyNotInDeck");
-                CardsAlreadyNotInDeck = localizer.Get("CardsAlreadyNotInDeck");
-                AlertRemoveOneCardFromDeck = localizer.Get("AlertRemoveOneCardFromDeck");
-                AlertRemoveCardFromDeckPart1 = localizer.Get("AlertRemoveCardFromDeckPart1");
-                AlertRemoveCardsFromDeckPart1 = localizer.Get("AlertRemoveCardsFromDeckPart1");
-                AlertRemoveCardsFromDeckPart2 = localizer.Get("AlertRemoveCardsFromDeckPart2");
-                AlertRemoveCardsFromDeckPart3 = localizer.Get("AlertRemoveCardsFromDeckPart3");
-                AlertRemoveCardFromDeckPart3 = localizer.Get("AlertRemoveCardFromDeckPart3");
+                CardAlreadyNotInDeck = localizer.GetLocalized("CardAlreadyNotInDeck");
+                CardsAlreadyNotInDeck = localizer.GetLocalized("CardsAlreadyNotInDeck");
+                AlertRemoveOneCardFromDeck = localizer.GetLocalized("AlertRemoveOneCardFromDeck");
+                AlertRemoveCardFromDeckPart1 = localizer.GetLocalized("AlertRemoveCardFromDeckPart1");
+                AlertRemoveCardsFromDeckPart1 = localizer.GetLocalized("AlertRemoveCardsFromDeckPart1");
+                AlertRemoveCardsFromDeckPart2 = localizer.GetLocalized("AlertRemoveCardsFromDeckPart2");
+                AlertRemoveCardsFromDeckPart3 = localizer.GetLocalized("AlertRemoveCardsFromDeckPart3");
+                AlertRemoveCardFromDeckPart3 = localizer.GetLocalized("AlertRemoveCardFromDeckPart3");
 
-                OperationIsForFilteringOnDeckInclusive = localizer.Get("OperationIsForFilteringOnDeckInclusive");
-                CardAlreadyInTargetHeap = localizer.Get("CardAlreadyInTargetHeap");
-                CardsAlreadyInTargetHeap = localizer.Get("CardsAlreadyInTargetHeap");
-                AlertMoveOneCardToHeap = localizer.Get("AlertMoveOneCardToHeap");
-                AlertMoveCardsToHeapPart1 = localizer.Get("AlertMoveCardsToHeapPart1");
-                AlertMoveCardsToHeapPart2 = localizer.Get("AlertMoveCardsToHeapPart2");
-                AlertMoveCardToHeapPart3 = localizer.Get("AlertMoveCardToHeapPart3");
-                AlertMoveCardsToHeapPart3 = localizer.Get("AlertMoveCardsToHeapPart3");
+                OperationIsForFilteringOnDeckInclusive = localizer.GetLocalized("OperationIsForFilteringOnDeckInclusive");
+                CardAlreadyInTargetHeap = localizer.GetLocalized("CardAlreadyInTargetHeap");
+                CardsAlreadyInTargetHeap = localizer.GetLocalized("CardsAlreadyInTargetHeap");
+                AlertMoveOneCardToHeap = localizer.GetLocalized("AlertMoveOneCardToHeap");
+                AlertMoveCardsToHeapPart1 = localizer.GetLocalized("AlertMoveCardsToHeapPart1");
+                AlertMoveCardsToHeapPart2 = localizer.GetLocalized("AlertMoveCardsToHeapPart2");
+                AlertMoveCardToHeapPart3 = localizer.GetLocalized("AlertMoveCardToHeapPart3");
+                AlertMoveCardsToHeapPart3 = localizer.GetLocalized("AlertMoveCardsToHeapPart3");
 
-                AlertDeleteCardsPart1 = localizer.Get("AlertDeleteCardsPart1");
-                AlertDeleteCardsPart2Single = localizer.Get("AlertDeleteCardsPart2Single");
-                AlertDeleteCardsPart2Plural = localizer.Get("AlertDeleteCardsPart2Plural");
+                AlertDeleteCardsPart1 = localizer.GetLocalized("AlertDeleteCardsPart1");
+                AlertDeleteCardsPart2Single = localizer.GetLocalized("AlertDeleteCardsPart2Single");
+                AlertDeleteCardsPart2Plural = localizer.GetLocalized("AlertDeleteCardsPart2Plural");
 
-                SelectedRatingAndAbove = localizer.Get("SelectedRatingAndAbove");
-                SelectedRatingAndBelow = localizer.Get("SelectedRatingAndBelow");
-                NoRating = localizer.Get("NoRating");
+                SelectedRatingAndAbove = localizer.GetLocalized("SelectedRatingAndAbove");
+                SelectedRatingAndBelow = localizer.GetLocalized("SelectedRatingAndBelow");
+                NoRating = localizer.GetLocalized("NoRating");
 
-                CardsRegisteredForNotif = localizer.Get("CardsRegisteredForNotif");
-                CardsNotRegisteredForNotif = localizer.Get("CardsNotRegisteredForNotif");
+                CardsRegisteredForNotif = localizer.GetLocalized("CardsRegisteredForNotif");
+                CardsNotRegisteredForNotif = localizer.GetLocalized("CardsNotRegisteredForNotif");
 
-                ConfirmSubscription = localizer.Get("ConfirmSubscription");
+                ConfirmSubscription = localizer.GetLocalized("ConfirmSubscription");
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -382,13 +382,13 @@ namespace MemCheck.WebUI.Controllers
                 AverageRating = card.AverageRating;
                 CurrentUserRating = card.CurrentUserRating;
                 CountOfUserRatings = card.CountOfUserRatings;
-                PopoverVisibility = localizer.Get("Visibility");
+                PopoverVisibility = localizer.GetLocalized("Visibility");
                 if (VisibleToCount == 1)
-                    PopoverVisibility = localizer.Get("YouOnly");
+                    PopoverVisibility = localizer.GetLocalized("YouOnly");
                 else
                 {
                     if (VisibleToCount == 0)
-                        PopoverVisibility = localizer.Get("AllUsers");
+                        PopoverVisibility = localizer.GetLocalized("AllUsers");
                     else
                         PopoverVisibility = string.Join(',', card.VisibleTo);
                 }
@@ -452,7 +452,7 @@ namespace MemCheck.WebUI.Controllers
             var user = await userManager.GetUserAsync(HttpContext.User);
             var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
             await new AddTagToCards(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(Get("TagAdded"), this);
+            return ControllerResultWithToast.Success(GetLocalized("TagAdded"), this);
         }
         public sealed class AddTagToCardsRequest
         {
@@ -466,7 +466,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, deckId, request.CardIds.ToArray()));
-            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardAdded") : Get("CardsAdded"), this);
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? GetLocalized("CardAdded") : GetLocalized("CardsAdded"), this);
         }
         public sealed class AddCardsToDeckRequest
         {
@@ -480,7 +480,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             await new RemoveCardsFromDeck(callContext).RunAsync(new RemoveCardsFromDeck.Request(userId, deckId, request.CardIds));
-            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardRemoved") : Get("CardsRemoved"), this);
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? GetLocalized("CardRemoved") : GetLocalized("CardsRemoved"), this);
         }
         public sealed class RemoveCardsFromDeckRequest
         {
@@ -495,7 +495,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new MoveCardsToHeap.Request(userId, deckId, heapId, request.CardIds);
             await new MoveCardsToHeap(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardMoved") : Get("CardsMoved"), this);
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? GetLocalized("CardMoved") : GetLocalized("CardsMoved"), this);
 
         }
         public sealed class MoveCardsToHeapRequest
@@ -511,7 +511,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new DeleteCards.Request(userId, request.CardIds);
             await new DeleteCards(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? Get("CardDeleted") : Get("CardsDeleted"), this);
+            return ControllerResultWithToast.Success(request.CardIds.Count() == 1 ? GetLocalized("CardDeleted") : GetLocalized("CardsDeleted"), this);
 
         }
         public sealed class DeleteCardsRequest
@@ -527,7 +527,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new AddCardSubscriptions.Request(userId, request.CardIds);
             await new AddCardSubscriptions(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(Get("Registered"), this);
+            return ControllerResultWithToast.Success(GetLocalized("Registered"), this);
         }
         public sealed class RegisterForNotificationsRequest
         {
@@ -542,7 +542,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new RemoveCardSubscriptions.Request(userId, request.CardIds);
             await new RemoveCardSubscriptions(callContext).RunAsync(appRequest);
-            return ControllerResultWithToast.Success(Get("Unregistered"), this);
+            return ControllerResultWithToast.Success(GetLocalized("Unregistered"), this);
         }
         public sealed class UnregisterForNotificationsRequest
         {
@@ -562,11 +562,11 @@ namespace MemCheck.WebUI.Controllers
             if (request.ExcludedTags.Contains(allTagsFakeGuid) && (request.RequiredTags.Count() > 1))
                 throw new ArgumentException("The allTagsFakeGuid must be alone in the excluded list");
             if (request.Deck != Guid.Empty && request.DeckIsInclusive)
-                throw new RequestInputException(Get("CanNotSubscribeToSearchInDeck"));
+                throw new RequestInputException(GetLocalized("CanNotSubscribeToSearchInDeck"));
             if (request.Visibility != 1)
-                throw new RequestInputException(Get("CanNotSubscribeToSearchWithVisibilityCriteria"));
+                throw new RequestInputException(GetLocalized("CanNotSubscribeToSearchWithVisibilityCriteria"));
             if (request.RatingFilteringMode != 1)
-                throw new RequestInputException(Get("CanNotSubscribeToSearchWithRatingCriteria"));
+                throw new RequestInputException(GetLocalized("CanNotSubscribeToSearchWithRatingCriteria"));
         }
         [HttpPost("SubscribeToSearch")]
         public async Task<IActionResult> SubscribeToSearch([FromBody] RunQueryRequest request)
@@ -574,9 +574,9 @@ namespace MemCheck.WebUI.Controllers
             ChecSubscribeToSearchRequestValidity(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
-            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, Get("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
+            var applicationRequest = new SubscribeToSearch.Request(userId, request.Deck, GetLocalized("NoName"), request.RequiredText, request.RequiredTags, excludedTags);
             await new SubscribeToSearch(callContext).RunAsync(applicationRequest);
-            return ControllerResultWithToast.Success(Get("SubscriptionRecorded"), this);
+            return ControllerResultWithToast.Success(GetLocalized("SubscriptionRecorded"), this);
         }
         public sealed class SubscribeToSearchViewModel
         {

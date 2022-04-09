@@ -1,4 +1,6 @@
-﻿namespace MemCheck.Basics
+﻿using System;
+
+namespace MemCheck.Basics
 {
     public static class StringExtensions
     {
@@ -10,7 +12,7 @@
             if (str.Length <= maxLength)
                 return str;
 
-            return str.Substring(0, maxLength) + "[...]";
+            return string.Concat(str.AsSpan(0, maxLength), "[...]");
         }
     }
 }

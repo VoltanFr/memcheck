@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,8 +17,7 @@ namespace MemCheck.Application.Notifying
         {
             var now = DateTime.UtcNow;
 
-            var search = new SearchSubscription
-            {
+            var search = new SearchSubscription {
                 UserId = request.UserId,
                 Name = request.Name,
                 ExcludedDeck = request.ExcludedDeck,
@@ -33,8 +31,7 @@ namespace MemCheck.Application.Notifying
             var requiredTags = new List<RequiredTagInSearchSubscription>();
             foreach (var requiredTag in request.RequiredTags)
             {
-                var required = new RequiredTagInSearchSubscription
-                {
+                var required = new RequiredTagInSearchSubscription {
                     SearchSubscriptionId = search.Id,
                     TagId = requiredTag
                 };
@@ -48,8 +45,7 @@ namespace MemCheck.Application.Notifying
                 var excludedTags = new List<ExcludedTagInSearchSubscription>();
                 foreach (var excludedTag in request.ExcludedTags)
                 {
-                    var excluded = new ExcludedTagInSearchSubscription
-                    {
+                    var excluded = new ExcludedTagInSearchSubscription {
                         SearchSubscriptionId = search.Id,
                         TagId = excludedTag
                     };
@@ -69,9 +65,9 @@ namespace MemCheck.Application.Notifying
                 ("HasAnExcludedDeck", (request.ExcludedDeck != Guid.Empty).ToString()),
                 ("Name", request.Name),
                 ("RequiredText", request.RequiredText),
-                ("RequiredTagCount", request.RequiredTags.Count().ToString()),
-                ("ExcludedTagCount", request.ExcludedTags == null ? "-1" : request.ExcludedTags.Count().ToString()),
-                ("NameLength", request.Name.Length.ToString()));
+                IntMetric("RequiredTagCount", request.RequiredTags.Count()),
+                IntMetric("ExcludedTagCount", request.ExcludedTags == null ? -1 : request.ExcludedTags.Count()),
+                IntMetric("NameLength", request.Name.Length));
         }
         #region Request & Result
         public sealed class Request : IRequest

@@ -1,6 +1,4 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
-using MemCheck.Domain;
+﻿using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -63,7 +61,7 @@ namespace MemCheck.Application.Images
                 result.Add(new ResultImageVersion(iterationVersion, previousVersion));
                 iterationVersion = previousVersion;
             }
-            return new ResultWithMetrologyProperties<IEnumerable<ResultImageVersion>>(result, ("ImageId", request.ImageId.ToString()), ("ResultCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<ResultImageVersion>>(result, ("ImageId", request.ImageId.ToString()), IntMetric("ResultCount", result.Count));
         }
         public sealed record Request(Guid ImageId) : IRequest
         {

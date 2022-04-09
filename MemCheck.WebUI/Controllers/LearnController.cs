@@ -52,7 +52,7 @@ namespace MemCheck.WebUI.Controllers
             }
 
             var blob = await new GetImage(callContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
-            var content = new MemoryStream(blob.ImageBytes);
+            var content = new MemoryStream(blob.ImageBytes.ToArray());
             return base.File(content, "APPLICATION/octet-stream", "noname");
         }
         #endregion
@@ -182,7 +182,7 @@ namespace MemCheck.WebUI.Controllers
                 References = RenderMarkdown(applicationResult.References);
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
-                RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
+                RemoveAlertMessage = localizer.GetLocalized("RemoveAlertMessage") + " " + Heap + "\n" + localizer.GetLocalized("DateAddedToDeck") + " ";
                 VisibleToCount = applicationResult.VisibleTo.Count();
                 AddToDeckUtcTime = applicationResult.AddToDeckUtcTime;
                 CurrentUserRating = applicationResult.UserRating;
@@ -194,12 +194,12 @@ namespace MemCheck.WebUI.Controllers
                     var visibleToUser = applicationResult.VisibleTo.First();
                     if (visibleToUser != currentUser)
                         throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
-                    VisibleTo = localizer.Get("YouOnly");
+                    VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
                 {
                     if (VisibleToCount == 0)
-                        VisibleTo = localizer.Get("AllUsers");
+                        VisibleTo = localizer.GetLocalized("AllUsers");
                     else
                         VisibleTo = string.Join(',', applicationResult.VisibleTo);
                 }
@@ -224,7 +224,7 @@ namespace MemCheck.WebUI.Controllers
                 References = RenderMarkdown(applicationResult.References);
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
-                RemoveAlertMessage = localizer.Get("RemoveAlertMessage") + " " + Heap + "\n" + localizer.Get("DateAddedToDeck") + " ";
+                RemoveAlertMessage = localizer.GetLocalized("RemoveAlertMessage") + " " + Heap + "\n" + localizer.GetLocalized("DateAddedToDeck") + " ";
                 VisibleToCount = applicationResult.VisibleTo.Count();
                 AddToDeckUtcTime = applicationResult.AddToDeckUtcTime;
                 CurrentUserRating = applicationResult.UserRating;
@@ -236,12 +236,12 @@ namespace MemCheck.WebUI.Controllers
                     var visibleToUser = applicationResult.VisibleTo.First();
                     if (visibleToUser != currentUser)
                         throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
-                    VisibleTo = localizer.Get("YouOnly");
+                    VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
                 {
                     if (VisibleToCount == 0)
-                        VisibleTo = localizer.Get("AllUsers");
+                        VisibleTo = localizer.GetLocalized("AllUsers");
                     else
                         VisibleTo = string.Join(',', applicationResult.VisibleTo);
                 }
@@ -273,7 +273,7 @@ namespace MemCheck.WebUI.Controllers
                 AverageRating = Math.Round(applicationResult.AverageRating, 1);
                 CountOfUserRatings = applicationResult.CountOfUserRatings;
                 IsInFrench = applicationResult.IsInFrench;
-                VisibleTo = localizer.Get("AllUsers");
+                VisibleTo = localizer.GetLocalized("AllUsers");
                 Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
                 MoveToHeapTargets = new GetCardsHeapModel[0];
                 RegisteredForNotifications = false;
@@ -336,19 +336,19 @@ namespace MemCheck.WebUI.Controllers
                 if (heapId == 0)
                 {
                     ExpiryUtcDate = CardInDeck.NeverLearntLastLearnTime;
-                    MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ?";
+                    MoveToAlertMessage = localizer.GetLocalized("MoveThisCardToHeap") + ' ' + heapName + " ?";
                 }
                 else
                 {
                     if (expiryUtcDate < DateTime.UtcNow)
                     {
                         ExpiryUtcDate = CardInDeck.NeverLearntLastLearnTime;
-                        MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.Get("ItWillBeExpired");
+                        MoveToAlertMessage = localizer.GetLocalized("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.GetLocalized("ItWillBeExpired");
                     }
                     else
                     {
                         ExpiryUtcDate = expiryUtcDate;
-                        MoveToAlertMessage = localizer.Get("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.Get("ItWillExpireOn");
+                        MoveToAlertMessage = localizer.GetLocalized("MoveThisCardToHeap") + ' ' + heapName + " ? " + localizer.GetLocalized("ItWillExpireOn");
                     }
                 }
             }
@@ -416,7 +416,7 @@ namespace MemCheck.WebUI.Controllers
                 DeckId = deckId;
                 Description = description;
                 ShowDebugInfo = showDebugInfo;
-                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer.Get("None")) }.Concat(tags.Select(tag => new UserDecksTagViewModel(tag.TagId, tag.TagName)));
+                Tags = new[] { new UserDecksTagViewModel(noTagFakeGuid, localizer.GetLocalized("None")) }.Concat(tags.Select(tag => new UserDecksTagViewModel(tag.TagId, tag.TagName)));
             }
             public Guid DeckId { get; }
             public string Description { get; }
@@ -467,10 +467,10 @@ namespace MemCheck.WebUI.Controllers
         public IActionResult GetDemoMessages()
         {
             return Ok(new GetDemoMessagesViewModel(
-            Get("OnKnewToastTitle"),
-            Get("OnKnewToastMessage"),
-            Get("OnDidNotKnowToastTitle"),
-            Get("OnDidNotKnowToastMessage")
+            GetLocalized("OnKnewToastTitle"),
+            GetLocalized("OnKnewToastMessage"),
+            GetLocalized("OnDidNotKnowToastTitle"),
+            GetLocalized("OnDidNotKnowToastMessage")
             ));
         }
         public sealed class GetDemoMessagesViewModel

@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -42,7 +41,7 @@ namespace MemCheck.Application.Decks
                 result.Add(new Result(deck.Id, deck.Description, heaps, tags.Select(tag => new ResultTag(tag.TagId, tag.TagName))));
             }
 
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("DeckCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("DeckCount", result.Count));
         }
         #region Request & Result
         public sealed record Request(Guid UserId) : IRequest

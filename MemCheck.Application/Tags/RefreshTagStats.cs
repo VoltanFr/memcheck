@@ -49,7 +49,7 @@ namespace MemCheck.Application.Tags
 
             await DbContext.SaveChangesAsync();
 
-            return new ResultWithMetrologyProperties<Result>(new Result(result.ToImmutableArray()), ("TagCount", result.Count.ToString()));
+            return new ResultWithMetrologyProperties<Result>(new Result(result.ToImmutableArray()), IntMetric("TagCount", result.Count));
         }
         #region Request & Result
         public sealed record Request() : IRequest

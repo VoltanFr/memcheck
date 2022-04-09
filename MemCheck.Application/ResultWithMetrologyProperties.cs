@@ -1,4 +1,6 @@
-﻿namespace MemCheck.Application
+﻿using System.Collections.Generic;
+
+namespace MemCheck.Application
 {
     public class ResultWithMetrologyProperties<TResult>
     {
@@ -12,7 +14,7 @@
             this.properties = properties;
         }
         public TResult ActualResult => actualResult;
-        public (string key, string value)[] Properties => properties;
+        public IEnumerable<(string key, string value)> Properties => properties;
     }
 
 }

@@ -28,7 +28,7 @@ namespace MemCheck.Application.Notifying
                 .ToListAsync();
 
             var result = queryResult.Select(subscription => new Result(subscription, tagDictionary, deckDictionary, DbContext));
-            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, ("ResultCount", result.Count().ToString()));
+            return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("ResultCount", result.Count()));
         }
         #region Request & Result
         public sealed record Request : IRequest

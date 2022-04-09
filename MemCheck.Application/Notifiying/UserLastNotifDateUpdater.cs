@@ -1,5 +1,4 @@
-﻿using MemCheck.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -15,10 +14,10 @@ namespace MemCheck.Application.Notifying
     {
         #region Fields
         private readonly CallContext callContext;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         private readonly DateTime runningUtcDate;
         #endregion
-        public UserLastNotifDateUpdater(CallContext callContext, List<string> performanceIndicators, DateTime runningUtcDate)
+        public UserLastNotifDateUpdater(CallContext callContext, ICollection<string> performanceIndicators, DateTime runningUtcDate)
         {
             //Prod constructor
             this.callContext = callContext;

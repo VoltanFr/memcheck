@@ -50,7 +50,7 @@ namespace MemCheck.WebUI.Controllers
                 this.linkGenerator = linkGenerator;
                 this.httpContext = httpContext;
             }
-            public string GetAbsoluteUri(string relativeUri)
+            public string GetAbsoluteAddress(string relativeUri)
             {
                 return linkGenerator.GetUriByPage(httpContext, page: relativeUri)!;
             }

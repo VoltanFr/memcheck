@@ -29,7 +29,7 @@ namespace MemCheck.Application.Notifying
         private readonly CallContext callContext;
         private readonly DateTime runningUtcDate;
         private readonly int maxCountToReport;
-        private readonly List<string> performanceIndicators;
+        private readonly ICollection<string> performanceIndicators;
         #endregion
         #region private sealed record DetailsFromCardsNotFoundAnymore
         private sealed record DetailsFromCardsNotFoundAnymore(
@@ -44,8 +44,7 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private static SearchCards.Request GetRequest(SearchSubscription subscription)
         {
-            var request = new SearchCards.Request
-            {
+            var request = new SearchCards.Request {
                 UserId = subscription.UserId,
                 RequiredText = subscription.RequiredText,
                 RequiredTags = subscription.RequiredTags.Select(t => t.TagId),
@@ -196,7 +195,7 @@ namespace MemCheck.Application.Notifying
              );
         }
         #endregion
-        public UserSearchNotifier(CallContext callContext, int maxCountToReport, List<string> performanceIndicators)
+        public UserSearchNotifier(CallContext callContext, int maxCountToReport, ICollection<string> performanceIndicators)
         {
             //Prod constructor
             this.callContext = callContext;
@@ -237,14 +236,14 @@ namespace MemCheck.Application.Notifying
             callContext.TelemetryClient.TrackEvent("UserSearchNotifier",
                 ("searchSubscriptionId", searchSubscriptionId.ToString()),
                 ("SubscriptionName", result.SubscriptionName.ToString()),
-                ("TotalNewlyFoundCardCount", result.TotalNewlyFoundCardCount.ToString()),
-                ("NewlyFoundCardsCount", result.NewlyFoundCards.Length.ToString()),
-                ("CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView", result.CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView.ToString()),
-                ("CardsNotFoundAnymore_StillExists_UserAllowedToViewCount", result.CardsNotFoundAnymore_StillExists_UserAllowedToView.Length.ToString()),
-                ("CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView", result.CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView.ToString()),
-                ("CardsNotFoundAnymore_Deleted_UserAllowedToViewCount", result.CardsNotFoundAnymore_Deleted_UserAllowedToView.Length.ToString()),
-                ("CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView", result.CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView.ToString()),
-                ("CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToViewCount", result.CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView.ToString()));
+                ClassWithMetrics.IntMetric("TotalNewlyFoundCardCount", result.TotalNewlyFoundCardCount),
+                ClassWithMetrics.IntMetric("NewlyFoundCardsCount", result.NewlyFoundCards.Length),
+                ClassWithMetrics.IntMetric("CountOfCardsNotFoundAnymore_StillExists_UserAllowedToView", result.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView),
+                ClassWithMetrics.IntMetric("CardsNotFoundAnymore_StillExists_UserAllowedToViewCount", result.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length),
+                ClassWithMetrics.IntMetric("CountOfCardsNotFoundAnymore_Deleted_UserAllowedToView", result.CountOfCardsNotFoundAnymoreDeletedUserAllowedToView),
+                ClassWithMetrics.IntMetric("CardsNotFoundAnymore_Deleted_UserAllowedToViewCount", result.CardsNotFoundAnymoreDeletedUserAllowedToView.Length),
+                ClassWithMetrics.IntMetric("CountOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView", result.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView),
+                ClassWithMetrics.IntMetric("CountOfCardsNotFoundAnymore_Deleted_UserNotAllowedToViewCount", result.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView));
 
             return result;
         }
