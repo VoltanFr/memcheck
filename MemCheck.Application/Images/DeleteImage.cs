@@ -15,7 +15,8 @@ namespace MemCheck.Application.Images
         #region Private methods
         private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
         {
-            return i.VersionType switch {
+            return i.VersionType switch
+            {
                 ImageVersionType.Creation => ImagePreviousVersionType.Creation,
                 ImageVersionType.Changes => ImagePreviousVersionType.Changes,
                 _ => throw new NotImplementedException(),
@@ -42,7 +43,8 @@ namespace MemCheck.Application.Images
             //- one for the last known operation (described in the image)
             //- one for the deletion operation
 
-            var versionFromCurrentImage = new ImagePreviousVersion() {
+            var versionFromCurrentImage = new ImagePreviousVersion()
+            {
                 Image = request.ImageId,
                 Owner = image.Owner,
                 Name = image.Name,
@@ -58,7 +60,8 @@ namespace MemCheck.Application.Images
                 PreviousVersion = image.PreviousVersion,
             };
 
-            var deletionVersion = new ImagePreviousVersion() {
+            var deletionVersion = new ImagePreviousVersion()
+            {
                 Image = request.ImageId,
                 Owner = user,
                 Name = image.Name,
@@ -92,7 +95,7 @@ namespace MemCheck.Application.Images
             {
                 if (DeletionDescription != DeletionDescription.Trim())
                     throw new InvalidOperationException("Invalid name: not trimmed");
-                if (DeletionDescription.Length < MinDescriptionLength || DeletionDescription.Length > MaxDescriptionLength)
+                if (DeletionDescription.Length is < MinDescriptionLength or > MaxDescriptionLength)
                     throw new RequestInputException(callContext.Localized.GetLocalized("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxDescriptionLength}");
 
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);

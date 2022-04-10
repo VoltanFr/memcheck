@@ -1,5 +1,5 @@
-﻿using MemCheck.Application.Notifying;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Notifying
 {
     [TestClass()]
     public class AddCardSubscriptionsTest
@@ -29,7 +29,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(testDB))
             {
                 var subscription = await dbContext.CardNotifications.SingleAsync(notif => notif.UserId == otherUserId && notif.CardId == card.Id);
-                Assert.AreEqual(CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser, subscription.RegistrationMethod);
+                Assert.AreEqual(CardNotificationSubscription.CardNotificationRegistrationMethodExplicitByUser, subscription.RegistrationMethod);
             }
         }
         [TestMethod()]

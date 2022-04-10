@@ -16,7 +16,7 @@ namespace MemCheck.WebUI
         {
             this.settings = settings;
         }
-        public async Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             var client = new SendGridClient(settings.SendGridKey);
             var senderEmail = new EmailAddress(settings.SendGridSender, settings.SendGridUser);
@@ -24,8 +24,8 @@ namespace MemCheck.WebUI
             {
                 From = senderEmail,
                 Subject = subject,
-                PlainTextContent = message,
-                HtmlContent = message,
+                PlainTextContent = htmlMessage,
+                HtmlContent = htmlMessage,
             };
             msg.AddTo(new EmailAddress(email));
             msg.AddBcc(new EmailAddress(settings.SendGridSender));
@@ -35,8 +35,7 @@ namespace MemCheck.WebUI
         public string Sender => settings.SendGridSender;
         public static string SenderFromInterface(IEmailSender emailSender)
         {
-            var sendGrid = emailSender as SendGridEmailSender;
-            return sendGrid != null ? sendGrid.Sender : "Unknown";
+            return emailSender is SendGridEmailSender sendGrid ? sendGrid.Sender : "Unknown";
         }
     }
 }

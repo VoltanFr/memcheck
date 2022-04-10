@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     /// <summary> This notifier reports cards which appear or disappear in the given search, compared to the previous run.
     /// Here is the complete list of possibilities of events which bring this situation if they have occurred since last execution:
@@ -44,7 +44,8 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private static SearchCards.Request GetRequest(SearchSubscription subscription)
         {
-            var request = new SearchCards.Request {
+            var request = new SearchCards.Request
+            {
                 UserId = subscription.UserId,
                 RequiredText = subscription.RequiredText,
                 RequiredTags = subscription.RequiredTags.Select(t => t.TagId),
@@ -52,10 +53,9 @@ namespace MemCheck.Application.Notifying
                 PageNo = 0
             };
 
-            if (subscription.ExcludeAllTags)
-                request = request with { ExcludedTags = null };
-            else
-                request = request with { ExcludedTags = subscription.ExcludedTags.Select(t => t.TagId) };
+            request = subscription.ExcludeAllTags
+                ? (request with { ExcludedTags = null })
+                : (request with { ExcludedTags = subscription.ExcludedTags.Select(t => t.TagId) });
 
             if (subscription.ExcludedDeck != Guid.Empty)
                 request = request with { Deck = subscription.ExcludedDeck, DeckIsInclusive = false };

@@ -1,5 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,13 +32,13 @@ namespace MemCheck.Application.Cards
                     RandomHelper.String(),
                     new Guid[] { imageId },
                     RandomHelper.String(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     RandomHelper.String(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     RandomHelper.String(),
                     languageId,
-                    new Guid[0],
-                    new Guid[0],
+                    Array.Empty<Guid>(),
+                    Array.Empty<Guid>(),
                     RandomHelper.String());
                 cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
             }
@@ -265,14 +266,14 @@ namespace MemCheck.Application.Cards
                 RandomHelper.String(CardInputValidator.MaxReferencesLength + 1),
                 languageId,
                 Array.Empty<Guid>(),
-                new Guid[0],
+                Array.Empty<Guid>(),
                 RandomHelper.String());
 
             using var dbContext = new MemCheckDbContext(testDB);
             var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
-            StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString());
-            StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString());
-            StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString());
+            StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString(CultureInfo.InvariantCulture));
+            StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString(CultureInfo.InvariantCulture));
+            StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString(CultureInfo.InvariantCulture));
         }
     }
 }

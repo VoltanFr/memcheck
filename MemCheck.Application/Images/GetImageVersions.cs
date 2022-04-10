@@ -29,7 +29,7 @@ namespace MemCheck.Application.Images
                 .Include(img => img.PreviousVersion)
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
-                    img.PreviousVersion == null ? (Guid?)null : img.PreviousVersion.Id,
+                    img.PreviousVersion == null ? null : img.PreviousVersion.Id,
                     img.LastChangeUtcDate,
                     img.Owner,
                     img.Name,
@@ -42,7 +42,7 @@ namespace MemCheck.Application.Images
                 .AsNoTracking()
                 .Select(img => new ImageVersionFromDb(
                     img.Id,
-                    img.PreviousVersion == null ? (Guid?)null : img.PreviousVersion.Id,
+                    img.PreviousVersion == null ? null : img.PreviousVersion.Id,
                     img.VersionUtcDate,
                     img.Owner,
                     img.Name,

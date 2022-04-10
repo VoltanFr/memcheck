@@ -1,7 +1,7 @@
 ﻿using MemCheck.Basics;
 using System;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     public sealed class CardDeletion
     {

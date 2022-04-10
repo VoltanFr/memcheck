@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.NotifierResult>
     {

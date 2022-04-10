@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Tests.Helpers;
+using MemCheck.Application.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -577,10 +577,14 @@ namespace MemCheck.Application.History
             using (var dbContextForUpdate = new MemCheckDbContext(db))
             {
                 var request = UpdateCardHelper.RequestForFrontSideChange(card, newFrontSide, versionDescription: newVersionDescription)
-                    with { BackSide = newBackSide }
-                    with { AdditionalInfoImageList = newVersionImage.AsArray() }
-                    with { Tags = originalTagId1.AsArray() }
-                    with { References = newReferences };
+                    with
+                { BackSide = newBackSide }
+                    with
+                { AdditionalInfoImageList = newVersionImage.AsArray() }
+                    with
+                { Tags = originalTagId1.AsArray() }
+                    with
+                { References = newReferences };
                 await new UpdateCard(dbContextForUpdate.AsCallContext(), newVersionDate).RunAsync(request);
             }
 

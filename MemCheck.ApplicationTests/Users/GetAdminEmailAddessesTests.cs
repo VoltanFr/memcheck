@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -39,7 +39,7 @@ namespace MemCheck.Application.Users
             var adminUserEMail = RandomHelper.String();
             var adminUser = await UserHelper.CreateInDbAsync(db, userName: adminUserName, userEMail: adminUserEMail);
 
-            var nonAdminUser = await UserHelper.CreateInDbAsync(db);
+            await UserHelper.CreateInDbAsync(db);
 
             using var dbContext = new MemCheckDbContext(db);
             var loaded = await new GetAdminEmailAddesses(dbContext.AsCallContext(new TestRoleChecker(adminUser))).RunAsync(new GetAdminEmailAddesses.Request(adminUser));

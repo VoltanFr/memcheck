@@ -13,9 +13,10 @@ namespace MemCheck.Application.Images
         #region Fields
         #endregion
         #region Private methods
-        private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Domain.Image i)
+        private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)
         {
-            return i.VersionType switch {
+            return i.VersionType switch
+            {
                 ImageVersionType.Creation => ImagePreviousVersionType.Creation,
                 ImageVersionType.Changes => ImagePreviousVersionType.Changes,
                 _ => throw new NotImplementedException(),
@@ -31,7 +32,8 @@ namespace MemCheck.Application.Images
             var image = await DbContext.Images.Include(img => img.Owner).Include(img => img.PreviousVersion).SingleAsync(img => img.Id == request.ImageId);
             var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
 
-            var versionFromCurrentImage = new ImagePreviousVersion() {
+            var versionFromCurrentImage = new ImagePreviousVersion()
+            {
                 Image = request.ImageId,
                 Owner = image.Owner,
                 Name = image.Name,

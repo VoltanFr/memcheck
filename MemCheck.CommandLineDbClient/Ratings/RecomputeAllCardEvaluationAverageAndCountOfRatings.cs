@@ -25,7 +25,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         {
             logger.LogInformation($"Will recompute average rating and rating count for all cards");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var allCardWithRatings = (await dbContext.UserCardRatings.Select(c => c.CardId).ToListAsync()).ToImmutableArray();
             logger.LogInformation($"Will recompute ratings of {allCardWithRatings.Length} cards");
@@ -42,9 +42,9 @@ namespace MemCheck.CommandLineDbClient.Ratings
                 card.AverageRating = average;
             }
 
-            await dbContext.SaveChangesAsync();
+            var dbUpdateCount = await dbContext.SaveChangesAsync();
 
-            logger.LogInformation($"Rating updates finished");
+            logger.LogInformation($"Rating updates finished - dbUpdateCount: {dbUpdateCount}");
         }
     }
 }

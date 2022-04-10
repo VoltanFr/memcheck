@@ -20,7 +20,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         #endregion
         private record TestDefinition(string Description, GetAllTags.Request Request)
         {
-            public List<double> RunSpentSeconds = new List<double>();
+            public List<double> RunSpentSeconds = new();
             public int TagCount { get; set; }
             public int TotalCardCount { get; set; }
             public int AnomalyCount { get; set; } = 0;
@@ -56,7 +56,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
                 }
             }
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             //Tests show that single measures are not reliable. I run each case ten times, not taking the first time into account.
 

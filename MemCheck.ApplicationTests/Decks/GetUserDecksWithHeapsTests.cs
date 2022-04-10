@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.Tests.Helpers;
+using MemCheck.Application.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

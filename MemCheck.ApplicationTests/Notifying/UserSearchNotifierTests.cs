@@ -1,7 +1,7 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Notifying;
+using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.Searching;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Notifying
 {
     [TestClass()]
     public class UserSearchNotifierTests
@@ -371,7 +371,7 @@ namespace MemCheck.Application.Tests.Notifying
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var searchResult = await new UserSearchNotifier(dbContext.AsCallContext(), 2, new DateTime(2050, 05, 01)).RunAsync(subscriptionId);
-                Assert.AreEqual(SearchCards.Request.MaxPageSize * 2 + 1, searchResult.TotalNewlyFoundCardCount);
+                Assert.AreEqual((SearchCards.Request.MaxPageSize * 2) + 1, searchResult.TotalNewlyFoundCardCount);
                 Assert.AreEqual(2, searchResult.NewlyFoundCards.Length);
                 Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserAllowedToView);
                 Assert.AreEqual(0, searchResult.CardsNotFoundAnymoreStillExistsUserAllowedToView.Length);

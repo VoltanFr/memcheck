@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     public sealed class AddCardSubscriptions : RequestRunner<AddCardSubscriptions.Request, AddCardSubscriptions.Result>
     {
@@ -18,7 +18,7 @@ namespace MemCheck.Application.Notifying
             var now = DateTime.UtcNow;
 
             foreach (var cardId in request.CardIds)
-                CreateSubscription(DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethod_ExplicitByUser);
+                CreateSubscription(DbContext, request.UserId, cardId, now, CardNotificationSubscription.CardNotificationRegistrationMethodExplicitByUser);
 
             await DbContext.SaveChangesAsync();
             return new ResultWithMetrologyProperties<Result>(new Result(), IntMetric("CardCount", request.CardIds.Count()));
@@ -27,7 +27,8 @@ namespace MemCheck.Application.Notifying
         {
             if (dbContext.CardNotifications.Where(notif => notif.UserId == userId && notif.CardId == cardId).Any())
                 return;
-            CardNotificationSubscription notif = new() {
+            CardNotificationSubscription notif = new()
+            {
                 CardId = cardId,
                 UserId = userId,
                 RegistrationUtcDate = registrationUtcDate,

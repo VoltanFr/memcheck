@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     internal sealed class TestLocalizer : ILocalized
     {

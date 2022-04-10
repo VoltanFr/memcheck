@@ -9,7 +9,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     public sealed class GetSearchSubscriptions : RequestRunner<GetSearchSubscriptions.Request, IEnumerable<GetSearchSubscriptions.Result>>
     {

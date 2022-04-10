@@ -24,7 +24,7 @@ namespace MemCheck.Application.Cards
                 .Where(cardInDeck =>
                     cardInDeck.DeckId == request.DeckId
                     && (request.LessonModeIsUnknown ? cardInDeck.CurrentHeap == CardInDeck.UnknownHeap : cardInDeck.CurrentHeap != CardInDeck.UnknownHeap)
-                    && (request.LessonModeIsUnknown ? true : cardInDeck.ExpiryUtcTime <= runDate)
+                    && (request.LessonModeIsUnknown || cardInDeck.ExpiryUtcTime <= runDate)
                     && !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)))
                 .CountAsync();
 

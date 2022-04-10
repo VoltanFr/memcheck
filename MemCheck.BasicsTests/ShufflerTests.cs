@@ -3,7 +3,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace MemCheck.Basics.Tests
+namespace MemCheck.Basics
 {
     [TestClass()]
     public class ShufflerTests

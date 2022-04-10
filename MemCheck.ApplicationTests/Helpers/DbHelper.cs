@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     public static class DbHelper
     {

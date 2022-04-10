@@ -37,9 +37,9 @@ namespace MemCheck.Application.Users
             //In MemCheck, a user account is never deleted, but anonymized (with class DeleteUserAccount)
             throw new InvalidOperationException("This is not meant to be called");
         }
-        public async override Task<IdentityResult> CreateAsync(MemCheckUser user)
+        public override async Task<IdentityResult> CreateAsync(MemCheckUser user)
         {
-            if (user.UserName.Length > MaxUserNameLength || user.UserName.Length < MinUserNameLength)
+            if (user.UserName.Length is > MaxUserNameLength or < MinUserNameLength)
                 return IdentityResult.Failed(new IdentityError() { Code = BadUserNameLengthErrorCode, Description = $"User name must contain between {MinUserNameLength} and {MaxUserNameLength} chars" }.AsArray());
 
             user.RegistrationUtcDate = DateTime.UtcNow;
@@ -53,7 +53,7 @@ namespace MemCheck.Application.Users
             }
             return result;
         }
-        public async override Task<IdentityResult> ConfirmEmailAsync(MemCheckUser user, string token)
+        public override async Task<IdentityResult> ConfirmEmailAsync(MemCheckUser user, string token)
         {
             var result = await base.ConfirmEmailAsync(user, token);
             callContext.TelemetryClient.TrackEvent("UserAccountConfirmed", ("UserName", user.UserName), ("Email", user.Email), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));

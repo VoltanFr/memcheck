@@ -1,6 +1,6 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.Ratings;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -528,8 +528,10 @@ namespace MemCheck.Application.Users
             using (var dbContext = new MemCheckDbContext(db))
             {
                 using var userManager = UserHelper.GetUserManager(dbContext);
-                var user = new MemCheckUser();
-                user.UserName = userName;
+                var user = new MemCheckUser
+                {
+                    UserName = userName
+                };
                 var creationResult = await userManager.CreateAsync(user);
                 Assert.AreNotEqual(IdentityResult.Success, creationResult);
             }

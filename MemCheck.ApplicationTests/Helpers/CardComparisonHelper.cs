@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     public static class CardComparisonHelper
     {

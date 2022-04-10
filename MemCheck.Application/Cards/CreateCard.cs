@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Notifiying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -72,7 +72,7 @@ namespace MemCheck.Application.Cards
             card.Images = cardImageList;
 
             if (versionCreator.SubscribeToCardOnEdit)
-                AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
+                AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
 
             await DbContext.SaveChangesAsync();
 

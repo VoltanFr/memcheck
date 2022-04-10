@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -265,6 +265,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(0, dbContext.ImagesInCardPreviousVersions.Count());
             }
         }
+        [TestMethod()]
         public async Task CascadeDeletionOfImageInCardPreviousVersion_ImageChangesSide()
         {
             var db = DbHelper.GetEmptyTestDB();

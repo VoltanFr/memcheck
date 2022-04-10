@@ -1,5 +1,5 @@
-﻿using MemCheck.Application.Notifying;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Notifying
 {
     [TestClass()]
     public class NotifierTests

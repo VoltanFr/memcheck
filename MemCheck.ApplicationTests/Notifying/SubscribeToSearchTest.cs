@@ -1,7 +1,7 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Notifying
+namespace MemCheck.Application.Notifying
 {
     [TestClass()]
     public class SubscribeToSearchTest

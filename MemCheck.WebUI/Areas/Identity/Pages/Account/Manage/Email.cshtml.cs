@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -53,8 +54,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             Email = email;
 
-            Input = new InputModel
-            {
+            Input = new InputModel {
                 NewEmail = email,
             };
 
@@ -93,9 +93,9 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
                 var callbackUrl = Url.Page("/Account/ConfirmEmailChange", pageHandler: null, values: new { userId, email = Input.NewEmail, code }, protocol: Request.Scheme)!;
 
                 var mailBody = new StringBuilder();
-                mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-                mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
-                mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["ThankYou"].Value}</p>");
 
                 await _emailSender.SendEmailAsync(Input.NewEmail, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
@@ -128,9 +128,9 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId, code }, protocol: Request.Scheme)!;
 
             var mailBody = new StringBuilder();
-            mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-            mailBody.Append($"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
-            mailBody.Append($"<p>{localizer["ThankYou"].Value}</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
+            mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["ThankYou"].Value}</p>");
 
             await _emailSender.SendEmailAsync(email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 

@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -33,7 +33,7 @@ namespace MemCheck.Application.Users
 
             using (var dbContext = new MemCheckDbContext(db))
             using (var userManager = UserHelper.GetUserManager(dbContext))
-                await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(userId,userId));
+                await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(userId, userId));
 
             using (var dbContext = new MemCheckDbContext(db))
                 await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(userId)));
@@ -50,7 +50,7 @@ namespace MemCheck.Application.Users
 
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var user=dbContext.Users.Single(user => user.Id == userId);
+                var user = dbContext.Users.Single(user => user.Id == userId);
                 Assert.AreEqual(lastSeenDate, user.LastSeenUtcDate);
             }
         }

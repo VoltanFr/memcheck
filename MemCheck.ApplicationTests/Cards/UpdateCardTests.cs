@@ -1,6 +1,6 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
@@ -517,15 +517,15 @@ namespace MemCheck.Application.Cards
                     originalCard.Id,
                     cardCreator,
                     newFrontSide + ' ',
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     originalCard.BackSide,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     originalCard.AdditionalInfo,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     originalCard.References,
                     languageId,
-                    new Guid[0],
-                    new Guid[0],
+                    Array.Empty<Guid>(),
+                    Array.Empty<Guid>(),
                     RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
             }
@@ -566,14 +566,14 @@ namespace MemCheck.Application.Cards
                     originalCard.Id,
                     cardCreator,
                     originalCard.FrontSide,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     originalCard.BackSide,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     originalCard.AdditionalInfo,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     " " + newReferences,
                     languageId,
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     new Guid[0],
                     RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);

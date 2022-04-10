@@ -1,1 +1,69 @@
+# General rule to activate all analysis
+dotnet_analyzer_diagnostic.severity = error
+
+# I don't care about marking assemblies CLSCompliant
 dotnet_diagnostic.CA1014.severity = none
+
+# I want to use var
+dotnet_diagnostic.IDE0008.severity = none
+
+# I don't want to always use braces (eg if or foreach blocks)
+dotnet_diagnostic.IDE0011.severity = none
+
+# I want to use file-scoped namespaces
+dotnet_diagnostic.IDE0160.severity = none
+
+# I like inlined methods
+dotnet_diagnostic.IDE0022.severity = none
+
+# Never ignoring expression value is not efficient from my point of view
+dotnet_diagnostic.IDE0058.severity = none
+
+# ConfigureAwait is useless in Asp NET Core
+dotnet_diagnostic.CA2007.severity = none
+
+# I use public nested classes
+dotnet_diagnostic.CA1034.severity = none
+
+# I rely on nullable and don't want to check params
+dotnet_diagnostic.CA1062.severity = none
+
+# Rules to be reconsidered for activation when I have time
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.CA1052.severity = none
+dotnet_diagnostic.CA1054.severity = none
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1061.severity = none
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1508.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1805.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.CA1823.severity = none
+dotnet_diagnostic.CA1825.severity = none
+dotnet_diagnostic.CA1846.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA2000.severity = none
+dotnet_diagnostic.CA2201.severity = none
+dotnet_diagnostic.CA2227.severity = none
+dotnet_diagnostic.CA2254.severity = none
+dotnet_diagnostic.IDE0004.severity = none
+dotnet_diagnostic.IDE0025.severity = none
+dotnet_diagnostic.IDE0032.severity = none
+dotnet_diagnostic.IDE0036.severity = none
+dotnet_diagnostic.IDE0040.severity = none
+dotnet_diagnostic.IDE0045.severity = none
+dotnet_diagnostic.IDE0046.severity = none
+dotnet_diagnostic.IDE0055.severity = none
+dotnet_diagnostic.IDE0057.severity = none
+dotnet_diagnostic.IDE0078.severity = none
+dotnet_diagnostic.IDE0090.severity = none
+dotnet_diagnostic.IDE0120.severity = none
+dotnet_diagnostic.IDE0130.severity = none
+dotnet_diagnostic.IDE1006.severity = none

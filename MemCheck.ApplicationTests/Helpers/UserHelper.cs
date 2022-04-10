@@ -15,10 +15,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
-    public class UserHelper
+    public sealed class UserHelper
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by MemCheckUserManager")]
         public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
         {
             var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
@@ -49,7 +50,8 @@ namespace MemCheck.Application.Tests.Helpers
         }
         public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
         {
-            return new MemCheckUser {
+            return new MemCheckUser
+            {
                 MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
                 LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
                 SubscribeToCardOnEdit = subscribeToCardOnEdit,

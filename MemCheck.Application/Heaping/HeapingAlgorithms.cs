@@ -9,7 +9,6 @@ namespace MemCheck.Application.Heaping
     {
         #region Fields
         private readonly ImmutableDictionary<int, HeapingAlgorithm> algorithms;
-        private static readonly HeapingAlgorithms instance = new();
         #endregion
         #region Private methods
         private HeapingAlgorithms()
@@ -24,20 +23,14 @@ namespace MemCheck.Application.Heaping
             }.ToImmutableDictionary();
         }
         #endregion
-        public IEnumerable<int> Ids
-        {
-            get
-            {
-                return algorithms.Keys.OrderBy(key => key);
-            }
-        }
+        public IEnumerable<int> Ids => algorithms.Keys.OrderBy(key => key);
         public HeapingAlgorithm FromId(int heapingAlgorithmId)
         {
-            if (!algorithms.ContainsKey(heapingAlgorithmId))
-                throw new ArgumentException($"Unknown heaping algorithm {heapingAlgorithmId}");
-            return algorithms[heapingAlgorithmId];
+            return !algorithms.ContainsKey(heapingAlgorithmId)
+                ? throw new ArgumentException($"Unknown heaping algorithm {heapingAlgorithmId}")
+                : algorithms[heapingAlgorithmId];
         }
-        public static HeapingAlgorithms Instance => instance;
+        public static HeapingAlgorithms Instance { get; } = new();
         public static int DefaultAlgoId => DefaultHeapingAlgorithm.ID;
     }
 }

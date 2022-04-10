@@ -23,7 +23,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadImages
         {
             logger.LogInformation("Will change owners previous image versions with null ones");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
 
@@ -37,8 +37,9 @@ namespace MemCheck.CommandLineDbClient.HandleBadImages
                 image.Owner = user;
             }
 
-            await dbContext.SaveChangesAsync();
-            logger.LogInformation($"Finished");
+            var dbUpdateCount = await dbContext.SaveChangesAsync();
+
+            logger.LogInformation($"Finished - dbUpdateCount: {dbUpdateCount}");
         }
     }
 }

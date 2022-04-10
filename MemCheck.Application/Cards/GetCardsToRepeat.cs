@@ -132,7 +132,7 @@ namespace MemCheck.Application.Cards
                 QueryValidationHelper.CheckNotReservedGuid(DeckId);
                 QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedCardIds);
                 QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedTagIds);
-                if (CardsToDownload < 1 || CardsToDownload > 100)
+                if (CardsToDownload is < 1 or > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);
             }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     public sealed class SubscribeToSearch : RequestRunner<SubscribeToSearch.Request, SubscribeToSearch.Result>
     {
@@ -17,7 +17,8 @@ namespace MemCheck.Application.Notifying
         {
             var now = DateTime.UtcNow;
 
-            var search = new SearchSubscription {
+            var search = new SearchSubscription
+            {
                 UserId = request.UserId,
                 Name = request.Name,
                 ExcludedDeck = request.ExcludedDeck,
@@ -31,7 +32,8 @@ namespace MemCheck.Application.Notifying
             var requiredTags = new List<RequiredTagInSearchSubscription>();
             foreach (var requiredTag in request.RequiredTags)
             {
-                var required = new RequiredTagInSearchSubscription {
+                var required = new RequiredTagInSearchSubscription
+                {
                     SearchSubscriptionId = search.Id,
                     TagId = requiredTag
                 };
@@ -45,7 +47,8 @@ namespace MemCheck.Application.Notifying
                 var excludedTags = new List<ExcludedTagInSearchSubscription>();
                 foreach (var excludedTag in request.ExcludedTags)
                 {
-                    var excluded = new ExcludedTagInSearchSubscription {
+                    var excluded = new ExcludedTagInSearchSubscription
+                    {
                         SearchSubscriptionId = search.Id,
                         TagId = excludedTag
                     };
@@ -107,7 +110,7 @@ namespace MemCheck.Application.Notifying
                     foreach (var excludedTag in ExcludedTags)
                         if (!await callContext.DbContext.Tags.AnyAsync(t => t.Id == excludedTag))
                             throw new RequestInputException($"Invalid excluded tag id '{excludedTag}'");
-                    if (ExcludedTags.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
+                    if (ExcludedTags.GroupBy(guid => guid).Any(guid => guid.Count() > 1))
                         throw new RequestInputException("Excluded tag list contains duplicate");
                 }
 
@@ -115,7 +118,7 @@ namespace MemCheck.Application.Notifying
                     if (!callContext.DbContext.Tags.Any(t => t.Id == requiredTag))
                         throw new RequestInputException($"Invalid required tag id '{requiredTag}'");
 
-                if (RequiredTags.GroupBy(guid => guid).Where(guid => guid.Count() > 1).Any())
+                if (RequiredTags.GroupBy(guid => guid).Any(guid => guid.Count() > 1))
                     throw new RequestInputException("Required tag list contains duplicate");
 
                 int userSubscriptionsCount = callContext.DbContext.SearchSubscriptions.Count(s => s.UserId == UserId);

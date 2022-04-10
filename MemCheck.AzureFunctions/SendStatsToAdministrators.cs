@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MemCheck.AzureFunctions;
 
-internal sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
+public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
 {
     #region Fields
     private const string FuncName = nameof(SendStatsToAdministrators);
@@ -50,7 +50,7 @@ internal sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         await RunAsync();
     }
     protected override string FunctionName => FuncName;
-    protected async override Task DoRunAsync()
+    protected override async Task DoRunAsync()
     {
         var allUsers = await GetAllUsersAsync();
         var mailBody = new StatsToAdminMailBuilder(FunctionName, StartTime, await AdminsAsync(), allUsers).GetMailBody();

@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,20 +21,17 @@ namespace MemCheck.WebUI.Controllers
         private readonly CallContext callContext;
         private readonly UserManager<MemCheckUser> userManager;
         private readonly SignInManager<MemCheckUser> signInManager;
-        private readonly ILogger<UILanguagesController> logger;
         #endregion
-        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, TelemetryClient telemetryClient, IStringLocalizer<TagsController> localizer, ILogger<UILanguagesController> logger) : base(localizer)
+        public UILanguagesController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, TelemetryClient telemetryClient, IStringLocalizer<TagsController> localizer) : base(localizer)
         {
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.logger = logger;
         }
         [HttpGet("GetAvailableLanguages")]
         public IActionResult GetAvailableLanguages()
         {
             var result = MemCheckSupportedCultures.All.Select(c => MemCheckSupportedCultures.IdFromCulture(c));
-            logger.LogInformation($"UILanguagesController.GetAvailableLanguages returning '{string.Concat(result)}'");
             return base.Ok(result);
         }
         [HttpGet("GetActiveLanguage")]
@@ -51,10 +47,7 @@ namespace MemCheck.WebUI.Controllers
             var newCulture = MemCheckSupportedCultures.CultureFromId(cultureId);
 
             if (newCulture == null)
-            {
-                logger.LogError($"UILanguagesController.SetCulture({cultureId}) returning BadRequest");
                 return BadRequest();
-            }
 
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user != null)

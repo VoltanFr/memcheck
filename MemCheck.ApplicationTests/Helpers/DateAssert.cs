@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     public static class DateAssert
     {

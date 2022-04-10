@@ -75,7 +75,8 @@ namespace MemCheck.Application.Images
         {
             var owner = await DbContext.Users.SingleAsync(u => u.Id == request.Owner);
 
-            var image = new Domain.Image {
+            var image = new Domain.Image
+            {
                 Name = request.Name,
                 Description = request.Description,
                 Source = request.Source,
@@ -137,7 +138,7 @@ namespace MemCheck.Application.Images
                 //ImageMetadataInputValidator.Run(this, localizer);
                 if (!supportedContentTypes.Contains(ContentType))
                     throw new InvalidOperationException(callContext.Localized.GetLocalized("InvalidImageContentType") + $" '{ContentType}'");
-                if (Blob.Count() < minBlobLength || Blob.Count() > maxBlobLength)
+                if (Blob.Count() is < minBlobLength or > maxBlobLength)
                     throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBlobLength") + $" {Blob.Count()}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minBlobLength} " + callContext.Localized.GetLocalized("And") + $" {maxBlobLength}");
 
                 await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);

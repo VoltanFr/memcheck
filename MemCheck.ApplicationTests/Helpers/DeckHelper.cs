@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     public static class DeckHelper
     {
@@ -62,7 +62,7 @@ namespace MemCheck.Application.Tests.Helpers
             using (var dbContext = new MemCheckDbContext(testDB))
                 owner = (await dbContext.Decks.Include(d => d.Owner).SingleAsync(d => d.Id == deck)).Owner.Id;
 
-            var card = await CardHelper.CreateIdAsync(testDB, owner,tagIds: tagIds);
+            var card = await CardHelper.CreateIdAsync(testDB, owner, tagIds: tagIds);
 
             await AddCardAsync(testDB, deck, card, heap, lastLearnUtcTime, addToDeckUtcTime);
         }

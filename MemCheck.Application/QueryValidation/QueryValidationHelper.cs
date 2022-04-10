@@ -107,7 +107,7 @@ namespace MemCheck.Application.QueryValidation
                 throw new InvalidOperationException("Invalid Name: not trimmed");
             if (description != description.Trim())
                 throw new InvalidOperationException("Invalid Description: not trimmed");
-            if (name.Length < Tag.MinNameLength || name.Length > Tag.MaxNameLength)
+            if (name.Length is < Tag.MinNameLength or > Tag.MaxNameLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.GetLocalized("And") + $" {Tag.MaxNameLength}");
             if (description.Length > Tag.MaxDescriptionLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeNoMoreThan") + $" {Tag.MaxDescriptionLength}");
@@ -139,7 +139,7 @@ namespace MemCheck.Application.QueryValidation
         {
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
-            if (name.Length < LanguageMinNameLength || name.Length > LanguageMaxNameLength)
+            if (name.Length is < LanguageMinNameLength or > LanguageMaxNameLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {LanguageMinNameLength} " + localizer.GetLocalized("And") + $" {LanguageMaxNameLength}");
             foreach (var forbiddenChar in ForbiddenCharsInLanguages)
                 if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
@@ -152,7 +152,7 @@ namespace MemCheck.Application.QueryValidation
             if (deckName != deckName.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
 
-            if (deckName.Length < DeckMinNameLength || deckName.Length > DeckMaxNameLength)
+            if (deckName.Length is < DeckMinNameLength or > DeckMaxNameLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {deckName.Length}" + localizer.GetLocalized("MustBeBetween") + $" {DeckMinNameLength} " + localizer.GetLocalized("And") + $" {DeckMaxNameLength}");
 
             if (!HeapingAlgorithms.Instance.Ids.Contains(heapingAlgorithmId))
@@ -165,7 +165,7 @@ namespace MemCheck.Application.QueryValidation
         {
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
-            if (name.Length < ImageMinNameLength || name.Length > ImageMaxNameLength)
+            if (name.Length is < ImageMinNameLength or > ImageMaxNameLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinNameLength} " + localizer.GetLocalized("And") + $" {ImageMaxNameLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageNames)
                 if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
@@ -177,7 +177,7 @@ namespace MemCheck.Application.QueryValidation
         {
             if (source != source.Trim())
                 throw new InvalidOperationException("Invalid source: not trimmed");
-            if (source.Length < ImageMinSourceLength || source.Length > ImageMaxSourceLength)
+            if (source.Length is < ImageMinSourceLength or > ImageMaxSourceLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidSourceLength") + $" {source.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinSourceLength} " + localizer.GetLocalized("And") + $" {ImageMaxSourceLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageSource)
                 if (source.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
@@ -187,7 +187,7 @@ namespace MemCheck.Application.QueryValidation
         {
             if (description != description.Trim())
                 throw new InvalidOperationException("Invalid description: not trimmed");
-            if (description.Length < ImageMinDescriptionLength || description.Length > ImageMaxDescriptionLength)
+            if (description.Length is < ImageMinDescriptionLength or > ImageMaxDescriptionLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {description.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageDescription)
                 if (description.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
@@ -197,7 +197,7 @@ namespace MemCheck.Application.QueryValidation
         {
             if (versionDescription != versionDescription.Trim())
                 throw new InvalidOperationException("Invalid version description: not trimmed");
-            if (versionDescription.Length < ImageMinVersionDescriptionLength || versionDescription.Length > ImageMaxVersionDescriptionLength)
+            if (versionDescription.Length is < ImageMinVersionDescriptionLength or > ImageMaxVersionDescriptionLength)
                 throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {versionDescription.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxVersionDescriptionLength}");
             foreach (var forbiddenChar in ForbiddenCharsInImageVersionDescription)
                 if (versionDescription.Contains(forbiddenChar, StringComparison.Ordinal))

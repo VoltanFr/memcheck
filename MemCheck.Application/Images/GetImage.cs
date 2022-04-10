@@ -15,7 +15,8 @@ namespace MemCheck.Application.Images
         }
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            byte[] result = request.Size switch {
+            byte[] result = request.Size switch
+            {
                 Request.ImageSize.Small => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.SmallBlob }).SingleAsync(img => img.Id == request.ImageId)).SmallBlob,
                 Request.ImageSize.Medium => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.MediumBlob }).SingleAsync(img => img.Id == request.ImageId)).MediumBlob,
                 Request.ImageSize.Big => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.BigBlob }).SingleAsync(img => img.Id == request.ImageId)).BigBlob,

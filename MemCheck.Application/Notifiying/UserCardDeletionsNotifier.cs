@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     internal interface IUserCardDeletionsNotifier
     {
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Notifying
                     cardNotif => cardNotif.CardId,
                     (previousVersion, cardNotif) => new { previousVersion, cardNotif }
                 )
-                .Where(cardAndNotif => (cardAndNotif.previousVersion.VersionType == CardPreviousVersionType.Deletion) && cardAndNotif.previousVersion.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate);
+                .Where(cardAndNotif => cardAndNotif.previousVersion.VersionType == CardPreviousVersionType.Deletion && cardAndNotif.previousVersion.VersionUtcDate > cardAndNotif.cardNotif.LastNotificationUtcDate);
 
             foreach (var cardVersion in deletedCards)
                 cardVersion.cardNotif.LastNotificationUtcDate = runningUtcDate;

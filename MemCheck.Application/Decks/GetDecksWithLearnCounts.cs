@@ -12,9 +12,9 @@ namespace MemCheck.Application.Decks
     public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCounts.Request, IEnumerable<GetDecksWithLearnCounts.Result>>
     {
         #region Fields
-        private readonly static TimeSpan oneHour = TimeSpan.FromHours(1);
-        private readonly static TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
-        private readonly static TimeSpan fourDays = TimeSpan.FromDays(4);
+        private static readonly TimeSpan oneHour = TimeSpan.FromHours(1);
+        private static readonly TimeSpan twentyFiveHours = TimeSpan.FromHours(25);
+        private static readonly TimeSpan fourDays = TimeSpan.FromDays(4);
         private readonly DateTime? runDate;
         #endregion
         #region Private methods

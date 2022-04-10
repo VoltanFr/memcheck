@@ -1,5 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;

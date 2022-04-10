@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -333,10 +334,10 @@ namespace MemCheck.WebUI.Controllers
                 else
                 {
                     var html = new StringBuilder();
-                    html.Append($"<strong>{localizer.GetLocalized(fieldNameResourceId)}</strong>");
+                    html.Append(CultureInfo.InvariantCulture, $"<strong>{localizer.GetLocalized(fieldNameResourceId)}</strong>");
                     html.Append("<ul>");
-                    html.Append($"<li><strong>{localizer.GetLocalized("SelectedVersion")}</strong> {(fieldValueInSelectedVersion.Length > 0 ? fieldValueInSelectedVersion : localizer.GetLocalized("Empty"))}</li>");
-                    html.Append($"<li><strong>{localizer.GetLocalized("LastVersion")}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.GetLocalized("Empty"))}</li>");
+                    html.Append(CultureInfo.InvariantCulture, $"<li><strong>{localizer.GetLocalized("SelectedVersion")}</strong> {(fieldValueInSelectedVersion.Length > 0 ? fieldValueInSelectedVersion : localizer.GetLocalized("Empty"))}</li>");
+                    html.Append(CultureInfo.InvariantCulture, $"<li><strong>{localizer.GetLocalized("LastVersion")}</strong> {(fieldValueInCard.Length > 0 ? fieldValueInCard : localizer.GetLocalized("Empty"))}</li>");
                     html.Append("</ul>");
                     changedFields.Add(html.ToString());
                 }

@@ -114,7 +114,7 @@ namespace MemCheck.Application.History
                 .Select(card => new CardVersionFromDb(
                     card.Id,
                     true,
-                    card.PreviousVersion == null ? (Guid?)null : card.PreviousVersion.Id,
+                    card.PreviousVersion == null ? null : card.PreviousVersion.Id,
                     card.VersionUtcDate,
                     card.VersionCreator,
                     card.VersionDescription,
@@ -136,7 +136,7 @@ namespace MemCheck.Application.History
                 .Select(card => new CardVersionFromDb(
                     card.Id,
                     false,
-                    card.PreviousVersion == null ? (Guid?)null : card.PreviousVersion.Id,
+                    card.PreviousVersion == null ? null : card.PreviousVersion.Id,
                     card.VersionUtcDate,
                     card.VersionCreator,
                     card.VersionDescription,

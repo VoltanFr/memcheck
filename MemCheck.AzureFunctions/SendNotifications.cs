@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MemCheck.Application.Notifying;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
@@ -11,7 +12,7 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
-internal sealed class SendNotifications : AbstractMemCheckAzureFunction
+public sealed class SendNotifications : AbstractMemCheckAzureFunction
 {
     #region Private classes MemCheckMailSender & MemCheckLinkGenerator
     private sealed class MemCheckMailSender : IMemCheckMailSender
@@ -25,14 +26,14 @@ internal sealed class SendNotifications : AbstractMemCheckAzureFunction
         }
         public async Task SendAsync(string to, string subject, string body)
         {
-            await mailSender.SendAsync(subject, body, new EmailAddress(to).AsArray());
+            await mailSender.SendAsync(subject, body, new EmailAddress(to).AsArray()).ConfigureAwait(false);
         }
     }
     private sealed class MemCheckLinkGenerator : IMemCheckLinkGenerator
     {
         public string GetAbsoluteAddress(string relativeUri)
         {
-            return "https://memcheckfr.azurewebsites.net" + (relativeUri.StartsWith("/") ? "" : "/") + relativeUri;
+            return "https://memcheckfr.azurewebsites.net" + (relativeUri.StartsWith("/", StringComparison.InvariantCulture) ? "" : "/") + relativeUri;
         }
     }
     #endregion
@@ -51,12 +52,12 @@ internal sealed class SendNotifications : AbstractMemCheckAzureFunction
         #endif
         )] TimerInfo myTimer, ExecutionContext context)
     {
-        await RunAsync();
+        await RunAsync().ConfigureAwait(false);
     }
     protected override string FunctionName => FuncName;
-    protected async override Task DoRunAsync()
+    protected override async Task DoRunAsync()
     {
         var mailer = new NotificationMailer(NewCallContext(), MailSender.SenderEmail.Email, new MemCheckMailSender(MailSender), new MemCheckLinkGenerator());
-        await mailer.RunAsync();
+        await mailer.RunAsync().ConfigureAwait(false);
     }
 }

@@ -43,7 +43,7 @@ namespace MemCheck.Application.Users
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(UserId);
-                if (PageSize < 1 || PageSize > MaxPageSize)
+                if (PageSize is < 1 or > MaxPageSize)
                     throw new InvalidOperationException($"Invalid page size: {PageSize}");
                 if (PageNo < 1)
                     throw new InvalidOperationException($"Invalid page index: {PageNo}");

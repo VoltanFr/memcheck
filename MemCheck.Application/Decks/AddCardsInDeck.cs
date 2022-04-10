@@ -16,7 +16,8 @@ namespace MemCheck.Application.Decks
         {
             var cardsInDeck = DbContext.CardsInDecks.Where(cardInDeck => cardInDeck.DeckId == request.DeckId).Select(cardInDeck => cardInDeck.CardId);
 
-            var toAdd = request.CardIds.Where(cardId => !cardsInDeck.Contains(cardId)).Select(cardId => new CardInDeck() {
+            var toAdd = request.CardIds.Where(cardId => !cardsInDeck.Contains(cardId)).Select(cardId => new CardInDeck()
+            {
                 CardId = cardId,
                 DeckId = request.DeckId,
                 CurrentHeap = 0,
@@ -49,13 +50,7 @@ namespace MemCheck.Application.Decks
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, cardIds);
             }
-            public IEnumerable<Guid> CardIds
-            {
-                get
-                {
-                    return cardIds;
-                }
-            }
+            public IEnumerable<Guid> CardIds => cardIds;
 
             public Guid UserId { get; }
             public Guid DeckId { get; }

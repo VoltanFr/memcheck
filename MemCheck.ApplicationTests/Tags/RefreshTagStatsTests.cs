@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Tests.Helpers;
+﻿using MemCheck.Application.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -127,7 +127,7 @@ namespace MemCheck.Application.Tags
         {
             var db = DbHelper.GetEmptyTestDB();
             var name = RandomHelper.String();
-            var tagId = await TagHelper.CreateAsync(db, name: name);
+            await TagHelper.CreateAsync(db, name: name);
             var userId = await UserHelper.CreateInDbAsync(db);
             var cardId = await CardHelper.CreateIdAsync(db, userId);
 
@@ -269,7 +269,9 @@ namespace MemCheck.Application.Tags
                 Assert.AreEqual(1, resultTag1.CardCountBeforeRun);
                 Assert.AreEqual((user1RatingOnCard1 + user2RatingOnCard1) / 2.0, resultTag1.AverageRatingBeforeRun);
                 Assert.AreEqual(2, resultTag1.CardCountAfterRun);
-                Assert.AreEqual(((user1RatingOnCard1 + user2NewRatingOnCard1) / 2.0 + user2RatingOnCard2) / 2.0, resultTag1.AverageRatingAfterRun);
+                int sum1 = user1RatingOnCard1 + user2NewRatingOnCard1;
+                double average1 = sum1 / 2.0;
+                Assert.AreEqual((average1 + user2RatingOnCard2) / 2.0, resultTag1.AverageRatingAfterRun);
 
                 var resultTag2 = result.Tags.Single(tag => tag.TagId == tag2Id);
                 Assert.AreEqual(0, resultTag2.CardCountBeforeRun);
@@ -281,7 +283,7 @@ namespace MemCheck.Application.Tags
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var tag1FromDb = await dbContext.Tags.SingleAsync(tag => tag.Id == tag1Id);
-                Assert.AreEqual(((user1RatingOnCard1 + user2NewRatingOnCard1) / 2.0 + user2RatingOnCard2) / 2.0, tag1FromDb.AverageRatingOfPublicCards);
+                Assert.AreEqual((((user1RatingOnCard1 + user2NewRatingOnCard1) / 2.0) + user2RatingOnCard2) / 2.0, tag1FromDb.AverageRatingOfPublicCards);
                 Assert.AreEqual(2, tag1FromDb.CountOfPublicCards);
 
                 var tag2FromDb = await dbContext.Tags.SingleAsync(tag => tag.Id == tag2Id);

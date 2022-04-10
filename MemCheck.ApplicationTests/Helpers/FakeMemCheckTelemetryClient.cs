@@ -1,6 +1,6 @@
 ﻿using MemCheck.Database;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     internal sealed class FakeMemCheckTelemetryClient : IMemCheckTelemetryClient
     {

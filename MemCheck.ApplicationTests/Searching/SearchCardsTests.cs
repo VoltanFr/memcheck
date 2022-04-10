@@ -1,7 +1,7 @@
 ﻿using MemCheck.Application.Decks;
+using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

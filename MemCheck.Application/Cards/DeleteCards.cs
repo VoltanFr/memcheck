@@ -40,9 +40,7 @@ namespace MemCheck.Application.Cards
             private static async Task<string> CardFrontSideInfoForExceptionMessageAsync(Guid cardId, MemCheckDbContext dbContext, ILocalized localizer)
             {
                 var cardFrontSide = await dbContext.Cards.Where(card => card.Id == cardId).Select(card => card.FrontSide).SingleAsync();
-                if (cardFrontSide.Length < 100)
-                    return $" '{cardFrontSide}'";
-                return $"{localizer.GetLocalized("StartingWith")} '{cardFrontSide.Substring(0, 100)}'";
+                return cardFrontSide.Length < 100 ? $" '{cardFrontSide}'" : $"{localizer.GetLocalized("StartingWith")} '{cardFrontSide[..100]}'";
             }
             private async Task CheckUsersWithCardInADeckAsync(Guid cardId, MemCheckDbContext dbContext, ILocalized localizer)
             {

@@ -1,4 +1,3 @@
-using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -9,13 +8,13 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace MemCheck.DatabaseTests
+namespace MemCheck.Database
 {
     /* Checks that the database specified in the `appsettings.json` file is ok.
      * Note that when running in GitHub actions, the settings in the file are substituted with the real production database.
      */
     [TestClass(), TestCategory("IntegrationTests")]
-    public class DatabaseUsabilityTests : IDisposable
+    public sealed class DatabaseUsabilityTests : IDisposable
     {
         #region Fields
         private readonly DbContext dbContext;

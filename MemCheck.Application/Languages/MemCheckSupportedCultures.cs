@@ -6,12 +6,12 @@ namespace MemCheck.Application.Languages
     public static class MemCheckSupportedCultures
     {
         #region Fields
-        private static readonly CultureInfo english = new("en-US");
-        private static readonly CultureInfo french = new("fr-FR");
         #endregion
-        public static CultureInfo English => english;
-        public static CultureInfo French => french;
+        public static CultureInfo English { get; } = new("en-US");
+        public static CultureInfo French { get; } = new("fr-FR");
         public static ImmutableArray<CultureInfo> All => new[] { English, French }.ToImmutableArray();
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "More complicated")]
         public static string? IdFromCulture(CultureInfo c)
         {
             if (English.Equals(c))
@@ -22,15 +22,12 @@ namespace MemCheck.Application.Languages
         }
         public static CultureInfo? CultureFromId(string culture)
         {
-            switch (culture)
+            return culture switch
             {
-                case "En":
-                    return English;
-                case "Fr":
-                    return French;
-                default:
-                    return null;
-            }
+                "En" => English,
+                "Fr" => French,
+                _ => null,
+            };
         }
     }
 }

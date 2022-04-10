@@ -4,7 +4,7 @@
 		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<VersionPrefix>0.5.2</VersionPrefix>
+		<VersionPrefix>0.5.3</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,6 +20,9 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningLevel>5</WarningLevel>
 		<AnalysisLevel>latest-all</AnalysisLevel>
+		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 	</PropertyGroup>
 
 	<ItemGroup>

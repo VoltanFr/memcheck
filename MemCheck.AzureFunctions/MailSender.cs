@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,7 +13,7 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
-internal sealed class MailSender
+public sealed class MailSender
 {
     #region Fields
     private readonly string functionName;
@@ -23,13 +24,14 @@ internal sealed class MailSender
     #region Private methods
     private void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
     {
-        body.Append($"<p>Caught {e.GetType().Name}</p>");
-        body.Append($"<p>Message: {e.Message}</p>");
-        body.Append($"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>")}</p>");
+        body = body
+            .Append(CultureInfo.InvariantCulture, $"<p>Caught {e.GetType().Name}</p>")
+            .Append(CultureInfo.InvariantCulture, $"<p>Message: {e.Message}</p>")
+            .Append(CultureInfo.InvariantCulture, $"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>", StringComparison.Ordinal)}</p>");
 
         if (e.InnerException != null)
         {
-            body.Append($"<p>-------- Inner ---------</p>");
+            body = body.Append(CultureInfo.InvariantCulture, $"<p>-------- Inner ---------</p>");
             AddExceptionDetailsToMailBody(body, e.InnerException);
         }
     }
@@ -46,10 +48,9 @@ internal sealed class MailSender
     }
     public async Task SendFailureInfoMailAsync(Exception e)
     {
-        var body = new StringBuilder();
-
-        body.Append($"<h1>MemCheck function '{functionName}' failure</h1>");
-        body.Append($"<p>Sent by Azure func '{functionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {functionStartTime}, mail constructed at {DateTime.UtcNow}</p>");
+        var body = new StringBuilder()
+            .Append(CultureInfo.InvariantCulture, $"<h1>MemCheck function '{functionName}' failure</h1>")
+            .Append(CultureInfo.InvariantCulture, $"<p>Sent by Azure func '{functionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {functionStartTime}, mail constructed at {DateTime.UtcNow}</p>");
 
         AddExceptionDetailsToMailBody(body, e);
 
@@ -57,7 +58,8 @@ internal sealed class MailSender
     }
     public async Task SendAsync(string subject, string body, IEnumerable<EmailAddress> to)
     {
-        var msg = new SendGridMessage() {
+        var msg = new SendGridMessage()
+        {
             From = SenderEmail,
             Subject = subject,
             HtmlContent = body
@@ -80,14 +82,14 @@ internal sealed class MailSender
     }
     public static string GetMailFooter(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {
-        var writer = new StringBuilder();
+        var listItems = new List<string> {
+            $"<li>Sent by Azure func '{azureFunctionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>",
+            $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
+        };
 
-        var listItems = new List<string>();
-        listItems.Add($"<li>Sent by Azure func '{azureFunctionName}' {MailSender.GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>");
-        listItems.Add($"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>");
-
-        writer.Append("<h2>Info</h2>");
-        writer.Append($"<ul>{string.Join("", listItems)}</ul>");
+        var writer = new StringBuilder()
+            .Append("<h2>Info</h2>")
+            .Append(CultureInfo.InvariantCulture, $"<ul>{string.Join("", listItems)}</ul>");
 
         return writer.ToString();
     }

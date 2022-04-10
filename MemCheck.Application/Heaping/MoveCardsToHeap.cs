@@ -49,7 +49,7 @@ namespace MemCheck.Application.Heaping
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 QueryValidationHelper.CheckNotReservedGuid(DeckId);
-                if (TargetHeap < CardInDeck.UnknownHeap || TargetHeap > CardInDeck.MaxHeapValue)
+                if (TargetHeap is < CardInDeck.UnknownHeap or > CardInDeck.MaxHeapValue)
                     throw new InvalidOperationException($"Invalid target heap {TargetHeap}");
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
             }

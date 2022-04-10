@@ -13,12 +13,11 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
-internal abstract class AbstractMemCheckAzureFunction
+public abstract class AbstractMemCheckAzureFunction
 {
     #region Fields
     private readonly TelemetryClient telemetryClient;
     private readonly MemCheckDbContext memCheckDbContext;
-    private readonly MemCheckUserManager userManager;
     private readonly ILogger logger;
     private readonly IRoleChecker roleChecker;
     private readonly Lazy<Task<ImmutableList<EmailAddress>>> admins;
@@ -36,7 +35,7 @@ internal abstract class AbstractMemCheckAzureFunction
     {
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         this.memCheckDbContext = memCheckDbContext;
-        this.userManager = userManager;
+        UserManager = userManager;
         this.logger = logger;
         roleChecker = new ProdRoleChecker(userManager); ;
         RunningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
@@ -48,8 +47,9 @@ internal abstract class AbstractMemCheckAzureFunction
     {
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
-    protected MemCheckUserManager UserManager { get => userManager; }
+    protected MemCheckUserManager UserManager { get; }
     protected abstract string FunctionName { get; }
+
     protected async Task RunAsync()
     {
         try

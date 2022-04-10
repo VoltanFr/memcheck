@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifiying
 {
     //The information reported by this class is only based on the subscriptions and the last notification date
     //ie, it does not take care of whether or not there are actually changes to notify

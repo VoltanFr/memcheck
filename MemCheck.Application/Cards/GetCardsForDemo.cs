@@ -90,7 +90,7 @@ namespace MemCheck.Application.Cards
                 await QueryValidationHelper.CheckTagExistsAsync(TagId, callContext.DbContext);
                 if (ExcludedCardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
-                if (CardsToDownload < 1 || CardsToDownload > 100)
+                if (CardsToDownload is < 1 or > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
             }
         }

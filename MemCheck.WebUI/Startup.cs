@@ -28,7 +28,7 @@ namespace MemCheck.WebUI
         private readonly IConfiguration configuration;
         #endregion
         #region Private methods
-        private ILogger<AppSettings> CreateLogger()
+        private static ILogger<AppSettings> CreateLogger()
         {
             using ILoggerFactory? loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -122,7 +122,7 @@ namespace MemCheck.WebUI
                 var requestCultureFeature = context.Features.Get<IRequestCultureFeature>();
                 var cultureName = requestCultureFeature == null ? "EN" : requestCultureFeature!.RequestCulture.Culture.Name;
                 var ToastTitle = cultureName.Equals("FR", StringComparison.OrdinalIgnoreCase) ? "Échec" : "Failure";
-                var ShowStatus = !(e is RequestInputException);
+                var ShowStatus = e is not RequestInputException;
                 var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
                 await context.Response.WriteAsJsonAsync(new { ToastTitle, ToastText, ShowStatus });
             }));

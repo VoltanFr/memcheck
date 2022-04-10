@@ -89,7 +89,7 @@ namespace MemCheck.Application.Ratings
             {
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 await QueryValidationHelper.CheckCardExistsAsync(callContext.DbContext, CardId);
-                if (Rating < 1 || Rating > 5)
+                if (Rating is < 1 or > 5)
                     throw new RequestInputException($"Invalid rating: {Rating}");
             }
         }

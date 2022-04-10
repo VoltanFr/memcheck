@@ -24,7 +24,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         {
             logger.LogInformation($"Will recompute all expiration dates");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
             var deck = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;
@@ -46,9 +46,9 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
                 card.ExpiryUtcTime = expiryDate;
             }
 
-            await dbContext.SaveChangesAsync();
+            var dbUpdateCount = await dbContext.SaveChangesAsync();
 
-            logger.LogInformation($"Expiration dates updating of {count} cards finished");
+            logger.LogInformation($"Expiration dates updating of {count} cards finished - dbUpdateCount: {dbUpdateCount}");
         }
     }
 }

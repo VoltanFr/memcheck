@@ -1,4 +1,4 @@
-﻿using MemCheck.Application.Notifying;
+﻿using MemCheck.Application.Notifiying;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -109,7 +109,7 @@ namespace MemCheck.Application.Cards
             card.VersionType = CardVersionType.Changes;
 
             if (newVersionCreator.SubscribeToCardOnEdit)
-                AddCardSubscriptions.CreateSubscription(dbContext, newVersionCreator.Id, cardId, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethod_VersionCreation);
+                AddCardSubscriptions.CreateSubscription(dbContext, newVersionCreator.Id, cardId, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
 
             return card;
         }

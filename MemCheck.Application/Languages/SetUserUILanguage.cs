@@ -25,7 +25,7 @@ namespace MemCheck.Application.Languages
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
-                if (MemCheckSupportedCultures.IdFromCulture(Culture)==null)
+                if (MemCheckSupportedCultures.IdFromCulture(Culture) == null)
                     throw new InvalidOperationException($"Unknown culture '{Culture}'");
             }
         }

@@ -30,15 +30,13 @@ namespace MemCheck.Application.Cards
 
             var withoutExcludedCards = cardsOfDeck;
             foreach (var tag in excludedTagIds)   //I tried to do better with an intersect between the two sets, but that failed
-                withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
+                withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tagInCard => tagInCard.TagId == tag));
 
             var countToTake = neverLearnt ? cardCount * 3 : cardCount; //For cards never learnt, we take more cards for shuffling accross more
 
-            IQueryable<CardInDeck>? finalSelection;
-            if (neverLearnt)
-                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.AddToDeckUtcTime).Take(countToTake);
-            else
-                finalSelection = withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
+            IQueryable<CardInDeck>? finalSelection = neverLearnt
+                ? withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.AddToDeckUtcTime).Take(countToTake)
+                : withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
 
             var withDetails = finalSelection.Select(cardInDeck => new
             {
@@ -89,10 +87,7 @@ namespace MemCheck.Application.Cards
                 notifications[cardInDeck.CardId],
                 cardInDeck.LanguageName == "Français" //Questionable hardcoding
             ));
-            if (neverLearnt)
-                return Shuffler.Shuffle(result).Take(cardCount);
-            else
-                return result;
+            return neverLearnt ? Shuffler.Shuffle(result).Take(cardCount) : result;
         }
         #endregion
         public GetUnknownCardsToLearn(CallContext callContext) : base(callContext)
@@ -142,7 +137,7 @@ namespace MemCheck.Application.Cards
                     throw new RequestInputException($"Invalid card id");
                 if (ExcludedTagIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid tag id");
-                if (CardsToDownload < 1 || CardsToDownload > 100)
+                if (CardsToDownload is < 1 or > 100)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);
             }

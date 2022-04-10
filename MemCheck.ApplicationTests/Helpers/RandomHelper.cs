@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MemCheck.Application.Tests.Helpers
+namespace MemCheck.Application.Helpers
 {
     internal static class RandomHelper
     {

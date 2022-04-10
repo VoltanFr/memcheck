@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MemCheck.Basics.Tests
+namespace MemCheck.Basics
 {
     [TestClass()]
     public class AssemblyServicesTests

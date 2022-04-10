@@ -102,7 +102,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region Create
         [HttpPost("Create")]
-        async public Task<IActionResult> Create([FromBody] CreateRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateRequest request)
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
@@ -118,7 +118,7 @@ namespace MemCheck.WebUI.Controllers
         #endregion
         #region Update
         [HttpPost("Update")]
-        async public Task<IActionResult> Update([FromBody] UpdateRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateRequest request)
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);

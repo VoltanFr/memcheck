@@ -112,6 +112,8 @@ namespace MemCheck.Application.Searching
         public SearchCards(CallContext callContext) : base(callContext)
         {
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Too complicated")]
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
             var allCards = DbContext.Cards.AsNoTracking()
@@ -122,7 +124,7 @@ namespace MemCheck.Application.Searching
                 .Include(card => card.UsersWithView)
                 .AsSingleQuery();
 
-            var cardsViewableByUser = allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Where(userWithView => userWithView.UserId == request.UserId).Any());
+            var cardsViewableByUser = allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));
 
             var cardsFilteredWithDate = request.MinimumUtcDateOfCards == null ? cardsViewableByUser : cardsViewableByUser.Where(card => card.VersionUtcDate >= request.MinimumUtcDateOfCards.Value);
 
@@ -142,14 +144,14 @@ namespace MemCheck.Application.Searching
 
             var cardsFilteredWithRequiredTags = cardsFilteredWithDeck;
             foreach (var tag in request.RequiredTags)   //I tried to do better with an intersect between the two sets, but that failed
-                cardsFilteredWithRequiredTags = cardsFilteredWithRequiredTags.Where(card => card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
+                cardsFilteredWithRequiredTags = cardsFilteredWithRequiredTags.Where(card => card.TagsInCards.Any(tagInCard => tagInCard.TagId == tag));
 
             var cardsFilteredWithExludedTags = cardsFilteredWithRequiredTags;
             if (request.ExcludedTags == null)
                 cardsFilteredWithExludedTags = cardsFilteredWithExludedTags.Where(card => !card.TagsInCards.Any());
             else
                 foreach (var tag in request.ExcludedTags)   //I tried to do better with an intersect between the two sets, but that failed
-                    cardsFilteredWithExludedTags = cardsFilteredWithExludedTags.Where(card => !card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
+                    cardsFilteredWithExludedTags = cardsFilteredWithExludedTags.Where(card => !card.TagsInCards.Any(tagInCard => tagInCard.TagId == tag));
 
             var cardsFilteredWithText = string.IsNullOrEmpty(request.RequiredText) ? cardsFilteredWithExludedTags :
                 cardsFilteredWithExludedTags.Where(card =>
@@ -164,10 +166,9 @@ namespace MemCheck.Application.Searching
                 cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() != 1);
             else
             {
-                if (request.Visibility == Request.VibilityFiltering.PrivateToOwner)
-                    cardsFilteredWithVisibility = cardsFilteredWithText.Where(card => card.UsersWithView.Count() == 1);
-                else
-                    cardsFilteredWithVisibility = cardsFilteredWithText;
+                cardsFilteredWithVisibility = request.Visibility == Request.VibilityFiltering.PrivateToOwner
+                    ? cardsFilteredWithText.Where(card => card.UsersWithView.Count() == 1)
+                    : cardsFilteredWithText;
             }
 
             IQueryable<Card> cardsFilteredWithAverageRating;
@@ -179,10 +180,9 @@ namespace MemCheck.Application.Searching
                     cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount == 0);
                 else
                 {
-                    if (request.RatingFiltering == Request.RatingFilteringMode.AtLeast)
-                        cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating >= request.RatingFilteringValue);
-                    else
-                        cardsFilteredWithAverageRating = cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating <= request.RatingFilteringValue);
+                    cardsFilteredWithAverageRating = request.RatingFiltering == Request.RatingFilteringMode.AtLeast
+                        ? cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating >= request.RatingFilteringValue)
+                        : cardsFilteredWithVisibility.Where(card => card.RatingCount > 0 && card.AverageRating <= request.RatingFilteringValue);
                 }
             }
 

@@ -35,6 +35,8 @@ namespace MemCheck.Application.QueryValidation
         {
             return !usersWithView.Any();
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
         public static bool CardIsPrivateToSingleUser(Guid userId, IEnumerable<Guid> usersWithView)
         {
             if (QueryValidationHelper.IsReservedGuid(userId))

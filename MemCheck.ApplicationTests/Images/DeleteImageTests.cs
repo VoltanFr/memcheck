@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Decks;
+using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Tests.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -131,7 +130,7 @@ namespace MemCheck.Application.Images
             var imageCreationVersionDescription = RandomHelper.String();
             var imageUploadDate = RandomHelper.Date();
             var image = await ImageHelper.CreateAsync(db, user, imageName, imageCreationVersionDescription, lastChangeUtcDate: imageUploadDate);
-            var card = await CardHelper.CreateAsync(db, user, frontSideImages:otherImage.AsArray(), additionalSideImages: image.AsArray());
+            var card = await CardHelper.CreateAsync(db, user, frontSideImages: otherImage.AsArray(), additionalSideImages: image.AsArray());
 
             using (var dbContext = new MemCheckDbContext(db))
                 await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));

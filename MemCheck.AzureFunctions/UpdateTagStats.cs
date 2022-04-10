@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application.Tags;
 using MemCheck.Application.Users;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MemCheck.AzureFunctions;
 
-internal sealed class UpdateTagStats : AbstractMemCheckAzureFunction
+public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
 {
     #region Fields
     private const string FuncName = nameof(UpdateTagStats);
@@ -29,62 +30,68 @@ internal sealed class UpdateTagStats : AbstractMemCheckAzureFunction
         await RunAsync();
     }
     protected override string FunctionName => FuncName;
-    protected async override Task DoRunAsync()
+    protected override async Task DoRunAsync()
     {
         var updater = new RefreshTagStats(NewCallContext());
         var result = await updater.RunAsync(new RefreshTagStats.Request());
 
-        var mailBody = new StringBuilder();
-        mailBody.Append("<style>");
-        mailBody.Append("thead{background-color:darkgray;color:white;}");
-        mailBody.Append("table{border-width:1px;border-color:green;border-collapse:collapse;}");
-        mailBody.Append("tr{border-width:1px;border-style:solid;border-color:black;}");
-        mailBody.Append("td{border-width:1px;border-style:solid;border-color:darkgray;}");
-        mailBody.Append("tr:nth-child(even){background-color:lightgray;}");
-        mailBody.Append("</style>");
-        mailBody.Append($"<h1>{result.Tags.Length} MemCheck tags</h1>");
-        mailBody.Append("<p><table>");
-        mailBody.Append("<thead><tr><th>Name</th><th>Previous count</th><th>Previous average</th><th>New count</th><th>New average</th></tr></thead>");
-        mailBody.Append("<body>");
+        var mailBody = new StringBuilder()
+            .Append("<style>")
+            .Append("thead{background-color:darkgray;color:white;}")
+            .Append("table{border-width:1px;border-color:green;border-collapse:collapse;}")
+            .Append("tr{border-width:1px;border-style:solid;border-color:black;}")
+            .Append("td{border-width:1px;border-style:solid;border-color:darkgray;}")
+            .Append("tr:nth-child(even){background-color:lightgray;}")
+            .Append("</style>")
+            .Append(CultureInfo.InvariantCulture, $"<h1>{result.Tags.Length} MemCheck tags</h1>")
+            .Append("<p><table>")
+            .Append("<thead><tr><th>Name</th><th>Previous count</th><th>Previous average</th><th>New count</th><th>New average</th></tr></thead>")
+            .Append("<body>");
         foreach (var tag in result.Tags)
         {
-            mailBody.Append("<tr style='nth-child(odd) {background: lightgray}'>");
-            mailBody.Append($"<td>{tag.TagName}</td>");
+            mailBody = mailBody
+                .Append("<tr style='nth-child(odd) {background: lightgray}'>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{tag.TagName}</td>");
             var cardCountChanged = tag.CardCountBeforeRun != tag.CardCountAfterRun;
             var averageChanged = tag.AverageRatingBeforeRun != tag.AverageRatingAfterRun;
-            mailBody.Append("<td>");
+            mailBody = mailBody.Append("<td>");
             if (cardCountChanged)
-                mailBody.Append("<strong>");
-            mailBody.Append($"{tag.CardCountBeforeRun}");
+                mailBody = mailBody.Append("<strong>");
+            mailBody = mailBody.Append(CultureInfo.InvariantCulture, $"{tag.CardCountBeforeRun}");
             if (cardCountChanged)
-                mailBody.Append("</strong>");
-            mailBody.Append("</td>");
-            mailBody.Append("<td>");
+                mailBody = mailBody.Append("</strong>");
+            mailBody = mailBody
+                .Append("</td>")
+                .Append("<td>");
             if (averageChanged)
-                mailBody.Append("<strong>");
-            mailBody.Append($"{tag.AverageRatingBeforeRun:0.##}");
+                mailBody = mailBody.Append("<strong>");
+            mailBody = mailBody.Append(CultureInfo.InvariantCulture, $"{tag.AverageRatingBeforeRun:0.##}");
             if (averageChanged)
-                mailBody.Append("</strong>");
-            mailBody.Append("</td>");
-            mailBody.Append("<td>");
+                mailBody = mailBody.Append("</strong>");
+            mailBody = mailBody
+                .Append("</td>")
+                .Append("<td>");
             if (cardCountChanged)
-                mailBody.Append("<strong>");
-            mailBody.Append($"{tag.CardCountAfterRun}");
+                mailBody = mailBody.Append("<strong>");
+            mailBody = mailBody.Append(CultureInfo.InvariantCulture, $"{tag.CardCountAfterRun}");
             if (cardCountChanged)
-                mailBody.Append("</strong>");
-            mailBody.Append("</td>");
-            mailBody.Append("<td>");
+                mailBody = mailBody.Append("</strong>");
+            mailBody = mailBody
+                .Append("</td>")
+                .Append("<td>");
             if (averageChanged)
-                mailBody.Append("<strong>");
-            mailBody.Append($"{tag.AverageRatingAfterRun:0.##}");
+                mailBody = mailBody.Append("<strong>");
+            mailBody = mailBody.Append(CultureInfo.InvariantCulture, $"{tag.AverageRatingAfterRun:0.##}");
             if (averageChanged)
-                mailBody.Append("</strong>");
-            mailBody.Append("</td>");
-            mailBody.Append("</tr>");
+                mailBody = mailBody.Append("</strong>");
+            mailBody = mailBody
+                .Append("</td>")
+                .Append("</tr>");
         }
-        mailBody.Append("</body>");
-        mailBody.Append("</table></p>");
-        mailBody.Append(MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync()));
+        mailBody = mailBody
+            .Append("</body>")
+            .Append("</table></p>")
+            .Append(MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync()));
 
         await MailSender.SendAsync("MemCheck tags refreshed", mailBody.ToString(), await AdminsAsync());
     }

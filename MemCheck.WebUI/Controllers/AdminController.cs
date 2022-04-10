@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application;
-using MemCheck.Application.Notifying;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
 using MemCheck.Database;
@@ -14,9 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers
@@ -61,20 +59,6 @@ namespace MemCheck.WebUI.Controllers
         private readonly IEmailSender emailSender;
         private readonly LinkGenerator linkGenerator;
         private readonly UserManager<MemCheckUser> userManager;
-        #endregion
-        #region Private methods
-        private string GetAuthoringPageLink()
-        {
-            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Index")!;
-        }
-        private string GetComparePageLink()
-        {
-            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/Compare")!;
-        }
-        private string GetHistoryPageLink()
-        {
-            return linkGenerator.GetUriByPage(HttpContext, page: "/Authoring/History")!;
-        }
         #endregion
         public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
         {

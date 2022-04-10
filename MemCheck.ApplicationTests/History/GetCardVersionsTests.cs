@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Tests.Helpers;
+using MemCheck.Application.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -59,19 +59,17 @@ namespace MemCheck.Application.History
             var versionDescription = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, userId, versionDate, frontSide: "", backSide: "", additionalInfo: "", references: "", versionDescription: versionDescription);
 
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
-                Assert.AreEqual(1, versions.Count());
+            using var dbContext = new MemCheckDbContext(db);
+            var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
+            Assert.AreEqual(1, versions.Count());
 
-                var version = versions.Single();
+            var version = versions.Single();
 
-                Assert.AreEqual(versionDate, version.VersionUtcDate);
-                Assert.AreEqual(versionDescription, version.VersionDescription);
-                Assert.AreEqual(2, version.ChangedFieldNames.Count());
-                CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.LanguageName);
-                CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.UsersWithView);
-            }
+            Assert.AreEqual(versionDate, version.VersionUtcDate);
+            Assert.AreEqual(versionDescription, version.VersionDescription);
+            Assert.AreEqual(2, version.ChangedFieldNames.Count());
+            CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.LanguageName);
+            CollectionAssert.Contains(version.ChangedFieldNames.ToList(), GetCardVersions.UsersWithView);
         }
         [TestMethod()]
         public async Task TwoVersions()
