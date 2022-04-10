@@ -40,11 +40,9 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> GetAllStaticData()
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
-            IEnumerable<GetUserDecksWithHeapsAndTags.Result> decksWithHeapsAndTags;
-            if (user == null)
-                decksWithHeapsAndTags = Array.Empty<GetUserDecksWithHeapsAndTags.Result>();
-            else
-                decksWithHeapsAndTags = await new GetUserDecksWithHeapsAndTags(callContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
+            var decksWithHeapsAndTags = user == null
+                ? Array.Empty<GetUserDecksWithHeapsAndTags.Result>()
+                : await new GetUserDecksWithHeapsAndTags(callContext).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
             var allTags = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize, 1, ""));
             var allUsers = await new GetUsers(callContext).RunAsync(new GetUsers.Request());
             GetAllStaticDataViewModel value = new(decksWithHeapsAndTags, allTags.Tags, allUsers, this, user);
@@ -386,16 +384,12 @@ namespace MemCheck.WebUI.Controllers
                 AverageRating = card.AverageRating;
                 CurrentUserRating = card.CurrentUserRating;
                 CountOfUserRatings = card.CountOfUserRatings;
-                PopoverVisibility = localizer.GetLocalized("Visibility");
-                if (VisibleToCount == 1)
-                    PopoverVisibility = localizer.GetLocalized("YouOnly");
-                else
+                PopoverVisibility = VisibleToCount switch
                 {
-                    if (VisibleToCount == 0)
-                        PopoverVisibility = localizer.GetLocalized("AllUsers");
-                    else
-                        PopoverVisibility = string.Join(',', card.VisibleTo);
-                }
+                    0 => localizer.GetLocalized("AllUsers"),
+                    1 => localizer.GetLocalized("YouOnly"),
+                    _ => string.Join(',', card.VisibleTo),
+                };
 
                 Decks = card.DeckInfo.Select(deckInfo =>
                     new RunQueryCardDeckViewModel(

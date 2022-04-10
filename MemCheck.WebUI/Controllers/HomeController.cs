@@ -87,10 +87,9 @@ namespace MemCheck.WebUI.Controllers
                 }
                 else
                 {
-                    if (isTheOnlyDeck)
-                        HeadLine = $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{localizer.GetLocalized("YourDeck")}</a>...";
-                    else
-                        HeadLine = $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} {localizer.GetLocalized("YourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
+                    HeadLine = isTheOnlyDeck
+                        ? $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{localizer.GetLocalized("YourDeck")}</a>..."
+                        : $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} {localizer.GetLocalized("YourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
                     if (applicationDeck.UnknownCardCount == 0)
                         lines.Add(localizer.GetLocalized("NoUnknownCard"));
                     else

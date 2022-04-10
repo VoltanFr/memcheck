@@ -199,12 +199,7 @@ namespace MemCheck.WebUI.Controllers
                     VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
-                {
-                    if (VisibleToCount == 0)
-                        VisibleTo = localizer.GetLocalized("AllUsers");
-                    else
-                        VisibleTo = string.Join(',', applicationResult.VisibleTo);
-                }
+                    VisibleTo = VisibleToCount == 0 ? localizer.GetLocalized("AllUsers") : string.Join(',', applicationResult.VisibleTo);
                 Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
                 MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                         new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
@@ -241,12 +236,7 @@ namespace MemCheck.WebUI.Controllers
                     VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
-                {
-                    if (VisibleToCount == 0)
-                        VisibleTo = localizer.GetLocalized("AllUsers");
-                    else
-                        VisibleTo = string.Join(',', applicationResult.VisibleTo);
-                }
+                    VisibleTo = VisibleToCount == 0 ? localizer.GetLocalized("AllUsers") : string.Join(',', applicationResult.VisibleTo);
                 Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
                 MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                         new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
