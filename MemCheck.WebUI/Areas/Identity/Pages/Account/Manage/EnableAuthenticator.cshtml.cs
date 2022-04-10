@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -79,7 +81,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             }
 
             // Strip spaces and hypens
-            var verificationCode = Input.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var verificationCode = Input.Code.Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
 
             var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
                 user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
@@ -144,11 +146,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 
         private string GenerateQrCodeUri(string email, string unformattedKey)
         {
-            return string.Format(
-                AuthenticatorUriFormat,
-                _urlEncoder.Encode("MemCheck.WebUI"),
-                _urlEncoder.Encode(email),
-                unformattedKey);
+            return string.Format(CultureInfo.InvariantCulture, AuthenticatorUriFormat, _urlEncoder.Encode("MemCheck.WebUI"), _urlEncoder.Encode(email), unformattedKey);
         }
     }
 }

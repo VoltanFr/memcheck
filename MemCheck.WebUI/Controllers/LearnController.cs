@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace MemCheck.WebUI.Controllers
                     1 => GetImage.Request.ImageSize.Small,
                     2 => GetImage.Request.ImageSize.Medium,
                     3 => GetImage.Request.ImageSize.Big,
-                    _ => throw new NotImplementedException(size.ToString())
+                    _ => throw new NotImplementedException(size.ToString(CultureInfo.InvariantCulture))
                 };
             }
 

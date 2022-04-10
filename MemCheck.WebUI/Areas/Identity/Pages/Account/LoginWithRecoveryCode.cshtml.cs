@@ -67,7 +67,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 // Don't reveal that the user is deleted
                 return RedirectToPage("./Login");
 
-            var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
+            var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty, StringComparison.Ordinal);
 
             var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 

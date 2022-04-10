@@ -10,6 +10,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -89,11 +90,11 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                         protocol: Request.Scheme)!;
 
                     var mailBody = new StringBuilder();
-                    mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-                    mailBody.Append($"<p>{localizer["BeforeHyperLink"].Value}</p>");
-                    mailBody.Append($"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
-                    mailBody.Append($"<p>{localizer["AfterHyperLink"].Value}</p>");
-                    mailBody.Append($"<p>{localizer["Final"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["BeforeHyperLink"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["AfterHyperLink"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Final"].Value}</p>");
 
                     await _emailSender.SendEmailAsync(Input.Email, localizer["MailSubject"].Value, mailBody.ToString());
 

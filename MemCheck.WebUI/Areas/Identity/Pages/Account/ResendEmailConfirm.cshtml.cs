@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -22,14 +22,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         private readonly UserManager<MemCheckUser> userManager;
         private readonly IEmailSender emailSender;
         private readonly IStringLocalizer<ResendEmailConfirmModel> localizer;
-        private readonly ILogger<RegisterModel> logger;
         #endregion
-        public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IEmailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer, ILogger<RegisterModel> logger)
+        public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IEmailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer)
         {
             this.userManager = userManager;
             this.emailSender = emailSender;
             this.localizer = localizer;
-            this.logger = logger;
         }
 
         [BindProperty] public InputModel Input { get; set; } = null!;
@@ -60,15 +58,13 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                     var url = HtmlEncoder.Default.Encode(callbackUrl);
 
                     var mailBody = new StringBuilder();
-                    mailBody.Append($"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-                    mailBody.Append($"<p>{localizer["BeforeHyperLink"].Value}</p>");
-                    mailBody.Append($"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
-                    mailBody.Append($"<p>{localizer["AfterHyperLink"].Value}</p>");
-                    mailBody.Append($"<p>{localizer["Final"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Hello"].Value} {user.UserName}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["BeforeHyperLink"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["AfterHyperLink"].Value}</p>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Final"].Value}</p>");
 
                     await emailSender.SendEmailAsync(Input.Email, localizer["MailSubject"], mailBody.ToString());
-
-                    logger.LogInformation($"EMail confirmation message resent for user '{user.UserName}'.");
                 }
             }
 

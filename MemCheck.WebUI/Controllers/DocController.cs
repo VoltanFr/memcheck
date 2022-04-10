@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System;
 
 namespace MemCheck.WebUI.Controllers
 {
@@ -15,7 +16,7 @@ namespace MemCheck.WebUI.Controllers
             if (hostIndex == -1)
                 return null;
             var result = previousPageUrl[(hostIndex + Request.Host.Value.Length)..];
-            var parameterIndex = result.IndexOf('?');
+            var parameterIndex = result.IndexOf('?', StringComparison.Ordinal);
             if (parameterIndex == -1)
                 return result;
             return result.Substring(0, parameterIndex);

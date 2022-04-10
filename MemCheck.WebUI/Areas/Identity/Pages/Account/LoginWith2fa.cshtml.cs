@@ -72,7 +72,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 throw new InvalidOperationException($"Unable to load two-factor authentication user.");
             }
 
-            var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty, StringComparison.Ordinal).Replace("-", string.Empty, StringComparison.Ordinal);
 
             var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
 

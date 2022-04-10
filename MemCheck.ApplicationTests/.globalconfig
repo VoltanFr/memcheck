@@ -2,5 +2,5 @@
 dotnet_diagnostic.CA1707.severity = none
 
 # In unit tests, I consider ok not to specify culture in string operations
-## dotnet_diagnostic.CA1305.severity = none
-## dotnet_diagnostic.CA1307.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none

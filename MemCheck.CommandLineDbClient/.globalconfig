@@ -7,3 +7,7 @@ dotnet_diagnostic.IDE0051.severity = none
 dotnet_diagnostic.IDE0052.severity = none
 dotnet_diagnostic.IDE0059.severity = none
 dotnet_diagnostic.IDE0060.severity = none
+
+# In this project, I consider ok not to specify culture in string operations
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1307.severity = none
