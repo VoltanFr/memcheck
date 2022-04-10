@@ -44,7 +44,8 @@ namespace MemCheck.WebUI.Controllers
         {
             static GetImage.Request.ImageSize AppSizeFromWebParam(int size)
             {
-                return size switch {
+                return size switch
+                {
                     1 => GetImage.Request.ImageSize.Small,
                     2 => GetImage.Request.ImageSize.Medium,
                     3 => GetImage.Request.ImageSize.Big,

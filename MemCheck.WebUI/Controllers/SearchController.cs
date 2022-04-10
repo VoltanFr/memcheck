@@ -282,7 +282,8 @@ namespace MemCheck.WebUI.Controllers
         }
         private static SearchCards.Request.VibilityFiltering AppVisibility(RunQueryRequest request)
         {
-            return request.Visibility switch {
+            return request.Visibility switch
+            {
                 1 => SearchCards.Request.VibilityFiltering.Ignore,
                 2 => SearchCards.Request.VibilityFiltering.CardsVisibleByMoreThanOwner,
                 3 => SearchCards.Request.VibilityFiltering.PrivateToOwner,
@@ -291,7 +292,8 @@ namespace MemCheck.WebUI.Controllers
         }
         private static SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
         {
-            return request.RatingFilteringMode switch {
+            return request.RatingFilteringMode switch
+            {
                 1 => SearchCards.Request.RatingFilteringMode.Ignore,
                 2 => SearchCards.Request.RatingFilteringMode.AtLeast,
                 3 => SearchCards.Request.RatingFilteringMode.AtMost,
@@ -301,7 +303,8 @@ namespace MemCheck.WebUI.Controllers
         }
         private static SearchCards.Request.NotificationFiltering AppNotificationFiltering(RunQueryRequest request)
         {
-            return request.NotificationFiltering switch {
+            return request.NotificationFiltering switch
+            {
                 1 => SearchCards.Request.NotificationFiltering.Ignore,
                 2 => SearchCards.Request.NotificationFiltering.RegisteredCards,
                 3 => SearchCards.Request.NotificationFiltering.NotRegisteredCards,
@@ -318,7 +321,8 @@ namespace MemCheck.WebUI.Controllers
 
             var excludedTags = (request.ExcludedTags.Count() == 1 && request.ExcludedTags.First() == allTagsFakeGuid) ? null : request.ExcludedTags;
 
-            var applicationRequest = new SearchCards.Request {
+            var applicationRequest = new SearchCards.Request
+            {
                 UserId = userId,
                 Deck = request.Deck,
                 DeckIsInclusive = request.DeckIsInclusive,

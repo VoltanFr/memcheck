@@ -54,7 +54,8 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             Email = email;
 
-            Input = new InputModel {
+            Input = new InputModel
+            {
                 NewEmail = email,
             };
 
