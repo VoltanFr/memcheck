@@ -82,7 +82,7 @@ namespace MemCheck.WebUI.Controllers
             CheckBodyParameter(request);
             var user = await userManager.GetUserAsync(HttpContext.User);
 
-            switch (request.learnMode)
+            switch (request.LearnMode)
             {
                 case learnModeUnknown:
                     {
@@ -116,7 +116,7 @@ namespace MemCheck.WebUI.Controllers
         public sealed class GetCardsRequest
         {
             public Guid DeckId { get; set; }    //When learnMode == learnModeDemo, this is not a deck but a tag
-            public int learnMode { get; set; } //can be learnModeExpired, learnModeUnknown, learnModeDemo
+            public int LearnMode { get; set; } //can be learnModeExpired, learnModeUnknown, learnModeDemo
             public IEnumerable<Guid> ExcludedCardIds { get; set; } = null!;
             public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
             public int CurrentCardCount { get; set; }
