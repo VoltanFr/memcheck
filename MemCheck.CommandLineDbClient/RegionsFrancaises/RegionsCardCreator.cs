@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Images;
 using MemCheck.Basics;
+using MemCheck.CommandLineDbClient.Pauker;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.Pauker
+namespace MemCheck.CommandLineDbClient.RegionsFrancaises
 {
     internal sealed class RegionsCardCreator : ICmdLinePlugin
     {

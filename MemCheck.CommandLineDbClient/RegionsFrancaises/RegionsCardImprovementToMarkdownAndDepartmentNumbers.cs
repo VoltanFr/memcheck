@@ -1,4 +1,5 @@
 ﻿using MemCheck.CommandLineDbClient.Geography;
+using MemCheck.CommandLineDbClient.Pauker;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.Pauker
+namespace MemCheck.CommandLineDbClient.RegionsFrancaises
 {
     internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICmdLinePlugin
     {

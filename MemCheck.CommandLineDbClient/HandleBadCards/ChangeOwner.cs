@@ -1,4 +1,6 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.CommandLineDbClient.Pauker;
+using MemCheck.CommandLineDbClient.RegionsFrancaises;
+using MemCheck.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -8,7 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.Pauker
+namespace MemCheck.CommandLineDbClient.HandleBadCards
 {
     internal sealed class ChangeOwner : ICmdLinePlugin
     {

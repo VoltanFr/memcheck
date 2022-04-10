@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Cards;
 using MemCheck.Basics;
+using MemCheck.CommandLineDbClient.Pauker;
 using MemCheck.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.Pauker
+namespace MemCheck.CommandLineDbClient.BeaufortScale
 {
     internal sealed class BeaufortCardCreator : ICmdLinePlugin
     {

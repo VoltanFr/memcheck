@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MemCheck.CommandLineDbClient.Pauker
+namespace MemCheck.CommandLineDbClient.RegionsFrancaises
 {
     internal static class StringExtensions
     {
