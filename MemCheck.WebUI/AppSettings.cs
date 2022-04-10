@@ -37,7 +37,7 @@ namespace MemCheck.WebUI
                 return new SendGridSettings(configuration["SendGrid:User"], configuration["SendGrid:Key"], configuration["SendGrid:Sender"]);
             }
             var debuggingDb = configuration["ConnectionStrings:DebuggingDb"];
-            if (debuggingDb == "AlternativeProdDbConnection" || debuggingDb == "Azure")
+            if (debuggingDb is "AlternativeProdDbConnection" or "Azure")
             {
                 var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\SendGridSecrets.json"));
                 sendGridLogMessage(logger, "prod settings from private file", null);
