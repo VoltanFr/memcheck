@@ -111,7 +111,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 
                     var withoutExcludedCards = cardsOfHeap;
                     foreach (var tag in excludedTagIds)   //I tried to do better with an intersect between the two sets, but that failed
-                        withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Where(tagInCard => tagInCard.TagId == tag).Any());
+                        withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tagInCard => tagInCard.TagId == tag));
 
                     var ordered = withoutExcludedCards.OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime);
                     var oldest = ordered.Take(cardCount);

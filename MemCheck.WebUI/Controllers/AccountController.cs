@@ -81,7 +81,7 @@ namespace MemCheck.WebUI.Controllers
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
             var appRequest = new GetSearchSubscriptions.Request(userId);
             var results = await new GetSearchSubscriptions(callContext).RunAsync(appRequest);  //Using this class is of course overkill, but it's ok since a user has very few search subscriptions
-            var result = results.Where(r => r.Id == id).Single();
+            var result = results.Single(r => r.Id == id);
             return Ok(new SearchSubscriptionViewModel(result, this));
         }
         #endregion
