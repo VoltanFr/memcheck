@@ -44,7 +44,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
             {
                 var withoutBlanks = field.RemoveBlanks();
                 int commaIndec = withoutBlanks.IndexOf(',');
-                string s1 = withoutBlanks.Substring(0, commaIndec == -1 ? withoutBlanks.Length : commaIndec);
+                string s1 = withoutBlanks[..(commaIndec == -1 ? withoutBlanks.Length : commaIndec)];
                 return int.Parse(s1);
             }
             #endregion

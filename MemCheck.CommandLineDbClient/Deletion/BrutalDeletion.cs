@@ -28,7 +28,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
             var cards = await dbContext.Cards.Where(c => (c.VersionCreator.UserName == "Toto2" || c.VersionCreator.UserName == "Voltan" || c.VersionCreator.UserName == "VoltanBot") && c.TagsInCards.Count() == 1 && c.TagsInCards.First().Tag.Name == "États américains").ToListAsync();
 
             foreach (var card in cards)
-                logger.LogInformation($"\t {card.FrontSide.Substring(0, Math.Min(100, card.FrontSide.Length))}");
+                logger.LogInformation($"\t {card.FrontSide[..Math.Min(100, card.FrontSide.Length)]}");
             logger.LogInformation($"{cards.Count} cards selected");
             logger.LogWarning("Opportunity to cancel. Please confirm with Y");
             var input = Console.ReadLine();

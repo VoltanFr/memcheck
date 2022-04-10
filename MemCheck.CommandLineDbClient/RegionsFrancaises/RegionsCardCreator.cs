@@ -47,8 +47,8 @@ namespace MemCheck.CommandLineDbClient.RegionsFrancaises
             private static int GetDensity(string field)
             {
                 var withoutBlanks = field.RemoveBlanks();
-                int commaIndec = withoutBlanks.IndexOf(',');
-                string s1 = withoutBlanks.Substring(0, commaIndec == -1 ? withoutBlanks.Length : commaIndec);
+                int commaIndex = withoutBlanks.IndexOf(',');
+                string s1 = withoutBlanks[..(commaIndex == -1 ? withoutBlanks.Length : commaIndex)];
                 return int.Parse(s1);
             }
             #endregion

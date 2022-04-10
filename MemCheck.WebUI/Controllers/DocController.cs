@@ -19,7 +19,7 @@ namespace MemCheck.WebUI.Controllers
             var parameterIndex = result.IndexOf('?', StringComparison.Ordinal);
             if (parameterIndex == -1)
                 return result;
-            return result.Substring(0, parameterIndex);
+            return result[..parameterIndex];
         }
         #endregion
         [HttpGet("")]
@@ -27,7 +27,7 @@ namespace MemCheck.WebUI.Controllers
         {
             //We provide contextual doc for the previously active page if any, otherwise we return the doc root page in the GUI language
             var refererRoute = GetRefererRoute();
-            var cultureName = HttpContext.Features.Get<IRequestCultureFeature>()!.RequestCulture.Culture.Name.Substring(0, 2);
+            var cultureName = HttpContext.Features.Get<IRequestCultureFeature>()!.RequestCulture.Culture.Name[..2];
             return RedirectToPage("/Doc/MdRenderer", new { refererRoute, cultureName });
         }
     }
