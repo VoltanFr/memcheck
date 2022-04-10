@@ -17,9 +17,7 @@ namespace MemCheck.WebUI.Controllers
                 return null;
             var result = previousPageUrl[(hostIndex + Request.Host.Value.Length)..];
             var parameterIndex = result.IndexOf('?', StringComparison.Ordinal);
-            if (parameterIndex == -1)
-                return result;
-            return result[..parameterIndex];
+            return parameterIndex == -1 ? result : result[..parameterIndex];
         }
         #endregion
         [HttpGet("")]

@@ -27,10 +27,7 @@ namespace MemCheck.Application.Helpers
         public async Task<IEnumerable<string>> GetRolesAsync(MemCheckUser user)
         {
             await Task.CompletedTask;
-            if (await UserIsAdminAsync(user))
-                return IRoleChecker.AdminRoleName.AsArray();
-
-            return Array.Empty<string>();
+            return await UserIsAdminAsync(user) ? IRoleChecker.AdminRoleName.AsArray() : Array.Empty<string>();
         }
     }
 }

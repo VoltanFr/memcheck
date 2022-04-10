@@ -51,12 +51,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
-            if (!hasPassword)
-            {
-                return RedirectToPage("./SetPassword");
-            }
-
-            return Page();
+            return hasPassword ? Page() : RedirectToPage("./SetPassword");
         }
 
         public async Task<IActionResult> OnPostAsync()

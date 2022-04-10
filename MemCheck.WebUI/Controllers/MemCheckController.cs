@@ -29,9 +29,9 @@ namespace MemCheck.WebUI.Controllers
         public string GetLocalized(string resourceName)
         {
             var result = localizer[resourceName];
-            if (result.ResourceNotFound)
-                throw new InvalidOperationException($"Ressource '{resourceName}' not found in localizer of {GetType().Name}");
-            return result.Value;
+            return result.ResourceNotFound
+                ? throw new InvalidOperationException($"Ressource '{resourceName}' not found in localizer of {GetType().Name}")
+                : result.Value;
         }
     }
 }

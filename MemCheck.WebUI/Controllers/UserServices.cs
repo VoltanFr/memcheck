@@ -12,9 +12,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var contextUser = httpContext.User;
             var user = await userManager.GetUserAsync(contextUser);
-            if (user == null)
-                return Guid.Empty;
-            return user.Id;
+            return user == null ? Guid.Empty : user.Id;
         }
     }
 }

@@ -16,10 +16,13 @@ namespace MemCheck.CommandLineDbClient.Pauker
         #endregion
         private static string StackNameFromIndex(int i)
         {
-            if (i == 0) return "Non apprises";
-            if (i == 1) return "Ultra court terme";
-            if (i == 2) return "Court terme";
-            return (i - 2).ToString();
+            return i switch
+            {
+                0 => "Non apprises",
+                1 => "Ultra court terme",
+                2 => "Court terme",
+                _ => (i - 2).ToString(),
+            };
         }
         private static PaukerStack ReadStack(XmlNode n, int stackIndex)
         {
@@ -36,12 +39,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         private static XmlElement FirstElem(XmlElement parent, string tagName)
         {
             XmlNodeList xmlNodeList = parent.GetElementsByTagName(tagName);
-            if (xmlNodeList == null)
-                throw new IOException();
-            if (xmlNodeList[0] is not XmlElement result)
-                throw new IOException();
-            return result;
-
+            return xmlNodeList != null && xmlNodeList[0] is XmlElement result ? result : throw new IOException();
         }
         private static PaukerCard ReadCard(XmlElement cardNode)
         {

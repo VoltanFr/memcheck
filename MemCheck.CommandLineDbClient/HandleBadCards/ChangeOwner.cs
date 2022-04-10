@@ -28,17 +28,17 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
             #region Private methods
             private static ImmutableArray<string> GetFields(string dataSetFileLine)
             {
-                IEnumerable<string> fields = dataSetFileLine.Split(';');
-                if (fields.Count() != 7)
-                    throw new Exception($"Invalid line '{dataSetFileLine}'");
-                return fields.Select(field => field.Trim()).ToImmutableArray();
+                var fields = dataSetFileLine.Split(';');
+                return fields.Length == 7
+                    ? fields.Select(field => field.Trim()).ToImmutableArray()
+                    : throw new Exception($"Invalid line '{dataSetFileLine}'");
             }
             private static ImmutableArray<string> GetDepartments(string field, int expectedCount)
             {
-                IEnumerable<string> fields = field.Split(',');
-                if (fields.Count() != expectedCount)
-                    throw new Exception($"Invalid department list '{field}'");
-                return fields.Select(field => field.Trim()).ToImmutableArray();
+                var fields = field.Split(',');
+                return fields.Length == expectedCount
+                    ? fields.Select(field => field.Trim()).ToImmutableArray()
+                    : throw new Exception($"Invalid department list '{field}'");
             }
             private static int GetDensity(string field)
             {

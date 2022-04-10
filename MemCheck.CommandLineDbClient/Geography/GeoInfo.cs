@@ -10,10 +10,10 @@ namespace MemCheck.CommandLineDbClient.Geography
     {
         public static ImmutableArray<string> GetFields(string line, int expectedCount)
         {
-            IEnumerable<string> fields = line.Split(',');
-            if (fields.Count() != expectedCount)
-                throw new Exception($"Invalid line '{line}'");
-            return fields.Select(field => field.Trim()).ToImmutableArray();
+            var fields = line.Split(',');
+            return fields.Length == expectedCount
+                ? fields.Select(field => field.Trim()).ToImmutableArray()
+                : throw new Exception($"Invalid line '{line}'");
         }
     }
 

@@ -44,18 +44,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
-            {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
             var hasPassword = await _userManager.HasPasswordAsync(user);
-
-            if (hasPassword)
-            {
-                return RedirectToPage("./ChangePassword");
-            }
-
-            return Page();
+            return hasPassword ? RedirectToPage("./ChangePassword") : Page();
         }
 
         public async Task<IActionResult> OnPostAsync()

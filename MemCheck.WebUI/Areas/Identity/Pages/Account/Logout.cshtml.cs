@@ -24,10 +24,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = "/")
         {
             await _signInManager.SignOutAsync();
-            if (returnUrl != null)
-                return LocalRedirect(returnUrl);
-
-            return RedirectToPage();
+            return returnUrl != null ? LocalRedirect(returnUrl) : RedirectToPage();
         }
     }
 }
