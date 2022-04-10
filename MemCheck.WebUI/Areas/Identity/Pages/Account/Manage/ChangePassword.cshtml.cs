@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
@@ -11,16 +10,11 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly ILogger<ChangePasswordModel> _logger;
 
-        public ChangePasswordModel(
-            UserManager<MemCheckUser> userManager,
-            SignInManager<MemCheckUser> signInManager,
-            ILogger<ChangePasswordModel> logger)
+        public ChangePasswordModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _logger = logger;
         }
 
         [BindProperty]
@@ -89,7 +83,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            _logger.LogInformation("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();

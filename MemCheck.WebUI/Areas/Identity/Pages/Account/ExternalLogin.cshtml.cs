@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,14 +13,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     public class ExternalLoginModel : PageModel
     {
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly ILogger<ExternalLoginModel> _logger;
 
-        public ExternalLoginModel(
-            SignInManager<MemCheckUser> signInManager,
-            ILogger<ExternalLoginModel> logger)
+        public ExternalLoginModel(SignInManager<MemCheckUser> signInManager)
         {
             _signInManager = signInManager;
-            _logger = logger;
         }
 
         [BindProperty]
@@ -72,28 +67,22 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
-            {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity?.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
-            }
+
             if (result.IsLockedOut)
-            {
                 return RedirectToPage("./Lockout");
-            }
-            else
+
+            // If the user does not have an account, then ask the user to create an account.
+            ReturnUrl = returnUrl;
+            LoginProvider = info.LoginProvider;
+            if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                LoginProvider = info.LoginProvider;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                Input = new InputModel
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
-                }
-                return Page();
+                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                };
             }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = "/")

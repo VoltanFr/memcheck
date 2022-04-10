@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,14 +11,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
     public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<MemCheckUser> _userManager;
-        private readonly ILogger<GenerateRecoveryCodesModel> _logger;
 
-        public GenerateRecoveryCodesModel(
-            UserManager<MemCheckUser> userManager,
-            ILogger<GenerateRecoveryCodesModel> logger)
+        public GenerateRecoveryCodesModel(UserManager<MemCheckUser> userManager)
         {
             _userManager = userManager;
-            _logger = logger;
         }
 
         [TempData]
@@ -64,7 +59,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             RecoveryCodes = recoveryCodes.ToArray();
 
-            _logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", userId);
             StatusMessage = "You have generated new recovery codes.";
             return RedirectToPage("./ShowRecoveryCodes");
         }

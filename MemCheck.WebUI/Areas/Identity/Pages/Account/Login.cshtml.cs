@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,16 +18,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         #region Fields
         private readonly IStringLocalizer<LoginModel> localizer;
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
         #endregion
 
-        public LoginModel(SignInManager<MemCheckUser> signInManager,
-            ILogger<LoginModel> logger,
-            IStringLocalizer<LoginModel> localizer)
+        public LoginModel(SignInManager<MemCheckUser> signInManager, IStringLocalizer<LoginModel> localizer)
         {
             this.localizer = localizer;
             _signInManager = signInManager;
-            _logger = logger;
         }
 
         [BindProperty]
@@ -70,24 +65,16 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
                     return LocalRedirect("/");
-                }
+
                 if (result.RequiresTwoFactor)
-                {
                     return RedirectToPage("./LoginWith2fa", new { Input.RememberMe });
-                }
+
                 if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, localizer["InvalidLoginAttempt"].Value);
-                    return Page();
-                }
+
+                ModelState.AddModelError(string.Empty, localizer["InvalidLoginAttempt"].Value);
+                return Page();
             }
 
             // If we got this far, something failed, redisplay form

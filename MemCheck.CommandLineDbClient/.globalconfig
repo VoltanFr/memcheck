@@ -1,6 +1,6 @@
 # I don't care about not using the logger very well in this project
-## dotnet_diagnostic.CA1848.severity = none
-## dotnet_diagnostic.CA2254.severity = none
+dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.CA2254.severity = none
 
 # Rules to be reconsidered for activation when I have time
 dotnet_diagnostic.IDE0051.severity = none

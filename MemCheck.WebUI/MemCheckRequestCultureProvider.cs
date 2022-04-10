@@ -12,12 +12,8 @@ namespace MemCheck.WebUI
     //If not available, we use the culture passed by the browser.
     public sealed class MemCheckRequestCultureProvider : RequestCultureProvider
     {
-        #region Fields
-        private readonly ILogger logger;
-        #endregion
-        public MemCheckRequestCultureProvider(ILogger logger)
+        public MemCheckRequestCultureProvider()
         {
-            this.logger = logger;
         }
         public async override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
@@ -29,9 +25,7 @@ namespace MemCheck.WebUI
                     var cultureFromClaim = MemCheckSupportedCultures.CultureFromId(cultureIdFromClaim);
                     if (cultureFromClaim != null)
                     {
-                        var resultFromClaim = new ProviderCultureResult(cultureFromClaim.Name);
-                        logger.LogInformation($"Request: {httpContext.Request.Path} (using culture {cultureIdFromClaim} thanks to claim)");
-                        return resultFromClaim;
+                        return new ProviderCultureResult(cultureFromClaim.Name);
                     }
                 }
             }
@@ -41,14 +35,10 @@ namespace MemCheck.WebUI
                 {
                     var cultureFromCookie = MemCheckSupportedCultures.CultureFromId(cookieValue);
                     if (cultureFromCookie != null)
-                    {
-                        logger.LogInformation($"Request: {httpContext.Request.Path} (using culture {cookieValue} thanks to cookie)");
                         return new ProviderCultureResult(cultureFromCookie.Name);
-                    }
                 }
 
             //We will then use AcceptLanguageHeaderRequestCultureProvider (as configured in Startup)
-            logger.LogInformation($"Request: {httpContext.Request.Path} (will use browser default culture)");
             await Task.CompletedTask;
             return null;
         }

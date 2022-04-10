@@ -114,7 +114,7 @@ namespace MemCheck.WebUI
             services.AddApplicationInsightsTelemetry();
             services.AddSingleton<ITelemetryInitializer, MemCheckTelemetryInitializer>();
         }
-        public void Configure(IApplicationBuilder app, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseExceptionHandler(a => a.Run(async context =>
             {
@@ -139,10 +139,7 @@ namespace MemCheck.WebUI
                 options.DefaultRequestCulture = new RequestCulture(MemCheckSupportedCultures.English);
                 options.SupportedCultures = MemCheckSupportedCultures.All;    //Culture is used for numbers, dates, etc.
                 options.SupportedUICultures = MemCheckSupportedCultures.All; //UI culture is used for looking up translations from resource files
-                options.RequestCultureProviders = new IRequestCultureProvider[] {
-                    new MemCheckRequestCultureProvider(logger),
-                    new AcceptLanguageHeaderRequestCultureProvider()
-                };
+                options.RequestCultureProviders = new IRequestCultureProvider[] { new MemCheckRequestCultureProvider(), new AcceptLanguageHeaderRequestCultureProvider() };
             });
 
             app.UseMvc();

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -14,12 +13,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
     public class LoginWith2faModel : PageModel
     {
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly ILogger<LoginWith2faModel> _logger;
 
-        public LoginWith2faModel(SignInManager<MemCheckUser> signInManager, ILogger<LoginWith2faModel> logger)
+        public LoginWith2faModel(SignInManager<MemCheckUser> signInManager)
         {
             _signInManager = signInManager;
-            _logger = logger;
         }
 
         [BindProperty]
@@ -77,21 +74,13 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
             var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
 
             if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
                 return LocalRedirect(returnUrl);
-            }
-            else if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
+
+            if (result.IsLockedOut)
                 return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
-                return Page();
-            }
+
+            ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
+            return Page();
         }
     }
 }

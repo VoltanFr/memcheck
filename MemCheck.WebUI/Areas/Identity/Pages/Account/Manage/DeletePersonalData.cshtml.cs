@@ -7,7 +7,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
@@ -18,15 +17,13 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
         #region Fields
         private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
-        private readonly ILogger<DeletePersonalDataModel> _logger;
         private readonly CallContext callContext;
         #endregion
 
-        public DeletePersonalDataModel(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, ILogger<DeletePersonalDataModel> logger, TelemetryClient telemetryClient)
+        public DeletePersonalDataModel(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, TelemetryClient telemetryClient)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _logger = logger;
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), new ProdRoleChecker(userManager));
         }
 
@@ -67,8 +64,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
             var deleter = new DeleteUserAccount(callContext, _userManager);
             await deleter.RunAsync(new DeleteUserAccount.Request(user.Id, user.Id));
             await _signInManager.SignOutAsync();
-
-            _logger.LogInformation("User with ID '{UserId}' deleted themselves.", user.Id);
 
             return Redirect("~/");
         }
