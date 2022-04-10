@@ -13,7 +13,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         #region Fields
         private readonly ILogger<RateAllBotCards> logger;
         private readonly MemCheckDbContext dbContext;
-        private readonly Guid cardId = new Guid("{f005a3e4-c358-4af8-32f6-08d9a7c792b3}");
+        private readonly Guid cardId = new("{f005a3e4-c358-4af8-32f6-08d9a7c792b3}");
         #endregion
         public DumpCardRatings(IServiceProvider serviceProvider)
         {
