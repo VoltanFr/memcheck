@@ -2,7 +2,7 @@
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    class PaukerCard
+    internal class PaukerCard
     {
         private readonly PaukerCardSide front;
         private readonly PaukerCardSide reverse;

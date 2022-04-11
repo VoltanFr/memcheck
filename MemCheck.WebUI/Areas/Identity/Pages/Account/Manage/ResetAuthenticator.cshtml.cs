@@ -8,7 +8,7 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
 {
     public class ResetAuthenticatorModel : PageModel
     {
-        readonly UserManager<MemCheckUser> _userManager;
+        private readonly UserManager<MemCheckUser> _userManager;
         private readonly SignInManager<MemCheckUser> _signInManager;
 
         public ResetAuthenticatorModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager)

@@ -2,7 +2,7 @@
 
 namespace MemCheck.CommandLineDbClient.Pauker
 {
-    class PaukerCardSide
+    internal class PaukerCardSide
     {
         private readonly long? learnedTimestamp;
         private readonly string orientation;

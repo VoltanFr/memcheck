@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace MemCheck.CommandLineDbClient.Geography
 {
-    static class ResourceFileReadHelper
+    internal static class ResourceFileReadHelper
     {
         public static ImmutableArray<string> GetFields(string line, int expectedCount)
         {
@@ -17,7 +17,7 @@ namespace MemCheck.CommandLineDbClient.Geography
         }
     }
 
-    sealed class Region
+    internal sealed class Region
     //The examples are for Ile de France
     {
         //        REG	2	Code région
@@ -31,7 +31,7 @@ namespace MemCheck.CommandLineDbClient.Geography
         //11,75056,1,ILE DE FRANCE,Île-de-France,Île-de-France
 
     }
-    sealed class Department
+    internal sealed class Department
     //The examples are for Yvelines. The line is:
     //78,11,78646,4,YVELINES,Yvelines,Yvelines
     {
@@ -71,7 +71,7 @@ namespace MemCheck.CommandLineDbClient.Geography
         //NCCENR	200	Nom en clair(typographie riche)
         //LIBELLE	200	Nom en clair(typographie riche) avec article
     }
-    sealed class City
+    internal sealed class City
     //The examples are for La Celle-Saint-Cloud. The line is:
     //COM,78126,11,78,784,3,CELLE SAINT CLOUD,Celle-Saint-Cloud,La Celle-Saint-Cloud,7804,
     {
@@ -110,7 +110,7 @@ namespace MemCheck.CommandLineDbClient.Geography
             return contents.Select(line => line.Trim()).Where(line => line.Length > 0).Select(line => new City(line));
         }
     }
-    sealed class GeoInfo
+    internal sealed class GeoInfo
     {
         public GeoInfo()
         {

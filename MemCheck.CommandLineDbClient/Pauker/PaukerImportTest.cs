@@ -20,7 +20,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         private const string CardVersionDescription = "Created by VoltanBot PaukerImportTest";
         private readonly ILogger<PaukerImportTest> logger;
         private readonly MemCheckDbContext dbContext;
-        const string filePath = @"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Pauker\Vince.pau.gz";
+        private const string filePath = @"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Pauker\Vince.pau.gz";
         #endregion
         #region Private methods
         private static string StringFromGZipFile(string file, Encoding encoding)
