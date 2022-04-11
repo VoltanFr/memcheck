@@ -171,8 +171,8 @@ const learnApp = Vue.createApp({
                 toast(this.demoMessages.onDidNotKnowToastMessage, this.demoMessages.onDidNotKnowToastTitle, true, 10000);
             this.getCard();
         },
-        editCard() {
-            window.location.href = `/Authoring?CardId=${this.currentCard.cardId}&ReturnUrl=${window.location}`;
+        editUrl() {
+            return `/Authoring?CardId=${this.currentCard.cardId}&ReturnUrl=${window.location}`;
         },
         spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
             this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })

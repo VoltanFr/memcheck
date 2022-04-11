@@ -3,25 +3,25 @@
 @inject IViewLocalizer Localizer
 @model LearnViewModel
 @section head {
-    <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/js/CardRating.js" asp-append-version="true"></script>
-    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
-    <script src="~/js/TagButton.js" asp-append-version="true"></script>
-    <script>
-        const localized = {
-            Learning: '@Localizer["Learning"]',
-            Rehearsing: '@Localizer["Rehearsing"]',
-            Demo: '@Localizer["Demo"]',
-        };
-    </script>
-    <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script>
+<script src="~/js/big-size-image.js" asp-append-version="true"></script>
+<script src="~/js/TagButton.js" asp-append-version="true"></script>
+<script>
+    const localized = {
+        Learning: '@Localizer["Learning"]',
+        Rehearsing: '@Localizer["Rehearsing"]',
+        Demo: '@Localizer["Demo"]',
+    };
+</script>
+<script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -71,7 +71,7 @@
                 <div id="Small buttons" class="small-buttons-div">
                     <ul class="small-buttons-ul">
                         <li id="Edit button" style="padding-right:5px" v-if="showEditButton()">
-                            <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["Edit"] @@click="editCard"><i class="fas fa-pen"></i></van-button>
+                            <a v-bind:href="editUrl()" class="toolbar-button-circle toolbar-button"><i class="fas fa-pen toolbar-button-content"></i></a>
                         </li>
                         <li id="Remove button" style="padding-right:5px" v-if="showRemoveButton()">
                             <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></van-button>
