@@ -127,7 +127,7 @@ namespace MemCheck.CommandLineDbClient.RegionsFrancaises
         {
             logger.LogInformation($"Will update region cards");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var geoInfo = new GeoInfo();
             var user = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();

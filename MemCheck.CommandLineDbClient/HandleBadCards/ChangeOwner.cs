@@ -105,7 +105,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         {
             logger.LogInformation("Will change owners of cards and images with null ones");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single();
 

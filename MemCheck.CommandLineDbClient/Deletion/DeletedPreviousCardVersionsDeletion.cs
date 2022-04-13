@@ -29,7 +29,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
         {
             logger.LogCritical($"Will completely delete cards currently soft-deleted");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             await new CountDeletedCards(dbContext, logger).RunAsync();
 

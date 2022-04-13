@@ -36,7 +36,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             return new(result.TotalNbCards, chrono.Elapsed.TotalSeconds);
 
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single().Id;
             var deckId = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;

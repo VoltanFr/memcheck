@@ -21,7 +21,7 @@ namespace MemCheck.WebUI
         {
             callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), new ProdRoleChecker(userManager));
         }
-        public async override Task<ClaimsPrincipal> CreateAsync(MemCheckUser user)
+        public override async Task<ClaimsPrincipal> CreateAsync(MemCheckUser user)
         {
             var principal = await base.CreateAsync(user);
             if (user.UILanguage != null)

@@ -1,13 +1,8 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Basics;
+﻿using MemCheck.Basics;
 using MemCheck.Database;
-using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient.Images
@@ -27,7 +22,7 @@ namespace MemCheck.CommandLineDbClient.Images
         {
             logger.LogInformation("Will recompute the SHA1 of all image blobs");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var images = dbContext.Images;
             foreach (var image in images)

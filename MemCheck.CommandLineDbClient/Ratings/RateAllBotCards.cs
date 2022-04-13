@@ -24,7 +24,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         {
             logger.LogInformation($"Will rate all bot cards");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var author = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();
             var ratingUser = await dbContext.Users.Where(u => u.UserName == "VoltanBot").SingleAsync();

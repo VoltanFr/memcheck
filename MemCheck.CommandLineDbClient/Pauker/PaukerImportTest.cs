@@ -93,7 +93,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
         {
             logger.LogInformation($"Will play with {filePath}");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var lesson = GetPaukerLesson();
 

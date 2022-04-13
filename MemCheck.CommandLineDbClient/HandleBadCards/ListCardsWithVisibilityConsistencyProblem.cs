@@ -24,7 +24,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         {
             logger.LogInformation("Will change visibility of cards currently private but must be public because used by other users");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
 

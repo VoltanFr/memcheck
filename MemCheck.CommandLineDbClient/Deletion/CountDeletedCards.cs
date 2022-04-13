@@ -1,8 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Application.Users;
-using MemCheck.Database;
+﻿using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,7 +27,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
         {
             logger.LogInformation($"Will count the deleted cards in the database");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var deletedCount = await dbContext.CardPreviousVersions.Where(pv => pv.VersionType == CardPreviousVersionType.Deletion).CountAsync();
             var totalCount = await dbContext.CardPreviousVersions.CountAsync();

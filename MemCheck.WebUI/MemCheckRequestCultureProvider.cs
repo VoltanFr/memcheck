@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Languages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -15,7 +14,7 @@ namespace MemCheck.WebUI
         public MemCheckRequestCultureProvider()
         {
         }
-        public async override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
+        public override async Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
             if (httpContext.User.Identity != null && httpContext.User.Identity.IsAuthenticated)
             {

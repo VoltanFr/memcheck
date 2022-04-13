@@ -20,7 +20,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
             logger = serviceProvider.GetRequiredService<ILogger<GetUserDecksWithHeapsAndTags>>();
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var userId = dbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
 

@@ -23,7 +23,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
         {
             logger.LogInformation($"Will delete some cards - D A N G E R");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var cards = await dbContext.Cards.Where(c => (c.VersionCreator.UserName == "Toto2" || c.VersionCreator.UserName == "Voltan" || c.VersionCreator.UserName == "VoltanBot") && c.TagsInCards.Count() == 1 && c.TagsInCards.First().Tag.Name == "États américains").ToListAsync();
 

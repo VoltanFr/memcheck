@@ -24,7 +24,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
         {
             logger.LogInformation($"Will dump all ratings of card '{cardId}'");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var ratings = await dbContext.UserCardRatings.Include(rating => rating.User).Where(rating => rating.CardId == cardId).ToListAsync();
             logger.LogInformation($"Dumping {ratings.Count} ratings of card '{cardId}'...");

@@ -25,7 +25,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         {
             logger.LogInformation($"Will request cards to repeat");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(user => user.UserName == "Toto1").Single().Id;
             var deck = dbContext.Decks.Where(deck => deck.Owner.Id == user).First().Id;

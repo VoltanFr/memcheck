@@ -31,7 +31,7 @@ namespace MemCheck.CommandLineDbClient.Deletion
         {
             logger.LogCritical($"Will delete user '{userToDeleteName}' - D A N G E R");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var userToDelete = await dbContext.Users.Where(u => u.UserName == userToDeleteName).Select(u => new { u.Id, u.UserName }).SingleAsync();
             var userDeckIds = await dbContext.Decks.Where(d => d.Owner.Id == userToDelete.Id).Select(d => d.Id).ToListAsync();

@@ -21,7 +21,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             logger = serviceProvider.GetRequiredService<ILogger<GetCardForEdit>>();
             callContext = serviceProvider.GetRequiredService<MemCheckDbContext>().AsCallContext();
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var userId = callContext.DbContext.Users.Where(user => user.UserName == "Voltan").Single().Id;
             var cardId = callContext.DbContext.Cards.Where(card => !card.UsersWithView.Any() && card.Images.Any()).OrderBy(card => card.VersionUtcDate).First().Id;

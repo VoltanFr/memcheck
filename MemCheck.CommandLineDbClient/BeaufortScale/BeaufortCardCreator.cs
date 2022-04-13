@@ -322,7 +322,7 @@ namespace MemCheck.CommandLineDbClient.BeaufortScale
         {
             logger.LogInformation($"Will generate Beaufort scale cards");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var user = dbContext.Users.Where(u => u.UserName == "VoltanBot").Single();
             var frenchLanguageId = dbContext.CardLanguages.Where(lang => lang.Name == "Français").Select(lang => lang.Id).Single();

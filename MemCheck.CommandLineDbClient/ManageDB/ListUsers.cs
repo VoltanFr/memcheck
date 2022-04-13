@@ -28,7 +28,7 @@ namespace MemCheck.CommandLineDbClient.ManageDB
         {
             logger.LogInformation("Will list users");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var users = await dbContext.Users.ToListAsync();
             var roleChecker = new ProdRoleChecker(userManager);

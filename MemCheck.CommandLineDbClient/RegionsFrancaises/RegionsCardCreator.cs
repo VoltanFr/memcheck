@@ -198,7 +198,7 @@ namespace MemCheck.CommandLineDbClient.RegionsFrancaises
         {
             logger.LogInformation($"Will create region cards from path {sourceDir}");
         }
-        async public Task RunAsync()
+        public async Task RunAsync()
         {
             var infoFileContents = new InfoFileContents();
             logger.LogInformation($"Loaded {infoFileContents.Regions.Count()} regions");
