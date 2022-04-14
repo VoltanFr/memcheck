@@ -10,7 +10,6 @@ namespace MemCheck.CommandLineDbClient.Pauker
     {
         #region Fields
         private readonly string lessonFormat;
-        private readonly List<PaukerStack> stacks;  //ordered
         private readonly Dictionary<PaukerCard, List<PaukerStack>> cardsInStacks;
         private readonly FileInfo inputFile;
         #endregion
@@ -48,14 +47,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
         public PaukerLesson(XmlDocument d, FileInfo inputFile)
         {
             this.inputFile = inputFile;
-            stacks = new List<PaukerStack>();
+            Stacks = new List<PaukerStack>();
             cardsInStacks = new Dictionary<PaukerCard, List<PaukerStack>>();
             lessonFormat = d.DocumentElement!.GetAttribute("LessonFormat");
             var stackNodes = d.DocumentElement.SelectNodes("Batch");
             for (int i = 0; i < stackNodes!.Count; i++)
             {
                 var currentStack = ReadStack(stackNodes[i]!, i);
-                stacks.Add(currentStack);
+                Stacks.Add(currentStack);
                 foreach (var c in currentStack.Cards)
                     if (cardsInStacks.ContainsKey(c))
                         cardsInStacks[c].Add(currentStack);
@@ -91,14 +90,14 @@ namespace MemCheck.CommandLineDbClient.Pauker
             foreach (var c in cardsInStacks.Keys)
                 if (cardsInStacks[c].Count > 1)
                     RemoveDoublons(c);
-            Console.WriteLine($"Doublons removed, there are now {stacks.Sum(stack => stack.Cards.Count)} cards");
+            Console.WriteLine($"Doublons removed, there are now {Stacks.Sum(stack => stack.Cards.Count)} cards");
         }
 
         private void RemoveDoublons(PaukerCard card)
         {
             var firstAlreadyFound = false;
 
-            foreach (var stack in stacks)
+            foreach (var stack in Stacks)
                 firstAlreadyFound = stack.RemoveCard(card, !firstAlreadyFound) || firstAlreadyFound;
         }
 
@@ -122,7 +121,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
 
             lessonElem.AppendChild(doc.CreateElement(string.Empty, "Description", string.Empty));
 
-            foreach (var stack in stacks)
+            foreach (var stack in Stacks)
                 SaveStack(stack, lessonElem);
 
             doc.Save(outputFile.FullName);
@@ -204,6 +203,6 @@ namespace MemCheck.CommandLineDbClient.Pauker
             font.Attributes.Append(sizeAttrib);
         }
 
-        public List<PaukerStack> Stacks => stacks;
+        public List<PaukerStack> Stacks { get; }
     }
 }

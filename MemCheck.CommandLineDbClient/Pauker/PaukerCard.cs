@@ -4,27 +4,13 @@ namespace MemCheck.CommandLineDbClient.Pauker
 {
     internal class PaukerCard
     {
-        private readonly PaukerCardSide front;
-        private readonly PaukerCardSide reverse;
         public PaukerCard(PaukerCardSide front, PaukerCardSide reverse)
         {
-            this.front = front ?? throw new ArgumentNullException(nameof(front));
-            this.reverse = reverse ?? throw new ArgumentNullException(nameof(reverse));
+            this.Front = front ?? throw new ArgumentNullException(nameof(front));
+            this.Reverse = reverse ?? throw new ArgumentNullException(nameof(reverse));
         }
-        public PaukerCardSide Front
-        {
-            get
-            {
-                return front;
-            }
-        }
-        public PaukerCardSide Reverse
-        {
-            get
-            {
-                return reverse;
-            }
-        }
+        public PaukerCardSide Front { get; }
+        public PaukerCardSide Reverse { get; }
         public override bool Equals(object? obj)
         {
             if (obj == null)
@@ -42,12 +28,12 @@ namespace MemCheck.CommandLineDbClient.Pauker
         }
         public DateTime LearnedDate()
         {
-            if (reverse.LearnedTimestamp != null)
+            if (Reverse.LearnedTimestamp != null)
                 throw new InvalidProgramException("Non null reverse.LearnedTimestamp found");
-            if (front.LearnedTimestamp == null)
+            if (Front.LearnedTimestamp == null)
                 throw new InvalidProgramException("null front.LearnedTimestamp found");
             DateTime dtDateTime = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddMilliseconds(front.LearnedTimestamp.Value).ToLocalTime();
+            dtDateTime = dtDateTime.AddMilliseconds(Front.LearnedTimestamp.Value).ToLocalTime();
             return dtDateTime;
         }
     }
