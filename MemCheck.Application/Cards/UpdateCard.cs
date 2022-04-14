@@ -159,11 +159,6 @@ namespace MemCheck.Application.Cards
                 IEnumerable<Guid> userIds = await GetAllUsersWithCardInADeckAsync(dbContext);
                 await CheckVisibilityForUsersAsync(userIds, localizer, "HeHasThisCardInADeck", dbContext);
             }
-            private void CheckVisibilityAndPersoTagConsistency(Card cardFromDb)
-            {
-                //, IEnumerable<Guid> newTags, IEnumerable<Guid> newUsersWithVisibility
-                throw new NotImplementedException();
-            }
             #endregion
             public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
             {
@@ -216,8 +211,6 @@ namespace MemCheck.Application.Cards
                 var card = cards.Single();
 
                 CheckAtLeastOneFieldDifferent(card, callContext.Localized);
-
-                CheckVisibilityAndPersoTagConsistency(card);
 
                 await CheckNewVisibilityAsync(card, callContext.Localized, callContext.DbContext);
             }
