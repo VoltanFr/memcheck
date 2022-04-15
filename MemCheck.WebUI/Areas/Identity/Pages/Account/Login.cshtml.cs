@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account
@@ -28,8 +26,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         [BindProperty]
         public InputModel Input { get; set; } = null!;
-
-        public List<AuthenticationScheme> ExternalLogins { get; set; } = null!;
 
         [TempData]
         public string ErrorMessage { get; set; } = null!;
@@ -54,7 +50,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync()

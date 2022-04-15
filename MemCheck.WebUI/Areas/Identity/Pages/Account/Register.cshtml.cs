@@ -1,5 +1,4 @@
 ﻿using MemCheck.Domain;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -7,10 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -36,8 +33,6 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         [BindProperty]
         public InputModel Input { get; set; } = null!;
 
-        public IList<AuthenticationScheme> ExternalLogins { get; set; } = null!;
-
         public class InputModel
         {
             [Required]
@@ -59,12 +54,11 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync()
         {
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            await Task.CompletedTask;
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
                 var user = new MemCheckUser { UserName = Input.UserName, Email = Input.Email };
