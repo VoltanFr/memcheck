@@ -13,7 +13,7 @@ namespace MemCheck.CommandLineDbClient.Geography
             var fields = line.Split(',');
             return fields.Length == expectedCount
                 ? fields.Select(field => field.Trim()).ToImmutableArray()
-                : throw new Exception($"Invalid line '{line}'");
+                : throw new ArgumentException($"Invalid line '{line}'");
         }
     }
 

@@ -31,14 +31,14 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
                 var fields = dataSetFileLine.Split(';');
                 return fields.Length == 7
                     ? fields.Select(field => field.Trim()).ToImmutableArray()
-                    : throw new Exception($"Invalid line '{dataSetFileLine}'");
+                    : throw new ArgumentException($"Invalid line '{dataSetFileLine}'");
             }
             private static ImmutableArray<string> GetDepartments(string field, int expectedCount)
             {
                 var fields = field.Split(',');
                 return fields.Length == expectedCount
                     ? fields.Select(field => field.Trim()).ToImmutableArray()
-                    : throw new Exception($"Invalid department list '{field}'");
+                    : throw new ArgumentException($"Invalid department list '{field}'");
             }
             private static int GetDensity(string field)
             {
@@ -63,7 +63,7 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"Failed to read region from '{dataSetFileLine}'", e);
+                    throw new IOException($"Failed to read region from '{dataSetFileLine}'", e);
                 }
             }
             public string Name { get; }

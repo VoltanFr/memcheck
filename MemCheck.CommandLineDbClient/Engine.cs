@@ -51,7 +51,7 @@ namespace MemCheck.CommandLineDbClient
             if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
             {
                 logger.LogError("User cancellation");
-                throw new Exception("User cancellation");
+                throw new InvalidProgramException("User cancellation");
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)

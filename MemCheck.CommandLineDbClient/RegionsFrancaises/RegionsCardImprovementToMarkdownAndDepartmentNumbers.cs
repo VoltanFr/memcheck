@@ -27,7 +27,7 @@ namespace MemCheck.CommandLineDbClient.RegionsFrancaises
             {
                 var additionalInfoLines = cardToUpdate.AdditionalInfo.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
                 if (!additionalInfoLines[0].StartsWith("Elle est constituée de ces"))
-                    throw new Exception($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
+                    throw new ArgumentException($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
                 if (additionalInfoLines[1].StartsWith("-"))
                     logger.LogInformation($"Card is already Markdown ({cardToUpdate.BackSide})");
                 else
@@ -54,7 +54,7 @@ namespace MemCheck.CommandLineDbClient.RegionsFrancaises
             {
                 var additionalInfoLines = cardToUpdate.AdditionalInfo.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
                 if (!additionalInfoLines[0].StartsWith("Elle est constituée de ces"))
-                    throw new Exception($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
+                    throw new ArgumentException($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
                 if (additionalInfoLines[1].StartsWith("-"))
                     logger.LogInformation($"Card is already Markdown ({cardToUpdate.BackSide})");
                 else

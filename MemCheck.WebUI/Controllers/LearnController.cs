@@ -195,7 +195,7 @@ namespace MemCheck.WebUI.Controllers
                 {
                     var visibleToUser = applicationResult.VisibleTo.First();
                     if (visibleToUser != currentUser)
-                        throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
+                        throw new InvalidProgramException($"Card visible to single user should be current user, is {visibleToUser}");
                     VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
@@ -232,7 +232,7 @@ namespace MemCheck.WebUI.Controllers
                 {
                     var visibleToUser = applicationResult.VisibleTo.First();
                     if (visibleToUser != currentUser)
-                        throw new ApplicationException($"Card visible to single user should be current user, is {visibleToUser}");
+                        throw new InvalidProgramException($"Card visible to single user should be current user, is {visibleToUser}");
                     VisibleTo = localizer.GetLocalized("YouOnly");
                 }
                 else
@@ -419,8 +419,8 @@ namespace MemCheck.WebUI.Controllers
         {
             public UserDecksTagViewModel(Guid tagId, string tagName)
             {
-                this.TagId = tagId;
-                this.TagName = tagName;
+                TagId = tagId;
+                TagName = tagName;
             }
             public Guid TagId { get; }
             public string TagName { get; }
