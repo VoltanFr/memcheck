@@ -74,8 +74,7 @@ namespace MemCheck.CommandLineDbClient.Pauker
             var textNode = n.SelectSingleNode("Text");
 
             var tsAttrib = n.GetAttribute("LearnedTimestamp");
-            long? learnedTimestamp = string.IsNullOrEmpty(tsAttrib) ? null : (long?)long.Parse(tsAttrib);
-
+            long? learnedTimestamp = string.IsNullOrEmpty(tsAttrib) ? null : long.Parse(tsAttrib);
 
             return new PaukerCardSide(
                 learnedTimestamp,
