@@ -140,35 +140,6 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetCardsCardViewModel
         {
-            #region Private methods
-            private static string RenderMarkdown(string markdown)
-            {
-                return markdown;
-                //if (string.IsNullOrEmpty(markdown))
-                //    return string.Empty;
-
-                //using (var htmlWriter = new StringWriter())
-                //{
-
-                //    var pipeline = new MarkdownPipelineBuilder()
-                //        .UseSoftlineBreakAsHardlineBreak()
-                //        .UseAutoLinks(new AutoLinkOptions() { OpenInNewWindow = true });
-
-                //    var document = Markdown.Parse(markdown, pipeline.Build());
-
-                //    foreach (var descendant in document.Descendants())
-                //        if (descendant is AutolinkInline || descendant is LinkInline)
-                //            descendant.GetAttributes().AddPropertyIfNotExist("target", "_blank");
-
-                //    var renderer = new HtmlRenderer(htmlWriter);
-                //    renderer.Render(document);
-
-                //    var rendered = htmlWriter.ToString();
-                //    var sanitized = new HtmlSanitizer().Sanitize(rendered);
-                //    return sanitized;
-                //}
-            }
-            #endregion
             public GetCardsCardViewModel(GetUnknownCardsToLearn.ResultCard applicationResult, ILocalized localizer, string currentUser)
             {
                 CardId = applicationResult.CardId;
@@ -178,10 +149,10 @@ namespace MemCheck.WebUI.Controllers
                 LastChangeUtcTime = applicationResult.LastChangeUtcTime;
                 BiggestHeapReached = applicationResult.BiggestHeapReached;
                 NbTimesInNotLearnedHeap = applicationResult.NbTimesInNotLearnedHeap;
-                FrontSide = RenderMarkdown(applicationResult.FrontSide);
-                BackSide = RenderMarkdown(applicationResult.BackSide);
-                AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
-                References = RenderMarkdown(applicationResult.References);
+                FrontSide = applicationResult.FrontSide;
+                BackSide = applicationResult.BackSide;
+                AdditionalInfo = applicationResult.AdditionalInfo;
+                References = applicationResult.References;
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
                 RemoveAlertMessage = localizer.GetLocalized("RemoveAlertMessage") + " " + Heap + "\n" + localizer.GetLocalized("DateAddedToDeck") + " ";
@@ -215,10 +186,10 @@ namespace MemCheck.WebUI.Controllers
                 LastChangeUtcTime = applicationResult.LastChangeUtcTime;
                 BiggestHeapReached = applicationResult.BiggestHeapReached;
                 NbTimesInNotLearnedHeap = applicationResult.NbTimesInNotLearnedHeap;
-                FrontSide = RenderMarkdown(applicationResult.FrontSide);
-                BackSide = RenderMarkdown(applicationResult.BackSide);
-                AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
-                References = RenderMarkdown(applicationResult.References);
+                FrontSide = applicationResult.FrontSide;
+                BackSide = applicationResult.BackSide;
+                AdditionalInfo = applicationResult.AdditionalInfo;
+                References = applicationResult.References;
                 Owner = applicationResult.Owner;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
                 RemoveAlertMessage = localizer.GetLocalized("RemoveAlertMessage") + " " + Heap + "\n" + localizer.GetLocalized("DateAddedToDeck") + " ";
@@ -252,10 +223,10 @@ namespace MemCheck.WebUI.Controllers
                 LastChangeUtcTime = applicationResult.LastChangeUtcTime;
                 BiggestHeapReached = CardInDeck.UnknownHeap;
                 NbTimesInNotLearnedHeap = 1;
-                FrontSide = RenderMarkdown(applicationResult.FrontSide);
-                BackSide = RenderMarkdown(applicationResult.BackSide);
-                AdditionalInfo = RenderMarkdown(applicationResult.AdditionalInfo);
-                References = RenderMarkdown(applicationResult.References);
+                FrontSide = applicationResult.FrontSide;
+                BackSide = applicationResult.BackSide;
+                AdditionalInfo = applicationResult.AdditionalInfo;
+                References = applicationResult.References;
                 Owner = applicationResult.VersionCreator;
                 Tags = applicationResult.Tags.OrderBy(tag => tag);
                 RemoveAlertMessage = "ERROR";
