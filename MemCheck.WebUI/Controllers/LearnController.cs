@@ -40,6 +40,7 @@ namespace MemCheck.WebUI.Controllers
         }
         #region GetImage
         [HttpGet("GetImage/{imageId}/{size}")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "We return a disposable object, which will be disposed by ASP NET Core")]
         public async Task<IActionResult> GetImageAsync(Guid imageId, int size)
         {
             static GetImage.Request.ImageSize AppSizeFromWebParam(int size)
