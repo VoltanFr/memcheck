@@ -580,7 +580,7 @@ namespace MemCheck.WebUI.Controllers
         {
             public SubscribeToSearchViewModel(string toastTitle, string toastMesg)
             {
-                this.ToastTitle = toastTitle;
+                ToastTitle = toastTitle;
                 ToastMesg = toastMesg;
             }
             public string ToastTitle { get; }

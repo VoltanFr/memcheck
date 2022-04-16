@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.Helpers;
-using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

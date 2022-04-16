@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

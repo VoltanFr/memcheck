@@ -6,8 +6,8 @@ namespace MemCheck.CommandLineDbClient.Pauker
     {
         public PaukerCard(PaukerCardSide front, PaukerCardSide reverse)
         {
-            this.Front = front ?? throw new ArgumentNullException(nameof(front));
-            this.Reverse = reverse ?? throw new ArgumentNullException(nameof(reverse));
+            Front = front ?? throw new ArgumentNullException(nameof(front));
+            Reverse = reverse ?? throw new ArgumentNullException(nameof(reverse));
         }
         public PaukerCardSide Front { get; }
         public PaukerCardSide Reverse { get; }

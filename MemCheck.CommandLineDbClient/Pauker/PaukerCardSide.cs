@@ -8,10 +8,10 @@ namespace MemCheck.CommandLineDbClient.Pauker
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
 
-            this.LearnedTimestamp = learnedTimestamp;
-            this.Text = text.Trim();
-            this.Orientation = orientation ?? throw new ArgumentNullException(nameof(orientation));
-            this.RepeatByTyping = repeatByTyping ?? throw new ArgumentNullException(nameof(repeatByTyping));
+            LearnedTimestamp = learnedTimestamp;
+            Text = text.Trim();
+            Orientation = orientation ?? throw new ArgumentNullException(nameof(orientation));
+            RepeatByTyping = repeatByTyping ?? throw new ArgumentNullException(nameof(repeatByTyping));
         }
         public string Text { get; }
         public long? LearnedTimestamp { get; }

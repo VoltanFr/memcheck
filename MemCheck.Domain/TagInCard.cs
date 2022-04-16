@@ -13,16 +13,7 @@ namespace MemCheck.Domain
 
         public override bool Equals(object? obj)
         {
-            // If the passed object is null
-            if (obj == null)
-            {
-                return false;
-            }
-            if (!(obj is TagInCard))
-            {
-                return false;
-            }
-            return TagId == ((TagInCard)obj).TagId;
+            return obj != null && obj is TagInCard card && TagId == card.TagId;
         }
         public override int GetHashCode()
         {

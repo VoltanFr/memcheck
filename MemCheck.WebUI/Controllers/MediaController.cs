@@ -134,9 +134,9 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetImageMetadataViewModel(string imageName, string source, string description)
             {
-                this.ImageName = imageName;
-                this.Source = source;
-                this.Description = description;
+                ImageName = imageName;
+                Source = source;
+                Description = description;
             }
             public string ImageName { get; }
             public string Source { get; }

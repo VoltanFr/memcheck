@@ -7,8 +7,8 @@ namespace MemCheck.CommandLineDbClient.Pauker
     {
         public PaukerStack(string name, List<PaukerCard> cards)
         {
-            this.Name = name;
-            this.Cards = cards;
+            Name = name;
+            Cards = cards;
         }
         public string Name { get; }
         internal bool RemoveCard(PaukerCard card, bool excludingFirst)

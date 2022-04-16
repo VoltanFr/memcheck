@@ -36,8 +36,8 @@ namespace MemCheck.WebUI.Controllers
         {
             public GetGuiMessagesViewModel(string alreadyExistsErr, string nameLengthErr)
             {
-                this.AlreadyExistsErr = alreadyExistsErr;
-                this.NameLengthErr = nameLengthErr;
+                AlreadyExistsErr = alreadyExistsErr;
+                NameLengthErr = nameLengthErr;
             }
             public string AlreadyExistsErr { get; } = null!;
             public string NameLengthErr { get; } = null!;
