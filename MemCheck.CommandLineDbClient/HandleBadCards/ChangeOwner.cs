@@ -17,7 +17,6 @@ namespace MemCheck.CommandLineDbClient.HandleBadCards
         #region Fields
         private readonly ILogger<PaukerImportTest> logger;
         private readonly MemCheckDbContext dbContext;
-        private const string sourceDir = @"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\CSharp\Vinny\MemCheck_v0.2\MemCheck.CommandLineDbClient\RegionsFrancaises";
         #endregion
         #region classes Region, InfoFileContents
         private sealed class Region
