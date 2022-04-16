@@ -239,7 +239,7 @@ namespace MemCheck.WebUI.Controllers
                 IsInFrench = applicationResult.IsInFrench;
                 VisibleTo = localizer.GetLocalized("AllUsers");
                 Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
-                MoveToHeapTargets = new GetCardsHeapModel[0];
+                MoveToHeapTargets = Array.Empty<GetCardsHeapModel>();
                 RegisteredForNotifications = false;
             }
             public Guid CardId { get; }
@@ -356,7 +356,7 @@ namespace MemCheck.WebUI.Controllers
         {
             var user = await userManager.GetUserAsync(HttpContext.User);
             if (user == null)
-                return base.Ok(new UserDecksViewModel(false, new UserDecksDeckViewModel[0]));
+                return Ok(new UserDecksViewModel(false, Array.Empty<UserDecksDeckViewModel>()));
 
             var decks = await new GetUserDecksWithTags(callContext).RunAsync(new GetUserDecksWithTags.Request(user.Id));
             var resultDecks = decks.Select(deck => new UserDecksDeckViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));

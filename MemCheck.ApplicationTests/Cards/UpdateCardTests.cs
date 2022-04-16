@@ -574,7 +574,7 @@ namespace MemCheck.Application.Cards
                     " " + newReferences,
                     languageId,
                     Array.Empty<Guid>(),
-                    new Guid[0],
+                    Array.Empty<Guid>(),
                     RandomHelper.String());
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
             }
