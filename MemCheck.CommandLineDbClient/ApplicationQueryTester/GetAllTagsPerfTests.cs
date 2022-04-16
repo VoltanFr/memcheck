@@ -23,7 +23,7 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
             public List<double> RunSpentSeconds = new();
             public int TagCount { get; set; }
             public int TotalCardCount { get; set; }
-            public int AnomalyCount { get; set; } = 0;
+            public int AnomalyCount { get; set; }
         }
         public GetAllTagsPerfTests(IServiceProvider serviceProvider)
         {
