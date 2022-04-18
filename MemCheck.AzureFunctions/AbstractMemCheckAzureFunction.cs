@@ -49,7 +49,7 @@ public abstract class AbstractMemCheckAzureFunction
     }
     protected MemCheckUserManager UserManager { get; }
     protected abstract string FunctionName { get; }
-
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Really want to catch all possible problems")]
     protected async Task RunAsync()
     {
         try

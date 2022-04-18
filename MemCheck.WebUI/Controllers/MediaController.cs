@@ -189,16 +189,9 @@ namespace MemCheck.WebUI.Controllers
         [HttpGet("GetImageInfoForDeletion/{imageId}")]
         public async Task<IActionResult> GetImageInfoForDeletion(Guid imageId)
         {
-            try
-            {
-                var runner = new GetImageInfoFromId(callContext);
-                var result = await runner.RunAsync(new GetImageInfoFromId.Request(imageId));
-                return Ok(new GetImageInfoForDeletionResult(result, this));
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            var runner = new GetImageInfoFromId(callContext);
+            var result = await runner.RunAsync(new GetImageInfoFromId.Request(imageId));
+            return Ok(new GetImageInfoForDeletionResult(result, this));
         }
         public sealed class GetImageInfoForDeletionResult
         {
