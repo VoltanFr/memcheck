@@ -31,4 +31,3 @@ dotnet_diagnostic.CA1062.severity = none
 # Rules to be reconsidered for activation when I have time
 dotnet_diagnostic.CA1002.severity = none
 dotnet_diagnostic.CA1031.severity = none
-dotnet_diagnostic.CA1052.severity = none
