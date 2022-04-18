@@ -9,9 +9,11 @@ namespace MemCheck.CommandLineDbClient.Pauker
     internal sealed class PaukerLesson
     {
         #region Fields
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly string lessonFormat;
         private readonly Dictionary<PaukerCard, List<PaukerStack>> cardsInStacks;
         private readonly FileInfo inputFile;
+#pragma warning restore IDE0052 // Remove unread private members
         #endregion
         private static string StackNameFromIndex(int i)
         {
@@ -101,7 +103,9 @@ namespace MemCheck.CommandLineDbClient.Pauker
         }
 
 
+#pragma warning disable IDE0051 // Remove unused private members
         private void Save(FileInfo outputFile)
+#pragma warning restore IDE0051 // Remove unused private members
         {
             var doc = new XmlDocument();
 

@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 
+#pragma warning disable IDE0052 // Remove unread private members
+
 namespace MemCheck.CommandLineDbClient.Geography
 {
     internal static class ResourceFileReadHelper
@@ -121,3 +123,4 @@ namespace MemCheck.CommandLineDbClient.Geography
         public ImmutableDictionary<string, Department> DepartmentsFromName;
     }
 }
+#pragma warning restore IDE0052 // Remove unread private members

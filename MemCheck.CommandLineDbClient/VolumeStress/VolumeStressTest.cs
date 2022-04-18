@@ -21,8 +21,10 @@ namespace MemCheck.CommandLineDbClient.VolumeStress
         }
         public async Task RunAsync()
         {
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             var cardLanguage = dbContext.CardLanguages.First();
             var user = dbContext.Users.First();
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
             //for (int i = 0; i < cardCount; i++)
             //{

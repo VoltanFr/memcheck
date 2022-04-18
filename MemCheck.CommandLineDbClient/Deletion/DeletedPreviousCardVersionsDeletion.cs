@@ -1,7 +1,5 @@
 ﻿using MemCheck.Application.Cards;
 using MemCheck.Database;
-using MemCheck.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,12 +14,10 @@ namespace MemCheck.CommandLineDbClient.Deletion
         #region Fields
         private readonly ILogger<BrutalDeletion> logger;
         private readonly MemCheckDbContext dbContext;
-        private readonly UserManager<MemCheckUser> userManager;
         #endregion
         public DeletedPreviousCardVersionsDeletion(IServiceProvider serviceProvider)
         {
             dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
             logger = serviceProvider.GetRequiredService<ILogger<BrutalDeletion>>();
         }
         public void DescribeForOpportunityToCancel()

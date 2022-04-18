@@ -18,8 +18,3 @@ dotnet_diagnostic.CA1303.severity = none
 
 # Ok to catch Exception
 dotnet_diagnostic.CA1031.severity = none
-
-# Rules to be reconsidered for activation when I have time
-dotnet_diagnostic.IDE0051.severity = none
-dotnet_diagnostic.IDE0052.severity = none
-dotnet_diagnostic.IDE0059.severity = none
