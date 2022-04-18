@@ -63,7 +63,9 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         {
             logger.LogInformation($"Will load decks with tags");
         }
+#pragma warning disable IDE0060 // Remove unused parameter
         private static async Task<(Dictionary<Guid, double> averageRatings, Dictionary<Guid, int> userRatings, Dictionary<Guid, int> countOfUserRatings)> GetRatingsAsync(Guid userId, HashSet<Guid> cardIds)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             //var allUsersRatings = await dbContext.UserCardRatings
             //    .Where(rating => cardIds.Contains(rating.CardId))
@@ -91,7 +93,9 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
 
             return (averageRatings, userRatings, countOfUserRatings);
         }
+#pragma warning disable IDE0060 // Remove unused parameter
         private async Task<IEnumerable<string>> GetCardsToRepeatAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             var result = new List<string>();
             var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(dbContext, deckId);

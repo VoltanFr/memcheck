@@ -65,7 +65,9 @@ namespace MemCheck.CommandLineDbClient.ApplicationQueryTester
         {
             logger.LogInformation($"Will load homepage data");
         }
+#pragma warning disable IDE0060 // Remove unused parameter
         private static async Task<(Dictionary<Guid, double> averageRatings, Dictionary<Guid, int> userRatings, Dictionary<Guid, int> countOfUserRatings)> GetRatingsAsync(Guid userId, HashSet<Guid> cardIds)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             //var allUsersRatings = await dbContext.UserCardRatings
             //    .Where(rating => cardIds.Contains(rating.CardId))
