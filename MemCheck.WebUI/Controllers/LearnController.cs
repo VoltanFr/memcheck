@@ -360,7 +360,7 @@ namespace MemCheck.WebUI.Controllers
 
             var decks = await new GetUserDecksWithTags(callContext).RunAsync(new GetUserDecksWithTags.Request(user.Id));
             var resultDecks = decks.Select(deck => new UserDecksDeckViewModel(deck.DeckId, deck.Description, DisplayServices.ShowDebugInfo(user), deck.Tags, this));
-            var result = new UserDecksViewModel(user != null, resultDecks);
+            var result = new UserDecksViewModel(true, resultDecks);
             return base.Ok(result);
         }
         public sealed class UserDecksViewModel
