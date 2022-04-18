@@ -77,7 +77,7 @@ const tagListingApp = Vue.createApp({
             window.location.href = `/Search?TagFilter=${tagId}`;
         },
         edit(tagId) {
-            window.location.href = `/Tags/Authoring?TagId=${tagId}&ReturnUrl=${window.location}`;
+            window.location.href = `/Tags/Authoring?TagId=${tagId}&ReturnAddress=${window.location}`;
         },
         demo(tagId) {
             window.location.href = `/Learn/Index?LearnMode=Demo&TagId=${tagId}`;

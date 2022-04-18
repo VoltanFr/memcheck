@@ -8,7 +8,7 @@ const editSearchSubscriptionApp = Vue.createApp({
             subscription: '',  // AccountController.SearchSubscriptionViewModel. Null if page param not valid
             newName: '',    // string
             mountFinished: false,
-            returnUrl: '', // string
+            returnAddress: '', // string
         };
     },
     beforeCreate() {
@@ -16,7 +16,7 @@ const editSearchSubscriptionApp = Vue.createApp({
     },
     async mounted() {
         try {
-            this.getReturnUrlFromPageParameter();
+            this.getReturnAddressFromPageParameter();
             await this.getSubscriptionFromPageParameter();
         }
         finally {
@@ -27,8 +27,8 @@ const editSearchSubscriptionApp = Vue.createApp({
         async save() {
             await axios.put(`/Account/SetSearchSubscriptionName/${this.subscription.id}`, { NewName: this.newName })
                 .then(() => {
-                    if (this.returnUrl)
-                        window.location = this.returnUrl;
+                    if (this.returnAddress)
+                        window.location = this.returnAddress;
                     else
                         window.location = '/';
                 })
@@ -36,8 +36,8 @@ const editSearchSubscriptionApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        getReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById('ReturnUrlInput').value;
+        getReturnAddressFromPageParameter() {
+            this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         async getSubscriptionFromPageParameter() {
             const subscriptionId = document.getElementById('SubscriptionIdInput').value;

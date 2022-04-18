@@ -15,7 +15,7 @@ const uploadMediaApp = Vue.createApp({
             imagePreview: null, // blob
             uploading: false,
             editingImageId: null,   // Guid
-            returnUrl: '', // string
+            returnAddress: '', // string
             originalName: '',
             originalDescription: '',  // string
             originalSource: '',  // string
@@ -24,7 +24,7 @@ const uploadMediaApp = Vue.createApp({
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
-            this.getReturnUrlFromPageParameter();
+            this.getReturnAddressFromPageParameter();
             await this.getImageToEditFromPageParameter();
         }
         finally {
@@ -72,8 +72,8 @@ const uploadMediaApp = Vue.createApp({
                 .then((result) => {
                     tellControllerSuccess(result);
                     this.clearAll();
-                    if (this.returnUrl)
-                        window.location = this.returnUrl;
+                    if (this.returnAddress)
+                        window.location = this.returnAddress;
                 })
                 .catch(error => {
                     tellAxiosError(error);
@@ -129,8 +129,8 @@ const uploadMediaApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async getReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById('ReturnUrlInput').value;
+        async getReturnAddressFromPageParameter() {
+            this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         onBeforeUnload(event) {
             if (this.isDirty()) {

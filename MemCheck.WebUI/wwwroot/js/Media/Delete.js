@@ -7,7 +7,7 @@ const deleteMediaApp = Vue.createApp({
         return {
             mountFinished: false,
             deleting: false,
-            returnUrl: '', // string
+            returnAddress: '', // string
             error: '',
             deletionDescription: '',
             image: {
@@ -27,7 +27,7 @@ const deleteMediaApp = Vue.createApp({
     },
     async mounted() {
         try {
-            this.getReturnUrlFromPageParameter();
+            this.getReturnAddressFromPageParameter();
             await this.getImageFromPageParameter();
         }
         finally {
@@ -70,8 +70,8 @@ const deleteMediaApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async getReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById('ReturnUrlInput').value;
+        async getReturnAddressFromPageParameter() {
+            this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         async deleteImage() {
             if (confirm(this.image.deletionAlertMessage)) {
@@ -90,7 +90,7 @@ const deleteMediaApp = Vue.createApp({
             }
         },
         goBack() {
-            window.location = this.returnUrl;
+            window.location = this.returnAddress;
         },
         showDebugInfo() {
             return true;

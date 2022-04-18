@@ -46,7 +46,7 @@ const authoringApp = Vue.createApp({
             editingCardCreationDate: '',  // string, used only if !creatingNewCard
             editingCardLastChangeDate: '',  // string, used only if !creatingNewCard
             infoAboutUsage: '',  // string, used only if !creatingNewCard
-            returnUrl: '', // string
+            returnAddress: '', // string
             mountFinished: false,
             guiMessages: {
                 success: '',
@@ -85,7 +85,7 @@ const authoringApp = Vue.createApp({
             const task6 = this.getGuiMessages();
             const task7 = this.getDecksOfUser();
             const task8 = this.getBigSizeImageLabels();
-            this.getReturnUrlFromPageParameter();
+            this.getReturnAddressFromPageParameter();
             await Promise.all([task1, task2, task3, task4, task5, task6, task7, task8]);
             if (this.creatingNewCard)
                 this.makePrivate();
@@ -172,8 +172,8 @@ const authoringApp = Vue.createApp({
                     .then(result => {
                         this.clearAll();
                         tellControllerSuccess(result);
-                        if (this.returnUrl)
-                            window.location = this.returnUrl;
+                        if (this.returnAddress)
+                            window.location = this.returnAddress;
                     })
                     .catch(error => {
                         tellAxiosError(error);
@@ -269,8 +269,8 @@ const authoringApp = Vue.createApp({
         makePublic() {
             this.card.usersWithView = [];
         },
-        async getReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById('ReturnUrlInput').value;
+        async getReturnAddressFromPageParameter() {
+            this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         async getCardToEditFromPageParameter() {
             // There has to be a better way, but here's how I get a parameter passed to a page

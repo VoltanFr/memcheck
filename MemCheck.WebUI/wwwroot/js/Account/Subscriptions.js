@@ -33,7 +33,7 @@ const subscriptionsApp = Vue.createApp({
             this.loading = false;
         },
         edit(searchSubscriptionId) {
-            window.location.href = `/Identity/Account/Manage/EditSearchSubscription?Id=${searchSubscriptionId}&ReturnUrl=${window.location}`;
+            window.location.href = `/Identity/Account/Manage/EditSearchSubscription?Id=${searchSubscriptionId}&ReturnAddress=${window.location}`;
         },
         async deleteSubscription(subscription) {
             if (confirm(subscription.deleteConfirmMessage)) {

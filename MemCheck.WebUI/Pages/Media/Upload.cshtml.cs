@@ -6,6 +6,6 @@ namespace MemCheck.WebUI.Pages.Media
     public sealed class UploadModel : PageModel
     {
         [BindProperty(SupportsGet = true)] public string ImageId { get; set; } = "";
-        [BindProperty(SupportsGet = true)] public string ReturnUrl { get; set; } = null!;
+        [BindProperty(SupportsGet = true)] public string ReturnAddress { get; set; } = null!;
     }
 }

@@ -11,7 +11,7 @@ const tagAuthoringApp = Vue.createApp({
             newNameProblem: '', // string
             newDescription: '',    // string
             mountFinished: false,
-            returnUrl: '', // string
+            returnAddress: '', // string
             guiMessages: {
                 alreadyExistsErr: '',
                 nameLengthErr: '',
@@ -24,7 +24,7 @@ const tagAuthoringApp = Vue.createApp({
             const task1 = this.getTagNames();
             const task2 = this.getEditedTagFromPageParameter();
             const task3 = this.getGuiMessages();
-            this.getReturnUrlFromPageParameter();
+            this.getReturnAddressFromPageParameter();
             await Promise.all([task1, task2, task3]);
             // this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
         }
@@ -91,13 +91,13 @@ const tagAuthoringApp = Vue.createApp({
             this.newName = '';
             this.newDescription = '';
             this.newNameProblem = '';
-            if (this.returnUrl)
-                window.location = this.returnUrl;
+            if (this.returnAddress)
+                window.location = this.returnAddress;
             else
                 await this.getTagNames();
         },
-        getReturnUrlFromPageParameter() {
-            this.returnUrl = document.getElementById('ReturnUrlInput').value;
+        getReturnAddressFromPageParameter() {
+            this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         async getEditedTagFromPageParameter() {
             // There has to be a better way, but here's how I get a parameter passed to a page

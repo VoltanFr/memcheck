@@ -117,10 +117,10 @@ const imageListApp = Vue.createApp({
             await this.getImages();
         },
         edit(imageId) {
-            window.location.href = `/Media/Upload?ImageId=${imageId}&ReturnUrl=${window.location}`;
+            window.location.href = `/Media/Upload?ImageId=${imageId}&ReturnAddress=${window.location}`;
         },
         deleteImage(imageId) {
-            window.location.href = `/Media/Delete?ImageId=${imageId}&ReturnUrl=${window.location}`;
+            window.location.href = `/Media/Delete?ImageId=${imageId}&ReturnAddress=${window.location}`;
         },
         imageHistory(imageId) {
             window.location.href = `/Media/History?ImageId=${imageId}`;

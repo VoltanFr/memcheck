@@ -172,7 +172,7 @@ const learnApp = Vue.createApp({
             this.getCard();
         },
         editUrl() {
-            return `/Authoring?CardId=${this.currentCard.cardId}&ReturnUrl=${window.location}`;
+            return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
         spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
             this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })
