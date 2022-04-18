@@ -12,7 +12,7 @@ namespace MemCheck.WebUI.Controllers
         private string? GetRefererRoute()
         {
             var previousPageUrl = Request.Headers["Referer"].ToString();
-            var hostIndex = previousPageUrl.IndexOf(Request.Host.Value);
+            var hostIndex = previousPageUrl.IndexOf(Request.Host.Value, StringComparison.OrdinalIgnoreCase);
             if (hostIndex == -1)
                 return null;
             var result = previousPageUrl[(hostIndex + Request.Host.Value.Length)..];

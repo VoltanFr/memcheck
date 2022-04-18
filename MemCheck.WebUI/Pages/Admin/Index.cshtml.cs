@@ -34,7 +34,7 @@ namespace MemCheck.WebUI.Pages.Admin
             ApplicationName = currentEnvironment.ApplicationName;
             EnvironmentName = currentEnvironment.EnvironmentName;
             EntryAssembly = AssemblyServices.GetDisplayInfoForAssembly(Assembly.GetEntryAssembly());
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName!.StartsWith("MemCheck"));
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName!.StartsWith("MemCheck", StringComparison.OrdinalIgnoreCase));
             MemCheckAssemblies = assemblies.Select(a => AssemblyServices.GetDisplayInfoForAssembly(a)).OrderBy(a => a);
         }
     }
