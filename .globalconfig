@@ -32,4 +32,3 @@ dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA1002.severity = none
 dotnet_diagnostic.CA1031.severity = none
 dotnet_diagnostic.CA1052.severity = none
-dotnet_diagnostic.CA1054.severity = none

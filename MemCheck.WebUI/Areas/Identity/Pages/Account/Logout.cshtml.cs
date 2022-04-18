@@ -21,10 +21,10 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account
         {
         }
 
-        public async Task<IActionResult> OnPost(string returnUrl = "/")
+        public async Task<IActionResult> OnPost(string returnAddress = "/")
         {
             await _signInManager.SignOutAsync();
-            return returnUrl != null ? LocalRedirect(returnUrl) : RedirectToPage();
+            return returnAddress != null ? LocalRedirect(returnAddress) : RedirectToPage();
         }
     }
 }
