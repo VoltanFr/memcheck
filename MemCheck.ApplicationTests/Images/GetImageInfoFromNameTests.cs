@@ -60,12 +60,11 @@ namespace MemCheck.Application.Images
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var name = RandomHelper.String().ToLowerInvariant();
-            Assert.AreNotEqual(name, name.ToUpperInvariant());
-            var image = await ImageHelper.CreateAsync(db, user, name: name.ToLowerInvariant());
+            var name = "A User Name";
+            var image = await ImageHelper.CreateAsync(db, user, name: name);
 
             using var dbContext = new MemCheckDbContext(db);
-            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(name));
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("a user namE"));
             Assert.AreEqual(image, loaded.ImageId);
             Assert.AreEqual(name, loaded.Name);
         }

@@ -104,14 +104,14 @@ namespace MemCheck.Application.Users
         public async Task Filtering()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var user1Name = "a" + RandomHelper.String();
+            var user1Name = "A User Name";
             var user1 = await UserHelper.CreateInDbAsync(db, userName: user1Name);
             var user2Name = "b" + RandomHelper.String();
             await UserHelper.CreateInDbAsync(db, userName: user2Name);
 
             using var dbContext = new MemCheckDbContext(db);
 
-            var loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, user1Name.ToLowerInvariant()));
+            var loaded = await new GetAllUsers(dbContext.AsCallContext(new TestRoleChecker(user1))).RunAsync(new GetAllUsers.Request(user1, 1, 1, "a useR name"));
             Assert.AreEqual(1, loaded.TotalCount);
             Assert.AreEqual(1, loaded.PageCount);
             Assert.AreEqual(user1Name, loaded.Users.Single().UserName);
