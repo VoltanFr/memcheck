@@ -138,7 +138,7 @@ function convertMarkdown(src, beautifyForFrench) {
 async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
-    const timeOutId = setTimeout(async () => {
+    const timeOutId = setTimeout(async() => {
         clearTimeout(timeOutId);
         cancellationTokenSource.cancel(`Timeout of ${timeout} ms (through cancellation token).`);
     }, timeout);
