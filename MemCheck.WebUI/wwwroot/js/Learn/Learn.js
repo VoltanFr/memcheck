@@ -187,13 +187,14 @@ const learnApp = Vue.createApp({
                 });
         },
         onCardRemoved() {
-            this.getCard();
-            tellControllerSuccess(result);
         },
         async removeCard() {
             if (confirm(this.currentCard.removeAlertMessage + dateTime(this.currentCard.addToDeckUtcTime))) {
                 await axios.delete(`/Decks/RemoveCardFromDeck/${this.activeDeck.deckId}/${this.currentCard.cardId}`)
-                    .then(() => this.onCardRemoved())
+                    .then(result => {
+                        this.getCard();
+                        tellControllerSuccess(result);
+                    })
                     .catch(error => {
                         tellAxiosError(error);
                     });
