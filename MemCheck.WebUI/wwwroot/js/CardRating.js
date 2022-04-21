@@ -20,27 +20,29 @@ const CardRating = Vue.defineComponent({
     },
     template: `
         <div class="rating-component-div" >
-            <van-popover v-model:show="ratingPopover" overlay close-on-click-outside close-on-click-overlay >
-                <p class="rating-paragraph" >
-                    <div v-if="modelValue != null">
-                        {{yourratingstr}} <van-rate v-bind:modelValue="modelValue" v-bind:readonly="readonly" @change="onChange" color="black"></van-rate><br />
-                    </div>
-                    {{averagestr}}<span v-if="countinaverage"> ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>) :</span> <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
-                </p>
-                <template #reference>
-                    <van-button class="toolbar-button rating-button" >
-                        <div v-if="micro">
-                            <i class='fas fa-star rating-star'></i> {{ Math.round(average * 10) / 10 }}
+            <div v-if="micro">
+                <van-button class="toolbar-button rating-button" >
+                    <i class='fas fa-star rating-star'></i> {{ Math.round(average * 10) / 10 }}
+                </van-button>
+            </div>
+            <div v-else>
+                <van-popover v-model:show="ratingPopover" overlay close-on-click-outside close-on-click-overlay >
+                    <p class="rating-paragraph" >
+                        <div v-if="modelValue != null">
+                            {{yourratingstr}} <van-rate v-bind:modelValue="modelValue" v-bind:readonly="readonly" @change="onChange" color="black"></van-rate><br />
                         </div>
-                        <div v-else>                
+                        {{averagestr}}<span v-if="countinaverage"> ({{countinaverage}} <span v-if="countinaverage > 1">{{usersstr}}</span><span v-else>{{userstr}}</span>) :</span> <van-rate readonly color="black" v-model="average" allow-half v-bind:title="average"></van-rate>
+                    </p>
+                    <template #reference>
+                        <van-button class="toolbar-button rating-button" >
                             <div v-if="modelValue != null">
                                 <span v-html="currentUserRatingAsStars()" /><br />
                             </div>
                             <span v-html="averageRatingAsStars()" />                            
-                        </div>
-                    </van-button>
-                </template>
-            </van-popover>
+                        </van-button>
+                    </template>
+                </van-popover>
+            </div>
         </div>
     `,
     data() {
