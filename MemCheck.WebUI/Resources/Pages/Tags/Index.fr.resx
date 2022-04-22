@@ -148,6 +148,9 @@
     <value>Éval</value>
   </data>
   <data name="Average" xml:space="preserve">
-    <value>Moyenne</value>
+    <value>Moyenne des évaluations</value>
+  </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>Aucune évaluation</value>
   </data>
 </root>

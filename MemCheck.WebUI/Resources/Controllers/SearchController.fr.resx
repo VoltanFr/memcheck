@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddedToDeckOn" xml:space="preserve">
+    <value>Ajoutée au paquet le</value>
+  </data>
   <data name="AddTag" xml:space="preserve">
     <value>Ajout du label</value>
   </data>
@@ -207,6 +210,9 @@
   <data name="Before" xml:space="preserve">
     <value>Avant</value>
   </data>
+  <data name="BiggestHeapReached" xml:space="preserve">
+    <value>Tas maxi atteint dans ce paquet :</value>
+  </data>
   <data name="CanNotSubscribeToSearchInDeck" xml:space="preserve">
     <value>Il n'est pas possible de s'abonner à une recherche dans un paquet</value>
   </data>
@@ -279,17 +285,44 @@
   <data name="ConfirmSubscription" xml:space="preserve">
     <value>Veuillez confirmer que vous souhaitez vous abonner à cette recherche et être prévenu par courrier électronique lorsque les résultats changent (selon vos paramètres utilisateur).</value>
   </data>
+  <data name="Deck" xml:space="preserve">
+    <value>Paquet</value>
+  </data>
   <data name="Deletion" xml:space="preserve">
     <value>Suppression</value>
   </data>
   <data name="ExcludeCards" xml:space="preserve">
     <value>Exclure les cartes</value>
   </data>
+  <data name="ExpiredOn" xml:space="preserve">
+    <value>Expirée depuis :</value>
+  </data>
+  <data name="Heap" xml:space="preserve">
+    <value>Tas :</value>
+  </data>
   <data name="Ignore" xml:space="preserve">
     <value>&lt;Peu importe&gt;</value>
   </data>
   <data name="IncludeCards" xml:space="preserve">
     <value>Inclure les cartes</value>
+  </data>
+  <data name="InNoneOfYourDecks" xml:space="preserve">
+    <value>Cette carte n'est pas dans vos paquets</value>
+  </data>
+  <data name="InYourDeck" xml:space="preserve">
+    <value>Cette carte est dans votre paquet</value>
+  </data>
+  <data name="InYourDecks" xml:space="preserve">
+    <value>Cette carte est dans vos paquets</value>
+  </data>
+  <data name="LastLearnedOn" xml:space="preserve">
+    <value>Dernière révision le</value>
+  </data>
+  <data name="NbTimesInNotLearnedHeap" xml:space="preserve">
+    <value>Passages par le tas des non apprises :</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Jamais</value>
   </data>
   <data name="NoName" xml:space="preserve">
     <value>Non nommée</value>
@@ -302,6 +335,9 @@
   </data>
   <data name="NotAllowedToModifyAllTheseCards" xml:space="preserve">
     <value>Vous ne pouvez pas modifier toutes ces cartes (vous devez en être propriétaire)</value>
+  </data>
+  <data name="NotInYourDeck" xml:space="preserve">
+    <value>Cette carte n'est pas dans votre paquet</value>
   </data>
   <data name="On" xml:space="preserve">
     <value>Le</value>
@@ -353,6 +389,9 @@
   </data>
   <data name="Visibility" xml:space="preserve">
     <value>Visibilité :</value>
+  </data>
+  <data name="WillExpireOn" xml:space="preserve">
+    <value>Expirera :</value>
   </data>
   <data name="YouAreNotTheCreatorOfAllPreviousVersions" xml:space="preserve">
     <value>Vous n'êtes pas l'auteur de toutes les versions précédentes de la carte avec avant</value>

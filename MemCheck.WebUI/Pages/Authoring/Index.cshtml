@@ -57,7 +57,7 @@
                     </span>
                     <span id="Rating" v-if="!creatingNewCard">
                         <card-rating v-model="card.currentUserRating" v-bind:average="card.averageRating" v-bind:countinaverage="card.countOfUserRatings" v-on:update:model-value="onRatingChange"
-                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' />
+                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' noevaluationstr='@Localizer["NoEvaluation"]' />
                     </span>
                 </h1>
             </div>

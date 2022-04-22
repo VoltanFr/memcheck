@@ -232,6 +232,9 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="MoveToHeap" xml:space="preserve">
     <value>Changer de tas</value>
   </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>Aucune évaluation</value>
+  </data>
   <data name="NoMoreCardTo" xml:space="preserve">
     <value>Il n'y a plus de carte à</value>
   </data>

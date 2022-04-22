@@ -130,7 +130,7 @@
                         </li>
                         <li id="Rating">
                             <card-rating v-model="currentCard.currentUserRating" v-bind:average="currentCard.averageRating" v-bind:countinaverage="currentCard.countOfUserRatings" v-bind:readonly="showRatingReadonly()" v-on:update:model-value="onRatingChange"
-                                         yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' />
+                                         yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' noevaluationstr='@Localizer["NoEvaluation"]' />
                         </li>
                         <li id="Last learn date" v-if="rehearsing()" class="ms-auto" data-bs-toggle="tooltip" data-placement="top" v-bind:title="'@Localizer["LastLearnDate"] ' + dateTimeWithTime(currentCard.lastLearnUtcTime)">
                             <i class="fas fa-clock"></i> {{dateTime(currentCard.lastLearnUtcTime)}}

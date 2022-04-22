@@ -17,11 +17,12 @@ const CardRating = Vue.defineComponent({
         averagestr: { required: true, type: String },
         usersstr: { required: true, type: String },
         userstr: { required: true, type: String },
+        noevaluationstr: { required: true, type: String },
     },
     template: `
         <div class="rating-component-div" >
             <div v-if="micro">
-                <van-button class="toolbar-button rating-button" >
+                <van-button class="toolbar-button rating-button" v-on:click="onMicroButtonClick()" >
                     <i class='fas fa-star rating-star'></i> {{ Math.round(average * 10) / 10 }}
                 </van-button>
             </div>
@@ -76,6 +77,12 @@ const CardRating = Vue.defineComponent({
         },
         averageRatingAsStars() {
             return this.ratingAsStars(this.average);
+        },
+        onMicroButtonClick() {
+            if (this.average === 0)
+                toastWithoutIcon('', this.noevaluationstr);
+            else
+                toastWithoutIcon(`${Math.round(this.average * 100) / 100}\n${this.averageRatingAsStars()}`, this.averagestr);
         },
     },
 });

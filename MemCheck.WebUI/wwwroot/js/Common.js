@@ -2,6 +2,8 @@
 
 /* exported emptyGuid */
 const emptyGuid = '00000000-0000-0000-0000-000000000000';
+const toastShortDuration = 4000;
+const toastLongDuration = 10000;
 
 function isValidDateTime(utcFromDotNet) {
     return utcFromDotNet && (utcFromDotNet !== '0001-01-01T00:00:00Z') && (utcFromDotNet !== '9999-12-31T23:59:59.9999999');  // matches DateTime.MinValue and Max
@@ -19,9 +21,17 @@ function dateIsTomorrow(d) {
 function toast(mesg, title, success, duration) {
     const actualMesg = `<strong>${title}</strong><br/>${mesg}`;
     const icon = success ? 'thumb-circle' : 'fire';
-    const actualDuration = duration ? duration : (success ? 4000 : 10000);
+    const actualDuration = duration ? duration : (success ? toastShortDuration : toastLongDuration);
     // eslint-disable-next-line new-cap
     globalThis.vant.Toast({ message: actualMesg, type: 'html', icon: icon, iconSize: 30, duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
+}
+
+/* exported toastWithoutIcon */
+function toastWithoutIcon(mesg, title, duration) {
+    const actualMesg = `<strong>${title}</strong><br/>${mesg}`;
+    const actualDuration = duration ? duration : toastLongDuration;
+    // eslint-disable-next-line new-cap
+    globalThis.vant.Toast({ message: actualMesg, type: 'html', duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
 }
 
 function toastAxiosResult(controllerResultWithToast, success) {

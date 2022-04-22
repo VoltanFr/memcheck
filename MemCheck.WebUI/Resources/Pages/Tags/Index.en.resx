@@ -148,6 +148,9 @@
     <value>Rating</value>
   </data>
   <data name="Average" xml:space="preserve">
-    <value>Average</value>
+    <value>Average rating</value>
+  </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>No evaluation</value>
   </data>
 </root>

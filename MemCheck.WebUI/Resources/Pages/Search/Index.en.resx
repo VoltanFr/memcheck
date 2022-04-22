@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddedToDeckOn" xml:space="preserve">
-    <value>Added to deck on</value>
-  </data>
   <data name="AddTo" xml:space="preserve">
     <value>Add to</value>
   </data>
@@ -129,14 +126,11 @@
   <data name="AddToDeckDate" xml:space="preserve">
     <value>Date added to deck</value>
   </data>
-  <data name="Average" xml:space="preserve">
-    <value>Average</value>
-  </data>
   <data name="AverageRating" xml:space="preserve">
     <value>Average rating</value>
   </data>
-  <data name="BiggestHeapReached" xml:space="preserve">
-    <value>Biggest heap reached in this deck:</value>
+  <data name="AverageRatingLong" xml:space="preserve">
+    <value>Average rating</value>
   </data>
   <data name="Cards_BigScreen" xml:space="preserve">
     <value>Cards</value>
@@ -159,9 +153,6 @@
   <data name="ExcludedTags" xml:space="preserve">
     <value>Excluded tags</value>
   </data>
-  <data name="ExpiredOn" xml:space="preserve">
-    <value>Expired on</value>
-  </data>
   <data name="ExpiryDate" xml:space="preserve">
     <value>Expiry date</value>
   </data>
@@ -171,29 +162,17 @@
   <data name="InNoneOfYourDecks" xml:space="preserve">
     <value>In none of your decks</value>
   </data>
-  <data name="InYourDeck" xml:space="preserve">
-    <value>In your deck</value>
-  </data>
-  <data name="LastLearnedOn" xml:space="preserve">
-    <value>Last learned on</value>
-  </data>
   <data name="MoveToHeap" xml:space="preserve">
     <value>Move to heap</value>
-  </data>
-  <data name="NbTimesInNotLearnedHeap" xml:space="preserve">
-    <value>Times in not learned heap:</value>
-  </data>
-  <data name="Never" xml:space="preserve">
-    <value>Never</value>
   </data>
   <data name="NoCard" xml:space="preserve">
     <value>No card</value>
   </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>No evaluation</value>
+  </data>
   <data name="Notifications" xml:space="preserve">
     <value>Notifications</value>
-  </data>
-  <data name="NotInYourDeck" xml:space="preserve">
-    <value>Not in your deck</value>
   </data>
   <data name="OpenInTab" xml:space="preserve">
     <value>Open card in tab</value>
@@ -272,9 +251,6 @@
   </data>
   <data name="Visibility" xml:space="preserve">
     <value>Visibility</value>
-  </data>
-  <data name="WillExpireOn" xml:space="preserve">
-    <value>Will expire:</value>
   </data>
   <data name="YourRating" xml:space="preserve">
     <value>Your rating:</value>

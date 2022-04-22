@@ -189,4 +189,7 @@
   <data name="References" xml:space="preserve">
     <value>Références</value>
   </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>Aucune évaluation</value>
+  </data>
 </root>

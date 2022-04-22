@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddedToDeckOn" xml:space="preserve">
+    <value>Added to deck on</value>
+  </data>
   <data name="AddTag" xml:space="preserve">
     <value>Add tag</value>
   </data>
@@ -207,6 +210,9 @@
   <data name="Before" xml:space="preserve">
     <value>Before</value>
   </data>
+  <data name="BiggestHeapReached" xml:space="preserve">
+    <value>Biggest heap reached in this deck:</value>
+  </data>
   <data name="CanNotSubscribeToSearchInDeck" xml:space="preserve">
     <value>Subscribing to a search in a deck is not supported</value>
   </data>
@@ -279,17 +285,44 @@
   <data name="ConfirmSubscription" xml:space="preserve">
     <value>Sure you want to subscribe to this search? You will be notified by email when the result changes (according to your user settings).</value>
   </data>
+  <data name="Deck" xml:space="preserve">
+    <value>Deck</value>
+  </data>
   <data name="Deletion" xml:space="preserve">
     <value>Deletion</value>
   </data>
   <data name="ExcludeCards" xml:space="preserve">
     <value>Exclude cards</value>
   </data>
+  <data name="ExpiredOn" xml:space="preserve">
+    <value>Expired on</value>
+  </data>
+  <data name="Heap" xml:space="preserve">
+    <value>Heap:</value>
+  </data>
   <data name="Ignore" xml:space="preserve">
     <value>Ignore</value>
   </data>
   <data name="IncludeCards" xml:space="preserve">
     <value>Include cards</value>
+  </data>
+  <data name="InNoneOfYourDecks" xml:space="preserve">
+    <value>This card is in none of your decks</value>
+  </data>
+  <data name="InYourDeck" xml:space="preserve">
+    <value>This card is in your deck</value>
+  </data>
+  <data name="InYourDecks" xml:space="preserve">
+    <value>This card is in your decks</value>
+  </data>
+  <data name="LastLearnedOn" xml:space="preserve">
+    <value>Last learned on</value>
+  </data>
+  <data name="NbTimesInNotLearnedHeap" xml:space="preserve">
+    <value>Times in not learned heap:</value>
+  </data>
+  <data name="Never" xml:space="preserve">
+    <value>Never</value>
   </data>
   <data name="NoName" xml:space="preserve">
     <value>Not named</value>
@@ -302,6 +335,9 @@
   </data>
   <data name="NotAllowedToModifyAllTheseCards" xml:space="preserve">
     <value>You are not allowed to modify all these cards (you need to be owner)</value>
+  </data>
+  <data name="NotInYourDeck" xml:space="preserve">
+    <value>This card is not in your deck</value>
   </data>
   <data name="On" xml:space="preserve">
     <value>On</value>
@@ -353,6 +389,9 @@
   </data>
   <data name="Visibility" xml:space="preserve">
     <value>Visibility:</value>
+  </data>
+  <data name="WillExpireOn" xml:space="preserve">
+    <value>Will expire:</value>
   </data>
   <data name="YouAreNotTheCreatorOfAllPreviousVersions" xml:space="preserve">
     <value>You are not the creator of all the previous versions of the card with front side</value>

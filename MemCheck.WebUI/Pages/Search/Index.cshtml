@@ -3,15 +3,15 @@
 @inject IViewLocalizer Localizer
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
 @section head {
-    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-    <link href="@Url.Content("~/css/search.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/search.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-    <script src="~/js/CardRating.js" asp-append-version="true"></script>
-    <script src="~/js/TagButton.js" asp-append-version="true"></script>
-    <script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+<script src="~/js/CardRating.js" asp-append-version="true"></script>
+<script src="~/js/TagButton.js" asp-append-version="true"></script>
+<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -249,55 +249,26 @@
                         <input type="checkbox" style="padding:0px;vertical-align:middle" v-model="cardWithSelectionInfo.selected" />
                     </td>
                     <td id="Visibility" class="search-page-widget-td">
-                        <van-popover v-model:show="cardWithSelectionInfo.visibilityInfoPopover" overlay close-on-click-outside close-on-click-overlay>
-                            {{cardWithSelectionInfo.card.popoverVisibility}}
-                            <template #reference>
-                                <van-button class="toolbar-button-circle toolbar-button" style="padding:0px">
-                                    <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
-                                    <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
-                                    <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
-                                </van-button>
-                            </template>
-                        </van-popover>
+                        <van-button class="toolbar-button-circle toolbar-button" style="padding:0px" v-on:click="onCardInfoButtonClick(cardWithSelectionInfo.card)">
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 0"><i class="far fa-eye"></i></span>
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount == 1"><i class="far fa-eye-slash"></i></span>
+                            <span v-if="cardWithSelectionInfo.card.visibleToCount > 1"><i class="fas fa-users"></i></span>
+                        </van-button>
                     </td>
                     <td id="Heap" info class="search-page-widget-td">
-                        <van-popover v-model:show="cardWithSelectionInfo.heapDetailPopover" overlay close-on-click-outside close-on-click-overlay>
-                            <span v-if="cardWithSelectionInfo.card.decks.length == 0">
-                                <span v-if="singleDeckDisplayOptimization">@Localizer["NotInYourDeck"]</span><span v-else>@Localizer["InNoneOfYourDecks"]</span>
-                            </span>
+                        <van-button class="toolbar-button search-page-heap-info" v-on:click="onCardHeapButtonClick(cardWithSelectionInfo.card)">
+                            <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
                             <span v-else>
-                                <span v-for="deck in cardWithSelectionInfo.card.decks">
-                                    <strong><span v-if="singleDeckDisplayOptimization">@Localizer["InYourDeck"]</span><span v-else>@Localizer["InYourDeck"] {{deck.deckName}}</span><br /></strong>
-                                    @Localizer["Heap"] {{deck.heapName}}<br />
-                                    @Localizer["NbTimesInNotLearnedHeap"] {{deck.nbTimesInNotLearnedHeap}}<br />
-                                    @Localizer["BiggestHeapReached"] {{deck.biggestHeapReached}}<br />
-                                    @Localizer["AddedToDeckOn"] {{dateTime(deck.addToDeckUtcTime)}}<br />
-                                    @Localizer["LastLearnedOn"] <span v-if="isValidDateTime(deck.lastLearnUtcTime)">{{dateTime(deck.lastLearnUtcTime)}}</span><span v-else>@Localizer["Never"]</span><br />
-                                    <span v-if="deck.heapId > 0">
-                                        <span v-if="deck.expired" style="color:orange">@Localizer["ExpiredOn"]</span><span v-else>@Localizer["WillExpireOn"]</span> {{dateTime(deck.expiryUtcDate)}}
-                                    </span>
-                                    <span v-else>
-                                        <span style="color:orange">{{deck.heapName}}</span>
-                                    </span>
-                                    <br />
+                                <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
+                                    <i class="fas fa-layer-group"></i> {{cardWithSelectionInfo.card.decks[0].heapId}}
                                 </span>
+                                <span v-else style="color:ButtonText"><i class="fas fa-layer-group"></i></span>
                             </span>
-                            <template #reference>
-                                <van-button class="toolbar-button search-page-heap-info">
-                                    <span v-if="cardWithSelectionInfo.card.decks.length == 0"><i class="fas fa-layer-group" style="color: InactiveCaptionText"></i></span>
-                                    <span v-else>
-                                        <span v-if="cardWithSelectionInfo.card.decks.length == 1 && (!filteringOnDeckInclusive() || (filteringOnDeckInclusive() && selectedDeck.deckId == cardWithSelectionInfo.card.decks[0].deckId))" v-bind:style="'color:' + (cardWithSelectionInfo.card.decks[0].expired ? 'orange' : 'ButtonText')">
-                                            <i class="fas fa-layer-group"></i> {{cardWithSelectionInfo.card.decks[0].heapId}}
-                                        </span>
-                                        <span v-else style="color:ButtonText"><i class="fas fa-layer-group"></i></span>
-                                    </span>
-                                </van-button>
-                            </template>
-                        </van-popover>
+                        </van-button>
                     </td>
                     <td id="Rating" info class="search-page-widget-td">
                         <card-rating class="rating-component" v-model="cardWithSelectionInfo.card.currentUserRating" micro readonly v-bind:average="cardWithSelectionInfo.card.averageRating" v-bind:countinaverage="cardWithSelectionInfo.card.countOfUserRatings"
-                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' />
+                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["AverageRatingLong"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' noevaluationstr='@Localizer["NoEvaluation"]' />
                     </td>
                     <td id="Front side" style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;max-width:0">
                         <a v-bind:href="'/Authoring?CardId='+cardWithSelectionInfo.card.cardId">{{cardWithSelectionInfo.card.frontSide}}</a>

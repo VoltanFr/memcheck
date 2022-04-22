@@ -54,7 +54,7 @@ const searchApp = Vue.createApp({
             runResult: {
                 pageCount: 0,
                 totalNbCard: 0,
-                cardsWithSelectionInfo: [], // {selected: bool, card: result of SearchController.RunQueryCardViewModel, visibilityInfoPopover, heapDetailPopover}
+                cardsWithSelectionInfo: [], // {selected: bool, card: result of SearchController.RunQueryCardViewModel}
             },
             guidNoCurrentUser: '00000000-0000-0000-0000-000000000000',
             guidNoDeckFiltering: '00000000-0000-0000-0000-000000000000',
@@ -165,8 +165,6 @@ const searchApp = Vue.createApp({
                         this.runResult.cardsWithSelectionInfo.push({
                             selected: false,
                             card: result.data.cards[i],
-                            visibilityInfoPopover: false,
-                            heapDetailPopover: false,
                         });
                     }
                 })
@@ -675,6 +673,38 @@ const searchApp = Vue.createApp({
                         tellAxiosError(error);
                     });
             }
+        },
+        onCardInfoButtonClick(card) {
+            toast(card.popoverVisibility, this.allStaticData.localizedText.visibility, true);
+        },
+        onCardHeapButtonClick(card) {
+            let toastCaption;
+            let toastText = '';
+            if (card.decks.length === 0) {
+                if (this.singleDeckDisplayOptimization)
+                    toastCaption = this.allStaticData.localizedText.notInYourDeck;
+                else
+                    toastCaption = this.allStaticData.localizedText.inNoneOfYourDecks;
+            }
+            else {
+                if (this.singleDeckDisplayOptimization)
+                    toastCaption = this.allStaticData.localizedText.inYourDeck;
+                else
+                    toastCaption = this.allStaticData.localizedText.inYourDecks;
+
+                card.decks.forEach(deck => {
+                    if (!this.singleDeckDisplayOptimization)
+                        toastText = `${toastText}<strong>${this.allStaticData.localizedText.deck} ${deck.deckName}</strong>\n`;
+                    toastText = `${toastText}${this.allStaticData.localizedText.heap} ${deck.heapName}\n`;
+                    toastText = `${toastText}${this.allStaticData.localizedText.nbTimesInNotLearnedHeap} ${deck.nbTimesInNotLearnedHeap}\n`;
+                    toastText = `${toastText}${this.allStaticData.localizedText.biggestHeapReached} ${deck.biggestHeapReached}\n`;
+                    toastText = `${toastText}${this.allStaticData.localizedText.addedToDeckOn} ${dateTime(deck.addToDeckUtcTime)}\n`;
+                    toastText = `${toastText}${this.allStaticData.localizedText.lastLearnedOn} ${isValidDateTime(deck.lastLearnUtcTime) ? dateTime(deck.lastLearnUtcTime) : this.allStaticData.localizedText.never}`;
+                    if (deck.heapId > 0)
+                        toastText = `${toastText}\n${deck.expired ? this.allStaticData.localizedText.expiredOn : this.allStaticData.localizedText.willExpireOn} ${dateTime(deck.expiryUtcDate)}`;
+                });
+            }
+            toastWithoutIcon(toastText, toastCaption);
         },
     },
     watch: {

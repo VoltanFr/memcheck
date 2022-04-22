@@ -212,6 +212,21 @@ namespace MemCheck.WebUI.Controllers
                 CardsNotRegisteredForNotif = localizer.GetLocalized("CardsNotRegisteredForNotif");
 
                 ConfirmSubscription = localizer.GetLocalized("ConfirmSubscription");
+                Visibility = localizer.GetLocalized("Visibility");
+
+                NotInYourDeck = localizer.GetLocalized("NotInYourDeck");
+                InNoneOfYourDecks = localizer.GetLocalized("InNoneOfYourDecks");
+                InYourDeck = localizer.GetLocalized("InYourDeck");
+                InYourDecks = localizer.GetLocalized("InYourDecks");
+                Deck = localizer.GetLocalized("Deck");
+                Heap = localizer.GetLocalized("Heap");
+                NbTimesInNotLearnedHeap = localizer.GetLocalized("NbTimesInNotLearnedHeap");
+                BiggestHeapReached = localizer.GetLocalized("BiggestHeapReached");
+                AddedToDeckOn = localizer.GetLocalized("AddedToDeckOn");
+                LastLearnedOn = localizer.GetLocalized("LastLearnedOn");
+                Never = localizer.GetLocalized("Never");
+                ExpiredOn = localizer.GetLocalized("ExpiredOn");
+                WillExpireOn = localizer.GetLocalized("WillExpireOn");
             }
             public string Any { get; }
             public string Ignore { get; }
@@ -262,6 +277,20 @@ namespace MemCheck.WebUI.Controllers
             public string CardsRegisteredForNotif { get; }
             public string CardsNotRegisteredForNotif { get; }
             public string ConfirmSubscription { get; }
+            public string Visibility { get; }
+            public string NotInYourDeck { get; }
+            public string InNoneOfYourDecks { get; }
+            public string InYourDeck { get; }
+            public string InYourDecks { get; }
+            public string Deck { get; }
+            public string Heap { get; }
+            public string NbTimesInNotLearnedHeap { get; }
+            public string BiggestHeapReached { get; }
+            public string AddedToDeckOn { get; }
+            public string LastLearnedOn { get; }
+            public string Never { get; }
+            public string ExpiredOn { get; }
+            public string WillExpireOn { get; }
         }
         #endregion
         #endregion

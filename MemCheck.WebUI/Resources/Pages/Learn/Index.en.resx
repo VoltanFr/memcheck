@@ -231,6 +231,9 @@
   <data name="MoveToHeap" xml:space="preserve">
     <value>Move to heap</value>
   </data>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>No evaluation</value>
+  </data>
   <data name="NoMoreCardTo" xml:space="preserve">
     <value>No more card to</value>
   </data>
