@@ -675,7 +675,7 @@ const searchApp = Vue.createApp({
             }
         },
         onCardInfoButtonClick(card) {
-            toast(card.popoverVisibility, this.allStaticData.localizedText.visibility, true);
+            toastWithoutIcon(card.popoverVisibility, this.allStaticData.localizedText.visibility, toastShortDuration);
         },
         onCardHeapButtonClick(card) {
             let toastCaption;
