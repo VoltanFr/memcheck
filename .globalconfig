@@ -27,3 +27,6 @@ dotnet_diagnostic.CA1034.severity = none
 
 # I rely on nullable and don't want to check params
 dotnet_diagnostic.CA1062.severity = none
+
+# I want to use underscores in some names
+dotnet_diagnostic.CA1707.severity = none

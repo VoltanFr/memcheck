@@ -476,8 +476,8 @@ namespace MemCheck.WebUI.Controllers
         public async Task<IActionResult> AddTagToCards(Guid tagId, [FromBody] AddTagToCardsRequest request)
         {
             CheckBodyParameter(request);
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            var appRequest = new AddTagToCards.Request(user, tagId, request.CardIds);
+            var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+            var appRequest = new AddTagToCards.Request(userId, tagId, request.CardIds);
             await new AddTagToCards(callContext).RunAsync(appRequest);
             return ControllerResultWithToast.Success(GetLocalized("TagAdded"), this);
         }

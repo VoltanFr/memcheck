@@ -34,6 +34,9 @@ namespace MemCheck.Application.QueryValidation
         public const int DeckMaxNameLength = 36;
         public const int LanguageMinNameLength = 2;
         public const int LanguageMaxNameLength = 36;
+        public const string ExceptionMesg_CardDoesNotExist = "Card noes not exist";
+        public const string ExceptionMesg_TagDoesNotExist = "Tag not found";
+        public const string ExceptionMesg_UserDoesNotExist = "User not found";
         public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
         public static readonly ImmutableHashSet<char> ForbiddenCharsInImageNames = new[] { '<', '>' }.ToImmutableHashSet();
         public static readonly ImmutableHashSet<char> ForbiddenCharsInImageSource = new[] { '<', '>' }.ToImmutableHashSet();
@@ -57,14 +60,13 @@ namespace MemCheck.Application.QueryValidation
         public static async Task CheckCardExistsAsync(MemCheckDbContext dbContext, Guid cardId)
         {
             if (!await dbContext.Cards.AsNoTracking().AnyAsync(card => card.Id == cardId))
-                throw new InvalidOperationException("Card noes not exist");
+                throw new InvalidOperationException(ExceptionMesg_CardDoesNotExist);
         }
         public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
         {
             var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
-
             if (user == null || user.DeletionDate != null)
-                throw new InvalidOperationException("User not found");
+                throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
         }
         public static async Task CheckUserExistsAndIsAdminAsync(MemCheckDbContext dbContext, Guid userId, IRoleChecker roleChecker)
         {
@@ -99,7 +101,7 @@ namespace MemCheck.Application.QueryValidation
         public static async Task CheckTagExistsAsync(Guid tagId, MemCheckDbContext dbContext)
         {
             if (!await dbContext.Tags.AsNoTracking().AnyAsync(tag => tag.Id == tagId))
-                throw new RequestInputException("Tag not found");
+                throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
         }
         public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer)
         {

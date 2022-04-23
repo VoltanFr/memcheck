@@ -15,51 +15,33 @@ namespace MemCheck.Application.Cards
         }
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
-            var tagName = await DbContext.Tags.Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
-            var previousVersionCreator = new PreviousVersionCreator(DbContext);
+            var tagName = await DbContext.Tags.AsNoTracking().Where(tag => tag.Id == request.TagId).Select(tag => tag.Name).SingleAsync();
             foreach (var cardId in request.CardIds)
-                if (!DbContext.TagsInCards.Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
+                if (!DbContext.TagsInCards.AsNoTracking().Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
                 {
-                    var card = await previousVersionCreator.RunAsync(cardId, request.VersionCreator.Id, Localized.GetLocalized("AddTag") + $" '{tagName}'");
-                    card.VersionCreator = request.VersionCreator; //A priori inutile, à confirmer
+                    var previousVersionCreator = new PreviousVersionCreator(DbContext);
+                    await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.GetLocalized("AddTag") + $" '{tagName}'");
                     DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
                 }
             await DbContext.SaveChangesAsync();
 
-            return new ResultWithMetrologyProperties<Result>(new Result(),
-                ("TagId", request.TagId.ToString()),
-                ("TagName", tagName),
-           IntMetric("CardCount", request.CardIds.Count()));
+            return new ResultWithMetrologyProperties<Result>(new Result(), ("TagId", request.TagId.ToString()), ("TagName", tagName), IntMetric("CardCount", request.CardIds.Count()));
         }
         #region Request class
-        public sealed class Request : IRequest
+        public sealed record Request(Guid UserId, Guid TagId, IEnumerable<Guid> CardIds) : IRequest
         {
-            public Request(MemCheckUser versionCreator, Guid tagId, IEnumerable<Guid> cardIds)
-            {
-                VersionCreator = versionCreator;
-                TagId = tagId;
-                CardIds = cardIds;
-            }
-            public MemCheckUser VersionCreator { get; }
-            public Guid TagId { get; }
-            public IEnumerable<Guid> CardIds { get; }
+            public const string ExceptionMesg_NoCard = "No card to add label to";
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 if (!CardIds.Any())
-                    throw new RequestInputException("No card to add label to");
-                if (QueryValidationHelper.IsReservedGuid(VersionCreator.Id))
-                    throw new RequestInputException("Invalid user id");
-                if (QueryValidationHelper.IsReservedGuid(TagId))
-                    throw new RequestInputException("Reserved tag id");
+                    throw new RequestInputException(ExceptionMesg_NoCard);
+                await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+                await QueryValidationHelper.CheckTagExistsAsync(TagId, callContext.DbContext);
                 foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, VersionCreator.Id, cardId);
-                if (!await callContext.DbContext.Tags.Where(tag => tag.Id == TagId).AnyAsync())
-                    throw new RequestInputException("Invalid tag id");
+                    CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, UserId, cardId);
             }
         }
-        public sealed class Result
-        {
-        }
+        public sealed record Result;
         #endregion
     }
 }

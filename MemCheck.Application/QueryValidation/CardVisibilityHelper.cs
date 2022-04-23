@@ -5,12 +5,14 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace MemCheck.Application.QueryValidation
 {
     internal static class CardVisibilityHelper
     {
+        public const string UserNotAllowedToViewCard = "User not allowed to view card";
         public static bool CardIsVisibleToUser(Guid userId, SearchCards.ResultCard card)
         {
             return CardIsVisibleToUser(userId, card.VisibleTo.Select(uwv => uwv.UserId));
@@ -59,10 +61,13 @@ namespace MemCheck.Application.QueryValidation
                 .AsNoTracking()
                 .Include(card => card.UsersWithView)
                 .Include(card => card.VersionCreator)
-                .Where(card => cardIds.Contains(card.Id));
-            foreach (var card in cards)
-                if (!CardIsVisibleToUser(userId, card))
-                    throw new InvalidOperationException("User not allowed to view card");
+                .Where(card => cardIds.Contains(card.Id))
+                .ToImmutableArray();
+            var cardIdsFromDb = cards.Select(card => card.Id).ToImmutableHashSet();
+            if (cardIds.Any(cardId => !cardIdsFromDb.Contains(cardId)))
+                throw new InvalidOperationException(QueryValidationHelper.ExceptionMesg_CardDoesNotExist);
+            if (cards.Any(card => !CardIsVisibleToUser(userId, card)))
+                throw new InvalidOperationException(UserNotAllowedToViewCard);
         }
         public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
         {
