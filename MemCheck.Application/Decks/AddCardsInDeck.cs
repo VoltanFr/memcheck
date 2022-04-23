@@ -46,7 +46,6 @@ namespace MemCheck.Application.Decks
             {
                 if (QueryValidationHelper.IsReservedGuid(UserId))
                     throw new InvalidOperationException("Invalid user ID");
-
                 await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, DeckId);
                 CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, cardIds);
             }

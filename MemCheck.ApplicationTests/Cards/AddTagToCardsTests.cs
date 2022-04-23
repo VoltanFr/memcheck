@@ -2,6 +2,7 @@
 using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -109,7 +110,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, card.Id.AsArray())));
-            Assert.AreEqual(CardVisibilityHelper.UserNotAllowedToViewCard, e.Message);
+            Assert.AreEqual(CardVisibilityHelper.ExceptionMesg_UserNotAllowedToViewCard, e.Message);
         }
         [TestMethod()]
         public async Task ACardNotViewableMustFail_MultipleCards()
@@ -125,7 +126,7 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, new[] { card2Id, card.Id, card3Id })));
-            Assert.AreEqual(CardVisibilityHelper.UserNotAllowedToViewCard, e.Message);
+            Assert.AreEqual(CardVisibilityHelper.ExceptionMesg_UserNotAllowedToViewCard, e.Message);
         }
         [TestMethod()]
         public async Task CheckSuccessfullAdding()
@@ -183,11 +184,11 @@ namespace MemCheck.Application.Cards
                 var cardFromDb = dbContext.Cards.AsNoTracking().Include(card => card.TagsInCards).Include(card => card.VersionCreator).Single();
                 CollectionAssert.Contains(cardFromDb.TagsInCards.Select(tag => tag.TagId).ToArray(), tag1Id);
                 StringAssert.Contains(cardFromDb.VersionDescription, tag1Name);
-                Assert.AreEqual(Domain.CardVersionType.Changes, cardFromDb.VersionType);
+                Assert.AreEqual(CardVersionType.Changes, cardFromDb.VersionType);
                 Assert.AreEqual(user1Id, cardFromDb.VersionCreator.Id);
 
                 var previousVersion = dbContext.CardPreviousVersions.Single();
-                Assert.AreEqual(Domain.CardPreviousVersionType.Creation, previousVersion.VersionType);
+                Assert.AreEqual(CardPreviousVersionType.Creation, previousVersion.VersionType);
             }
 
             var tag2Name = RandomHelper.String();
@@ -203,12 +204,12 @@ namespace MemCheck.Application.Cards
                 CollectionAssert.Contains(tagsInCard, tag1Id);
                 CollectionAssert.Contains(tagsInCard, tag2Id);
                 StringAssert.Contains(cardFromDb.VersionDescription, tag2Name);
-                Assert.AreEqual(Domain.CardVersionType.Changes, cardFromDb.VersionType);
+                Assert.AreEqual(CardVersionType.Changes, cardFromDb.VersionType);
 
                 var previousVersions = dbContext.CardPreviousVersions.ToImmutableArray();
                 Assert.AreEqual(2, previousVersions.Length);
-                Assert.AreEqual(Domain.CardPreviousVersionType.Creation, previousVersions[0].VersionType);
-                Assert.AreEqual(Domain.CardPreviousVersionType.Changes, previousVersions[1].VersionType);
+                Assert.AreEqual(CardPreviousVersionType.Creation, previousVersions[0].VersionType);
+                Assert.AreEqual(CardPreviousVersionType.Changes, previousVersions[1].VersionType);
                 StringAssert.Contains(previousVersions[1].VersionDescription, tag1Name);
             }
         }
