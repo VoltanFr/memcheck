@@ -37,8 +37,18 @@ namespace MemCheck.Application.Cards
                     throw new RequestInputException(ExceptionMesg_NoCard);
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
                 await QueryValidationHelper.CheckTagExistsAsync(TagId, callContext.DbContext);
-                foreach (var cardId in CardIds)
-                    CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, UserId, cardId);
+                CardVisibilityHelper.CheckUserIsAllowedToViewCards(callContext.DbContext, UserId, CardIds);
+                if (QueryValidationHelper.TagIsPerso(TagId, callContext.DbContext))
+                {
+                    try
+                    {
+                        await CardVisibilityHelper.CheckCardsArePrivateAsync(callContext.DbContext, CardIds, UserId);
+                    }
+                    catch (RequestInputException)
+                    {
+                        throw new PersoTagAllowedOnlyOnPrivateCardsException(callContext.Localized.GetLocalized("PersoTagAllowedOnlyOnPrivateCards"));
+                    }
+                }
             }
         }
         public sealed record Result;

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.QueryValidation
 {
@@ -36,6 +37,11 @@ namespace MemCheck.Application.QueryValidation
         public static bool CardIsPublic(IEnumerable<UserWithViewOnCard> usersWithView)
         {
             return !usersWithView.Any();
+        }
+        public static async Task CheckCardsArePrivateAsync(MemCheckDbContext dbContext, IEnumerable<Guid> cardIds, Guid userId)
+        {
+            if (await dbContext.Cards.AsNoTracking().AnyAsync(card => cardIds.Contains(card.Id) && (card.UsersWithView.Count() != 1 || card.UsersWithView.Single().UserId != userId)))
+                throw new RequestInputException("At least one non-private card");
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]

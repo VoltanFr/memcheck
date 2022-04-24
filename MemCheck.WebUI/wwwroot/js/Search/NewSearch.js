@@ -351,13 +351,13 @@ const searchApp = Vue.createApp({
                 await axios.post(`/Search/AddTagToCards/${tag.tagId}`, { cardIds: selectedCardIds })
                     .then(result => {
                         tellControllerSuccess(result);
+                        this.loadingQuery = false;
+                        this.runQuery();
                     })
                     .catch(error => {
                         tellAxiosError(error);
+                        this.loadingQuery = false;
                     });
-
-                this.loadingQuery = false;
-                this.runQuery();
             }
         },
         selectAll() {

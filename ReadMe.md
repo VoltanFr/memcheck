@@ -43,7 +43,9 @@ I plan to check that but did not have time yet: development on a Mac or Linux ma
   2. In the file `MemCheck.CommandLineDbClient\ManageDB\MakeUserAdmin.cs`, modify the field `userName` to set it to the user name you created.
   3. Compile and run the `MemCheck.CommandLineDbClient` project. Note that it ends on an exception, because the current implementation of this project is a bit askew. Its execution is a success if it logs `Test done`.
   4. After that, the MemCheck web site must run correctly from your debugger, and you should be able to log in.
-- Now, running the web site project, you should be able to log in. You then need to create a language for cards. Since your account is admin, you have an `Admin` link at the bottom of the screen. This is where you can create a language (eg `Français`).
+- Now, running the web site project, you should be able to log in. You then need to...
+  - Create a language for cards. Since your account is admin, you have an `Admin` link at the bottom of the screen. This is where you can create a language (eg `Français`).
+  - Create the tag named `Perso`.
 - You're now all set, with a fully functional local deployment of MemCheck!
 
 ### Projects

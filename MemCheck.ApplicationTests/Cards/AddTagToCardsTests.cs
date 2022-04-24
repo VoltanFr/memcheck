@@ -213,5 +213,56 @@ namespace MemCheck.Application.Cards
                 StringAssert.Contains(previousVersions[1].VersionDescription, tag1Name);
             }
         }
+        [TestMethod()]
+        public async Task AddingPersoTagToPublicCardMustFail()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+
+            var user1Id = await UserHelper.CreateInDbAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, user1Id);
+            var persoTagId = await TagHelper.CreateAsync(db, Tag.Perso);
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(db);
+            var e = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user1Id, persoTagId, cardId.AsArray())));
+            Assert.AreEqual(errorMesg, e.Message);
+        }
+        [TestMethod()]
+        public async Task AddingPersoTagToMultiUserCardMustFail()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+
+            var user1Id = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, user1Id);
+            var persoTagId = await TagHelper.CreateAsync(db, Tag.Perso);
+            var user2Id = await UserHelper.CreateInDbAsync(db);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, new[] { user1Id, user2Id }));
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(db);
+            var e = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user1Id, persoTagId, card.Id.AsArray())));
+            Assert.AreEqual(errorMesg, e.Message);
+        }
+        [TestMethod()]
+        public async Task AddingPersoTagToPrivateCardMustSucceed()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+
+            var user1Id = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, user1Id);
+            var persoTagId = await TagHelper.CreateAsync(db, Tag.Perso);
+            await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, user1Id.AsArray()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(user1Id, persoTagId, card.Id.AsArray()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                var cardFromDb = dbContext.Cards.AsNoTracking().Include(card => card.TagsInCards).Single();
+                CollectionAssert.Contains(cardFromDb.TagsInCards.Select(tag => tag.TagId).ToArray(), persoTagId);
+            }
+        }
     }
 }

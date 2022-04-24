@@ -351,6 +351,9 @@
   <data name="OperationIsForSelectedCards" xml:space="preserve">
     <value>This applies to selected cards</value>
   </data>
+  <data name="PersoTagAllowedOnlyOnPrivateCards" xml:space="preserve">
+    <value>Tag 'Perso' is allowed only on private cards.</value>
+  </data>
   <data name="Registered" xml:space="preserve">
     <value>Registered</value>
   </data>

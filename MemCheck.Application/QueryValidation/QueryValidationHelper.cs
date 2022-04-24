@@ -205,5 +205,9 @@ namespace MemCheck.Application.QueryValidation
                 if (versionDescription.Contains(forbiddenChar, StringComparison.Ordinal))
                     throw new RequestInputException(localizer.GetLocalized("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
         }
+        public static bool TagIsPerso(Guid tagId, MemCheckDbContext dbContext)
+        {
+            return dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId).Name == Tag.Perso;
+        }
     }
 }

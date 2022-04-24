@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MemCheck.Basics
 {
@@ -14,6 +15,10 @@ namespace MemCheck.Basics
                 return str;
 
             return string.Concat(str.AsSpan(0, maxLength), "[...]");
+        }
+        public static KeyValuePair<string, TValue> PairedWith<TValue>(this string str, TValue value)
+        {
+            return new KeyValuePair<string, TValue>(str, value);
         }
     }
 }

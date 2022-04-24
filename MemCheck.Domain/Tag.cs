@@ -10,6 +10,7 @@ namespace MemCheck.Domain
         public const int MinNameLength = 3;
         public const int MaxNameLength = 50;
         public const int MaxDescriptionLength = 5000;
+        public const string Perso = "Perso";
 
         [Key] public Guid Id { get; set; }
         [StringLength(MaxNameLength, MinimumLength = MinNameLength)] public string Name { get; set; } = null!;
