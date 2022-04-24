@@ -122,6 +122,7 @@ namespace MemCheck.Application.Searching
                 .Include(card => card.VersionCreator)
                 .Include(card => card.CardLanguage)
                 .Include(card => card.UsersWithView)
+                .ThenInclude(usersWithView => usersWithView.User)
                 .AsSingleQuery();
 
             var cardsViewableByUser = allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));

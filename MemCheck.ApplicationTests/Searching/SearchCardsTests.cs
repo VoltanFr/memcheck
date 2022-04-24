@@ -434,5 +434,28 @@ namespace MemCheck.Application.Searching
             Assert.IsNotNull(result.Cards.SingleOrDefault(card => card.CardId == card1.Id));
             Assert.IsNotNull(result.Cards.SingleOrDefault(card => card.CardId == card2.Id));
         }
+        [TestMethod()]
+        public async Task TestResultContainsUserWithView()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var user1Name = RandomHelper.String();
+            var user1Id = await UserHelper.CreateInDbAsync(testDB, userName: user1Name);
+            var user2Name = RandomHelper.String();
+            var user2Id = await UserHelper.CreateInDbAsync(testDB, userName: user2Name);
+            await CardHelper.CreateIdAsync(testDB, user1Id, userWithViewIds: new[] { user1Id, user2Id });
+
+            using var dbContext = new MemCheckDbContext(testDB);
+            var request = new SearchCards.Request { UserId = user2Id };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(1, result.TotalNbCards);
+            var card = result.Cards.Single();
+            Assert.AreEqual(2, card.VisibleTo.Count());
+            var visibleToUser1 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user1Id);
+            Assert.IsNotNull(visibleToUser1.User);
+            Assert.AreEqual(user1Name, visibleToUser1.User.UserName);
+            var visibleToUser2 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user2Id);
+            Assert.IsNotNull(visibleToUser2.User);
+            Assert.AreEqual(user2Name, visibleToUser2.User.UserName);
+        }
     }
 }

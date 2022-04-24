@@ -417,7 +417,7 @@ namespace MemCheck.WebUI.Controllers
                 {
                     0 => localizer.GetLocalized("AllUsers"),
                     1 => localizer.GetLocalized("YouOnly"),
-                    _ => string.Join(',', card.VisibleTo),
+                    _ => string.Join(',', card.VisibleTo.Select(userWithViewOnCard => userWithViewOnCard.User.UserName)),
                 };
 
                 Decks = card.DeckInfo.Select(deckInfo =>
