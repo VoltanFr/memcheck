@@ -17,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.WebUI
 {
@@ -38,6 +38,14 @@ namespace MemCheck.WebUI
             });
 
             return loggerFactory.CreateLogger<AppSettings>();
+        }
+        private static async Task ControllerExceptionHandlerAsync(HttpContext context)
+        {
+            var e = context.Features.Get<IExceptionHandlerPathFeature>()!.Error;
+            var ToastTitle = MemCheckSupportedCultures.French.Equals(context.Features.Get<IRequestCultureFeature>()?.RequestCulture?.Culture) ? "Échec" : "Failure";
+            var ShowStatus = e is not RequestInputException;
+            var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
+            await context.Response.WriteAsJsonAsync(new { ToastTitle, ToastText, ShowStatus });
         }
         #endregion
         public Startup(IConfiguration configuration, IWebHostEnvironment currentEnvironment)
@@ -116,17 +124,7 @@ namespace MemCheck.WebUI
         }
         public void Configure(IApplicationBuilder app)
         {
-            app.UseExceptionHandler(a => a.Run(async context =>
-            {
-                var e = context.Features.Get<IExceptionHandlerPathFeature>()!.Error;
-                var requestCultureFeature = context.Features.Get<IRequestCultureFeature>();
-                var cultureName = requestCultureFeature == null ? "EN" : requestCultureFeature!.RequestCulture.Culture.Name;
-                var ToastTitle = cultureName.Equals("FR", StringComparison.OrdinalIgnoreCase) ? "Échec" : "Failure";
-                var ShowStatus = e is not RequestInputException;
-                var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
-                await context.Response.WriteAsJsonAsync(new { ToastTitle, ToastText, ShowStatus });
-            }));
-
+            app.UseExceptionHandler(a => a.Run(async context => await ControllerExceptionHandlerAsync(context)));
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
