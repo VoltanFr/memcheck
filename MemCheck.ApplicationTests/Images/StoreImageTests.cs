@@ -6,7 +6,6 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -205,7 +204,7 @@ namespace MemCheck.Application.Images
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var request = new StoreImage.Request(user, name, description, source, StoreImage.pngImageContentType, pngImage);
-                var localizer = new TestLocalizer(new KeyValuePair<string, string>("InitialImageVersionCreation", versionDesc).AsArray());
+                var localizer = new TestLocalizer("InitialImageVersionCreation".PairedWith(versionDesc));
                 await new StoreImage(dbContext.AsCallContext(localizer), uploadDate).RunAsync(request);
             }
 

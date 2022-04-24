@@ -38,7 +38,7 @@ namespace MemCheck.Application.Cards
             var otherUser = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfCurrentVersion".PairedWith("YouAreNotTheCreatorOfCurrentVersion"))));
                 var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
                 Assert.AreEqual("User not allowed to view card", e.Message);
             }
@@ -144,7 +144,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfAllPreviousVersions", "YouAreNotTheCreatorOfAllPreviousVersions"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfAllPreviousVersions".PairedWith("YouAreNotTheCreatorOfAllPreviousVersions"))));
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray())));
                 StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfAllPreviousVersions");
             }
@@ -187,7 +187,7 @@ namespace MemCheck.Application.Cards
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("YouAreNotTheCreatorOfCurrentVersion", "YouAreNotTheCreatorOfCurrentVersion"))));
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfCurrentVersion".PairedWith("YouAreNotTheCreatorOfCurrentVersion"))));
                 var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray())));
                 StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfCurrentVersion");
             }

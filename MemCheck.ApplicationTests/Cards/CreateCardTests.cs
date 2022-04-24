@@ -6,7 +6,6 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -172,7 +171,7 @@ namespace MemCheck.Application.Cards
                 new Guid[] { otherUser },
                 RandomHelper.String());
             var ownerMustHaveVisibility = RandomHelper.String();
-            var localizer = new TestLocalizer(new KeyValuePair<string, string>("OwnerMustHaveVisibility", ownerMustHaveVisibility).AsArray());
+            var localizer = new TestLocalizer("OwnerMustHaveVisibility".PairedWith(ownerMustHaveVisibility));
             var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
             Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
         }
