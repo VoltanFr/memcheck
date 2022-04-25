@@ -68,6 +68,11 @@ namespace MemCheck.Application.QueryValidation
             if (user == null || user.DeletionDate != null)
                 throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
         }
+        public static async Task CheckUsersExistAsync(MemCheckDbContext dbContext, IEnumerable<Guid> userIds)
+        {
+            if (await dbContext.Users.AsNoTracking().Where(user => userIds.Contains(user.Id)).CountAsync() != userIds.Count())
+                throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
+        }
         public static async Task CheckUserExistsAndIsAdminAsync(MemCheckDbContext dbContext, Guid userId, IRoleChecker roleChecker)
         {
             var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
@@ -101,6 +106,11 @@ namespace MemCheck.Application.QueryValidation
         public static async Task CheckTagExistsAsync(Guid tagId, MemCheckDbContext dbContext)
         {
             if (!await dbContext.Tags.AsNoTracking().AnyAsync(tag => tag.Id == tagId))
+                throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
+        }
+        public static async Task CheckTagsExistAsync(IEnumerable<Guid> tagIds, MemCheckDbContext dbContext)
+        {
+            if (await dbContext.Tags.AsNoTracking().Where(tag => tagIds.Contains(tag.Id)).CountAsync() != tagIds.Count())
                 throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
         }
         public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer)

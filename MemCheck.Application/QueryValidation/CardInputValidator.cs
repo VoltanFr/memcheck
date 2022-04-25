@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Cards;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.QueryValidation
 {
@@ -19,10 +20,11 @@ namespace MemCheck.Application.QueryValidation
         public const int MaxVersionDescriptionLength = 1000;
         public const int MinReferencesLength = 0;
         public const int MaxReferencesLength = 4000;
-        public static void Run(ICardInput input, CallContext callContext)
+        public static async Task RunAsync(ICardInput input, CallContext callContext)
         {
-            if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
-                throw new InvalidOperationException(callContext.Localized.GetLocalized("InvalidOwner"));
+            await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, input.VersionCreatorId);
+            await QueryValidationHelper.CheckTagsExistAsync(input.Tags, callContext.DbContext);
+            await QueryValidationHelper.CheckUsersExistAsync(callContext.DbContext, input.UsersWithVisibility);
 
             if (input.FrontSide != input.FrontSide.Trim())
                 throw new InvalidOperationException("Invalid front side: not trimmed");
@@ -61,12 +63,6 @@ namespace MemCheck.Application.QueryValidation
 
             if (QueryValidationHelper.IsReservedGuid(input.LanguageId))
                 throw new RequestInputException(callContext.Localized.GetLocalized("InvalidInputLanguage"));
-
-            if (input.Tags.Any(tag => QueryValidationHelper.IsReservedGuid(tag)))
-                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidTag"));
-
-            if (input.UsersWithVisibility.Any(userWithVisibility => QueryValidationHelper.IsReservedGuid(userWithVisibility)))
-                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidUserWithVisibility"));
 
             if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
                 throw new InvalidOperationException(callContext.Localized.GetLocalized("OwnerMustHaveVisibility"));

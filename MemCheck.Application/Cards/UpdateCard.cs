@@ -191,7 +191,7 @@ namespace MemCheck.Application.Cards
             public string VersionDescription { get; }
             public async Task CheckValidityAsync(CallContext callContext)
             {
-                CardInputValidator.Run(this, callContext);
+                await CardInputValidator.RunAsync(this, callContext);
 
                 var cards = callContext.DbContext.Cards
                     .Include(card => card.VersionCreator)
