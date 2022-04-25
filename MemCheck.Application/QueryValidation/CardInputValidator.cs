@@ -19,58 +19,57 @@ namespace MemCheck.Application.QueryValidation
         public const int MaxVersionDescriptionLength = 1000;
         public const int MinReferencesLength = 0;
         public const int MaxReferencesLength = 4000;
-        public static void Run(ICardInput input, ILocalized localizer)
+        public static void Run(ICardInput input, CallContext callContext)
         {
             if (QueryValidationHelper.IsReservedGuid(input.VersionCreatorId))
-                throw new InvalidOperationException(localizer.GetLocalized("InvalidOwner"));
+                throw new InvalidOperationException(callContext.Localized.GetLocalized("InvalidOwner"));
 
             if (input.FrontSide != input.FrontSide.Trim())
                 throw new InvalidOperationException("Invalid front side: not trimmed");
             if (input.FrontSide.Length is < minFrontSideLength or > maxFrontSideLength)
-                throw new RequestInputException(localizer.GetLocalized("InvalidFrontSideLength") + $" {input.FrontSide.Length}" + localizer.GetLocalized("MustBeBetween") + $" {minFrontSideLength} " + localizer.GetLocalized("And") + $" {maxFrontSideLength}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideLength") + $" {input.FrontSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minFrontSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxFrontSideLength}");
             if (input.FrontSideImageList.Count() > maxImageCountPerSide)
-                throw new RequestInputException(localizer.GetLocalized("InvalidFrontSideImageCount") + $" {input.FrontSideImageList.Count()}" + localizer.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideImageCount") + $" {input.FrontSideImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
             if (input.BackSide != input.BackSide.Trim())
                 throw new InvalidOperationException("Invalid back side: not trimmed");
             if ((input.BackSide.Length < minBackSideLength || input.BackSide.Length > maxBackSideLength) && !(input.BackSide.Length == 0 && input.BackSideImageList.Any()))
-                throw new RequestInputException(localizer.GetLocalized("InvalidBackSideLength") + $" {input.BackSide.Length}" + localizer.GetLocalized("MustBeBetween") + $" {minBackSideLength} " + localizer.GetLocalized("And") + $" {maxBackSideLength}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideLength") + $" {input.BackSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minBackSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxBackSideLength}");
             if (input.BackSideImageList.Count() > maxImageCountPerSide)
-                throw new RequestInputException(localizer.GetLocalized("InvalidBackSideImageCount") + $" {input.BackSideImageList.Count()}" + localizer.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideImageCount") + $" {input.BackSideImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
             if (input.AdditionalInfo != input.AdditionalInfo.Trim())
                 throw new InvalidOperationException("Invalid additional info: not trimmed");
             if (input.AdditionalInfo.Length is < minAdditionalInfoLength or > maxAdditionalInfoLength)
-                throw new RequestInputException(localizer.GetLocalized("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + localizer.GetLocalized("MustBeBetween") + $" {minAdditionalInfoLength} " + localizer.GetLocalized("And") + $" {maxAdditionalInfoLength}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minAdditionalInfoLength} " + callContext.Localized.GetLocalized("And") + $" {maxAdditionalInfoLength}");
             if (input.AdditionalInfoImageList.Count() > maxImageCountPerSide)
-                throw new RequestInputException(localizer.GetLocalized("InvalidAdditionalInfoImageCount") + $" {input.AdditionalInfoImageList.Count()}" + localizer.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoImageCount") + $" {input.AdditionalInfoImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
             if (input.References != input.References.Trim())
                 throw new InvalidOperationException("Invalid References: not trimmed");
             if (input.References.Length is < MinReferencesLength or > MaxReferencesLength)
-                throw new RequestInputException(localizer.GetLocalized("InvalidReferencesLength") + $" {input.References.Length}" + localizer.GetLocalized("MustBeBetween") + $" {MinReferencesLength} " + localizer.GetLocalized("And") + $" {MaxReferencesLength}");
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidReferencesLength") + $" {input.References.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinReferencesLength} " + callContext.Localized.GetLocalized("And") + $" {MaxReferencesLength}");
 
             if (input.VersionDescription != input.VersionDescription.Trim())
                 throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
             if (input.VersionDescription.Length is < MinVersionDescriptionLength or > MaxVersionDescriptionLength)
-                throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + localizer.GetLocalized("MustBeBetween") + $" {MinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {MaxVersionDescriptionLength}");
-
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinVersionDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxVersionDescriptionLength}");
 
             var unionedImageLists = input.FrontSideImageList.Concat(input.BackSideImageList).Concat(input.AdditionalInfoImageList);
             if (unionedImageLists.GroupBy(guid => guid).Any(guid => guid.Count() > 1))
-                throw new RequestInputException(localizer.GetLocalized("ImageDuplicated"));
+                throw new RequestInputException(callContext.Localized.GetLocalized("ImageDuplicated"));
 
             if (QueryValidationHelper.IsReservedGuid(input.LanguageId))
-                throw new RequestInputException(localizer.GetLocalized("InvalidInputLanguage"));
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidInputLanguage"));
 
             if (input.Tags.Any(tag => QueryValidationHelper.IsReservedGuid(tag)))
-                throw new RequestInputException(localizer.GetLocalized("InvalidTag"));
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidTag"));
 
             if (input.UsersWithVisibility.Any(userWithVisibility => QueryValidationHelper.IsReservedGuid(userWithVisibility)))
-                throw new RequestInputException(localizer.GetLocalized("InvalidUserWithVisibility"));
+                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidUserWithVisibility"));
 
             if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
-                throw new InvalidOperationException(localizer.GetLocalized("OwnerMustHaveVisibility"));
+                throw new InvalidOperationException(callContext.Localized.GetLocalized("OwnerMustHaveVisibility"));
         }
     }
 }

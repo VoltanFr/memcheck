@@ -207,7 +207,7 @@ namespace MemCheck.Application.QueryValidation
         }
         public static bool TagIsPerso(Guid tagId, MemCheckDbContext dbContext)
         {
-            return dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId).Name == Tag.Perso;
+            return dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId).Name.Equals(Tag.Perso, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

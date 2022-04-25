@@ -111,7 +111,7 @@ namespace MemCheck.Application.Cards
             public string VersionDescription { get; }
             public async Task CheckValidityAsync(CallContext callContext)
             {
-                CardInputValidator.Run(this, callContext.Localized);
+                CardInputValidator.Run(this, callContext);
                 await Task.CompletedTask;
             }
         }
