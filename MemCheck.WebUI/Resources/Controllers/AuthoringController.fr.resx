@@ -228,6 +228,9 @@
   <data name="NotIncludedInAnyDeck" xml:space="preserve">
     <value>N'apparaît dans aucun paquet</value>
   </data>
+  <data name="PersoTagAllowedOnlyOnPrivateCards" xml:space="preserve">
+    <value>Le tag 'Perso' n'est autorisé que sur les cartes privées.</value>
+  </data>
   <data name="PleaseEnterAnImageName" xml:space="preserve">
     <value>Saisissez un nom d'image</value>
   </data>

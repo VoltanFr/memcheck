@@ -274,5 +274,93 @@ namespace MemCheck.Application.Cards
             StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString(CultureInfo.InvariantCulture));
             StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString(CultureInfo.InvariantCulture));
         }
+        [TestMethod()]
+        public async Task PublicCardWithPersoTagMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task CardVisibleToOtherWithPersoTagMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                new[] { creatorId, otherUserId },
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task PrivateCardWithPersoTagMustSucceed()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                creatorId.AsArray(),
+                RandomHelper.String());
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
+                Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            }
+        }
     }
 }

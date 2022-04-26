@@ -66,6 +66,9 @@ namespace MemCheck.Application.QueryValidation
 
             if (!CardVisibilityHelper.CardIsVisibleToUser(input.VersionCreatorId, input.UsersWithVisibility))
                 throw new InvalidOperationException(callContext.Localized.GetLocalized("OwnerMustHaveVisibility"));
+
+            if (input.Tags.Any(tagId => QueryValidationHelper.TagIsPerso(tagId, callContext.DbContext)) && (input.UsersWithVisibility.Count() != 1))
+                throw new PersoTagAllowedOnlyOnPrivateCardsException(callContext.Localized.GetLocalized("PersoTagAllowedOnlyOnPrivateCards"));
         }
     }
 }
