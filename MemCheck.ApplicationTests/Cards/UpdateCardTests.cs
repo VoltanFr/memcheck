@@ -599,5 +599,265 @@ namespace MemCheck.Application.Cards
                 Assert.IsFalse(updatedCard.UsersWithView.Any());
             }
         }
+        [TestMethod()]
+        public async Task AddingPersoTagToPublicCardMustFail()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, creatorId, language: languageId, userWithViewIds: Array.Empty<Guid>());
+
+            var persoTagId = await TagHelper.CreateAsync(db, name: Tag.Perso);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(db);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task AddingPersoTagToCardVisibleToOtherMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: new[] { creatorId, otherUserId });
+
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                new[] { creatorId, otherUserId },
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task AddingPersoTagToPrivateCardMustSucceed()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray());
+
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                creatorId.AsArray(),
+                RandomHelper.String());
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
+                Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task ChangingAPersoCardToPublicAndAddingPersoTagMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var aTagId = await TagHelper.CreateAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: aTagId.AsArray());
+
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task ChangingAPersoCardToCardVisibleToOtherAndAddingPersoTagMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var aTagId = await TagHelper.CreateAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: aTagId.AsArray());
+
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+            var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                new[] { creatorId, otherUserId },
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task ChangingAPublicCardToPrivateAndAddingPersoTagMustSucceed()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: Array.Empty<Guid>());
+
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                persoTagId.AsArray(),
+                creatorId.AsArray(),
+                RandomHelper.String());
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
+
+            using (var dbContext = new MemCheckDbContext(testDB))
+            {
+                var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
+                Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            }
+        }
+        [TestMethod()]
+        public async Task ChangingAPersoCardWithPersoTagToPublicMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var aTagId = await TagHelper.CreateAsync(testDB);
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: new[] { aTagId, persoTagId });
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                new[] { aTagId, persoTagId },
+                Array.Empty<Guid>(),
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
+        [TestMethod()]
+        public async Task ChangingAPersoCardWithPersoTagToLimitedVisibilityMustFail()
+        {
+            var testDB = DbHelper.GetEmptyTestDB();
+            var creatorId = await UserHelper.CreateInDbAsync(testDB);
+            var languageId = await CardLanguagHelper.CreateAsync(testDB);
+            var aTagId = await TagHelper.CreateAsync(testDB);
+            var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+            var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: new[] { aTagId, persoTagId });
+
+            var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+
+            var request = new UpdateCard.Request(
+                cardId,
+                creatorId,
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                Array.Empty<Guid>(),
+                RandomHelper.String(),
+                languageId,
+                new[] { aTagId, persoTagId },
+                new[] { creatorId, otherUserId },
+                RandomHelper.String());
+
+            var errorMesg = RandomHelper.String();
+            var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
+            using var dbContext = new MemCheckDbContext(testDB);
+            var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+            Assert.AreEqual(errorMesg, exception.Message);
+        }
     }
 }
