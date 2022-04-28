@@ -1,6 +1,10 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.QueryValidation
@@ -9,6 +13,7 @@ namespace MemCheck.Application.QueryValidation
     {
         const string AdminRoleName = "Admin";
 
+        Task<bool> UserIsAdminAsync(MemCheckDbContext dbContext, Guid userId);
         Task<bool> UserIsAdminAsync(MemCheckUser user);
         Task<IEnumerable<string>> GetRolesAsync(MemCheckUser user);
     }
@@ -29,6 +34,11 @@ namespace MemCheck.Application.QueryValidation
         public async Task<bool> UserIsAdminAsync(MemCheckUser user)
         {
             return await userManager.IsInRoleAsync(user, IRoleChecker.AdminRoleName);
+        }
+        public async Task<bool> UserIsAdminAsync(MemCheckDbContext dbContext, Guid userId)
+        {
+            var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleAsync();
+            return await UserIsAdminAsync(user);
         }
     }
 }

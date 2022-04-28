@@ -113,7 +113,7 @@ namespace MemCheck.Application.QueryValidation
             if (await dbContext.Tags.AsNoTracking().Where(tag => tagIds.Contains(tag.Id)).CountAsync() != tagIds.Count())
                 throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
         }
-        public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer)
+        public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer, IRoleChecker roleChecker, Guid userId)
         {
             if (name != name.Trim())
                 throw new InvalidOperationException("Invalid Name: not trimmed");
@@ -129,6 +129,15 @@ namespace MemCheck.Application.QueryValidation
             if (updatingId != null)
             {
                 var current = await dbContext.Tags.AsNoTracking().SingleAsync(tag => tag.Id == updatingId.Value);
+
+                if (TagIsPerso(current.Name))
+                {
+                    if (!await roleChecker.UserIsAdminAsync(dbContext, userId))
+                        throw new RequestInputException(localizer.GetLocalized("OnlyAdminsCanModifyPersoTag"));
+
+                    if (!TagIsPerso(name))
+                        throw new RequestInputException($"Can not rename {Tag.Perso} tag");
+                }
 
                 if (current.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
@@ -217,7 +226,16 @@ namespace MemCheck.Application.QueryValidation
         }
         public static bool TagIsPerso(Guid tagId, MemCheckDbContext dbContext)
         {
-            return dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId).Name.Equals(Tag.Perso, StringComparison.OrdinalIgnoreCase);
+            var tag = dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId);
+            return TagIsPerso(tag.Name);
+        }
+        public static bool TagIsPerso(string tagName)
+        {
+            //Hardcoding this is highly debatable
+            //It would probably be nicer that the admin defines the perso tag somewhere in the config of the app, and we use this tag's id
+            //Can be considered later
+            //Currently I indulge myself with this trick
+            return tagName.Equals(Tag.Perso, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

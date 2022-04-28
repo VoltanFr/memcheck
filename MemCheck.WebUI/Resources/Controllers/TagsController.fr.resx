@@ -156,6 +156,9 @@
   <data name="NoDifference" xml:space="preserve">
     <value>Aucune modification</value>
   </data>
+  <data name="OnlyAdminsCanModifyPersoTag" xml:space="preserve">
+    <value>Il faut être administrateur pour modifier le label 'Perso'</value>
+  </data>
   <data name="Saved" xml:space="preserve">
     <value>Enregistré</value>
   </data>

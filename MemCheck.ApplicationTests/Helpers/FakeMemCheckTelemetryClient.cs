@@ -22,5 +22,9 @@ namespace MemCheck.Application.Helpers
         {
             return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), new TestLocalizer(), roleChecker);
         }
+        public static CallContext AsCallContext(this MemCheckDbContext dbContext, TestLocalizer testLocalizer, TestRoleChecker roleChecker)
+        {
+            return new CallContext(dbContext, new FakeMemCheckTelemetryClient(), testLocalizer, roleChecker);
+        }
     }
 }

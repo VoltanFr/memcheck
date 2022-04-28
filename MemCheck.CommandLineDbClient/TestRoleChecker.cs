@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Database;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,11 @@ namespace MemCheck.CommandLineDbClient
     {
         public TestRoleChecker()
         {
+        }
+        public async Task<bool> UserIsAdminAsync(MemCheckDbContext dbContext, Guid userId)
+        {
+            await Task.CompletedTask;
+            return false;
         }
         public async Task<bool> UserIsAdminAsync(MemCheckUser user)
         {

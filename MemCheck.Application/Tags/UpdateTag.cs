@@ -25,7 +25,7 @@ namespace MemCheck.Application.Tags
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
-                await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, callContext.DbContext, callContext.Localized);
+                await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, callContext.DbContext, callContext.Localized, callContext.RoleChecker, UserId);
             }
         }
         public sealed record Result();

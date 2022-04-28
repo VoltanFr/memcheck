@@ -23,7 +23,7 @@ namespace MemCheck.Application.Tags
             public async Task CheckValidityAsync(CallContext callContext)
             {
                 await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
-                await QueryValidationHelper.CheckCanCreateTag(Name, Description, null, callContext.DbContext, callContext.Localized);
+                await QueryValidationHelper.CheckCanCreateTag(Name, Description, null, callContext.DbContext, callContext.Localized, callContext.RoleChecker, UserId);
             }
         }
         public sealed record Result(Guid TagId);

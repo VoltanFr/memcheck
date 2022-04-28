@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
+using MemCheck.Database;
 using MemCheck.Domain;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,11 @@ namespace MemCheck.Application.Helpers
         public TestRoleChecker(params Guid[] admins)
         {
             this.admins = admins.ToImmutableHashSet();
+        }
+        public async Task<bool> UserIsAdminAsync(MemCheckDbContext dbContext, Guid userId)
+        {
+            await Task.CompletedTask;
+            return admins.Contains(userId);
         }
         public async Task<bool> UserIsAdminAsync(MemCheckUser user)
         {
