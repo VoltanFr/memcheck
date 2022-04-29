@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace MemCheck.Application.Cards
 {
     [TestClass()]
-    public class DeleteCardTests
+    public class DeleteCardsTests
     {
         [TestMethod()]
         public async Task FailIfUserDoesNotExist()
@@ -64,11 +64,17 @@ namespace MemCheck.Application.Cards
         public async Task DeleteNonExistingCard()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var user = await UserHelper.CreateInDbAsync(db);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await CardDeletionHelper.DeleteCardAsync(db, user, Guid.NewGuid()));
+            var userId = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, userId, language: languageId);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var deleter = new DeleteCards(dbContext.AsCallContext());
+            var deletionRequest = new DeleteCards.Request(userId, new[] { cardId, RandomHelper.Guid() });
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(deletionRequest));
         }
         [TestMethod()]
-        public async Task DeleteDeletedCard()
+        public async Task DeleteDeletedCardMustFail()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -93,7 +99,7 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(1, dbContext.CardNotifications.Count());
         }
         [TestMethod()]
-        public async Task DeleteSuccessfully()
+        public async Task DeleteSingleCardSuccessfully()
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
@@ -133,25 +139,24 @@ namespace MemCheck.Application.Cards
             Assert.AreEqual(deletionDate, deletionVersion.VersionUtcDate);
         }
         [TestMethod()]
-        public async Task FailIfOtherUserHasCreatedAPreviousVersion()
+        public async Task SucceedsIfOtherUserHasCreatedAPreviousVersion()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var firstVersionCreatorId = await UserHelper.CreateInDbAsync(db);
             var languageId = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
-            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var card = await CardHelper.CreateAsync(db, firstVersionCreatorId, language: languageId);
+
+            var lastVersionCreatorId = await UserHelper.CreateInDbAsync(db);
             using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
+                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreatorId));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(lastVersionCreatorId, card.Id.AsArray()));
+
             using (var dbContext = new MemCheckDbContext(db))
             {
-                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfAllPreviousVersions".PairedWith("YouAreNotTheCreatorOfAllPreviousVersions"))));
-                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(lastVersionCreator, card.Id.AsArray())));
-                StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfAllPreviousVersions");
-            }
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                Assert.AreEqual(card.Id, dbContext.Cards.Single().Id);
-                Assert.AreEqual(card.Id, dbContext.CardPreviousVersions.Single().Card);
+                Assert.IsFalse(dbContext.Cards.Any());
+                Assert.AreEqual(3, dbContext.CardPreviousVersions.Count());
             }
         }
         [TestMethod()]
@@ -176,26 +181,61 @@ namespace MemCheck.Application.Cards
             }
         }
         [TestMethod()]
-        public async Task FailIfNotCreatorOfCurrentVersion()
+        public async Task FailIfOtherUserHasCardInDeck()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var firstVersionCreator = await UserHelper.CreateInDbAsync(db);
+            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
             var languageId = await CardLanguagHelper.CreateAsync(db);
-            var card = await CardHelper.CreateAsync(db, firstVersionCreator, language: languageId);
-            var lastVersionCreator = await UserHelper.CreateInDbAsync(db);
-            using (var dbContext = new MemCheckDbContext(db))
-                await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), lastVersionCreator));
-            using (var dbContext = new MemCheckDbContext(db))
-            {
-                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfCurrentVersion".PairedWith("YouAreNotTheCreatorOfCurrentVersion"))));
-                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(firstVersionCreator, card.Id.AsArray())));
-                StringAssert.Contains(e.Message, "YouAreNotTheCreatorOfCurrentVersion");
-            }
+            var cardId = await CardHelper.CreateIdAsync(db, cardCreatorId, language: languageId);
+
+            var otherUserId = await UserHelper.CreateInDbAsync(db);
+            var deckId = await DeckHelper.CreateAsync(db, otherUserId);
+            await DeckHelper.AddCardAsync(db, deckId, cardId);
+
             using (var dbContext = new MemCheckDbContext(db))
             {
-                Assert.AreEqual(card.Id, dbContext.Cards.Single().Id);
-                Assert.AreEqual(card.Id, dbContext.CardPreviousVersions.Single().Card);
+                var errorMesg = RandomHelper.String();
+                var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("OneUserHasCardWithFrontSide".PairedWith(errorMesg))));
+                var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(cardCreatorId, cardId.AsArray())));
+                StringAssert.Contains(e.Message, errorMesg);
             }
+
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.AreEqual(cardId, dbContext.Cards.Single().Id);
+        }
+        [TestMethod()]
+        public async Task SucceedsIfDeleterHasCardInDeck()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, cardCreatorId, language: languageId);
+
+            var deckId = await DeckHelper.CreateAsync(db, cardCreatorId);
+            await DeckHelper.AddCardAsync(db, deckId, cardId);
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(cardCreatorId, cardId.AsArray()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.IsFalse(dbContext.Cards.Any());
+        }
+        [TestMethod()]
+        public async Task SucceedsIfCardHasRating()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var cardCreatorId = await UserHelper.CreateInDbAsync(db);
+            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var cardId = await CardHelper.CreateIdAsync(db, cardCreatorId, language: languageId);
+
+            var raterId = await UserHelper.CreateInDbAsync(db);
+            await RatingHelper.RecordForUserAsync(db, raterId, cardId, RandomHelper.Rating());
+
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(cardCreatorId, cardId.AsArray()));
+
+            using (var dbContext = new MemCheckDbContext(db))
+                Assert.IsFalse(dbContext.Cards.Any());
         }
         [TestMethod()]
         public async Task SucceedsIfCreatorOfCurrentVersionIsDeleted()
@@ -237,6 +277,35 @@ namespace MemCheck.Application.Cards
             {
                 Assert.AreEqual(1, dbContext.Images.Count());
                 Assert.AreEqual(0, dbContext.ImagesInCards.Count());
+            }
+        }
+        [TestMethod()]
+        public async Task DeleteThreeCardsSuccessfully()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user1 = await UserHelper.CreateInDbAsync(db);
+            var user2 = await UserHelper.CreateInDbAsync(db);
+            var language = await CardLanguagHelper.CreateAsync(db);
+
+            var deletedCard1Id = await CardHelper.CreateIdAsync(db, user1, language: language);
+            var deletedCard2Id = await CardHelper.CreateIdAsync(db, user2, language: language);
+            var deletedCard3Id = await CardHelper.CreateIdAsync(db, user1, language: language);
+
+            var deckId = await DeckHelper.CreateAsync(db, user2);
+            await DeckHelper.AddCardAsync(db, deckId, deletedCard1Id);
+
+            await RatingHelper.RecordForUserAsync(db, user1, deletedCard2Id, RandomHelper.Rating());
+
+            var nonDeletedCardId = await CardHelper.CreateIdAsync(db, user1, language: language);
+
+            var deletionDate = RandomHelper.Date();
+            using (var dbContext = new MemCheckDbContext(db))
+                await new DeleteCards(dbContext.AsCallContext(), deletionDate).RunAsync(new DeleteCards.Request(user2, new[] { deletedCard1Id, deletedCard2Id, deletedCard3Id }));
+
+            using (var dbContext = new MemCheckDbContext(db))
+            {
+                Assert.AreEqual(1, dbContext.Cards.Count());
+                Assert.AreEqual(nonDeletedCardId, dbContext.Cards.Single().Id);
             }
         }
     }

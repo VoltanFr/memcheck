@@ -62,6 +62,11 @@ namespace MemCheck.Application.QueryValidation
             if (!await dbContext.Cards.AsNoTracking().AnyAsync(card => card.Id == cardId))
                 throw new InvalidOperationException(ExceptionMesg_CardDoesNotExist);
         }
+        public static async Task CheckCardsExistAsync(MemCheckDbContext dbContext, IEnumerable<Guid> cardIds)
+        {
+            if (await dbContext.Cards.AsNoTracking().Where(card => cardIds.Contains(card.Id)).CountAsync() != cardIds.Count())
+                throw new InvalidOperationException(ExceptionMesg_CardDoesNotExist);
+        }
         public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
         {
             var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
