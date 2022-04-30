@@ -14,13 +14,30 @@
     background-color: var(--input-field-background-color);
 }
 
-.markdown-edit-div {
+.markdown-edit-main-div {
     padding: 0px;
     border-radius: 4px;
     color: ButtonText;
     background-color: transparent;
     border-style: none;
     margin: 0px;
+    width: 100%;
+}
+
+.markdown-edit-top-bar-div {
+    padding-left: 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    border-style: none;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.markdown-edit-text-input-div {
+    width: 100%;
+}
+
+.markdown-edit-preview-div {
     width: 100%;
 }
 
@@ -43,41 +60,6 @@
         background-color: ButtonFace;
         border-color: ButtonHighlight;
     }
-
-.markdown-edit-table {
-    display: table;
-    padding: 0px;
-    margin: 0px;
-    width: 100%;
-}
-
-.markdown-edit-table-body {
-    display: table;
-    width: 100%;
-    padding: 0px;
-}
-
-.markdown-edit-caption-row {
-    padding-left: 4px;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    border-style: none;
-    font-weight: bold;
-    display: table-row;
-    vertical-align: middle;
-}
-
-.markdown-edit-row {
-    padding: 0px;
-    border-style: none;
-    font-weight: normal;
-    vertical-align: middle;
-    display: table-row;
-}
-
-.markdown-edit-td {
-    display: table-cell;
-}
 
 .markdown-edit-preview {
     display: block;
