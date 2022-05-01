@@ -37,7 +37,7 @@ namespace MemCheck.Application.History
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray()); //Private
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: Array.Empty<Guid>()));    //Now public
@@ -55,7 +55,7 @@ namespace MemCheck.Application.History
         public async Task MultipleVersions()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
 
             var initialVersionCreatorName = RandomHelper.String();
             var initialVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: initialVersionCreatorName);

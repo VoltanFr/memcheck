@@ -33,7 +33,7 @@ namespace MemCheck.Application.Helpers
                 VersionType = CardVersionType.Creation
             };
             if (language == null)
-                language = await CardLanguagHelper.CreateAsync(testDB);
+                language = await CardLanguageHelper.CreateAsync(testDB);
             result.CardLanguage = await dbContext.CardLanguages.SingleAsync(l => l.Id == language);
             if (versionDate != null)
             {

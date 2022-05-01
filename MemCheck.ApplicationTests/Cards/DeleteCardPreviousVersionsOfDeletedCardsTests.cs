@@ -56,7 +56,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
             using (var dbContext = new MemCheckDbContext(db))
@@ -71,7 +71,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
             var runDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
@@ -91,7 +91,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
             var deletionDate = RandomHelper.Date();
             using (var dbContext = new MemCheckDbContext(db))
@@ -111,7 +111,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId);
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
             var runDate = RandomHelper.Date();
@@ -132,7 +132,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var runDate = RandomHelper.Date();
 
             var cardNotDeleted = await CardHelper.CreateAsync(db, user, language: languageId);
@@ -177,7 +177,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var tag1 = await TagHelper.CreateAsync(db);
             var tag2 = await TagHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId, tagIds: new[] { tag1, tag2 });
@@ -208,7 +208,7 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var otherUser = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, user, language: languageId, userWithViewIds: user.AsArray());
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, new[] { user, otherUser }));
             var deletionDate = RandomHelper.Date();
@@ -235,7 +235,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var image = await ImageHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user, language: languageId, frontSideImages: image.AsArray());
             using (var dbContext = new MemCheckDbContext(db))
@@ -270,7 +270,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
-            var languageId = await CardLanguagHelper.CreateAsync(db);
+            var languageId = await CardLanguageHelper.CreateAsync(db);
             var image1 = await ImageHelper.CreateAsync(db, user);
             var image2 = await ImageHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user, language: languageId, frontSideImages: image1.AsArray());

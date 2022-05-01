@@ -30,7 +30,7 @@ namespace MemCheck.Application.History
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
@@ -44,7 +44,7 @@ namespace MemCheck.Application.History
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
@@ -63,7 +63,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalFrontSide = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription, userWithViewIds: userId.AsArray());
             var newFrontSide = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -86,7 +86,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalFrontSide = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription);
             var newFrontSide = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -109,7 +109,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalFrontSide = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription);
             var newFrontSide = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -150,7 +150,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalFrontSide = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, frontSide: originalFrontSide, language: language, versionDescription: originalVersionDescription, userWithViewIds: new[] { userId, allowedUserId });
             var newFrontSide = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -190,7 +190,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalBackSide = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, backSide: originalBackSide, language: language, versionDescription: originalVersionDescription);
             var newBackSide = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -230,12 +230,12 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
             var originalLanguageName = RandomHelper.String();
-            var originalLanguage = await CardLanguagHelper.CreateAsync(db, originalLanguageName);
+            var originalLanguage = await CardLanguageHelper.CreateAsync(db, originalLanguageName);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: originalLanguage, versionDescription: originalVersionDescription);
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
             var newLanguageName = RandomHelper.String();
-            var newVersionLanguage = await CardLanguagHelper.CreateAsync(db, newLanguageName);
+            var newVersionLanguage = await CardLanguageHelper.CreateAsync(db, newLanguageName);
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForLanguageChange(card, newVersionLanguage, versionDescription: newVersionDescription));
             Guid previousVersionId;
@@ -271,7 +271,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalAdditionInfo = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, additionalInfo: originalAdditionInfo, language: language, versionDescription: originalVersionDescription);
             var newAdditionalInfo = RandomHelper.String();
             var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -311,7 +311,7 @@ namespace MemCheck.Application.History
             var originalVersionDate = RandomHelper.Date();
             var originalReferences = RandomHelper.String();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, references: originalReferences, language: language, versionDescription: originalVersionDescription);
             var additionalInfo = RandomHelper.String();
             var newReferences = RandomHelper.String();
@@ -356,7 +356,7 @@ namespace MemCheck.Application.History
             var originalTagId1 = await TagHelper.CreateAsync(db, originalTagName1);
             var originalTagName2 = RandomHelper.String();
             var originalTagId2 = await TagHelper.CreateAsync(db, originalTagName2);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, tagIds: new[] { originalTagId1, originalTagId2 }, language: language, versionDescription: originalVersionDescription);
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
@@ -395,7 +395,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, userWithViewIds: userId.AsArray(), language: language, versionDescription: originalVersionDescription);
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
@@ -433,7 +433,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var imageName = RandomHelper.String();
             var image = await ImageHelper.CreateAsync(db, userId, imageName);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSideImages: image.AsArray(), versionDescription: originalVersionDescription);
@@ -473,7 +473,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, versionDescription: originalVersionDescription);
             var newVersionDate = RandomHelper.Date(originalVersionDate);
             var newVersionDescription = RandomHelper.String();
@@ -513,7 +513,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var originalVersionImageName = RandomHelper.String();
             var originalVersionImage = await ImageHelper.CreateAsync(db, userId, originalVersionImageName);
             var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, additionalSideImages: originalVersionImage.AsArray(), versionDescription: originalVersionDescription);
@@ -555,7 +555,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
             var originalVersionDate = RandomHelper.Date();
             var originalVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var originalVersionImageName = RandomHelper.String();
             var originalVersionImage = await ImageHelper.CreateAsync(db, userId, originalVersionImageName);
             var originalFrontSide = RandomHelper.String();
@@ -618,7 +618,7 @@ namespace MemCheck.Application.History
             var userId = await UserHelper.CreateInDbAsync(db);
             var initialVersionDate = RandomHelper.Date();
             var intialVersionDescription = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var initialFrontSide = RandomHelper.String();
             var initialReferences = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, userId, initialVersionDate, language: language, frontSide: initialFrontSide, references: initialReferences, versionDescription: intialVersionDescription);

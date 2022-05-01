@@ -36,7 +36,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray());
             var otherUserId = await UserHelper.CreateInDbAsync(db);
             using var dbContext = new MemCheckDbContext(db);
@@ -46,7 +46,7 @@ namespace MemCheck.Application.Cards
         public async Task CardWithPreviousVersion()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
 
             var firstVersionCreatorId = await UserHelper.CreateInDbAsync(db);
             var firstVersionDate = RandomHelper.Date();
@@ -78,7 +78,7 @@ namespace MemCheck.Application.Cards
         {
             var db = DbHelper.GetEmptyTestDB();
             var languageName = RandomHelper.String();
-            var language = await CardLanguagHelper.CreateAsync(db, languageName);
+            var language = await CardLanguageHelper.CreateAsync(db, languageName);
             var creatorName = RandomHelper.String();
             var creatorId = await UserHelper.CreateInDbAsync(db, userName: creatorName);
             var creationDate = RandomHelper.Date();

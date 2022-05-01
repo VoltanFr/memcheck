@@ -251,7 +251,7 @@ namespace MemCheck.Application.Cards
         public async Task OneCardInNonFrench()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var otherLanguage = await CardLanguagHelper.CreateAsync(db, RandomHelper.String());
+            var otherLanguage = await CardLanguageHelper.CreateAsync(db, RandomHelper.String());
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user, language: otherLanguage);
@@ -266,7 +266,7 @@ namespace MemCheck.Application.Cards
         public async Task OneCardInFrench()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var french = await CardLanguagHelper.CreateAsync(db, "Français");
+            var french = await CardLanguageHelper.CreateAsync(db, "Français");
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var card = await CardHelper.CreateAsync(db, user, language: french);
@@ -281,8 +281,8 @@ namespace MemCheck.Application.Cards
         public async Task TwoCardsWithLanguages()
         {
             var db = DbHelper.GetEmptyTestDB();
-            var french = await CardLanguagHelper.CreateAsync(db, "Français");
-            var otherLanguage = await CardLanguagHelper.CreateAsync(db, RandomHelper.String());
+            var french = await CardLanguageHelper.CreateAsync(db, "Français");
+            var otherLanguage = await CardLanguageHelper.CreateAsync(db, RandomHelper.String());
             var user = await UserHelper.CreateInDbAsync(db);
             var deck = await DeckHelper.CreateAsync(db, user);
             var frenchCreatedCard = await CardHelper.CreateAsync(db, user, language: french);

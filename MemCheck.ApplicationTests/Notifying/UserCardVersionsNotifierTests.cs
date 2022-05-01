@@ -17,7 +17,7 @@ namespace MemCheck.Application.Notifying
         #region Private methods
         private static async Task<CardPreviousVersion> CreateCardPreviousVersionAsync(DbContextOptions<MemCheckDbContext> testDB, Guid versionCreatorId, Guid cardId, DateTime versionDate)
         {
-            var cardLanguageId = await CardLanguagHelper.CreateAsync(testDB);
+            var cardLanguageId = await CardLanguageHelper.CreateAsync(testDB);
 
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();

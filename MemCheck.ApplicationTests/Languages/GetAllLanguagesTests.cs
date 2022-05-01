@@ -21,7 +21,7 @@ namespace MemCheck.Application.Languages
         {
             var db = DbHelper.GetEmptyTestDB();
             var name = RandomHelper.String();
-            var id = await CardLanguagHelper.CreateAsync(db, name);
+            var id = await CardLanguageHelper.CreateAsync(db, name);
 
             using var dbContext = new MemCheckDbContext(db);
             var result = await new GetAllLanguages(dbContext.AsCallContext()).RunAsync(new GetAllLanguages.Request());
@@ -35,9 +35,9 @@ namespace MemCheck.Application.Languages
         {
             var db = DbHelper.GetEmptyTestDB();
             var language1Name = RandomHelper.String();
-            var language1 = await CardLanguagHelper.CreateAsync(db, language1Name);
+            var language1 = await CardLanguageHelper.CreateAsync(db, language1Name);
             var language2Name = RandomHelper.String();
-            var language2 = await CardLanguagHelper.CreateAsync(db, language2Name);
+            var language2 = await CardLanguageHelper.CreateAsync(db, language2Name);
             var user = await UserHelper.CreateInDbAsync(db);
             await CardHelper.CreateAsync(db, versionCreatorId: user, language: language1);
             await CardHelper.CreateAsync(db, versionCreatorId: user, language: language1);

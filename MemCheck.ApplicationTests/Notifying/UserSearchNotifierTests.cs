@@ -78,7 +78,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), language: language);
             var card2 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 04, 02), language: language);
 
@@ -117,7 +117,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card1 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), language: language);
             var card2 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 04, 02), language: language);
 
@@ -169,7 +169,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card1 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 03, 01), language: language);
             var card2 = await CardHelper.CreateAsync(db, user, versionDate: new DateTime(2050, 04, 02), language: language);
 
@@ -225,7 +225,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var requiredTag = await TagHelper.CreateAsync(db);
             var excludedTag = await TagHelper.CreateAsync(db);
 
@@ -285,7 +285,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var user = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var ignoredTag = await TagHelper.CreateAsync(db);
             var requiredTag1 = await TagHelper.CreateAsync(db);
             var requiredTag2 = await TagHelper.CreateAsync(db);
@@ -355,7 +355,7 @@ namespace MemCheck.Application.Notifying
 
             var userName = RandomHelper.String();
             var user = await UserHelper.CreateInDbAsync(db, userName: userName);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
 
             for (int i = 0; i < SearchCards.Request.MaxPageSize * 2; i++)
                 await CardHelper.CreateAsync(db, user, language: language);
@@ -419,7 +419,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var cardCreator = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
             var subscriber = await UserHelper.CreateInDbAsync(db);
             var subscription = await SearchSubscriptionHelper.CreateAsync(db, subscriber, requiredText: card.FrontSide);
@@ -461,7 +461,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var cardCreator = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
 
             var subscriber = await UserHelper.CreateInDbAsync(db);
@@ -505,7 +505,7 @@ namespace MemCheck.Application.Notifying
 
             var cardCreatorUserName = RandomHelper.String();
             var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorUserName);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
 
             var subscriber = await UserHelper.CreateInDbAsync(db);
@@ -552,7 +552,7 @@ namespace MemCheck.Application.Notifying
             var db = DbHelper.GetEmptyTestDB();
 
             var cardCreator = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
             var subscriber = await UserHelper.CreateInDbAsync(db);
             var subscription = await SearchSubscriptionHelper.CreateAsync(db, subscriber);

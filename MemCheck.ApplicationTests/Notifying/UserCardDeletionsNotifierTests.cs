@@ -28,7 +28,7 @@ namespace MemCheck.Application.Notifying
         {
             //userWithViewIds null means public card
 
-            var cardLanguageId = await CardLanguagHelper.CreateAsync(testDB);
+            var cardLanguageId = await CardLanguageHelper.CreateAsync(testDB);
 
             using var dbContext = new MemCheckDbContext(testDB);
             var creator = await dbContext.Users.Where(u => u.Id == versionCreatorId).SingleAsync();

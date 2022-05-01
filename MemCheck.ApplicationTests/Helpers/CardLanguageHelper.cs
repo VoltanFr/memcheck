@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Helpers
 {
-    public static class CardLanguagHelper
+    public static class CardLanguageHelper
     {
         public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, string? name = null)
         {

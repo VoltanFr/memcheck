@@ -38,7 +38,7 @@ namespace MemCheck.Application.History
         {
             var db = DbHelper.GetEmptyTestDB();
             var userId = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var card = await CardHelper.CreateAsync(db, userId, language: language);    //Created public
             using (var dbContext = new MemCheckDbContext(db))
                 await new UpdateCard(dbContext.AsCallContext()).RunAsync(UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userId.AsArray()));    //Now private
@@ -113,7 +113,7 @@ namespace MemCheck.Application.History
             var db = DbHelper.GetEmptyTestDB();
             var userName = RandomHelper.String();
             var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var oldestDate = RandomHelper.Date();
             var oldestDescription = RandomHelper.String();
             var card = await CardHelper.CreateAsync(db, userId, language: language, versionDate: oldestDate, versionDescription: oldestDescription);

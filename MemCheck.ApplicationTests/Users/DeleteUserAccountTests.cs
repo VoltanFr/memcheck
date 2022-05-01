@@ -306,7 +306,7 @@ namespace MemCheck.Application.Users
         {
             var db = DbHelper.GetEmptyTestDB();
             var loggedUser = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var userToDelete = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, userToDelete, language: language);
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String()));
@@ -329,7 +329,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var loggedUserName = RandomHelper.String();
             var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var userToDelete = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: new[] { loggedUser, userToDelete });
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: loggedUser));
@@ -352,7 +352,7 @@ namespace MemCheck.Application.Users
             var db = DbHelper.GetEmptyTestDB();
             var loggedUserName = RandomHelper.String();
             var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var userToDelete = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, loggedUser, language: language);
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: userToDelete));
@@ -374,7 +374,7 @@ namespace MemCheck.Application.Users
         {
             var db = DbHelper.GetEmptyTestDB();
             var loggedUser = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var userToDelete = await UserHelper.CreateInDbAsync(db);
             var card = await CardHelper.CreateAsync(db, userToDelete, language: language);  //Public
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForVisibilityChange(card, userWithViewIds: userToDelete.AsArray())); //Private
@@ -396,7 +396,7 @@ namespace MemCheck.Application.Users
         {
             var db = DbHelper.GetEmptyTestDB();
             var loggedUser = await UserHelper.CreateInDbAsync(db);
-            var language = await CardLanguagHelper.CreateAsync(db);
+            var language = await CardLanguageHelper.CreateAsync(db);
             var userToDelete = await UserHelper.CreateInDbAsync(db);
             var privateCardToDelete = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: userToDelete.AsArray());
             await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForBackSideChange(privateCardToDelete, RandomHelper.String()));
