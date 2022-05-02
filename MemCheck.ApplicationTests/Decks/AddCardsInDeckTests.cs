@@ -1,16 +1,11 @@
-﻿using MemCheck.Application.Helpers;
-using MemCheck.Application.QueryValidation;
-using MemCheck.Basics;
-using MemCheck.Database;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MemCheck.Application.Decks
 {
     [TestClass()]
     public class AddCardsInDeckTests
     {
+        /*
         [TestMethod()]
         public async Task UserNotLoggedIn()
         {
@@ -143,5 +138,6 @@ namespace MemCheck.Application.Decks
 
             await DeckHelper.CheckDeckContainsCards(db, deck, card1.Id, card2.Id, card3.Id);
         }
+        */
     }
 }
