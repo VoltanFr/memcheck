@@ -23,7 +23,7 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         var result = new List<GetAllUsers.ResultUserModel>();
         while (true)
         {
-            var getterResult = await getter.RunAsync(new GetAllUsers.Request(RunningUserId, 2, page, ""));
+            var getterResult = await getter.RunAsync(new GetAllUsers.Request(RunningUserId, 50, page, ""));
             if (getterResult.Users.Any())
             {
                 result.AddRange(getterResult.Users);
