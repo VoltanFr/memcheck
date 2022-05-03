@@ -2,18 +2,17 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
-		<VersionPrefix>0.7.6</VersionPrefix>
+		<VersionPrefix>0.7.7</VersionPrefix>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AzureFunctions.Authentication" Version="4.0.3" />
 		<PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.4" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.1" />
-		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
-		<PackageReference Include="SendGrid" Version="9.25.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.4" />
+		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.0" />
+		<PackageReference Include="SendGrid" Version="9.27.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
