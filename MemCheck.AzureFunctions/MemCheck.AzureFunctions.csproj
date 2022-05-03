@@ -2,9 +2,10 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<AzureFunctionsVersion>v4</AzureFunctionsVersion>
-		<VersionPrefix>0.7.5</VersionPrefix>
+		<VersionPrefix>0.7.6</VersionPrefix>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AzureFunctions.Authentication" Version="4.0.3" />
 		<PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1" />
