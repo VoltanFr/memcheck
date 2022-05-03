@@ -1,11 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Ratings;
+using MemCheck.Basics;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class UpdateCardTests
     {
-        /*
         [TestMethod()]
         public async Task UserNotLoggedIn()
         {
@@ -850,6 +859,5 @@ namespace MemCheck.Application.Cards
             var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
             Assert.AreEqual(errorMesg, exception.Message);
         }
-        */
     }
 }

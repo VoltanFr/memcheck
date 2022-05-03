@@ -1,11 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.Notifiying;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying
 {
     [TestClass()]
     public class AddCardSubscriptionsTest
     {
-        /*
         [TestMethod()]
         public async Task TestRun()
         {
@@ -38,6 +44,5 @@ namespace MemCheck.Application.Notifying
             var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
         }
-        */
     }
 }

@@ -1,11 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Tags
 {
     [TestClass()]
     public class UpdateTagTests
     {
-        /*
         [TestMethod()]
         public async Task DoesNotExist()
         {
@@ -269,6 +275,5 @@ namespace MemCheck.Application.Tags
                 Assert.AreEqual(newDescription, loaded.Description);
             }
         }
-        */
     }
 }

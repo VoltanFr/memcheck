@@ -75,9 +75,8 @@ namespace MemCheck.Application.QueryValidation
         }
         public static async Task CheckUsersExistAsync(MemCheckDbContext dbContext, IEnumerable<Guid> userIds)
         {
-            await Task.CompletedTask;
-            //if (await dbContext.Users.AsNoTracking().Where(user => userIds.Contains(user.Id)).CountAsync() != userIds.Count())
-            //    throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
+            if (await dbContext.Users.AsNoTracking().Where(user => userIds.Contains(user.Id)).CountAsync() != userIds.Count())
+                throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
         }
         public static async Task CheckUserExistsAndIsAdminAsync(MemCheckDbContext dbContext, Guid userId, IRoleChecker roleChecker)
         {
@@ -116,9 +115,8 @@ namespace MemCheck.Application.QueryValidation
         }
         public static async Task CheckTagsExistAsync(IEnumerable<Guid> tagIds, MemCheckDbContext dbContext)
         {
-            await Task.CompletedTask;
-            //if (await dbContext.Tags.AsNoTracking().Where(tag => tagIds.Contains(tag.Id)).CountAsync() != tagIds.Count())
-            //    throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
+            if (await dbContext.Tags.AsNoTracking().Where(tag => tagIds.Contains(tag.Id)).CountAsync() != tagIds.Count())
+                throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
         }
         public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer, IRoleChecker roleChecker, Guid userId)
         {
@@ -242,8 +240,7 @@ namespace MemCheck.Application.QueryValidation
             //It would probably be nicer that the admin defines the perso tag somewhere in the config of the app, and we use this tag's id
             //Can be considered later
             //Currently I indulge myself with this trick
-            return false;
-            //return tagName.Equals(Tag.Perso, StringComparison.OrdinalIgnoreCase);
+            return tagName.Equals(Tag.Perso, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

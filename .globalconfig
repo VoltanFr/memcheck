@@ -30,6 +30,3 @@ dotnet_diagnostic.CA1062.severity = none
 
 # I want to use underscores in some names
 dotnet_diagnostic.CA1707.severity = none
-
-# Temporary rollback
-dotnet_diagnostic.IDE0060.severity = none

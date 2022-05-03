@@ -1,11 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
+using MemCheck.Basics;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class DeleteCardsTests
     {
-        /*
         [TestMethod()]
         public async Task FailIfUserDoesNotExist()
         {
@@ -299,6 +308,5 @@ namespace MemCheck.Application.Cards
                 Assert.AreEqual(nonDeletedCardId, dbContext.Cards.Single().Id);
             }
         }
-        */
     }
 }

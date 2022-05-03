@@ -1,11 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
+using MemCheck.Database;
+using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
     [TestClass()]
     public class AddTagToCardsTests
     {
-        /*
         [TestMethod()]
         public async Task UserNotLoggedInMustFail()
         {
@@ -255,6 +264,5 @@ namespace MemCheck.Application.Cards
                 CollectionAssert.Contains(cardFromDb.TagsInCards.Select(tag => tag.TagId).ToArray(), persoTagId);
             }
         }
-        */
     }
 }
