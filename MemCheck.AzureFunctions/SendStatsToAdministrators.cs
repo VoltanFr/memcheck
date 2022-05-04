@@ -41,7 +41,7 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     }
     [FunctionName(FuncName)]
     public async Task Run([TimerTrigger(
-        Constants.CronAt3Daily
+        Constants.CronEvery5Min
         #if DEBUG
         //, RunOnStartup = true
         #endif
