@@ -5,7 +5,6 @@
 		<VersionPrefix>0.7.11</VersionPrefix>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.4" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
