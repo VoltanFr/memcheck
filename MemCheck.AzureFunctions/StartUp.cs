@@ -20,5 +20,7 @@ public class Startup : FunctionsStartup
             .AddRoles<MemCheckUserRole>()
             .AddUserManager<MemCheckUserManager>()
             .AddEntityFrameworkStores<MemCheckDbContext>();
+
+        builder.Services.AddAuthentication();
     }
 }
