@@ -35,8 +35,8 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         return result.ToImmutableList();
     }
     #endregion
-    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
-        : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
+    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger<SendStatsToAdministrators> logger)
+        : base(telemetryConfiguration, memCheckDbContext, logger)
     {
     }
     [FunctionName(FuncName)]

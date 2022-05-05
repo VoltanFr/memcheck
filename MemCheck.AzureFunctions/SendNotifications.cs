@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MemCheck.Application.Notifiying;
-using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -40,8 +39,8 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     #region Fields
     private const string FuncName = nameof(SendNotifications);
     #endregion
-    public SendNotifications(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendNotifications> logger)
-        : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
+    public SendNotifications(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger<SendNotifications> logger)
+        : base(telemetryConfiguration, memCheckDbContext, logger)
     {
     }
     [FunctionName(FuncName)]
