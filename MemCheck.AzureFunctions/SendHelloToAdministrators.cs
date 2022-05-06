@@ -27,14 +27,7 @@ public sealed class SendHelloToAdministrators
         )] TimerInfo myTimer, ExecutionContext context)
     {
         var mailSender = new MailSender(FuncName, DateTime.UtcNow, logger);
-        try
-        {
-            var mailBody = $"<h1>MemCheck says hello</h1><h2>Time here</h2><p>{DateTime.Now}</p>";
-            await mailSender.SendAsync("MemCheck hello", mailBody, new EmailAddress("MemCheckAdm@gmail.com").AsArray());
-        }
-        catch (Exception ex)
-        {
-            await mailSender.SendFailureInfoMailAsync(ex);
-        }
+        var mailBody = $"<h1>MemCheck says hello</h1><h2>Time here</h2><p>{DateTime.Now}</p>";
+        await mailSender.SendAsync("MemCheck hello", mailBody, new EmailAddress("MemCheckAdm@gmail.com").AsArray());
     }
 }

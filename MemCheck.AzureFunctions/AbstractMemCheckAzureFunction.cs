@@ -87,6 +87,7 @@ public abstract class AbstractMemCheckAzureFunction
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
     protected abstract string FunctionName { get; }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Really want to catch all possible problems")]
     protected async Task RunAsync()
     {
         try
