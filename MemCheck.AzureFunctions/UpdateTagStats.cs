@@ -20,9 +20,9 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
     }
     [FunctionName(FuncName)]
     public async Task Run([TimerTrigger(
-        Constants.CronAt2Daily
+        Constants.CronAt3Daily
         #if DEBUG
-        , RunOnStartup = true
+        //, RunOnStartup = true
         #endif
         )] TimerInfo myTimer, ExecutionContext context)
     {

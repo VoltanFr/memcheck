@@ -16,6 +16,15 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
+//This is not nice. I'm turning around the security and pretending the user id obtained as a parameter is sure to be an admin
+//It would be much better to request this info from a UserManager, using the real security.
+//Unfortunately, I failed to use a UserManager, with very obscure problems: when I add the commented code below in Startup.Configure, I get some errors in Azure with this message: System.InvalidOperationException : No authentication handlers are registered. Did you forget to call AddAuthentication().Add[SomeAuthHandler]("ArmToken",...)?
+//builder.Services.AddIdentityCore<MemCheckUser>(opt => { opt.SignIn.RequireConfirmedAccount = true; opt.User.RequireUniqueEmail = false; })
+//    .AddRoles<MemCheckUserRole>()
+//    .AddUserManager<MemCheckUserManager>()
+//    .AddEntityFrameworkStores<MemCheckDbContext>();
+
+
 public sealed class AzureFuncRoleChecker : IRoleChecker
 {
     #region Fields
@@ -78,7 +87,6 @@ public abstract class AbstractMemCheckAzureFunction
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
     protected abstract string FunctionName { get; }
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Really want to catch all possible problems")]
     protected async Task RunAsync()
     {
         try
