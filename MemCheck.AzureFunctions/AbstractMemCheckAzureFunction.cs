@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -73,14 +74,40 @@ public abstract class AbstractMemCheckAzureFunction
     #endregion
     protected AbstractMemCheckAzureFunction(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger logger)
     {
-        telemetryClient = new TelemetryClient(telemetryConfiguration);
-        this.memCheckDbContext = memCheckDbContext;
-        this.logger = logger;
-        RunningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
-        roleChecker = new AzureFuncRoleChecker(RunningUserId);
-        StartTime = DateTime.UtcNow;
-        MailSender = new MailSender(FunctionName, StartTime, logger);
-        admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
+        try
+        {
+            telemetryClient = new TelemetryClient(telemetryConfiguration);
+            this.memCheckDbContext = memCheckDbContext;
+            this.logger = logger;
+            RunningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
+            roleChecker = new AzureFuncRoleChecker(RunningUserId);
+            StartTime = DateTime.UtcNow;
+            MailSender = new MailSender(FunctionName, StartTime, logger);
+            admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"In AbstractMemCheckAzureFunction.Constructor for {GetType().Name}");
+            Console.WriteLine($"Caught {e.GetType().Name}");
+            Console.WriteLine($"Message: '{e.Message}'");
+            Console.WriteLine("Stack");
+            Console.WriteLine(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+            if (e.InnerException != null)
+            {
+                Console.WriteLine("****** Inner");
+                Console.WriteLine($"Caught {e.InnerException.GetType().Name}");
+                Console.WriteLine($"Message: '{e.InnerException.Message}'");
+                Console.WriteLine("Stack");
+                Console.WriteLine(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+            }
+            else
+                Console.WriteLine("No inner");
+            Console.WriteLine("****** Env vars");
+            var envVars = Environment.GetEnvironmentVariables();
+            foreach (DictionaryEntry envVar in envVars)
+                Console.WriteLine($"'{envVar.Key}'='{envVar.Value}'");
+            throw;
+        }
     }
     protected CallContext NewCallContext()
     {

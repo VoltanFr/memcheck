@@ -13,8 +13,5 @@ dotnet_diagnostic.CA1310.severity = none
 # Ok with classes never used
 dotnet_diagnostic.CA1812.severity = none
 
-# Ok to use litteral strings
-dotnet_diagnostic.CA1303.severity = none
-
 # Ok to catch Exception
 dotnet_diagnostic.CA1031.severity = none
