@@ -76,36 +76,60 @@ public abstract class AbstractMemCheckAzureFunction
     {
         try
         {
+            logger.LogInformation($"In AbstractMemCheckAzureFunction.Constructor for {GetType().Name}");
+            var envVars = Environment.GetEnvironmentVariables();
+            logger.LogInformation("Logging env vars");
+            foreach (DictionaryEntry envVar in envVars)
+                logger.LogInformation($"'{envVar.Key}'='{envVar.Value}'");
+            logger.LogInformation("Creating telemetryClient");
             telemetryClient = new TelemetryClient(telemetryConfiguration);
+            logger.LogInformation("Assigning memCheckDbContext");
             this.memCheckDbContext = memCheckDbContext;
+            logger.LogInformation("Assigning logger");
             this.logger = logger;
-            RunningUserId = new Guid(Environment.GetEnvironmentVariable("RunningUserId"));
+            logger.LogInformation("Assigning runningUserIdEnvVar");
+            string runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
+            if (runningUserIdEnvVar == null)
+            {
+                logger.LogError("runningUserIdEnvVar is null");
+                RunningUserId = Guid.Empty;
+            }
+            else
+            {
+                logger.LogInformation($"runningUserIdEnvVar = '{runningUserIdEnvVar}'");
+                RunningUserId = new Guid(runningUserIdEnvVar);
+            }
+            logger.LogInformation("Assigning roleChecker");
             roleChecker = new AzureFuncRoleChecker(RunningUserId);
+            logger.LogInformation("Assigning StartTime");
             StartTime = DateTime.UtcNow;
+            logger.LogInformation("Assigning MailSender");
             MailSender = new MailSender(FunctionName, StartTime, logger);
+            logger.LogInformation("Assigning admins");
             admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
+            logger.LogInformation("End of constructor");
         }
         catch (Exception e)
         {
-            Console.WriteLine($"In AbstractMemCheckAzureFunction.Constructor for {GetType().Name}");
-            Console.WriteLine($"Caught {e.GetType().Name}");
-            Console.WriteLine($"Message: '{e.Message}'");
-            Console.WriteLine("Stack");
-            Console.WriteLine(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+            logger.LogError($"Exception in AbstractMemCheckAzureFunction.Constructor for {GetType().Name}");
+            logger.LogError($"Caught {e.GetType().Name}");
+            logger.LogError($"Message: '{e.Message}'");
+            logger.LogError("Stack");
+            logger.LogError(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             if (e.InnerException != null)
             {
-                Console.WriteLine("****** Inner");
-                Console.WriteLine($"Caught {e.InnerException.GetType().Name}");
-                Console.WriteLine($"Message: '{e.InnerException.Message}'");
-                Console.WriteLine("Stack");
-                Console.WriteLine(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+                logger.LogError("****** Inner");
+                logger.LogError($"Caught {e.InnerException.GetType().Name}");
+                logger.LogError($"Message: '{e.InnerException.Message}'");
+                logger.LogError("Stack");
+                logger.LogError(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             }
             else
-                Console.WriteLine("No inner");
-            Console.WriteLine("****** Env vars");
+                logger.LogError("No inner");
+            logger.LogError("****** Env vars");
             var envVars = Environment.GetEnvironmentVariables();
             foreach (DictionaryEntry envVar in envVars)
-                Console.WriteLine($"'{envVar.Key}'='{envVar.Value}'");
+                logger.LogError($"'{envVar.Key}'='{envVar.Value}'");
             throw;
         }
     }
