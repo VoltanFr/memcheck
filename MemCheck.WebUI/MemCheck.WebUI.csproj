@@ -18,7 +18,7 @@
 	<ItemGroup>
 		<PackageReference Include="Markdig" Version="0.30.2" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.4">
