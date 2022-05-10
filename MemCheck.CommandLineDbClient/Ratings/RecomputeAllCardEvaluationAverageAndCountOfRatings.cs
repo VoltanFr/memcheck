@@ -36,7 +36,7 @@ namespace MemCheck.CommandLineDbClient.Ratings
                 var average = await dbContext.UserCardRatings.AsNoTracking().Where(c => c.CardId == cardId).Select(c => c.Rating).AverageAsync();
 
                 var card = await dbContext.Cards.Where(c => c.Id == cardId).SingleAsync();
-                logger.LogInformation($"Will update to average eval {average} with a count of {count} evals: { card.FrontSide.Truncate(100)}");
+                logger.LogInformation($"Will update to average eval {average} with a count of {count} evals: {card.FrontSide.Truncate(100)}");
 
                 card.RatingCount = count;
                 card.AverageRating = average;
