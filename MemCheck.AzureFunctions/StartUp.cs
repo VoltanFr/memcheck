@@ -1,4 +1,6 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Users;
+using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +16,9 @@ public class Startup : FunctionsStartup
     {
         builder.Services.AddDbContext<MemCheckDbContext>(options => SqlServerDbContextOptionsExtensions.UseSqlServer(options, Environment.GetEnvironmentVariable("MemCheckDbConnectionString")));
 
-        //builder.Services.AddIdentityCore<MemCheckUser>(opt => { opt.SignIn.RequireConfirmedAccount = true; opt.User.RequireUniqueEmail = false; })
-        //    .AddRoles<MemCheckUserRole>()
-        //    .AddUserManager<MemCheckUserManager>()
-        //    .AddEntityFrameworkStores<MemCheckDbContext>();
+        builder.Services.AddIdentityCore<MemCheckUser>(opt => { opt.SignIn.RequireConfirmedAccount = true; opt.User.RequireUniqueEmail = false; })
+            .AddRoles<MemCheckUserRole>()
+            .AddUserManager<MemCheckUserManager>()
+            .AddEntityFrameworkStores<MemCheckDbContext>();
     }
 }
