@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
@@ -12,8 +13,8 @@ public sealed class SendHelloToAdministrators : AbstractMemCheckAzureFunction
     #region Fields
     private const string FuncName = nameof(SendHelloToAdministrators);
     #endregion
-    public SendHelloToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger<SendHelloToAdministrators> logger)
-        : base(telemetryConfiguration, memCheckDbContext, logger)
+    public SendHelloToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendHelloToAdministrators> logger)
+        : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
     [FunctionName(FuncName)]

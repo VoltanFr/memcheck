@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application.Tags;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
@@ -14,8 +15,8 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
     #region Fields
     private const string FuncName = nameof(UpdateTagStats);
     #endregion
-    public UpdateTagStats(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger<UpdateTagStats> logger)
-        : base(telemetryConfiguration, memCheckDbContext, logger)
+    public UpdateTagStats(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<UpdateTagStats> logger)
+        : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
     [FunctionName(FuncName)]

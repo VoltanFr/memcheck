@@ -35,13 +35,13 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         return result.ToImmutableList();
     }
     #endregion
-    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, ILogger<SendStatsToAdministrators> logger)
-        : base(telemetryConfiguration, memCheckDbContext, logger)
+    public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
+        : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
     [FunctionName(FuncName)]
     public async Task Run([TimerTrigger(
-        Constants.CronAt2Daily
+        Constants.CronEach5Min
         #if DEBUG
         , RunOnStartup = true
         #endif
