@@ -29,7 +29,7 @@ public sealed class SendHelloToAdministrators : AbstractMemCheckAzureFunction
     protected override string FunctionName => FuncName;
     protected override async Task DoRunAsync()
     {
-        var mailBody = $"<h1>MemCheck says hello</h1><h2>Time here</h2><p>{DateTime.Now}</p>";
+        var mailBody = $"<h1>MemCheck says hello</h1><h2>Time here</h2><p>{DateTime.Now}</p>" + MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync());
         await MailSender.SendAsync("MemCheck hello", mailBody, await AdminsAsync());
     }
 }
