@@ -24,6 +24,7 @@ namespace MemCheck.Application.Cards
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(Guid.Empty, Array.Empty<Guid>(), 10);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
+            Assert.IsFalse(dbContext.DemoDownloadAuditTrailEntries.Any());
         }
         [TestMethod()]
         public async Task NonexistentTag()
@@ -33,6 +34,7 @@ namespace MemCheck.Application.Cards
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(RandomHelper.Guid(), Array.Empty<Guid>(), 10);
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
+            Assert.IsFalse(dbContext.DemoDownloadAuditTrailEntries.Any());
         }
         [TestMethod()]
         public async Task NoCardInDb()
@@ -42,8 +44,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task OneCardWithoutTag()
@@ -56,8 +65,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task OneCardWithOtherTag()
@@ -71,8 +87,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task OneCardWithTheRequestedTag()
@@ -84,9 +107,16 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.AreEqual(1, result.Cards.Count());
             Assert.AreEqual(cardId, result.Cards.Single().CardId);
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(1, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task OneExcludedCard()
@@ -98,8 +128,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, cardId.AsArray(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task ExcludedCardInList()
@@ -113,9 +150,16 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, excludedCardId.AsArray(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.AreEqual(9, result.Cards.Count());
             Assert.IsFalse(result.Cards.Any(card => card.CardId == excludedCardId));
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(9, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task OneCardWithTheRequestedTagAndAnotherOne()
@@ -128,9 +172,16 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.AreEqual(1, result.Cards.Count());
             Assert.AreEqual(cardId, result.Cards.Single().CardId);
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(1, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task ObtainCorrectCount()
@@ -145,8 +196,15 @@ namespace MemCheck.Application.Cards
             using var dbContext = new MemCheckDbContext(db);
             var countRequested = RandomNumberGenerator.GetInt32(1, createdCount - 2);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), countRequested);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.AreEqual(countRequested, result.Cards.Count());
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(countRequested, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
         [TestMethod()]
         public async Task TestResultFields()
@@ -246,21 +304,38 @@ namespace MemCheck.Application.Cards
 
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), requestCardCount);
 
-            var firstRunCards = (await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
+            var firstRunDate = RandomHelper.Date();
+            var firstRunCards = (await new GetCardsForDemo(dbContext.AsCallContext(), firstRunDate).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, firstRunCards.Count);
             CollectionAssert.IsSubsetOf(firstRunCards, cardsWithRating5);
 
-            var secondRunCards = (await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
+            var secondRunDate = RandomHelper.Date();
+            var secondRunCards = (await new GetCardsForDemo(dbContext.AsCallContext(), secondRunDate).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, secondRunCards.Count);
             CollectionAssert.IsSubsetOf(secondRunCards, cardsWithRating5);
 
-            var thirdRunCards = (await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
+            var thirdRunDate = RandomHelper.Date();
+            var thirdRunCards = (await new GetCardsForDemo(dbContext.AsCallContext(), thirdRunDate).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
             Assert.AreEqual(requestCardCount, thirdRunCards.Count);
             CollectionAssert.IsSubsetOf(thirdRunCards, cardsWithRating5);
 
             Assert.IsFalse(firstRunCards.SetEquals(secondRunCards));
             Assert.IsFalse(firstRunCards.SetEquals(thirdRunCards));
             Assert.IsFalse(secondRunCards.SetEquals(thirdRunCards));
+
+            Assert.AreEqual(3, dbContext.DemoDownloadAuditTrailEntries.Count());
+
+            var firstRunAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single(entry => entry.DownloadUtcDate == firstRunDate);
+            Assert.AreEqual(tagId, firstRunAuditTrailEntry.TagId);
+            Assert.AreEqual(requestCardCount, firstRunAuditTrailEntry.CountOfCardsReturned);
+
+            var secondRunAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single(entry => entry.DownloadUtcDate == secondRunDate);
+            Assert.AreEqual(tagId, secondRunAuditTrailEntry.TagId);
+            Assert.AreEqual(requestCardCount, secondRunAuditTrailEntry.CountOfCardsReturned);
+
+            var thirdRunAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single(entry => entry.DownloadUtcDate == thirdRunDate);
+            Assert.AreEqual(tagId, thirdRunAuditTrailEntry.TagId);
+            Assert.AreEqual(requestCardCount, thirdRunAuditTrailEntry.CountOfCardsReturned);
         }
         [TestMethod()]
         public async Task OneCardPrivate()
@@ -272,8 +347,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
         }
         [TestMethod()]
         public async Task OneCardVisibleToSomeUsers()
@@ -286,8 +368,15 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.IsFalse(result.Cards.Any());
+
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(0, demoDownloadAuditTrailEntry.CountOfCardsReturned);
         }
         [TestMethod()]
         public async Task TwoCardsWithOnlyOnePublic()
@@ -300,9 +389,17 @@ namespace MemCheck.Application.Cards
 
             using var dbContext = new MemCheckDbContext(db);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), 10);
-            var result = await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request);
+            var runDate = RandomHelper.Date();
+            var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
             Assert.AreEqual(1, result.Cards.Count());
             Assert.AreEqual(publicCard.Id, result.Cards.Single().CardId);
+
+            Assert.AreEqual(1, dbContext.DemoDownloadAuditTrailEntries.Count());
+            var demoDownloadAuditTrailEntry = dbContext.DemoDownloadAuditTrailEntries.Single();
+            Assert.AreEqual(tagId, demoDownloadAuditTrailEntry.TagId);
+            Assert.AreEqual(runDate, demoDownloadAuditTrailEntry.DownloadUtcDate);
+            Assert.AreEqual(1, demoDownloadAuditTrailEntry.CountOfCardsReturned);
+            Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
     }
 }

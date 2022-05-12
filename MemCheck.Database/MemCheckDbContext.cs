@@ -42,6 +42,7 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public DbSet<RequiredTagInSearchSubscription> RequiredTagInSearchSubscriptions { get; set; } = null!;
     public DbSet<ExcludedTagInSearchSubscription> ExcludedTagInSearchSubscriptions { get; set; } = null!;
     public DbSet<CardInSearchResult> CardsInSearchResults { get; set; } = null!;
+    public DbSet<DemoDownloadAuditTrailEntry> DemoDownloadAuditTrailEntries { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

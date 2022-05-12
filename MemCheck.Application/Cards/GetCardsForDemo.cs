@@ -2,6 +2,7 @@
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace MemCheck.Application.Cards
      * We take a set of 3 times the number of requested cards, sorted by rating, then we shuffle this set. */
     public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, GetCardsForDemo.Result>
     {
+        #region Fields
+        private readonly DateTime? now;
+        #endregion
         #region Private method
         private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount)
         {
@@ -53,8 +57,9 @@ namespace MemCheck.Application.Cards
             return Shuffler.Shuffle(result).Take(cardCount);
         }
         #endregion
-        public GetCardsForDemo(CallContext callContext) : base(callContext)
+        public GetCardsForDemo(CallContext callContext, DateTime? now = null) : base(callContext)
         {
+            this.now = now;
         }
         protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
         {
@@ -64,6 +69,15 @@ namespace MemCheck.Application.Cards
 
             var result = new List<ResultCard>();
             result.AddRange(await GetUnknownCardsAsync(request.TagId, request.ExcludedCardIds, userNames, imageNames, tagNames, request.CardsToDownload));
+
+            var auditEntry = new DemoDownloadAuditTrailEntry()
+            {
+                TagId = request.TagId,
+                DownloadUtcDate = now == null ? DateTime.UtcNow : now.Value,
+                CountOfCardsReturned = result.Count
+            };
+            DbContext.DemoDownloadAuditTrailEntries.Add(auditEntry);
+            await DbContext.SaveChangesAsync();
 
             return new ResultWithMetrologyProperties<Result>(new Result(result),
                 ("TagId", request.TagId.ToString()),
