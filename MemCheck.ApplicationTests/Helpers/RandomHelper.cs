@@ -14,20 +14,20 @@ namespace MemCheck.Application.Helpers
         private static T EntryOfEnumerable<T>(IEnumerable<T> values)
         {
             var array = values.ToImmutableArray();
-            return array[RandomNumberGenerator.GetInt32(array.Length)];
+            return array[Int(array.Length)];
         }
         #endregion
         public static int ValueNotInSet(IEnumerable<int> excludedPossibilities)
         {
             var excl = excludedPossibilities.ToImmutableHashSet();
-            var result = RandomNumberGenerator.GetInt32(int.MaxValue);
+            var result = Int(int.MaxValue);
             while (excl.Contains(result))
-                result = RandomNumberGenerator.GetInt32(int.MaxValue);
+                result = Int(int.MaxValue);
             return result;
         }
         public static int Heap(bool notUnknown = false)
         {
-            return RandomNumberGenerator.GetInt32(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
+            return Int(notUnknown ? 1 : 0, CardInDeck.MaxHeapValue);
         }
         public static int HeapingAlgorithm()
         {
@@ -48,17 +48,17 @@ namespace MemCheck.Application.Helpers
         public static DateTime Date(DateTime? after = null)
         {
             var start = after == null ? new DateTime(1995, 1, 1) : after.Value;
-            return start.AddDays(RandomNumberGenerator.GetInt32(3650)).ToUniversalTime();
+            return start.AddDays(Int(3650)).ToUniversalTime();
         }
         public static DateTime DateBefore(DateTime d)
         {
-            return d.AddDays(-RandomNumberGenerator.GetInt32(1, 3650)).ToUniversalTime();
+            return d.AddDays(-Int(1, 3650)).ToUniversalTime();
         }
         public static int Rating(int excludedValue = 0)
         {
             while (true)
             {
-                var result = RandomNumberGenerator.GetInt32(1, 5);
+                var result = Int(1, 5);
                 if (result != excludedValue)
                     return result;
             }
@@ -69,11 +69,19 @@ namespace MemCheck.Application.Helpers
         }
         public static bool Bool()
         {
-            return RandomNumberGenerator.GetInt32(0, 1) == 1;
+            return Int(0, 1) == 1;
         }
         public static Guid Guid()
         {
             return System.Guid.NewGuid();
+        }
+        public static int Int(int toExclusive)
+        {
+            return Int(0, toExclusive);
+        }
+        public static int Int(int fromInclusive, int toExclusive)
+        {
+            return RandomNumberGenerator.GetInt32(fromInclusive, toExclusive);
         }
     }
 }

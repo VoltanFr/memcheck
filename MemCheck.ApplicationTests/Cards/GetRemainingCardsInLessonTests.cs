@@ -5,7 +5,6 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
@@ -140,7 +139,7 @@ namespace MemCheck.Application.Cards
             for (int currentCardIndex = 0; currentCardIndex < 100; currentCardIndex++)
             {
                 var heap = RandomHelper.Heap();
-                var lastLearnDate = runDate.AddDays(heap).AddDays(RandomNumberGenerator.GetInt32(-10, 10));
+                var lastLearnDate = runDate.AddDays(heap).AddDays(RandomHelper.Int(-10, 10));
                 await DeckHelper.AddNewCardAsync(db, deck, heap, lastLearnDate);
                 if (heap == 0)
                     unknownCardCount++;
@@ -178,10 +177,10 @@ namespace MemCheck.Application.Cards
             await DeckHelper.AddNewCardAsync(db, deck, CardInDeck.UnknownHeap, tagIds: new[] { tagToIgnore, otherTag });
 
             //Add non expired cards
-            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomNumberGenerator.GetInt32(-23, -1)));
-            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomNumberGenerator.GetInt32(-23, -1)), tagIds: tagToIgnore.AsArray());
-            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomNumberGenerator.GetInt32(-23, -1)), tagIds: otherTag.AsArray());
-            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomNumberGenerator.GetInt32(-23, -1)), tagIds: new[] { tagToIgnore, otherTag });
+            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)));
+            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: tagToIgnore.AsArray());
+            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: otherTag.AsArray());
+            await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: new[] { tagToIgnore, otherTag });
 
             //Add expired cards
             await DeckHelper.AddNewCardAsync(db, deck, 1, runDate.AddDays(-2));

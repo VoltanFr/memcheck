@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
@@ -189,12 +188,12 @@ namespace MemCheck.Application.Cards
             var db = DbHelper.GetEmptyTestDB();
             var user = await UserHelper.CreateInDbAsync(db);
             var tagId = await TagHelper.CreateAsync(db);
-            var createdCount = RandomNumberGenerator.GetInt32(5, 20);
+            var createdCount = RandomHelper.Int(5, 20);
             for (int i = 0; i < createdCount; i++)
                 await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
             using var dbContext = new MemCheckDbContext(db);
-            var countRequested = RandomNumberGenerator.GetInt32(1, createdCount - 2);
+            var countRequested = RandomHelper.Int(1, createdCount - 2);
             var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), countRequested);
             var runDate = RandomHelper.Date();
             var result = await new GetCardsForDemo(dbContext.AsCallContext(), runDate).RunAsync(request);
