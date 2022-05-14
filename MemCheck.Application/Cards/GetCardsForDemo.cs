@@ -80,7 +80,7 @@ namespace MemCheck.Application.Cards
             await DbContext.SaveChangesAsync();
 
             return new ResultWithMetrologyProperties<Result>(new Result(result),
-                ("TagId", request.TagId.ToString()),
+               GuidMetric("TagId", request.TagId),
                IntMetric("ExcludedCardCount", request.ExcludedCardIds.Count()),
                IntMetric("RequestedCardCount", request.CardsToDownload),
                IntMetric("ResultCount", result.Count));

@@ -17,6 +17,9 @@ namespace MemCheck.Application
         {
             return (key, value.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
         }
+        protected static (string key, string value) GuidMetric(string key, Guid value)
+        {
+            return (key, value.ToString());
+        }
     }
-
 }
