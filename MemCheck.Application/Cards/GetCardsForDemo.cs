@@ -88,6 +88,7 @@ namespace MemCheck.Application.Cards
         #region Request and Result
         public sealed class Request : IRequest
         {
+            public const int MaxCount = 100;
             public Request(Guid tagId, IEnumerable<Guid> excludedCardIds, int cardsToDownload)
             {
                 TagId = tagId;
@@ -104,7 +105,7 @@ namespace MemCheck.Application.Cards
                 await QueryValidationHelper.CheckTagExistsAsync(TagId, callContext.DbContext);
                 if (ExcludedCardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                     throw new RequestInputException($"Invalid card id");
-                if (CardsToDownload is < 1 or > 100)
+                if (CardsToDownload is < 1 or > MaxCount)
                     throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
             }
         }
