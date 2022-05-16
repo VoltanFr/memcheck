@@ -30,7 +30,7 @@ namespace MemCheck.Application.Helpers
                 {
                     if (!e.Message.Contains("Connection Timeout Expired") || attempts > 5)  //Happens sometimes in GitHub actions
                         throw;
-                    Thread.Sleep(5000);
+                    Thread.Sleep((attempts + 1) * 2000);
                 }
             }
         }
