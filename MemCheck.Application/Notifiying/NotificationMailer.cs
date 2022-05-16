@@ -20,7 +20,6 @@ public sealed class NotificationMailer
 {
     #region Fields
     private readonly CallContext callContext;
-    private readonly string globalReportToAddress;
     private readonly IMemCheckMailSender emailSender;
     private readonly IMemCheckLinkGenerator linkGenerator;
     #endregion
@@ -213,8 +212,6 @@ public sealed class NotificationMailer
     private static string GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
     {
         var mailBody = new StringBuilder()
-            .Append("<html>")
-            .Append("<body>")
             .Append(CultureInfo.InvariantCulture, $"<p>Sent {sentEmailCount} emails.</p>")
             .Append($"<p>Perf indicators...</p>")
             .Append("<ul>");
@@ -223,10 +220,6 @@ public sealed class NotificationMailer
         mailBody = mailBody
             .Append("</ul>")
             .Append(CultureInfo.InvariantCulture, $"<p>Finished at {DateTime.UtcNow} (UTC)</p>");
-
-        mailBody = mailBody
-            .Append("</body>")
-            .Append("</html>");
         return mailBody.ToString();
     }
     private static bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
@@ -242,14 +235,13 @@ public sealed class NotificationMailer
                 );
     }
     #endregion
-    public NotificationMailer(CallContext callContext, string globalReportToAddress, IMemCheckMailSender emailSender, IMemCheckLinkGenerator linkGenerator)
+    public NotificationMailer(CallContext callContext, IMemCheckMailSender emailSender, IMemCheckLinkGenerator linkGenerator)
     {
         this.callContext = callContext;
-        this.globalReportToAddress = globalReportToAddress;
         this.emailSender = emailSender;
         this.linkGenerator = linkGenerator;
     }
-    public async Task RunAsync()
+    public async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var mailSendingsToWaitFor = new List<Task>();
         var performanceIndicators = new List<string>();
@@ -264,7 +256,8 @@ public sealed class NotificationMailer
                 sentEmailCount++;
             }
 
-        mailSendingsToWaitFor.Add(emailSender.SendAsync(globalReportToAddress, "Notifier ended on success", GetAdminMailBody(sentEmailCount, performanceIndicators)));
         await Task.WhenAll(mailSendingsToWaitFor);
+
+        return GetAdminMailBody(sentEmailCount, performanceIndicators);
     }
 }

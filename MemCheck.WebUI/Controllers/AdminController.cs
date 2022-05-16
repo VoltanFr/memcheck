@@ -127,8 +127,8 @@ namespace MemCheck.WebUI.Controllers
             var launchingUser = await userManager.GetUserAsync(HttpContext.User);
             try
             {
-                var mailer = new NotificationMailer(callContext, launchingUser.Email, new MemCheckMailSender(emailSender), new MemCheckLinkGenerator(linkGenerator, HttpContext));
-                await mailer.RunAsync();
+                var mailer = new NotificationMailer(callContext, new MemCheckMailSender(emailSender), new MemCheckLinkGenerator(linkGenerator, HttpContext));
+                await mailer.RunAndCreateReportMailMainPartAsync();
                 return ControllerResultWithToast.Success("Notifications sent", this);
             }
             catch (Exception e)

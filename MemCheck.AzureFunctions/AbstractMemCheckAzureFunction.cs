@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application;
 using MemCheck.Application.QueryValidation;
@@ -105,7 +107,21 @@ public abstract class AbstractMemCheckAzureFunction
         {
             logger.LogInformation($"{FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
             telemetryClient.TrackEvent($"{FunctionName} Azure func start");
-            await DoRunAsync();
+            var reportMailMainPart = await RunAndCreateReportMailMainPartAsync();
+
+            var reportMailBody = new StringBuilder()
+                .Append("<style>")
+                .Append("thead{background-color:darkgray;color:white;}")
+                .Append("table{border-width:1px;border-color:green;border-collapse:collapse;}")
+                .Append("tr{border-width:1px;border-style:solid;border-color:black;}")
+                .Append("td{border-width:1px;border-style:solid;border-color:darkgray;}")
+                .Append("tr:nth-child(even){background-color:lightgray;}")
+                .Append("</style>")
+                .Append(CultureInfo.InvariantCulture, $"<h1>{FunctionName}</h1>")
+                .Append(reportMailMainPart)
+                .Append(MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync()));
+
+            await MailSender.SendAsync(FunctionName, reportMailBody.ToString(), await AdminsAsync());
         }
         catch (Exception ex)
         {
@@ -116,7 +132,7 @@ public abstract class AbstractMemCheckAzureFunction
             logger.LogInformation($"Function '{FunctionName}' ending, {DateTime.Now}");
         }
     }
-    protected abstract Task DoRunAsync();
+    protected abstract Task<string> RunAndCreateReportMailMainPartAsync();
     protected DateTime StartTime { get; }
     protected MailSender MailSender { get; }
     protected Guid RunningUserId { get; }

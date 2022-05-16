@@ -50,10 +50,9 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         await RunAsync();
     }
     protected override string FunctionName => FuncName;
-    protected override async Task DoRunAsync()
+    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var allUsers = await GetAllUsersAsync();
-        var mailBody = new StatsToAdminMailBuilder(FunctionName, StartTime, await AdminsAsync(), allUsers).GetMailBody();
-        await MailSender.SendAsync("MemCheck stats", mailBody, await AdminsAsync());
+        return new StatsToAdminMailBuilder(allUsers).GetMailBody();
     }
 }
