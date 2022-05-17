@@ -20,7 +20,7 @@ namespace MemCheck.Application.Cards
         {
             var oldestIncludedDate = now - TimeSpan.FromDays(request.DayCount);
             var resultEntries = await DbContext.DemoDownloadAuditTrailEntries.AsNoTracking().Where(entry => entry.DownloadUtcDate >= oldestIncludedDate).Select(entry => new ResultEntry(entry.TagId, entry.DownloadUtcDate, entry.CountOfCardsReturned)).ToListAsync();
-            var result = new Result(resultEntries.ToImmutableArray());
+            var result = new Result(request.DayCount, resultEntries.ToImmutableArray());
 
             return new ResultWithMetrologyProperties<Result>(result,
                IntMetric("DayCount", request.DayCount),
@@ -36,7 +36,7 @@ namespace MemCheck.Application.Cards
                 await Task.CompletedTask;
             }
         }
-        public sealed record Result(ImmutableArray<ResultEntry> Entries);
+        public sealed record Result(int DayCount, ImmutableArray<ResultEntry> Entries);
         public sealed record ResultEntry(Guid TagId, DateTime DownloadUtcDate, int CountOfCardsReturned);
         #endregion
     }

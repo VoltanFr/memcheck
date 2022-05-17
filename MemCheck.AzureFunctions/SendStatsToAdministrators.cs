@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using MemCheck.Application.Cards;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MemCheck.AzureFunctions;
@@ -34,6 +37,16 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         }
         return result.ToImmutableList();
     }
+    private async Task<GetRecentDemoUses.Result> GetRecentDemosAsync()
+    {
+        var getter = new GetRecentDemoUses(NewCallContext());
+        var queryResult = await getter.RunAsync(new GetRecentDemoUses.Request(30));
+        return queryResult;
+    }
+    private ImmutableDictionary<Guid, string> GetTagNames()
+    {
+        return NewCallContext().DbContext.Tags.AsNoTracking().Select(t => new { t.Id, t.Name }).ToImmutableDictionary(t => t.Id, t => t.Name);
+    }
     #endregion
     public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
@@ -53,6 +66,8 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var allUsers = await GetAllUsersAsync();
-        return new StatsToAdminMailBuilder(allUsers).GetMailBody();
+        var recentDemos = await GetRecentDemosAsync();
+        var tagNames = GetTagNames();
+        return new StatsToAdminMailBuilder(allUsers, recentDemos, tagNames).GetMailBody();
     }
 }

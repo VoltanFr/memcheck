@@ -29,6 +29,7 @@ namespace MemCheck.Application.Cards
             {
                 var request = new GetRecentDemoUses.Request(1);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), demoRunDate.AddDays(2)).RunAsync(request);
+                Assert.AreEqual(1, result.DayCount);
                 Assert.AreEqual(0, result.Entries.Length);
             }
         }
@@ -50,6 +51,7 @@ namespace MemCheck.Application.Cards
             {
                 var request = new GetRecentDemoUses.Request(1);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), demoRunDate.AddHours(12)).RunAsync(request);
+                Assert.AreEqual(1, result.DayCount);
                 Assert.AreEqual(1, result.Entries.Length);
                 var entry = result.Entries.Single();
                 Assert.AreEqual(demoRunDate, entry.DownloadUtcDate);
@@ -76,6 +78,7 @@ namespace MemCheck.Application.Cards
             {
                 var request = new GetRecentDemoUses.Request(1);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), demoRunDate.AddHours(12)).RunAsync(request);
+                Assert.AreEqual(1, result.DayCount);
                 Assert.AreEqual(1, result.Entries.Length);
                 var entry = result.Entries.Single();
                 Assert.AreEqual(demoRunDate, entry.DownloadUtcDate);
@@ -146,6 +149,7 @@ namespace MemCheck.Application.Cards
                 var request = new GetRecentDemoUses.Request(1);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), getRunDate).RunAsync(request);
                 Assert.IsFalse(result.Entries.Any());
+                Assert.AreEqual(1, result.DayCount);
             }
 
             using (var dbContext = new MemCheckDbContext(db))
@@ -153,6 +157,7 @@ namespace MemCheck.Application.Cards
                 var request = new GetRecentDemoUses.Request(2);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), getRunDate).RunAsync(request);
                 Assert.AreEqual(2, result.Entries.Length);
+                Assert.AreEqual(2, result.DayCount);
 
                 var entryForTag1 = result.Entries.Single(entry => entry.TagId == tag1);
                 Assert.AreEqual(demoRunDate2, entryForTag1.DownloadUtcDate);
@@ -168,6 +173,7 @@ namespace MemCheck.Application.Cards
                 var request = new GetRecentDemoUses.Request(4);
                 var result = await new GetRecentDemoUses(dbContext.AsCallContext(), getRunDate).RunAsync(request);
                 Assert.AreEqual(4, result.Entries.Length);
+                Assert.AreEqual(4, result.DayCount);
 
                 var entryForTag1Date2 = result.Entries.Single(entry => entry.TagId == tag1 && entry.DownloadUtcDate == demoRunDate2);
                 Assert.AreEqual(countOfCardsWithTag1, entryForTag1Date2.CountOfCardsReturned);
