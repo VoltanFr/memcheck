@@ -43,7 +43,7 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
         foreach (var tag in result.Tags)
         {
             reportMailMainPart = reportMailMainPart
-                .Append("<tr style='nth-child(odd) {background: lightgray}'>")
+                .Append("<tr>")
                 .Append(CultureInfo.InvariantCulture, $"<td>{tag.TagName}</td>");
             var cardCountChanged = tag.CardCountBeforeRun != tag.CardCountAfterRun;
             var averageChanged = tag.AverageRatingBeforeRun != tag.AverageRatingAfterRun;

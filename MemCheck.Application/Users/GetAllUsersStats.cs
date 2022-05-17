@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,7 +25,8 @@ namespace MemCheck.Application.Users
             foreach (var user in pageEntries)
             {
                 var roles = await RoleChecker.GetRolesAsync(user);
-                resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate));
+                var decks = DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == user.Id).Select(deck => new ResultDeckModel(deck.Description, deck.CardInDecks.Count));
+                resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate, decks));
             }
             var result = new ResultModel(totalCount, pageCount, resultUsers);
             return new ResultWithMetrologyProperties<ResultModel>(result,
@@ -66,7 +68,7 @@ namespace MemCheck.Application.Users
         }
         public sealed class ResultUserModel
         {
-            public ResultUserModel(string userName, Guid userId, string roles, string email, int notifInterval, DateTime lastNotifUtcDate, DateTime lastSeenUtcDate, DateTime registrationUtcDate)
+            public ResultUserModel(string userName, Guid userId, string roles, string email, int notifInterval, DateTime lastNotifUtcDate, DateTime lastSeenUtcDate, DateTime registrationUtcDate, IEnumerable<ResultDeckModel> decks)
             {
                 UserName = userName;
                 UserId = userId;
@@ -76,6 +78,7 @@ namespace MemCheck.Application.Users
                 LastNotifUtcDate = lastNotifUtcDate;
                 LastSeenUtcDate = lastSeenUtcDate;
                 RegistrationUtcDate = registrationUtcDate;
+                Decks = decks.ToImmutableArray();
             }
             public string UserName { get; }
             public Guid UserId { get; }
@@ -85,7 +88,9 @@ namespace MemCheck.Application.Users
             public DateTime LastNotifUtcDate { get; }
             public DateTime LastSeenUtcDate { get; }
             public DateTime RegistrationUtcDate { get; }
+            public ImmutableArray<ResultDeckModel> Decks { get; }
         }
+        public sealed record ResultDeckModel(string Name, int CardCount);
         #endregion
     }
 }

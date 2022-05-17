@@ -113,15 +113,17 @@ public abstract class AbstractMemCheckAzureFunction
                 .Append("<style>")
                 .Append("thead{background-color:darkgray;color:white;}")
                 .Append("table{border-width:1px;border-color:green;border-collapse:collapse;}")
-                .Append("tr{border-width:1px;border-style:solid;border-color:black;}")
-                .Append("td{border-width:1px;border-style:solid;border-color:darkgray;}")
-                .Append("tr:nth-child(even){background-color:lightgray;}")
+                .Append("tr{border-width:1px;border-style:solid}")
+                .Append("td{border-width:1px;border-style:solid}")
+                .Append("tr:nth-child(odd) {background-color: lavender;}")
                 .Append("</style>")
                 .Append(CultureInfo.InvariantCulture, $"<h1>{FunctionName}</h1>")
                 .Append(reportMailMainPart)
                 .Append(MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync()));
 
-            await MailSender.SendAsync(FunctionName, reportMailBody.ToString(), await AdminsAsync());
+            string bodyText = reportMailBody.ToString();
+
+            await MailSender.SendAsync(FunctionName, bodyText, await AdminsAsync());
         }
         catch (Exception ex)
         {

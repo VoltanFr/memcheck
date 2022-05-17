@@ -21,14 +21,24 @@ internal sealed class StatsToAdminMailBuilder
 
         writer.Append(CultureInfo.InvariantCulture, $"<h1>{allUsers.Count} Users</h1>")
             .Append("<p><table>")
-            .Append("<thead><tr><th>Name</th><th>Last seen</th></tr></thead>")
+            .Append(@"<thead><tr><th scope=""col"">Name</th><th scope=""col"">Last seen</th><th scope=""col"">Registration</th><th scope=""col"">Decks</th></tr></thead>")
             .Append("<tbody>");
 
         foreach (var user in allUsers)
+        {
             writer = writer
-                .Append("<tr style='nth-child(odd) {background: lightgray}'>")
-                .Append(CultureInfo.InvariantCulture, $"<td>{user.UserName}</td><td>{user.LastSeenUtcDate}</td><td>{user.RegistrationUtcDate}</td>")
-                .Append("</tr>");
+                .Append("<tr>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{user.UserName}</td>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{user.LastSeenUtcDate}</td>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{user.RegistrationUtcDate}</td>")
+                .Append("<td><ul>");
+
+            foreach (var deck in user.Decks)
+                writer = writer.Append(CultureInfo.InvariantCulture, $"<li>{deck.Name}: {deck.CardCount} cards</li>");
+
+            writer = writer
+                .Append("</ul></td></tr>");
+        }
 
         writer = writer
             .Append("</tbody>")
@@ -48,7 +58,7 @@ internal sealed class StatsToAdminMailBuilder
         foreach (var recentDemo in recentDemos.Entries)
         {
             writer = writer
-                .Append("<tr style='nth-child(odd) {background: lightgray}'>")
+                .Append("<tr>")
                 .Append(CultureInfo.InvariantCulture, $"<td>{recentDemo.DownloadUtcDate}</td><td>{tagNames[recentDemo.TagId]}</td><td>{recentDemo.CountOfCardsReturned}</td>")
                 .Append("</tr>");
         }

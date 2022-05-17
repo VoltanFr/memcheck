@@ -56,7 +56,7 @@ namespace MemCheck.Application.Users
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, GetAllUsersStats.Request.MaxPageSize + 1, 0, "")));
         }
         [TestMethod()]
-        public async Task OnlyUser()
+        public async Task OnlyUser_NoDeck()
         {
             var db = DbHelper.GetEmptyTestDB();
             var userName = RandomHelper.String();
@@ -68,11 +68,83 @@ namespace MemCheck.Application.Users
             Assert.AreEqual(1, loaded.PageCount);
             var loadedUsers = loaded.Users.ToArray();
             Assert.AreEqual(1, loadedUsers.Length);
-            Assert.AreEqual(userName, loadedUsers[0].UserName);
-            Assert.AreEqual(IRoleChecker.AdminRoleName, loadedUsers[0].Roles);
-            Assert.AreEqual(userEMail, loadedUsers[0].Email);
-            Assert.AreEqual(0, loadedUsers[0].NotifInterval);
-            Assert.AreEqual(DateTime.MinValue, loadedUsers[0].LastNotifUtcDate);
+            var userFromQuery = loadedUsers[0];
+            Assert.AreEqual(userName, userFromQuery.UserName);
+            Assert.AreEqual(IRoleChecker.AdminRoleName, userFromQuery.Roles);
+            Assert.AreEqual(userEMail, userFromQuery.Email);
+            Assert.AreEqual(0, userFromQuery.NotifInterval);
+            Assert.AreEqual(DateTime.MinValue, userFromQuery.LastNotifUtcDate);
+            Assert.AreEqual(0, userFromQuery.Decks.Length);
+        }
+        [TestMethod()]
+        public async Task OnlyUser_OneDeck()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = RandomHelper.String();
+            var userEMail = RandomHelper.String();
+            var user = await UserHelper.CreateInDbAsync(db, userName: userName, userEMail: userEMail);
+            var deckName = RandomHelper.String();
+            var deck = await DeckHelper.CreateAsync(db, user, deckName);
+            var cardId1 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck, cardId1);
+            var cardId2 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck, cardId2);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var loaded = await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, 10, 1, ""));
+            Assert.AreEqual(1, loaded.TotalCount);
+            Assert.AreEqual(1, loaded.PageCount);
+            var loadedUsers = loaded.Users.ToArray();
+            Assert.AreEqual(1, loadedUsers.Length);
+            var userFromQuery = loadedUsers[0];
+            Assert.AreEqual(userName, userFromQuery.UserName);
+            Assert.AreEqual(IRoleChecker.AdminRoleName, userFromQuery.Roles);
+            Assert.AreEqual(userEMail, userFromQuery.Email);
+            Assert.AreEqual(0, userFromQuery.NotifInterval);
+            Assert.AreEqual(DateTime.MinValue, userFromQuery.LastNotifUtcDate);
+            Assert.AreEqual(1, userFromQuery.Decks.Length);
+            Assert.AreEqual(deckName, userFromQuery.Decks.Single().Name);
+            Assert.AreEqual(2, userFromQuery.Decks.Single().CardCount);
+        }
+        [TestMethod()]
+        public async Task OnlyUser_TwoDecks()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var userName = RandomHelper.String();
+            var userEMail = RandomHelper.String();
+            var user = await UserHelper.CreateInDbAsync(db, userName: userName, userEMail: userEMail);
+
+            var deck1Name = RandomHelper.String();
+            var deck1 = await DeckHelper.CreateAsync(db, user, deck1Name);
+            var cardId1 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck1, cardId1);
+            var cardId2 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck1, cardId2);
+
+            var deck2Name = RandomHelper.String();
+            var deck2 = await DeckHelper.CreateAsync(db, user, deck2Name);
+            var cardId3 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck2, cardId3);
+            var cardId4 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck2, cardId4);
+            var cardId5 = await CardHelper.CreateIdAsync(db, user);
+            await DeckHelper.AddCardAsync(db, deck2, cardId5);
+
+            using var dbContext = new MemCheckDbContext(db);
+            var loaded = await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, 10, 1, ""));
+            Assert.AreEqual(1, loaded.TotalCount);
+            Assert.AreEqual(1, loaded.PageCount);
+            var loadedUsers = loaded.Users.ToArray();
+            Assert.AreEqual(1, loadedUsers.Length);
+            var userFromQuery = loadedUsers[0];
+            Assert.AreEqual(userName, userFromQuery.UserName);
+            Assert.AreEqual(IRoleChecker.AdminRoleName, userFromQuery.Roles);
+            Assert.AreEqual(userEMail, userFromQuery.Email);
+            Assert.AreEqual(0, userFromQuery.NotifInterval);
+            Assert.AreEqual(DateTime.MinValue, userFromQuery.LastNotifUtcDate);
+            Assert.AreEqual(2, userFromQuery.Decks.Length);
+            Assert.AreEqual(2, userFromQuery.Decks.Single(deck => deck.Name == deck1Name).CardCount);
+            Assert.AreEqual(3, userFromQuery.Decks.Single(deck => deck.Name == deck2Name).CardCount);
         }
         [TestMethod()]
         public async Task Paging()
