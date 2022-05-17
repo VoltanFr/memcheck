@@ -73,8 +73,8 @@ namespace MemCheck.WebUI.Controllers
         {
             CheckBodyParameter(request);
             var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-            var appRequest = new GetAllUsers.Request(userId, request.PageSize, request.PageNo, request.Filter);
-            var result = await new GetAllUsers(callContext).RunAsync(appRequest);
+            var appRequest = new GetAllUsersStats.Request(userId, request.PageSize, request.PageNo, request.Filter);
+            var result = await new GetAllUsersStats(callContext).RunAsync(appRequest);
             return Ok(new GetUsersViewModel(result));
         }
         #region Request and result classes
@@ -86,7 +86,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetUsersViewModel
         {
-            public GetUsersViewModel(GetAllUsers.ResultModel applicationResult)
+            public GetUsersViewModel(GetAllUsersStats.ResultModel applicationResult)
             {
                 TotalCount = applicationResult.TotalCount;
                 PageCount = applicationResult.PageCount;
@@ -98,7 +98,7 @@ namespace MemCheck.WebUI.Controllers
         }
         public sealed class GetUsersUserViewModel
         {
-            public GetUsersUserViewModel(GetAllUsers.ResultUserModel user)
+            public GetUsersUserViewModel(GetAllUsersStats.ResultUserModel user)
             {
                 UserName = user.UserName;
                 UserId = user.UserId.ToString();

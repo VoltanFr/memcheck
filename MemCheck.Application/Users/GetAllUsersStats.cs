@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users
 {
-    public sealed class GetAllUsers : RequestRunner<GetAllUsers.Request, GetAllUsers.ResultModel>
+    public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, GetAllUsersStats.ResultModel>
     {
-        public GetAllUsers(CallContext callContext) : base(callContext)
+        public GetAllUsersStats(CallContext callContext) : base(callContext)
         {
         }
         protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)

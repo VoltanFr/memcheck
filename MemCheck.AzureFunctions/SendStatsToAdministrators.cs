@@ -19,14 +19,14 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     private const string FuncName = nameof(SendStatsToAdministrators);
     #endregion
     #region Private methods
-    private async Task<ImmutableList<GetAllUsers.ResultUserModel>> GetAllUsersAsync()
+    private async Task<ImmutableList<GetAllUsersStats.ResultUserModel>> GetAllUsersAsync()
     {
-        var getter = new GetAllUsers(NewCallContext());
+        var getter = new GetAllUsersStats(NewCallContext());
         var page = 1;
-        var result = new List<GetAllUsers.ResultUserModel>();
+        var result = new List<GetAllUsersStats.ResultUserModel>();
         while (true)
         {
-            var getterResult = await getter.RunAsync(new GetAllUsers.Request(RunningUserId, 50, page, ""));
+            var getterResult = await getter.RunAsync(new GetAllUsersStats.Request(RunningUserId, 50, page, ""));
             if (getterResult.Users.Any())
             {
                 result.AddRange(getterResult.Users);

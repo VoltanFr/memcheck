@@ -10,7 +10,7 @@ namespace MemCheck.AzureFunctions;
 internal sealed class StatsToAdminMailBuilder
 {
     #region Fields
-    private readonly ImmutableList<GetAllUsers.ResultUserModel> allUsers;
+    private readonly ImmutableList<GetAllUsersStats.ResultUserModel> allUsers;
     private readonly GetRecentDemoUses.Result recentDemos;
     private readonly ImmutableDictionary<Guid, string> tagNames;
     #endregion
@@ -60,7 +60,7 @@ internal sealed class StatsToAdminMailBuilder
         return writer.ToString();
     }
     #endregion
-    public StatsToAdminMailBuilder(ImmutableList<GetAllUsers.ResultUserModel> allUsers, GetRecentDemoUses.Result recentDemos, ImmutableDictionary<Guid, string> tagNames)
+    public StatsToAdminMailBuilder(ImmutableList<GetAllUsersStats.ResultUserModel> allUsers, GetRecentDemoUses.Result recentDemos, ImmutableDictionary<Guid, string> tagNames)
     {
         this.allUsers = allUsers;
         this.recentDemos = recentDemos;
