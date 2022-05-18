@@ -232,7 +232,7 @@
     <value>page des labels</value>
   </data>
   <data name="UseTheDemoButtonOnTheLabelOfYourChoice" xml:space="preserve">
-    <value>vous pouvez utiliser le bouton Démo sur le label de votre choix</value>
+    <value>vous pouvez utiliser le bouton Démo (👁) sur le label de votre choix - conseil : choisissez un label qui a une évaluation moyenne élevée</value>
   </data>
   <data name="WantADemo" xml:space="preserve">
     <value>Vous voulez un apperçu de MemCheck ?</value>
