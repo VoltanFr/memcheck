@@ -12,49 +12,52 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards
 {
-    /* Returns a set of cards for demo mode.
-     * We take a set of 3 times the number of requested cards, sorted by rating, then we shuffle this set. */
+    /* Returns a set of public cards for demo mode.
+     * We take a big set of cards, and split this set into buckets per rating.
+     * We shuffle each bucket contents.
+     * We merge again the buckets, in order. */
     public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, GetCardsForDemo.Result>
     {
         #region Fields
         private readonly DateTime? now;
         #endregion
         #region Private method
-        private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount)
+        private async Task<ImmutableArray<ResultCard>> GetCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount)
         {
-            var cardsWithTag = DbContext.TagsInCards
+            var cards = await DbContext.TagsInCards
                 .AsNoTracking()
                 .Include(tagInCard => tagInCard.Card)
-                .AsSingleQuery()
+                .Include(tagInCard => tagInCard.Card.VersionCreator)
+                .Include(tagInCard => tagInCard.Card.Images)
+                .Include(tagInCard => tagInCard.Card.CardLanguage)
+                .Include(tagInCard => tagInCard.Card.TagsInCards)
                 .Where(tagInCard => tagInCard.TagId == tagId && !excludedCardIds.Contains(tagInCard.CardId))
                 .Where(tagInCard => !tagInCard.Card.UsersWithView.Any())
                 .OrderByDescending(tagInCard => tagInCard.Card.AverageRating)
-                .Take(cardCount * 3);
+                .Take(Request.MaxCount * 10)
+                .Select(tagInCard => new ResultCard(
+                    tagInCard.Card.Id,
+                    tagInCard.Card.FrontSide,
+                    tagInCard.Card.BackSide,
+                    tagInCard.Card.AdditionalInfo,
+                    tagInCard.Card.References,
+                    tagInCard.Card.VersionUtcDate,
+                    userNames[tagInCard.Card.VersionCreator.Id],
+                    tagInCard.Card.TagsInCards.Select(tag => tagNames[tag.TagId]),
+                    tagInCard.Card.Images.Select(img => new ResultImageModel(img.ImageId, imageNames[img.ImageId], img.CardSide)),
+                    tagInCard.Card.AverageRating,
+                    tagInCard.Card.RatingCount,
+                    tagInCard.Card.CardLanguage.Name == "Français" // Questionable hardcoding
+                ))
+                .ToListAsync();
 
-            var result = await cardsWithTag.Select(cardInDeck => new ResultCard(
-                 cardInDeck.CardId,
-                 cardInDeck.Card.FrontSide,
-                 cardInDeck.Card.BackSide,
-                 cardInDeck.Card.AdditionalInfo,
-                 cardInDeck.Card.References,
-                 cardInDeck.Card.VersionUtcDate,
-                 userNames[cardInDeck.Card.VersionCreator.Id],
-                 cardInDeck.Card.TagsInCards.Select(tag => tagNames[tag.TagId]),
-                 cardInDeck.Card.Images.Select(img => new ResultImageModel(img.ImageId, imageNames[img.ImageId], img.CardSide)),
-                 cardInDeck.Card.AverageRating,
-                 cardInDeck.Card.RatingCount,
-                 cardInDeck.Card.CardLanguage.Name == "Français" //Questionable hardcoding
-             )).ToListAsync();
+            var groups = cards.GroupBy(card => Math.Truncate(card.AverageRating));
+            var result = new List<ResultCard>();
 
-            if (result.Count > cardCount)
-            {
-                var highestRatingToReturn = result[0].AverageRating;
-                var lowestRatingToReturn = result[cardCount - 1].AverageRating;
-                if (highestRatingToReturn != lowestRatingToReturn)
-                    result = result.Take(cardCount).ToList();
-            }
+            foreach (var group in groups.OrderByDescending(group => group.Key))
+                result.AddRange(Shuffler.Shuffle(group));
 
-            return Shuffler.Shuffle(result).Take(cardCount);
+            return result.Take(cardCount).ToImmutableArray();
         }
         #endregion
         public GetCardsForDemo(CallContext callContext, DateTime? now = null) : base(callContext)
@@ -67,14 +70,13 @@ namespace MemCheck.Application.Cards
             var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
             var tagNames = TagLoadingHelper.Run(DbContext);
 
-            var result = new List<ResultCard>();
-            result.AddRange(await GetUnknownCardsAsync(request.TagId, request.ExcludedCardIds, userNames, imageNames, tagNames, request.CardsToDownload));
+            var result = await GetCardsAsync(request.TagId, request.ExcludedCardIds, userNames, imageNames, tagNames, request.CardsToDownload);
 
             var auditEntry = new DemoDownloadAuditTrailEntry()
             {
                 TagId = request.TagId,
                 DownloadUtcDate = now == null ? DateTime.UtcNow : now.Value,
-                CountOfCardsReturned = result.Count
+                CountOfCardsReturned = result.Length
             };
             DbContext.DemoDownloadAuditTrailEntries.Add(auditEntry);
             await DbContext.SaveChangesAsync();
@@ -83,7 +85,7 @@ namespace MemCheck.Application.Cards
                GuidMetric("TagId", request.TagId),
                IntMetric("ExcludedCardCount", request.ExcludedCardIds.Count()),
                IntMetric("RequestedCardCount", request.CardsToDownload),
-               IntMetric("ResultCount", result.Count));
+               IntMetric("ResultCount", result.Length));
         }
         #region Request and Result
         public sealed class Request : IRequest

@@ -400,5 +400,27 @@ namespace MemCheck.Application.Cards
             Assert.AreEqual(1, demoDownloadAuditTrailEntry.CountOfCardsReturned);
             Assert.AreNotEqual(Guid.Empty, demoDownloadAuditTrailEntry.Id);
         }
+        [TestMethod()]
+        public async Task RightOrder()
+        {
+            var db = DbHelper.GetEmptyTestDB();
+            var user = await UserHelper.CreateInDbAsync(db);
+            var tagId = await TagHelper.CreateAsync(db);
+
+            for (int cardIndex = 0; cardIndex <= GetCardsForDemo.Request.MaxCount; cardIndex++)
+            {
+                var card = await CardHelper.CreateAsync(db, user, tagIds: tagId.AsArray());
+                await RatingHelper.RecordForUserAsync(db, user, card.Id, RandomHelper.Rating());
+            }
+
+            using var dbContext = new MemCheckDbContext(db);
+            var request = new GetCardsForDemo.Request(tagId, Array.Empty<Guid>(), GetCardsForDemo.Request.MaxCount);
+            var result = (await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request)).Cards.ToImmutableArray();
+
+            Assert.AreEqual(GetCardsForDemo.Request.MaxCount, result.Length);
+
+            var expectedOrder = result.OrderByDescending(card => card.AverageRating).ToImmutableArray();
+            Assert.IsTrue(expectedOrder.SequenceEqual(result));
+        }
     }
 }
