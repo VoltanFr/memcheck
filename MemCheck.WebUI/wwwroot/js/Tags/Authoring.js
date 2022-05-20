@@ -96,7 +96,7 @@ const tagAuthoringApp = Vue.createApp({
             if (this.returnAddress)
                 window.location = this.returnAddress;
             else
-                window.location = "/Tags/Index";
+                window.location = '/Tags/Index';
         },
         getReturnAddressFromPageParameter() {
             this.returnAddress = document.getElementById('ReturnAddressInput').value;
