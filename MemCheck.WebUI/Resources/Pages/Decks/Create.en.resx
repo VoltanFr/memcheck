@@ -121,7 +121,7 @@
     <value>Name</value>
   </data>
   <data name="DescriptionAdditionalInfo" xml:space="preserve">
-    <value>Will be used for selection, so keep it small (eg "Main").</value>
+    <value>Will be used for selection, so keep it small (eg "Flowers") for optimal display.</value>
   </data>
   <data name="HeapingAlgo" xml:space="preserve">
     <value>Heap escalation algorithm</value>
@@ -140,5 +140,14 @@
   </data>
   <data name="AdviceForSingleDeck" xml:space="preserve">
     <value>We advise you to have only one deck with the current version of MemCheck, because the GUI is not optimized yet for working with multiple decks.</value>
+  </data>
+  <data name="Deck" xml:space="preserve">
+    <value>deck</value>
+  </data>
+  <data name="Decks" xml:space="preserve">
+    <value>decks</value>
+  </data>
+  <data name="YouAlreadyHave" xml:space="preserve">
+    <value>You already have</value>
   </data>
 </root>

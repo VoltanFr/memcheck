@@ -121,7 +121,7 @@
     <value>Nom</value>
   </data>
   <data name="DescriptionAdditionalInfo" xml:space="preserve">
-    <value>Choisissez un nom court (par exemple "Mon paquet" ou "Principal")</value>
+    <value>Choisissez un nom court (par exemple "Métallurgie" ou "Enluminures") pour un affichage optimal des pages.</value>
   </data>
   <data name="HeapingAlgo" xml:space="preserve">
     <value>Algorithme de parcours des piles</value>
@@ -140,5 +140,14 @@
   </data>
   <data name="AdviceForSingleDeck" xml:space="preserve">
     <value>Nous vous conseillons de n'avoir qu'un paquet, parce que l'interface utilisateur n'est pas encore optimisée pour travailler avec plusieurs.</value>
+  </data>
+  <data name="Deck" xml:space="preserve">
+    <value>paquet</value>
+  </data>
+  <data name="Decks" xml:space="preserve">
+    <value>paquets</value>
+  </data>
+  <data name="YouAlreadyHave" xml:space="preserve">
+    <value>Vous avez actuellement</value>
   </data>
 </root>
