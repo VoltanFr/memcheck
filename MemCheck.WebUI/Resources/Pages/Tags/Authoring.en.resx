@@ -118,22 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CardsWithThisTag" xml:space="preserve">
-    <value>Cards with this tag</value>
+    <value>Cards with this tag:</value>
   </data>
   <data name="CurrentName" xml:space="preserve">
     <value>Current name</value>
   </data>
+  <data name="CurrentVersion" xml:space="preserve">
+    <value>Current version</value>
+  </data>
   <data name="Description" xml:space="preserve">
-    <value>Description</value>
+    <value>Description:</value>
   </data>
   <data name="Name" xml:space="preserve">
-    <value>Name</value>
+    <value>Name:</value>
   </data>
   <data name="NewDescription" xml:space="preserve">
     <value>New description</value>
   </data>
   <data name="NewName" xml:space="preserve">
-    <value>New name</value>
+    <value>New name:</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>New version</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Tag authoring</value>

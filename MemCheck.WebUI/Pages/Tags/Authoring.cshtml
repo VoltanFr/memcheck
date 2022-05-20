@@ -2,7 +2,14 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
 @model AuthoringViewModel
+@section head {
+<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+<link href="@Url.Content("~/css/tageditpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+}
 @section scripts {
+<script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
 <script type="module" src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
 }
 @{
@@ -18,39 +25,30 @@
     <div id="After mount" v-else>
         <h1 class="title"><span v-if="editedTag">@Localizer["TagEdition"]</span><span v-else>@Localizer["TagCreation"]</span></h1>
 
-        <div id="Table">
-            <table class="table table-sm table-authoring" width="100%">
-                <tbody>
-                    <tr id="Hidden row to specify width of first column" style="visibility:hidden">
-                        <th style="width:20%"></th>
-                        <th style="width:80%"></th>
-                    </tr>
-                    <tr v-if="editedTag">
-                        <th>@Localizer["CurrentName"]</th>
-                        <td>{{editedTag.tagName}}</td>
-                    </tr>
-                    <tr v-if="editedTag">
-                        <th>@Localizer["Description"]</th>
-                        <td><span v-html="renderedDescription()"></span></td>
-                    </tr>
-                    <tr v-if="editedTag">
-                        <th>@Localizer["CardsWithThisTag"]</th>
-                        <td>{{editedTag.cardCount}}</td>
-                    </tr>
-                    <tr class="memcheck-input-div">
-                        <th><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></th>
-                        <td><input class="form-control responsive-padding-edit" v-model="newName" /></td>
-                    </tr>
-                    <tr class="memcheck-input-div">
-                        <th><span v-if="editedTag">@Localizer["NewDescription"]</span><span v-else>@Localizer["Description"]</span></th>
-                        <td><textarea class="form-control responsive-padding-edit" v-model="newDescription" rows="2" max-rows="15"></textarea></td>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <td><span v-html="renderedNewDescription()"></span></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div id="CurrentVersion" class="memcheck-input-div" v-if="editedTag">
+            <h2>@Localizer["CurrentVersion"]</h2>
+            <div id="Name" class="field-div">
+                <label class="field-caption">@Localizer["Name"]</label> {{editedTag.tagName}}
+            </div>
+            <div id="Description" class="field-div">
+                <label class="field-caption">@Localizer["Description"]</label>
+                <span class="rendered-description" v-html="renderedDescription()"></span>
+            </div>
+        </div>
+
+        <div id="Statistics" class="memcheck-input-div" v-if="editedTag">
+            <label class="field-caption">@Localizer["CardsWithThisTag"] {{editedTag.cardCount}}</label>
+        </div>
+
+        <div id="NewVersion" class="memcheck-input-div">
+            <h2 v-if="editedTag">@Localizer["NewVersion"]</h2>
+            <div id="Name" class="field-div">
+                <label class="field-caption"><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></label>
+                <input class="form-control responsive-padding-edit" v-model="newName" />
+            </div>
+            <div id="Description" class="field-div">
+                <markdown-editor v-model="newDescription" v-bind:isinfrench="true" title="@Localizer["NewDescription"]" />
+            </div>
         </div>
 
         <p v-if="newNameProblem" class="alert alert-danger">{{newNameProblem}}</p>

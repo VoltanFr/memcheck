@@ -2,6 +2,8 @@
 
 const tagAuthoringApp = Vue.createApp({
     components: {
+        'van-button': globalThis.vant.Button,
+        'markdown-editor': MarkdownEditor,
     },
     data() {
         return {
@@ -94,7 +96,7 @@ const tagAuthoringApp = Vue.createApp({
             if (this.returnAddress)
                 window.location = this.returnAddress;
             else
-                await this.getTagNames();
+                window.location = "/Tags/Index";
         },
         getReturnAddressFromPageParameter() {
             this.returnAddress = document.getElementById('ReturnAddressInput').value;
@@ -120,9 +122,6 @@ const tagAuthoringApp = Vue.createApp({
         },
         renderedDescription() {
             return convertMarkdown(this.editedTag.description, true); // Questionable hardcoding of French
-        },
-        renderedNewDescription() {
-            return convertMarkdown(this.newDescription, true); // Questionable hardcoding of French
         },
         onNameChanged() {
             if (this.toastVisible) {
