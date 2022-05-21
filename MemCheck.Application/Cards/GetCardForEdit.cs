@@ -30,7 +30,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             .SingleAsync();
 
         var userRating = await DbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
-        int userRatingValue = userRating == null ? 0 : userRating.Rating;
+        var userRatingValue = userRating == null ? 0 : userRating.Rating;
 
         var ownersOfDecksWithThisCard = DbContext.CardsInDecks
             .AsNoTracking()

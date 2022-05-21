@@ -269,8 +269,8 @@ public class RefreshTagStatsTests
             Assert.AreEqual(1, resultTag1.CardCountBeforeRun);
             Assert.AreEqual((user1RatingOnCard1 + user2RatingOnCard1) / 2.0, resultTag1.AverageRatingBeforeRun);
             Assert.AreEqual(2, resultTag1.CardCountAfterRun);
-            int sum1 = user1RatingOnCard1 + user2NewRatingOnCard1;
-            double average1 = sum1 / 2.0;
+            var sum1 = user1RatingOnCard1 + user2NewRatingOnCard1;
+            var average1 = sum1 / 2.0;
             Assert.AreEqual((average1 + user2RatingOnCard2) / 2.0, resultTag1.AverageRatingAfterRun);
 
             var resultTag2 = result.Tags.Single(tag => tag.TagId == tag2Id);

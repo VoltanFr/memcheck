@@ -30,14 +30,14 @@ public sealed class DatabaseUsabilityTests : IDisposable
     private static IMigrationsAssembly GetMigrationsAssembly()
     {
         using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(@"Server=none;Database=none;Trusted_Connection=True;").Options);
-        IMigrationsAssembly? result = dbContext.GetService<IMigrationsAssembly>();
+        var result = dbContext.GetService<IMigrationsAssembly>();
         Assert.IsNotNull(result);
         return result;
     }
     private static IRelationalModel GetModelFromMigrations()
     {
         var migrationsAssembly = GetMigrationsAssembly();
-        IModel migrationsAssemblyModel = migrationsAssembly.ModelSnapshot?.Model!;
+        var migrationsAssemblyModel = migrationsAssembly.ModelSnapshot?.Model!;
         if (migrationsAssemblyModel is IMutableModel mutableModel)
             migrationsAssemblyModel = mutableModel.FinalizeModel();
         using var dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(@"Server=none;Database=none;Trusted_Connection=True;").Options);

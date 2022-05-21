@@ -109,7 +109,7 @@ public class GetCardsToRepeatTests
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
         var loadTime = RandomHelper.Date();
         const int cardCount = 50;
-        for (int i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddCardAsync(db, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
@@ -135,7 +135,7 @@ public class GetCardsToRepeatTests
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
         var loadTime = RandomHelper.Date();
         const int cardCount = 100;
-        for (int i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddCardAsync(db, deck, card.Id, RandomHelper.Heap(true), RandomHelper.DateBefore(loadTime));
@@ -144,7 +144,7 @@ public class GetCardsToRepeatTests
         var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
         var cards = (await new GetCardsToRepeat(dbContext.AsCallContext(), loadTime).RunAsync(request)).Cards.ToImmutableArray();
         Assert.AreEqual(cardCount, cards.Length);
-        for (int i = 1; i < cards.Length; i++)
+        for (var i = 1; i < cards.Length; i++)
         {
             Assert.IsTrue(cards[i].Heap <= cards[i - 1].Heap);
             if (cards[i].Heap == cards[i - 1].Heap)

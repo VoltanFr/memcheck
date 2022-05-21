@@ -83,7 +83,7 @@ public class DeleteUserAccountTests
         using (var dbContext = new MemCheckDbContext(db))
         //Check user is all set
         {
-            MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
+            var userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
             Assert.AreEqual(userToDeleteName, userToDelete.UserName);
             Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
             Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
@@ -127,7 +127,7 @@ public class DeleteUserAccountTests
         using (var dbContext = new MemCheckDbContext(db))
         //Check user is all set
         {
-            MemCheckUser userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
+            var userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
             Assert.AreEqual(userToDeleteName, userToDelete.UserName);
             Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
             Assert.AreEqual(userToDeleteEmail, userToDelete.Email);

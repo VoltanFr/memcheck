@@ -84,7 +84,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.FrontSide})");
             else
             {
-                for (int lineIndex = 0; lineIndex < additionalInfoLines.Count; lineIndex++)
+                for (var lineIndex = 0; lineIndex < additionalInfoLines.Count; lineIndex++)
                 {
                     var department = geoInfo.DepartmentsFromName[additionalInfoLines[lineIndex]];
                     additionalInfoLines[lineIndex] = $"- {department.FullName} ({department.DepartmentCode})";
@@ -107,7 +107,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.FrontSide})");
             else
             {
-                for (int lineIndex = 0; lineIndex < backSideLines.Count; lineIndex++)
+                for (var lineIndex = 0; lineIndex < backSideLines.Count; lineIndex++)
                 {
                     var department = geoInfo.DepartmentsFromName[backSideLines[lineIndex]];
                     backSideLines[lineIndex] = $"- {department.FullName} ({department.DepartmentCode})";

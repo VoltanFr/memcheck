@@ -103,7 +103,7 @@ public class GetRecentDemoUsesTests
         var countOfCardsWithTag1 = 1;
         var countOfCardsWithTag2 = 1;
 
-        for (int cardIndex = 0; cardIndex < cardCount; cardIndex++)
+        for (var cardIndex = 0; cardIndex < cardCount; cardIndex++)
         {
             var tagChoice = RandomHelper.Int(1, 4);
             switch (tagChoice)

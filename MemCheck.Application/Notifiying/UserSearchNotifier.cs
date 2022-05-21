@@ -65,7 +65,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
     private async Task<SearchSubscription> GetSearchSubscriptionAsync(Guid searchSubscriptionId)
     {
         var chrono = Stopwatch.StartNew();
-        SearchSubscription subscription = await callContext.DbContext.SearchSubscriptions
+        var subscription = await callContext.DbContext.SearchSubscriptions
             .Include(s => s.ExcludedTags)
             .Include(s => s.RequiredTags)
             .Include(s => s.CardsInLastRun)
@@ -84,7 +84,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
     {
         var chrono = Stopwatch.StartNew();
         var result = new HashSet<CardVersion>();
-        SearchCards.Request request = GetRequest(subscription);
+        var request = GetRequest(subscription);
         SearchCards.Result searchResult;
         do
         {
@@ -112,8 +112,8 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
     {
         var chrono = Stopwatch.StartNew();
         var allCardsFromSearchHashSetIds = new HashSet<Guid>(allCardsFromSearchHashSet.Select(cardVersion => cardVersion.CardId));
-        ImmutableArray<Guid> cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
-        ImmutableArray<CardVersion> newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
+        var cardsNotFoundAnymore = cardsInLastRun.Where(c => !allCardsFromSearchHashSetIds.Contains(c)).ToImmutableArray();
+        var newFoundCards = allCardsFromSearchHashSet.Where(c => !cardsInLastRun.Contains(c.CardId)).ToImmutableArray();
         performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to filter in memory data");
         return (cardsNotFoundAnymore, newFoundCards);
     }
@@ -144,7 +144,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
         var countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView = 0;
 
         var chrono = Stopwatch.StartNew();
-        foreach (Guid notFoundId in cardsNotFoundAnymore)
+        foreach (var notFoundId in cardsNotFoundAnymore)
         {
             var card = await callContext.DbContext.Cards
                 .Include(c => c.UsersWithView)
@@ -216,7 +216,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
         var subscription = await GetSearchSubscriptionAsync(searchSubscriptionId);
         var cardsInLastRun = GetIdsOfCardsInLastRun(subscription);
         var allCardsFromSearchHashSet = await GetAllCardsFromSearchAsync(subscription);
-        (ImmutableArray<Guid> cardsNotFoundAnymore, ImmutableArray<CardVersion> newFoundCards) = FilterCardsFromSearchResult(allCardsFromSearchHashSet, cardsInLastRun);
+        (var cardsNotFoundAnymore, var newFoundCards) = FilterCardsFromSearchResult(allCardsFromSearchHashSet, cardsInLastRun);
         await RemoveCardsNotFoundAnymoreFromResultsInDbAsync(cardsNotFoundAnymore, searchSubscriptionId);
         await AddNewFoundCardToResultsInDbAsync(newFoundCards, searchSubscriptionId);
         var detailsFromCardsNotFoundAnymore = await GetDetailsFromCardsNotFoundAnymoreAsync(cardsNotFoundAnymore, subscription);

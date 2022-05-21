@@ -29,10 +29,10 @@ internal sealed class PaukerImportTest : ICmdLinePlugin
         using FileStream fs = new(file, FileMode.Open, FileAccess.Read);
         using GZipStream gz = new(fs, CompressionMode.Decompress);
         List<byte> allBytes = new();
-        byte[] buffer = new byte[4096];
+        var buffer = new byte[4096];
         int numRead;
         while ((numRead = gz.Read(buffer, 0, buffer.Length)) != 0)
-            for (int i = 0; i < numRead; i++)
+            for (var i = 0; i < numRead; i++)
                 allBytes.Add(buffer[i]);
         return encoding.GetString(allBytes.ToArray());
     }
@@ -48,9 +48,9 @@ internal sealed class PaukerImportTest : ICmdLinePlugin
         var resultDistanceToPauker = int.MaxValue;
         var result = 0;
 
-        for (int i = 1; i < 20; i++)
+        for (var i = 1; i < 20; i++)
         {
-            double nbDaysOfExpiry = Math.Pow(2, i);
+            var nbDaysOfExpiry = Math.Pow(2, i);
             var memCheckExpiryInThisHeap = learnedDate.AddDays(nbDaysOfExpiry);
 
             var distanceToPauker = (int)(paukerExpiry - memCheckExpiryInThisHeap).TotalDays;
@@ -111,10 +111,10 @@ internal sealed class PaukerImportTest : ICmdLinePlugin
         logger.LogDebug($"Working on stack '{stack.Name}'");
         logger.LogDebug($"Stack contains {stack.Cards.Count} cards");
 
-        for (int cardIndex = 0; cardIndex < stack.Cards.Count; cardIndex++)
+        for (var cardIndex = 0; cardIndex < stack.Cards.Count; cardIndex++)
         {
             logger.LogInformation($"Working on card {cardIndex} of {stack.Cards.Count}");
-            PaukerCard paukerCard = stack.Cards[cardIndex];
+            var paukerCard = stack.Cards[cardIndex];
             if (dbContext.Cards.Where(card => card.FrontSide == paukerCard.Front.Text.Trim()).Any())
                 logger.LogInformation($"Card already exists in MemCheck with this front, skipping: {paukerCard.Front.Text}");
             else

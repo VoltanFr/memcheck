@@ -32,7 +32,7 @@ internal sealed class GetCardsToRepeatPerf : ICmdLinePlugin
 
         var chronos = new List<double>();
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             var chrono = await RunOneGet(user, deck);
             chronos.Add(chrono);

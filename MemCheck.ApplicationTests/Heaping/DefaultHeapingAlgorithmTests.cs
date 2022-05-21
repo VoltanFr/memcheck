@@ -46,7 +46,7 @@ public class DefaultHeapingAlgorithmTests
     {
         var lastLearnDate = RandomHelper.Date();
         var expiryDate = algo.ExpiryUtcDate(heap, lastLearnDate);
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
             if (algo.ExpiryUtcDate(heap, lastLearnDate) != expiryDate)
                 return;
         Assert.Fail("Always got the same expiry date");

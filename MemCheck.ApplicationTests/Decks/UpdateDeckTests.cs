@@ -122,7 +122,7 @@ public class UpdateDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         var newName = RandomHelper.String();
-        int newAlgo = RandomHelper.HeapingAlgorithm();
+        var newAlgo = RandomHelper.HeapingAlgorithm();
         var request = new UpdateDeck.Request(user, deck, newName, newAlgo);
 
         using (var dbContext = new MemCheckDbContext(db))

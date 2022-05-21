@@ -136,7 +136,7 @@ public class GetRemainingCardsInLessonTests
         var expiredCardCount = 0;
         var unknownCardCount = 0;
 
-        for (int currentCardIndex = 0; currentCardIndex < 100; currentCardIndex++)
+        for (var currentCardIndex = 0; currentCardIndex < 100; currentCardIndex++)
         {
             var heap = RandomHelper.Heap();
             var lastLearnDate = runDate.AddDays(heap).AddDays(RandomHelper.Int(-10, 10));

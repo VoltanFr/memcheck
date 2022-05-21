@@ -42,8 +42,8 @@ internal sealed class ChangeOwner : ICmdLinePlugin
         private static int GetDensity(string field)
         {
             var withoutBlanks = field.RemoveBlanks();
-            int commaIndec = withoutBlanks.IndexOf(',');
-            string s1 = withoutBlanks[..(commaIndec == -1 ? withoutBlanks.Length : commaIndec)];
+            var commaIndec = withoutBlanks.IndexOf(',');
+            var s1 = withoutBlanks[..(commaIndec == -1 ? withoutBlanks.Length : commaIndec)];
             return int.Parse(s1);
         }
         #endregion
@@ -53,7 +53,7 @@ internal sealed class ChangeOwner : ICmdLinePlugin
             {
                 var fields = GetFields(dataSetFileLine);
                 Name = fields[0];
-                int departmentCount = int.Parse(fields[1]);
+                var departmentCount = int.Parse(fields[1]);
                 Population = int.Parse(fields[2].RemoveBlanks());
                 Density = GetDensity(fields[3]);
                 Departments = GetDepartments(fields[4], departmentCount);

@@ -357,7 +357,7 @@ public class UserSearchNotifierTests
         var user = await UserHelper.CreateInDbAsync(db, userName: userName);
         var language = await CardLanguageHelper.CreateAsync(db);
 
-        for (int i = 0; i < SearchCards.Request.MaxPageSize * 2; i++)
+        for (var i = 0; i < SearchCards.Request.MaxPageSize * 2; i++)
             await CardHelper.CreateAsync(db, user, language: language);
         var card = await CardHelper.CreateAsync(db, user, language: language);
 

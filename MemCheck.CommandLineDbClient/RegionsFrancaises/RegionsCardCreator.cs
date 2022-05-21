@@ -47,8 +47,8 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
         private static int GetDensity(string field)
         {
             var withoutBlanks = field.RemoveBlanks();
-            int commaIndex = withoutBlanks.IndexOf(',');
-            string s1 = withoutBlanks[..(commaIndex == -1 ? withoutBlanks.Length : commaIndex)];
+            var commaIndex = withoutBlanks.IndexOf(',');
+            var s1 = withoutBlanks[..(commaIndex == -1 ? withoutBlanks.Length : commaIndex)];
             return int.Parse(s1);
         }
         #endregion
@@ -58,7 +58,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
             {
                 var fields = GetFields(dataSetFileLine);
                 Name = fields[0];
-                int departmentCount = int.Parse(fields[1]);
+                var departmentCount = int.Parse(fields[1]);
                 Population = int.Parse(fields[2].RemoveBlanks());
                 Density = GetDensity(fields[3]);
                 Departments = GetDepartments(fields[4], departmentCount);

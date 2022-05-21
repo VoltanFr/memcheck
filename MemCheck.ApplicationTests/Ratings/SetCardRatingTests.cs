@@ -98,7 +98,7 @@ public class SetCardRatingTests
         var languageId = await CardLanguageHelper.CreateAsync(db);
         var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             var rating = RandomHelper.Rating();
             using (var dbContext = new MemCheckDbContext(db))

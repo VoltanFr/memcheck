@@ -32,14 +32,14 @@ internal sealed class PaukerLesson
 
         var cardNodes = n.SelectNodes("Card");
         if (cardNodes != null)
-            for (int i = 0; i < cardNodes.Count; i++)
+            for (var i = 0; i < cardNodes.Count; i++)
                 if (cardNodes[i] is XmlElement cardNode)
                     cards.Add(ReadCard(cardNode));
         return new PaukerStack(name, cards);
     }
     private static XmlElement FirstElem(XmlElement parent, string tagName)
     {
-        XmlNodeList xmlNodeList = parent.GetElementsByTagName(tagName);
+        var xmlNodeList = parent.GetElementsByTagName(tagName);
         return xmlNodeList != null && xmlNodeList[0] is XmlElement result ? result : throw new IOException();
     }
     private static PaukerCard ReadCard(XmlElement cardNode)
@@ -53,7 +53,7 @@ internal sealed class PaukerLesson
         cardsInStacks = new Dictionary<PaukerCard, List<PaukerStack>>();
         lessonFormat = d.DocumentElement!.GetAttribute("LessonFormat");
         var stackNodes = d.DocumentElement.SelectNodes("Batch");
-        for (int i = 0; i < stackNodes!.Count; i++)
+        for (var i = 0; i < stackNodes!.Count; i++)
         {
             var currentStack = ReadStack(stackNodes[i]!, i);
             Stacks.Add(currentStack);
@@ -109,8 +109,8 @@ internal sealed class PaukerLesson
     {
         var doc = new XmlDocument();
 
-        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-        XmlElement root = doc.DocumentElement!;
+        var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+        var root = doc.DocumentElement!;
         doc.InsertBefore(xmlDeclaration, root);
 
         doc.AppendChild(doc.CreateComment("This is a lesson file for Pauker (http://pauker.sourceforge.net)"));

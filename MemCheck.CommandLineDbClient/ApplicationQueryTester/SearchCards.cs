@@ -45,9 +45,9 @@ internal sealed class SearchCards : ICmdLinePlugin
 
         var chronos = new List<double>();
 
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
-            (int cardCount, double secondsElapsed) = await RunTestAsync(user);
+            (var cardCount, var secondsElapsed) = await RunTestAsync(user);
 
             if (cardCount != expectedCardCount)
                 throw new InvalidProgramException($"Expected {expectedCardCount} cards, got {cardCount}");

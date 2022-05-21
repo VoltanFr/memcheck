@@ -23,7 +23,7 @@ public class CreateCardTests
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
         var imageId = await ImageHelper.CreateAsync(testDB, ownerId);
 
-        Guid cardGuid = Guid.Empty;
+        var cardGuid = Guid.Empty;
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new CreateCard.Request(
@@ -69,7 +69,7 @@ public class CreateCardTests
         var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(testDB, ownerId);
         var tagId = await TagHelper.CreateAsync(testDB);
 
-        Guid cardGuid = Guid.Empty;
+        var cardGuid = Guid.Empty;
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new CreateCard.Request(
@@ -125,7 +125,7 @@ public class CreateCardTests
         var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: true);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
 
-        Guid cardGuid = Guid.Empty;
+        var cardGuid = Guid.Empty;
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new CreateCard.Request(
@@ -155,7 +155,7 @@ public class CreateCardTests
         var otherUser = await UserHelper.CreateInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
 
-        Guid cardGuid = Guid.Empty;
+        var cardGuid = Guid.Empty;
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new CreateCard.Request(
             creatorId,

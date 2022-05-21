@@ -50,7 +50,7 @@ public abstract class AbstractMemCheckAzureFunction
             logger.LogInformation("Assigning logger");
             this.logger = logger;
             logger.LogInformation("Assigning runningUserIdEnvVar");
-            string? runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
+            var runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
             if (runningUserIdEnvVar == null)
             {
                 logger.LogError("runningUserIdEnvVar is null");
@@ -123,7 +123,7 @@ public abstract class AbstractMemCheckAzureFunction
                 .Append(reportMailMainPart)
                 .Append(MailSender.GetMailFooter(FunctionName, StartTime, await AdminsAsync()));
 
-            string bodyText = reportMailBody.ToString();
+            var bodyText = reportMailBody.ToString();
 
             await MailSender.SendAsync(FunctionName, bodyText, await AdminsAsync());
         }

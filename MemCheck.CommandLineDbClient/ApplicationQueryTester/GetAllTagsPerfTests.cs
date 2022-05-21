@@ -69,7 +69,7 @@ internal sealed class GetAllTagsPerfTests : ICmdLinePlugin
             new TestDefinition("No user with filtering",new GetAllTags.Request(  200, 1, "Marine")),
         };
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
             foreach (var testDefinition in testDefinitions)
                 await RunTestAsync(testDefinition, i == 0);
 

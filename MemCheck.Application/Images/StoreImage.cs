@@ -30,7 +30,7 @@ public sealed class StoreImage : RequestRunner<StoreImage.Request, StoreImage.Re
     }
     public static byte[] ResizeImage(Bitmap originalImage, int targetWidth)
     {
-        int targetheight = originalImage.Height * targetWidth / originalImage.Width;
+        var targetheight = originalImage.Height * targetWidth / originalImage.Width;
         using var resultImage = new Bitmap(targetWidth, targetheight);
         using var resultImageGraphics = Graphics.FromImage(resultImage);
         resultImageGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;

@@ -16,7 +16,7 @@ public class Startup : FunctionsStartup
     {
         builder.Services.AddDbContext<MemCheckDbContext>(options =>
         {
-            string? connectionString = Environment.GetEnvironmentVariable("MemCheckDbConnectionString");
+            var connectionString = Environment.GetEnvironmentVariable("MemCheckDbConnectionString");
             if (connectionString == null)
                 throw new InvalidOperationException("MemCheckDbConnectionString not found");
             SqlServerDbContextOptionsExtensions.UseSqlServer(options, connectionString);

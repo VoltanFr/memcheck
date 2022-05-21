@@ -26,7 +26,7 @@ internal sealed class GetUserDecksWithHeapsAndTags : ICmdLinePlugin
 
         var chronos = new List<double>();
 
-        for (int i = 0; i < 5; i++)
+        for (var i = 0; i < 5; i++)
         {
             var realCodeChrono = Stopwatch.StartNew();
             var runner = new Application.Decks.GetUserDecksWithHeapsAndTags(dbContext.AsCallContext());

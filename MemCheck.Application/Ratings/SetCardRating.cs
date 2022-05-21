@@ -14,7 +14,7 @@ public sealed class SetCardRating : RequestRunner<SetCardRating.Request, SetCard
     #region Private methods
     private async Task<int> SaveRatingByUserAsync(Request request)
     {
-        int attempts = 0;
+        var attempts = 0;
         while (true)
         {
             var existingRatingByUser = await DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == request.CardId).SingleOrDefaultAsync();

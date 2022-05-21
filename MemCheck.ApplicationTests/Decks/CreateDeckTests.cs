@@ -72,7 +72,7 @@ public class CreateDeckTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         var name = RandomHelper.String();
-        int algo = RandomHelper.HeapingAlgorithm();
+        var algo = RandomHelper.HeapingAlgorithm();
 
         using (var dbContext = new MemCheckDbContext(db))
             await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, name, algo));

@@ -29,7 +29,7 @@ internal sealed class GetCardForEdit : ICmdLinePlugin
         const int runCount = 20;
 
         var chronos = new List<double>();
-        for (int i = 0; i < runCount; i++)
+        for (var i = 0; i < runCount; i++)
         {
             var request = new Application.Cards.GetCardForEdit.Request(userId, cardId);
             var runner = new Application.Cards.GetCardForEdit(callContext);

@@ -15,7 +15,7 @@ internal class PaukerStack
     {
         var indicesToDelete = new List<int>();
 
-        for (int i = 0; i < Cards.Count; i++)
+        for (var i = 0; i < Cards.Count; i++)
             if (Cards[i].Equals(card))
                 indicesToDelete.Add(i);
 
@@ -24,9 +24,9 @@ internal class PaukerStack
 
         if (excludingFirst)
         {
-            int indexToKeep = 0;
-            long smallestLearnedTimeStamp = long.MaxValue;
-            foreach (int i in indicesToDelete)
+            var indexToKeep = 0;
+            var smallestLearnedTimeStamp = long.MaxValue;
+            foreach (var i in indicesToDelete)
             {
                 var learned = Cards[i].Front.LearnedTimestamp;
                 if (!learned.HasValue || (learned.Value < smallestLearnedTimeStamp))
@@ -35,7 +35,7 @@ internal class PaukerStack
             indicesToDelete.Remove(indexToKeep);
         }
 
-        for (int i = indicesToDelete.Count - 1; i >= 0; i--)
+        for (var i = indicesToDelete.Count - 1; i >= 0; i--)
         {
             Console.WriteLine("Deleting card with front '{0}'", card.Front.Text);
             Cards.RemoveAt(indicesToDelete[i]);

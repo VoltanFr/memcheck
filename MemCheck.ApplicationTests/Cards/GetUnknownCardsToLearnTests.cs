@@ -110,7 +110,7 @@ public class GetUnknownCardsToLearnTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
-        for (int i = 0; i < 100; i++)
+        for (var i = 0; i < 100; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddNeverLearntCardAsync(db, deck, card.Id);
@@ -135,7 +135,7 @@ public class GetUnknownCardsToLearnTests
         var user = await UserHelper.CreateInDbAsync(db);
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
         const int cardCount = 100;
-        for (int i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddNeverLearntCardAsync(db, deck, card.Id);
@@ -173,7 +173,7 @@ public class GetUnknownCardsToLearnTests
         var user = await UserHelper.CreateInDbAsync(db);
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
         const int cardCount = 100;
-        for (int i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddCardAsync(db, deck, card.Id, 0);
@@ -182,7 +182,7 @@ public class GetUnknownCardsToLearnTests
         var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
         var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.ToImmutableArray();
         Assert.AreEqual(cardCount, cards.Length);
-        for (int i = 1; i < cards.Length; i++)
+        for (var i = 1; i < cards.Length; i++)
             Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
     }
     [TestMethod()]
@@ -192,7 +192,7 @@ public class GetUnknownCardsToLearnTests
         var user = await UserHelper.CreateInDbAsync(db);
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
         const int cardCount = 100;
-        for (int i = 0; i < cardCount; i++)
+        for (var i = 0; i < cardCount; i++)
         {
             await DeckHelper.AddNeverLearntCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user));
             await DeckHelper.AddCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user), 0);
@@ -201,9 +201,9 @@ public class GetUnknownCardsToLearnTests
         var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount);
         var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.ToImmutableArray();
         Assert.AreEqual(cardCount, cards.Length);
-        for (int i = 1; i < cardCount / 2; i++)
+        for (var i = 1; i < cardCount / 2; i++)
             Assert.AreEqual(CardInDeck.NeverLearntLastLearnTime, cards[i].LastLearnUtcTime);
-        for (int i = cardCount / 2; i < cards.Length; i++)
+        for (var i = cardCount / 2; i < cards.Length; i++)
             Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
     }
     [TestMethod()]
@@ -213,7 +213,7 @@ public class GetUnknownCardsToLearnTests
         var user = await UserHelper.CreateInDbAsync(db);
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DeveloperHeapingAlgorithm.ID);
         const int cardCount = 10;
-        for (int i = 0; i < cardCount / 2; i++)
+        for (var i = 0; i < cardCount / 2; i++)
         {
             await DeckHelper.AddNeverLearntCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user));
             await DeckHelper.AddCardAsync(db, deck, await CardHelper.CreateIdAsync(db, user), 0);
@@ -222,9 +222,9 @@ public class GetUnknownCardsToLearnTests
         var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), cardCount * 2);
         var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.ToImmutableArray();
         Assert.AreEqual(cardCount, cards.Length);
-        for (int i = 1; i < cardCount / 2; i++)
+        for (var i = 1; i < cardCount / 2; i++)
             Assert.AreEqual(CardInDeck.NeverLearntLastLearnTime, cards[i].LastLearnUtcTime);
-        for (int i = cardCount / 2; i < cards.Length; i++)
+        for (var i = cardCount / 2; i < cards.Length; i++)
             Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
     }
     [TestMethod()]
@@ -236,7 +236,7 @@ public class GetUnknownCardsToLearnTests
         var randomDate = RandomHelper.Date();
         var cardAddedLater = await CardHelper.CreateAsync(db, user);
         await DeckHelper.AddNeverLearntCardAsync(db, deck, cardAddedLater.Id, randomDate.AddDays(1));
-        for (int i = 0; i < 9; i++)
+        for (var i = 0; i < 9; i++)
         {
             var card = await CardHelper.CreateAsync(db, user);
             await DeckHelper.AddNeverLearntCardAsync(db, deck, card.Id, randomDate);

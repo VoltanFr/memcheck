@@ -121,7 +121,7 @@ public sealed class SubscribeToSearch : RequestRunner<SubscribeToSearch.Request,
             if (RequiredTags.GroupBy(guid => guid).Any(guid => guid.Count() > 1))
                 throw new RequestInputException("Required tag list contains duplicate");
 
-            int userSubscriptionsCount = callContext.DbContext.SearchSubscriptions.Count(s => s.UserId == UserId);
+            var userSubscriptionsCount = callContext.DbContext.SearchSubscriptions.Count(s => s.UserId == UserId);
             if (userSubscriptionsCount >= MaxSubscriptionCount)
                 throw new RequestInputException($"User already has {userSubscriptionsCount} subscriptions, can not have more than {MaxSubscriptionCount}");
         }

@@ -32,7 +32,7 @@ internal sealed class RecomputeAllExpirationDates : ICmdLinePlugin
         logger.LogInformation($"Algo: {algo.GetType().Name}, id: {algo.Id}");
 
         var allCardsNotUnkown = dbContext.CardsInDecks.Where(c => c.DeckId == deck && c.CurrentHeap != CardInDeck.UnknownHeap).OrderBy(c => c.LastLearnUtcTime);
-        int count = allCardsNotUnkown.Count();
+        var count = allCardsNotUnkown.Count();
         logger.LogInformation($"Will recompute expiration dates of {count} cards");
 
         var doneCount = 0;

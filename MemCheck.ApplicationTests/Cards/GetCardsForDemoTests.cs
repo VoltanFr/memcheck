@@ -144,7 +144,7 @@ public class GetCardsForDemoTests
         var user = await UserHelper.CreateInDbAsync(db);
         var tagId = await TagHelper.CreateAsync(db);
         var excludedCardId = await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
-        for (int i = 0; i < 9; i++)
+        for (var i = 0; i < 9; i++)
             await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
@@ -189,7 +189,7 @@ public class GetCardsForDemoTests
         var user = await UserHelper.CreateInDbAsync(db);
         var tagId = await TagHelper.CreateAsync(db);
         var createdCount = RandomHelper.Int(5, 20);
-        for (int i = 0; i < createdCount; i++)
+        for (var i = 0; i < createdCount; i++)
             await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
@@ -259,8 +259,8 @@ public class GetCardsForDemoTests
         var cardsWithRating4 = new List<Guid>();
         var cardsWithRating3 = new List<Guid>();
 
-        for (int rating = 0; rating <= 4; rating++)
-            for (int i = 0; i < 3; i++)
+        for (var rating = 0; rating <= 4; rating++)
+            for (var i = 0; i < 3; i++)
             {
                 var card = await CardHelper.CreateAsync(db, user, tagIds: tagId.AsArray());
                 if (rating != 0)
@@ -288,8 +288,8 @@ public class GetCardsForDemoTests
         var cardsWithRating5 = new List<Guid>();
 
         //100 cards with each rating value
-        for (int rating = 0; rating < 6; rating++)
-            for (int i = 0; i < 100; i++)
+        for (var rating = 0; rating < 6; rating++)
+            for (var i = 0; i < 100; i++)
             {
                 var card = await CardHelper.CreateAsync(db, user, tagIds: tagId.AsArray());
                 if (rating != 0)
@@ -407,7 +407,7 @@ public class GetCardsForDemoTests
         var user = await UserHelper.CreateInDbAsync(db);
         var tagId = await TagHelper.CreateAsync(db);
 
-        for (int cardIndex = 0; cardIndex <= GetCardsForDemo.Request.MaxCount; cardIndex++)
+        for (var cardIndex = 0; cardIndex <= GetCardsForDemo.Request.MaxCount; cardIndex++)
         {
             var card = await CardHelper.CreateAsync(db, user, tagIds: tagId.AsArray());
             await RatingHelper.RecordForUserAsync(db, user, card.Id, RandomHelper.Rating());

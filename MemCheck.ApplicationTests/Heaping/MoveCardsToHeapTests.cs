@@ -304,7 +304,7 @@ public class MoveCardsToHeapTests
         using (var dbContext = new MemCheckDbContext(db))
             await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.UnknownHeap, card.Id.AsArray()));
 
-        for (int i = 0; i < 2; i++)
+        for (var i = 0; i < 2; i++)
             using (var dbContext = new MemCheckDbContext(db))
             {
                 var loadedCard = dbContext.CardsInDecks.Single();

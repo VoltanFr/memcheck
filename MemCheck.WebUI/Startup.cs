@@ -30,7 +30,7 @@ public sealed class Startup
     #region Private methods
     private static ILogger<AppSettings> CreateLogger()
     {
-        using ILoggerFactory? loggerFactory = LoggerFactory.Create(builder =>
+        using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Trace);
             builder.AddConsole();

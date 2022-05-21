@@ -33,7 +33,7 @@ internal sealed class GetUserDecksWithTags : ICmdLinePlugin
         {
             var chronos = new List<double>();
 
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var realCodeChrono = Stopwatch.StartNew();
                 var userDecks = await new Application.Decks.GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new Application.Decks.GetUserDecksWithTags.Request(user.Id));

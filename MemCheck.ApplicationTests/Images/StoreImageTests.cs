@@ -22,8 +22,8 @@ public class StoreImageTests
     #region Private methods
     private static ImmutableArray<byte> GetPngImage()
     {
-        using Stream resFilestream = typeof(StoreImageTests).Assembly.GetManifestResourceStream("MemCheck.Application.Resources.Gray.png")!;
-        byte[] result = new byte[resFilestream.Length];
+        using var resFilestream = typeof(StoreImageTests).Assembly.GetManifestResourceStream("MemCheck.Application.Resources.Gray.png")!;
+        var result = new byte[resFilestream.Length];
         resFilestream.Read(result, 0, result.Length);
         return result.ToImmutableArray();
     }

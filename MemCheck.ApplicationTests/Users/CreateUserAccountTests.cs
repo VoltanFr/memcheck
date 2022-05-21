@@ -73,8 +73,8 @@ public class CreateUserAccountTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        string userName = RandomHelper.String(MemCheckUserManager.MaxUserNameLength);
-        string email = RandomHelper.String();
+        var userName = RandomHelper.String(MemCheckUserManager.MaxUserNameLength);
+        var email = RandomHelper.String();
         var userToCreate = new MemCheckUser { UserName = userName, Email = email };
 
         using (var dbContext = new MemCheckDbContext(db))

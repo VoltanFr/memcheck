@@ -34,7 +34,7 @@ internal sealed class Homepage : ICmdLinePlugin
         {
             var chronos = new List<double>();
 
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var realCodeChrono = Stopwatch.StartNew();
                 var userDecks = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));

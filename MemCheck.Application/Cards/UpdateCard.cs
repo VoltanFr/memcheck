@@ -156,7 +156,7 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
             if (!UsersWithVisibility.Any())
                 return;
             await CheckVisibilityForUsersAsync(await GetAllAuthorsAsync(card, dbContext), localizer, "HeCreatedAVersionOfThisCard", dbContext);
-            IEnumerable<Guid> userIds = await GetAllUsersWithCardInADeckAsync(dbContext);
+            var userIds = await GetAllUsersWithCardInADeckAsync(dbContext);
             await CheckVisibilityForUsersAsync(userIds, localizer, "HeHasThisCardInADeck", dbContext);
         }
         #endregion

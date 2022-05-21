@@ -260,7 +260,7 @@ public class SubscribeToSearchTest
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
         using (var dbContext = new MemCheckDbContext(testDB))
-            for (int i = 0; i < SubscribeToSearch.Request.MaxSubscriptionCount; i++)
+            for (var i = 0; i < SubscribeToSearch.Request.MaxSubscriptionCount; i++)
                 await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>()));
 
         using (var dbContext = new MemCheckDbContext(testDB))

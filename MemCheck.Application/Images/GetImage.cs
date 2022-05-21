@@ -15,7 +15,7 @@ public sealed class GetImage : RequestRunner<GetImage.Request, GetImage.Result>
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        byte[] result = request.Size switch
+        var result = request.Size switch
         {
             Request.ImageSize.Small => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.SmallBlob }).SingleAsync(img => img.Id == request.ImageId)).SmallBlob,
             Request.ImageSize.Medium => (await DbContext.Images.AsNoTracking().Select(img => new { img.Id, img.MediumBlob }).SingleAsync(img => img.Id == request.ImageId)).MediumBlob,
