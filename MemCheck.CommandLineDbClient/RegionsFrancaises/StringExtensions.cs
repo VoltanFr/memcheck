@@ -1,12 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MemCheck.CommandLineDbClient.RegionsFrancaises
+namespace MemCheck.CommandLineDbClient.RegionsFrancaises;
+
+internal static class StringExtensions
 {
-    internal static class StringExtensions
+    public static string RemoveBlanks(this string s)
     {
-        public static string RemoveBlanks(this string s)
-        {
-            return Regex.Replace(s, @"\s+", "");
-        }
+        return Regex.Replace(s, @"\s+", "");
     }
 }

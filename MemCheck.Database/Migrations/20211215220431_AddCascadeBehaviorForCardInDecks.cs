@@ -1,36 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MemCheck.Database.Migrations
+namespace MemCheck.Database.Migrations;
+
+public partial class AddCascadeBehaviorForCardInDecks : Migration
 {
-    public partial class AddCascadeBehaviorForCardInDecks : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_CardsInDecks_Cards_CardId",
-                table: "CardsInDecks");
+        migrationBuilder.DropForeignKey(
+            name: "FK_CardsInDecks_Cards_CardId",
+            table: "CardsInDecks");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_CardsInDecks_Cards_CardId",
-                table: "CardsInDecks",
-                column: "CardId",
-                principalTable: "Cards",
-                principalColumn: "Id");
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_CardsInDecks_Cards_CardId",
+            table: "CardsInDecks",
+            column: "CardId",
+            principalTable: "Cards",
+            principalColumn: "Id");
+    }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_CardsInDecks_Cards_CardId",
-                table: "CardsInDecks");
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropForeignKey(
+            name: "FK_CardsInDecks_Cards_CardId",
+            table: "CardsInDecks");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_CardsInDecks_Cards_CardId",
-                table: "CardsInDecks",
-                column: "CardId",
-                principalTable: "Cards",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_CardsInDecks_Cards_CardId",
+            table: "CardsInDecks",
+            column: "CardId",
+            principalTable: "Cards",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Cascade);
     }
 }

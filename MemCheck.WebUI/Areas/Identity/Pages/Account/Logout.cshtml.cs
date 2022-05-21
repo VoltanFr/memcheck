@@ -5,26 +5,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
 
-namespace MemCheck.WebUI.Areas.Identity.Pages.Account
+namespace MemCheck.WebUI.Areas.Identity.Pages.Account;
+
+[AllowAnonymous]
+public class LogoutModel : PageModel
 {
-    [AllowAnonymous]
-    public class LogoutModel : PageModel
+    private readonly SignInManager<MemCheckUser> _signInManager;
+
+    public LogoutModel(SignInManager<MemCheckUser> signInManager)
     {
-        private readonly SignInManager<MemCheckUser> _signInManager;
+        _signInManager = signInManager;
+    }
 
-        public LogoutModel(SignInManager<MemCheckUser> signInManager)
-        {
-            _signInManager = signInManager;
-        }
+    public void OnGet()
+    {
+    }
 
-        public void OnGet()
-        {
-        }
-
-        public async Task<IActionResult> OnPost(string returnAddress = "/")
-        {
-            await _signInManager.SignOutAsync();
-            return returnAddress != null ? LocalRedirect(returnAddress) : RedirectToPage();
-        }
+    public async Task<IActionResult> OnPost(string returnAddress = "/")
+    {
+        await _signInManager.SignOutAsync();
+        return returnAddress != null ? LocalRedirect(returnAddress) : RedirectToPage();
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace MemCheck.WebUI
+﻿namespace MemCheck.WebUI;
+
+public static class MemCheckClaims
 {
-    public static class MemCheckClaims
-    {
-        public const string UICulture = "UICulture";
-    }
+    public const string UICulture = "UICulture";
 }

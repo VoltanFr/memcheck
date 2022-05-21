@@ -9,33 +9,32 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.ManageDB
-{
-    internal sealed class ListUsers : ICmdLinePlugin
-    {
-        #region Fields
-        private readonly ILogger<ListUsers> logger;
-        private readonly MemCheckDbContext dbContext;
-        private readonly UserManager<MemCheckUser> userManager;
-        #endregion
-        public ListUsers(IServiceProvider serviceProvider)
-        {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<ListUsers>>();
-            userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
-        }
-        public void DescribeForOpportunityToCancel()
-        {
-            logger.LogInformation("Will list users");
-        }
-        public async Task RunAsync()
-        {
-            var users = await dbContext.Users.ToListAsync();
-            var roleChecker = new ProdRoleChecker(userManager);
-            var usersWithAdminInfo = users.Select(u => new { u.Id, u.UserName, isAdmin = roleChecker.UserIsAdminAsync(u).Result, u.DeletionDate, lockoutEnabled = userManager.GetLockoutEnabledAsync(u).Result, u.Email, u.EmailConfirmed }).ToList();
+namespace MemCheck.CommandLineDbClient.ManageDB;
 
-            foreach (var userWithAdminInfo in usersWithAdminInfo)
-                logger.LogInformation($"User '{userWithAdminInfo.UserName}' has id {userWithAdminInfo.Id}, {(userWithAdminInfo.isAdmin ? "IS" : "NOT")} admin, deletion '{userWithAdminInfo.DeletionDate}', lockoutEnabled: {userWithAdminInfo.lockoutEnabled}, Email: '{userWithAdminInfo.Email}', Email confirmed: {userWithAdminInfo.EmailConfirmed}");
-        }
+internal sealed class ListUsers : ICmdLinePlugin
+{
+    #region Fields
+    private readonly ILogger<ListUsers> logger;
+    private readonly MemCheckDbContext dbContext;
+    private readonly UserManager<MemCheckUser> userManager;
+    #endregion
+    public ListUsers(IServiceProvider serviceProvider)
+    {
+        dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+        logger = serviceProvider.GetRequiredService<ILogger<ListUsers>>();
+        userManager = serviceProvider.GetRequiredService<UserManager<MemCheckUser>>();
+    }
+    public void DescribeForOpportunityToCancel()
+    {
+        logger.LogInformation("Will list users");
+    }
+    public async Task RunAsync()
+    {
+        var users = await dbContext.Users.ToListAsync();
+        var roleChecker = new ProdRoleChecker(userManager);
+        var usersWithAdminInfo = users.Select(u => new { u.Id, u.UserName, isAdmin = roleChecker.UserIsAdminAsync(u).Result, u.DeletionDate, lockoutEnabled = userManager.GetLockoutEnabledAsync(u).Result, u.Email, u.EmailConfirmed }).ToList();
+
+        foreach (var userWithAdminInfo in usersWithAdminInfo)
+            logger.LogInformation($"User '{userWithAdminInfo.UserName}' has id {userWithAdminInfo.Id}, {(userWithAdminInfo.isAdmin ? "IS" : "NOT")} admin, deletion '{userWithAdminInfo.DeletionDate}', lockoutEnabled: {userWithAdminInfo.lockoutEnabled}, Email: '{userWithAdminInfo.Email}', Email confirmed: {userWithAdminInfo.EmailConfirmed}");
     }
 }

@@ -6,57 +6,56 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient
+namespace MemCheck.CommandLineDbClient;
+
+internal sealed class Engine : IHostedService
 {
-    internal sealed class Engine : IHostedService
+    #region Fields
+    private readonly ILogger<Engine> logger;
+    private readonly IServiceProvider serviceProvider;
+    #endregion
+    #region Private method
+    private ICmdLinePlugin GetPlugin()
     {
-        #region Fields
-        private readonly ILogger<Engine> logger;
-        private readonly IServiceProvider serviceProvider;
-        #endregion
-        #region Private method
-        private ICmdLinePlugin GetPlugin()
+        return new GetAllTagsPerfTests(serviceProvider);
+    }
+    #endregion
+    public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
+    {
+        this.logger = logger;
+        this.serviceProvider = serviceProvider;
+    }
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        var test = GetPlugin();
+        test.DescribeForOpportunityToCancel();
+        GetConfirmationOrCancel(logger);
+        var chrono = Stopwatch.StartNew();
+        try
         {
-            return new GetAllTagsPerfTests(serviceProvider);
+            await test.RunAsync();
+            chrono.Stop();
         }
-        #endregion
-        public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
+        catch (Exception e)
         {
-            this.logger = logger;
-            this.serviceProvider = serviceProvider;
+            logger.LogError(e, e.Message);
         }
-        public async Task StartAsync(CancellationToken cancellationToken)
+        logger.LogInformation($"Program terminating, took {chrono.Elapsed}");
+        Debugger.Break();
+        throw new InvalidProgramException("Test done");
+    }
+    public static void GetConfirmationOrCancel(ILogger logger)
+    {
+        logger.LogWarning("Opportunity to cancel. Please confirm with Y");
+        var input = Console.ReadLine();
+        if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
         {
-            var test = GetPlugin();
-            test.DescribeForOpportunityToCancel();
-            GetConfirmationOrCancel(logger);
-            var chrono = Stopwatch.StartNew();
-            try
-            {
-                await test.RunAsync();
-                chrono.Stop();
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, e.Message);
-            }
-            logger.LogInformation($"Program terminating, took {chrono.Elapsed}");
-            Debugger.Break();
-            throw new InvalidProgramException("Test done");
+            logger.LogError("User cancellation");
+            throw new InvalidProgramException("User cancellation");
         }
-        public static void GetConfirmationOrCancel(ILogger logger)
-        {
-            logger.LogWarning("Opportunity to cancel. Please confirm with Y");
-            var input = Console.ReadLine();
-            if (input == null || !input.Trim().Equals("y", StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogError("User cancellation");
-                throw new InvalidProgramException("User cancellation");
-            }
-        }
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

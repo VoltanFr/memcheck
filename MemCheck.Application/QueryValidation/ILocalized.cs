@@ -1,7 +1,6 @@
-﻿namespace MemCheck.Application.QueryValidation
+﻿namespace MemCheck.Application.QueryValidation;
+
+public interface ILocalized
 {
-    public interface ILocalized
-    {
-        string GetLocalized(string resourceName);
-    }
+    string GetLocalized(string resourceName);
 }

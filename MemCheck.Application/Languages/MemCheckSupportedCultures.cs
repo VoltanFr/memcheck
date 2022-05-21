@@ -1,33 +1,32 @@
 ﻿using System.Collections.Immutable;
 using System.Globalization;
 
-namespace MemCheck.Application.Languages
-{
-    public static class MemCheckSupportedCultures
-    {
-        #region Fields
-        #endregion
-        public static CultureInfo English { get; } = new("en-US");
-        public static CultureInfo French { get; } = new("fr-FR");
-        public static ImmutableArray<CultureInfo> All => new[] { English, French }.ToImmutableArray();
+namespace MemCheck.Application.Languages;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "More complicated")]
-        public static string? IdFromCulture(CultureInfo c)
+public static class MemCheckSupportedCultures
+{
+    #region Fields
+    #endregion
+    public static CultureInfo English { get; } = new("en-US");
+    public static CultureInfo French { get; } = new("fr-FR");
+    public static ImmutableArray<CultureInfo> All => new[] { English, French }.ToImmutableArray();
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "More complicated")]
+    public static string? IdFromCulture(CultureInfo c)
+    {
+        if (English.Equals(c))
+            return "En";
+        if (French.Equals(c))
+            return "Fr";
+        return null;
+    }
+    public static CultureInfo? CultureFromId(string culture)
+    {
+        return culture switch
         {
-            if (English.Equals(c))
-                return "En";
-            if (French.Equals(c))
-                return "Fr";
-            return null;
-        }
-        public static CultureInfo? CultureFromId(string culture)
-        {
-            return culture switch
-            {
-                "En" => English,
-                "Fr" => French,
-                _ => null,
-            };
-        }
+            "En" => English,
+            "Fr" => French,
+            _ => null,
+        };
     }
 }

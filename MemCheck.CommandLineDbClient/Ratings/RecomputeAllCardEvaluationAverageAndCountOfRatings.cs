@@ -8,43 +8,42 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.Ratings
+namespace MemCheck.CommandLineDbClient.Ratings;
+
+internal sealed class RecomputeAllCardEvaluationAverageAndCountOfRatings : ICmdLinePlugin
 {
-    internal sealed class RecomputeAllCardEvaluationAverageAndCountOfRatings : ICmdLinePlugin
+    #region Fields
+    private readonly ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings> logger;
+    private readonly MemCheckDbContext dbContext;
+    #endregion
+    public RecomputeAllCardEvaluationAverageAndCountOfRatings(IServiceProvider serviceProvider)
     {
-        #region Fields
-        private readonly ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings> logger;
-        private readonly MemCheckDbContext dbContext;
-        #endregion
-        public RecomputeAllCardEvaluationAverageAndCountOfRatings(IServiceProvider serviceProvider)
+        dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+        logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings>>();
+    }
+    public void DescribeForOpportunityToCancel()
+    {
+        logger.LogInformation($"Will recompute average rating and rating count for all cards");
+    }
+    public async Task RunAsync()
+    {
+        var allCardWithRatings = (await dbContext.UserCardRatings.Select(c => c.CardId).ToListAsync()).ToImmutableArray();
+        logger.LogInformation($"Will recompute ratings of {allCardWithRatings.Length} cards");
+
+        foreach (var cardId in allCardWithRatings)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<RecomputeAllCardEvaluationAverageAndCountOfRatings>>();
+            var count = await dbContext.UserCardRatings.AsNoTracking().Where(c => c.CardId == cardId).CountAsync();
+            var average = await dbContext.UserCardRatings.AsNoTracking().Where(c => c.CardId == cardId).Select(c => c.Rating).AverageAsync();
+
+            var card = await dbContext.Cards.Where(c => c.Id == cardId).SingleAsync();
+            logger.LogInformation($"Will update to average eval {average} with a count of {count} evals: {card.FrontSide.Truncate(100)}");
+
+            card.RatingCount = count;
+            card.AverageRating = average;
         }
-        public void DescribeForOpportunityToCancel()
-        {
-            logger.LogInformation($"Will recompute average rating and rating count for all cards");
-        }
-        public async Task RunAsync()
-        {
-            var allCardWithRatings = (await dbContext.UserCardRatings.Select(c => c.CardId).ToListAsync()).ToImmutableArray();
-            logger.LogInformation($"Will recompute ratings of {allCardWithRatings.Length} cards");
 
-            foreach (var cardId in allCardWithRatings)
-            {
-                var count = await dbContext.UserCardRatings.AsNoTracking().Where(c => c.CardId == cardId).CountAsync();
-                var average = await dbContext.UserCardRatings.AsNoTracking().Where(c => c.CardId == cardId).Select(c => c.Rating).AverageAsync();
+        var dbUpdateCount = await dbContext.SaveChangesAsync();
 
-                var card = await dbContext.Cards.Where(c => c.Id == cardId).SingleAsync();
-                logger.LogInformation($"Will update to average eval {average} with a count of {count} evals: {card.FrontSide.Truncate(100)}");
-
-                card.RatingCount = count;
-                card.AverageRating = average;
-            }
-
-            var dbUpdateCount = await dbContext.SaveChangesAsync();
-
-            logger.LogInformation($"Rating updates finished - dbUpdateCount: {dbUpdateCount}");
-        }
+        logger.LogInformation($"Rating updates finished - dbUpdateCount: {dbUpdateCount}");
     }
 }

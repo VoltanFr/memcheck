@@ -6,24 +6,23 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifying;
+
+[TestClass()]
+public class UserLastNotifDateUpdaterTest
 {
-    [TestClass()]
-    public class UserLastNotifDateUpdaterTest
+    [TestMethod()]
+    public async Task TestRun_UserWithoutSubscription()
     {
-        [TestMethod()]
-        public async Task TestRun_UserWithoutSubscription()
-        {
-            var testDB = DbHelper.GetEmptyTestDB();
+        var testDB = DbHelper.GetEmptyTestDB();
 
-            var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2040, 1, 1));
-            var lastNotifDate = new DateTime(2040, 1, 2);
+        var user = await UserHelper.CreateInDbAsync(testDB, 1, new DateTime(2040, 1, 1));
+        var lastNotifDate = new DateTime(2040, 1, 2);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-                await new UserLastNotifDateUpdater(dbContext.AsCallContext(), lastNotifDate).RunAsync(user);
+        using (var dbContext = new MemCheckDbContext(testDB))
+            await new UserLastNotifDateUpdater(dbContext.AsCallContext(), lastNotifDate).RunAsync(user);
 
-            using (var dbContext = new MemCheckDbContext(testDB))
-                Assert.AreEqual(lastNotifDate, dbContext.Users.First().LastNotificationUtcDate);
-        }
+        using (var dbContext = new MemCheckDbContext(testDB))
+            Assert.AreEqual(lastNotifDate, dbContext.Users.First().LastNotificationUtcDate);
     }
 }

@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MemCheck.Application.QueryValidation
+namespace MemCheck.Application.QueryValidation;
+
+internal static class ComparisonHelper
 {
-    internal static class ComparisonHelper
+    public static bool SameSetOfGuid(IEnumerable<Guid> left, IEnumerable<Guid> right)
     {
-        public static bool SameSetOfGuid(IEnumerable<Guid> left, IEnumerable<Guid> right)
-        {
-            return left.ToHashSet().SetEquals(right.ToHashSet());
-        }
+        return left.ToHashSet().SetEquals(right.ToHashSet());
     }
 }

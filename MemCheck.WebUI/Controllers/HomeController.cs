@@ -12,134 +12,133 @@ using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using MemCheck.Application;
 
-namespace MemCheck.WebUI.Controllers
+namespace MemCheck.WebUI.Controllers;
+
+[Route("[controller]")]
+public class HomeController : MemCheckController
 {
-    [Route("[controller]")]
-    public class HomeController : MemCheckController
+    #region Fields
+    private readonly CallContext callContext;
+    private readonly UserManager<MemCheckUser> userManager;
+    #endregion
+    public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<HomeController> localizer, TelemetryClient telemetryClient) : base(localizer)
     {
-        #region Fields
-        private readonly CallContext callContext;
-        private readonly UserManager<MemCheckUser> userManager;
-        #endregion
-        public HomeController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<HomeController> localizer, TelemetryClient telemetryClient) : base(localizer)
-        {
-            callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
-            this.userManager = userManager;
-        }
-        #region GetAll
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            var user = await userManager.GetUserAsync(HttpContext.User);
-            if (user == null)
-                return Ok(new GetAllViewModel(null, false, 0, Array.Empty<GetAllDeckViewModel>(), DateTime.UtcNow));
+        callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
+        this.userManager = userManager;
+    }
+    #region GetAll
+    [HttpGet("GetAll")]
+    public async Task<IActionResult> GetAllAsync()
+    {
+        var user = await userManager.GetUserAsync(HttpContext.User);
+        if (user == null)
+            return Ok(new GetAllViewModel(null, false, 0, Array.Empty<GetAllDeckViewModel>(), DateTime.UtcNow));
 
-            var userDecks = await new GetDecksWithLearnCounts(callContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
-            var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
-            var cardCount = userDecks.Sum(deck => deck.CardCount);
+        var userDecks = await new GetDecksWithLearnCounts(callContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
+        var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
+        var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-            return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, userDecks.Count() == 1, this)), DateTime.UtcNow));
-        }
-        #region Result classes
-        public sealed class GetAllViewModel
+        return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, userDecks.Count() == 1, this)), DateTime.UtcNow));
+    }
+    #region Result classes
+    public sealed class GetAllViewModel
+    {
+        private static TimeSpan GetReloadWaitTime(IEnumerable<GetAllDeckViewModel> userDecks)
         {
-            private static TimeSpan GetReloadWaitTime(IEnumerable<GetAllDeckViewModel> userDecks)
+            if (!userDecks.Any())
+                //Refreshing is useless
+                return TimeSpan.Zero;
+
+            if (userDecks.Any(deck => deck.ExpiredCardCount > 0))
+                return TimeSpan.FromMinutes(10);
+
+            var sleepTimeForDecks = userDecks.Select(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow).Min();
+            return new[] { TimeSpan.FromMinutes(1), sleepTimeForDecks }.Max().Add(TimeSpan.FromMinutes(1));    //Not less than 2'
+        }
+        public GetAllViewModel(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllDeckViewModel> userDecks, DateTime dataUTCDate)
+        {
+            UserName = userName;
+            AnythingToLearn = anythingToLearn;
+            TotalCardCountInDecksOfUser = totalCardCountInDecksOfUser;
+            //Formula below: if a deck is expired, it will not make us refresh before 10'. And anyway we won't refresh before 2'
+            ReloadWaitTime = (int)GetReloadWaitTime(userDecks).TotalMilliseconds;
+            UserDecks = userDecks;
+            DataUTCDate = dataUTCDate;
+        }
+        public string? UserName { get; }    //null if no user
+        public bool AnythingToLearn { get; }
+        public int TotalCardCountInDecksOfUser { get; }
+        public int ReloadWaitTime { get; }  //milliseconds
+        public IEnumerable<GetAllDeckViewModel> UserDecks { get; }
+        public DateTime DataUTCDate { get; }
+    }
+    public sealed class GetAllDeckViewModel
+    {
+        public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, bool isTheOnlyDeck, ILocalized localizer)
+        {
+            NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
+
+            var lines = new List<string>();
+            if (applicationDeck.CardCount == 0)
             {
-                if (!userDecks.Any())
-                    //Refreshing is useless
-                    return TimeSpan.Zero;
-
-                if (userDecks.Any(deck => deck.ExpiredCardCount > 0))
-                    return TimeSpan.FromMinutes(10);
-
-                var sleepTimeForDecks = userDecks.Select(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow).Min();
-                return new[] { TimeSpan.FromMinutes(1), sleepTimeForDecks }.Max().Add(TimeSpan.FromMinutes(1));    //Not less than 2'
+                HeadLine = localizer.GetLocalized("ThereIsNoCardInYourDeck") + $" <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>.";
+                lines.Add($"<a href=\"/Search/Index\" >{localizer.GetLocalized("ClickHereToSearchAndAddCards")}</a>...");
+                lines.Add($"<a href=\"/Authoring/Index\">{localizer.GetLocalized("ClickHereToCreateCards")}</a>...");
             }
-            public GetAllViewModel(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllDeckViewModel> userDecks, DateTime dataUTCDate)
+            else
             {
-                UserName = userName;
-                AnythingToLearn = anythingToLearn;
-                TotalCardCountInDecksOfUser = totalCardCountInDecksOfUser;
-                //Formula below: if a deck is expired, it will not make us refresh before 10'. And anyway we won't refresh before 2'
-                ReloadWaitTime = (int)GetReloadWaitTime(userDecks).TotalMilliseconds;
-                UserDecks = userDecks;
-                DataUTCDate = dataUTCDate;
-            }
-            public string? UserName { get; }    //null if no user
-            public bool AnythingToLearn { get; }
-            public int TotalCardCountInDecksOfUser { get; }
-            public int ReloadWaitTime { get; }  //milliseconds
-            public IEnumerable<GetAllDeckViewModel> UserDecks { get; }
-            public DateTime DataUTCDate { get; }
-        }
-        public sealed class GetAllDeckViewModel
-        {
-            public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, bool isTheOnlyDeck, ILocalized localizer)
-            {
-                NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
-
-                var lines = new List<string>();
-                if (applicationDeck.CardCount == 0)
-                {
-                    HeadLine = localizer.GetLocalized("ThereIsNoCardInYourDeck") + $" <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>.";
-                    lines.Add($"<a href=\"/Search/Index\" >{localizer.GetLocalized("ClickHereToSearchAndAddCards")}</a>...");
-                    lines.Add($"<a href=\"/Authoring/Index\">{localizer.GetLocalized("ClickHereToCreateCards")}</a>...");
-                }
+                HeadLine = isTheOnlyDeck
+                    ? $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{localizer.GetLocalized("YourDeck")}</a>..."
+                    : $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} {localizer.GetLocalized("YourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
+                if (applicationDeck.UnknownCardCount == 0)
+                    lines.Add(localizer.GetLocalized("NoUnknownCard"));
                 else
                 {
-                    HeadLine = isTheOnlyDeck
-                        ? $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{localizer.GetLocalized("YourDeck")}</a>..."
-                        : $"{localizer.GetLocalized("AmongThe")} {applicationDeck.CardCount} {localizer.GetLocalized("CardsOf")} {localizer.GetLocalized("YourDeck")} <a href=\"/Decks/Index?DeckId={applicationDeck.Id}\">{applicationDeck.Description}</a>...";
-                    if (applicationDeck.UnknownCardCount == 0)
-                        lines.Add(localizer.GetLocalized("NoUnknownCard"));
-                    else
-                    {
-                        var linkText = applicationDeck.UnknownCardCount == 1 ? localizer.GetLocalized("OneUnknownCard") : $"{applicationDeck.UnknownCardCount} {localizer.GetLocalized("UnknownCards")}";
-                        lines.Add($"<a href=\"/Learn/Index?LearnMode=Unknown\">{linkText}</a>");
-                    }
-                    if (applicationDeck.ExpiredCardCount == 0)
-                        lines.Add(localizer.GetLocalized("NoExpiredCard"));
-                    else
-                    {
-                        var linkText = applicationDeck.ExpiredCardCount == 1 ? localizer.GetLocalized("OneExpiredCard") : $"{applicationDeck.ExpiredCardCount} {localizer.GetLocalized("ExpiredCards")}";
-                        lines.Add($"<a href=\"/Learn/Index?LearnMode=Expired\">{linkText}</a>");
-                    }
-                    if (applicationDeck.ExpiringNextHourCount == 0)
-                        lines.Add(localizer.GetLocalized("NoCardToExpireInTheNextHour"));
-                    else
-                    {
-                        if (applicationDeck.ExpiringNextHourCount == 1)
-                            lines.Add(localizer.GetLocalized("OneCardWillExpireInTheNextHour"));
-                        else
-                            lines.Add($"{applicationDeck.ExpiringNextHourCount} {localizer.GetLocalized("CardsWillExpireInTheNextHour")}");
-                    }
-                    if (applicationDeck.ExpiringFollowing24hCount == 0)
-                        lines.Add(localizer.GetLocalized("NoCardToExpireInTheFollowing24h"));
-                    else
-                    {
-                        if (applicationDeck.ExpiringFollowing24hCount == 1)
-                            lines.Add(localizer.GetLocalized("OneCardWillExpireInTheFollowing24h"));
-                        else
-                            lines.Add($"{applicationDeck.ExpiringFollowing24hCount} {localizer.GetLocalized("CardsWillExpireInTheFollowing24h")}");
-                    }
-                    if (applicationDeck.ExpiringFollowing3DaysCount == 0)
-                        lines.Add(localizer.GetLocalized("NoCardToExpireInTheFollowing3Days"));
-                    else
-                    {
-                        if (applicationDeck.ExpiringFollowing3DaysCount == 1)
-                            lines.Add(localizer.GetLocalized("OneCardWillExpireInTheFollowing3Days"));
-                        else
-                            lines.Add($"{applicationDeck.ExpiringFollowing3DaysCount} {localizer.GetLocalized("CardsWillExpireInTheFollowing3Days")}");
-                    }
+                    var linkText = applicationDeck.UnknownCardCount == 1 ? localizer.GetLocalized("OneUnknownCard") : $"{applicationDeck.UnknownCardCount} {localizer.GetLocalized("UnknownCards")}";
+                    lines.Add($"<a href=\"/Learn/Index?LearnMode=Unknown\">{linkText}</a>");
                 }
-                Lines = lines;
+                if (applicationDeck.ExpiredCardCount == 0)
+                    lines.Add(localizer.GetLocalized("NoExpiredCard"));
+                else
+                {
+                    var linkText = applicationDeck.ExpiredCardCount == 1 ? localizer.GetLocalized("OneExpiredCard") : $"{applicationDeck.ExpiredCardCount} {localizer.GetLocalized("ExpiredCards")}";
+                    lines.Add($"<a href=\"/Learn/Index?LearnMode=Expired\">{linkText}</a>");
+                }
+                if (applicationDeck.ExpiringNextHourCount == 0)
+                    lines.Add(localizer.GetLocalized("NoCardToExpireInTheNextHour"));
+                else
+                {
+                    if (applicationDeck.ExpiringNextHourCount == 1)
+                        lines.Add(localizer.GetLocalized("OneCardWillExpireInTheNextHour"));
+                    else
+                        lines.Add($"{applicationDeck.ExpiringNextHourCount} {localizer.GetLocalized("CardsWillExpireInTheNextHour")}");
+                }
+                if (applicationDeck.ExpiringFollowing24hCount == 0)
+                    lines.Add(localizer.GetLocalized("NoCardToExpireInTheFollowing24h"));
+                else
+                {
+                    if (applicationDeck.ExpiringFollowing24hCount == 1)
+                        lines.Add(localizer.GetLocalized("OneCardWillExpireInTheFollowing24h"));
+                    else
+                        lines.Add($"{applicationDeck.ExpiringFollowing24hCount} {localizer.GetLocalized("CardsWillExpireInTheFollowing24h")}");
+                }
+                if (applicationDeck.ExpiringFollowing3DaysCount == 0)
+                    lines.Add(localizer.GetLocalized("NoCardToExpireInTheFollowing3Days"));
+                else
+                {
+                    if (applicationDeck.ExpiringFollowing3DaysCount == 1)
+                        lines.Add(localizer.GetLocalized("OneCardWillExpireInTheFollowing3Days"));
+                    else
+                        lines.Add($"{applicationDeck.ExpiringFollowing3DaysCount} {localizer.GetLocalized("CardsWillExpireInTheFollowing3Days")}");
+                }
             }
-            internal int ExpiredCardCount { get; }
-            public DateTime NextExpiryUTCDate { get; }
-            public string HeadLine { get; }
-            public IEnumerable<string> Lines { get; }
+            Lines = lines;
         }
-        #endregion
-        #endregion
+        internal int ExpiredCardCount { get; }
+        public DateTime NextExpiryUTCDate { get; }
+        public string HeadLine { get; }
+        public IEnumerable<string> Lines { get; }
     }
+    #endregion
+    #endregion
 }

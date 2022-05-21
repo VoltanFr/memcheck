@@ -1,10 +1,9 @@
-﻿namespace MemCheck.Application.QueryValidation
+﻿namespace MemCheck.Application.QueryValidation;
+
+public sealed class FakeStringLocalizer : ILocalized
 {
-    public sealed class FakeStringLocalizer : ILocalized
+    public string GetLocalized(string resourceName)
     {
-        public string GetLocalized(string resourceName)
-        {
-            return "no translation";
-        }
+        return "no translation";
     }
 }

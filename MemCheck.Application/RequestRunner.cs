@@ -4,39 +4,38 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application
+namespace MemCheck.Application;
+
+public abstract class RequestRunner<TRequest, TResult> : ClassWithMetrics where TRequest : IRequest
 {
-    public abstract class RequestRunner<TRequest, TResult> : ClassWithMetrics where TRequest : IRequest
+    #region Fields
+    private readonly CallContext callContext;
+    #endregion
+    protected RequestRunner(CallContext callContext)
     {
-        #region Fields
-        private readonly CallContext callContext;
-        #endregion
-        protected RequestRunner(CallContext callContext)
-        {
-            this.callContext = callContext;
-        }
-        protected abstract Task<ResultWithMetrologyProperties<TResult>> DoRunAsync(TRequest request);
-        public async Task<TResult> RunAsync(TRequest request)
-        {
-            var checkValidityChrono = Stopwatch.StartNew();
-            await request.CheckValidityAsync(callContext);
-            checkValidityChrono.Stop();
-
-            var runChrono = Stopwatch.StartNew();
-            var result = await DoRunAsync(request);
-            runChrono.Stop();
-
-            var metrologyProperties = result.Properties.ToList();
-            metrologyProperties.Add(DurationMetric("CheckValidityDuration", checkValidityChrono.Elapsed));
-            metrologyProperties.Add(DurationMetric("RunDuration", runChrono.Elapsed));
-
-            callContext.TelemetryClient.TrackEvent(GetType().Name, metrologyProperties.ToArray());
-
-            return result.ActualResult;
-        }
-        protected MemCheckDbContext DbContext => callContext.DbContext;
-        protected ILocalized Localized => callContext.Localized;
-        protected IRoleChecker RoleChecker => callContext.RoleChecker;
+        this.callContext = callContext;
     }
+    protected abstract Task<ResultWithMetrologyProperties<TResult>> DoRunAsync(TRequest request);
+    public async Task<TResult> RunAsync(TRequest request)
+    {
+        var checkValidityChrono = Stopwatch.StartNew();
+        await request.CheckValidityAsync(callContext);
+        checkValidityChrono.Stop();
 
+        var runChrono = Stopwatch.StartNew();
+        var result = await DoRunAsync(request);
+        runChrono.Stop();
+
+        var metrologyProperties = result.Properties.ToList();
+        metrologyProperties.Add(DurationMetric("CheckValidityDuration", checkValidityChrono.Elapsed));
+        metrologyProperties.Add(DurationMetric("RunDuration", runChrono.Elapsed));
+
+        callContext.TelemetryClient.TrackEvent(GetType().Name, metrologyProperties.ToArray());
+
+        return result.ActualResult;
+    }
+    protected MemCheckDbContext DbContext => callContext.DbContext;
+    protected ILocalized Localized => callContext.Localized;
+    protected IRoleChecker RoleChecker => callContext.RoleChecker;
 }
+

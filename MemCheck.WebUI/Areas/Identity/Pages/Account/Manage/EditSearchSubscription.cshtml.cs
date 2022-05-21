@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage
+namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage;
+
+public sealed class EditSearchSubscriptionModel : PageModel
 {
-    public sealed class EditSearchSubscriptionModel : PageModel
-    {
-        [BindProperty(SupportsGet = true)] public string Id { get; set; } = "";
-        [BindProperty(SupportsGet = true)] public string ReturnAddress { get; set; } = "";
-    }
+    [BindProperty(SupportsGet = true)] public string Id { get; set; } = "";
+    [BindProperty(SupportsGet = true)] public string ReturnAddress { get; set; } = "";
 }

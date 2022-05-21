@@ -5,16 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Helpers
+namespace MemCheck.Application.Helpers;
+
+public static class CardDeletionHelper
 {
-    public static class CardDeletionHelper
+    public static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime? deletionDate = null)
     {
-        public static async Task DeleteCardAsync(DbContextOptions<MemCheckDbContext> db, Guid userId, Guid cardId, DateTime? deletionDate = null)
-        {
-            using var dbContext = new MemCheckDbContext(db);
-            var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
-            var deletionRequest = new DeleteCards.Request(userId, cardId.AsArray());
-            await deleter.RunAsync(deletionRequest);
-        }
+        using var dbContext = new MemCheckDbContext(db);
+        var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
+        var deletionRequest = new DeleteCards.Request(userId, cardId.AsArray());
+        await deleter.RunAsync(deletionRequest);
     }
 }

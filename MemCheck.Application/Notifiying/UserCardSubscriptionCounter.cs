@@ -5,30 +5,29 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifiying
+namespace MemCheck.Application.Notifiying;
+
+internal interface IUserCardSubscriptionCounter
 {
-    internal interface IUserCardSubscriptionCounter
+    public Task<int> RunAsync(Guid userId);
+}
+internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
+{
+    #region Fields
+    private readonly CallContext callContext;
+    private readonly ICollection<string> performanceIndicators;
+    #endregion
+    public UserCardSubscriptionCounter(CallContext callContext, ICollection<string>? performanceIndicators = null)
     {
-        public Task<int> RunAsync(Guid userId);
+        this.callContext = callContext;
+        this.performanceIndicators = performanceIndicators ?? new List<string>();
     }
-    internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
+    public async Task<int> RunAsync(Guid userId)
     {
-        #region Fields
-        private readonly CallContext callContext;
-        private readonly ICollection<string> performanceIndicators;
-        #endregion
-        public UserCardSubscriptionCounter(CallContext callContext, ICollection<string>? performanceIndicators = null)
-        {
-            this.callContext = callContext;
-            this.performanceIndicators = performanceIndicators ?? new List<string>();
-        }
-        public async Task<int> RunAsync(Guid userId)
-        {
-            var chrono = Stopwatch.StartNew();
-            var result = await callContext.DbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
-            performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
-            callContext.TelemetryClient.TrackEvent("UserCardSubscriptionCounter", ClassWithMetrics.IntMetric("Result", result));
-            return result;
-        }
+        var chrono = Stopwatch.StartNew();
+        var result = await callContext.DbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
+        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+        callContext.TelemetryClient.TrackEvent("UserCardSubscriptionCounter", ClassWithMetrics.IntMetric("Result", result));
+        return result;
     }
 }

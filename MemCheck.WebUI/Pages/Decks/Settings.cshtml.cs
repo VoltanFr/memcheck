@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MemCheck.WebUI.Pages.Decks
+namespace MemCheck.WebUI.Pages.Decks;
+
+public sealed class SettingsModel : PageModel
 {
-    public sealed class SettingsModel : PageModel
-    {
-        [BindProperty(SupportsGet = true)] public string DeckId { get; set; } = "";
-    }
+    [BindProperty(SupportsGet = true)] public string DeckId { get; set; } = "";
 }

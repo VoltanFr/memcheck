@@ -1,0 +1,3 @@
+[*.cs]
+csharp_style_namespace_declarations=file_scoped:error
+dotnet_style_namespace_match_folder = true

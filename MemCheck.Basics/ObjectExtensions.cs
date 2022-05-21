@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 
-namespace MemCheck.Basics
+namespace MemCheck.Basics;
+
+public static class ObjectExtensions
 {
-    public static class ObjectExtensions
+    [DebuggerStepThrough]
+    public static T[] AsArray<T>(this T t)
     {
-        [DebuggerStepThrough]
-        public static T[] AsArray<T>(this T t)
-        {
-            return new[] { t };
-        }
+        return new[] { t };
     }
 }

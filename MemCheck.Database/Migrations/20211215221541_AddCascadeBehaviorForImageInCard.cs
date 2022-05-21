@@ -1,36 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MemCheck.Database.Migrations
+namespace MemCheck.Database.Migrations;
+
+public partial class AddCascadeBehaviorForImageInCard : Migration
 {
-    public partial class AddCascadeBehaviorForImageInCard : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_ImagesInCards_Images_ImageId",
-                table: "ImagesInCards");
+        migrationBuilder.DropForeignKey(
+            name: "FK_ImagesInCards_Images_ImageId",
+            table: "ImagesInCards");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_ImagesInCards_Images_ImageId",
-                table: "ImagesInCards",
-                column: "ImageId",
-                principalTable: "Images",
-                principalColumn: "Id");
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_ImagesInCards_Images_ImageId",
+            table: "ImagesInCards",
+            column: "ImageId",
+            principalTable: "Images",
+            principalColumn: "Id");
+    }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropForeignKey(
-                name: "FK_ImagesInCards_Images_ImageId",
-                table: "ImagesInCards");
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropForeignKey(
+            name: "FK_ImagesInCards_Images_ImageId",
+            table: "ImagesInCards");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_ImagesInCards_Images_ImageId",
-                table: "ImagesInCards",
-                column: "ImageId",
-                principalTable: "Images",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-        }
+        migrationBuilder.AddForeignKey(
+            name: "FK_ImagesInCards_Images_ImageId",
+            table: "ImagesInCards",
+            column: "ImageId",
+            principalTable: "Images",
+            principalColumn: "Id",
+            onDelete: ReferentialAction.Cascade);
     }
 }

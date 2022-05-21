@@ -15,75 +15,74 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Helpers
-{
-    public sealed class UserHelper
-    {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by MemCheckUserManager")]
-        public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
-        {
-            var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
-            var optionsAccessor = Options.Create(new IdentityOptions());
-            var passwordHasher = new PasswordHasher<MemCheckUser>();
-            var userValidators = new UserValidator<MemCheckUser>().AsArray();
-            var passwordValidators = new PasswordValidator<MemCheckUser>().AsArray();
-            var keyNormalizer = new UpperInvariantLookupNormalizer();
-            var errors = new IdentityErrorDescriber();
-            var services = new ServiceCollection();
-            var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
-            var serviceProvider = services.BuildServiceProvider();
-            var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
-            return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
-        }
-        public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
-        {
-            using var dbContext = new MemCheckDbContext(db);
-            var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate, subscribeToCardOnEdit, userName);
-            if (userEMail != null)
-            {
-                result.Email = userEMail;
-                result.EmailConfirmed = true;
-            }
-            dbContext.Users.Add(result);
-            await dbContext.SaveChangesAsync();
-            return result.Id;
-        }
-        public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
-        {
-            return new MemCheckUser
-            {
-                MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
-                LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
-                SubscribeToCardOnEdit = subscribeToCardOnEdit,
-                UserName = userName ?? RandomHelper.String()
-            };
-        }
-        public static async Task SetRandomPasswordAsync(DbContextOptions<MemCheckDbContext> db, Guid userId)
-        {
-            using var dbContext = new MemCheckDbContext(db);
-            var userToDelete = dbContext.Users.Single(u => u.Id == userId);
-            using var userManager = GetUserManager(dbContext);
-            var addPasswordResult = await userManager.AddPasswordAsync(userToDelete, RandomHelper.String().ToUpperInvariant() + RandomHelper.String());
-            Assert.IsTrue(addPasswordResult.Succeeded);
-        }
-        public static async Task DeleteAsync(DbContextOptions<MemCheckDbContext> db, Guid userToDeleteId, Guid? deleterUserId = null)
-        {
-            DeleteUserAccount.Request request;
-            TestRoleChecker roleChecker;
-            if (deleterUserId == null)
-            {
-                roleChecker = new TestRoleChecker();
-                request = new DeleteUserAccount.Request(userToDeleteId, userToDeleteId);
-            }
-            else
-            {
-                roleChecker = new TestRoleChecker(deleterUserId.Value);
-                request = new DeleteUserAccount.Request(deleterUserId.Value, userToDeleteId);
-            }
+namespace MemCheck.Application.Helpers;
 
-            using var dbContext = new MemCheckDbContext(db);
-            using var userManager = GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(roleChecker), userManager).RunAsync(request);
+public sealed class UserHelper
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by MemCheckUserManager")]
+    public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
+    {
+        var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
+        var optionsAccessor = Options.Create(new IdentityOptions());
+        var passwordHasher = new PasswordHasher<MemCheckUser>();
+        var userValidators = new UserValidator<MemCheckUser>().AsArray();
+        var passwordValidators = new PasswordValidator<MemCheckUser>().AsArray();
+        var keyNormalizer = new UpperInvariantLookupNormalizer();
+        var errors = new IdentityErrorDescriber();
+        var services = new ServiceCollection();
+        var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
+        var serviceProvider = services.BuildServiceProvider();
+        var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
+        return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
+    }
+    public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
+    {
+        using var dbContext = new MemCheckDbContext(db);
+        var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate, subscribeToCardOnEdit, userName);
+        if (userEMail != null)
+        {
+            result.Email = userEMail;
+            result.EmailConfirmed = true;
         }
+        dbContext.Users.Add(result);
+        await dbContext.SaveChangesAsync();
+        return result.Id;
+    }
+    public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
+    {
+        return new MemCheckUser
+        {
+            MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
+            LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
+            SubscribeToCardOnEdit = subscribeToCardOnEdit,
+            UserName = userName ?? RandomHelper.String()
+        };
+    }
+    public static async Task SetRandomPasswordAsync(DbContextOptions<MemCheckDbContext> db, Guid userId)
+    {
+        using var dbContext = new MemCheckDbContext(db);
+        var userToDelete = dbContext.Users.Single(u => u.Id == userId);
+        using var userManager = GetUserManager(dbContext);
+        var addPasswordResult = await userManager.AddPasswordAsync(userToDelete, RandomHelper.String().ToUpperInvariant() + RandomHelper.String());
+        Assert.IsTrue(addPasswordResult.Succeeded);
+    }
+    public static async Task DeleteAsync(DbContextOptions<MemCheckDbContext> db, Guid userToDeleteId, Guid? deleterUserId = null)
+    {
+        DeleteUserAccount.Request request;
+        TestRoleChecker roleChecker;
+        if (deleterUserId == null)
+        {
+            roleChecker = new TestRoleChecker();
+            request = new DeleteUserAccount.Request(userToDeleteId, userToDeleteId);
+        }
+        else
+        {
+            roleChecker = new TestRoleChecker(deleterUserId.Value);
+            request = new DeleteUserAccount.Request(deleterUserId.Value, userToDeleteId);
+        }
+
+        using var dbContext = new MemCheckDbContext(db);
+        using var userManager = GetUserManager(dbContext);
+        await new DeleteUserAccount(dbContext.AsCallContext(roleChecker), userManager).RunAsync(request);
     }
 }

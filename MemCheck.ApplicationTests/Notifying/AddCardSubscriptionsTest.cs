@@ -7,42 +7,41 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Notifying
+namespace MemCheck.Application.Notifying;
+
+[TestClass()]
+public class AddCardSubscriptionsTest
 {
-    [TestClass()]
-    public class AddCardSubscriptionsTest
+    [TestMethod()]
+    public async Task TestRun()
     {
-        [TestMethod()]
-        public async Task TestRun()
+        var testDB = DbHelper.GetEmptyTestDB();
+
+        var card = await CardHelper.CreateAsync(testDB, await UserHelper.CreateInDbAsync(testDB));
+        var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+
+        using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var testDB = DbHelper.GetEmptyTestDB();
-
-            var card = await CardHelper.CreateAsync(testDB, await UserHelper.CreateInDbAsync(testDB));
-            var otherUserId = await UserHelper.CreateInDbAsync(testDB);
-
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var request = new AddCardSubscriptions.Request(otherUserId, new Guid[] { card.Id });
-                await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request);
-            }
-
-            using (var dbContext = new MemCheckDbContext(testDB))
-            {
-                var subscription = await dbContext.CardNotifications.SingleAsync(notif => notif.UserId == otherUserId && notif.CardId == card.Id);
-                Assert.AreEqual(CardNotificationSubscription.CardNotificationRegistrationMethodExplicitByUser, subscription.RegistrationMethod);
-            }
+            var request = new AddCardSubscriptions.Request(otherUserId, new Guid[] { card.Id });
+            await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request);
         }
-        [TestMethod()]
-        public async Task TestRun_UserNotAllowedBecauseHasNoVisibility()
+
+        using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var testDB = DbHelper.GetEmptyTestDB();
-
-            var cardCreatorId = await UserHelper.CreateInDbAsync(testDB);
-            var card = await CardHelper.CreateAsync(testDB, cardCreatorId, userWithViewIds: new Guid[] { cardCreatorId });
-
-            using var dbContext = new MemCheckDbContext(testDB);
-            var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
+            var subscription = await dbContext.CardNotifications.SingleAsync(notif => notif.UserId == otherUserId && notif.CardId == card.Id);
+            Assert.AreEqual(CardNotificationSubscription.CardNotificationRegistrationMethodExplicitByUser, subscription.RegistrationMethod);
         }
+    }
+    [TestMethod()]
+    public async Task TestRun_UserNotAllowedBecauseHasNoVisibility()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+
+        var cardCreatorId = await UserHelper.CreateInDbAsync(testDB);
+        var card = await CardHelper.CreateAsync(testDB, cardCreatorId, userWithViewIds: new Guid[] { cardCreatorId });
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
     }
 }

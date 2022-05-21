@@ -6,40 +6,39 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient.HandleBadImages
+namespace MemCheck.CommandLineDbClient.HandleBadImages;
+
+internal sealed class ChangeOwner : ICmdLinePlugin
 {
-    internal sealed class ChangeOwner : ICmdLinePlugin
+    #region Fields
+    private readonly ILogger<ChangeOwner> logger;
+    private readonly MemCheckDbContext dbContext;
+    #endregion
+    public ChangeOwner(IServiceProvider serviceProvider)
     {
-        #region Fields
-        private readonly ILogger<ChangeOwner> logger;
-        private readonly MemCheckDbContext dbContext;
-        #endregion
-        public ChangeOwner(IServiceProvider serviceProvider)
+        dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+        logger = serviceProvider.GetRequiredService<ILogger<ChangeOwner>>();
+    }
+    public void DescribeForOpportunityToCancel()
+    {
+        logger.LogInformation("Will change owners previous image versions with null ones");
+    }
+    public async Task RunAsync()
+    {
+        var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
+
+        logger.LogInformation($"DB contains {dbContext.ImagePreviousVersions.Count()} image versions");
+
+        var images = dbContext.ImagePreviousVersions.Include(img => img.Owner).Where(image => image.Owner == null);
+        logger.LogInformation($"Found {images.Count()} image versions to modify");
+        foreach (var image in images)
         {
-            dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
-            logger = serviceProvider.GetRequiredService<ILogger<ChangeOwner>>();
+            logger.LogInformation($"Changing image '{image.Name}'");
+            image.Owner = user;
         }
-        public void DescribeForOpportunityToCancel()
-        {
-            logger.LogInformation("Will change owners previous image versions with null ones");
-        }
-        public async Task RunAsync()
-        {
-            var user = dbContext.Users.Where(user => user.UserName == "Voltan").Single();
 
-            logger.LogInformation($"DB contains {dbContext.ImagePreviousVersions.Count()} image versions");
+        var dbUpdateCount = await dbContext.SaveChangesAsync();
 
-            var images = dbContext.ImagePreviousVersions.Include(img => img.Owner).Where(image => image.Owner == null);
-            logger.LogInformation($"Found {images.Count()} image versions to modify");
-            foreach (var image in images)
-            {
-                logger.LogInformation($"Changing image '{image.Name}'");
-                image.Owner = user;
-            }
-
-            var dbUpdateCount = await dbContext.SaveChangesAsync();
-
-            logger.LogInformation($"Finished - dbUpdateCount: {dbUpdateCount}");
-        }
+        logger.LogInformation($"Finished - dbUpdateCount: {dbUpdateCount}");
     }
 }

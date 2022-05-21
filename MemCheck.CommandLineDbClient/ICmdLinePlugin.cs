@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace MemCheck.CommandLineDbClient
+namespace MemCheck.CommandLineDbClient;
+
+internal interface ICmdLinePlugin
 {
-    internal interface ICmdLinePlugin
-    {
-        Task RunAsync();
-        void DescribeForOpportunityToCancel();
-    }
+    Task RunAsync();
+    void DescribeForOpportunityToCancel();
 }

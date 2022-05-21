@@ -1,14 +1,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MemCheck.Basics
+namespace MemCheck.Basics;
+
+[TestClass()]
+public class StringExtensionsTests
 {
-    [TestClass()]
-    public class StringExtensionsTests
+    [TestMethod()]
+    public void Empty()
     {
-        [TestMethod()]
-        public void Empty()
-        {
-            Assert.AreEqual("", "".Truncate(12));
-        }
+        Assert.AreEqual("", "".Truncate(12));
     }
 }
