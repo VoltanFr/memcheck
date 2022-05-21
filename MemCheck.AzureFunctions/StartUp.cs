@@ -14,7 +14,13 @@ public class Startup : FunctionsStartup
 {
     public override void Configure(IFunctionsHostBuilder builder)
     {
-        builder.Services.AddDbContext<MemCheckDbContext>(options => SqlServerDbContextOptionsExtensions.UseSqlServer(options, Environment.GetEnvironmentVariable("MemCheckDbConnectionString")));
+        builder.Services.AddDbContext<MemCheckDbContext>(options =>
+        {
+            string? connectionString = Environment.GetEnvironmentVariable("MemCheckDbConnectionString");
+            if (connectionString == null)
+                throw new InvalidOperationException("MemCheckDbConnectionString not found");
+            SqlServerDbContextOptionsExtensions.UseSqlServer(options, connectionString);
+        });
 
         builder.Services.AddIdentityCore<MemCheckUser>(opt => { opt.SignIn.RequireConfirmedAccount = true; opt.User.RequireUniqueEmail = false; })
             .AddRoles<MemCheckUserRole>()

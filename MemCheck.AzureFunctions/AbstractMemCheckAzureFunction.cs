@@ -50,7 +50,7 @@ public abstract class AbstractMemCheckAzureFunction
             logger.LogInformation("Assigning logger");
             this.logger = logger;
             logger.LogInformation("Assigning runningUserIdEnvVar");
-            string runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
+            string? runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
             if (runningUserIdEnvVar == null)
             {
                 logger.LogError("runningUserIdEnvVar is null");
@@ -77,14 +77,16 @@ public abstract class AbstractMemCheckAzureFunction
             logger.LogError($"Caught {e.GetType().Name}");
             logger.LogError($"Message: '{e.Message}'");
             logger.LogError("Stack");
-            logger.LogError(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+            if (e.StackTrace != null)
+                logger.LogError(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             if (e.InnerException != null)
             {
                 logger.LogError("****** Inner");
                 logger.LogError($"Caught {e.InnerException.GetType().Name}");
                 logger.LogError($"Message: '{e.InnerException.Message}'");
                 logger.LogError("Stack");
-                logger.LogError(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+                if (e.InnerException.StackTrace != null)
+                    logger.LogError(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             }
             else
                 logger.LogError("No inner");

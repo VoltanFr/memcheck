@@ -1,18 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<Nullable>enable</Nullable>
-		<TargetFramework>net6.0</TargetFramework>
-		<VersionPrefix>0.88.1</VersionPrefix>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<WarningLevel>5</WarningLevel>
-		<AnalysisLevel>latest-all</AnalysisLevel>
-		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<VersionPrefix>0.88.2</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -120,7 +109,5 @@
 			<SubType>Designer</SubType>
 		</EmbeddedResource>
 	</ItemGroup>
-
-
 
 </Project>

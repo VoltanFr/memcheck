@@ -1,8 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<RootNamespace>MemCheck.Application</RootNamespace>
 	</PropertyGroup>
@@ -21,14 +19,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
 	</ItemGroup>
-
-	<PropertyGroup>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<WarningLevel>5</WarningLevel>
-		<AnalysisLevel>latest-all</AnalysisLevel>
-		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-	</PropertyGroup>
 
 </Project>

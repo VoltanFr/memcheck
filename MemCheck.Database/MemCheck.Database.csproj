@@ -1,19 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
-		<VersionPrefix>0.8.1</VersionPrefix>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<WarningLevel>5</WarningLevel>
-		<AnalysisLevel>latest-all</AnalysisLevel>
-		<CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<VersionPrefix>0.8.2</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>

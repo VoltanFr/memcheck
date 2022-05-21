@@ -26,8 +26,10 @@ public sealed class MailSender
     {
         body = body
             .Append(CultureInfo.InvariantCulture, $"<p>Caught {e.GetType().Name}</p>")
-            .Append(CultureInfo.InvariantCulture, $"<p>Message: {e.Message}</p>")
-            .Append(CultureInfo.InvariantCulture, $"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>", StringComparison.Ordinal)}</p>");
+            .Append(CultureInfo.InvariantCulture, $"<p>Message: {e.Message}</p>");
+
+        if (e.StackTrace != null)
+            body = body.Append(CultureInfo.InvariantCulture, $"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>", StringComparison.Ordinal)}</p>");
 
         if (e.InnerException != null)
         {
@@ -43,7 +45,7 @@ public sealed class MailSender
         var sendGridSender = Environment.GetEnvironmentVariable("SendGridSender");
         var sendGridUser = Environment.GetEnvironmentVariable("SendGridUser");
         SenderEmail = new EmailAddress(sendGridSender, sendGridUser);
-        sendGridKey = Environment.GetEnvironmentVariable("SendGridKey");
+        sendGridKey = Environment.GetEnvironmentVariable("SendGridKey") ?? "NoSendGridKey";
         this.functionStartTime = functionStartTime;
     }
     public async Task SendFailureInfoMailAsync(Exception e)
@@ -78,7 +80,7 @@ public sealed class MailSender
     public EmailAddress SenderEmail { get; }
     public static string GetAssemblyVersion()
     {
-        return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     }
     public static string GetMailFooter(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {

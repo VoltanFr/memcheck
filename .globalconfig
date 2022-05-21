@@ -4,6 +4,12 @@ dotnet_analyzer_diagnostic.severity = error
 # I don't care about marking assemblies CLSCompliant
 dotnet_diagnostic.CA1014.severity = none
 
+# Allow properties to return arrays
+dotnet_diagnostic.CA1819.severity = none
+
+# Allow mutable properties
+dotnet_diagnostic.CA2227.severity = none
+
 # I want to use var
 dotnet_diagnostic.IDE0008.severity = none
 

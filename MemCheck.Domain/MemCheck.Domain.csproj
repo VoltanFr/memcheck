@@ -1,15 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Nullable>enable</Nullable>
-		<TargetFramework>net6.0</TargetFramework>
-		<VersionPrefix>0.9.1</VersionPrefix>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<WarningLevel>5</WarningLevel>
-		<AnalysisLevel>none</AnalysisLevel>
+		<VersionPrefix>0.9.2</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
