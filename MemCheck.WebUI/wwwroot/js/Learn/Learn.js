@@ -520,7 +520,7 @@ const learnApp = Vue.createApp({
             return !this.demoMode();
         },
         showLastLearnDate() {
-            return !this.demoMode();
+            return !this.demoMode() && isValidDateTime(this.currentCard.lastLearnUtcTime);
         },
         showDateAddedInDeck() {
             return !this.demoMode();

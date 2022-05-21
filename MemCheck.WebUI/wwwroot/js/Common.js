@@ -140,7 +140,7 @@ function convertMarkdown(src, beautifyForFrench) {
     converter.setOption('openLinksInNewWindow', 'true');
     converter.setOption('simplifiedAutoLink', 'true');
     converter.setOption('simpleLineBreaks', 'true');
-    converter.setOption('noHeaderId', 'true');
+    converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
     return converter.makeHtml(acutalText);
 }
 
