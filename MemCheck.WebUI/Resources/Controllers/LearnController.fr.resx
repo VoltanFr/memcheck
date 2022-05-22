@@ -196,9 +196,6 @@ Elle est actuellement dans le tas</value>
   <data name="UnknownCardsHeap" xml:space="preserve">
     <value>Cartes non apprises</value>
   </data>
-  <data name="UnknownCardsHeap1" xml:space="preserve">
-    <value>Cartes non apprises</value>
-  </data>
   <data name="YouOnly" xml:space="preserve">
     <value>Vous seulement</value>
   </data>
