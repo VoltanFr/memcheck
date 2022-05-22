@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const imageListApp = Vue.createApp({
     components: {
@@ -19,20 +19,12 @@ const imageListApp = Vue.createApp({
             loading: false,
             currentFullScreenImage: null,   // Medium sized
             TableFormat: false,
-            staticText: {
-                copyToClipboardToastTitleOnSuccess: '',
-                copyToClipboardToastTitleOnFailure: '',
-            },
-            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
         };
     },
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
-            const task1 = this.getImages();
-            const task2 = this.getStaticText();
-            const task3 = this.getBigSizeImageLabels();
-            await Promise.all([task1, task2, task3]);
+            await this.getImages();
         }
         finally {
             this.mountFinished = true;
@@ -91,15 +83,6 @@ const imageListApp = Vue.createApp({
                 if (this.totalCount > 0)
                     await this.getImages();
             }
-        },
-        async getStaticText() {
-            await axios.get('/Media/GetStaticText')
-                .then(result => {
-                    this.staticText = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
         },
         canMovePage(shift) {
             return (this.request.pageNo + shift > 0) && (this.request.pageNo + shift <= this.pageCount);
@@ -165,16 +148,10 @@ const imageListApp = Vue.createApp({
             window.history.back();
         },
         copyToClipboard(text) {
-            copyToClipboardAndToast(text, this.staticText.copyToClipboardToastTitleOnSuccess, this.staticText.copyToClipboardToastTitleOnFailure);
+            copyToClipboardAndToast(text, localized.CopyToClipboardToastTitleOnSuccess, localized.CopyToClipboardToastTitleOnFailure);
         },
-        async getBigSizeImageLabels() {
-            await axios.get('/Media/GetBigSizeImageLabels')
-                .then(result => {
-                    this.bigSizeImageLabels = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
+        bigSizeImageLabelsLocalizer() {
+            return localized;
         },
     },
 });

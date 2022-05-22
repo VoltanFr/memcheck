@@ -162,13 +162,6 @@ public class MediaController : MemCheckController
         public string VersionDescription { get; set; } = null!;
     }
     #endregion
-    #region GetStaticText
-    [HttpGet("GetStaticText")]
-    public IActionResult GetStaticText()
-    {
-        return Ok(new { copyToClipboardToastTitleOnSuccess = GetLocalized("CopyToClipboardToastTitleOnSuccess"), copyToClipboardToastTitleOnFailure = GetLocalized("CopyToClipboardToastTitleOnFailure") });
-    }
-    #endregion
     #region Delete
     [HttpPost("Delete/{imageId}")]
     public async Task<IActionResult> Delete(Guid imageId, [FromBody] DeleteRequest request)

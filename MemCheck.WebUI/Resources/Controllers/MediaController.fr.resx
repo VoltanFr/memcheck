@@ -195,12 +195,6 @@
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>
   </data>
-  <data name="CopyToClipboardToastTitleOnFailure" xml:space="preserve">
-    <value>Échec de la copie</value>
-  </data>
-  <data name="CopyToClipboardToastTitleOnSuccess" xml:space="preserve">
-    <value>Copié</value>
-  </data>
   <data name="DescriptionNotSet" xml:space="preserve">
     <value>Description nécessaire</value>
   </data>

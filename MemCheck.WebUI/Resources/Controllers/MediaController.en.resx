@@ -195,12 +195,6 @@
   <data name="CanNotUpdateMetadataBecauseSameAsOriginal" xml:space="preserve">
     <value>Can not update metadata because you did not change anything.</value>
   </data>
-  <data name="CopyToClipboardToastTitleOnFailure" xml:space="preserve">
-    <value>Copy to clipboard failed</value>
-  </data>
-  <data name="CopyToClipboardToastTitleOnSuccess" xml:space="preserve">
-    <value>Copied to clipboard</value>
-  </data>
   <data name="DescriptionNotSet" xml:space="preserve">
     <value>You need to set the description</value>
   </data>

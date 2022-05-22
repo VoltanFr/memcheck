@@ -1,14 +1,22 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
 @inject IViewLocalizer Localizer
 @section head {
     <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-@section scripts {
+    @section scripts {
     <script src="~/js/big-size-image.js" asp-append-version="true"></script>
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
     <script type="module" src="~/js/Media/ImageList.js" asp-append-version="true"></script>
 }
-@{
+    @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
 
@@ -21,7 +29,7 @@
     </div>
     <div id="After mount and not loading" v-if="mountFinished && !loading">
         <div id="FullImage" v-if="currentFullScreenImage">
-            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labels="bigSizeImageLabels" v-on:remove="deleteImage(currentFullScreenImage.imageId)" v-on:versionhistory="imageHistory(currentFullScreenImage.imageId)" v-on:edit="edit(currentFullScreenImage.imageId)" v-on:close="closeFullScreenImage()" />
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:remove="deleteImage(currentFullScreenImage.imageId)" v-on:versionhistory="imageHistory(currentFullScreenImage.imageId)" v-on:edit="edit(currentFullScreenImage.imageId)" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="NormalMode" v-else>
             <div id="Title" class="container">
