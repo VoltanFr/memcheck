@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const learnModeExpired = 1;
 const learnModeUnknown = 2;
@@ -45,18 +45,11 @@ const learnApp = Vue.createApp({
             guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
             userQuitAttemptDisplay: false,
             lastDownloadIsEmpty: false,
-            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
             additionalMoveDebugInfo: null,
             additionalRatingDebugInfo: null,
             learnMode: 0,   // can be learnModeExpired, learnModeUnknown, learnModeDemo
             tagIdForDemo: emptyGuid,
             reachedMaxCountOfCardsForDemo: false,
-            demoMessages: {
-                onKnewToastTitle: '',
-                onKnewToastMessage: '',
-                onDidNotKnowToastTitle: '',
-                onDidNotKnowToastMessage: '',
-            },
         };
     },
     beforeCreate() {
@@ -67,19 +60,12 @@ const learnApp = Vue.createApp({
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
-            const getBigSizeImageLabelsTask = this.getBigSizeImageLabels();
             this.getLearnModeFromPageParameter();
-            let downloadDemoMessagesTask = null;
-            if (this.demoMode())
-                downloadDemoMessagesTask = this.downloadDemoMessages();
             await this.getUserDecks();
             this.downloadCardsIfNeeded();
             if (this.cardDownloadOperation)
                 await this.cardDownloadOperation;
             this.getCard();
-            await getBigSizeImageLabelsTask;
-            if (downloadDemoMessagesTask !== null)
-                await downloadDemoMessagesTask;
         }
         finally {
             this.mountFinished = true;
@@ -131,8 +117,8 @@ const learnApp = Vue.createApp({
                     this.activeDeck = this.userDecks.length === 1 ? this.userDecks[0] : '';
                 })
                 .catch(error => {
-                    tellAxiosError(error);
-                    window.location.href = '/Index';
+                    tellAxiosError(error, localized.FailedToGetUserDecks);
+                    this.userDecks = [];
                 });
         },
         getCard() {
@@ -162,13 +148,13 @@ const learnApp = Vue.createApp({
         knew() {
             this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: this.currentCard.heapId + 1, manualMove: false, nbAttempts: 0 });
             if (this.demoMode())
-                toast(this.demoMessages.onKnewToastMessage, this.demoMessages.onKnewToastTitle, true, 10000);
+                toast(localized.OnKnewToastMessage, localized.OnKnewToastTitle, true, 10000);
             this.getCard();
         },
         forgot() {
             this.pendingMoveOperations.push({ deckId: this.activeDeck.deckId, cardId: this.currentCard.cardId, targetHeap: 0, manualMove: false, nbAttempts: 0 });
             if (this.demoMode())
-                toast(this.demoMessages.onDidNotKnowToastMessage, this.demoMessages.onDidNotKnowToastTitle, true, 10000);
+                toast(localized.OnDidNotKnowToastMessage, localized.OnDidNotKnowToastTitle, true, 10000);
             this.getCard();
         },
         editUrl() {
@@ -196,7 +182,8 @@ const learnApp = Vue.createApp({
                         tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error);
+                        tellAxiosError(error, 'Failed to remove card from deck');
+                        tellAxiosError(error, localized.FailedToRemoveCardFromDeck);
                     });
             }
         },
@@ -292,15 +279,6 @@ const learnApp = Vue.createApp({
                     if (!card.images[imageIndex].blob)
                         this.spawnDownloadImage(card.images[imageIndex]);
             }
-        },
-        async downloadDemoMessages() {
-            await axios.get('/Learn/GetDemoMessages')
-                .then(result => {
-                    this.demoMessages = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
         },
         preventQuittingPage() {
             return !this.canExitPageSafely();
@@ -469,14 +447,8 @@ const learnApp = Vue.createApp({
                     });
             }
         },
-        async getBigSizeImageLabels() {
-            await axios.get('/Media/GetBigSizeImageLabels')
-                .then(result => {
-                    this.bigSizeImageLabels = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
+        bigSizeImageLabelsLocalizer() {
+            return localized;
         },
         onRatingChange(newValue) {
             this.enqueueRatingUpload(newValue);

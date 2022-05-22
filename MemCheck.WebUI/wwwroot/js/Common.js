@@ -34,7 +34,7 @@ function toastWithoutIcon(mesg, title, duration) {
     globalThis.vant.Toast({ message: actualMesg, type: 'html', duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
 }
 
-function toastAxiosResult(controllerResultWithToast, success) {
+function toastAxiosResult(description, controllerResultWithToast, success) {
     // Code is meant to support ControllerResult
     let title = success ? 'Success' : 'Failure';
     if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastTitle)
@@ -43,6 +43,8 @@ function toastAxiosResult(controllerResultWithToast, success) {
     let text = controllerResultWithToast;
     if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastText)
         text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? (`\r\n${text}`) : '');
+    if (description)
+        text = `${description}\r\n${text}`;
 
     toast(text, title, success);
 }
@@ -70,16 +72,16 @@ function dateTimeWithTime(utcFromDotNet) {
 }
 
 /* exported tellAxiosError */
-function tellAxiosError(result) {
+function tellAxiosError(result, description) {
     if (result.response)
-        toastAxiosResult(result.response, false);
+        toastAxiosResult(description, result.response, false);
     else
-        toastAxiosResult(result, false);
+        toastAxiosResult(description, result, false);
 }
 
 /* exported tellControllerSuccess */
 function tellControllerSuccess(result) {
-    toastAxiosResult(result, true);
+    toastAxiosResult('', result, true); // No additional description provided, since the message is meant to have been built by the back-end
 }
 
 /* exported base64FromBytes */
@@ -148,7 +150,7 @@ function convertMarkdown(src, beautifyForFrench) {
 async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
-    const timeOutId = setTimeout(async() => {
+    const timeOutId = setTimeout(async () => {
         clearTimeout(timeOutId);
         cancellationTokenSource.cancel(`Timeout of ${timeout} ms (through cancellation token).`);
     }, timeout);

@@ -1,29 +1,30 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
 @inject IViewLocalizer Localizer
 @model LearnViewModel
 @section head {
-<link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/learn.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-@section scripts {
-<script src="~/js/CardRating.js" asp-append-version="true"></script>
-<script src="~/js/big-size-image.js" asp-append-version="true"></script>
-<script src="~/js/TagButton.js" asp-append-version="true"></script>
-<script>
-    const localized = {
-        Learning: '@Localizer["Learning"]',
-        Rehearsing: '@Localizer["Rehearsing"]',
-        Demo: '@Localizer["Demo"]',
-    };
-</script>
-<script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
+    @section scripts {
+    <script src="~/js/CardRating.js" asp-append-version="true"></script>
+    <script src="~/js/big-size-image.js" asp-append-version="true"></script>
+    <script src="~/js/TagButton.js" asp-append-version="true"></script>
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
+    <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
-@{
+    @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
 <input type="text" asp-for="LearnMode" id="LearnModeInput" hidden="hidden" />
@@ -47,7 +48,7 @@
     </div>
     <div id="NormalOrFullScreenMode" v-if="mountFinished && !filteringDisplay && !userQuitAttemptDisplay">
         <div id="FullScreenImage" v-if="currentFullScreenImage">
-            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labels="bigSizeImageLabels" v-on:close="closeFullScreenImage()" />
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="NormalMode" v-else>
             <div id="Deck choice" class="table-responsive" v-if="offerDeckChoice()">

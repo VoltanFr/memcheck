@@ -165,18 +165,6 @@
   <data name="NoUndo" xml:space="preserve">
     <value>Opération irrévocable !</value>
   </data>
-  <data name="OnDidNotKnowToastMessage" xml:space="preserve">
-    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans votre prochaine session d'apprentissage.</value>
-  </data>
-  <data name="OnDidNotKnowToastTitle" xml:space="preserve">
-    <value>Vous ne saviez pas</value>
-  </data>
-  <data name="OnKnewToastMessage" xml:space="preserve">
-    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans deux jours (cet intervalle augmentant au fur et à mesure de vos répétitions).</value>
-  </data>
-  <data name="OnKnewToastTitle" xml:space="preserve">
-    <value>Vous saviez</value>
-  </data>
   <data name="RemoveAlertMessage" xml:space="preserve">
     <value>Êtes-vous sûr de vouloir enlever cette carte du paquet ?
 Elle est actuellement dans le tas</value>

@@ -165,18 +165,6 @@
   <data name="NoUndo" xml:space="preserve">
     <value>This can not be undone!</value>
   </data>
-  <data name="OnDidNotKnowToastMessage" xml:space="preserve">
-    <value>If you were using MemCheck with an account, you would learn that card again in your next learning session.</value>
-  </data>
-  <data name="OnDidNotKnowToastTitle" xml:space="preserve">
-    <value>You did not know</value>
-  </data>
-  <data name="OnKnewToastMessage" xml:space="preserve">
-    <value>If you were using MemCheck with an account, you would rehearse that card in 2 days (a delay which increases as you rehearse).</value>
-  </data>
-  <data name="OnKnewToastTitle" xml:space="preserve">
-    <value>You knew</value>
-  </data>
   <data name="RemoveAlertMessage" xml:space="preserve">
     <value>Are you sure you want to remove this card from the deck?
 It is currently in heap</value>
