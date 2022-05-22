@@ -165,9 +165,6 @@
   <data name="HeHasThisCardInADeck" xml:space="preserve">
     <value>he has this card in a deck.</value>
   </data>
-  <data name="ImageAlreadyInCard" xml:space="preserve">
-    <value>Image already in the card (you can't use the same image twice)</value>
-  </data>
   <data name="ImageName" xml:space="preserve">
     <value>Image name:</value>
   </data>
@@ -257,9 +254,6 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
-  </data>
-  <data name="SureCreateWithoutTag" xml:space="preserve">
-    <value>Save without tag?</value>
   </data>
   <data name="Tag" xml:space="preserve">
     <value>Tag</value>

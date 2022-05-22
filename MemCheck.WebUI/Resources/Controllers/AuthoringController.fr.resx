@@ -165,9 +165,6 @@
   <data name="HeHasThisCardInADeck" xml:space="preserve">
     <value>il a cette carte dans un paquet.</value>
   </data>
-  <data name="ImageAlreadyInCard" xml:space="preserve">
-    <value>Cette image est déjà dans la carte (vous ne pouvez pas l'utiliser plus d'une fois).</value>
-  </data>
   <data name="ImageName" xml:space="preserve">
     <value>Nom de l'image :</value>
   </data>
@@ -257,9 +254,6 @@
   </data>
   <data name="Success" xml:space="preserve">
     <value>Ok</value>
-  </data>
-  <data name="SureCreateWithoutTag" xml:space="preserve">
-    <value>Enregistrer sans label ?</value>
   </data>
   <data name="Tag" xml:space="preserve">
     <value>Label</value>

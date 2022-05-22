@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const authoringApp = Vue.createApp({
     components: {
@@ -48,12 +48,6 @@ const authoringApp = Vue.createApp({
             infoAboutUsage: '',  // string, used only if !creatingNewCard
             returnAddress: '', // string
             mountFinished: false,
-            guiMessages: {
-                success: '',
-                failure: '',
-                sureCreateWithoutTag: '',
-                imageAlreadyInCard: '',
-            },
             addToDeck: '',  // AuthoringController.DecksOfUserViewModel
             addToSingleDeck: true,  // meaningful only if singleDeckDisplay
             decksOfUser: [],    // AuthoringController.DecksOfUserViewModel
@@ -69,7 +63,6 @@ const authoringApp = Vue.createApp({
             originalAdditionalInfoImageList: [],   // MyImageType
             currentFullScreenImage: null,   // MyImageType
             saving: false,
-            bigSizeImageLabels: null,   // MediaController.GetBigSizeImageLabels
             showInfoPopover: false,
         };
     },
@@ -82,11 +75,9 @@ const authoringApp = Vue.createApp({
             const task3 = this.getAllAvailableLanguages();
             const task4 = this.getUsers();
             const task5 = this.getCardToEditFromPageParameter();
-            const task6 = this.getGuiMessages();
-            const task7 = this.getDecksOfUser();
-            const task8 = this.getBigSizeImageLabels();
+            const task6 = this.getDecksOfUser();
             this.getReturnAddressFromPageParameter();
-            await Promise.all([task1, task2, task3, task4, task5, task6, task7, task8]);
+            await Promise.all([task1, task2, task3, task4, task5, task6]);
             if (this.creatingNewCard)
                 this.makePrivate();
             this.copyAllInfoToOriginalCard();
@@ -122,27 +113,12 @@ const authoringApp = Vue.createApp({
         async getAllAvailableLanguages() {
             this.allAvailableLanguages = (await axios.get('/Languages/GetAllLanguages')).data;
         },
-        async getGuiMessages() {
-            await axios.get('/Authoring/GetGuiMessages')
-                .then(result => {
-                    this.guiMessages = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
-        },
-        async getBigSizeImageLabels() {
-            await axios.get('/Media/GetBigSizeImageLabels')
-                .then(result => {
-                    this.bigSizeImageLabels = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
+        bigSizeImageLabelsLocalizer() {
+            return localized;
         },
         async sendCard() {
             if (this.card.tags.length === 0)
-                if (!confirm(this.guiMessages.sureCreateWithoutTag))
+                if (!confirm(localized.SureCreateWithoutTag))
                     return;
 
             this.saving = true;
@@ -366,7 +342,7 @@ const authoringApp = Vue.createApp({
             await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
-                        toast(this.guiMessages.imageAlreadyInCard, this.guiMessages.failure, false);
+                        toast(localized.ImageAlreadyInCard, localized.Failure, false);
                         return;
                     }
 

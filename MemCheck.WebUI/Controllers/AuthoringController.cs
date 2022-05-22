@@ -205,32 +205,6 @@ public class AuthoringController : MemCheckController
     }
     #endregion
     #endregion
-    #region GetGuiMessages
-    [HttpGet("GetGuiMessages")]
-    public IActionResult GetGuiMessages()
-    {
-        return Ok(new GetGuiMessagesViewModel(
-        GetLocalized("Success"),
-        GetLocalized("Failure"),
-        GetLocalized("SureCreateWithoutTag"),
-        GetLocalized("ImageAlreadyInCard")
-        ));
-    }
-    public sealed class GetGuiMessagesViewModel
-    {
-        public GetGuiMessagesViewModel(string success, string failure, string sureCreateWithoutTag, string imageAlreadyInCard)
-        {
-            Success = success;
-            Failure = failure;
-            SureCreateWithoutTag = sureCreateWithoutTag;
-            ImageAlreadyInCard = imageAlreadyInCard;
-        }
-        public string Success { get; }
-        public string Failure { get; }
-        public string SureCreateWithoutTag { get; }
-        public string ImageAlreadyInCard { get; }
-    }
-    #endregion
     #region DecksOfUser, returns IEnumerable<GetUsersViewModel>
     [HttpGet("DecksOfUser")]
     public async Task<IActionResult> DecksOfUser()
