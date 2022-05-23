@@ -253,9 +253,6 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="ExplainMoveOperationsOkButton" xml:space="preserve">
     <value>Compris</value>
   </data>
-  <data name="FailedToGetBigSizeImageLabels" xml:space="preserve">
-    <value>Échec lors du téléchargement des ressources pour l'affichage des images plein écran</value>
-  </data>
   <data name="FailedToGetUserDecks" xml:space="preserve">
     <value>Échec du téléchargement des paquets</value>
   </data>

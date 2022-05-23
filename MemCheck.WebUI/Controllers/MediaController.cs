@@ -235,39 +235,4 @@ public class MediaController : MemCheckController
         public string ChangedFieldList { get; }
     }
     #endregion
-    #region GetBigSizeImageLabels
-    [HttpGet("GetBigSizeImageLabels")]
-    public IActionResult GetBigSizeImageLabels()
-    {
-        return Ok(new
-        {
-            //Labels for fields
-            name = GetLocalized("BigSizeImageLabel_Name"),
-            description = GetLocalized("BigSizeImageLabel_Description"),
-            source = GetLocalized("BigSizeImageLabel_Source"),
-            initialVersionCreatedOn = GetLocalized("BigSizeImageLabel_InitialVersionCreatedOn"),
-            initialVersionCreatedBy = GetLocalized("BigSizeImageLabel_InitialVersionCreatedBy"),
-            currentVersionCreatedOn = GetLocalized("BigSizeImageLabel_CurrentVersionCreatedOn"),
-            currentVersionDescription = GetLocalized("BigSizeImageLabel_CurrentVersionDescription"),
-            numberOfCards = GetLocalized("BigSizeImageLabel_NumberOfCards"),
-            originalImageContentType = GetLocalized("BigSizeImageLabel_originalImageContentType"),
-            originalImageSize = GetLocalized("BigSizeImageLabel_OriginalImageSize"),
-            smallSize = GetLocalized("BigSizeImageLabel_SmallSize"),
-            mediumSize = GetLocalized("BigSizeImageLabel_MediumSize"),
-            bigSize = GetLocalized("BigSizeImageLabel_BigSize"),
-
-            //Labels for Buttons
-            removeButtonTitle = GetLocalized("BigSizeImageLabel_Remove"),
-            copyToClipboardButtonTitle = GetLocalized("BigSizeImageLabel_CopyToClipboard"),
-            closeButtonTitle = GetLocalized("BigSizeImageLabel_CloseButtonTitle"),
-            editButtonTitle = GetLocalized("BigSizeImageLabel_EditButtonTitle"),
-            versionHistoryButtonTitle = GetLocalized("BigSizeImageLabel_VersionHistoryButtonTitle"),
-
-            //Labels for Messages
-            copiedToClipboardToastTitleOnSuccess = GetLocalized("BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess"),
-            copiedToClipboardToastTitleOnFailure = GetLocalized("BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure"),
-            downloadBiggestSize = GetLocalized("BigSizeImageLabel_DownloadBiggestSize"),
-        });
-    }
-    #endregion
 }

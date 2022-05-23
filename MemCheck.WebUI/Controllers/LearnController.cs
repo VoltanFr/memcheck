@@ -426,30 +426,4 @@ public class LearnController : MemCheckController
         return Ok();
     }
     #endregion
-    #region GetDemoMessages
-    [HttpGet("GetDemoMessages")]
-    public IActionResult GetDemoMessages()
-    {
-        return Ok(new GetDemoMessagesViewModel(
-        GetLocalized("OnKnewToastTitle"),
-        GetLocalized("OnKnewToastMessage"),
-        GetLocalized("OnDidNotKnowToastTitle"),
-        GetLocalized("OnDidNotKnowToastMessage")
-        ));
-    }
-    public sealed class GetDemoMessagesViewModel
-    {
-        public GetDemoMessagesViewModel(string onKnewToastTitle, string onKnewToastMessage, string onDidNotKnowToastTitle, string onDidNotKnowToastMessage)
-        {
-            OnKnewToastTitle = onKnewToastTitle;
-            OnKnewToastMessage = onKnewToastMessage;
-            OnDidNotKnowToastTitle = onDidNotKnowToastTitle;
-            OnDidNotKnowToastMessage = onDidNotKnowToastMessage;
-        }
-        public string OnKnewToastTitle { get; }
-        public string OnKnewToastMessage { get; }
-        public string OnDidNotKnowToastTitle { get; }
-        public string OnDidNotKnowToastMessage { get; }
-    }
-    #endregion
 }

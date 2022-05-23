@@ -252,9 +252,6 @@
   <data name="ExplainMoveOperationsOkButton" xml:space="preserve">
     <value>Got it</value>
   </data>
-  <data name="FailedToGetBigSizeImageLabels" xml:space="preserve">
-    <value>Failed to download resources for displaying full size images</value>
-  </data>
   <data name="FailedToGetUserDecks" xml:space="preserve">
     <value>Failed to get user decks</value>
   </data>
