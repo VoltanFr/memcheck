@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AlreadyExistsErrMesg" xml:space="preserve">
+    <value>Un label existe déjà avec ce nom.</value>
+  </data>
   <data name="CardsWithThisTag" xml:space="preserve">
     <value>Cartes avec ce label :</value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="Name" xml:space="preserve">
     <value>Nom :</value>
+  </data>
+  <data name="NameLengthErrMesg" xml:space="preserve">
+    <value>Longueur incorrecte pour le nom(doit être entre 3 et 50 caractères).</value>
   </data>
   <data name="NewDescription" xml:space="preserve">
     <value>Nouvelle description</value>

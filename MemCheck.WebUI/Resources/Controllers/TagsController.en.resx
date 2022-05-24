@@ -120,9 +120,6 @@
   <data name="AlreadyExistsCaseInsensitive" xml:space="preserve">
     <value>already exists (this check is not case sensitive)</value>
   </data>
-  <data name="AlreadyExistsErrMesg" xml:space="preserve">
-    <value>There is already a tag with this name.</value>
-  </data>
   <data name="And" xml:space="preserve">
     <value>and</value>
   </data>
@@ -149,9 +146,6 @@
   </data>
   <data name="MustBeNoMoreThan" xml:space="preserve">
     <value>must not be more than</value>
-  </data>
-  <data name="NameLengthErrMesg" xml:space="preserve">
-    <value>Invalid length (must be between 3 and 50 characters).</value>
   </data>
   <data name="NoDifference" xml:space="preserve">
     <value>No change</value>

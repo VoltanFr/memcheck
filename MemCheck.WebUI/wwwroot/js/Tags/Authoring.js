@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const tagAuthoringApp = Vue.createApp({
     components: {
@@ -14,10 +14,6 @@ const tagAuthoringApp = Vue.createApp({
             newDescription: '',    // string
             mountFinished: false,
             returnAddress: '', // string
-            guiMessages: {
-                alreadyExistsErr: '',
-                nameLengthErr: '',
-            },
             toastVisible: false,
         };
     },
@@ -25,10 +21,8 @@ const tagAuthoringApp = Vue.createApp({
         try {
             const task1 = this.getTagNames();
             const task2 = this.getEditedTagFromPageParameter();
-            const task3 = this.getGuiMessages();
             this.getReturnAddressFromPageParameter();
-            await Promise.all([task1, task2, task3]);
-            // this.$root.$on('bv::toast:hidden', () => { this.toastVisible = false; this.onNameChanged(); });
+            await Promise.all([task1, task2]);
         }
         finally {
             this.mountFinished = true;
@@ -43,15 +37,6 @@ const tagAuthoringApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                     this.existingTagNames = new Set();
-                });
-        },
-        async getGuiMessages() {
-            await axios.get('/Tags/GetGuiMessages')
-                .then(result => {
-                    this.guiMessages = result.data;
-                })
-                .catch(error => {
-                    tellAxiosError(error);
                 });
         },
         async postNewTag() {
@@ -129,11 +114,11 @@ const tagAuthoringApp = Vue.createApp({
                 return;
             }
             if (this.newName !== this.editedTag.tagName && this.existingTagNames.has(this.newName)) {
-                this.newNameProblem = this.guiMessages.alreadyExistsErr;
+                this.newNameProblem = localized.AlreadyExistsErrMesg;
                 return;
             }
             if (this.newName.length < 3 || this.newName.length > 50) {
-                this.newNameProblem = this.guiMessages.nameLengthErr;
+                this.newNameProblem = localized.NameLengthErrMesg;
                 return;
             }
             this.newNameProblem = '';

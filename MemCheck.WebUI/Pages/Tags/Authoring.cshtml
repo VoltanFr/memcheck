@@ -1,18 +1,26 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
 @inject IViewLocalizer Localizer
 @model AuthoringViewModel
 @section head {
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/tageditpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/tageditpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-@section scripts {
-<script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
-<script type="module" src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
+    @section scripts {
+    <script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
+    <script type="module" src="~/js/Tags/Authoring.js" asp-append-version="true"></script>
 }
-@{
+    @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
 <input type="text" asp-for="TagId" id="TagIdInput" hidden="hidden" />

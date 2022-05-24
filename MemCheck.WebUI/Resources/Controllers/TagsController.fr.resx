@@ -120,9 +120,6 @@
   <data name="AlreadyExistsCaseInsensitive" xml:space="preserve">
     <value>existe déjà (ne tient pas compte de la casse)</value>
   </data>
-  <data name="AlreadyExistsErrMesg" xml:space="preserve">
-    <value>Un label existe déjà avec ce nom.</value>
-  </data>
   <data name="And" xml:space="preserve">
     <value>et</value>
   </data>
@@ -149,9 +146,6 @@
   </data>
   <data name="MustBeNoMoreThan" xml:space="preserve">
     <value>ne doit pas dépasser</value>
-  </data>
-  <data name="NameLengthErrMesg" xml:space="preserve">
-    <value>Longueur incorrecte pour le nom(doit être entre 3 et 50 caractères).</value>
   </data>
   <data name="NoDifference" xml:space="preserve">
     <value>Aucune modification</value>
