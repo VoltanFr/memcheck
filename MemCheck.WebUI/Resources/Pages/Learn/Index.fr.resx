@@ -240,9 +240,6 @@
   <data name="Edit" xml:space="preserve">
     <value>Modifier</value>
   </data>
-  <data name="ExcludedTags" xml:space="preserve">
-    <value>Labels exclus</value>
-  </data>
   <data name="ExplainMoveOperationsAfterIcon" xml:space="preserve">
     <value>en bas de la page vous indique que les informations concernant votre apprentissage sont en cours de transfert vers le serveur. Ces opérations sont généralement rapide et vous ne verrez ce témoin que brièvement, mais elles peuvent prendre plus de temps dans des conditions dégradées de transfert sur le web.
 Quitter la page dans ces conditions pourrait vous faire perdre des informations d'apprentissage. Nous vous recommandons d'attendre la disparition du symbole.</value>
@@ -258,9 +255,6 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   </data>
   <data name="FailedToRemoveCardFromDeck" xml:space="preserve">
     <value>Échec, la carte n'est pas enlevée du paquet</value>
-  </data>
-  <data name="FilterThisLearningSession" xml:space="preserve">
-    <value>Filtre pour cette session</value>
   </data>
   <data name="Forgot" xml:space="preserve">
     <value>J'avais oublié</value>

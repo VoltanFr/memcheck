@@ -88,7 +88,7 @@ public class LearnController : MemCheckController
         {
             case learnModeUnknown:
                 {
-                    var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, 30);
+                    var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, 30);
                     var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
                     var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                     return Ok(result);
@@ -96,7 +96,7 @@ public class LearnController : MemCheckController
             case learnModeExpired:
                 {
                     var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
-                    var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, cardsToDownload);
+                    var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, cardsToDownload);
                     var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
                     var result = new GetCardsViewModel(applicationResult, this, user.UserName);
                     return Ok(result);
@@ -120,7 +120,6 @@ public class LearnController : MemCheckController
         public Guid DeckId { get; set; }    //When learnMode == learnModeDemo, this is not a deck but a tag
         public int LearnMode { get; set; } //can be learnModeExpired, learnModeUnknown, learnModeDemo
         public IEnumerable<Guid> ExcludedCardIds { get; set; } = null!;
-        public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
         public int CurrentCardCount { get; set; }
     }
     public sealed class GetCardsViewModel
@@ -329,7 +328,7 @@ public class LearnController : MemCheckController
     {
         CheckBodyParameter(request);
         var user = await userManager.GetUserAsync(HttpContext.User);
-        var remainingCardsInLesson = await new GetRemainingCardsInLesson(callContext).RunAsync(new GetRemainingCardsInLesson.Request(user.Id, request.DeckId, request.LearnModeIsUnknown, request.ExcludedTagIds));
+        var remainingCardsInLesson = await new GetRemainingCardsInLesson(callContext).RunAsync(new GetRemainingCardsInLesson.Request(user.Id, request.DeckId, request.LearnModeIsUnknown));
         var result = new GetRemainingCardsInLessonResult(remainingCardsInLesson.Count);
         return Ok(result);
     }
@@ -338,7 +337,6 @@ public class LearnController : MemCheckController
     {
         public Guid DeckId { get; set; }
         public bool LearnModeIsUnknown { get; set; }
-        public IEnumerable<Guid> ExcludedTagIds { get; set; } = null!;
     }
     public sealed class GetRemainingCardsInLessonResult
     {

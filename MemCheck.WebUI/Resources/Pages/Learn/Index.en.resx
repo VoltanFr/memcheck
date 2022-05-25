@@ -240,9 +240,6 @@
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
   </data>
-  <data name="ExcludedTags" xml:space="preserve">
-    <value>Excluded tags</value>
-  </data>
   <data name="ExplainMoveOperationsAfterIcon" xml:space="preserve">
     <value>at the bottom of the page tells you that some asynchronous card move operations are pending. These operations are most of the time so fast that you will only see the icon shortly, but in case of slow network transfers, they may take some time. Navigating away from the page in this state would prevent your learning information to be saved as expected. You should wait for this icon to disappear.</value>
   </data>
@@ -257,9 +254,6 @@
   </data>
   <data name="FailedToRemoveCardFromDeck" xml:space="preserve">
     <value>Failed to remove card from deck</value>
-  </data>
-  <data name="FilterThisLearningSession" xml:space="preserve">
-    <value>Filter this learning session</value>
   </data>
   <data name="Forgot" xml:space="preserve">
     <value>I had forgotten</value>

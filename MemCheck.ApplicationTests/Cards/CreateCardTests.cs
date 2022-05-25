@@ -207,7 +207,7 @@ public class CreateCardTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), Array.Empty<Guid>(), 10);
+            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), 10);
             var card = (await new GetCardsToRepeat(dbContext.AsCallContext(), addToDeckDate.AddDays(1)).RunAsync(request)).Cards.Single();
 
             var images = card.Images;

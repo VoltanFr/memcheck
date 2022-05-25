@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
-using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,7 +19,7 @@ public class GetRemainingCardsInLessonTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetRemainingCardsInLesson.Request(Guid.Empty, deck, RandomHelper.Bool(), Array.Empty<Guid>());
+        var request = new GetRemainingCardsInLesson.Request(Guid.Empty, deck, RandomHelper.Bool());
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
@@ -31,7 +30,7 @@ public class GetRemainingCardsInLessonTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetRemainingCardsInLesson.Request(Guid.NewGuid(), deck, RandomHelper.Bool(), Array.Empty<Guid>());
+        var request = new GetRemainingCardsInLesson.Request(Guid.NewGuid(), deck, RandomHelper.Bool());
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
@@ -41,7 +40,7 @@ public class GetRemainingCardsInLessonTests
         var user = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetRemainingCardsInLesson.Request(user, Guid.NewGuid(), RandomHelper.Bool(), Array.Empty<Guid>());
+        var request = new GetRemainingCardsInLesson.Request(user, Guid.NewGuid(), RandomHelper.Bool());
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
@@ -53,7 +52,7 @@ public class GetRemainingCardsInLessonTests
         var otherUser = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetRemainingCardsInLesson.Request(otherUser, deck, RandomHelper.Bool(), Array.Empty<Guid>());
+        var request = new GetRemainingCardsInLesson.Request(otherUser, deck, RandomHelper.Bool());
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
@@ -64,7 +63,7 @@ public class GetRemainingCardsInLessonTests
         var deck = await DeckHelper.CreateAsync(db, user, algorithmId: DefaultHeapingAlgorithm.ID);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetRemainingCardsInLesson.Request(user, deck, RandomHelper.Bool(), Array.Empty<Guid>());
+        var request = new GetRemainingCardsInLesson.Request(user, deck, RandomHelper.Bool());
         var result = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), new DateTime(2000, 1, 2)).RunAsync(request);
         Assert.AreEqual(0, result.Count);
     }
@@ -78,11 +77,11 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
 
-        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false, Array.Empty<Guid>());
+        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false);
         var expiredResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(expiredRequest);
         Assert.AreEqual(0, expiredResult.Count);
 
-        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true, Array.Empty<Guid>());
+        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true);
         var unknownResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(unknownRequest);
         Assert.AreEqual(1, unknownResult.Count);
     }
@@ -97,11 +96,11 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
 
-        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false, Array.Empty<Guid>());
+        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false);
         var expiredResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), lastLearnUtcTime.AddDays(1).AddSeconds(-1)).RunAsync(expiredRequest);
         Assert.AreEqual(0, expiredResult.Count);
 
-        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true, Array.Empty<Guid>());
+        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true);
         var unknownResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), lastLearnUtcTime.AddDays(1).AddSeconds(-1)).RunAsync(unknownRequest);
         Assert.AreEqual(0, unknownResult.Count);
     }
@@ -116,11 +115,11 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
 
-        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false, Array.Empty<Guid>());
+        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false);
         var expiredResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), lastLearnUtcTime.AddDays(1)).RunAsync(expiredRequest);
         Assert.AreEqual(1, expiredResult.Count);
 
-        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true, Array.Empty<Guid>());
+        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true);
         var unknownResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), lastLearnUtcTime.AddDays(1)).RunAsync(unknownRequest);
         Assert.AreEqual(0, unknownResult.Count);
     }
@@ -152,50 +151,12 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
 
-        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false, Array.Empty<Guid>());
+        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false);
         var expiredResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), runDate).RunAsync(expiredRequest);
         Assert.AreEqual(expiredCardCount, expiredResult.Count);
 
-        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true, Array.Empty<Guid>());
+        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true);
         var unknownResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), runDate).RunAsync(unknownRequest);
         Assert.AreEqual(unknownCardCount, unknownResult.Count);
-    }
-    [TestMethod()]
-    public async Task WithIgnoredTags()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.CreateAsync(db, user, algorithmId: UnitTestsHeapingAlgorithm.ID);
-        var tagToIgnore = await TagHelper.CreateAsync(db);
-        var otherTag = await TagHelper.CreateAsync(db);
-        var runDate = RandomHelper.Date();
-
-        //Add unkown cards
-        await DeckHelper.AddNewCardAsync(db, deck, CardInDeck.UnknownHeap);
-        await DeckHelper.AddNewCardAsync(db, deck, CardInDeck.UnknownHeap, tagIds: tagToIgnore.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, CardInDeck.UnknownHeap, tagIds: otherTag.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, CardInDeck.UnknownHeap, tagIds: new[] { tagToIgnore, otherTag });
-
-        //Add non expired cards
-        await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)));
-        await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: tagToIgnore.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: otherTag.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, RandomHelper.Heap(true), runDate.AddHours(RandomHelper.Int(-23, -1)), tagIds: new[] { tagToIgnore, otherTag });
-
-        //Add expired cards
-        await DeckHelper.AddNewCardAsync(db, deck, 1, runDate.AddDays(-2));
-        await DeckHelper.AddNewCardAsync(db, deck, 1, runDate.AddDays(-2), tagIds: tagToIgnore.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, 1, runDate.AddDays(-2), tagIds: otherTag.AsArray());
-        await DeckHelper.AddNewCardAsync(db, deck, 1, runDate.AddDays(-2), tagIds: new[] { tagToIgnore, otherTag });
-
-        using var dbContext = new MemCheckDbContext(db);
-
-        var expiredRequest = new GetRemainingCardsInLesson.Request(user, deck, false, tagToIgnore.AsArray());
-        var expiredResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), runDate).RunAsync(expiredRequest);
-        Assert.AreEqual(2, expiredResult.Count);
-
-        var unknownRequest = new GetRemainingCardsInLesson.Request(user, deck, true, tagToIgnore.AsArray());
-        var unknownResult = await new GetRemainingCardsInLesson(dbContext.AsCallContext(), runDate).RunAsync(unknownRequest);
-        Assert.AreEqual(2, unknownResult.Count);
     }
 }

@@ -22,21 +22,17 @@ namespace MemCheck.Application.Cards;
 public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLearn.Request, GetUnknownCardsToLearn.Result>
 {
     #region Private methods
-    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
+    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
     {
         var cardsOfDeck = DbContext.CardsInDecks.AsNoTracking()
             .Include(card => card.Card).AsSingleQuery()
             .Where(card => card.DeckId.Equals(deckId) && card.CurrentHeap == 0 && !excludedCardIds.Contains(card.CardId));
 
-        var withoutExcludedCards = cardsOfDeck;
-        foreach (var tag in excludedTagIds)   //I tried to do better with an intersect between the two sets, but that failed
-            withoutExcludedCards = withoutExcludedCards.Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tagInCard => tagInCard.TagId == tag));
-
         var countToTake = neverLearnt ? cardCount * 3 : cardCount; //For cards never learnt, we take more cards for shuffling accross more
 
         var finalSelection = neverLearnt
-            ? withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.AddToDeckUtcTime).Take(countToTake)
-            : withoutExcludedCards.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
+            ? cardsOfDeck.Where(cardInDeck => cardInDeck.LastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.AddToDeckUtcTime).Take(countToTake)
+            : cardsOfDeck.Where(cardInDeck => cardInDeck.LastLearnUtcTime != CardInDeck.NeverLearntLastLearnTime).OrderBy(cardInDeck => cardInDeck.LastLearnUtcTime).Take(countToTake);
 
         var withDetails = finalSelection.Select(cardInDeck => new
         {
@@ -101,31 +97,28 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
         var tagNames = TagLoadingHelper.Run(DbContext);
 
         var result = new List<ResultCard>();
-        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
-        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, request.ExcludedTagIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
+        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
+        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
 
         return new ResultWithMetrologyProperties<Result>(new Result(result),
             ("DeckId", request.DeckId.ToString()),
            IntMetric("ExcludedCardCount", request.ExcludedCardIds.Count()),
-           IntMetric("ExcludedTagCount", request.ExcludedTagIds.Count()),
            IntMetric("RequestedCardCount", request.CardsToDownload),
            IntMetric("ResultCount", result.Count));
     }
     #region Request and Result
     public sealed class Request : IRequest
     {
-        public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, int cardsToDownload)
+        public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, int cardsToDownload)
         {
             CurrentUserId = currentUserId;
             DeckId = deckId;
             ExcludedCardIds = excludedCardIds;
-            ExcludedTagIds = excludedTagIds;
             CardsToDownload = cardsToDownload;
         }
         public Guid CurrentUserId { get; }
         public Guid DeckId { get; }
         public IEnumerable<Guid> ExcludedCardIds { get; }
-        public IEnumerable<Guid> ExcludedTagIds { get; }
         public int CardsToDownload { get; }
         public async Task CheckValidityAsync(CallContext callContext)
         {
@@ -135,8 +128,6 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
                 throw new RequestInputException($"Invalid deck id '{DeckId}'");
             if (ExcludedCardIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
                 throw new RequestInputException($"Invalid card id");
-            if (ExcludedTagIds.Any(cardId => QueryValidationHelper.IsReservedGuid(cardId)))
-                throw new RequestInputException($"Invalid tag id");
             if (CardsToDownload is < 1 or > 100)
                 throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
             await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);

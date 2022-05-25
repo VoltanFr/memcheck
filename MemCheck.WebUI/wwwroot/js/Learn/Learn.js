@@ -39,10 +39,6 @@ const learnApp = Vue.createApp({
             remainingCardsInLesson: 0,
             cardDownloadOperation: null,
             currentImageLoadingPromise: null,
-            filteringDisplay: false,
-            selectedExcludedTags: [],   // LearnController.GetAllStaticDataTagViewModel
-            selectedExcludedTagToAdd: '',   // LearnController.GetAllStaticDataTagViewModel. Model of the combo box, used to manage adding
-            guidNoTagFiltering: '00000000-0000-0000-0000-000000000000',
             userQuitAttemptDisplay: false,
             lastDownloadIsEmpty: false,
             additionalMoveDebugInfo: null,
@@ -249,7 +245,6 @@ const learnApp = Vue.createApp({
                     deckId: this.activeDeck ? this.activeDeck.deckId : this.tagIdForDemo,
                     learnMode: this.learnMode,
                     excludedCardIds: excludedCardIds,
-                    excludedTagIds: this.selectedExcludedTags.map(tag => tag.tagId),
                     currentCardCount: this.downloadedCards.length
                 };
 
@@ -285,45 +280,6 @@ const learnApp = Vue.createApp({
         },
         preventQuittingPage() {
             return !this.canExitPageSafely();
-        },
-        switchToFilteringMode() {
-            this.filteringDisplay = true;
-        },
-        async closeFilteringMode() {
-            this.filteringDisplay = false;
-            this.loading = true;
-            this.currentCard = null;
-            this.backSideVisible = false;
-            this.downloadedCards = [];
-            this.cardDownloadOperation = null;
-            this.currentImageLoadingPromise = null;
-            this.downloadCardsIfNeeded();
-            if (this.cardDownloadOperation)
-                await this.cardDownloadOperation;
-            this.getCard();
-            this.loading = false;
-        },
-        requestContainsExcludedTag(tag) {
-            return this.selectedExcludedTags.some(t => t === tag);
-        },
-        requestContainsExcludedTagWithId(tagId) {
-            return this.selectedExcludedTags.some(t => t.tagId === tagId);
-        },
-        canAddSelectedExcludedTag() {
-            const result = this.selectedExcludedTagToAdd && !this.requestContainsExcludedTag(this.selectedExcludedTagToAdd);
-            return result;
-        },
-        addExcludedTag() {
-            if (this.canAddSelectedExcludedTag()) {
-                if (this.selectedExcludedTagToAdd.tagId === this.guidNoTagFiltering) {
-                    this.selectedExcludedTags = [];
-                    return;
-                }
-                this.selectedExcludedTags.push(this.selectedExcludedTagToAdd);
-            }
-        },
-        removeExcludedTag(index) {
-            this.selectedExcludedTags.splice(index, 1);
         },
         onBeforeUnload(event) {
             if (!this.canExitPageSafely()) {
@@ -464,7 +420,6 @@ const learnApp = Vue.createApp({
             const query = {
                 deckId: this.activeDeck.deckId,
                 learnModeIsUnknown: this.learningUnknowns(),
-                excludedTagIds: this.selectedExcludedTags.map(tag => tag.tagId),
             };
 
             axios.post('/Learn/GetRemainingCardsInLesson', query)
@@ -547,12 +502,6 @@ const learnApp = Vue.createApp({
             handler: function currentImageLoadingPromiseHandler() {
                 this.downloadImagesIfNeeded();
             },
-        },
-        selectedExcludedTagToAdd: {
-            handler: function selectedExcludedTagToAddHandler() {
-                this.addExcludedTag();
-                this.selectedExcludedTagToAdd = '';
-            }
         },
         pendingRatingOperations: {
             handler: function pendingRatingOperationsHandler() {

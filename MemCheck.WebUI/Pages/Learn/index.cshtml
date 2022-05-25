@@ -34,19 +34,7 @@
     <div id="WaitingOrLoading" v-if="!mountFinished || loading">
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
-    <div id="FilteringDisplayDiv" v-if="mountFinished && filteringDisplay && !userQuitAttemptDisplay" class="learn-filtering-display-div">
-        <div id="TagFilteringDiv">
-            <h1>@Localizer["FilterThisLearningSession"]</h1>
-            @Localizer["ExcludedTags"]
-            <select v-model="selectedExcludedTagToAdd"><option v-for="tag in activeDeck.tags" v-bind:value="tag">{{tag.tagName}}</option></select>
-            <span id="AddExcludedTagButton" v-if="CanAddSelectedExcludedTag()">
-                <button class="btn-success toolbar-button" @@click="addExcludedTag">+</button>
-            </span>
-            <button class="tag" v-for="(tag,index) in selectedExcludedTags" @@click="removeExcludedTag(index)"><span aria-hidden="true">{{tag.tagName}} &times;</span></button>
-        </div>
-        <button class="btn btn-info toolbar-button learn-filtering-ok-button" @@click="closeFilteringMode()">@Localizer["Ok"]</button>
-    </div>
-    <div id="NormalOrFullScreenMode" v-if="mountFinished && !filteringDisplay && !userQuitAttemptDisplay">
+    <div id="NormalOrFullScreenMode" v-if="mountFinished && !userQuitAttemptDisplay">
         <div id="FullScreenImage" v-if="currentFullScreenImage">
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
@@ -105,9 +93,6 @@
                                     <van-button class="toolbar-button-circle toolbar-button" v-if="currentCard.visibleToCount > 1"><i class="fas fa-users"></i></van-button>
                                 </template>
                             </van-popover>
-                        </li>
-                        <li id="FilteringButton" style="padding-right:5px" v-if="showFilteringButton()">
-                            <van-button class="toolbar-button toolbar-button-circle" title=@Localizer["FilterThisLearningSession"] @@click="switchToFilteringMode()"><i class="fas fa-ellipsis-v"></i></van-button>
                         </li>
                         <li id="Heap info" style="padding-right:5px" title=@Localizer["Heap"]>
                             <van-popover v-model:show="heapInfoPopover" overlay close-on-click-outside close-on-click-overlay>

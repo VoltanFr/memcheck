@@ -37,7 +37,6 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             .Include(cardInDeck => cardInDeck.Card)
             .Where(cardInDeck => cardInDeck.DeckId == request.DeckId && cardInDeck.CurrentHeap == heap)
             .Where(cardInDeck => !request.ExcludedCardIds.Contains(cardInDeck.CardId))
-            .Where(cardInDeck => !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)))
             .Where(cardInDeck => cardInDeck.ExpiryUtcTime <= now)
             .OrderBy(cardInDeck => cardInDeck.ExpiryUtcTime)
             .Take(maxCount)
@@ -106,32 +105,28 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
         return new ResultWithMetrologyProperties<Result>(new Result(result),
             ("DeckId", request.DeckId.ToString()),
             IntMetric("ExcludedCardCount", request.ExcludedCardIds.Count()),
-            IntMetric("ExcludedTagCount", request.ExcludedTagIds.Count()),
             IntMetric("RequestedCardCount", request.CardsToDownload),
             IntMetric("ResultCount", result.Count));
     }
     #region Request and Result
     public sealed class Request : IRequest
     {
-        public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, IEnumerable<Guid> excludedTagIds, int cardsToDownload)
+        public Request(Guid currentUserId, Guid deckId, IEnumerable<Guid> excludedCardIds, int cardsToDownload)
         {
             CurrentUserId = currentUserId;
             DeckId = deckId;
             ExcludedCardIds = excludedCardIds;
-            ExcludedTagIds = excludedTagIds;
             CardsToDownload = cardsToDownload;
         }
         public Guid CurrentUserId { get; }
         public Guid DeckId { get; }
         public IEnumerable<Guid> ExcludedCardIds { get; }
-        public IEnumerable<Guid> ExcludedTagIds { get; }
         public int CardsToDownload { get; }
         public async Task CheckValidityAsync(CallContext callContext)
         {
             QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
             QueryValidationHelper.CheckNotReservedGuid(DeckId);
             QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedCardIds);
-            QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedTagIds);
             if (CardsToDownload is < 1 or > 100)
                 throw new RequestInputException($"Invalid CardsToDownload: {CardsToDownload}");
             await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);

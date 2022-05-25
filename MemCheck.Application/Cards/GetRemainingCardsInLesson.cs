@@ -2,8 +2,6 @@
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,20 +22,18 @@ public sealed class GetRemainingCardsInLesson : RequestRunner<GetRemainingCardsI
             .Where(cardInDeck =>
                 cardInDeck.DeckId == request.DeckId
                 && (request.LessonModeIsUnknown ? cardInDeck.CurrentHeap == CardInDeck.UnknownHeap : cardInDeck.CurrentHeap != CardInDeck.UnknownHeap)
-                && (request.LessonModeIsUnknown || cardInDeck.ExpiryUtcTime <= runDate)
-                && !cardInDeck.Card.TagsInCards.Any(tag => request.ExcludedTagIds.Contains(tag.TagId)))
+                && (request.LessonModeIsUnknown || cardInDeck.ExpiryUtcTime <= runDate))
             .CountAsync();
 
         return new ResultWithMetrologyProperties<Result>(new Result(result), ("DeckId", request.DeckId.ToString()));
     }
     #region Request and Result
-    public sealed record Request(Guid CurrentUserId, Guid DeckId, bool LessonModeIsUnknown, IEnumerable<Guid> ExcludedTagIds) : IRequest
+    public sealed record Request(Guid CurrentUserId, Guid DeckId, bool LessonModeIsUnknown) : IRequest
     {
         public async Task CheckValidityAsync(CallContext callContext)
         {
             QueryValidationHelper.CheckNotReservedGuid(CurrentUserId);
             QueryValidationHelper.CheckNotReservedGuid(DeckId);
-            QueryValidationHelper.CheckContainsNoReservedGuid(ExcludedTagIds);
             await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, CurrentUserId, DeckId);
         }
     }
