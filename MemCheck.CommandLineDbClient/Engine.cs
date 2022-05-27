@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.ApplicationQueryTester;
+﻿using MemCheck.CommandLineDbClient.Geography;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,7 +17,7 @@ internal sealed class Engine : IHostedService
     #region Private method
     private ICmdLinePlugin GetPlugin()
     {
-        return new GetAllTagsPerfTests(serviceProvider);
+        return new AddRefToUsStates(serviceProvider);
     }
     #endregion
     public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
