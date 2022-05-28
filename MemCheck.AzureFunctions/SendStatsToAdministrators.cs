@@ -17,9 +17,6 @@ namespace MemCheck.AzureFunctions;
 
 public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
 {
-    #region Fields
-    private const string FuncName = nameof(SendStatsToAdministrators);
-    #endregion
     #region Private methods
     private async Task<ImmutableList<GetAllUsersStats.ResultUserModel>> GetAllUsersAsync()
     {
@@ -109,7 +106,6 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     }
     #endregion
     #region Protected override methods
-    protected override string FunctionName => FuncName;
     protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var allUsers = await GetAllUsersAsync();
@@ -122,14 +118,9 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
-    [FunctionName(FuncName)]
-    public async Task Run([TimerTrigger(
-        Constants.CronAt2Daily
-        #if DEBUG
-        , RunOnStartup = true
-        #endif
-        )] TimerInfo myTimer, ExecutionContext context)
+    [FunctionName(nameof(SendStatsToAdministrators))]
+    public async Task Run([TimerTrigger(Constants.CronAt2Daily)] TimerInfo timer, ExecutionContext context)
     {
-        await RunAsync();
+        await RunAsync(timer, context);
     }
 }

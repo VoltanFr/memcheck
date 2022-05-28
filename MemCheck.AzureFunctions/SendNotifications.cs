@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MemCheck.Application.Notifiying;
@@ -37,24 +37,15 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
         }
     }
     #endregion
-    #region Fields
-    private const string FuncName = nameof(SendNotifications);
-    #endregion
     public SendNotifications(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendNotifications> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
-    [FunctionName(FuncName)]
-    public async Task Run([TimerTrigger(
-        Constants.CronAt4Daily
-        #if DEBUG
-        //, RunOnStartup = true
-        #endif
-        )] TimerInfo myTimer, ExecutionContext context)
+    [FunctionName(nameof(SendNotifications))]
+    public async Task Run([TimerTrigger(Constants.CronAt4Daily)] TimerInfo timer, ExecutionContext context)
     {
-        await RunAsync().ConfigureAwait(false);
+        await RunAsync(timer, context).ConfigureAwait(false);
     }
-    protected override string FunctionName => FuncName;
     protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var mailer = new NotificationMailer(NewCallContext(), new MemCheckMailSender(MailSender), new MemCheckLinkGenerator());

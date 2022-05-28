@@ -10,24 +10,15 @@ namespace MemCheck.AzureFunctions;
 
 public sealed class SendHelloToAdministrators : AbstractMemCheckAzureFunction
 {
-    #region Fields
-    private const string FuncName = nameof(SendHelloToAdministrators);
-    #endregion
     public SendHelloToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendHelloToAdministrators> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
-    [FunctionName(FuncName)]
-    public async Task Run([TimerTrigger(
-        Constants.CronEach5Min
-        #if DEBUG
-        , RunOnStartup = true
-        #endif
-        )] TimerInfo myTimer, ExecutionContext context)
+    [FunctionName(nameof(SendHelloToAdministrators))]
+    public async Task Run([TimerTrigger(Constants.CronEach5Min)] TimerInfo timer, ExecutionContext context)
     {
-        await RunAsync();
+        await RunAsync(timer, context);
     }
-    protected override string FunctionName => FuncName;
     protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         await Task.CompletedTask;

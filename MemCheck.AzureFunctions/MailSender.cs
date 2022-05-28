@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Basics;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -16,7 +17,6 @@ namespace MemCheck.AzureFunctions;
 public sealed class MailSender
 {
     #region Fields
-    private readonly string functionName;
     private readonly ILogger logger;
     private readonly DateTime functionStartTime;
     private readonly string sendGridKey;
@@ -38,9 +38,8 @@ public sealed class MailSender
         }
     }
     #endregion
-    public MailSender(string functionName, DateTime functionStartTime, ILogger logger)
+    public MailSender(DateTime functionStartTime, ILogger logger)
     {
-        this.functionName = functionName;
         this.logger = logger;
         var sendGridSender = Environment.GetEnvironmentVariable("SendGridSender");
         var sendGridUser = Environment.GetEnvironmentVariable("SendGridUser");
@@ -48,7 +47,7 @@ public sealed class MailSender
         sendGridKey = Environment.GetEnvironmentVariable("SendGridKey") ?? "NoSendGridKey";
         this.functionStartTime = functionStartTime;
     }
-    public async Task SendFailureInfoMailAsync(Exception e)
+    public async Task SendFailureInfoMailAsync(string functionName, Exception e)
     {
         var body = new StringBuilder()
             .Append(CultureInfo.InvariantCulture, $"<h1>MemCheck function '{functionName}' failure</h1>")
@@ -82,10 +81,11 @@ public sealed class MailSender
     {
         return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     }
-    public static string GetMailFooter(string azureFunctionName, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
+    public static string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {
         var listItems = new List<string> {
             $"<li>Sent by Azure func '{azureFunctionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow}</li>",
+            $"<li>Timer: {timer}</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
         };
 

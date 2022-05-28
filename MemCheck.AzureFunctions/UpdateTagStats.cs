@@ -12,24 +12,15 @@ namespace MemCheck.AzureFunctions;
 
 public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
 {
-    #region Fields
-    private const string FuncName = nameof(UpdateTagStats);
-    #endregion
     public UpdateTagStats(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<UpdateTagStats> logger)
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
-    [FunctionName(FuncName)]
-    public async Task Run([TimerTrigger(
-        Constants.CronAt3Daily
-        #if DEBUG
-        //, RunOnStartup = true
-        #endif
-        )] TimerInfo myTimer, ExecutionContext context)
+    [FunctionName(nameof(UpdateTagStats))]
+    public async Task Run([TimerTrigger(Constants.CronAt3Daily)] TimerInfo timer, ExecutionContext context)
     {
-        await RunAsync();
+        await RunAsync(timer, context);
     }
-    protected override string FunctionName => FuncName;
     protected override async Task<string> RunAndCreateReportMailMainPartAsync()
     {
         var updater = new RefreshTagStats(NewCallContext());
