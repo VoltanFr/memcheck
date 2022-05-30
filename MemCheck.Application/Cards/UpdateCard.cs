@@ -193,7 +193,9 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         {
             await CardInputValidator.RunAsync(this, callContext);
 
-            var cards = callContext.DbContext.Cards
+            await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, VersionCreatorId);
+
+            var card = await callContext.DbContext.Cards
                 .Include(card => card.VersionCreator)
                 .Include(card => card.CardLanguage)
                 .Include(card => card.Images)
@@ -201,14 +203,12 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
                 .ThenInclude(tag => tag.Tag)
                 .Include(card => card.UsersWithView)
                 .AsSingleQuery()
-                .Where(card => card.Id == CardId);
+                .SingleOrDefaultAsync(card => card.Id == CardId);
 
-            if (!await cards.AnyAsync())
+            if (card == null)
                 throw new ArgumentException("Unknown card id");
 
             CardVisibilityHelper.CheckUserIsAllowedToViewCard(callContext.DbContext, VersionCreatorId, CardId);
-
-            var card = cards.Single();
 
             CheckAtLeastOneFieldDifferent(card, callContext.Localized);
 
