@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -26,17 +27,20 @@ public static class DeckHelper
         await dbContext.SaveChangesAsync();
         return result.Id;
     }
-    public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deck, Guid card, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null)
+    public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deckId, Guid cardId, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null)
     {
         heap ??= RandomHelper.Heap();
         lastLearnUtcTime ??= RandomHelper.Date();
 
         using var dbContext = new MemCheckDbContext(testDB);
 
+        var deck = await dbContext.Decks.AsNoTracking().Include(deck => deck.Owner).SingleAsync(d => d.Id == deckId);
+        CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, deck.Owner.Id, cardId);
+
         DateTime expiryTime;
         if (heap.Value != CardInDeck.UnknownHeap)
         {
-            var heapingAlgo = await HeapingAlgorithm.OfDeckAsync(dbContext, deck);
+            var heapingAlgo = await HeapingAlgorithm.OfDeckAsync(dbContext, deckId);
             expiryTime = heapingAlgo.ExpiryUtcDate(heap.Value, lastLearnUtcTime.Value);
         }
         else
@@ -44,8 +48,8 @@ public static class DeckHelper
 
         var cardForUser = new CardInDeck()
         {
-            CardId = card,
-            DeckId = deck,
+            CardId = cardId,
+            DeckId = deckId,
             CurrentHeap = heap.Value,
             LastLearnUtcTime = lastLearnUtcTime.Value,
             ExpiryUtcTime = expiryTime,
