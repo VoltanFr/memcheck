@@ -30,9 +30,19 @@ public abstract class AbstractMemCheckAzureFunction
     private async Task<ImmutableList<EmailAddress>> GetAdminsAsync()
     {
         var getter = new GetAdminEmailAddesses(NewCallContext());
-        var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(RunningUserId));
+        var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(AdminUserId));
         var result = getterResult.Users;
         return result.Select(address => new EmailAddress(address.Email, address.Name)).ToImmutableList();
+    }
+    private static Guid GetUserIdFromEnv(string envVarName, ILogger logger)
+    {
+        var envVarValue = Environment.GetEnvironmentVariable(envVarName);
+        if (envVarValue == null)
+        {
+            logger.LogError($"{envVarName} is null");
+            return Guid.Empty;
+        }
+        return new Guid(envVarValue);
     }
     #endregion
     protected AbstractMemCheckAzureFunction(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger logger)
@@ -42,14 +52,8 @@ public abstract class AbstractMemCheckAzureFunction
             telemetryClient = new TelemetryClient(telemetryConfiguration);
             this.memCheckDbContext = memCheckDbContext;
             this.logger = logger;
-            var runningUserIdEnvVar = Environment.GetEnvironmentVariable("RunningUserId");
-            if (runningUserIdEnvVar == null)
-            {
-                logger.LogError("runningUserIdEnvVar is null");
-                RunningUserId = Guid.Empty;
-            }
-            else
-                RunningUserId = new Guid(runningUserIdEnvVar);
+            AdminUserId = GetUserIdFromEnv("AdminUserId", logger);
+            BotUserId = GetUserIdFromEnv("BotAccountUserId", logger);
             roleChecker = new ProdRoleChecker(userManager);
             StartTime = DateTime.UtcNow;
             MailSender = new MailSender(StartTime, logger);
@@ -122,6 +126,7 @@ public abstract class AbstractMemCheckAzureFunction
     protected abstract Task<string> RunAndCreateReportMailMainPartAsync();
     protected DateTime StartTime { get; }
     protected MailSender MailSender { get; }
-    protected Guid RunningUserId { get; }
+    protected Guid AdminUserId { get; }
+    protected Guid BotUserId { get; }
     protected async Task<ImmutableList<EmailAddress>> AdminsAsync() => await admins.Value;
 }
