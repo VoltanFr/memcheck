@@ -103,4 +103,20 @@ public static class CardHelper
         var cardFromDb = await dbContext.Cards.SingleAsync(c => c.Id == cardId);
         Assert.AreEqual(expected, cardFromDb.FrontSide);
     }
+    public static async Task<Card> GetCardFromDbWithAllfieldsAsync(DbContextOptions<MemCheckDbContext> db, Guid cardId)
+    {
+        using var dbContext = new MemCheckDbContext(db);
+
+        return await dbContext.Cards
+            .Include(card => card.VersionCreator)
+            .Include(card => card.CardLanguage)
+            .Include(card => card.CardInDecks)
+            .ThenInclude(cardInDeck => cardInDeck.Deck)
+            .Include(card => card.TagsInCards)
+            .Include(card => card.UsersWithView)
+            .Include(card => card.Images)
+            .Include(card => card.UserCardRating)
+            .Include(card => card.PreviousVersion)
+            .SingleAsync(card => card.Id == cardId);
+    }
 }

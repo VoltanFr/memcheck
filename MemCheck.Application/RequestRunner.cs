@@ -9,17 +9,16 @@ namespace MemCheck.Application;
 public abstract class RequestRunner<TRequest, TResult> : ClassWithMetrics where TRequest : IRequest
 {
     #region Fields
-    private readonly CallContext callContext;
     #endregion
     protected RequestRunner(CallContext callContext)
     {
-        this.callContext = callContext;
+        CallContext = callContext;
     }
     protected abstract Task<ResultWithMetrologyProperties<TResult>> DoRunAsync(TRequest request);
     public async Task<TResult> RunAsync(TRequest request)
     {
         var checkValidityChrono = Stopwatch.StartNew();
-        await request.CheckValidityAsync(callContext);
+        await request.CheckValidityAsync(CallContext);
         checkValidityChrono.Stop();
 
         var runChrono = Stopwatch.StartNew();
@@ -30,12 +29,13 @@ public abstract class RequestRunner<TRequest, TResult> : ClassWithMetrics where 
         metrologyProperties.Add(DurationMetric("CheckValidityDuration", checkValidityChrono.Elapsed));
         metrologyProperties.Add(DurationMetric("RunDuration", runChrono.Elapsed));
 
-        callContext.TelemetryClient.TrackEvent(GetType().Name, metrologyProperties.ToArray());
+        CallContext.TelemetryClient.TrackEvent(GetType().Name, metrologyProperties.ToArray());
 
         return result.ActualResult;
     }
-    protected MemCheckDbContext DbContext => callContext.DbContext;
-    protected ILocalized Localized => callContext.Localized;
-    protected IRoleChecker RoleChecker => callContext.RoleChecker;
+    protected MemCheckDbContext DbContext => CallContext.DbContext;
+    protected ILocalized Localized => CallContext.Localized;
+    protected IRoleChecker RoleChecker => CallContext.RoleChecker;
+    protected CallContext CallContext { get; }
 }
 

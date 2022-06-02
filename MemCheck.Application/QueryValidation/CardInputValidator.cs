@@ -20,6 +20,7 @@ internal static class CardInputValidator
     public const int MaxVersionDescriptionLength = 1000;
     public const int MinReferencesLength = 0;
     public const int MaxReferencesLength = 4000;
+    public const string ExceptionMesg_VersionDescriptionNotTrimmed = "Invalid VersionDescription: not trimmed";
     public static async Task RunAsync(ICardInput input, CallContext callContext)
     {
         await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, input.VersionCreatorId);
@@ -53,7 +54,7 @@ internal static class CardInputValidator
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidReferencesLength") + $" {input.References.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinReferencesLength} " + callContext.Localized.GetLocalized("And") + $" {MaxReferencesLength}");
 
         if (input.VersionDescription != input.VersionDescription.Trim())
-            throw new InvalidOperationException("Invalid VersionDescription: not trimmed");
+            throw new InvalidOperationException(ExceptionMesg_VersionDescriptionNotTrimmed);
         if (input.VersionDescription.Length is < MinVersionDescriptionLength or > MaxVersionDescriptionLength)
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinVersionDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxVersionDescriptionLength}");
 
