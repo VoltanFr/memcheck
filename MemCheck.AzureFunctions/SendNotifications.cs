@@ -42,7 +42,7 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     {
     }
     [FunctionName(nameof(SendNotifications))]
-    public async Task Run([TimerTrigger(Constants.CronAt4Daily)] TimerInfo timer, ExecutionContext context)
+    public async Task Run([TimerTrigger(Constants.CronAt5Daily)] TimerInfo timer, ExecutionContext context)
     {
         await RunAsync(timer, context).ConfigureAwait(false);
     }

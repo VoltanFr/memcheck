@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MemCheck.Application.Cards;
 using MemCheck.Application.Searching;
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MemCheck.AzureFunctions;
@@ -55,7 +51,7 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
     {
     }
     [FunctionName(nameof(MakeWikipediaLinksDesktop))]
-    public async Task Run([TimerTrigger(Constants.CronAt5Daily)] TimerInfo timer, ExecutionContext context)
+    public async Task Run([TimerTrigger(Constants.CronAt4Daily)] TimerInfo timer, ExecutionContext context)
     {
         await RunAsync(timer, context);
     }
