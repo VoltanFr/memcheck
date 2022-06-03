@@ -20,16 +20,16 @@ namespace MemCheck.AzureFunctions;
 public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
 {
     #region Private methods
-    private static string GetMailBody(ImmutableArray<Guid> changedCardGuids)
+    private static string GetMailBody(ImmutableArray<Guid> changedCardGuids, string siteName)
     {
         var writer = new StringBuilder()
-            .Append(CultureInfo.InvariantCulture, $"<h1>{changedCardGuids.Length} cards changed for Wikipedia links</h1>")
-            .Append("<ul>");
+            .Append(CultureInfo.InvariantCulture, $"<h1>{changedCardGuids.Length} cards changed for {siteName} links</h1>")
+            .Append("<p><ul>");
 
         foreach (var changedCard in changedCardGuids)
             writer = writer.Append(CultureInfo.InvariantCulture, $"<li>https://memcheckfr.azurewebsites.net/Authoring?CardId={changedCard}</li>");
 
-        writer = writer.Append("</ul>");
+        writer = writer.Append("</ul></p>");
 
         return writer.ToString();
     }
@@ -39,11 +39,18 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
     {
         var callContext = NewCallContext();
 
-        var wikipediaRequest = new ReplaceTextInAllVisibleCards.Request(BotUserId, "https://fr.m.wikipedia.org/wiki/", "https://fr.wikipedia.org/wiki/", "Utilisation de liens Wikipédia par défaut au lieu de la version mobile");
+        var result = "";
         var replacer = new ReplaceTextInAllVisibleCards(callContext);
-        var wikipediaResult = await replacer.RunAsync(wikipediaRequest);
 
-        return GetMailBody(wikipediaResult.ChangedCardGuids);
+        var wikipediaRequest = new ReplaceTextInAllVisibleCards.Request(BotUserId, "https://fr.m.wikipedia.org/wiki/", "https://fr.wikipedia.org/wiki/", "Utilisation de liens Wikipédia par défaut au lieu de la version mobile");
+        var wikipediaResult = await replacer.RunAsync(wikipediaRequest);
+        result += GetMailBody(wikipediaResult.ChangedCardGuids, "Wikipédia");
+
+        var wiktionaryRequest = new ReplaceTextInAllVisibleCards.Request(BotUserId, "https://fr.m.wiktionary.org/wiki/", "https://fr.wiktionary.org/wiki/", "Utilisation de liens Wiktionnaire par défaut au lieu de la version mobile");
+        var wiktionaryResult = await replacer.RunAsync(wiktionaryRequest);
+        result += GetMailBody(wiktionaryResult.ChangedCardGuids, "Wiktionnaire");
+
+        return result;
     }
     #endregion
     public MakeWikipediaLinksDesktop(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
@@ -56,4 +63,3 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
         await RunAsync(timer, context);
     }
 }
-
