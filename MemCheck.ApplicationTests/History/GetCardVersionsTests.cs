@@ -54,7 +54,8 @@ public class GetCardVersionsTests
     public async Task SingleVersion()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(db);
+        var userName = RandomHelper.String();
+        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
         var versionDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
         var card = await CardHelper.CreateAsync(db, userId, versionDate, frontSide: "", backSide: "", additionalInfo: "", references: "", versionDescription: versionDescription);
@@ -65,6 +66,7 @@ public class GetCardVersionsTests
 
         var version = versions.Single();
 
+        Assert.AreEqual(userName, version.VersionCreator);
         Assert.AreEqual(versionDate, version.VersionUtcDate);
         Assert.AreEqual(versionDescription, version.VersionDescription);
         Assert.AreEqual(2, version.ChangedFieldNames.Count());
