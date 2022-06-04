@@ -16,6 +16,7 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
         var version = await DbContext.CardPreviousVersions
+            .Include(card => card.VersionCreator)
             .Include(card => card.Images)
             .ThenInclude(img => img.Image)
             .Include(card => card.CardLanguage)

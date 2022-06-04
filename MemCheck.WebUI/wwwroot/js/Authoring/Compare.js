@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 const cardCompareApp = Vue.createApp({
     components: {
@@ -34,7 +34,7 @@ const cardCompareApp = Vue.createApp({
                 this.error = 'Expected values not found in page parameters';
                 return;
             }
-            await axios.get($`/Authoring/CardSelectedVersionDiffWithCurrent/${this.cardId}/${this.versionId}`)
+            await axios.get(`/Authoring/CardSelectedVersionDiffWithCurrent/${this.cardId}/${this.versionId}`)
                 .then(result => {
                     this.diffResult = result.data;
                     this.loading = false;
