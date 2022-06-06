@@ -1,19 +1,27 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
 @inject IViewLocalizer Localizer
 @model MemCheck.WebUI.Pages.Search.NewSearchModel
 @section head {
-<link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/search.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/rating.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/tagbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/search.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-@section scripts {
-<script src="~/js/CardRating.js" asp-append-version="true"></script>
-<script src="~/js/TagButton.js" asp-append-version="true"></script>
-<script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+    @section scripts {
+    <script src="~/js/CardRating.js" asp-append-version="true"></script>
+    <script src="~/js/TagButton.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Search/NewSearch.js" asp-append-version="true"></script>
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
 }
-@{
+    @{
     ViewData["Title"] = @Localizer["PageTitle"];
 }
 
@@ -210,6 +218,14 @@
                                 <tr id="Text" class="memcheck-input-div">
                                     <th>@Localizer["Text"]</th>
                                     <td><input class="form-control-sm responsive-padding-edit search-page-required-text-edit" v-model="textFilter" v-on:keyup.enter="runQuery()" /></td>
+                                </tr>
+                                <tr id="Reference" class="memcheck-input-div">
+                                    <th>@Localizer["Reference"]</th>
+                                    <td>
+                                        <select v-model="selectedReferenceFilteringKind" class="responsive-padding-edit">
+                                            <option v-for="referenceFilteringKind in possibleReferenceFilteringKinds" v-bind:value="referenceFilteringKind.choiceId">{{referenceFilteringKind.choiceText}}</option>
+                                        </select>
+                                    </td>
                                 </tr>
                                 <tr id="Rating" class="memcheck-input-div">
                                     <th>@Localizer["AverageRating"]</th>

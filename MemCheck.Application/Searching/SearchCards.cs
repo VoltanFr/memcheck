@@ -196,7 +196,13 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             cardsFilteredWithNotifications = cardsFilteredWithAverageRating.Where(card => DbContext.CardNotifications.AsNoTracking().Where(cardNotif => cardNotif.CardId == card.Id && cardNotif.UserId == request.UserId).Any() == notifMustExist);
         }
 
-        var finalResult = cardsFilteredWithNotifications;
+        IQueryable<Card> cardsFilteredWithReference;
+        if (request.Reference == Request.ReferenceFiltering.Ignore)
+            cardsFilteredWithReference = cardsFilteredWithNotifications;
+        else
+            cardsFilteredWithReference = cardsFilteredWithNotifications.Where(card => request.Reference == Request.ReferenceFiltering.None ? card.References.Length == 0 : card.References.Length > 0);
+
+        var finalResult = cardsFilteredWithReference;
         finalResult = finalResult.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
 
         var totalNbCards = finalResult.Count();
@@ -229,6 +235,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     #region Request and result classes
     public sealed record Request : IRequest
     {
+        public enum ReferenceFiltering { Ignore, None, NotEmpty };
         public enum VibilityFiltering { Ignore, CardsVisibleByMoreThanOwner, PrivateToOwner };
         public enum RatingFilteringMode { Ignore, AtLeast, AtMost, NoRating };
         public enum NotificationFiltering { Ignore, RegisteredCards, NotRegisteredCards };
@@ -247,6 +254,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         public IEnumerable<Guid> RequiredTags { get; init; } = Array.Empty<Guid>();
         public IEnumerable<Guid>? ExcludedTags { get; init; } = Array.Empty<Guid>(); //null means that we return only cards which have no tag (we exclude all tags)
         public NotificationFiltering Notification { get; init; } = NotificationFiltering.Ignore;
+        public ReferenceFiltering Reference { get; init; } = ReferenceFiltering.Ignore;
         public DateTime? MinimumUtcDateOfCards { get; init; }
 
         public async Task CheckValidityAsync(CallContext callContext)

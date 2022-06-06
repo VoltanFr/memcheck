@@ -126,6 +126,9 @@
   <data name="AddToDeckDate" xml:space="preserve">
     <value>Date d'ajout au paquet</value>
   </data>
+  <data name="Any" xml:space="preserve">
+    <value>Peu importe</value>
+  </data>
   <data name="AverageRating" xml:space="preserve">
     <value>Éval. moyenne</value>
   </data>
@@ -171,6 +174,12 @@
   <data name="NoEvaluation" xml:space="preserve">
     <value>Aucune évaluation</value>
   </data>
+  <data name="None_Feminine" xml:space="preserve">
+    <value>Aucune</value>
+  </data>
+  <data name="NotEmpty" xml:space="preserve">
+    <value>Non vide</value>
+  </data>
   <data name="Notifications" xml:space="preserve">
     <value>Notifications</value>
   </data>
@@ -194,6 +203,9 @@
   </data>
   <data name="PleaseWaitForQuery" xml:space="preserve">
     <value>Chargement de la requête...</value>
+  </data>
+  <data name="Reference" xml:space="preserve">
+    <value>Références</value>
   </data>
   <data name="RegisterForNotifications" xml:space="preserve">
     <value>S'abonner aux notifications</value>

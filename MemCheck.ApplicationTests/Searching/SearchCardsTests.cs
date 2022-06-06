@@ -457,4 +457,32 @@ public class SearchCardsTests
         Assert.IsNotNull(visibleToUser2.User);
         Assert.AreEqual(user2Name, visibleToUser2.User.UserName);
     }
+    [TestMethod()]
+    public async Task TestFind_ReferenceNotEmpty()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(testDB);
+        await CardHelper.CreateAsync(testDB, userId, references: "");
+        var cardWithRef = await CardHelper.CreateAsync(testDB, userId, references: RandomHelper.String());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var request = new SearchCards.Request { Reference = SearchCards.Request.ReferenceFiltering.NotEmpty };
+        var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+        Assert.AreEqual(1, result.TotalNbCards);
+        Assert.AreEqual(cardWithRef.Id, result.Cards.Single().CardId);
+    }
+    [TestMethod()]
+    public async Task TestFind_ReferenceNone()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var cardWithoutRef = await CardHelper.CreateAsync(testDB, userId, references: "");
+        await CardHelper.CreateAsync(testDB, userId, references: RandomHelper.String());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var request = new SearchCards.Request { Reference = SearchCards.Request.ReferenceFiltering.None };
+        var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+        Assert.AreEqual(1, result.TotalNbCards);
+        Assert.AreEqual(cardWithoutRef.Id, result.Cards.Single().CardId);
+    }
 }

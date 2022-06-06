@@ -1,4 +1,8 @@
-'use strict';
+﻿'use strict';
+
+const referenceFilteringKindIgnore = 1;
+const referenceFilteringKindNone = 2;
+const referenceFilteringKindNotEmpty = 3;
 
 const searchApp = Vue.createApp({
     components: {
@@ -45,6 +49,10 @@ const searchApp = Vue.createApp({
             selectedAverageRatingFilteringKind: 1,
             possibleRatingFilteringValues: [],  // {choiceId: int, 1 to 5, choiceText: string}
             selectedAverageRatingFilteringValue: 5, // 1 to 5
+
+            selectedReferenceFilteringKind: 1,
+            possibleReferenceFilteringKinds: [],  // {choiceId: int (one of referenceFilteringKind_xxx), choiceText: string}
+
             selectedNotificationFilteringId: 1,  // choiceId: int
             possibleSelectedNotificationFiltering: [],   // {choiceId: int, choiceText: string}. 1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
             textFilter: '', // string
@@ -85,6 +93,8 @@ const searchApp = Vue.createApp({
     },
     methods: {
         async getAllStaticData() {
+            this.possibleReferenceFilteringKinds = [{ choiceId: referenceFilteringKindIgnore, choiceText: localized.Any }, { choiceId: referenceFilteringKindNone, choiceText: localized.None_Feminine }, { choiceId: referenceFilteringKindNotEmpty, choiceText: localized.NotEmpty }];
+
             await axios.get('/Search/GetAllStaticData/')
                 .then(result => {
                     this.allStaticData = result.data;
@@ -142,6 +152,7 @@ const searchApp = Vue.createApp({
                 ratingFilteringMode: this.selectedAverageRatingFilteringKind,
                 ratingFilteringValue: this.selectedAverageRatingFilteringValue,
                 notificationFiltering: this.selectedNotificationFilteringId,
+                referenceFiltering: this.selectedReferenceFilteringKind,
             };
         },
         async runQuery() {

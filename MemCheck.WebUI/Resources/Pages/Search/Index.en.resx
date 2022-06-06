@@ -126,6 +126,9 @@
   <data name="AddToDeckDate" xml:space="preserve">
     <value>Date added to deck</value>
   </data>
+  <data name="Any" xml:space="preserve">
+    <value>Peu importe</value>
+  </data>
   <data name="AverageRating" xml:space="preserve">
     <value>Average rating</value>
   </data>
@@ -171,6 +174,12 @@
   <data name="NoEvaluation" xml:space="preserve">
     <value>No evaluation</value>
   </data>
+  <data name="None_Feminine" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="NotEmpty" xml:space="preserve">
+    <value>Not empty</value>
+  </data>
   <data name="Notifications" xml:space="preserve">
     <value>Notifications</value>
   </data>
@@ -194,6 +203,9 @@
   </data>
   <data name="PleaseWaitForQuery" xml:space="preserve">
     <value>Please wait, loading query...</value>
+  </data>
+  <data name="Reference" xml:space="preserve">
+    <value>References</value>
   </data>
   <data name="RegisterForNotifications" xml:space="preserve">
     <value>Register for notifications</value>

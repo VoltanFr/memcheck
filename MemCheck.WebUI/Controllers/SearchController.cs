@@ -317,6 +317,16 @@ public class SearchController : MemCheckController
             _ => throw new RequestInputException($"Invalid Visibility {request.Visibility}"),
         };
     }
+    private static SearchCards.Request.ReferenceFiltering AppReference(RunQueryRequest request)
+    {
+        return request.ReferenceFiltering switch
+        {
+            1 => SearchCards.Request.ReferenceFiltering.Ignore,
+            2 => SearchCards.Request.ReferenceFiltering.None,
+            3 => SearchCards.Request.ReferenceFiltering.NotEmpty,
+            _ => throw new RequestInputException($"Invalid Reference filtering {request.Visibility}"),
+        };
+    }
     private static SearchCards.Request.RatingFilteringMode AppRatingMode(RunQueryRequest request)
     {
         return request.RatingFilteringMode switch
@@ -360,7 +370,8 @@ public class SearchController : MemCheckController
             ExcludedTags = excludedTags,
             Visibility = AppVisibility(request),
             RatingFiltering = AppRatingMode(request),
-            Notification = AppNotificationFiltering(request)
+            Notification = AppNotificationFiltering(request),
+            Reference = AppReference(request)
         };
 
         if (applicationRequest.RatingFiltering != SearchCards.Request.RatingFilteringMode.Ignore)
@@ -389,6 +400,7 @@ public class SearchController : MemCheckController
         public IEnumerable<Guid> RequiredTags { get; set; } = null!;
         public IEnumerable<Guid> ExcludedTags { get; set; } = null!;
         public int NotificationFiltering { get; set; } //1 = ignore this criteria, 2 = cards registered for notification, 3 = cards not registered for notification
+        public int ReferenceFiltering { get; set; } //1 = ignore, 2 = none, 3 = not empty
     }
     public sealed class RunQueryViewModel
     {

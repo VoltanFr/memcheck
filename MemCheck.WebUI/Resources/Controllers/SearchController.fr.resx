@@ -205,7 +205,7 @@
     <value>publique</value>
   </data>
   <data name="Any" xml:space="preserve">
-    <value>&lt;Peu importe&gt;</value>
+    <value>Peu importe</value>
   </data>
   <data name="Before" xml:space="preserve">
     <value>Avant</value>
