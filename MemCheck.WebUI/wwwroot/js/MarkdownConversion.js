@@ -60,11 +60,11 @@ function beautifyTextForFrench(src) {
 
 /* exported convertMarkdown */
 function convertMarkdown(src, beautifyForFrench) {
-    const acutalText = beautifyForFrench ? beautifyTextForFrench(src) : src;
+    const actualText = beautifyForFrench ? beautifyTextForFrench(src) : src;
     const converter = new showdown.Converter({ tables: true });
     converter.setOption('openLinksInNewWindow', 'true');
     converter.setOption('simplifiedAutoLink', 'true');
     converter.setOption('simpleLineBreaks', 'true');
     converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
-    return converter.makeHtml(acutalText);
+    return converter.makeHtml(actualText);
 }
