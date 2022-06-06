@@ -115,69 +115,6 @@ function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure)
         });
 }
 
-function valueWithThousandSeparators(number) { // number is a string
-    const value = Number(number);
-    if (isNaN(value)) // We could decide not to convert a number < 2100 since we can suspect it is a year
-        return null;
-    let result = value.toLocaleString('fr-FR');
-    result = result.replace(' ', '&nbsp;');
-    return result;
-}
-
-function insertThousandSeparatorsWhenStartOfInput(wholeMatch, number) {
-    const value = valueWithThousandSeparators(number);
-    if (value === null || value === 0)
-        return wholeMatch;
-    return value;
-}
-
-function insertThousandSeparatorsWhenBlankBefore(wholeMatch, blank, number) {
-    const value = valueWithThousandSeparators(number);
-    if (value === null || value === 0)
-        return wholeMatch;
-    return blank + value;
-}
-
-function replaceSpaceWithNbsp(_wholeMatch, _space, symbol) {
-    return `&nbsp;${symbol}`;
-}
-
-function replaceNumberAndSpaceWithNbsp(_wholeMatch, number, _space, symbol) {
-    return `${number}&nbsp;${symbol}`;
-}
-
-function beautifyTextForFrench(src) {
-    // This code is not very great: ideally, we should use a real parser to analyze the text and not modify anything in an hyperlink's URL, a backslashed quote, block quotes, and probably embedded HTML.
-    // However, I don't have such an implementation now (and I suspect it would be near-impossible, since Markdown is quite ambiguous and not BNF).
-    // Fortunately, we don't need to deal with all possible uses of Markdown, but only with MemCheck. So this implementation relies on the presence of a space char, which proves that we are not in an URL.
-    // The biggest problem here is we insert thousand separators in years, which is wrong. I don't know yet how to solve that (eg question: "Combien de ml dans un l ?", answer: "1000").
-
-    let result = src;
-
-    // Insert thousand separators
-    result = result.replace(/(\s)(\d+)/g, insertThousandSeparatorsWhenBlankBefore);
-    result = result.replace(/^(\d+)/g, insertThousandSeparatorsWhenStartOfInput);
-
-    // White space before punctuation becomes nbsp
-    result = result.replace(/( )(\?|!|;|:)/g, replaceSpaceWithNbsp);
-
-    // Digit and white space before unit becomes nbsp
-    result = result.replace(/(\d)( )(€|mm|cm|dm|m|km|l|L|hl|bar|h\/km²)/g, replaceNumberAndSpaceWithNbsp);
-
-    return result;
-}
-
-/* exported convertMarkdown */
-function convertMarkdown(src, beautifyForFrench) {
-    const acutalText = beautifyForFrench ? beautifyTextForFrench(src) : src;
-    const converter = new showdown.Converter({ tables: true });
-    converter.setOption('openLinksInNewWindow', 'true');
-    converter.setOption('simplifiedAutoLink', 'true');
-    converter.setOption('simpleLineBreaks', 'true');
-    converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
-    return converter.makeHtml(acutalText);
-}
-
 /* exported pachAxios */
 async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
