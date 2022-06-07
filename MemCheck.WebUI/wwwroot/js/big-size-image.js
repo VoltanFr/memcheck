@@ -31,7 +31,7 @@ const BigSizeImage = Vue.defineComponent({
                 <ul>
                     <li><strong>{{labellocalizer.BigSizeImageLabel_Name}}</strong> {{image.name}}</li>
                     <li v-if="image.description"><strong>{{labellocalizer.BigSizeImageLabel_Description}}</strong> {{image.description}}</li>
-                    <li v-if="image.source"><strong>{{labellocalizer.BigSizeImageLabel_Source}}</strong> {{image.BigSizeImageLabel_Source}}</li>
+                    <li v-if="image.source"><strong>{{labellocalizer.BigSizeImageLabel_Source}}</strong> {{image.source}}</li>
                     <li v-if="image.initialUploadUtcDate"><strong>{{labellocalizer.BigSizeImageLabel_InitialVersionCreatedOn}}</strong> {{dateTime(image.initialUploadUtcDate)}}</li>
                     <li v-if="image.initialVersionCreator"><strong>{{labellocalizer.BigSizeImageLabel_InitialVersionCreatedBy}}</strong> {{image.initialVersionCreator}}</li>
                     <li v-if="image.currentVersionUtcDate"><strong>{{labellocalizer.BigSizeImageLabel_CurrentVersionCreatedOn}}</strong> {{dateTime(image.currentVersionUtcDate)}}</li>
