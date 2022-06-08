@@ -13,6 +13,12 @@ const MarkdownEditor = Vue.defineComponent({
     },
     mounted() {
         this.adaptTextAreaSize();
+
+        var ro = new ResizeObserver(() => {
+            this.adaptTextAreaSize();
+        });
+
+        ro.observe(this.$refs.text_area_control);
     },
     template: `
         <div class="markdown-edit-main-div">
