@@ -14,7 +14,7 @@ const MarkdownEditor = Vue.defineComponent({
     mounted() {
         this.adaptTextAreaSize();
 
-        var ro = new ResizeObserver(() => {
+        const ro = new ResizeObserver(() => {
             this.adaptTextAreaSize();
         });
 
