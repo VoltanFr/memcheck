@@ -28,7 +28,7 @@ public static class DbHelper
             }
             catch (SqlException e)
             {
-                if (!e.Message.Contains("Connection Timeout Expired") || attempts > 5)  //Happens sometimes in GitHub actions
+                if (!e.Message.Contains("Connection Timeout Expired") || attempts > 10)  //Happens sometimes in GitHub actions
                     throw;
                 Thread.Sleep((attempts + 1) * 2000);
             }
