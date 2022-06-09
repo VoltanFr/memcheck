@@ -17,7 +17,7 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
     {
     }
     [FunctionName(nameof(UpdateTagStats))]
-    public async Task Run([TimerTrigger(Constants.CronAt3Daily)] TimerInfo timer, ExecutionContext context)
+    public async Task Run([TimerTrigger(Constants.Cron_UpdateTagStats)] TimerInfo timer, ExecutionContext context)
     {
         await RunAsync(timer, context);
     }

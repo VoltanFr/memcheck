@@ -58,7 +58,7 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
     {
     }
     [FunctionName(nameof(MakeWikipediaLinksDesktop))]
-    public async Task Run([TimerTrigger(Constants.CronAt4Daily)] TimerInfo timer, ExecutionContext context)
+    public async Task Run([TimerTrigger(Constants.Cron_MakeWikipediaLinksDesktop)] TimerInfo timer, ExecutionContext context)
     {
         await RunAsync(timer, context);
     }

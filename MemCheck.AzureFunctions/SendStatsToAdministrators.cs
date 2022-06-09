@@ -119,7 +119,7 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     {
     }
     [FunctionName(nameof(SendStatsToAdministrators))]
-    public async Task Run([TimerTrigger(Constants.CronAt2Daily)] TimerInfo timer, ExecutionContext context)
+    public async Task Run([TimerTrigger(Constants.Cron_SendStatsToAdministrators)] TimerInfo timer, ExecutionContext context)
     {
         await RunAsync(timer, context);
     }
