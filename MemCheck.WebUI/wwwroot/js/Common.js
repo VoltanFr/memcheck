@@ -35,16 +35,35 @@ function toastWithoutIcon(mesg, title, duration) {
 }
 
 function toastAxiosResult(description, controllerResultWithToast, success) {
-    // Code is meant to support ControllerResult
-    let title = success ? 'Success' : 'Failure';
+    // controllerResultWithToast can be a ControllerResult or the object returned by Axios
+
+    let title;
     if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastTitle)
         title = controllerResultWithToast.data.toastTitle;
+    else
+        title = success ? 'Success' : 'Failure';
 
-    let text = controllerResultWithToast;
-    if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastText)
-        text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? (`\r\n${text}`) : '');
-    if (description)
-        text = `${description}\r\n${text}`;
+    let text;
+    if (controllerResultWithToast) {
+        if (controllerResultWithToast.data && controllerResultWithToast.data.toastText)
+            text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? (`\r\nStatus: ${controllerResultWithToast.status}`) : '');
+        else {
+            if (controllerResultWithToast.status) {
+                text = controllerResultWithToast.status;
+                if (controllerResultWithToast.message)
+                    text = `${text} - ${controllerResultWithToast.message}`;
+            }
+            if (controllerResultWithToast.message)
+                text = controllerResultWithToast.message;
+            else
+                text = controllerResultWithToast;
+        }
+
+        if (description)
+            text = `${description}\r\n${text}`;
+    }
+    else
+        text = description;
 
     toast(text, title, success);
 }
