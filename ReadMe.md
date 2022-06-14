@@ -55,7 +55,7 @@ I plan to check that but did not have time yet: development on a Mac or Linux ma
 - [MemCheck.Database](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.Database/MemCheck.Database.csproj) contains the [MemCheckDbContext](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.Database/MemCheckDbContext.cs) class, which is the entry point for the database. It also includes the [migrations](https://github.com/VoltanFr/memcheck/tree/master/MemCheck.Database/Migrations).
 - [MemCheck.Application](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.Application/MemCheck.Application.csproj) defines the algorithms, the way we interact with the database. It returns raw data, describing what to display, not how to display it.
 - [MemCheck.WebUI](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.WebUI/MemCheck.WebUI.csproj) is the ASP.NET Core project which defines the web site. It contains as little algorithm as possible, and focuses on the UI. It is the job of the controllers to adapt for display the data delivered by `MemCheck.Application`.
-- [AzFunc.Notifier](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.AzFunc.Notifier/MemCheck.AzFunc.Notifier.csproj) is an Azure function project to run notification scheduled tasks.
+- [MemCheck.AzureFunctions](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.AzureFunctions/MemCheck.AzureFunctions.csproj) is an [Azure functions](https://docs.microsoft.com/en-us/azure/azure-functions/) project to run notification scheduled tasks in a serverless environment.
 - [MemCheck.CommandLineDbClient](https://github.com/VoltanFr/memcheck/blob/master/MemCheck.CommandLineDbClient/MemCheck.CommandLineDbClient.csproj) is a tool to manage the database from the command line.
 
 ### Third parties
