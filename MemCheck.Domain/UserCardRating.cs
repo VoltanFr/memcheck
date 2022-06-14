@@ -2,6 +2,8 @@
 
 namespace MemCheck.Domain;
 
+// The keys for this class are defined in MemCheckDbContext.CreateCompositePrimaryKeys
+
 public sealed class UserCardRating
 {
     public Guid CardId { get; set; }
