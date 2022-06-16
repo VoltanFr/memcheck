@@ -27,7 +27,7 @@ public static class DeckHelper
         await dbContext.SaveChangesAsync();
         return result.Id;
     }
-    public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deckId, Guid cardId, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null)
+    public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deckId, Guid cardId, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null, int? biggestHeapReached = null, int nbTimesInNotLearnedHeap = 1)
     {
         heap ??= RandomHelper.Heap();
         lastLearnUtcTime ??= RandomHelper.Date();
@@ -54,8 +54,8 @@ public static class DeckHelper
             LastLearnUtcTime = lastLearnUtcTime.Value,
             ExpiryUtcTime = expiryTime,
             AddToDeckUtcTime = addToDeckUtcTime ?? DateTime.UtcNow,
-            NbTimesInNotLearnedHeap = 1,
-            BiggestHeapReached = heap.Value
+            NbTimesInNotLearnedHeap = nbTimesInNotLearnedHeap,
+            BiggestHeapReached = biggestHeapReached != null ? biggestHeapReached.Value : heap.Value
         };
         dbContext.CardsInDecks.Add(cardForUser);
         await dbContext.SaveChangesAsync();

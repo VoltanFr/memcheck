@@ -22,7 +22,7 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
     private readonly DateTime? now;
     #endregion
     #region Private method
-    private async Task<ImmutableArray<ResultCard>> GetCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount)
+    private async Task<ImmutableArray<ResultCard>> GetCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
     {
         var cards = await DbContext.TagsInCards
             .AsNoTracking()
@@ -44,7 +44,7 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
                 tagInCard.Card.VersionUtcDate,
                 userNames[tagInCard.Card.VersionCreator.Id],
                 tagInCard.Card.TagsInCards.Select(tag => tagNames[tag.TagId]),
-                tagInCard.Card.Images.Select(img => new ResultImageModel(img.ImageId, imageNames[img.ImageId], img.CardSide)),
+                tagInCard.Card.Images.Select(img => new ResultImageModel(img.ImageId, img.CardSide, imageDetails[img.ImageId])),
                 tagInCard.Card.AverageRating,
                 tagInCard.Card.RatingCount,
                 tagInCard.Card.CardLanguage.Name == "Français" // Questionable hardcoding
@@ -143,17 +143,6 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
         public IEnumerable<string> Tags { get; }
         public IEnumerable<ResultImageModel> Images { get; }
     }
-    public sealed class ResultImageModel
-    {
-        public ResultImageModel(Guid id, string name, int cardSide)
-        {
-            ImageId = id;
-            Name = name;
-            CardSide = cardSide;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo, but use the constants in ImageInCard
-    }
+    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
     #endregion
 }

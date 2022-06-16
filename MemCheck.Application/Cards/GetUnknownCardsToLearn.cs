@@ -21,8 +21,11 @@ namespace MemCheck.Application.Cards;
  */
 public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLearn.Request, GetUnknownCardsToLearn.Result>
 {
+    #region Fields
+    private readonly DateTime runDate;
+    #endregion
     #region Private methods
-    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
+    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
     {
         var cardsOfDeck = DbContext.CardsInDecks.AsNoTracking()
             .Include(card => card.Card).AsSingleQuery()
@@ -75,19 +78,26 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             userNames[cardInDeck.VersionCreator],
             cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
             cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
-            heapingAlgorithm,
+            cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageIdAndCardSide.CardSide, imageDetails[imageIdAndCardSide.ImageId])),
             userRatings.ContainsKey(cardInDeck.CardId) ? userRatings[cardInDeck.CardId] : 0,
             cardInDeck.AverageRating,
             cardInDeck.RatingCount,
             notifications[cardInDeck.CardId],
-            cardInDeck.LanguageName == "Français" //Questionable hardcoding
+            cardInDeck.LanguageName == "Français", //Questionable hardcoding
+            GetMoveToHeapExpiryInfos(heapingAlgorithm, cardInDeck.LastLearnUtcTime)
         ));
         return neverLearnt ? Shuffler.Shuffle(result).Take(cardCount) : result;
     }
-    #endregion
-    public GetUnknownCardsToLearn(CallContext callContext) : base(callContext)
+    private ImmutableArray<MoveToHeapExpiryInfo> GetMoveToHeapExpiryInfos(HeapingAlgorithm heapingAlgorithm, DateTime lastLearnUtcTime)
     {
+        return Enumerable.Range(1, CardInDeck.MaxHeapValue)
+            .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, lastLearnUtcTime == CardInDeck.NeverLearntLastLearnTime ? runDate : heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
+            .ToImmutableArray();
+    }
+    #endregion
+    public GetUnknownCardsToLearn(CallContext callContext, DateTime? runDate = null) : base(callContext)
+    {
+        this.runDate = runDate ?? DateTime.UtcNow;
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
@@ -138,8 +148,8 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
     {
         public ResultCard(Guid cardId, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-            IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings,
-            bool registeredForNotifications, bool isInFrench)
+            IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings,
+            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
             CardId = cardId;
@@ -161,9 +171,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             CountOfUserRatings = countOfUserRatings;
             RegisteredForNotifications = registeredForNotifications;
             IsInFrench = isInFrench;
-            MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
-                .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
-                .Concat(new MoveToHeapExpiryInfo(0, CardInDeck.NeverLearntLastLearnTime).AsArray());
+            MoveToHeapExpiryInfos = moveToHeapExpiryInfos;
         }
         public Guid CardId { get; }
         public DateTime LastLearnUtcTime { get; }
@@ -184,29 +192,9 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
         public IEnumerable<ResultImageModel> Images { get; }
-        public IEnumerable<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
+        public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
     }
-    public sealed class ResultImageModel
-    {
-        public ResultImageModel(Guid id, string name, int cardSide)
-        {
-            ImageId = id;
-            Name = name;
-            CardSide = cardSide;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
-    }
-    public sealed class MoveToHeapExpiryInfo
-    {
-        public MoveToHeapExpiryInfo(int heapId, DateTime utcExpiryDate)
-        {
-            HeapId = heapId;
-            UtcExpiryDate = utcExpiryDate;
-        }
-        public int HeapId { get; }
-        public DateTime UtcExpiryDate { get; }
-    }
+    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
+    public sealed record MoveToHeapExpiryInfo(int HeapId, DateTime UtcExpiryDate);
     #endregion
 }

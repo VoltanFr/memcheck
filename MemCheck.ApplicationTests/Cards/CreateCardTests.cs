@@ -215,11 +215,11 @@ public class CreateCardTests
 
             var first = card.Images.First();
             Assert.AreEqual(ImageInCard.AdditionalInfo, first.CardSide);
-            Assert.AreEqual(image1, first.ImageId);
+            Assert.AreEqual(image1, first.ImageDetails.Id);
 
             var last = card.Images.Last();
             Assert.AreEqual(ImageInCard.AdditionalInfo, last.CardSide);
-            Assert.AreEqual(image2, last.ImageId);
+            Assert.AreEqual(image2, last.ImageDetails.Id);
         }
     }
     [TestMethod()]

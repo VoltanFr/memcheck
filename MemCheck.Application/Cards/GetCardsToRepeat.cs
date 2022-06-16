@@ -19,19 +19,19 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
     private readonly DateTime? now;
     #endregion
     #region Private methods
-    private async Task<List<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
+    private async Task<List<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, DateTime now)
     {
         var result = new List<ResultCard>();
 
         for (var heap = CardInDeck.MaxHeapValue; heap > 0 && result.Count < request.CardsToDownload; heap--)
         {
-            var heapResults = await RunForHeapAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now, heap, request.CardsToDownload - result.Count);
+            var heapResults = await RunForHeapAsync(request, heapingAlgorithm, userNames, imageDetails, tagNames, now, heap, request.CardsToDownload - result.Count);
             result.AddRange(heapResults);
         }
 
         return result;
     }
-    private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> imageNames, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
+    private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
     {
         var cardsOfHeap = DbContext.CardsInDecks.AsNoTracking()
             .Include(cardInDeck => cardInDeck.Card)
@@ -76,17 +76,23 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             userNames[oldestCard.VersionCreator],
             oldestCard.tagIds.Select(tagId => tagNames[tagId]),
             oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageNames[imageIdAndCardSide.ImageId], imageIdAndCardSide.CardSide)),
-            heapingAlgorithm,
+            oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageIdAndCardSide.CardSide, imageDetails[imageIdAndCardSide.ImageId])),
             userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
             oldestCard.AverageRating,
             oldestCard.RatingCount,
             notifications[oldestCard.CardId],
-            oldestCard.LanguageName == "Français" //Questionable hardcoding
+            oldestCard.LanguageName == "Français", //Questionable hardcoding
+            GetMoveToHeapExpiryInfos(heapingAlgorithm, oldestCard.LastLearnUtcTime)
             )
         ).OrderBy(r => r.LastLearnUtcTime);
 
         return thisHeapResult;
+    }
+    private static ImmutableArray<MoveToHeapExpiryInfo> GetMoveToHeapExpiryInfos(HeapingAlgorithm heapingAlgorithm, DateTime lastLearnUtcTime)
+    {
+        return Enumerable.Range(0, CardInDeck.MaxHeapValue)
+            .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, targetHeapForMove == 0 ? CardInDeck.NeverLearntLastLearnTime : heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
+            .ToImmutableArray();
     }
     #endregion
     public GetCardsToRepeat(CallContext callContext, DateTime? now = null) : base(callContext)
@@ -137,8 +143,8 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
     {
         public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-            IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings,
-            bool registeredForNotifications, bool isInFrench)
+            IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings,
+            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
             CardId = cardId;
@@ -161,10 +167,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             CountOfUserRatings = countOfUserRatings;
             RegisteredForNotifications = registeredForNotifications;
             IsInFrench = isInFrench;
-            MoveToHeapExpiryInfos = Enumerable.Range(1, CardInDeck.MaxHeapValue)
-                .Where(heapId => heapId != heap)
-                .Select(targetHeapForMove => new MoveToHeapExpiryInfo(targetHeapForMove, heapingAlgorithm.ExpiryUtcDate(targetHeapForMove, lastLearnUtcTime)))
-                .Concat(new MoveToHeapExpiryInfo(0, CardInDeck.NeverLearntLastLearnTime).AsArray());
+            MoveToHeapExpiryInfos = moveToHeapExpiryInfos;
         }
         public Guid CardId { get; }
         public int Heap { get; }
@@ -186,29 +189,9 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
         public IEnumerable<ResultImageModel> Images { get; }
-        public IEnumerable<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
+        public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
     }
-    public sealed class ResultImageModel
-    {
-        public ResultImageModel(Guid id, string name, int cardSide)
-        {
-            ImageId = id;
-            Name = name;
-            CardSide = cardSide;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
-    }
-    public sealed class MoveToHeapExpiryInfo
-    {
-        public MoveToHeapExpiryInfo(int heapId, DateTime utcExpiryDate)
-        {
-            HeapId = heapId;
-            UtcExpiryDate = utcExpiryDate;
-        }
-        public int HeapId { get; }
-        public DateTime UtcExpiryDate { get; }
-    }
+    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
+    public sealed record MoveToHeapExpiryInfo(int HeapId, DateTime UtcExpiryDate);
     #endregion
 }
