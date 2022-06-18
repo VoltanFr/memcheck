@@ -105,7 +105,7 @@ const authoringApp = Vue.createApp({
                 })
                 .catch(error => {
                     this.errorDebugInfoLines.push(`Failed to get user info: ${error}`);
-                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetUserInfo}`); // Telling FailedToGetUserInfo may be too much details, but we need to know that, and don't forget that errorDebugInfoLines will not be displayed since we don't have a user
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetUserInfo}`);
                     this.currentUser = null;
                 });
         },
@@ -121,13 +121,21 @@ const authoringApp = Vue.createApp({
             this.decksOfUser.splice(0, 0, '');
         },
         async getAllAvailableTags() {
-            this.allAvailableTags = (await axios.get('/Authoring/AllAvailableTags')).data;
+            await axios.get('/Authoring/AllAvailableTags')
+                .then(result => {
+                    this.allAvailableTags = result.data;
+                })
+                .catch(error => {
+                    this.errorDebugInfoLines.push(`Failed to get tags: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetTags}`);
+                    this.allAvailableTags = null;
+                });
         },
         async getAllAvailableLanguages() {
             this.allAvailableLanguages = (await axios.get('/Languages/GetAllLanguages')).data;
         },
         initializationFailure() {
-            return !this.currentUser;
+            return !this.currentUser || !this.allAvailableTags;
         },
         bigSizeImageLabelsLocalizer() {
             return localized;
