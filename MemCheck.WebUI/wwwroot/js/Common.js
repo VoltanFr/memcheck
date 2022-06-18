@@ -92,7 +92,7 @@ function dateTimeWithTime(utcFromDotNet) {
 
 /* exported tellAxiosError */
 function tellAxiosError(result, description) {
-    if (result.response)
+    if (!result.isAxiosError && result.response)
         toastAxiosResult(description, result.response, false);
     else
         toastAxiosResult(description, result, false);

@@ -264,4 +264,13 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Enregistrer sans label ?</value>
   </data>
+  <data name="FailedToGetUserInfo" xml:space="preserve">
+    <value>Impossible d'obtenir les infos utilisateur</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>Erreur réseau</value>
+  </data>
+  <data name="PleaseReload" xml:space="preserve">
+    <value>Rechargez la page lorsque votre connection sera meilleure</value>
+  </data>
 </root>

@@ -261,4 +261,13 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Save without tag?</value>
   </data>
+  <data name="FailedToGetUserInfo" xml:space="preserve">
+    <value>Failed to get user info</value>
+  </data>
+  <data name="NetworkError" xml:space="preserve">
+    <value>Network error</value>
+  </data>
+  <data name="PleaseReload" xml:space="preserve">
+    <value>Please reload when the connection improves</value>
+  </data>
 </root>

@@ -43,10 +43,13 @@
         <p class="wait-message">@Localizer["PleaseWaitForSave"]</p>
     </div>
     <div id="After mount" v-if="mountFinished && !saving">
-        <div id="FullImage" v-if="currentFullScreenImage">
+        <div id="InitializationFailure" v-if="initializationFailure()">
+            <p><strong>@Localizer["NetworkError"] - @Localizer["PleaseReload"].</strong></p>
+        </div>
+        <div id="FullImage" v-if="!initializationFailure() && currentFullScreenImage">
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:remove="removeFullScreenImageFromCard()" v-on:close="closeFullScreenImage()" />
         </div>
-        <div id="CardEditMode" v-else>
+        <div id="CardEditMode" v-if="!initializationFailure() && !currentFullScreenImage">
             <div id="TitleAndTopButtons">
                 <h1 class="title">
                     <span id="Title" v-if="creatingNewCard">@Localizer["Create"]</span><span v-else>@Localizer["Edit"]</span>
@@ -164,7 +167,7 @@
     </div>
     <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
         <ul>
-            <li>card.usersWithView.length: {{card.usersWithView.length}}</li>
+            <li v-for="errorDebugInfoLine in errorDebugInfoLines">{{errorDebugInfoLine}}</li>
         </ul>
     </div>
 </div>

@@ -40,7 +40,8 @@ const authoringApp = Vue.createApp({
             allAvailableUsers: [],  // AuthoringController.GetUsersViewModel
             selectedTagToAdd: '',   // AuthoringController.GetAllAvailableTagsViewModel
             selectedUserToAdd: '',  // AuthoringController.GetUsersViewModel
-            currentUser: '', // AuthoringController.GetUsersViewModel
+            currentUser: '', // { userId: Guid, userName: string }, set by getCurrentUser and never changed
+            userPreferredCardCreationLanguageId: null, // set by getCurrentUser and never changed
             creatingNewCard: true,  // If false, we are editing an existing card, see method getCardToEditFromPageParameter
             editingCardId: '',  // Guid, used only if !creatingNewCard
             editingCardCreationDate: '',  // string, used only if !creatingNewCard
@@ -64,6 +65,7 @@ const authoringApp = Vue.createApp({
             currentFullScreenImage: null,   // MyImageType
             saving: false,
             showInfoPopover: false,
+            errorDebugInfoLines: [], // strings
         };
     },
     async mounted() {
@@ -78,8 +80,12 @@ const authoringApp = Vue.createApp({
             const task6 = this.getDecksOfUser();
             this.getReturnAddressFromPageParameter();
             await Promise.all([task1, task2, task3, task4, task5, task6]);
-            if (this.creatingNewCard)
+            if (this.initializationFailure())
+                return;
+            if (this.creatingNewCard) {
                 this.makePrivate();
+                this.card.languageId = this.userPreferredCardCreationLanguageId;
+            }
             this.copyAllInfoToOriginalCard();
         }
         finally {
@@ -92,9 +98,16 @@ const authoringApp = Vue.createApp({
     },
     methods: {
         async getCurrentUser() {
-            const user = (await axios.get('/Authoring/GetCurrentUser')).data;
-            this.currentUser = { userId: user.userId, userName: user.userName };
-            this.card.languageId = user.preferredCardCreationLanguageId;
+            await axios.get('/Authoring/GetCurrentUser')
+                .then(result => {
+                    this.currentUser = { userId: result.data.userId, userName: result.data.userName };
+                    this.userPreferredCardCreationLanguageId = result.data.preferredCardCreationLanguageId;
+                })
+                .catch(error => {
+                    this.errorDebugInfoLines.push(`Failed to get user info: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetUserInfo}`); // Telling FailedToGetUserInfo may be too much details, but we need to know that, and don't forget that errorDebugInfoLines will not be displayed since we don't have a user
+                    this.currentUser = null;
+                });
         },
         async getUsers() {
             this.allAvailableUsers = (await axios.get('/Authoring/GetUsers')).data;
@@ -112,6 +125,9 @@ const authoringApp = Vue.createApp({
         },
         async getAllAvailableLanguages() {
             this.allAvailableLanguages = (await axios.get('/Languages/GetAllLanguages')).data;
+        },
+        initializationFailure() {
+            return !this.currentUser;
         },
         bigSizeImageLabelsLocalizer() {
             return localized;
@@ -423,7 +439,7 @@ const authoringApp = Vue.createApp({
             window.history.back();
         },
         showDebugInfo() {
-            return (this.currentUser.userName === 'Voltan') || (this.currentUser.userName === 'Toto1');
+            return this.currentUser && ((this.currentUser.userName === 'Voltan') || (this.currentUser.userName === 'Toto1'));
         },
         cardHistory() {
             window.location.href = `/Authoring/History?CardId=${this.editingCardId}`;
