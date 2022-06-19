@@ -456,7 +456,7 @@ const authoringApp = Vue.createApp({
             for (let i = 0; i < this.allAvailableLanguages.length; i++)
                 if (this.allAvailableLanguages[i].id === this.card.languageId) {
                     const currentLanguageName = this.allAvailableLanguages[i].name;
-                    return currentLanguageName.startsWith('Fr'); // This hardcoding is questionable
+                    return currentLanguageName.startsWith('Fr'); // To be revisited, bad hardcoding
                 }
             return false;
         },
