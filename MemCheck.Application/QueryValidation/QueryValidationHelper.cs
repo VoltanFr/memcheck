@@ -214,7 +214,7 @@ internal static class QueryValidationHelper
         if (description != description.Trim())
             throw new InvalidOperationException("Invalid description: not trimmed");
         if (description.Length is < ImageMinDescriptionLength or > ImageMaxDescriptionLength)
-            throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {description.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxDescriptionLength}");
+            throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {description.Length}" + localizer.GetLocalized("MustBeBetween") + $" {ImageMinDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxDescriptionLength}");
         foreach (var forbiddenChar in ForbiddenCharsInImageDescription)
             if (description.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
                 throw new RequestInputException(localizer.GetLocalized("InvalidImageDescription") + " '" + description + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
@@ -224,7 +224,7 @@ internal static class QueryValidationHelper
         if (versionDescription != versionDescription.Trim())
             throw new InvalidOperationException("Invalid version description: not trimmed");
         if (versionDescription.Length is < ImageMinVersionDescriptionLength or > ImageMaxVersionDescriptionLength)
-            throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {versionDescription.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxVersionDescriptionLength}");
+            throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {versionDescription.Length}" + localizer.GetLocalized("MustBeBetween") + $" {ImageMinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {ImageMaxVersionDescriptionLength}");
         foreach (var forbiddenChar in ForbiddenCharsInImageVersionDescription)
             if (versionDescription.Contains(forbiddenChar, StringComparison.Ordinal))
                 throw new RequestInputException(localizer.GetLocalized("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
