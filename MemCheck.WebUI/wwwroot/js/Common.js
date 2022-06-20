@@ -34,29 +34,26 @@ function toastWithoutIcon(mesg, title, duration) {
     globalThis.vant.Toast({ message: actualMesg, type: 'html', duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
 }
 
-function toastAxiosResult(description, controllerResultWithToast, success) {
+function toastMemCheckControllerResult(axiosResultResponse, success) {
+    const title = axiosResultResponse.data.toastTitle;
+    const text = axiosResultResponse.data.toastText + (axiosResultResponse.data.showStatus ? (`\r\nStatus: ${axiosResultResponse.status}`) : '');
+    toast(text, title, success);
+}
+
+function toastAxiosResult(description, axiosResult, success) {
     // controllerResultWithToast can be a ControllerResult or the object returned by Axios
 
-    let title;
-    if (controllerResultWithToast && controllerResultWithToast.data && controllerResultWithToast.data.toastTitle)
-        title = controllerResultWithToast.data.toastTitle;
-    else
-        title = success ? 'Success' : 'Failure';
+    const title = success ? 'Success' : 'Failure';
 
     let text;
-    if (controllerResultWithToast) {
-        if (controllerResultWithToast.data && controllerResultWithToast.data.toastText)
-            text = controllerResultWithToast.data.toastText + (controllerResultWithToast.data.showStatus ? (`\r\nStatus: ${controllerResultWithToast.status}`) : '');
+    if (axiosResult) {
+        if (axiosResult.message)
+            text = axiosResult.message;
         else {
-            if (controllerResultWithToast.status) {
-                text = controllerResultWithToast.status;
-                if (controllerResultWithToast.message)
-                    text = `${text} - ${controllerResultWithToast.message}`;
-            }
-            if (controllerResultWithToast.message)
-                text = controllerResultWithToast.message;
+            if (axiosResult.status)
+                text = `Status: ${axiosResult.status}`;
             else
-                text = controllerResultWithToast;
+                text = axiosResult;
         }
 
         if (description)
@@ -92,15 +89,22 @@ function dateTimeWithTime(utcFromDotNet) {
 
 /* exported tellAxiosError */
 function tellAxiosError(result, description) {
-    if (!result.isAxiosError && result.response)
-        toastAxiosResult(description, result.response, false);
+    if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
+        toastMemCheckControllerResult(result.response, false);
     else
         toastAxiosResult(description, result, false);
 }
 
 /* exported tellControllerSuccess */
 function tellControllerSuccess(result) {
-    toastAxiosResult('', result, true); // No additional description provided, since the message is meant to have been built by the back-end
+    if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
+        toastMemCheckControllerResult(result.response, true);
+    else {
+        if (result && result.data && result.data.toastTitle) // This is a MemCheck ControllerResult
+            toastMemCheckControllerResult(result, true);
+        else
+            toastAxiosResult('', result, true);
+    }
 }
 
 /* exported base64FromBytes */
