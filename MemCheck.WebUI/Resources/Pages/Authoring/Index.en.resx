@@ -261,6 +261,9 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Save without tag?</value>
   </data>
+  <data name="FailedToGetLanguages" xml:space="preserve">
+    <value>Failed to get languages</value>
+  </data>
   <data name="FailedToGetTags" xml:space="preserve">
     <value>Failed to get tags</value>
   </data>

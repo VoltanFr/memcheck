@@ -132,10 +132,18 @@ const authoringApp = Vue.createApp({
                 });
         },
         async getAllAvailableLanguages() {
-            this.allAvailableLanguages = (await axios.get('/Languages/GetAllLanguages')).data;
+            await axios.get('/Languages/GetAllLanguages')
+                .then(result => {
+                    this.allAvailableLanguages = result.data;
+                })
+                .catch(error => {
+                    this.errorDebugInfoLines.push(`Failed to get languages: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetLanguages}`);
+                    this.allAvailableLanguages = null;
+                });
         },
         initializationFailure() {
-            return !this.currentUser || !this.allAvailableTags;
+            return !this.currentUser || !this.allAvailableTags || !this.allAvailableLanguages;
         },
         bigSizeImageLabelsLocalizer() {
             return localized;

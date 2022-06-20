@@ -264,6 +264,9 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Enregistrer sans label ?</value>
   </data>
+  <data name="FailedToGetLanguages" xml:space="preserve">
+    <value>Impossible de charger les langues</value>
+  </data>
   <data name="FailedToGetTags" xml:space="preserve">
     <value>Impossible de charger les labels</value>
   </data>
