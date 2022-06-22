@@ -1,5 +1,10 @@
 ﻿'use strict';
 
+const imageSizeMedium = 2;
+const imageSideFront = 1;
+const imageSideBack = 2;
+const imageSideAdditional = 3;
+
 const authoringApp = Vue.createApp({
     components: {
         'van-button': globalThis.vant.Button,
@@ -289,7 +294,6 @@ const authoringApp = Vue.createApp({
             this.returnAddress = document.getElementById('ReturnAddressInput').value;
         },
         async getCardToEditFromPageParameter() {
-            // There has to be a better way, but here's how I get a parameter passed to a page
             const cardId = document.getElementById('CardIdInput').value;
             if (!cardId) {
                 this.creatingNewCard = true;
@@ -319,7 +323,8 @@ const authoringApp = Vue.createApp({
                 })
                 .catch(error => {
                     this.clearAll();
-                    tellAxiosError(error);
+                    this.errorDebugInfoLines.push(`Failed to get card to edit: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetCardToEdit}`);
                 });
 
             for (let i = 0; i < images.length; i++)
@@ -338,7 +343,7 @@ const authoringApp = Vue.createApp({
             return false;
         },
         async loadImage(imageId, name, source, side) {
-            await axios.get(`/Learn/GetImage/${imageId}/2`, { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                 .then(result => {
                     let xml = '';
                     const bytes = new Uint8Array(result.data);
@@ -352,33 +357,35 @@ const authoringApp = Vue.createApp({
                         source: source,
                     };
                     switch (side) {
-                        case 1:
+                        case imageSideFront:
                             this.frontSideImageList.push(img);
                             break;
-                        case 2:
+                        case imageSideBack:
                             this.backSideImageList.push(img);
                             break;
-                        case 3:
+                        case imageSideAdditional:
                             this.additionalInfoImageList.push(img);
                             break;
                         default:
                             return;
                     }
                 })
-                .catch(() => {
-                    tellAxiosError('Failed to load image');
+                .catch(error => {
+                    this.clearAll();
+                    this.errorDebugInfoLines.push(`Failed to load image: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToLoadImage}`);
                 });
         },
         async addFrontImage(imageName) {
-            await this.addImage(imageName, 1);
+            await this.addImage(imageName, imageSideFront);
         },
         async addBackImage(imageName) {
-            await this.addImage(imageName, 2);
+            await this.addImage(imageName, imageSideBack);
         },
         async addAdditionalImage(imageName) {
-            await this.addImage(imageName, 3);
+            await this.addImage(imageName, imageSideAdditional);
         },
-        async addImage(imageName, side) {  // 1 = front side ; 2 = back side ; 3 = AdditionalInfo
+        async addImage(imageName, side) {
             await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
                 .then((getImageInfoResult) => {
                     if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
@@ -397,20 +404,20 @@ const authoringApp = Vue.createApp({
                     tellAxiosError(error);
                 });
         },
-        async pasteImageName(side) {  // 1 = front side ; 2 = back side ; 3 = AdditionalInfo
+        async pasteImageName(side) {
             await navigator.clipboard.readText()
                 .then(text => {
                     if (!text)
                         return;
 
                     switch (side) {
-                        case 1:
+                        case imageSideFront:
                             this.imageToAddFront = text;
                             break;
-                        case 2:
+                        case imageSideBack:
                             this.imageToAddBack = text;
                             break;
-                        case 3:
+                        case imageSideAdditional:
                             this.imageToAddAdditional = text;
                             break;
                         default:

@@ -264,6 +264,9 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Enregistrer sans label ?</value>
   </data>
+  <data name="FailedToGetCardToEdit" xml:space="preserve">
+    <value>Impossible de charger la carde à modifier</value>
+  </data>
   <data name="FailedToGetLanguages" xml:space="preserve">
     <value>Impossible de charger les langues</value>
   </data>
@@ -275,6 +278,9 @@
   </data>
   <data name="FailedToGetUsers" xml:space="preserve">
     <value>Impossible de charger la liste des utilisateurs</value>
+  </data>
+  <data name="FailedToLoadImage" xml:space="preserve">
+    <value>Impossible de charger une image</value>
   </data>
   <data name="NetworkError" xml:space="preserve">
     <value>Erreur réseau</value>

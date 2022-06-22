@@ -261,6 +261,9 @@
   <data name="SureCreateWithoutTag" xml:space="preserve">
     <value>Save without tag?</value>
   </data>
+  <data name="FailedToGetCardToEdit" xml:space="preserve">
+    <value>Failed to get card to edit</value>
+  </data>
   <data name="FailedToGetLanguages" xml:space="preserve">
     <value>Failed to get languages</value>
   </data>
@@ -272,6 +275,9 @@
   </data>
   <data name="FailedToGetUsers" xml:space="preserve">
     <value>Failed to get users</value>
+  </data>
+  <data name="FailedToLoadImage" xml:space="preserve">
+    <value>Failed to load image</value>
   </data>
   <data name="NetworkError" xml:space="preserve">
     <value>Network error</value>
