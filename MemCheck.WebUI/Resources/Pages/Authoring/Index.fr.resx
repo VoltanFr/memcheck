@@ -273,6 +273,9 @@
   <data name="FailedToGetUserInfo" xml:space="preserve">
     <value>Impossible d'obtenir les infos utilisateur</value>
   </data>
+  <data name="FailedToGetUsers" xml:space="preserve">
+    <value>Impossible de charger la liste des utilisateurs</value>
+  </data>
   <data name="NetworkError" xml:space="preserve">
     <value>Erreur réseau</value>
   </data>

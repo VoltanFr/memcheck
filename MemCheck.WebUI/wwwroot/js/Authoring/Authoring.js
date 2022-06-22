@@ -110,7 +110,15 @@ const authoringApp = Vue.createApp({
                 });
         },
         async getUsers() {
-            this.allAvailableUsers = (await axios.get('/Authoring/GetUsers')).data;
+            await axios.get('/Authoring/GetUsers')
+                .then(result => {
+                    this.allAvailableUsers = result.data;
+                })
+                .catch(error => {
+                    this.errorDebugInfoLines.push(`Failed to get users: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetUsers}`);
+                    this.allAvailableUsers = null;
+                });
         },
         async getDecksOfUser() {
             this.decksOfUser = (await axios.get('/Authoring/DecksOfUser')).data;
@@ -143,7 +151,7 @@ const authoringApp = Vue.createApp({
                 });
         },
         initializationFailure() {
-            return !this.currentUser || !this.allAvailableTags || !this.allAvailableLanguages;
+            return !this.currentUser || !this.allAvailableTags || !this.allAvailableLanguages || !this.allAvailableUsers;
         },
         bigSizeImageLabelsLocalizer() {
             return localized;
