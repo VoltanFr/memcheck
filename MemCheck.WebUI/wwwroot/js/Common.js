@@ -1,7 +1,17 @@
 ﻿'use strict';
 
-/* exported emptyGuid */
+/* exported emptyGuid,imageSizeSmall,imageSizeMedium,imageSizeBig,imageSideFront,imageSideBack,imageSideAdditional,toastWithoutIcon,dateTime,dateTimeWithTime,tellAxiosError,tellControllerSuccess,base64FromBytes,sortTagArray,sleep,copyToClipboardAndToast,pachAxios,getCookie,deleteCookie */
+
 const emptyGuid = '00000000-0000-0000-0000-000000000000';
+
+const imageSizeSmall = 1;
+const imageSizeMedium = 2;
+const imageSizeBig = 3;
+
+const imageSideFront = 1;
+const imageSideBack = 2;
+const imageSideAdditional = 3;
+
 const toastShortDuration = 4000;
 const toastLongDuration = 10000;
 
@@ -26,7 +36,6 @@ function toast(mesg, title, success, duration) {
     globalThis.vant.Toast({ message: actualMesg, type: 'html', icon: icon, iconSize: 30, duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
 }
 
-/* exported toastWithoutIcon */
 function toastWithoutIcon(mesg, title, duration) {
     const actualMesg = `<strong>${title}</strong><br/>${mesg}`;
     const actualDuration = duration ? duration : toastLongDuration;
@@ -65,7 +74,6 @@ function toastAxiosResult(description, axiosResult, success) {
     toast(text, title, success);
 }
 
-/* exported dateTime */
 function dateTime(utcFromDotNet) {
     if (!isValidDateTime(utcFromDotNet))
         return '!';
@@ -77,7 +85,6 @@ function dateTime(utcFromDotNet) {
     return d.toLocaleDateString();
 }
 
-/* exported dateTimeWithTime */
 function dateTimeWithTime(utcFromDotNet) {
     if (!isValidDateTime(utcFromDotNet))
         return '!';
@@ -87,7 +94,6 @@ function dateTimeWithTime(utcFromDotNet) {
     return d.toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-/* exported tellAxiosError */
 function tellAxiosError(result, description) {
     if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
         toastMemCheckControllerResult(result.response, false);
@@ -95,7 +101,6 @@ function tellAxiosError(result, description) {
         toastAxiosResult(description, result, false);
 }
 
-/* exported tellControllerSuccess */
 function tellControllerSuccess(result) {
     if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
         toastMemCheckControllerResult(result.response, true);
@@ -107,7 +112,6 @@ function tellControllerSuccess(result) {
     }
 }
 
-/* exported base64FromBytes */
 function base64FromBytes(bytes) {
     let xml = '';
     const uints = new Uint8Array(bytes);
@@ -116,17 +120,14 @@ function base64FromBytes(bytes) {
     return `data:image/jpg;base64,${window.btoa(xml)}`;
 }
 
-/* exported sortTagArray */
 function sortTagArray(array) {
     array.sort((tagA, tagB) => (tagA.tagName > tagB.tagName) ? 1 : ((tagB.tagName > tagA.tagName) ? -1 : 0));
 }
 
-/* exported sleep */
 function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-/* exported copyToClipboardAndToast */
 function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure) {
     navigator.clipboard
         .writeText(text)
@@ -138,7 +139,6 @@ function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure)
         });
 }
 
-/* exported pachAxios */
 async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
@@ -153,7 +153,6 @@ async function pachAxios(url, timeout) {
         });
 }
 
-/* exported getCookie */
 function getCookie(cookieName) {
     const allCookies = document.cookie;
 
@@ -177,7 +176,6 @@ function setCookie(_, value, days) {
     document.cookie = `name=${value};max-age=${maxAge};path=/`;
 }
 
-/* exported deleteCookie */
 function deleteCookie(name) {
     setCookie(name, '', -1);
 }

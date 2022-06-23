@@ -72,7 +72,7 @@ const imageListApp = Vue.createApp({
                 });
 
             for (let i = 0; i < this.images.length; i++)
-                await axios.get(`/Learn/GetImage/${this.images[i].imageId}/1`, { responseType: 'arraybuffer' })
+                await axios.get(`/Learn/GetImage/${this.images[i].imageId}/${imageSizeSmall}`, { responseType: 'arraybuffer' })
                     .then(result => this.setImageThumbnail(i, result.data))
                     .catch(error => this.onAxiosError(error));
 
@@ -111,7 +111,7 @@ const imageListApp = Vue.createApp({
         async showImageFull(image) {  // {imageName: string, imageId: Guid, cardCount: int, thumbnail: base64 string}
             this.loading = true;
             try {
-                await axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })
+                await axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                     .then(result => {
                         this.currentFullScreenImage = {
                             imageId: image.imageId,

@@ -1,10 +1,5 @@
 ﻿'use strict';
 
-const imageSizeMedium = 2;
-const imageSideFront = 1;
-const imageSideBack = 2;
-const imageSideAdditional = 3;
-
 const authoringApp = Vue.createApp({
     components: {
         'van-button': globalThis.vant.Button,

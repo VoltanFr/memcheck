@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 /* exported MarkdownEditor */
+
 const MarkdownEditor = Vue.defineComponent({
     components: {
         // mention sub components, if we used in the template

@@ -62,7 +62,7 @@ const deleteMediaApp = Vue.createApp({
                 });
 
             // Note: no await here, asynchronous FTW
-            axios.get(`/Learn/GetImage/${imageId}/2`, { responseType: 'arraybuffer' })
+            axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                 .then(result => {
                     this.image.blob = base64FromBytes(result.data);
                 })

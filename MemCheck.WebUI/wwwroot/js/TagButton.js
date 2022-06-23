@@ -1,6 +1,7 @@
 ﻿'use strict';
 
 /* exported TagButton */
+
 const TagButton = Vue.defineComponent({
     components: {
     },

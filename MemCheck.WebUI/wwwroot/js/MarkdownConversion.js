@@ -1,5 +1,7 @@
 ﻿'use strict';
 
+/* exported convertMarkdown */
+
 function valueWithThousandSeparators(number) { // number is a string
     const value = Number(number);
     if (isNaN(value))
@@ -58,7 +60,6 @@ function beautifyTextForFrench(src) {
     return result;
 }
 
-/* exported convertMarkdown */
 function convertMarkdown(src, beautifyForFrench) {
     const actualText = beautifyForFrench ? beautifyTextForFrench(src) : src;
     const converter = new showdown.Converter({ tables: true });

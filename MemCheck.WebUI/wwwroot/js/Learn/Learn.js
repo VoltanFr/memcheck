@@ -157,7 +157,7 @@ const learnApp = Vue.createApp({
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
         spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
-            this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/2`, { responseType: 'arraybuffer' })
+            this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                 .then(result => {
                     image.blob = base64FromBytes(result.data);
                     this.currentImageLoadingPromise = null;
@@ -301,7 +301,7 @@ const learnApp = Vue.createApp({
             return this.userDecks.length > 0 && this.userDecks[0].showDebugInfo;
         },
         currentCardHasAdditionalSide() {
-            return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide === 3);
+            return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide === imageSideAdditional);
         },
         currentCardHasReferences() {
             return this.currentCard.references;

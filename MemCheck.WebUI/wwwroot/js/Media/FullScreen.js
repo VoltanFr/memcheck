@@ -26,7 +26,7 @@ const fullScreenImageApp = Vue.createApp({
                 return;
             }
 
-            await axios.get(`/Learn/GetImage/${imageId}/3`, { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/${imageSizeBig}`, { responseType: 'arraybuffer' })
                 .then(result => {
                     this.imageBlob = base64FromBytes(result.data);
                 })

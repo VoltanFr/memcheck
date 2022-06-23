@@ -121,7 +121,7 @@ const uploadMediaApp = Vue.createApp({
                     return;
                 });
 
-            await axios.get(`/Learn/GetImage/${imageId}/2`, { responseType: 'arraybuffer' })
+            await axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                 .then(result => {
                     this.imagePreview = base64FromBytes(result.data);
                 })
