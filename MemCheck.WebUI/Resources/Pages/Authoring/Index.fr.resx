@@ -267,6 +267,9 @@
   <data name="FailedToGetCardToEdit" xml:space="preserve">
     <value>Impossible de charger la carde à modifier</value>
   </data>
+  <data name="FailedToGetDecksOfUser" xml:space="preserve">
+    <value>Impossible de charger les paquets de l'utilisateur</value>
+  </data>
   <data name="FailedToGetLanguages" xml:space="preserve">
     <value>Impossible de charger les langues</value>
   </data>

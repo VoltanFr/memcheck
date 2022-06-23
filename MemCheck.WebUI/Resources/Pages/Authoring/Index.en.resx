@@ -264,6 +264,9 @@
   <data name="FailedToGetCardToEdit" xml:space="preserve">
     <value>Failed to get card to edit</value>
   </data>
+  <data name="FailedToGetDecksOfUser" xml:space="preserve">
+    <value>Failed to get decks of user</value>
+  </data>
   <data name="FailedToGetLanguages" xml:space="preserve">
     <value>Failed to get languages</value>
   </data>

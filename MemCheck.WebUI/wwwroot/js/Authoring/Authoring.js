@@ -91,6 +91,11 @@ const authoringApp = Vue.createApp({
                 this.makePrivate();
                 this.card.languageId = this.userPreferredCardCreationLanguageId;
             }
+            if (this.decksOfUser.length === 1) {
+                this.addToDeck = this.decksOfUser[0];
+                this.singleDeckDisplay = true;
+            }
+            this.decksOfUser.splice(0, 0, ''); // So that no deck is selected by default
             this.copyAllInfoToOriginalCard();
         }
         finally {
@@ -126,12 +131,15 @@ const authoringApp = Vue.createApp({
                 });
         },
         async getDecksOfUser() {
-            this.decksOfUser = (await axios.get('/Authoring/DecksOfUser')).data;
-            if (this.decksOfUser.length === 1) {
-                this.addToDeck = this.decksOfUser[0];
-                this.singleDeckDisplay = true;
-            }
-            this.decksOfUser.splice(0, 0, '');
+            await axios.get('/Authoring/DecksOfUser')
+                .then(result => {
+                    this.decksOfUser = result.data;
+                })
+                .catch(error => {
+                    this.errorDebugInfoLines.push(`Failed to get decks of user: ${error}`);
+                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetDecksOfUser}`);
+                    this.decksOfUser = null;
+                });
         },
         async getAllAvailableTags() {
             await axios.get('/Authoring/AllAvailableTags')
@@ -156,7 +164,7 @@ const authoringApp = Vue.createApp({
                 });
         },
         initializationFailure() {
-            return !this.currentUser || !this.allAvailableTags || !this.allAvailableLanguages || !this.allAvailableUsers;
+            return !this.currentUser || !this.allAvailableTags || !this.allAvailableLanguages || !this.allAvailableUsers || !this.decksOfUser;
         },
         bigSizeImageLabelsLocalizer() {
             return localized;
