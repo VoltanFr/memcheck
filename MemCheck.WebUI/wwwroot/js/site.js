@@ -4,7 +4,7 @@ const layoutApp = Vue.createApp({
     data() {
         return {
             activeLanguage: '',
-            availableLanguages: [],
+            availableLanguages: [], // Strings, like ['En', 'Fr']
             mountFinished: false,
             userLanguageCookieName: 'usrLang',
             allLanguagesCookieName: 'allLangs',
@@ -25,7 +25,8 @@ const layoutApp = Vue.createApp({
 
             if (fromCookie) {
                 this.availableLanguages = fromCookie.split(',');
-                return;
+                if (this.availableLanguages.length > 0)
+                    return;
             }
 
             await axios.get('/UILanguages/getAvailableLanguages')
@@ -36,6 +37,7 @@ const layoutApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                     deleteCookie(this.allLanguagesCookieName);
+                    this.availableLanguages = ['En', 'Fr'];
                 });
         },
         async getActiveLanguage() {
@@ -43,7 +45,9 @@ const layoutApp = Vue.createApp({
 
             if (fromCookie) {
                 this.activeLanguage = fromCookie;
-                return;
+
+                if (this.activeLanguage && this.activeLanguage.split(',').length === 1)
+                    return;
             }
 
             await axios.get('/UILanguages/getActiveLanguage')
@@ -53,6 +57,8 @@ const layoutApp = Vue.createApp({
                 })
                 .catch(error => {
                     tellAxiosError(error);
+                    deleteCookie(this.userLanguageCookieName);
+                    this.activeLanguage = 'Fr';
                 });
         },
         async activeLanguageChange() {

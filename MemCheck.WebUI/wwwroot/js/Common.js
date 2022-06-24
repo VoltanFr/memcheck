@@ -171,9 +171,9 @@ function getCookie(cookieName) {
     return '';
 }
 
-function setCookie(_, value, days) {
+function setCookie(name, value, days) {
     const maxAge = days * 24 * 60 * 60;
-    document.cookie = `name=${value};max-age=${maxAge};path=/`;
+    document.cookie = `${name}=${value};max-age=${maxAge};path=/`;
 }
 
 function deleteCookie(name) {
