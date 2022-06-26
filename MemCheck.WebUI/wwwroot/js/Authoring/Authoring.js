@@ -12,7 +12,6 @@ import { toast } from '../Common.js';
 import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
 import { sortTagArray } from '../Common.js';
-import { dateTimeWithTime } from '../Common.js';
 
 const authoringApp = Vue.createApp({
     components: {
