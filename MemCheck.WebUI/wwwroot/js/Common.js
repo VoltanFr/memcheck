@@ -1,21 +1,17 @@
-﻿'use strict';
+﻿export const emptyGuid = '00000000-0000-0000-0000-000000000000';
 
-/* exported emptyGuid,imageSizeSmall,imageSizeMedium,imageSizeBig,imageSideFront,imageSideBack,imageSideAdditional,toastWithoutIcon,dateTime,dateTimeWithTime,tellAxiosError,tellControllerSuccess,base64FromBytes,sortTagArray,sleep,copyToClipboardAndToast,pachAxios,getCookie,deleteCookie */
+export const imageSizeSmall = 1;
+export const imageSizeMedium = 2;
+export const imageSizeBig = 3;
 
-const emptyGuid = '00000000-0000-0000-0000-000000000000';
-
-const imageSizeSmall = 1;
-const imageSizeMedium = 2;
-const imageSizeBig = 3;
-
-const imageSideFront = 1;
-const imageSideBack = 2;
-const imageSideAdditional = 3;
+export const imageSideFront = 1;
+export const imageSideBack = 2;
+export const imageSideAdditional = 3;
 
 const toastShortDuration = 4000;
 const toastLongDuration = 10000;
 
-function isValidDateTime(utcFromDotNet) {
+export function isValidDateTime(utcFromDotNet) {
     return utcFromDotNet && (utcFromDotNet !== '0001-01-01T00:00:00Z') && (utcFromDotNet !== '9999-12-31T23:59:59.9999999');  // matches DateTime.MinValue and Max
 }
 
@@ -28,7 +24,7 @@ function dateIsTomorrow(d) {
     return tomorrow.toDateString() === d.toDateString();
 }
 
-function toast(mesg, title, success, duration) {
+export function toast(mesg, title, success, duration) {
     const actualMesg = `<strong>${title}</strong><br/>${mesg}`;
     const icon = success ? 'thumb-circle' : 'fire';
     const actualDuration = duration ? duration : (success ? toastShortDuration : toastLongDuration);
@@ -36,7 +32,7 @@ function toast(mesg, title, success, duration) {
     globalThis.vant.Toast({ message: actualMesg, type: 'html', icon: icon, iconSize: 30, duration: actualDuration, className: 'toast-mesg', position: 'top', closeOnClick: true });
 }
 
-function toastWithoutIcon(mesg, title, duration) {
+export function toastWithoutIcon(mesg, title, duration) {
     const actualMesg = `<strong>${title}</strong><br/>${mesg}`;
     const actualDuration = duration ? duration : toastLongDuration;
     // eslint-disable-next-line new-cap
@@ -74,7 +70,7 @@ function toastAxiosResult(description, axiosResult, success) {
     toast(text, title, success);
 }
 
-function dateTime(utcFromDotNet) {
+export function dateTime(utcFromDotNet) {
     if (!isValidDateTime(utcFromDotNet))
         return '!';
     const d = new Date(utcFromDotNet);
@@ -85,7 +81,7 @@ function dateTime(utcFromDotNet) {
     return d.toLocaleDateString();
 }
 
-function dateTimeWithTime(utcFromDotNet) {
+export function dateTimeWithTime(utcFromDotNet) {
     if (!isValidDateTime(utcFromDotNet))
         return '!';
     const d = new Date(utcFromDotNet);
@@ -94,14 +90,14 @@ function dateTimeWithTime(utcFromDotNet) {
     return d.toLocaleString([], { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
-function tellAxiosError(result, description) {
+export function tellAxiosError(result, description) {
     if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
         toastMemCheckControllerResult(result.response, false);
     else
         toastAxiosResult(description, result, false);
 }
 
-function tellControllerSuccess(result) {
+export function tellControllerSuccess(result) {
     if (result && result.response && result.response.data && result.response.data.toastTitle) // This is a MemCheck ControllerResult
         toastMemCheckControllerResult(result.response, true);
     else {
@@ -112,7 +108,7 @@ function tellControllerSuccess(result) {
     }
 }
 
-function base64FromBytes(bytes) {
+export function base64FromBytes(bytes) {
     let xml = '';
     const uints = new Uint8Array(bytes);
     for (let j = 0; j < uints.byteLength; j++)
@@ -120,15 +116,15 @@ function base64FromBytes(bytes) {
     return `data:image/jpg;base64,${window.btoa(xml)}`;
 }
 
-function sortTagArray(array) {
+export function sortTagArray(array) {
     array.sort((tagA, tagB) => (tagA.tagName > tagB.tagName) ? 1 : ((tagB.tagName > tagA.tagName) ? -1 : 0));
 }
 
-function sleep(milliseconds) {
+export function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 
-function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure) {
+export function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure) {
     navigator.clipboard
         .writeText(text)
         .then(() => {
@@ -139,7 +135,7 @@ function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnFailure)
         });
 }
 
-async function pachAxios(url, timeout) {
+export async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
     const timeOutId = setTimeout(async() => {
@@ -153,7 +149,7 @@ async function pachAxios(url, timeout) {
         });
 }
 
-function getCookie(cookieName) {
+export function getCookie(cookieName) {
     const allCookies = document.cookie;
 
     if (allCookies.length > 0) {
@@ -171,11 +167,11 @@ function getCookie(cookieName) {
     return '';
 }
 
-function setCookie(name, value, days) {
+export function setCookie(name, value, days) {
     const maxAge = days * 24 * 60 * 60;
     document.cookie = `${name}=${value};max-age=${maxAge};path=/`;
 }
 
-function deleteCookie(name) {
+export function deleteCookie(name) {
     setCookie(name, '', -1);
 }

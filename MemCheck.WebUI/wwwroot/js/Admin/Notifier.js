@@ -1,4 +1,5 @@
-'use strict';
+﻿import { tellAxiosError } from '../Common.js';
+import { tellControllerSuccess } from '../Common.js';
 
 const notifierMainApp = Vue.createApp({
     components: {

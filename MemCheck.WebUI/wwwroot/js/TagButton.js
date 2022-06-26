@@ -1,8 +1,4 @@
-﻿'use strict';
-
-/* exported TagButton */
-
-const TagButton = Vue.defineComponent({
+﻿export const TagButton = Vue.defineComponent({
     components: {
     },
     props: {

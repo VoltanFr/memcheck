@@ -1,4 +1,5 @@
-﻿'use strict';
+﻿import { dateTimeWithTime } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
 
 const cardCompareApp = Vue.createApp({
     components: {

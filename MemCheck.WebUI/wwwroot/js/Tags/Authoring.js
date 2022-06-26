@@ -1,4 +1,5 @@
-﻿'use strict';
+﻿import { MarkdownEditor } from '../MarkdownEditor.js';
+import { tellAxiosError } from '../Common.js';
 
 const tagAuthoringApp = Vue.createApp({
     components: {

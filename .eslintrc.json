@@ -5,7 +5,8 @@
     "es6": true
   },
   "parserOptions": {
-    "ecmaVersion": 8
+    "ecmaVersion": 2020,
+    "sourceType": "module"
   },
   "rules": {
     "strict": ["error", "global"],
@@ -27,12 +28,7 @@
     "prefer-template": "error",
     "no-console": "error",
     "no-nested-ternary": "off",
-
-
-
-
-
-
+    
 /**
  * ES6
  */

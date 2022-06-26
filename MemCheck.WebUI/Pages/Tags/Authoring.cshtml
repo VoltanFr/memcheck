@@ -10,7 +10,7 @@
     <link href="@Url.Content("~/css/tageditpage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
     @section scripts {
-    <script src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
     <script>
         var localized = {};
         @foreach (var localizerEntry in Localizer.GetAllStrings())

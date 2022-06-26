@@ -1,8 +1,4 @@
-﻿'use strict';
-
-/* exported convertMarkdown */
-
-function valueWithThousandSeparators(number) { // number is a string
+﻿function valueWithThousandSeparators(number) { // number is a string
     const value = Number(number);
     if (isNaN(value))
         return null;
@@ -29,15 +25,17 @@ function insertThousandSeparatorsWhenBlankBefore(wholeMatch, blank, number) {
     return blank + value;
 }
 
-function replaceSpaceWithNbsp(_wholeMatch, _space, symbol) {
-    return `&nbsp;${symbol}`;
+function replaceSpaceWithNbsp(wholematch, _spaceAndPunctuation, _space, punctuation, quote, _offset, _wholeInput) {
+    if (quote)
+        return wholematch;
+    return `&nbsp;${punctuation}`;
 }
 
 function replaceNumberAndSpaceWithNbsp(_wholeMatch, number, _space, symbol) {
     return `${number}&nbsp;${symbol}`;
 }
 
-function beautifyTextForFrench(src) {
+export function beautifyTextForFrench(src) {
     // This code is not very great: ideally, we should use a real parser to analyze the text and not modify anything in an hyperlink's URL, a backslashed quote, block quotes, and probably embedded HTML.
     // However, I don't have such an implementation now (and I suspect it would be near-impossible, since Markdown is quite ambiguous and not BNF).
     // Fortunately, we don't need to deal with all possible uses of Markdown, but only with MemCheck. So this implementation relies on the presence of a space char, which proves that we are not in an URL.
@@ -51,8 +49,8 @@ function beautifyTextForFrench(src) {
     // Insert thousand separators when we find a number at the begining of the text
     result = result.replace(/^(\d+)/g, insertThousandSeparatorsWhenStartOfInput);
 
-    // White space before punctuation becomes nbsp
-    result = result.replace(/( )(\?|!|;|:)/g, replaceSpaceWithNbsp);
+    // White space before punctuation becomes nbsp if not in quote
+    result = result.replace(/(?<space_and_punctuation>(?<space> )(?<punctuation>\?|!|;|:))|(?<quote>`.+`)/g, replaceSpaceWithNbsp);
 
     // Digit and white space before unit becomes nbsp
     result = result.replace(/(\d)( )(€|mm|cm|dm|m|km|l|L|hl|bar|h\/km²|°|%)/g, replaceNumberAndSpaceWithNbsp);
@@ -60,7 +58,7 @@ function beautifyTextForFrench(src) {
     return result;
 }
 
-function convertMarkdown(src, beautifyForFrench) {
+export function convertMarkdown(src, beautifyForFrench) {
     const actualText = beautifyForFrench ? beautifyTextForFrench(src) : src;
     const converter = new showdown.Converter({ tables: true });
     converter.setOption('openLinksInNewWindow', 'true');

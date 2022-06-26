@@ -26,8 +26,8 @@ The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRo
 
 ### Tests
 
-- To restore Node packages, run `npm install`
-- To run [eslint](https://eslint.org/), run `npx eslint MemCheck.WebUI/wwwroot/js`
+- To restore Node packages, run `npm install`.
+- To run the tests (which include [eslint](https://eslint.org/) and [jest](https://jestjs.io/)), run `npm run test`.
 
 ### On Linux or Mac
 

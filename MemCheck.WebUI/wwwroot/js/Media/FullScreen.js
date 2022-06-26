@@ -1,4 +1,6 @@
-'use strict';
+﻿import { imageSizeBig } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
+import { base64FromBytes } from '../Common.js';
 
 const fullScreenImageApp = Vue.createApp({
     components: {

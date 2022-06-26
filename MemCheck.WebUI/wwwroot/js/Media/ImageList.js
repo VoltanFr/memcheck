@@ -1,4 +1,9 @@
-﻿'use strict';
+﻿import { BigSizeImage } from '../big-size-image.js';
+import { imageSizeSmall } from '../Common.js';
+import { imageSizeMedium } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
+import { base64FromBytes } from '../Common.js';
+import { copyToClipboardAndToast } from '../Common.js';
 
 const imageListApp = Vue.createApp({
     components: {

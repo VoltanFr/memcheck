@@ -1,4 +1,7 @@
-﻿'use strict';
+﻿import { deleteCookie } from './Common.js';
+import { getCookie } from './Common.js';
+import { setCookie } from './Common.js';
+import { tellAxiosError } from './Common.js';
 
 const layoutApp = Vue.createApp({
     data() {

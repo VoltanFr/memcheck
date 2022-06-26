@@ -1,7 +1,6 @@
-﻿'use strict';
+﻿import { tellAxiosError } from './Common.js';
 
-/* exported ImageChoice */
-const ImageChoice = Vue.defineComponent({
+export const ImageChoice = Vue.defineComponent({
     components: {
     },
     props: {

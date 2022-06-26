@@ -1,4 +1,8 @@
-'use strict';
+﻿import { MarkdownEditor } from '../MarkdownEditor.js';
+import { imageSizeMedium } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
+import { tellControllerSuccess } from '../Common.js';
+import { base64FromBytes } from '../Common.js';
 
 const uploadMediaApp = Vue.createApp({
     components: {

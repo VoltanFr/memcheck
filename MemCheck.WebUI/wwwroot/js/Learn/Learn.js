@@ -1,4 +1,19 @@
-﻿'use strict';
+﻿import { convertMarkdown } from '../MarkdownConversion.js';
+import { BigSizeImage } from '../big-size-image.js';
+import { TagButton } from '../TagButton.js';
+import { CardRating } from '../CardRating.js';
+import { isValidDateTime } from '../Common.js';
+import { dateTime } from '../Common.js';
+import { dateTimeWithTime } from '../Common.js';
+import { emptyGuid } from '../Common.js';
+import { imageSizeMedium } from '../Common.js';
+import { imageSideAdditional } from '../Common.js';
+import { toast } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
+import { tellControllerSuccess } from '../Common.js';
+import { base64FromBytes } from '../Common.js';
+import { sleep } from '../Common.js';
+import { pachAxios } from '../Common.js';
 
 const learnModeExpired = 1;
 const learnModeUnknown = 2;

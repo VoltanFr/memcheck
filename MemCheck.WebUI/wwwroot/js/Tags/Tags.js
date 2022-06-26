@@ -1,4 +1,6 @@
-'use strict';
+﻿import { CardRating } from '../CardRating.js';
+import { convertMarkdown } from '../MarkdownConversion.js';
+import { tellAxiosError } from '../Common.js';
 
 const tagListingApp = Vue.createApp({
     components: {

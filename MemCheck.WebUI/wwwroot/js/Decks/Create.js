@@ -1,4 +1,4 @@
-'use strict';
+﻿import { tellAxiosError } from '../Common.js';
 
 const createDeckApp = Vue.createApp({
     components: {

@@ -1,28 +1,19 @@
 {
-  "name": "memcheck",
-  "version": "1.0.0",
-  "description": "[![MemCheck build, test and deploy to Azure](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml/badge.svg)](https://github.com/VoltanFr/memcheck/actions/workflows/master_memcheckfr.yml)",
-  "main": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t",
-  "dependencies": {},
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.2.0",
-    "eslint-plugin-vue": "^8.5.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/VoltanFr/memcheck.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/VoltanFr/memcheck/issues"
-  },
-  "homepage": "https://github.com/VoltanFr/memcheck#readme"
+    "name": "memcheck",
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.13.1",
+        "@babel/preset-env": "^7.11.0",
+        "eslint": "^8.18.0",
+        "jest": "^28.1.1"
+    },
+    "scripts": {
+        "lint": "eslint MemCheck.WebUI/wwwroot/js",
+        "unit-tests": "jest --transformIgnorePatterns",
+        "test": "npm run lint & npm run unit-tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/VoltanFr/memcheck.git"
+    }
 }

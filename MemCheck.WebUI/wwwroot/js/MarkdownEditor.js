@@ -1,8 +1,6 @@
-﻿'use strict';
+﻿import { convertMarkdown } from './MarkdownConversion.js';
 
-/* exported MarkdownEditor */
-
-const MarkdownEditor = Vue.defineComponent({
+export const MarkdownEditor = Vue.defineComponent({
     components: {
         // mention sub components, if we used in the template
     },

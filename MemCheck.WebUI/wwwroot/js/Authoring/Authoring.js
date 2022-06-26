@@ -1,4 +1,18 @@
-﻿'use strict';
+﻿import { MarkdownEditor } from '../MarkdownEditor.js';
+import { BigSizeImage } from '../big-size-image.js';
+import { TagButton } from '../TagButton.js';
+import { ImageChoice } from '../ImageChoice.js';
+import { CardRating } from '../CardRating.js';
+import { dateTime } from '../Common.js';
+import { imageSizeMedium } from '../Common.js';
+import { imageSideFront } from '../Common.js';
+import { imageSideBack } from '../Common.js';
+import { imageSideAdditional } from '../Common.js';
+import { toast } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
+import { tellControllerSuccess } from '../Common.js';
+import { sortTagArray } from '../Common.js';
+import { dateTimeWithTime } from '../Common.js';
 
 const authoringApp = Vue.createApp({
     components: {

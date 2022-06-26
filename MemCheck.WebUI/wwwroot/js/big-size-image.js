@@ -1,7 +1,7 @@
-﻿'use strict';
+﻿import { dateTime } from './Common.js';
+import { copyToClipboardAndToast } from './Common.js';
 
-/* exported BigSizeImage */
-const BigSizeImage = Vue.defineComponent({
+export const BigSizeImage = Vue.defineComponent({
     components: {
         // mention sub components, if we used in the template
     },

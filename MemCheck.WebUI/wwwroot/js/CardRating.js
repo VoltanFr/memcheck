@@ -1,7 +1,6 @@
-﻿'use strict';
+﻿import { toastWithoutIcon } from './Common.js';
 
-/* exported CardRating */
-const CardRating = Vue.defineComponent({
+export const CardRating = Vue.defineComponent({
     components: {
         'van-button': globalThis.vant.Button,
         'van-popover': globalThis.vant.Popover,

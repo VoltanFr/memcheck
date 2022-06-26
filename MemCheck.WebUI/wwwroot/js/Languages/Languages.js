@@ -1,4 +1,4 @@
-'use strict';
+﻿import { tellAxiosError } from '../Common.js';
 
 const languagesApp = Vue.createApp({
     data() {

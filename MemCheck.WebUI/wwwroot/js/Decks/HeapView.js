@@ -1,4 +1,6 @@
-'use strict';
+﻿import { dateTime } from '../Common.js';
+import { dateTimeWithTime } from '../Common.js';
+import { tellAxiosError } from '../Common.js';
 
 const heapViewApp = Vue.createApp({
     components: {
