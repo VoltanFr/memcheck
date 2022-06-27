@@ -133,12 +133,18 @@ describe('Quotes', () => {
     test('Only numeric in quote must not be changed', () => {
         expect(beautifyTextForFrench('`10000`')).toBe('`10000`');
     });
-    // test('Numeric after text in quote must not be changed', () => {
-    //     expect(beautifyTextForFrench('`hop 10000`')).toBe('`hop 10000`');
-    // });
-
-    // To be fixed
-    // test('mix of cases including quotes', () => { expect(beautifyTextForFrench('10000 € mais `a ; b`\n`10000 ml` 10000 ml')).toBe('10&nbsp;000&nbsp;€ mais `a ; b`\n`10000 ml` 10&nbsp;000&nbsp;ml'); });
+    test('Numeric and unit in quote must not be changed - No thousands sep', () => {
+        expect(beautifyTextForFrench('`5 €`')).toBe('`5 €`');
+    });
+    test('Numeric and unit in quote must not be changed - Thousands sep', () => {
+        expect(beautifyTextForFrench('`54321 km`')).toBe('`54321 km`');
+    });
+    test('Numeric after text in quote must not be changed', () => {
+        expect(beautifyTextForFrench('`hop 10000`')).toBe('`hop 10000`');
+    });
+    test('mix of cases including quotes', () => {
+        expect(beautifyTextForFrench('10000 € mais `a ; b`\n`10000 ml` 10000 ml')).toBe('10&nbsp;000&nbsp;€ mais `a ; b`\n`10000 ml` 10&nbsp;000&nbsp;ml');
+    });
 });
 
 describe('URLs', () => {

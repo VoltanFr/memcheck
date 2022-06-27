@@ -11,28 +11,32 @@
     return result;
 }
 
-function insertThousandSeparatorsWhenStartOfInput(wholeMatch, number) {
+function insertThousandSeparatorsWhenStartOfInput(wholeMatch, number, _offset, _wholeInput) {
     const value = valueWithThousandSeparators(number);
     if (value === null)
         return wholeMatch;
     return value;
 }
 
-function insertThousandSeparatorsWhenBlankBefore(wholeMatch, blank, number) {
+function insertThousandSeparatorsWhenBlankBefore(wholeMatch, spaceAndOptionalOpeningParenthesis, number, quote, _offset, _wholeInput) {
+    if (quote)
+        return wholeMatch;
     const value = valueWithThousandSeparators(number);
     if (value === null)
         return wholeMatch;
-    return blank + value;
+    return spaceAndOptionalOpeningParenthesis + value;
 }
 
-function replaceSpaceWithNbsp(wholematch, _spaceAndPunctuation, _space, punctuation, quote, _offset, _wholeInput) {
+function replaceSpaceWithNbsp(wholeMatch, _spaceAndPunctuation, _space, punctuation, quote, _offset, _wholeInput) {
     if (quote)
-        return wholematch;
+        return wholeMatch;
     return `&nbsp;${punctuation}`;
 }
 
-function replaceNumberAndSpaceWithNbsp(_wholeMatch, number, _space, symbol) {
-    return `${number}&nbsp;${symbol}`;
+function replaceNumberAndSpaceWithNbsp(wholeMatch, digit, _space, symbol, quote, _offset, _wholeInput) {
+    if (quote)
+        return wholeMatch;
+    return `${digit}&nbsp;${symbol}`;
 }
 
 export function beautifyTextForFrench(src) {
@@ -44,16 +48,16 @@ export function beautifyTextForFrench(src) {
     let result = src;
 
     // Insert thousand separators when we find a number after a space, or a space and a parenthesis
-    result = result.replace(/(\s\(?)(\d+)/g, insertThousandSeparatorsWhenBlankBefore);
+    result = result.replace(/(?<space_and_optional_open_parenth> \(?)(?<number>\d+)|(?<quote>`.+`)/g, insertThousandSeparatorsWhenBlankBefore);
 
     // Insert thousand separators when we find a number at the begining of the text
-    result = result.replace(/^(\d+)/g, insertThousandSeparatorsWhenStartOfInput);
+    result = result.replace(/^(?<number>\d+)/g, insertThousandSeparatorsWhenStartOfInput);
 
     // White space before punctuation becomes nbsp if not in quote
     result = result.replace(/(?<space_and_punctuation>(?<space> )(?<punctuation>\?|!|;|:))|(?<quote>`.+`)/g, replaceSpaceWithNbsp);
 
     // Digit and white space before unit becomes nbsp
-    result = result.replace(/(\d)( )(€|mm|cm|dm|m|km|l|L|hl|bar|h\/km²|°|%)/g, replaceNumberAndSpaceWithNbsp);
+    result = result.replace(/(?<symbol>\d)(?<space> )(?<unit>€|mm|cm|dm|m|km|l|L|hl|bar|h\/km²|°|%)|(?<quote>`.+`)/g, replaceNumberAndSpaceWithNbsp);
 
     return result;
 }
