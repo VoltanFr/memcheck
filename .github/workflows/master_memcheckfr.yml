@@ -48,8 +48,11 @@ jobs:
     - name: "Install JavaScript modules"
       run: yarn
 
-    - name: "Run ESLint"
-      run: yarn eslint MemCheck.WebUI/wwwroot/js
+    - name: "Run JavaScript lint with ESLint"
+      run: yarn lint
+
+    - name: "Run JavaScript unit-tests with jest"
+      run: yarn unit-tests
 
     - name: "Restore NuGet packages"
       run: dotnet restore
