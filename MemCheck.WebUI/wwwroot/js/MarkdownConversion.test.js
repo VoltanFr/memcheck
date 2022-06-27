@@ -155,6 +155,6 @@ describe('Mixes', () => {
         expect(beautifyTextForFrench('Son nom vient de sa cylindrée de 12 x 250 cm³ (3 L)')).toBe('Son nom vient de sa cylindrée de 12 x 250&nbsp;cm³ (3&nbsp;L)');
     });
     test('numbers and units', () => {
-        expect(beautifyTextForFrench('Sportif en plein effort : 100 l/min. Bouteille de 5 l gonflée à 200 bars débitant 15 l/min.')).toBe('Sportif en plein effort&nbsp;: 100&nbsp;l/min. Bouteille de 5&nbsp;l gonflée à 200&nbsp;bars débitant 15&nbsp;l/min.');
+        expect(beautifyTextForFrench('Sportif en plein effort : 100 l/min. Bouteille de 5 l gonflée à 200 bars débitant 15 l/min.')).toBe('AAAAAAAASportif en plein effort&nbsp;: 100&nbsp;l/min. Bouteille de 5&nbsp;l gonflée à 200&nbsp;bars débitant 15&nbsp;l/min.');
     });
 });

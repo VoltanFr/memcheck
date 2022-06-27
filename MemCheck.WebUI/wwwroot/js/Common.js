@@ -138,7 +138,7 @@ export function copyToClipboardAndToast(text, toastTitleOnSuccess, toastTitleOnF
 export async function pachAxios(url, timeout) {
     const cancellationTokenSource = axios.CancelToken.source();
 
-    const timeOutId = setTimeout(async() => {
+    const timeOutId = setTimeout(async () => {
         clearTimeout(timeOutId);
         cancellationTokenSource.cancel(`Timeout of ${timeout} ms (through cancellation token).`);
     }, timeout);
