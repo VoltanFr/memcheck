@@ -34,12 +34,6 @@ describe('Numeric value at start and unit', () => {
     test('Multiple numeric values on one line', () => {
         expect(beautifyTextForFrench('100 €, 2000 ml, 30000 cm, 40000 mm, 500000 hl, 6000000 bar')).toBe('100&nbsp;€, 2000&nbsp;ml, 30&nbsp;000&nbsp;cm, 40&nbsp;000&nbsp;mm, 500&nbsp;000&nbsp;hl, 6&nbsp;000&nbsp;000&nbsp;bar');
     });
-});
-
-describe('Numeric value not at start and unit', () => {
-    test('0,001 m³ must get one nbsp', () => {
-        expect(beautifyTextForFrench('- 0,001 m³')).toBe('- 0,001&nbsp;m³');
-    });
     test('10 € must get nbsp', () => {
         expect(beautifyTextForFrench('10 €')).toBe('10&nbsp;€');
     });
@@ -60,6 +54,12 @@ describe('Numeric value not at start and unit', () => {
     });
     test('1000000 € must get three nbsp', () => {
         expect(beautifyTextForFrench('1000000 €')).toBe('1&nbsp;000&nbsp;000&nbsp;€');
+    });
+});
+
+describe('Numeric value not at start and unit', () => {
+    test('0,001 m³ must get one nbsp', () => {
+        expect(beautifyTextForFrench('- 0,001 m³')).toBe('- 0,001&nbsp;m³');
     });
     test('1000000 mm³ must get three nbsp', () => {
         expect(beautifyTextForFrench('- 1000000 mm³')).toBe('- 1&nbsp;000&nbsp;000&nbsp;mm³');
@@ -162,5 +162,35 @@ describe('Mixes', () => {
     });
     test('numbers and units', () => {
         expect(beautifyTextForFrench('Sportif en plein effort : 100 l/min. Bouteille de 5 l gonflée à 200 bars débitant 15 l/min.')).toBe('Sportif en plein effort&nbsp;: 100&nbsp;l/min. Bouteille de 5&nbsp;l gonflée à 200&nbsp;bars débitant 15&nbsp;l/min.');
+    });
+});
+
+describe('Links with caption and URL, with replacements to make in the caption and various kinds of URL', () => {
+    test('Nothing to replace, no blanks, no number & unit, no punctuation, no thousands separators', () => {
+        expect(beautifyTextForFrench('Lien : [Wikipédia](https://fr.wikipedia.org/)')).toBe('Lien&nbsp;: [Wikipédia](https://fr.wikipedia.org/)');
+    });
+    test('Nothing to replace, blanks, no number & unit, no punctuation, no thousands separators', () => {
+        expect(beautifyTextForFrench('[ Le Wikipédia français](https://www.google.com/imgres?imgurl=https%3A%2F%2Fimage.shutterstock.com%2Fimage-photo%2Fnorthern-flicker-snow-storm-260nw-1778937794.jpg&imgrefurl=https%3A%2F%2Fwww.shutterstock.com%2Ffr%2Fsearch%2Fflicker&tbnid=1LrhzjLKTC9KkM&vet=12ahUKEwjCzezrxdP4AhVTVfEDHXmVD0wQMygRegUIARDcAQ..i&docid=-CozTdnUvI2vPM&w=390&h=280&q=flicker%20image&ved=2ahUKEwjCzezrxdP4AhVTVfEDHXmVD0wQMygRegUIARDcAQ)')).toBe('[ Le Wikipédia français](https://www.google.com/imgres?imgurl=https%3A%2F%2Fimage.shutterstock.com%2Fimage-photo%2Fnorthern-flicker-snow-storm-260nw-1778937794.jpg&imgrefurl=https%3A%2F%2Fwww.shutterstock.com%2Ffr%2Fsearch%2Fflicker&tbnid=1LrhzjLKTC9KkM&vet=12ahUKEwjCzezrxdP4AhVTVfEDHXmVD0wQMygRegUIARDcAQ..i&docid=-CozTdnUvI2vPM&w=390&h=280&q=flicker%20image&ved=2ahUKEwjCzezrxdP4AhVTVfEDHXmVD0wQMygRegUIARDcAQ)');
+    });
+    test('Nothing to replace, no blanks, number & unit, no punctuation, no thousands separators', () => {
+        expect(beautifyTextForFrench('[50 ml](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Tal_Flicker.jpg/1130px-Tal_Flicker.jpg) est le lien !')).toBe('[50&nbsp;ml](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Tal_Flicker.jpg/1130px-Tal_Flicker.jpg) est le lien&nbsp;!');
+    });
+    test('Nothing to replace, no blanks, no number & unit, punctuation, no thousands separators', () => {
+        expect(beautifyTextForFrench('99999 fois [LeWikipédiafrançais !](https://camo.githubusercontent.com/e67439e304187b5eafaf9280ff600a8e205c71cbe5392d48ccd40ac590f84408/68747470733a2f2f6769746875622d726561646d652d73746174732e76657263656c2e6170702f6170692f746f702d6c616e67732f3f757365726e616d653d566f6c74616e4672266c61796f75743d636f6d70616374)')).toBe('99&nbsp;999 fois [LeWikipédiafrançais&nbsp;!](https://camo.githubusercontent.com/e67439e304187b5eafaf9280ff600a8e205c71cbe5392d48ccd40ac590f84408/68747470733a2f2f6769746875622d726561646d652d73746174732e76657263656c2e6170702f6170692f746f702d6c616e67732f3f757365726e616d653d566f6c74616e4672266c61796f75743d636f6d70616374)');
+    });
+    test('Nothing to replace, no blanks, no number & unit, no punctuation, thousands separators', () => {
+        expect(beautifyTextForFrench('[28078993](https://fr.wikipedia.org/)')).toBe('[28&nbsp;078&nbsp;993](https://fr.wikipedia.org/)');
+    });
+    test('Combination', () => {
+        expect(beautifyTextForFrench('[28078993 ! Voici 2 €, et même 78909 € !](https://fr.wikipedia.org/)')).toBe('[28&nbsp;078&nbsp;993&nbsp;! Voici 2&nbsp;€, et même 78&nbsp;909&nbsp;€&nbsp;!](https://fr.wikipedia.org/)');
+    });
+    test('Combination with square brackets', () => {
+        expect(beautifyTextForFrench('[28078993 ! Voici 2 €, et même [78909 €] ah !](https://fr.wikipedia.org/)')).toBe('[28&nbsp;078&nbsp;993&nbsp;! Voici 2&nbsp;€, et même [78&nbsp;909&nbsp;€] ah&nbsp;!](https://fr.wikipedia.org/)');
+    });
+    test('Combination with parenthesis', () => {
+        expect(beautifyTextForFrench('[28078993 ! Voici 2 €, (et même 78909 €) ah !](https://fr.wikipedia.org/)')).toBe('[28&nbsp;078&nbsp;993&nbsp;! Voici 2&nbsp;€, (et même 78&nbsp;909&nbsp;€) ah&nbsp;!](https://fr.wikipedia.org/)');
+    });
+    test('Combination with square brackets andparenthesis', () => {
+        expect(beautifyTextForFrench('avant [28078993 ! Voici 2 €, [doh] (et même 78909 €) ah !](https://fr.wikipedia.org/) après')).toBe('avant [28&nbsp;078&nbsp;993&nbsp;! Voici 2&nbsp;€, [doh] (et même 78&nbsp;909&nbsp;€) ah&nbsp;!](https://fr.wikipedia.org/) après');
     });
 });

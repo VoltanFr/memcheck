@@ -11,20 +11,22 @@
     return result;
 }
 
-function insertThousandSeparatorsWhenStartOfInput(wholeMatch, number, _offset, _wholeInput) {
+function insertThousandSeparatorsWhenStartOfInput(wholeMatch, openingSquareBracket, number, _offset, _wholeInput) {
     const value = valueWithThousandSeparators(number);
     if (value === null)
         return wholeMatch;
+    if (openingSquareBracket)
+        return `${openingSquareBracket}${value}`;
     return value;
 }
 
-function insertThousandSeparatorsWhenBlankBefore(wholeMatch, spaceAndOptionalOpeningParenthesis, number, quote, _offset, _wholeInput) {
+function insertThousandSeparatorsWhenBlankBefore(wholeMatch, separator, number, quote, _offset, _wholeInput) {
     if (quote)
         return wholeMatch;
     const value = valueWithThousandSeparators(number);
     if (value === null)
         return wholeMatch;
-    return spaceAndOptionalOpeningParenthesis + value;
+    return separator + value;
 }
 
 function replaceSpaceWithNbsp(wholeMatch, _spaceAndPunctuation, _space, punctuation, quote, _offset, _wholeInput) {
@@ -40,18 +42,20 @@ function replaceNumberAndSpaceWithNbsp(wholeMatch, digit, _space, symbol, quote,
 }
 
 export function beautifyTextForFrench(src) {
-    // This code is not very great: ideally, we should use a real parser to analyze the text and not modify anything in an hyperlink's URL, a backslashed quote, block quotes, and probably embedded HTML.
+    // This code is not very great: ideally, we should use a real parser to analyze the text
     // However, I don't have such an implementation now (and I suspect it would be near-impossible, since Markdown is quite ambiguous and not BNF).
     // Fortunately, we don't need to deal with all possible uses of Markdown, but only with MemCheck. So this implementation relies on the presence of a space char, which proves that we are not in an URL.
-    // The biggest problem here is we insert thousand separators in years, which is wrong. I don't know yet how to solve that (eg question: "Combien de ml dans un l ?", answer: "1000").
 
     let result = src;
 
-    // Insert thousand separators when we find a number after a space, or a space and a parenthesis
+    // The case of a link with two parts: [link_caption](url). In that case, the url is not to be modified, and the caption is to be treated as all other text
     result = result.replace(/(?<space_and_optional_open_parenth> \(?)(?<number>\d+)|(?<quote>`.+`)/g, insertThousandSeparatorsWhenBlankBefore);
 
-    // Insert thousand separators when we find a number at the begining of the text
-    result = result.replace(/^(?<number>\d+)/g, insertThousandSeparatorsWhenStartOfInput);
+    // Insert thousand separators when we find a number after an opening bracket, a space, a space and a parenthesis, or an opening bracket and a parenthesis
+    result = result.replace(/(?<separator> |\[\(?)(?<number>\d+)|(?<quote>`.+`)/g, insertThousandSeparatorsWhenBlankBefore);
+
+    // Insert thousand separators when we find a number at the begining of the text, with an optional opening square bracket before
+    result = result.replace(/^(?<opening_sq_brcket>\[)?(?<number>\d+)/g, insertThousandSeparatorsWhenStartOfInput);
 
     // White space before punctuation becomes nbsp if not in quote
     result = result.replace(/(?<space_and_punctuation>(?<space> )(?<punctuation>\?|!|;|:))|(?<quote>`.+`)/g, replaceSpaceWithNbsp);
