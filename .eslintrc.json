@@ -16,7 +16,7 @@
     "curly": "off",
     "dot-notation": ["error", {"allowKeywords": true}],
     "indent": ["error", 4, { "SwitchCase": 1 }],
-    "brace-style": ["error", "stroustrup"],
+    "brace-style": ["error", "stroustrup", {"allowSingleLine" : true}],
     "quotes": ["error", "single", "avoid-escape"],
     "comma-spacing": ["error", {"before": false, "after": true}],
     "keyword-spacing": "error",

@@ -1,4 +1,10 @@
-﻿function valueWithThousandSeparators(number) { // number is a string
+﻿import { imageSizeSmall } from './Common.js';
+import { imageSizeMedium } from './Common.js';
+import { imageSizeBig } from './Common.js';
+
+const charsAllowedInImageName = '[-_.();!@&=+$/%#A-z0-9]+';
+
+function valueWithThousandSeparators(number) { // number is a string
     const value = Number(number);
     if (isNaN(value))
         return null;
@@ -63,6 +69,38 @@ export function beautifyTextForFrench(src) {
     // Digit and white space before unit becomes nbsp
     result = result.replace(/(?<symbol>\d)(?<space> )(?<unit>€|mm|cm|dm|m|km|l|L|hl|bar|h\/km²|°|%)|(?<quote>`.+`)/g, replaceNumberAndSpaceWithNbsp);
 
+    return result;
+}
+
+function imageNameRegExp(size) {
+    let sizePart;
+    switch (size) {
+        case imageSizeSmall: sizePart = ',size=small'; break;
+        case imageSizeMedium: sizePart = ',size=medium'; break;
+        case imageSizeBig: sizePart = ',size=big'; break;
+        default: sizePart = ''; break;
+    }
+    const result = new RegExp(`(!\\[Mnesios:(?<imageName>${charsAllowedInImageName})${sizePart}\\])|(?<quote>\`[^\`]+\`)`, 'g');
+    // console.log(result.source);
+    return result;
+}
+
+function getMnesiosImageNamesFromSourceTextForSize(src, imageSize) {
+    const arrayed = Array.from(src.matchAll(imageNameRegExp(imageSize)));
+    const images = arrayed.filter(match => match.groups.imageName);
+    const actualImageSize = imageSize ?? imageSizeMedium;
+    return images.map(match => { return { name: match.groups.imageName, size: actualImageSize }; });
+}
+
+export function getMnesiosImageNamesFromSourceText(src) {
+    // Image format in text: ![Mnesios:Image-name-without-space-or-comma,width=small|medium|big]
+    // result is an array of {name: image name, string, size: one of the image_size constants in Common.js}
+    // The images are not in the order of the text, but small/medium/big/default
+
+    let result = getMnesiosImageNamesFromSourceTextForSize(src, imageSizeSmall);
+    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src, imageSizeMedium));
+    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src, imageSizeBig));
+    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src));
     return result;
 }
 

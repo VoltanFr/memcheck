@@ -1,4 +1,8 @@
 ﻿import { beautifyTextForFrench } from './MarkdownConversion.js';
+import { getMnesiosImageNamesFromSourceText } from './MarkdownConversion.js';
+import { imageSizeSmall } from './Common.js';
+import { imageSizeMedium } from './Common.js';
+import { imageSizeBig } from './Common.js';
 
 describe('beautifyTextForFrench: Inputs which must not be beautified', () => {
     test('beautifyTextForFrench: Empty string must not be changed', () => {
@@ -194,3 +198,158 @@ describe('beautifyTextForFrench: Links with caption and URL, with replacements t
         expect(beautifyTextForFrench('avant [28078993 ! Voici 2 €, [doh] (et même 78909 €) ah !](https://fr.wikipedia.org/) après')).toBe('avant [28&nbsp;078&nbsp;993&nbsp;! Voici 2&nbsp;€, [doh] (et même 78&nbsp;909&nbsp;€) ah&nbsp;!](https://fr.wikipedia.org/) après');
     });
 });
+
+describe('getMnesiosImageNamesFromSourceText: Inputs without image', () => {
+    test('getMnesiosImageNamesFromSourceText: Empty input', () => {
+        expect(getMnesiosImageNamesFromSourceText('').length).toBe;
+    });
+
+    test('getMnesiosImageNamesFromSourceText: Empty input', () => {
+        expect(getMnesiosImageNamesFromSourceText('').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: input with punctuation but no image', () => {
+        expect(getMnesiosImageNamesFromSourceText('Exclamons-nous ! Parlons !').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: complex input without image', () => {
+        expect(getMnesiosImageNamesFromSourceText('avant [28078993 ! Voici 2 €, [doh] (et même 78909 €) ah !](https://fr.wikipedia.org/) après').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: input with numbers and units', () => {
+        expect(getMnesiosImageNamesFromSourceText('Sportif en plein effort : 100 l/min. Bouteille de 5 l gonflée à 200 bars débitant 15 l/min.').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: input with only flat URL', () => {
+        expect(getMnesiosImageNamesFromSourceText('https://www.google.com/search?q=%22javascript%22&sxsrf=ALiCzsbRIobu3xxaBH8wJBdwxbHcvE21KQ%3A1654379567179&ei=L9S').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: input with quotes but no Mnesios image', () => {
+        expect(getMnesiosImageNamesFromSourceText('10000 € mais `a ; b`\n`10000 ml` 10000 ml').length).toBe(0);
+    });
+});
+
+describe('getMnesiosImageNamesFromSourceText: input is only one image', () => {
+    test('getMnesiosImageNamesFromSourceText: small image', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:Situation78979Alabama,size=small]');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('Situation78979Alabama');
+        expect(result[0].size).toBe(imageSizeSmall);
+    });
+    test('getMnesiosImageNamesFromSourceText: medium image', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:AnImageName_7978798,size=medium]');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('AnImageName_7978798');
+        expect(result[0].size).toBe(imageSizeMedium);
+    });
+    test('getMnesiosImageNamesFromSourceText: big image', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:An-Image-Name-797880,size=big]');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('An-Image-Name-797880');
+        expect(result[0].size).toBe(imageSizeBig);
+    });
+    test('getMnesiosImageNamesFromSourceText: default size', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:78900!An-Image-Name_.();@&=+$/%#]');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('78900!An-Image-Name_.();@&=+$/%#');
+        expect(result[0].size).toBe(imageSizeMedium);
+    });
+    test('getMnesiosImageNamesFromSourceText: special chars', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:An_Image-Name-79788.0(doh);789@MemCheck&Hop=678687+8980uoi$-78900/%#Auio,size=big]');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('An_Image-Name-79788.0(doh);789@MemCheck&Hop=678687+8980uoi$-78900/%#Auio');
+        expect(result[0].size).toBe(imageSizeBig);
+    });
+    test('getMnesiosImageNamesFromSourceText: with text before and CR after', () => {
+        const result = getMnesiosImageNamesFromSourceText('Hey![Mnesios:78900!An-Image-Name_.();@&=+$/%#]\n');
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe('78900!An-Image-Name_.();@&=+$/%#');
+        expect(result[0].size).toBe(imageSizeMedium);
+    });
+    test('getMnesiosImageNamesFromSourceText: with two blank lines before', () => {
+        const imgName = 'An_Image-Name-79788.0(doh);789@Mnesios-tto&Hop=678687+8980uoi$-78900/%#Auio';
+        const result = getMnesiosImageNamesFromSourceText(`Hop\n\n![Mnesios:${imgName},size=big]`);
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe(imgName);
+        expect(result[0].size).toBe(imageSizeBig);
+    });
+});
+
+describe('getMnesiosImageNamesFromSourceText: input contains multiple images', () => {
+    test('getMnesiosImageNamesFromSourceText: simple', () => {
+        const result = getMnesiosImageNamesFromSourceText('![Mnesios:Situation78979Alabama,size=small]![Mnesios:78900!An-Image-Name_.();@&=+$/%#]\n');
+        expect(result.length).toBe(2);
+        expect(result[0].name).toBe('Situation78979Alabama');
+        expect(result[0].size).toBe(imageSizeSmall);
+        expect(result[1].name).toBe('78900!An-Image-Name_.();@&=+$/%#');
+        expect(result[1].size).toBe(imageSizeMedium);
+    });
+    test('getMnesiosImageNamesFromSourceText: multiline', () => {
+        const imgNameSmall = 'Situation78979Alabama';
+        const imgNameDefaultSize1 = '78900!An-Image-Name_.();@&=+$/%#';
+        const imgNameDefaultSize2 = 'An_Image-Name-79788.0(doh);789@Mnesios-tto&Hop=678687+8980uoi$-78900/%#Auio';
+        const imgNameBigSize = 'img3Name';
+        const result = getMnesiosImageNamesFromSourceText(`Welcome to Mnesios, a [Fun tool](https://mnesios.com/)\nSee that image: ![Mnesios:${imgNameSmall},size=small]\nOr that: ![Mnesios:${imgNameDefaultSize1}]\n\n![Mnesios:${imgNameBigSize},size=big]![Mnesios:${imgNameDefaultSize2}]`);
+        expect(result.length).toBe(4);
+        expect(result[0].name).toBe(imgNameSmall);
+        expect(result[0].size).toBe(imageSizeSmall);
+        expect(result[1].name).toBe(imgNameBigSize);
+        expect(result[1].size).toBe(imageSizeBig);
+        expect(result[2].name).toBe(imgNameDefaultSize1);
+        expect(result[2].size).toBe(imageSizeMedium);
+        expect(result[3].name).toBe(imgNameDefaultSize2);
+        expect(result[3].size).toBe(imageSizeMedium);
+    });
+});
+
+describe('getMnesiosImageNamesFromSourceText: images and quotes', () => {
+    test('getMnesiosImageNamesFromSourceText: whole input is a quote without image', () => {
+        const result = getMnesiosImageNamesFromSourceText('`quote`');
+        expect(result.length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: whole input is an image in a quote', () => {
+        const result = getMnesiosImageNamesFromSourceText('`![Mnesios:img]`');
+        expect(result.length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: whole input is an image and text in a quote', () => {
+        const result = getMnesiosImageNamesFromSourceText('`image non affichée : ![Mnesios:img]`');
+        expect(result.length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: two quotes', () => {
+        const result = getMnesiosImageNamesFromSourceText('`image non affichée : ![Mnesios:img]` and `Pas ![Mnesios:hop9879879] affichée`');
+        expect(result.length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: a quote and an image', () => {
+        const imgName = 'Img';
+        const result = getMnesiosImageNamesFromSourceText(`\`image non affichée : ![Mnesios:${imgName}]\` image affichée : ![Mnesios:${imgName},size=small]`);
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe(imgName);
+        expect(result[0].size).toBe(imageSizeSmall);
+    });
+    test('getMnesiosImageNamesFromSourceText: an image and a quote', () => {
+        const imgName = 'Img';
+        const result = getMnesiosImageNamesFromSourceText(`image affichée : ![Mnesios:${imgName},size=big] \`image non affichée : ![Mnesios:${imgName}]\``);
+        expect(result.length).toBe(1);
+        expect(result[0].name).toBe(imgName);
+        expect(result[0].size).toBe(imageSizeBig);
+    });
+    test('getMnesiosImageNamesFromSourceText: complex', () => {
+        const bigImg0Name = 'big';
+        const bigImg1Name = 'big';
+        const mediumImg0Name = 'medium0';
+        const mediumImg1Name = 'medium1';
+        const smallImgName = 'small';
+        const noSizeImgName = 'noSize';
+        const result = getMnesiosImageNamesFromSourceText(`text ![Mnesios:${mediumImg0Name},size=medium] \`![Mnesios:toto]\` ![Mnesios:${bigImg0Name},size=big] ![Mnesios:${mediumImg1Name},size=medium] \`quote\` ![Mnesios:${bigImg1Name},size=big] ![Mnesios:${noSizeImgName}] ![Mnesios:${smallImgName},size=small] \`![Mnesios:hop,size=big]\``);
+        expect(result.length).toBe(6);
+        expect(result[0].name).toBe(smallImgName);
+        expect(result[0].size).toBe(imageSizeSmall);
+        expect(result[1].name).toBe(mediumImg0Name);
+        expect(result[1].size).toBe(imageSizeMedium);
+        expect(result[2].name).toBe(mediumImg1Name);
+        expect(result[2].size).toBe(imageSizeMedium);
+        expect(result[3].name).toBe(bigImg0Name);
+        expect(result[3].size).toBe(imageSizeBig);
+        expect(result[4].name).toBe(bigImg1Name);
+        expect(result[4].size).toBe(imageSizeBig);
+        expect(result[5].name).toBe(noSizeImgName);
+        expect(result[5].size).toBe(imageSizeMedium);
+    });
+});
+
+// beautifyTextForFrench: Verify no modification of image in html format, as added by MemCheck's image replacement
