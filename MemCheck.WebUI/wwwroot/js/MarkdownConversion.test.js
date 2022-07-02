@@ -219,6 +219,12 @@ describe('getMnesiosImageNamesFromSourceText: Inputs without image', () => {
     test('getMnesiosImageNamesFromSourceText: input with only flat URL', () => {
         expect(getMnesiosImageNamesFromSourceText('https://www.google.com/search?q=%22javascript%22&sxsrf=ALiCzsbRIobu3xxaBH8wJBdwxbHcvE21KQ%3A1654379567179&ei=L9S').length).toBe(0);
     });
+    test('getMnesiosImageNamesFromSourceText: empty quote', () => {
+        expect(getMnesiosImageNamesFromSourceText('``').length).toBe(0);
+    });
+    test('getMnesiosImageNamesFromSourceText: simple quote', () => {
+        expect(getMnesiosImageNamesFromSourceText('`hop`').length).toBe(0);
+    });
     test('getMnesiosImageNamesFromSourceText: input with quotes but no Mnesios image', () => {
         expect(getMnesiosImageNamesFromSourceText('10000 € mais `a ; b`\n`10000 ml` 10000 ml').length).toBe(0);
     });
@@ -335,7 +341,7 @@ describe('getMnesiosImageNamesFromSourceText: images and quotes', () => {
         const mediumImg1Name = 'medium1';
         const smallImgName = 'small';
         const noSizeImgName = 'noSize';
-        const result = getMnesiosImageNamesFromSourceText(`text ![Mnesios:${mediumImg0Name},size=medium] \`![Mnesios:toto]\` ![Mnesios:${bigImg0Name},size=big] ![Mnesios:${mediumImg1Name},size=medium] \`quote\` ![Mnesios:${bigImg1Name},size=big] ![Mnesios:${noSizeImgName}] ![Mnesios:${smallImgName},size=small] \`![Mnesios:hop,size=big]\``);
+        const result = getMnesiosImageNamesFromSourceText(`text ![Mnesios:${mediumImg0Name},size=medium] \`![Mnesios:toto]\` ![Mnesios:${bigImg0Name},size=big] \`\` ![Mnesios:${mediumImg1Name},size=medium] \`quote\` ![Mnesios:${bigImg1Name},size=big] ![Mnesios:${noSizeImgName}] ![Mnesios:${smallImgName},size=small] \`![Mnesios:hop,size=big]\``);
         expect(result.length).toBe(6);
         expect(result[0].name).toBe(smallImgName);
         expect(result[0].size).toBe(imageSizeSmall);

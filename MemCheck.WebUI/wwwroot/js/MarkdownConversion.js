@@ -80,7 +80,7 @@ function imageNameRegExp(size) {
         case imageSizeBig: sizePart = ',size=big'; break;
         default: sizePart = ''; break;
     }
-    const result = new RegExp(`(!\\[Mnesios:(?<imageName>${charsAllowedInImageName})${sizePart}\\])|(?<quote>\`[^\`]+\`)`, 'g');
+    const result = new RegExp(`(!\\[Mnesios:(?<imageName>${charsAllowedInImageName})${sizePart}\\])|(?<quote>\`([^\`]+)?\`)`, 'g');
     // console.log(result.source);
     return result;
 }
