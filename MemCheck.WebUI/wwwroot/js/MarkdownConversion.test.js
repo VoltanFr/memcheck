@@ -128,6 +128,21 @@ describe('beautifyTextForFrench: Punctuation', () => {
 });
 
 describe('beautifyTextForFrench: Quotes', () => {
+    test('beautifyTextForFrench: empty quote', () => {
+        expect(beautifyTextForFrench('``')).toBe('``');
+    });
+    test('beautifyTextForFrench: two empty quotes', () => {
+        expect(beautifyTextForFrench('`` ``')).toBe('`` ``');
+    });
+    test('beautifyTextForFrench: simple quote', () => {
+        expect(beautifyTextForFrench('`hop`')).toBe('`hop`');
+    });
+    test('beautifyTextForFrench: quote containing only Mnesios image', () => {
+        expect(beautifyTextForFrench('`![Mnesios:img]`')).toBe('`![Mnesios:img]`');
+    });
+    test('beautifyTextForFrench: quote containing text and Mnesios image', () => {
+        expect(beautifyTextForFrench('`hop ![Mnesios:img]` jlk')).toBe('`hop ![Mnesios:img]` jlk');
+    });
     test('beautifyTextForFrench: question in quote must not be changed', () => {
         expect(beautifyTextForFrench('`a ?`')).toBe('`a ?`');
     });
