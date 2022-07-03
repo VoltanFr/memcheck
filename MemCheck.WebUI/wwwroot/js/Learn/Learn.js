@@ -193,7 +193,6 @@ const learnApp = Vue.createApp({
                         tellControllerSuccess(result);
                     })
                     .catch(error => {
-                        tellAxiosError(error, 'Failed to remove card from deck');
                         tellAxiosError(error, localized.FailedToRemoveCardFromDeck);
                     });
             }
@@ -275,10 +274,7 @@ const learnApp = Vue.createApp({
                         this.cardDownloadOperation = null;
                         this.updateRemainingCardsInLesson();
                     })
-                    .catch(error => {
-                        if (this.showDebugInfo()) {
-                            tellAxiosError(error, 'Card downloading failed, will retry in 1 second');
-                        }
+                    .catch(() => {
                         sleep(1000).then(() => {
                             this.cardDownloadOperation = null;  // Thanks to the watcher on cardDownloadOperation, a new download will be spawned
                         });
