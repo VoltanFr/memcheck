@@ -217,7 +217,7 @@
                                 </tr>
                                 <tr id="Text" class="memcheck-input-div">
                                     <th>@Localizer["Text"]</th>
-                                    <td><input class="form-control-sm responsive-padding-edit search-page-required-text-edit" v-model="textFilter" v-on:keyup.enter="runQuery()" /></td>
+                                    <td><input class="form-control-sm responsive-padding-edit search-page-required-text-edit" v-model="textFilter" v-on:keyup.enter="runQuery()" v-on:keyup="keyUp" /></td>
                                 </tr>
                                 <tr id="Reference" class="memcheck-input-div">
                                     <th>@Localizer["Reference"]</th>

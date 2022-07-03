@@ -198,6 +198,10 @@ const searchApp = Vue.createApp({
                     await this.runQuery();
             }
         },
+        async keyUp(event) {
+            // temporary debug
+            this.lastQueryDebugInfo = `Key pressed ${event.code}`;
+        },
         filteringOnDeckInclusive() {
             const result = this.selectedDeck && (this.selectedDeck.deckId !== this.possibleDecks[0].deckId) && this.deckSelectionIsInclusive;
             return result;
