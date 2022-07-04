@@ -198,13 +198,6 @@ const searchApp = Vue.createApp({
                     await this.runQuery();
             }
         },
-        async keydown(event) {
-            // temporary debug
-            this.lastQueryDebugInfo = `keydown - code: '${event.code}' - keyCode: '${event.keyCode}' - key: '${event.key}' - type: ${event.type} - which: ${event.which} - isComposing: ${event.isComposing} `;
-            if (event.isComposing || event.keyCode === 229) return;
-            if (event.key === 'Enter')
-                this.runQuery();
-        },
         filteringOnDeckInclusive() {
             const result = this.selectedDeck && (this.selectedDeck.deckId !== this.possibleDecks[0].deckId) && this.deckSelectionIsInclusive;
             return result;
