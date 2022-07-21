@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.31.1</VersionPrefix>
+		<VersionPrefix>0.31.2</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
+		<PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
 		<PackageReference Include="Svg" Version="3.4.2" />
 	</ItemGroup>
