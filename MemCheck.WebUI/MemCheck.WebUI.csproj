@@ -16,7 +16,7 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
 		<PackageReference Include="Microsoft.Web.WebJobs.Publish" Version="17.1.361" />
-		<PackageReference Include="SendGrid" Version="9.27.0" />
+		<PackageReference Include="SendGrid" Version="9.28.0" />
 	</ItemGroup>
 
 	<ItemGroup>
