@@ -1,5 +1,4 @@
-﻿import { convertMarkdown } from '../MarkdownConversion.js';
-import { BigSizeImage } from '../big-size-image.js';
+﻿import { BigSizeImage } from '../big-size-image.js';
 import { TagButton } from '../TagButton.js';
 import { CardRating } from '../CardRating.js';
 import { isValidDateTime } from '../Common.js';
@@ -14,6 +13,8 @@ import { tellControllerSuccess } from '../Common.js';
 import { base64FromBytes } from '../Common.js';
 import { sleep } from '../Common.js';
 import { pachAxios } from '../Common.js';
+import { convertMarkdown } from '../MarkdownConversion.js';
+import { getMnesiosImageNamesFromSourceText } from '../MarkdownConversion.js';
 
 const learnModeExpired = 1;
 const learnModeUnknown = 2;
@@ -172,16 +173,32 @@ const learnApp = Vue.createApp({
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
         spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
-            this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
-                .then(result => {
-                    image.blob = base64FromBytes(result.data);
-                    this.currentImageLoadingPromise = null;
-                    if (!this.currentCard)
-                        this.getCard();
-                })
-                .catch(() => {
-                    this.currentImageLoadingPromise = null;
-                });
+            if (image.imageId) {
+                // Old image format
+                this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
+                    .then(result => {
+                        image.blob = base64FromBytes(result.data);
+                        this.currentImageLoadingPromise = null;
+                        if (!this.currentCard)
+                            this.getCard();
+                    })
+                    .catch(() => {
+                        this.currentImageLoadingPromise = null;
+                    });
+            }
+            else {
+                const request = { imageName: image.name, size: imageSizeMedium };
+                this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
+                    .then(result => {
+                        image.blob = base64FromBytes(result.data);
+                        this.currentImageLoadingPromise = null;
+                        if (!this.currentCard)
+                            this.getCard();
+                    })
+                    .catch(() => {
+                        this.currentImageLoadingPromise = null;
+                    });
+            }
         },
         onCardRemoved() {
         },
@@ -197,8 +214,9 @@ const learnApp = Vue.createApp({
                     });
             }
         },
-        showImageFull(image) {  // image is LearnController.GetCardsImageViewModel
-            this.currentFullScreenImage = image;
+        showImageFull(thisApp, image) {  // image is LearnController.GetCardsImageViewModel
+            thisApp._instance.data.currentFullScreenImage = image;
+            history.pushState('ShowingImageDetails', 'BackToCard');
         },
         handlePendingMoveOperations() {
             if (!this.currentMovePromise && this.pendingMoveOperations.length > 0) {
@@ -269,8 +287,17 @@ const learnApp = Vue.createApp({
                                 window.location.href = '/';
                             this.lastDownloadIsEmpty = true;
                         }
-                        for (let i = 0; i < result.data.cards.length; i++)
-                            this.downloadedCards.push(result.data.cards[i]);
+                        for (let i = 0; i < result.data.cards.length; i++) {
+                            const card = result.data.cards[i];
+
+                            // We don't discover images in card text on server side because we want the same code to be used at card authoring time
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+
+                            this.downloadedCards.push(card);
+                        }
                         this.cardDownloadOperation = null;
                         this.updateRemainingCardsInLesson();
                     })
@@ -301,9 +328,7 @@ const learnApp = Vue.createApp({
             return null;
         },
         onPopState() {
-            // If we are in full screen image mode, a state "#" has been pushed by the browser
-            if (!document.location.href.endsWith('#'))
-                this.currentFullScreenImage = null;
+            this.currentFullScreenImage = null;
         },
         closeFullScreenImage() {
             window.history.back();
@@ -376,17 +401,20 @@ const learnApp = Vue.createApp({
                     });
             }
         },
+        onImageClickFunctionText() {
+            return 'const div = document.querySelector("#LearnMainDiv"); const thisApp = div.__vue_app__; const imageClicked = thisApp._component.methods.showImageFull; ';
+        },
         currentCardFrontSide() {
-            return convertMarkdown(this.currentCard.frontSide, this.currentCard.isInFrench);
+            return convertMarkdown(this.currentCard.frontSide, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardBackSide() {
-            return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench);
+            return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardAdditionalInfo() {
-            return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench);
+            return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardReferences() {
-            return convertMarkdown(this.currentCard.references, this.currentCard.isInFrench);
+            return convertMarkdown(this.currentCard.references, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         unregisterForNotif() {
             this.currentCard.registeredForNotifications = false;

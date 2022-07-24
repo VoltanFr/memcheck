@@ -56,7 +56,34 @@ public class LearnController : MemCheckController
 
         var blob = await new GetImage(callContext).RunAsync(new GetImage.Request(imageId, AppSizeFromWebParam(size)));
         var content = new MemoryStream(blob.ImageBytes.ToArray());
-        return base.File(content, "APPLICATION/octet-stream", "noname");
+        return base.File(content, "image/jpeg", "noname.jpg");
+    }
+    #endregion
+    #region GetImageByName
+    [HttpPost("GetImageByName")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "We return a disposable object, which will be disposed by ASP NET Core")]
+    public async Task<IActionResult> GetImageByNameAsync([FromBody] GetImageByNameRequest request)
+    {
+        static GetImageFromName.Request.ImageSize AppSizeFromWebParam(int size)
+        {
+            return size switch
+            {
+                1 => GetImageFromName.Request.ImageSize.Small,
+                2 => GetImageFromName.Request.ImageSize.Medium,
+                3 => GetImageFromName.Request.ImageSize.Big,
+                _ => throw new NotImplementedException(size.ToString(CultureInfo.InvariantCulture))
+            };
+        }
+
+        CheckBodyParameter(request);
+        var blob = await new GetImageFromName(callContext).RunAsync(new GetImageFromName.Request(request.ImageName, AppSizeFromWebParam(request.Size)));
+        var content = new MemoryStream(blob.ImageBytes.ToArray());
+        return base.File(content, "image/jpeg", "noname.jpg");
+    }
+    public sealed class GetImageByNameRequest
+    {
+        public string ImageName { get; set; } = null!;
+        public int Size { get; set; }
     }
     #endregion
     #region MoveCardToHeap

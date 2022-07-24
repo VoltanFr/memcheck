@@ -2,7 +2,10 @@
 import { imageSizeMedium } from './Common.js';
 import { imageSizeBig } from './Common.js';
 
-const charsAllowedInImageName = '[-_.();!@&=+$/%#A-z0-9]+';
+const charsAllowedInImageName = '[-_.();!@&=+$/%#A-z0-9\u00C0-\u017F]+'; // The last range is for accents
+export const markDownImageCssClassSmall = 'markdown-render-image-small';
+export const markDownImageCssClassMedium = 'markdown-render-image-medium';
+export const markDownImageCssClassBig = 'markdown-render-image-big';
 
 function valueWithThousandSeparators(number) { // number is a string
     const value = Number(number);
@@ -80,7 +83,7 @@ function imageNameRegExp(size) {
         case imageSizeBig: sizePart = ',size=big'; break;
         default: sizePart = ''; break;
     }
-    const result = new RegExp(`(!\\[Mnesios:(?<imageName>${charsAllowedInImageName})${sizePart}\\])|(?<quote>\`([^\`]+)?\`)`, 'g');
+    const result = new RegExp(`(?<image>!\\[Mnesios:(?<imageName>${charsAllowedInImageName})${sizePart}\\])|(?<quote>\`([^\`]+)?\`)`, 'g');
     // console.log(result.source);
     return result;
 }
@@ -88,28 +91,61 @@ function imageNameRegExp(size) {
 function getMnesiosImageNamesFromSourceTextForSize(src, imageSize) {
     const arrayed = Array.from(src.matchAll(imageNameRegExp(imageSize)));
     const images = arrayed.filter(match => match.groups.imageName);
-    const actualImageSize = imageSize ?? imageSizeMedium;
-    return images.map(match => { return { name: match.groups.imageName, size: actualImageSize }; });
+    return images.map(match => { return match.groups.imageName; });
 }
 
 export function getMnesiosImageNamesFromSourceText(src) {
     // Image format in text: ![Mnesios:Image-name-without-space-or-comma,width=small|medium|big]
-    // result is an array of {name: image name, string, size: one of the image_size constants in Common.js}
-    // The images are not in the order of the text, but small/medium/big/default
+    // result is a Set of image names (string)
 
-    let result = getMnesiosImageNamesFromSourceTextForSize(src, imageSizeSmall);
-    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src, imageSizeMedium));
-    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src, imageSizeBig));
-    result = result.concat(getMnesiosImageNamesFromSourceTextForSize(src));
+    let result = new Set();
+    getMnesiosImageNamesFromSourceTextForSize(src, imageSizeSmall).forEach(item => result.add(item));
+    getMnesiosImageNamesFromSourceTextForSize(src, imageSizeMedium).forEach(item => result.add(item));
+    getMnesiosImageNamesFromSourceTextForSize(src, imageSizeBig).forEach(item => result.add(item));
+    getMnesiosImageNamesFromSourceTextForSize(src).forEach(item => result.add(item));
     return result;
 }
 
-export function convertMarkdown(src, beautifyForFrench) {
-    const actualText = beautifyForFrench ? beautifyTextForFrench(src) : src;
+// I use global variables because I need to access these values in replaceMnesiosImageWithBlob, to which I can not pass additional args. There has to be a better way
+let globalMnesiosImageDefinitions = [];
+let globalImageOnClickFunction = null;
+let globalCssClass = null;
+
+export function tell() {
+    alert('told');
+}
+
+function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, quote, _offset, _wholeInput) {
+    if (quote)
+        return wholeMatch;
+    const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
+    const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
+    const imageStringified = JSON.stringify(imageDefinitionFromGlobal);
+    return `<img src='${blob}' alt='${imageName}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked(thisApp, ${imageStringified});'/>`;
+}
+
+export function replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) {
+    // mnesiosImageDefinitions is an array of {name: image name, blob: the blob to use a image definition}
+    globalMnesiosImageDefinitions = mnesiosImageDefinitions;
+    globalImageOnClickFunction = methodToCallOnClick;
+    globalCssClass = markDownImageCssClassMedium;
+    let result = src.replace(imageNameRegExp(), replaceMnesiosImageWithBlob);
+    result = result.replace(imageNameRegExp(imageSizeMedium), replaceMnesiosImageWithBlob);
+    globalCssClass = markDownImageCssClassSmall;
+    result = result.replace(imageNameRegExp(imageSizeSmall), replaceMnesiosImageWithBlob);
+    globalCssClass = markDownImageCssClassBig;
+    result = result.replace(imageNameRegExp(imageSizeBig), replaceMnesiosImageWithBlob);
+    return result;
+}
+
+export function convertMarkdown(src, beautifyForFrench, mnesiosImageDefinitions, methodToCallOnClick) {
+    // mnesiosImageDefinitions is an array of {name: image name, blob: the blob to use a image definition}
+    const textWithMnesiosImageBlobs = mnesiosImageDefinitions ? replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) : src;
+    const beautifiedText = beautifyForFrench ? beautifyTextForFrench(textWithMnesiosImageBlobs) : textWithMnesiosImageBlobs;
     const converter = new showdown.Converter({ tables: true });
     converter.setOption('openLinksInNewWindow', 'true');
     converter.setOption('simplifiedAutoLink', 'true');
     converter.setOption('simpleLineBreaks', 'true');
     converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
-    return converter.makeHtml(actualText);
+    return converter.makeHtml(beautifiedText);
 }

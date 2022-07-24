@@ -189,6 +189,12 @@ internal static class QueryValidationHelper
     }
     public static async Task CheckCanCreateImageWithNameAsync(string name, MemCheckDbContext dbContext, ILocalized localizer)
     {
+        CheckImageNameValidity(name, localizer);
+        if (await dbContext.Images.AsNoTracking().Where(img => EF.Functions.Like(img.Name, name)).AnyAsync())
+            throw new RequestInputException(localizer.GetLocalized("AnImageWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
+    }
+    public static void CheckImageNameValidity(string name, ILocalized localizer)
+    {
         if (name != name.Trim())
             throw new InvalidOperationException("Invalid Name: not trimmed");
         if (name.Length is < ImageMinNameLength or > ImageMaxNameLength)
@@ -196,8 +202,6 @@ internal static class QueryValidationHelper
         foreach (var forbiddenChar in ForbiddenCharsInImageNames)
             if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
                 throw new RequestInputException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
-        if (await dbContext.Images.AsNoTracking().Where(img => EF.Functions.Like(img.Name, name)).AnyAsync())
-            throw new RequestInputException(localizer.GetLocalized("AnImageWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
     }
     public static void CheckCanCreateImageWithSource(string source, ILocalized localizer)
     {

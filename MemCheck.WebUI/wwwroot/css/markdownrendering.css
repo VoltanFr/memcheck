@@ -1,6 +1,6 @@
 ﻿.markdown-render {
     white-space: normal;
-    border-radius:4px;
+    border-radius: 4px;
     background-color: transparent;
 }
 
@@ -16,6 +16,18 @@
         width: 100%;
     }
 
+.markdown-render-image-small {
+    cursor: pointer;
+}
+
+.markdown-render-image-medium {
+    cursor: pointer;
+}
+
+.markdown-render-image-big {
+    cursor: pointer;
+}
+
 @media (max-width: 550px) {
     .markdown-render {
         padding: 1px;
@@ -28,6 +40,18 @@
         .markdown-render table td {
             padding: 1px;
         }
+
+    .markdown-render-image-small {
+        width: 150px;
+    }
+
+    .markdown-render-image-medium {
+        width: 250px;
+    }
+
+    .markdown-render-image-big {
+        width: 350px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -42,6 +66,18 @@
         .markdown-render table td {
             padding: 5px;
         }
+
+    .markdown-render-image-small {
+        width: 250px;
+    }
+
+    .markdown-render-image-medium {
+        width: 350px;
+    }
+
+    .markdown-render-image-big {
+        width: 450px;
+    }
 }
 
 @media (min-width: 979px) {
@@ -56,4 +92,16 @@
         .markdown-render table td {
             padding: 10px;
         }
+
+    .markdown-render-image-small {
+        width: 350px;
+    }
+
+    .markdown-render-image-medium {
+        width: 450px;
+    }
+
+    .markdown-render-image-big {
+        width: 550px;
+    }
 }
