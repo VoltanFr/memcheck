@@ -1,4 +1,7 @@
-﻿import { convertMarkdown } from './MarkdownConversion.js';
+﻿import { imageSizeMedium } from './Common.js';
+import { base64FromBytes } from './Common.js';
+import { getMnesiosImageNamesFromSourceText } from './MarkdownConversion.js';
+import { convertMarkdown } from './MarkdownConversion.js';
 
 export const MarkdownEditor = Vue.defineComponent({
     components: {
@@ -41,6 +44,7 @@ export const MarkdownEditor = Vue.defineComponent({
         return {
             content: this.modelValue,
             previewVisible: false,
+            images: new Map(), // Keys: image names, Values: the blob to use a image definition
         };
     },
     methods: {
@@ -125,8 +129,26 @@ export const MarkdownEditor = Vue.defineComponent({
         togglePreview() {
             this.previewVisible = !this.previewVisible;
         },
+        loadImage(imageName) {
+            const request = { imageName: imageName, size: imageSizeMedium };
+            axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
+                .then(result => {
+                    const blob = base64FromBytes(result.data);
+                    this.images.set(imageName, blob);
+                });
+        },
         renderedHtml() {
-            return convertMarkdown(this.content, this.isinfrench);
+            const neededImageNames = getMnesiosImageNamesFromSourceText(this.content);
+            const newImageNames = [...neededImageNames].filter(imageName => !this.images.has(imageName));
+            newImageNames.forEach(newImageName => this.images.set(newImageName, null));
+
+            this.images.forEach((value, key, map) => { if (!value) this.loadImage(key); });
+
+            const imageArray = Array.from(this.images, ([key, value]) => {
+                return { name: key, blob: value };
+            });
+
+            return convertMarkdown(this.content, this.isinfrench, imageArray);
         },
     },
 });
