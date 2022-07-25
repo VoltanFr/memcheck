@@ -142,7 +142,7 @@ export const MarkdownEditor = Vue.defineComponent({
             const newImageNames = [...neededImageNames].filter(imageName => !this.images.has(imageName));
             newImageNames.forEach(newImageName => this.images.set(newImageName, null));
 
-            this.images.forEach((value, key, map) => { if (!value) this.loadImage(key); });
+            this.images.forEach((value, key) => { if (!value) this.loadImage(key); });
 
             const imageArray = Array.from(this.images, ([key, value]) => {
                 return { name: key, blob: value };
