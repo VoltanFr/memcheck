@@ -55,6 +55,7 @@ const learnApp = Vue.createApp({
             remainingCardsInLesson: 0,
             cardDownloadOperation: null,
             currentImageLoadingPromise: null,
+            currentImageDetailsLoadingPromise: null,
             userQuitAttemptDisplay: false,
             lastDownloadIsEmpty: false,
             additionalMoveDebugInfo: null,
@@ -146,7 +147,7 @@ const learnApp = Vue.createApp({
         cardIsReady(card) { // card is an entry of downloadedCards
             // A card is ready when all its images have been loaded (or it has no image)
             for (let i = 0; i < card.images.length; i++)
-                if (!card.images[i].blob)
+                if (!card.images[i].blob || !card.images[i].description)
                     return false;
             return true;
         },
@@ -172,7 +173,7 @@ const learnApp = Vue.createApp({
         editUrl() {
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
-        spawnDownloadImage(image) {// image is LearnController.GetCardsImageViewModel
+        spawnDownloadImageBlob(image) {// image is LearnController.GetCardsImageViewModel
             if (image.imageId) {
                 // Old image format
                 this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
@@ -199,6 +200,30 @@ const learnApp = Vue.createApp({
                         this.currentImageLoadingPromise = null;
                     });
             }
+        },
+        spawnDownloadImageDetails(image) {// image is LearnController.GetCardsImageViewModel
+            const request = { imageName: image.name };
+            this.currentImageDetailsLoadingPromise = axios.post('/Media/GetImageMetadataFromName/', request)
+                .then(result => {
+                    image.description = result.data.description;
+                    image.source = result.data.source;
+                    image.initialUploadUtcDate = result.data.initialUploadUtcDate;
+                    image.initialVersionCreator = result.data.initialVersionCreator;
+                    image.currentVersionUtcDate = result.data.currentVersionUtcDate;
+                    image.currentVersionDescription = result.data.currentVersionDescription;
+                    image.cardCount = result.data.cardCount;
+                    image.originalImageContentType = result.data.originalImageContentType;
+                    image.originalImageSize = result.data.originalImageSize;
+                    image.smallSize = result.data.smallSize;
+                    image.mediumSize = result.data.mediumSize;
+                    image.bigSize = result.data.bigSize;
+                    this.currentImageDetailsLoadingPromise = null;
+                    if (!this.currentCard)
+                        this.getCard();
+                })
+                .catch(() => {
+                    this.currentImageDetailsLoadingPromise = null;
+                });
         },
         onCardRemoved() {
         },
@@ -311,9 +336,17 @@ const learnApp = Vue.createApp({
         downloadImagesIfNeeded() {
             for (let cardIndex = 0; !this.currentImageLoadingPromise && cardIndex < this.downloadedCards.length; cardIndex++) {
                 const card = this.downloadedCards[cardIndex];
-                for (let imageIndex = 0; !this.currentImageLoadingPromise && imageIndex < card.images.length; imageIndex++)
+                for (let imageIndex = 0; !this.currentImageLoadingPromise && imageIndex < card.images.length; imageIndex++) {
                     if (!card.images[imageIndex].blob)
-                        this.spawnDownloadImage(card.images[imageIndex]);
+                        this.spawnDownloadImageBlob(card.images[imageIndex]);
+                }
+            }
+            for (let cardIndex = 0; !this.currentImageDetailsLoadingPromise && cardIndex < this.downloadedCards.length; cardIndex++) {
+                const card = this.downloadedCards[cardIndex];
+                for (let imageIndex = 0; !this.currentImageDetailsLoadingPromise && imageIndex < card.images.length; imageIndex++) {
+                    if (!card.images[imageIndex].description)
+                        this.spawnDownloadImageDetails(card.images[imageIndex]);
+                }
             }
         },
         preventQuittingPage() {
@@ -539,6 +572,11 @@ const learnApp = Vue.createApp({
         },
         currentImageLoadingPromise: {
             handler: function currentImageLoadingPromiseHandler() {
+                this.downloadImagesIfNeeded();
+            },
+        },
+        currentImageDetailsLoadingPromise: {
+            handler: function currentImageDetailsLoadingPromiseHandler() {
                 this.downloadImagesIfNeeded();
             },
         },
