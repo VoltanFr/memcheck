@@ -230,7 +230,7 @@ public class AuthoringController : MemCheckController
     {
         CheckBodyParameter(request);
         var appResult = await new Application.Images.GetImageInfoFromName(callContext).RunAsync(new Application.Images.GetImageInfoFromName.Request(request.ImageName.Trim()));
-        return Ok(new GetImageInfoViewModel(appResult.ImageId, appResult.Name, appResult.Source));
+        return Ok(new GetImageInfoViewModel(appResult.Id, request.ImageName, appResult.Source));
     }
     #region Request and view model classes
     public sealed class GetImageInfoRequest

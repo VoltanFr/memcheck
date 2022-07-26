@@ -47,25 +47,22 @@ public class GetImageInfoFromNameTests
         var user = await UserHelper.CreateInDbAsync(db);
         var name = RandomHelper.String();
         var source = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, user, name: name, source: source);
+        await ImageHelper.CreateAsync(db, user, name: name, source: source);
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(name));
-        Assert.AreEqual(image, loaded.ImageId);
-        Assert.AreEqual(name, loaded.Name);
         Assert.AreEqual(source, loaded.Source);
     }
     [TestMethod()]
     public async Task CaseInsensitivity()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var name = "A User Name";
-        var image = await ImageHelper.CreateAsync(db, user, name: name);
+        var userName = RandomHelper.String();
+        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        await ImageHelper.CreateAsync(db, user, name: "ImageName");
 
         using var dbContext = new MemCheckDbContext(db);
-        var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("a user namE"));
-        Assert.AreEqual(image, loaded.ImageId);
-        Assert.AreEqual(name, loaded.Name);
+        var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("imagEname"));
+        Assert.AreEqual(userName, loaded.InitialVersionCreator);
     }
 }

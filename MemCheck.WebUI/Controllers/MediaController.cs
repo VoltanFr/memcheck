@@ -143,6 +143,49 @@ public class MediaController : MemCheckController
         public string Description { get; }
     }
     #endregion
+    #region GetImageMetadataFromName
+    [HttpPost("GetImageMetadataFromName")]
+    public async Task<IActionResult> GetImageMetadataFromName([FromBody] GetImageMetadataFromNameRequest request)
+    {
+        var appRequest = new GetImageInfoFromName(callContext);
+        var result = await appRequest.RunAsync(new GetImageInfoFromName.Request(request.ImageName));
+        return Ok(new GetImageMetadataFromNameViewModel(result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+    }
+    public sealed class GetImageMetadataFromNameRequest
+    {
+        public string ImageName { get; set; } = null!;
+    }
+    public sealed class GetImageMetadataFromNameViewModel
+    {
+        public GetImageMetadataFromNameViewModel(string description, string source, DateTime initialUploadUtcDate, string initialVersionCreator, DateTime currentVersionUtcDate, string currentVersionDescription, int cardCount, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
+        {
+            Description = description;
+            Source = source;
+            InitialUploadUtcDate = initialUploadUtcDate;
+            InitialVersionCreator = initialVersionCreator;
+            CurrentVersionUtcDate = currentVersionUtcDate;
+            CurrentVersionDescription = currentVersionDescription;
+            CardCount = cardCount;
+            OriginalImageContentType = originalImageContentType;
+            OriginalImageSize = originalImageSize;
+            SmallSize = smallSize;
+            MediumSize = mediumSize;
+            BigSize = bigSize;
+        }
+        public string Description { get; }
+        public string Source { get; }
+        public DateTime InitialUploadUtcDate { get; }
+        public string InitialVersionCreator { get; }
+        public DateTime CurrentVersionUtcDate { get; }
+        public string CurrentVersionDescription { get; }
+        public int CardCount { get; }
+        public string OriginalImageContentType { get; }
+        public int OriginalImageSize { get; }
+        public int SmallSize { get; }
+        public int MediumSize { get; }
+        public int BigSize { get; }
+    }
+    #endregion
     #region Update
     [HttpPost("Update/{imageId}")]
     public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
