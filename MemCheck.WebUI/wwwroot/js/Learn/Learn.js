@@ -58,8 +58,7 @@ const learnApp = Vue.createApp({
             currentImageDetailsLoadingPromise: null,
             userQuitAttemptDisplay: false,
             lastDownloadIsEmpty: false,
-            additionalMoveDebugInfo: null,
-            additionalRatingDebugInfo: null,
+            additionalDebugInfo: null,
             learnMode: 0,   // can be learnModeExpired, learnModeUnknown, learnModeDemo
             tagIdForDemo: emptyGuid,
             reachedMaxCountOfCardsForDemo: false,
@@ -256,14 +255,12 @@ const learnApp = Vue.createApp({
                     return;
                 }
 
-                this.additionalMoveDebugInfo = `Moving (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
                 const url = `/Learn/MoveCardToHeap/${this.currentMovingCard.deckId}/${this.currentMovingCard.cardId}/${this.currentMovingCard.targetHeap}/${this.currentMovingCard.manualMove}`;
                 const timeOut = Math.min(60000, (this.currentMovingCard.nbAttempts + 1) * 1000);
 
                 this.currentMovePromise = pachAxios(url, timeOut)
                     .then(() => {
                         this.currentMovePromise = null;
-                        this.additionalMoveDebugInfo = `Moved (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
                         this.currentMovingCard = null;
                         if (this.timeToExitPage())
                             window.location.href = '/';
@@ -271,10 +268,7 @@ const learnApp = Vue.createApp({
                             this.updateRemainingCardsInLesson();
                     })
                     .catch(() => {
-                        this.additionalMoveDebugInfo = `Move failed, will retry in 1 sec (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
-
                         sleep(1000).then(() => {
-                            this.additionalMoveDebugInfo = `Move failed, will retry asap (cardid: ${this.currentMovingCard.cardId}, target heap: ${this.currentMovingCard.targetHeap}, nbAttempts: ${this.currentMovingCard.nbAttempts})`;
                             this.currentMovePromise = null;
                             this.pendingMoveOperations.push({ deckId: this.currentMovingCard.deckId, cardId: this.currentMovingCard.cardId, targetHeap: this.currentMovingCard.targetHeap, manualMove: this.currentMovingCard.manualMove, nbAttempts: this.currentMovingCard.nbAttempts + 1 });
                             this.currentMovingCard = null;
@@ -413,21 +407,17 @@ const learnApp = Vue.createApp({
                     return;
                 }
 
-                this.additionalRatingDebugInfo = `Recording rating (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
                 const url = `/Learn/SetCardRating/${ratingOperation.cardId}/${ratingOperation.rating}`;
                 const timeOut = Math.min(60000, (ratingOperation.nbAttempts + 1) * 1000);
 
                 this.currentRatingPromise = pachAxios(url, timeOut)
                     .then(() => {
                         this.currentRatingPromise = null;
-                        this.additionalRatingDebugInfo = `Rating recorded (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
                     .catch(error => {
-                        this.additionalRatingDebugInfo = `Rating failed, will retry in 1 sec (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts}) - Error: ${error}`;
                         sleep(1000).then(() => {
-                            this.additionalRatingDebugInfo = `Rating failed, will retry asap (cardid: ${ratingOperation.cardId}, rating: ${ratingOperation.rating}, nbAttempts: ${ratingOperation.nbAttempts})`;
                             this.currentRatingPromise = null;
                             this.pendingRatingOperations.push({ cardId: ratingOperation.cardId, rating: ratingOperation.rating, nbAttempts: ratingOperation.nbAttempts + 1 });
                         });
@@ -444,6 +434,8 @@ const learnApp = Vue.createApp({
             return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardAdditionalInfo() {
+            const div = document.querySelector("#LearnMainDiv");
+            this.additionalDebugInfo = `currentCardAdditionalInfo - learnmaindiv:${div} - div.vueapp:${div.__vue_app__} - showImageFull method=${div.__vue_app__._component.methods.showImageFull}`;
             return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardReferences() {

@@ -210,13 +210,12 @@
             <li>pendingMoveOperations.length: {{pendingMoveOperations.length}}</li>
             <li v-if="!currentMovePromise">currentMovePromise is null</li>
             <li v-if="currentMovePromise">currentMovePromise: {{currentMovePromise}}</li>
-            <li v-if="additionalMoveDebugInfo">Move info: {{additionalMoveDebugInfo}}</li>
             <li v-if="!currentImageLoadingPromise">currentImageLoadingPromise is null</li>
             <li v-if="currentImageLoadingPromise">currentImageLoadingPromise: {{currentImageLoadingPromise}}</li>
             <li>pendingRatingOperations.length: {{pendingRatingOperations.length}}</li>
             <li v-if="!currentRatingPromise">currentRatingPromise is null</li>
             <li v-if="currentRatingPromise">currentRatingPromise: {{currentRatingPromise}}</li>
-            <li v-if="additionalRatingDebugInfo">Rating info: {{additionalRatingDebugInfo}}</li>
+            <li v-if="additionalDebugInfo">Additional info: {{additionalDebugInfo}}</li>
         </ul>
     </div>
 </div>
