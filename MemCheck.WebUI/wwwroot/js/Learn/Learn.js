@@ -238,8 +238,8 @@ const learnApp = Vue.createApp({
                     });
             }
         },
-        showImageFull(thisApp, image) {  // image is LearnController.GetCardsImageViewModel
-            thisApp._instance.data.currentFullScreenImage = image;
+        showImageFull(image) {
+            learnAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },
         handlePendingMoveOperations() {
@@ -310,10 +310,10 @@ const learnApp = Vue.createApp({
                             const card = result.data.cards[i];
 
                             // We don't discover images in card text on server side because we want the same code to be used at card authoring time
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
 
                             this.downloadedCards.push(card);
                         }
@@ -434,8 +434,6 @@ const learnApp = Vue.createApp({
             return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardAdditionalInfo() {
-            const div = document.querySelector('#LearnMainDiv');
-            this.additionalDebugInfo = `currentCardAdditionalInfo - learnmaindiv:${div} - div.vueapp:${div.__vue_app__} - showImageFull method=${div.__vue_app__._component.methods.showImageFull}`;
             return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardReferences() {
@@ -597,4 +595,4 @@ const learnApp = Vue.createApp({
     },
 });
 
-learnApp.mount('#LearnMainDiv');
+const learnAppInstance = learnApp.mount('#LearnMainDiv');

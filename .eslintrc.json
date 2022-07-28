@@ -39,7 +39,7 @@
  */
     "no-shadow": 2,                  // http://eslint.org/docs/rules/no-shadow
     "no-shadow-restricted-names": 2, // http://eslint.org/docs/rules/no-shadow-restricted-names
-    "no-use-before-define": 2,       // http://eslint.org/docs/rules/no-use-before-define
+    "no-use-before-define": ["error", { "variables": false }],       // http://eslint.org/docs/rules/no-use-before-define
 
 /**
  * Possible errors
