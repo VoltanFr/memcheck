@@ -380,7 +380,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName}]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with small size', () => {
         const imageName = 'img';
@@ -388,7 +388,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=small]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with medium size', () => {
         const imageName = 'img';
@@ -396,7 +396,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=medium]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with big size', () => {
         const imageName = 'img';
@@ -404,7 +404,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with big size with text before', () => {
         const imageName = 'img';
@@ -412,7 +412,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `XYZ![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`XYZ<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`XYZ<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with medium size with text after', () => {
         const imageName = 'img';
@@ -420,7 +420,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big]GHJ`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>GHJ`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>GHJ`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with medium size with text before and after', () => {
         const imageName = 'img';
@@ -428,7 +428,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `880980![Mnesios:${imageName},size=big]30 cm`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`880980<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>30 cm`);
+        expect(result).toBe(`880980<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>30 cm`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains two different images and text', () => {
         const image1Name = 'img1';
@@ -438,7 +438,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }];
         const sourceText = `G![Mnesios:${image1Name}] L\n ![Mnesios:${image2Name},size=big]P`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`G<img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${image1Name}","blob":"${blob1}"});'/> L\n <img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${image2Name}","blob":"${blob2}"});'/>P`);
+        expect(result).toBe(`G<img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image1Name}","blob":"${blob1}"});'/> L\n <img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/>P`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains only twice the same image with same size', () => {
         const imageName = 'img';
@@ -446,7 +446,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big] ![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/> <img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`);
+        expect(result).toBe(`<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/> <img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains four times the same image with various sizes and text', () => {
         const imageName = 'img';
@@ -454,10 +454,10 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `DEFAULT![Mnesios:${imageName}]BIG![Mnesios:${imageName},size=big]SMALL![Mnesios:${imageName},size=small]MEDIUM![Mnesios:${imageName},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const expected = `DEFAULT<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`
-            + `BIG<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`
-            + `SMALL<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`
-            + `MEDIUM<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${imageName}","blob":"${blob}"});'/>`
+        const expected = `DEFAULT<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`
+            + `BIG<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`
+            + `SMALL<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`
+            + `MEDIUM<img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/>`
             + 'END';
         expect(result).toBe(expected);
     });
@@ -471,11 +471,11 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }, { name: image3Name, blob: blob3 }];
         const sourceText = `\`QUOTE\`![Mnesios:${image1Name}]\`![Mnesios:${image2Name},size=big]\`![Mnesios:${image2Name},size=big]SMALL![Mnesios:${image3Name},size=small]MEDIUM![Mnesios:${image2Name},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const expected = `\`QUOTE\`<img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${image1Name}","blob":"${blob1}"});'/>`
+        const expected = `\`QUOTE\`<img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image1Name}","blob":"${blob1}"});'/>`
             + `\`![Mnesios:${image2Name},size=big]\``
-            + `<img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked(thisApp, {"name":"${image2Name}","blob":"${blob2}"});'/>`
-            + `SMALL<img src='${blob3}' alt='${image3Name}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked(thisApp, {"name":"${image3Name}","blob":"${blob3}"});'/>`
-            + `MEDIUM<img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked(thisApp, {"name":"${image2Name}","blob":"${blob2}"});'/>`
+            + `<img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/>`
+            + `SMALL<img src='${blob3}' alt='${image3Name}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${image3Name}","blob":"${blob3}"});'/>`
+            + `MEDIUM<img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/>`
             + 'END';
         expect(result).toBe(expected);
     });
