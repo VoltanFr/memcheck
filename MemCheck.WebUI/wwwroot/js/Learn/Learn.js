@@ -416,7 +416,7 @@ const learnApp = Vue.createApp({
                         if (this.timeToExitPage())
                             window.location.href = '/';
                     })
-                    .catch(error => {
+                    .catch(() => {
                         sleep(1000).then(() => {
                             this.currentRatingPromise = null;
                             this.pendingRatingOperations.push({ cardId: ratingOperation.cardId, rating: ratingOperation.rating, nbAttempts: ratingOperation.nbAttempts + 1 });
@@ -434,7 +434,7 @@ const learnApp = Vue.createApp({
             return convertMarkdown(this.currentCard.backSide, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
         currentCardAdditionalInfo() {
-            const div = document.querySelector("#LearnMainDiv");
+            const div = document.querySelector('#LearnMainDiv');
             this.additionalDebugInfo = `currentCardAdditionalInfo - learnmaindiv:${div} - div.vueapp:${div.__vue_app__} - showImageFull method=${div.__vue_app__._component.methods.showImageFull}`;
             return convertMarkdown(this.currentCard.additionalInfo, this.currentCard.isInFrench, this.currentCard.images, this.onImageClickFunctionText());
         },
