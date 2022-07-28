@@ -239,6 +239,12 @@ const learnApp = Vue.createApp({
             }
         },
         showImageFull(image) {
+            if (image === null) {
+                learnAppInstance.additionalDebugInfo = 'showImageFull - image is null';
+            }
+            else {
+                learnAppInstance.additionalDebugInfo = `showImageFull - image=${image} - image.description=${image.description}`;
+            }
             learnAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },
@@ -310,10 +316,10 @@ const learnApp = Vue.createApp({
                             const card = result.data.cards[i];
 
                             // We don't discover images in card text on server side because we want the same code to be used at card authoring time
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0}; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
 
                             this.downloadedCards.push(card);
                         }
