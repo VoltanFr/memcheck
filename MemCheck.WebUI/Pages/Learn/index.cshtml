@@ -178,7 +178,7 @@
                 </div>
             </div>
             <div id="No more card" class="card border-primary" v-if="!currentCard">
-                <p class="wait-message" v-if="currentImageLoadingPromise">@Localizer["PleaseWaitForImageLoad"]</p>
+                <p class="wait-message" v-if="currentImageLoadingPromise || currentImageDetailsLoadingPromise">@Localizer["PleaseWaitForImageLoad"]</p>
                 <div v-else>
                     <p class="wait-message" v-if="preventQuittingPage()">@Localizer["PleaseWaitSavingData"]</p>
                     <div v-else>
