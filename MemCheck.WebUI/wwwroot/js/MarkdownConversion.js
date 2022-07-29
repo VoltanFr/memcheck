@@ -3,6 +3,8 @@ import { imageSizeMedium } from './Common.js';
 import { imageSizeBig } from './Common.js';
 
 const charsAllowedInImageName = '[-_.();!@&=+$/%#A-z0-9\u00C0-\u017F]+'; // The last range is for accents
+const imageDivCssClass = 'markdown-render-image-div';
+
 export const markDownImageCssClassSmall = 'markdown-render-image-small';
 export const markDownImageCssClassMedium = 'markdown-render-image-medium';
 export const markDownImageCssClassBig = 'markdown-render-image-big';
@@ -121,7 +123,7 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
     const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
     const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
     const imageStringified = JSON.stringify(imageDefinitionFromGlobal);
-    return `<img src='${blob}' alt='${imageName}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'/>`;
+    return `<div class='${imageDivCssClass}'><img src='${blob}' alt='${imageName}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'/></div>`;
 }
 
 export function replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) {

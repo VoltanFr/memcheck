@@ -16,6 +16,10 @@
         width: 100%;
     }
 
+.markdown-render-image-div {
+    text-align: center;
+}
+
 .markdown-render-image-small {
     cursor: pointer;
 }
