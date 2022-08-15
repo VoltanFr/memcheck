@@ -1,5 +1,6 @@
 ﻿import { MarkdownEditor } from '../MarkdownEditor.js';
 import { tellAxiosError } from '../Common.js';
+import { convertMarkdown } from '../MarkdownConversion.js';
 
 const tagAuthoringApp = Vue.createApp({
     components: {
