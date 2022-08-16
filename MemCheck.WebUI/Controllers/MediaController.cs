@@ -192,7 +192,7 @@ public class MediaController : MemCheckController
     {
         CheckBodyParameter(request);
         var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-        var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName, request.Source, request.Description, request.VersionDescription);
+        var applicationRequest = new UpdateImageMetadata.Request(imageId, userId, request.ImageName.Trim(), request.Source.Trim(), request.Description.Trim(), request.VersionDescription.Trim());
         await new UpdateImageMetadata(callContext).RunAsync(applicationRequest);
         var toastText = $"{GetLocalized("SuccessfullyUpdatedImage")} '{request.ImageName}'";
         return ControllerResultWithToast.Success(toastText, this);
