@@ -155,7 +155,7 @@ export const MarkdownEditor = Vue.defineComponent({
                 return { name: key, blob: value };
             });
 
-            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray, this.onImageClickFunctionText());
+            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray);
         },
     },
 });
