@@ -220,7 +220,7 @@ describe('beautifyTextForFrench: Links with caption and URL, with replacements t
     });
 });
 
-describe('getMnesiosImageNamesFromSourceText: Inputs with image', () => {
+describe('getMnesiosImageNamesFromSourceText: Inputs without image', () => {
     test('getMnesiosImageNamesFromSourceText: Empty input', () => {
         expect(getMnesiosImageNamesFromSourceText('').size).toBe;
     });
@@ -288,6 +288,11 @@ describe('getMnesiosImageNamesFromSourceText: input is only one image', () => {
         const result = getMnesiosImageNamesFromSourceText('Birmingham\n\n![Mnesios:Carte.Amérique.USA.États]');
         expectSetEquals(['Carte.Amérique.USA.États'], result);
     });
+    test('getMnesiosImageNamesFromSourceText: image name contains space', () => {
+        const imgName = 'An image';
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName}]`);
+        expectSetEquals([imgName], result);
+    });
 });
 
 describe('getMnesiosImageNamesFromSourceText: input contains multiple images', () => {
@@ -296,14 +301,20 @@ describe('getMnesiosImageNamesFromSourceText: input contains multiple images', (
         expectSetEquals(['Situation78979Alabama', '78900!An-Image-Name_.();@&=+$/%#'], result);
     });
     test('getMnesiosImageNamesFromSourceText: twice the same image', () => {
-        const result = getMnesiosImageNamesFromSourceText('![Mnesios:Situation78979Alabama,size=small]![Mnesios:Situation78979Alabama]\n');
-        expectSetEquals(['Situation78979Alabama'], result);
+        const imgName = 'Situation78979Alabama';
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName},size=small]![Mnesios:${imgName}]\n`);
+        expectSetEquals([imgName], result);
+    });
+    test('getMnesiosImageNamesFromSourceText: twice the same image with special chars', () => {
+        const imgName = 'A - name with $strange$ things! ; this is @fun (or_not) &3=/%#é.';
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName},size=small]![Mnesios:${imgName}]\n`);
+        expectSetEquals([imgName], result);
     });
     test('getMnesiosImageNamesFromSourceText: multiline', () => {
         const imgNameSmall = 'Situation78979Alabama';
         const imgNameDefaultSize1 = '78900!An-Image-Name_.();@&=+$/%#';
         const imgNameDefaultSize2 = 'An_Image-Name-79788.0(doh);789@Mnesios-tto&Hop=678687+8980uoi$-78900/%#Auio';
-        const imgNameBigSize = 'img3Name';
+        const imgNameBigSize = 'img3 Name';
         const result = getMnesiosImageNamesFromSourceText(`Welcome to Mnesios, a [Fun tool](https://mnesios.com/)\nSee that image: ![Mnesios:${imgNameSmall},size=small]\nOr that: ![Mnesios:${imgNameDefaultSize1}]\n\n![Mnesios:${imgNameBigSize},size=big]![Mnesios:${imgNameDefaultSize2}] ![Mnesios:${imgNameSmall},size=big]`);
         expectSetEquals([imgNameSmall, imgNameDefaultSize1, imgNameDefaultSize2, imgNameBigSize], result);
     });
@@ -315,7 +326,7 @@ describe('getMnesiosImageNamesFromSourceText: images and quotes', () => {
         expect(result.size).toBe(0);
     });
     test('getMnesiosImageNamesFromSourceText: whole input is an image in a quote', () => {
-        const result = getMnesiosImageNamesFromSourceText('`![Mnesios:img]`');
+        const result = getMnesiosImageNamesFromSourceText('`![Mnesios:an img]`');
         expect(result.size).toBe(0);
     });
     test('getMnesiosImageNamesFromSourceText: whole input is an image and text in a quote', () => {
@@ -323,25 +334,25 @@ describe('getMnesiosImageNamesFromSourceText: images and quotes', () => {
         expect(result.size).toBe(0);
     });
     test('getMnesiosImageNamesFromSourceText: two quotes', () => {
-        const result = getMnesiosImageNamesFromSourceText('`image non affichée : ![Mnesios:img]` and `Pas ![Mnesios:hop9879879] affichée`');
+        const result = getMnesiosImageNamesFromSourceText('`image non affichée : ![Mnesios:img]` and `Pas ![Mnesios:hop9 879879] affichée`');
         expect(result.size).toBe(0);
     });
     test('getMnesiosImageNamesFromSourceText: a quote and an image', () => {
-        const imgName = 'Img';
+        const imgName = 'I-m g';
         const result = getMnesiosImageNamesFromSourceText(`\`image non affichée : ![Mnesios:${imgName}]\` image affichée : ![Mnesios:${imgName},size=small]`);
         expectSetEquals([imgName], result);
     });
     test('getMnesiosImageNamesFromSourceText: an image and a quote', () => {
-        const imgName = 'Img';
+        const imgName = 'I!mg';
         const result = getMnesiosImageNamesFromSourceText(`image affichée : ![Mnesios:${imgName},size=big] \`image non affichée : ![Mnesios:${imgName}]\``);
         expectSetEquals([imgName], result);
     });
     test('getMnesiosImageNamesFromSourceText: complex', () => {
         const bigImg0Name = 'big';
-        const mediumImg0Name = 'medium0';
-        const mediumImg1Name = 'medium1';
-        const smallImgName = 'small';
-        const noSizeImgName = 'noSize';
+        const mediumImg0Name = 'medium=0';
+        const mediumImg1Name = 'medium@1';
+        const smallImgName = '(small';
+        const noSizeImgName = '!noSize';
         const result = getMnesiosImageNamesFromSourceText(`text ![Mnesios:${mediumImg0Name},size=medium] \`![Mnesios:toto]\` ![Mnesios:${bigImg0Name},size=big] \`\` ![Mnesios:${mediumImg1Name},size=medium] \`quote\` ![Mnesios:${bigImg0Name},size=big] ![Mnesios:${noSizeImgName}] ![Mnesios:${smallImgName},size=small] \`![Mnesios:hop,size=big]\``);
         expectSetEquals([bigImg0Name, mediumImg0Name, mediumImg1Name, smallImgName, noSizeImgName], result);
     });
@@ -359,13 +370,13 @@ describe('replaceMnesiosImagesWithBlobs: cases with no replacement', () => {
         expect(result).toBe('`hop`');
     });
     test('replaceMnesiosImagesWithBlobs: whole input is a quote with an image', () => {
-        const imageName = 'img';
+        const imageName = '!my img;';
         const mnesiosImageDefinitions = [{ name: imageName, blob: 'A' }];
         const result = replaceMnesiosImagesWithBlobs(`\`![Mnesios:${imageName}]\``, mnesiosImageDefinitions);
         expect(result).toBe(`\`![Mnesios:${imageName}]\``);
     });
     test('replaceMnesiosImagesWithBlobs: complex', () => {
-        const imageName = 'img';
+        const imageName = '@img ;';
         const mnesiosImageDefinitions = [{ name: imageName, blob: 'A' }];
         const input = `Hop ! [Un lien](https://keep.google.com/u/0/#home) \`![Mnesios:${imageName}]\` https://keep.google.com/`;
         const result = replaceMnesiosImagesWithBlobs(input, mnesiosImageDefinitions);
@@ -375,7 +386,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with no replacement', () => {
 
 describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
     test('replaceMnesiosImagesWithBlobs: whole input is an image with no size specified', () => {
-        const imageName = 'img';
+        const imageName = '(my) img';
         const blob = 'A';
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName}]`;
@@ -462,12 +473,12 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         expect(result).toBe(expected);
     });
     test('replaceMnesiosImagesWithBlobs: complex case', () => {
-        const image1Name = 'img1';
+        const image1Name = 'img #1';
         const blob1 = 'Blob1';
         const image2Name = 'i.é-m!g2';
         const blob2 = 'a ,';
-        const image3Name = 'i3';
-        const blob3 = 'b3';
+        const image3Name = 'i 3';
+        const blob3 = '@b3';
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }, { name: image3Name, blob: blob3 }];
         const sourceText = `\`QUOTE\`![Mnesios:${image1Name}]\`![Mnesios:${image2Name},size=big]\`![Mnesios:${image2Name},size=big]SMALL![Mnesios:${image3Name},size=small]MEDIUM![Mnesios:${image2Name},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
@@ -480,6 +491,3 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         expect(result).toBe(expected);
     });
 });
-
-// beautifyTextForFrench: Verify no modification of image in html format, as added by MemCheck's image replacement
-//

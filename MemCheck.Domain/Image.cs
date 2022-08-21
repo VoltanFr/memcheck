@@ -7,8 +7,7 @@ namespace MemCheck.Domain;
 
 public enum ImageVersionType { Creation, Changes }
 
-/* Image names are unique, and the regexp of allowed chars is "[-_.();!@&=+$/%#A-z0-9\u00C0-\u017F]".
- * This is all related to how the finding of image patterns in card sides work (see MarkdownConversion.js).
+/* Image names are unique, and the regexp of allowed chars is defined by the constant `charsAllowedInImageName` in `MarkdownConversion.js`.
  */
 
 public sealed class Image
