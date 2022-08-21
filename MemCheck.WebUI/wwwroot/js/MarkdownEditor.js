@@ -36,7 +36,7 @@ export const MarkdownEditor = Vue.defineComponent({
                 <textarea class="markdown-edit-textarea" v-model="content" v-bind:rows="rows" v-on:keydown="onKeyDown" v-on:input="onInput" ref="text_area_control"></textarea>
             </div>
             <div class="markdown-edit-preview-div" v-if="previewVisible">
-                <span class="markdown-render markdown-body markdown-edit-preview" v-html="renderedHtml()" ></span>
+                <span class="markdown-render markdown-body markdown-edit-preview" v-html="preview" ></span>
             </div>
         </div>
     `,
@@ -45,12 +45,15 @@ export const MarkdownEditor = Vue.defineComponent({
             content: this.modelValue,
             previewVisible: false,
             images: new Map(), // Keys: image names, Values: the blob to use a image definition
+            preview: '',
         };
     },
     methods: {
         onInput() {
             this.$emit('update:modelValue', this.content);
             this.adaptTextAreaSize();
+            if (this.previewVisible)
+                this.renderedHtmlAsync();
         },
         adaptTextAreaSize() {
             const textarea = this.$refs.text_area_control;
@@ -128,27 +131,31 @@ export const MarkdownEditor = Vue.defineComponent({
         },
         togglePreview() {
             this.previewVisible = !this.previewVisible;
+            if (this.previewVisible)
+                this.renderedHtmlAsync();
         },
-        loadImage(imageName) {
+        async loadImage(imageName) {
             const request = { imageName: imageName, size: imageSizeMedium };
-            axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
+            await axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
                 .then(result => {
                     const blob = base64FromBytes(result.data);
                     this.images.set(imageName, blob);
                 });
         },
-        renderedHtml() {
+        async renderedHtmlAsync() {
             const neededImageNames = getMnesiosImageNamesFromSourceText(this.content);
             const newImageNames = [...neededImageNames].filter(imageName => !this.images.has(imageName));
             newImageNames.forEach(newImageName => this.images.set(newImageName, null));
 
-            this.images.forEach((value, key) => { if (!value) this.loadImage(key); });
+            const loadsToWait = [];
+            this.images.forEach((value, key) => { if (!value) { const loadPromise = this.loadImage(key); loadsToWait.push(loadPromise); } });
+            await Promise.all(loadsToWait);
 
             const imageArray = Array.from(this.images, ([key, value]) => {
                 return { name: key, blob: value };
             });
 
-            return convertMarkdown(this.content, this.isinfrench, imageArray);
+            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray, this.onImageClickFunctionText());
         },
     },
 });
