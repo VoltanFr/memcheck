@@ -46,15 +46,15 @@
         }
 
     .markdown-render-image-small {
-        width: 150px;
+        width: 170px;
     }
 
     .markdown-render-image-medium {
-        width: 250px;
+        width: 300px;
     }
 
     .markdown-render-image-big {
-        width: 350px;
+        width: 400px;
     }
 }
 
@@ -76,11 +76,11 @@
     }
 
     .markdown-render-image-medium {
-        width: 350px;
+        width: 400px;
     }
 
     .markdown-render-image-big {
-        width: 450px;
+        width: 500px;
     }
 }
 
@@ -102,10 +102,10 @@
     }
 
     .markdown-render-image-medium {
-        width: 450px;
+        width: 500px;
     }
 
     .markdown-render-image-big {
-        width: 550px;
+        width: 600px;
     }
 }
