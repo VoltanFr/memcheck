@@ -129,7 +129,7 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
     const imgAlt = `alt='${imageName}' `;
     const imgClass = `class='${globalCssClass}' `;
     const imgOnClick = `onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'`;
-    const imgEnd = ` />`;
+    const imgEnd = `/>`;
     const divEnd = `</div>`;
     const result = divStart + imgStart + imgSrc + imgAlt + imgClass + imgOnClick + imgEnd + divEnd;
     return result;
