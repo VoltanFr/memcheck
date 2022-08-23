@@ -123,15 +123,7 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
     const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
     const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
     const imageStringified = JSON.stringify(imageDefinitionFromGlobal);
-    const divStart = `<div class='${imageDivCssClass}'>`;
-    const imgStart = `<img `;
-    const imgSrc = `src='${blob}' `;
-    const imgAlt = `alt='${imageName}' `;
-    const imgClass = `class='${globalCssClass}' `;
-    const imgOnClick = `onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'`;
-    const imgEnd = `/>`;
-    const divEnd = `</div>`;
-    const result = divStart + imgStart + imgSrc + imgAlt + imgClass + imgOnClick + imgEnd + divEnd;
+    const result = `<div class='${imageDivCssClass}'><img src='${blob}' alt='${imageName}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'/></div>`;
     return result;
 }
 
