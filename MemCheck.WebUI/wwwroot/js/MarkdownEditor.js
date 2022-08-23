@@ -12,6 +12,7 @@ export const MarkdownEditor = Vue.defineComponent({
         rows: { required: false, type: Number, default: 2 },
         title: { required: true, type: String },
         isinfrench: { required: true, type: Boolean },
+        onimageclickfunctiontext: { required: false, type: String },
     },
     mounted() {
         this.adaptTextAreaSize();
@@ -155,7 +156,7 @@ export const MarkdownEditor = Vue.defineComponent({
                 return { name: key, blob: value };
             });
 
-            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray);
+            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray, this.onimageclickfunctiontext);
         },
     },
 });

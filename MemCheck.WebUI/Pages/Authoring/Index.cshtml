@@ -76,7 +76,7 @@
             <div id="The card" class="authoring-card-div">
                 <div id="FrontSideRow" class="memcheck-input-div">
                     <div id="FrontSideRowMarkdownEditor">
-                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" />
+                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" onimageclickfunctiontext='const div = document.querySelector("#AuthoringMainDiv"); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;' />
                     </div>
                     <div id="FrontSideRowImageDiv">
                         <image-choice v-on:add="addFrontImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>

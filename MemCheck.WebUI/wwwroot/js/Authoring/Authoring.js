@@ -280,8 +280,9 @@ const authoringApp = Vue.createApp({
         canAddSelectedUser() {
             return this.selectedUserToAdd && !this.cardContainsUserWithView(this.selectedUserToAdd.userId);
         },
-        showImageFull(image) {  // MyImageType
-            this.currentFullScreenImage = image;
+        showImageFull(image) {
+            authoringAppInstance.currentFullScreenImage = image;
+            history.pushState('ShowingImageDetails', 'BackToCard');
         },
         removeImageFromArray(image, array) {
             const index = array.indexOf(image);
@@ -528,4 +529,4 @@ const authoringApp = Vue.createApp({
     },
 });
 
-authoringApp.mount('#AuthoringMainDiv');
+const authoringAppInstance = authoringApp.mount('#AuthoringMainDiv');
