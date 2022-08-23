@@ -76,7 +76,7 @@
             <div id="The card" class="authoring-card-div">
                 <div id="FrontSideRow" class="memcheck-input-div">
                     <div id="FrontSideRowMarkdownEditor">
-                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" onimageclickfunctiontext='const div = document.querySelector("#AuthoringMainDiv"); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;' />
+                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                     </div>
                     <div id="FrontSideRowImageDiv">
                         <image-choice v-on:add="addFrontImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
@@ -87,7 +87,7 @@
                 </div>
                 <div id="BackSideRow" class="memcheck-input-div">
                     <div id="BackSideRowMarkdownEditor">
-                        <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" />
+                        <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                     </div>
                     <div id="BackSideRowImageDiv">
                         <image-choice v-on:add="addBackImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
@@ -98,7 +98,7 @@
                 </div>
                 <div id="AdditionalInfoRow" class="memcheck-input-div">
                     <div id="AdditionalSideRowMarkdownEditor">
-                        <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" />
+                        <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                     </div>
                     <div id="AdditionalSideRowImageDiv">
                         <image-choice v-on:add="addAdditionalImage" imagenamesmallscreenstr='@Localizer["ImageName_SmallScreen"]' imagenamemediumscreenstr='@Localizer["ImageName_MediumScreen"]' imagenamebigscreenstr='@Localizer["ImageName_BigScreen"]'></image-choice>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div id="ReferencesRow" class="memcheck-input-div">
-                    <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" />
+                    <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                 </div>
                 <div id="LanguageInputRow" class="memcheck-input-div">
                     <p class="authoring-row-caption">@Localizer["Language"]</p>

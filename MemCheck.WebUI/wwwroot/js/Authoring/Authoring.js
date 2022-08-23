@@ -280,6 +280,9 @@ const authoringApp = Vue.createApp({
         canAddSelectedUser() {
             return this.selectedUserToAdd && !this.cardContainsUserWithView(this.selectedUserToAdd.userId);
         },
+        onImageClickFunctionText() {
+            return 'const div = document.querySelector("#AuthoringMainDiv"); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;';
+        },
         showImageFull(image) {
             authoringAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
