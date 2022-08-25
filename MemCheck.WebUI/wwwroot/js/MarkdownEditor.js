@@ -45,7 +45,7 @@ export const MarkdownEditor = Vue.defineComponent({
         return {
             content: this.modelValue,
             previewVisible: false,
-            images: new Map(), // Keys: image names, Values: the blob to use a image definition
+            images: new Map(), // Keys: image names, Values: all image detail fields
             preview: '',
         };
     },
@@ -136,12 +136,39 @@ export const MarkdownEditor = Vue.defineComponent({
                 this.renderedHtmlAsync();
         },
         async loadImage(imageName) {
-            const request = { imageName: imageName, size: imageSizeMedium };
-            await axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
+            const imageDetails = { name: imageName };
+
+            const getImageByNameRequest = { imageName: imageName, size: imageSizeMedium };
+            const getImageByNamePromise = axios.post('/Learn/GetImageByName/', getImageByNameRequest, { responseType: 'arraybuffer' })
                 .then(result => {
-                    const blob = base64FromBytes(result.data);
-                    this.images.set(imageName, blob);
+                    imageDetails.blob = base64FromBytes(result.data);
+                })
+                .catch(() => {
                 });
+
+            const getImageMetadataFromNameRequest = { imageName: imageName };
+            const getImageMetadataFromNamePromise = axios.post('/Media/GetImageMetadataFromName/', getImageMetadataFromNameRequest)
+                .then(result => {
+                    imageDetails.description = result.data.description;
+                    imageDetails.source = result.data.source;
+                    imageDetails.initialUploadUtcDate = result.data.initialUploadUtcDate;
+                    imageDetails.initialVersionCreator = result.data.initialVersionCreator;
+                    imageDetails.currentVersionUtcDate = result.data.currentVersionUtcDate;
+                    imageDetails.currentVersionDescription = result.data.currentVersionDescription;
+                    imageDetails.cardCount = result.data.cardCount;
+                    imageDetails.originalImageContentType = result.data.originalImageContentType;
+                    imageDetails.originalImageSize = result.data.originalImageSize;
+                    imageDetails.smallSize = result.data.smallSize;
+                    imageDetails.mediumSize = result.data.mediumSize;
+                    imageDetails.bigSize = result.data.bigSize;
+                })
+                .catch(() => {
+                    // Just ignore, and the details won't be available
+                });
+
+            await Promise.all([getImageByNamePromise, getImageMetadataFromNamePromise]);
+
+            this.images.set(imageName, imageDetails);
         },
         async renderedHtmlAsync() {
             const neededImageNames = getMnesiosImageNamesFromSourceText(this.content);
@@ -149,11 +176,11 @@ export const MarkdownEditor = Vue.defineComponent({
             newImageNames.forEach(newImageName => this.images.set(newImageName, null));
 
             const loadsToWait = [];
-            this.images.forEach((value, key) => { if (!value) { const loadPromise = this.loadImage(key); loadsToWait.push(loadPromise); } });
+            this.images.forEach((value, key) => { if (!value || !value.blob) { const loadPromise = this.loadImage(key); loadsToWait.push(loadPromise); } });
             await Promise.all(loadsToWait);
 
-            const imageArray = Array.from(this.images, ([key, value]) => {
-                return { name: key, blob: value };
+            const imageArray = Array.from(this.images, ([_key, value]) => {
+                return value;
             });
 
             this.preview = convertMarkdown(this.content, this.isinfrench, imageArray, this.onimageclickfunctiontext);
