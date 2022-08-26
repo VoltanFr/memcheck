@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.QueryValidation;
@@ -14,6 +15,7 @@ internal static class QueryValidationHelper
 {
     #region Fields
     private static readonly ImmutableHashSet<Guid> reservedGuids = GetReservedGuids();
+    private const string charsAllowedInImageName = "[-' _.();!@&=+$/%#A-Za-z0-9\u00C0-\u017F]"; //This is a copy of the same info in MarkdownConversion.js, which is the reference info
     #endregion
     #region Private methods
     private static ImmutableHashSet<Guid> GetReservedGuids()
@@ -38,7 +40,6 @@ internal static class QueryValidationHelper
     public const string ExceptionMesg_TagDoesNotExist = "Tag not found";
     public const string ExceptionMesg_UserDoesNotExist = "User not found";
     public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
-    public static readonly ImmutableHashSet<char> ForbiddenCharsInImageNames = new[] { '<', '>' }.ToImmutableHashSet();
     public static readonly ImmutableHashSet<char> ForbiddenCharsInImageSource = new[] { '<', '>' }.ToImmutableHashSet();
     public static readonly ImmutableHashSet<char> ForbiddenCharsInImageDescription = new[] { '<', '>' }.ToImmutableHashSet();
     public static readonly ImmutableHashSet<char> ForbiddenCharsInImageVersionDescription = new[] { '<', '>' }.ToImmutableHashSet();
@@ -199,9 +200,10 @@ internal static class QueryValidationHelper
             throw new InvalidOperationException("Invalid Name: not trimmed");
         if (name.Length is < ImageMinNameLength or > ImageMaxNameLength)
             throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinNameLength} " + localizer.GetLocalized("And") + $" {ImageMaxNameLength}");
-        foreach (var forbiddenChar in ForbiddenCharsInImageNames)
-            if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
-                throw new RequestInputException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
+        var regexp = new Regex(charsAllowedInImageName);
+        foreach (var nameChar in name)
+            if (!regexp.IsMatch(nameChar.ToString()))
+                throw new RequestInputException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + nameChar + ' ' + (string?)localizer.GetLocalized("IsForbidden") + ")");
     }
     public static void CheckCanCreateImageWithSource(string source, ILocalized localizer)
     {

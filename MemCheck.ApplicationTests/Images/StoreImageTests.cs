@@ -191,7 +191,82 @@ public class StoreImageTests
         await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
-    public async Task Success()
+    public async Task ImageWithNameInOtherCasingExists()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateInDbAsync(db);
+#pragma warning disable CA1308 // Normalize strings to uppercase
+        var name = RandomHelper.String().ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
+        await ImageHelper.CreateAsync(db, user, name: name);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var request = new StoreImage.Request(user, name.ToUpperInvariant(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
+        var errorString = RandomHelper.String();
+        var localizer = new TestLocalizer("AlreadyExistsCaseInsensitive".PairedWith(errorString));
+        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request));
+        StringAssert.Contains(e.Message, errorString);
+    }
+    [DataTestMethod, DataRow('<'), DataRow('>'), DataRow('['), DataRow(']'), DataRow(','), DataRow('\t')]
+    public async Task InvalidChar(char c)
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateInDbAsync(db);
+        var name = RandomHelper.String() + c + RandomHelper.String();
+
+        using var dbContext = new MemCheckDbContext(db);
+        var errorString = RandomHelper.String();
+        var localizer = new TestLocalizer("IsForbidden".PairedWith(errorString));
+        var request = new StoreImage.Request(user, name, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
+        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request));
+        StringAssert.Contains(e.Message, errorString);
+        StringAssert.Contains(e.Message, c.ToString());
+    }
+    [DataTestMethod, DataRow("With space"), DataRow("#ss"), DataRow("sy-"), DataRow("d.d"), DataRow("fh("), DataRow("JKL)"), DataRow("78;"), DataRow("!!!!!"), DataRow("@oo"),
+        DataRow("v&l"), DataRow("m=p"), DataRow("a+2"), DataRow("$33"), DataRow("pp/"), DataRow("%%%"), DataRow("2#&"), DataRow("aéo"), DataRow("aaï"), DataRow("Môle"), DataRow("Duc-d'Albe")]
+    public async Task SuccessWithSpecialName(string name)
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateInDbAsync(db);
+        var description = RandomHelper.String();
+        var source = RandomHelper.String();
+        var uploadDate = RandomHelper.Date();
+        var versionDesc = RandomHelper.String();
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var request = new StoreImage.Request(user, name, description, source, StoreImage.pngImageContentType, pngImage);
+            var localizer = new TestLocalizer("InitialImageVersionCreation".PairedWith(versionDesc));
+            await new StoreImage(dbContext.AsCallContext(localizer), uploadDate).RunAsync(request);
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var image = await dbContext.Images.Include(img => img.Owner).Include(img => img.Cards).SingleAsync();
+            Assert.AreEqual(user, image.Owner.Id);
+            Assert.AreEqual(name, image.Name);
+            Assert.AreEqual(description, image.Description);
+            Assert.AreEqual(source, image.Source);
+            Assert.AreEqual(uploadDate, image.InitialUploadUtcDate);
+            Assert.AreEqual(uploadDate, image.LastChangeUtcDate);
+            Assert.AreEqual(versionDesc, image.VersionDescription);
+            Assert.AreEqual(ImageVersionType.Creation, image.VersionType);
+            Assert.AreEqual(StoreImage.pngImageContentType, image.OriginalContentType);
+            Assert.AreEqual(pngImage.Length, image.OriginalSize);
+            Assert.IsTrue(pngImage.SequenceEqual(image.OriginalBlob));
+            Assert.AreEqual(20, image.OriginalBlobSha1.Length);
+            Assert.IsTrue(image.SmallBlobSize > 0);
+            Assert.AreEqual(image.SmallBlobSize, image.SmallBlob.Length);
+            Assert.IsTrue(image.MediumBlobSize > 0);
+            Assert.AreEqual(image.MediumBlobSize, image.MediumBlob.Length);
+            Assert.IsTrue(image.BigBlobSize > 0);
+            Assert.AreEqual(image.BigBlobSize, image.BigBlob.Length);
+            Assert.IsFalse(image.Cards.Any());
+            Assert.IsNull(image.PreviousVersion);
+        }
+    }
+    [TestMethod()]
+    public async Task SuccessWithRandomName()
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);

@@ -2,7 +2,7 @@
 import { imageSizeMedium } from './Common.js';
 import { imageSizeBig } from './Common.js';
 
-const charsAllowedInImageName = '[- _.();!@&=+$/%#A-z0-9\u00C0-\u017F]+'; // The last range is for accents
+const charsAllowedInImageName = '[-\' _.();!@&=+$/%#a-zA-Z0-9\u00C0-\u017F]+'; // The last range is for accents. This information is duplicated in the C# class QueryValidationHelper
 const imageDivCssClass = 'markdown-render-image-div';
 
 export const markDownImageCssClassSmall = 'markdown-render-image-small';

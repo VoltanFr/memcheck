@@ -284,9 +284,24 @@ describe('getMnesiosImageNamesFromSourceText: input is only one image', () => {
         const result = getMnesiosImageNamesFromSourceText('Birmingham\n\n![Mnesios:Carte.Amerique.USA.Etats]');
         expectSetEquals(['Carte.Amerique.USA.Etats'], result);
     });
-    test('getMnesiosImageNamesFromSourceText: image name contains accent', () => {
+    test('getMnesiosImageNamesFromSourceText: image name contains accent é', () => {
         const result = getMnesiosImageNamesFromSourceText('Birmingham\n\n![Mnesios:Carte.Amérique.USA.États]');
         expectSetEquals(['Carte.Amérique.USA.États'], result);
+    });
+    test('getMnesiosImageNamesFromSourceText: image name contains accent ô', () => {
+        const imgName = 'Môle';
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName}]`);
+        expectSetEquals([imgName], result);
+    });
+    test('getMnesiosImageNamesFromSourceText: image name contains accent Ô', () => {
+        const imgName = 'Môle et musoir';
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName}]`);
+        expectSetEquals([imgName], result);
+    });
+    test('getMnesiosImageNamesFromSourceText: image name contains single quote', () => {
+        const imgName = "Duc-d'Albe";
+        const result = getMnesiosImageNamesFromSourceText(`![Mnesios:${imgName}]`);
+        expectSetEquals([imgName], result);
     });
     test('getMnesiosImageNamesFromSourceText: image name contains space', () => {
         const imgName = 'An image';
@@ -403,6 +418,14 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with medium size', () => {
         const imageName = 'img';
+        const blob = 'A';
+        const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
+        const sourceText = `![Mnesios:${imageName},size=medium]`;
+        const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+    });
+    test('replaceMnesiosImagesWithBlobs: whole input is an image with accent in name', () => {
+        const imageName = 'Môle et musoir';
         const blob = 'A';
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=medium]`;
