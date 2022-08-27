@@ -1,4 +1,4 @@
-using MemCheck.Application.Languages;
+﻿using MemCheck.Application.Languages;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
 using MemCheck.Database;
@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI;
@@ -42,7 +43,7 @@ public sealed class Startup
     private static async Task ControllerExceptionHandlerAsync(HttpContext context)
     {
         var e = context.Features.Get<IExceptionHandlerPathFeature>()!.Error;
-        var ToastTitle = MemCheckSupportedCultures.French.Equals(context.Features.Get<IRequestCultureFeature>()?.RequestCulture?.Culture) ? "�chec" : "Failure";
+        var ToastTitle = MemCheckSupportedCultures.French.Equals(context.Features.Get<IRequestCultureFeature>()?.RequestCulture?.Culture) ? "Échec" : "Failure";
         var ShowStatus = e is not RequestInputException;
         var ToastText = e is RequestInputException ? e.Message : ($"Exception class {e.GetType().Name}, message: '{e.Message}'" + (e.InnerException == null ? "" : $"\r\nInner exception class {e.InnerException.GetType().Name}, message: '{e.InnerException.Message}'"));
         await context.Response.WriteAsJsonAsync(new { ToastTitle, ToastText, ShowStatus });
@@ -111,6 +112,8 @@ public sealed class Startup
             options.LoginPath = "/Identity/Account/Login";
             options.LogoutPath = "/Identity/Account/Logout";
             options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromDays(10);
+            options.SlidingExpiration = true;
         });
 
         services.Configure<CookiePolicyOptions>(options =>
