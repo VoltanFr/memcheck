@@ -238,13 +238,9 @@ const learnApp = Vue.createApp({
                     });
             }
         },
-        showImageFull(image) {
-            if (image === null) {
-                learnAppInstance.additionalDebugInfo = 'showImageFull - image is null';
-            }
-            else {
-                learnAppInstance.additionalDebugInfo = `showImageFull - image=${image} - image.description=${image.description}`;
-            }
+        showImageFull(imageBase64) {
+            const decoded = atob(imageBase64);
+            const image = JSON.parse(decoded);
             learnAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },
