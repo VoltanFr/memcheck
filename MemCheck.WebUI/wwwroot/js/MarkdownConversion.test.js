@@ -401,12 +401,13 @@ describe('replaceMnesiosImagesWithBlobs: cases with no replacement', () => {
 
 describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
     test('replaceMnesiosImagesWithBlobs: whole input is an image with no size specified', () => {
-        const imageName = '(my) img';
+        const name = '(my) img';
         const blob = 'A';
-        const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
-        const sourceText = `![Mnesios:${imageName}]`;
+        const mnesiosImageDefinitions = [{ name, blob }];
+        const sourceText = `![Mnesios:${name}]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': name, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with small size', () => {
         const imageName = 'img';
@@ -414,7 +415,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=small]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with medium size', () => {
         const imageName = 'img';
@@ -422,7 +424,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=medium]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with accent in name', () => {
         const imageName = 'Môle et musoir';
@@ -430,7 +433,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=medium]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with big size', () => {
         const imageName = 'img';
@@ -438,7 +442,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with big size with text before', () => {
         const imageName = 'img';
@@ -446,7 +451,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `XYZ![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`XYZ<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`XYZ<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with medium size with text after', () => {
         const imageName = 'img';
@@ -454,7 +460,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big]GHJ`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>GHJ`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>GHJ`);
     });
     test('replaceMnesiosImagesWithBlobs: input is an image with medium size with text before and after', () => {
         const imageName = 'img';
@@ -462,7 +469,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `880980![Mnesios:${imageName},size=big]30 cm`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`880980<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>30 cm`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`880980<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>30 cm`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains two different images and text', () => {
         const image1Name = 'img1';
@@ -472,7 +480,9 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }];
         const sourceText = `G![Mnesios:${image1Name}] L\n ![Mnesios:${image2Name},size=big]P`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`G<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image1Name}","blob":"${blob1}"});'/></div> L\n <div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/></div>P`);
+        const image1Base64 = btoa(JSON.stringify({ 'name': image1Name, 'blob': blob1 }));
+        const image2Base64 = btoa(JSON.stringify({ 'name': image2Name, 'blob': blob2 }));
+        expect(result).toBe(`G<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${image1Base64}");'/></div> L\n <div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${image2Base64}");'/></div>P`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains only twice the same image with same size', () => {
         const imageName = 'img';
@@ -480,7 +490,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=big] ![Mnesios:${imageName},size=big]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div> <div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`);
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div> <div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains four times the same image with various sizes and text', () => {
         const imageName = 'img';
@@ -488,10 +499,11 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `DEFAULT![Mnesios:${imageName}]BIG![Mnesios:${imageName},size=big]SMALL![Mnesios:${imageName},size=small]MEDIUM![Mnesios:${imageName},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const expected = `DEFAULT<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`
-            + `BIG<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`
-            + `SMALL<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`
-            + `MEDIUM<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${imageName}","blob":"${blob}"});'/></div>`
+        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        const expected = `DEFAULT<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`
+            + `BIG<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`
+            + `SMALL<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`
+            + `MEDIUM<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`
             + 'END';
         expect(result).toBe(expected);
     });
@@ -505,12 +517,41 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }, { name: image3Name, blob: blob3 }];
         const sourceText = `\`QUOTE\`![Mnesios:${image1Name}]\`![Mnesios:${image2Name},size=big]\`![Mnesios:${image2Name},size=big]SMALL![Mnesios:${image3Name},size=small]MEDIUM![Mnesios:${image2Name},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const expected = `\`QUOTE\`<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image1Name}","blob":"${blob1}"});'/></div>`
+        const image1Base64 = btoa(JSON.stringify({ 'name': image1Name, 'blob': blob1 }));
+        const image2Base64 = btoa(JSON.stringify({ 'name': image2Name, 'blob': blob2 }));
+        const image3Base64 = btoa(JSON.stringify({ 'name': image3Name, 'blob': blob3 }));
+        const expected = `\`QUOTE\`<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${image1Base64}");'/></div>`
             + `\`![Mnesios:${image2Name},size=big]\``
-            + `<div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/></div>`
-            + `SMALL<div class='markdown-render-image-div'><img src='${blob3}' alt='${image3Name}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked({"name":"${image3Name}","blob":"${blob3}"});'/></div>`
-            + `MEDIUM<div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked({"name":"${image2Name}","blob":"${blob2}"});'/></div>`
+            + `<div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${image2Base64}");'/></div>`
+            + `SMALL<div class='markdown-render-image-div'><img src='${blob3}' alt='${image3Name}' class='${markDownImageCssClassSmall}' onclick='some_code; imageClicked("${image3Base64}");'/></div>`
+            + `MEDIUM<div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${image2Base64}");'/></div>`
             + 'END';
         expect(result).toBe(expected);
+    });
+    test('replaceMnesiosImagesWithBlobs: contains a quote in name', () => {
+        const name = "quote '";
+        const blob = 'blob';
+        const image = { name, blob };
+        const mnesiosImageDefinitions = [image];
+        const sourceText = `![Mnesios:${name}]`;
+        const onClickMethod = "const div = document.querySelector('#AuthoringMainDiv'); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;";
+        const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, onClickMethod);
+        const imageStringified = `{"name":"${name}","blob":"${blob}"}`;
+        const base64 = btoa(imageStringified);
+        const expectedName = 'quote &#39;';
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${expectedName}' class='${markDownImageCssClassMedium}' onclick='${onClickMethod} imageClicked("${base64}");'/></div>`);
+    });
+    test('replaceMnesiosImagesWithBlobs: contains two quotes in name', () => {
+        const name = " 'xxx' ";
+        const blob = 'blob';
+        const image = { name, blob };
+        const mnesiosImageDefinitions = [image];
+        const sourceText = `![Mnesios:${name}]`;
+        const onClickMethod = "const div = document.querySelector('#AuthoringMainDiv'); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;";
+        const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, onClickMethod);
+        const imageStringified = `{"name":"${name}","blob":"${blob}"}`;
+        const base64 = btoa(imageStringified);
+        const expectedName = ' &#39;xxx&#39; ';
+        expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${expectedName}' class='${markDownImageCssClassMedium}' onclick='${onClickMethod} imageClicked("${base64}");'/></div>`);
     });
 });

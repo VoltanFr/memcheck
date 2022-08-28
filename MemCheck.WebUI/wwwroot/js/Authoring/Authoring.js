@@ -283,7 +283,9 @@ const authoringApp = Vue.createApp({
         onImageClickFunctionText() {
             return 'const div = document.querySelector("#AuthoringMainDiv"); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;';
         },
-        showImageFull(image) {
+        showImageFull(imageBase64) {
+            const decoded = atob(imageBase64);
+            const image = JSON.parse(decoded);
             authoringAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },

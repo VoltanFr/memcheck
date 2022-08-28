@@ -123,7 +123,9 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
     const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
     const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
     const imageStringified = JSON.stringify(imageDefinitionFromGlobal);
-    return `<div class='${imageDivCssClass}'><img src='${blob}' alt='${imageName}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked(${imageStringified});'/></div>`;
+    const base64 = btoa(imageStringified); // The stringified version contains double quotes, and may contain quotes (in the image name or description)
+    const alt = imageName.replace(/[']/g, '&#39;'); // Quotes would close the attribute value
+    return `<div class='${imageDivCssClass}'><img src='${blob}' alt='${alt}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked("${base64}");` + '\'/></div>';
 }
 
 export function replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) {

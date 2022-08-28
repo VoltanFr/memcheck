@@ -58,6 +58,8 @@ export const MarkdownEditor = Vue.defineComponent({
         },
         adaptTextAreaSize() {
             const textarea = this.$refs.text_area_control;
+            if (!textarea) // Happens when the page does not display the control, eg because a big size image is shown
+                return;
             let scrollHeightBeforeUpdate = 0;
             do {
                 scrollHeightBeforeUpdate = textarea.scrollHeight;
