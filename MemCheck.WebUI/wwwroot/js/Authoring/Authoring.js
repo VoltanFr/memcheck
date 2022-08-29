@@ -12,6 +12,7 @@ import { toast } from '../Common.js';
 import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
 import { sortTagArray } from '../Common.js';
+import { decodeImageDefinition } from '../MarkdownConversion.js';
 
 const authoringApp = Vue.createApp({
     components: {
@@ -283,9 +284,8 @@ const authoringApp = Vue.createApp({
         onImageClickFunctionText() {
             return 'const div = document.querySelector("#AuthoringMainDiv"); const thisApp=div.__vue_app__; const imageClicked=thisApp._component.methods.showImageFull;';
         },
-        showImageFull(imageBase64) {
-            const decoded = atob(imageBase64);
-            const image = JSON.parse(decoded);
+        showImageFull(encodedImage) {
+            const image = decodeImageDefinition(encodedImage);
             authoringAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },

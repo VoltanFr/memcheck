@@ -1,8 +1,8 @@
 ﻿import { beautifyTextForFrench, markDownImageCssClassBig } from './MarkdownConversion.js';
 import { getMnesiosImageNamesFromSourceText } from './MarkdownConversion.js';
 import { replaceMnesiosImagesWithBlobs } from './MarkdownConversion.js';
-
 import { markDownImageCssClassSmall, markDownImageCssClassMedium } from './MarkdownConversion.js';
+import { encodeImageDefinition } from './MarkdownConversion.js';
 
 function expectSetEquals(expected, actual) { // expected is an array, actual is a Set
     expect(actual.size).toBe(expected.length);
@@ -433,7 +433,7 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: imageName, blob: blob }];
         const sourceText = `![Mnesios:${imageName},size=medium]`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const imageBase64 = btoa(JSON.stringify({ 'name': imageName, 'blob': blob }));
+        const imageBase64 = encodeImageDefinition({ 'name': imageName, 'blob': blob });
         expect(result).toBe(`<div class='markdown-render-image-div'><img src='${blob}' alt='${imageName}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${imageBase64}");'/></div>`);
     });
     test('replaceMnesiosImagesWithBlobs: whole input is an image with big size', () => {
@@ -480,8 +480,8 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }];
         const sourceText = `G![Mnesios:${image1Name}] L\n ![Mnesios:${image2Name},size=big]P`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const image1Base64 = btoa(JSON.stringify({ 'name': image1Name, 'blob': blob1 }));
-        const image2Base64 = btoa(JSON.stringify({ 'name': image2Name, 'blob': blob2 }));
+        const image1Base64 = encodeImageDefinition({ 'name': image1Name, 'blob': blob1 });
+        const image2Base64 = encodeImageDefinition({ 'name': image2Name, 'blob': blob2 });
         expect(result).toBe(`G<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${image1Base64}");'/></div> L\n <div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${image2Base64}");'/></div>P`);
     });
     test('replaceMnesiosImagesWithBlobs: input contains only twice the same image with same size', () => {
@@ -517,9 +517,9 @@ describe('replaceMnesiosImagesWithBlobs: cases with replacement', () => {
         const mnesiosImageDefinitions = [{ name: image1Name, blob: blob1 }, { name: image2Name, blob: blob2 }, { name: image3Name, blob: blob3 }];
         const sourceText = `\`QUOTE\`![Mnesios:${image1Name}]\`![Mnesios:${image2Name},size=big]\`![Mnesios:${image2Name},size=big]SMALL![Mnesios:${image3Name},size=small]MEDIUM![Mnesios:${image2Name},size=medium]END`;
         const result = replaceMnesiosImagesWithBlobs(sourceText, mnesiosImageDefinitions, 'some_code;');
-        const image1Base64 = btoa(JSON.stringify({ 'name': image1Name, 'blob': blob1 }));
-        const image2Base64 = btoa(JSON.stringify({ 'name': image2Name, 'blob': blob2 }));
-        const image3Base64 = btoa(JSON.stringify({ 'name': image3Name, 'blob': blob3 }));
+        const image1Base64 = encodeImageDefinition({ 'name': image1Name, 'blob': blob1 });
+        const image2Base64 = encodeImageDefinition({ 'name': image2Name, 'blob': blob2 });
+        const image3Base64 = encodeImageDefinition({ 'name': image3Name, 'blob': blob3 });
         const expected = `\`QUOTE\`<div class='markdown-render-image-div'><img src='${blob1}' alt='${image1Name}' class='${markDownImageCssClassMedium}' onclick='some_code; imageClicked("${image1Base64}");'/></div>`
             + `\`![Mnesios:${image2Name},size=big]\``
             + `<div class='markdown-render-image-div'><img src='${blob2}' alt='${image2Name}' class='${markDownImageCssClassBig}' onclick='some_code; imageClicked("${image2Base64}");'/></div>`

@@ -15,6 +15,7 @@ import { sleep } from '../Common.js';
 import { pachAxios } from '../Common.js';
 import { convertMarkdown } from '../MarkdownConversion.js';
 import { getMnesiosImageNamesFromSourceText } from '../MarkdownConversion.js';
+import { decodeImageDefinition } from '../MarkdownConversion.js';
 
 const learnModeExpired = 1;
 const learnModeUnknown = 2;
@@ -238,9 +239,8 @@ const learnApp = Vue.createApp({
                     });
             }
         },
-        showImageFull(imageBase64) {
-            const decoded = atob(imageBase64);
-            const image = JSON.parse(decoded);
+        showImageFull(encodedImage) {
+            const image = decodeImageDefinition(encodedImage);
             learnAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },

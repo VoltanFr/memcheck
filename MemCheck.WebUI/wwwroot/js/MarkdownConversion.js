@@ -96,6 +96,18 @@ function getMnesiosImageNamesFromSourceTextForSize(src, imageSize) {
     return images.map(match => { return match.groups.imageName; });
 }
 
+export function encodeImageDefinition(image) {
+    const imageStringified = JSON.stringify(image);
+    const result = btoa(unescape(encodeURIComponent(imageStringified))); // The stringified version contains double quotes, and may contain quotes (in the image name or description)
+    return result;
+}
+
+export function decodeImageDefinition(encodedImage) {
+    const decoded = decodeURIComponent(escape(atob(encodedImage)));
+    const result = JSON.parse(decoded);
+    return result;
+}
+
 export function getMnesiosImageNamesFromSourceText(src) {
     // Image format in text: ![Mnesios:Image-name-without-space-or-comma,width=small|medium|big]
     // result is a Set of image names (string)
@@ -122,8 +134,7 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
         return wholeMatch;
     const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
     const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
-    const imageStringified = JSON.stringify(imageDefinitionFromGlobal);
-    const base64 = btoa(imageStringified); // The stringified version contains double quotes, and may contain quotes (in the image name or description)
+    const base64 = encodeImageDefinition(imageDefinitionFromGlobal);
     const alt = imageName.replace(/[']/g, '&#39;'); // Quotes would close the attribute value
     return `<div class='${imageDivCssClass}'><img src='${blob}' alt='${alt}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked("${base64}");` + '\'/></div>';
 }
@@ -144,12 +155,17 @@ export function replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, meth
 
 export function convertMarkdown(src, beautifyForFrench, mnesiosImageDefinitions, methodToCallOnClick) {
     // mnesiosImageDefinitions is an array of {name: image name, blob: the blob to use a image definition}
-    const textWithMnesiosImageBlobs = mnesiosImageDefinitions ? replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) : src;
-    const beautifiedText = beautifyForFrench ? beautifyTextForFrench(textWithMnesiosImageBlobs) : textWithMnesiosImageBlobs;
-    const converter = new showdown.Converter({ tables: true });
-    converter.setOption('openLinksInNewWindow', 'true');
-    converter.setOption('simplifiedAutoLink', 'true');
-    converter.setOption('simpleLineBreaks', 'true');
-    converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
-    return converter.makeHtml(beautifiedText);
+    try {
+        const textWithMnesiosImageBlobs = mnesiosImageDefinitions ? replaceMnesiosImagesWithBlobs(src, mnesiosImageDefinitions, methodToCallOnClick) : src;
+        const beautifiedText = beautifyForFrench ? beautifyTextForFrench(textWithMnesiosImageBlobs) : textWithMnesiosImageBlobs;
+        const converter = new showdown.Converter({ tables: true });
+        converter.setOption('openLinksInNewWindow', 'true');
+        converter.setOption('simplifiedAutoLink', 'true');
+        converter.setOption('simpleLineBreaks', 'true');
+        converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
+        return converter.makeHtml(beautifiedText);
+    }
+    catch (error) {
+        return src;
+    }
 }
