@@ -54,6 +54,7 @@
     border-color: ButtonFace;
     border-width: 1px;
     box-sizing: unset;
+    margin-right: 3px;
 }
 
     .markdown-edit-button:hover {
