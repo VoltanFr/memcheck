@@ -426,128 +426,6 @@ public class GetCardDiffTests
         }
     }
     [TestMethod()]
-    public async Task FrontSideImageDiff()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
-        var originalVersionDate = RandomHelper.Date();
-        var originalVersionDescription = RandomHelper.String();
-        var language = await CardLanguageHelper.CreateAsync(db);
-        var imageName = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, userId, imageName);
-        var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSideImages: image.AsArray(), versionDescription: originalVersionDescription);
-        var newVersionDate = RandomHelper.Date(originalVersionDate);
-        var newVersionDescription = RandomHelper.String();
-        using (var dbContext = new MemCheckDbContext(db))
-            await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideImageChange(card, Array.Empty<Guid>(), versionDescription: newVersionDescription));
-        Guid previousVersionId;
-        using (var dbContext = new MemCheckDbContext(db))
-            previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-            var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
-            Assert.AreEqual(userName, result.CurrentVersionCreator);
-            Assert.AreEqual(userName, result.OriginalVersionCreator);
-            Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
-            Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
-            Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
-            Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-            Assert.AreEqual(new("", imageName), result.ImagesOnFrontSide);
-            Assert.IsNull(result.FrontSide);
-            Assert.IsNull(result.BackSide);
-            Assert.IsNull(result.Language);
-            Assert.IsNull(result.AdditionalInfo);
-            Assert.IsNull(result.Tags);
-            Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
-        }
-    }
-    [TestMethod()]
-    public async Task BackSideImageDiff()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
-        var originalVersionDate = RandomHelper.Date();
-        var originalVersionDescription = RandomHelper.String();
-        var language = await CardLanguageHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, versionDescription: originalVersionDescription);
-        var newVersionDate = RandomHelper.Date(originalVersionDate);
-        var newVersionDescription = RandomHelper.String();
-        var imageName = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, userId, imageName);
-        using (var dbContext = new MemCheckDbContext(db))
-            await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForBackSideImageChange(card, image.AsArray(), versionDescription: newVersionDescription));
-        Guid previousVersionId;
-        using (var dbContext = new MemCheckDbContext(db))
-            previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-            var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
-            Assert.AreEqual(userName, result.CurrentVersionCreator);
-            Assert.AreEqual(userName, result.OriginalVersionCreator);
-            Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
-            Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
-            Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
-            Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-            Assert.AreEqual(new(imageName, ""), result.ImagesOnBackSide);
-            Assert.IsNull(result.FrontSide);
-            Assert.IsNull(result.BackSide);
-            Assert.IsNull(result.Language);
-            Assert.IsNull(result.AdditionalInfo);
-            Assert.IsNull(result.Tags);
-            Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
-        }
-    }
-    [TestMethod()]
-    public async Task AdditionalSideImageDiff()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
-        var originalVersionDate = RandomHelper.Date();
-        var originalVersionDescription = RandomHelper.String();
-        var language = await CardLanguageHelper.CreateAsync(db);
-        var originalVersionImageName = RandomHelper.String();
-        var originalVersionImage = await ImageHelper.CreateAsync(db, userId, originalVersionImageName);
-        var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, additionalSideImages: originalVersionImage.AsArray(), versionDescription: originalVersionDescription);
-        var newVersionDate = RandomHelper.Date(originalVersionDate);
-        var newVersionDescription = RandomHelper.String();
-        var newVersionImageName = RandomHelper.String();
-        var newVersionImage = await ImageHelper.CreateAsync(db, userId, newVersionImageName);
-        using (var dbContext = new MemCheckDbContext(db))
-            await new UpdateCard(dbContext.AsCallContext(), newVersionDate).RunAsync(UpdateCardHelper.RequestForAdditionalSideImageChange(card, newVersionImage.AsArray(), versionDescription: newVersionDescription));
-        Guid previousVersionId;
-        using (var dbContext = new MemCheckDbContext(db))
-            previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            var diffRequest = new GetCardDiff.Request(userId, card.Id, previousVersionId);
-            var result = await new GetCardDiff(dbContext.AsCallContext()).RunAsync(diffRequest);
-            Assert.AreEqual(userName, result.CurrentVersionCreator);
-            Assert.AreEqual(userName, result.OriginalVersionCreator);
-            Assert.AreEqual(newVersionDate, result.CurrentVersionUtcDate);
-            Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
-            Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
-            Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-            Assert.AreEqual(new(newVersionImageName, originalVersionImageName), result.ImagesOnAdditionalSide);
-            Assert.IsNull(result.FrontSide);
-            Assert.IsNull(result.BackSide);
-            Assert.IsNull(result.Language);
-            Assert.IsNull(result.AdditionalInfo);
-            Assert.IsNull(result.Tags);
-            Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-        }
-    }
-    [TestMethod()]
     public async Task MultipleDiffs()
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -580,8 +458,6 @@ public class GetCardDiffTests
                 with
             { BackSide = newBackSide }
                 with
-            { AdditionalInfoImageList = newVersionImage.AsArray() }
-                with
             { Tags = originalTagId1.AsArray() }
                 with
             { References = newReferences };
@@ -599,7 +475,6 @@ public class GetCardDiffTests
         Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
         Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
         Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-        Assert.AreEqual(new(newVersionImageName, originalVersionImageName), result.ImagesOnAdditionalSide);
         Assert.AreEqual(new(newFrontSide, originalFrontSide), result.FrontSide);
         Assert.AreEqual(new(newBackSide, originalBackSide), result.BackSide);
         Assert.AreEqual(new(newReferences, originalReferences), result.References);

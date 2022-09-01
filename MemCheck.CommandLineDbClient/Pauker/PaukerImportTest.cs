@@ -122,11 +122,8 @@ internal sealed class PaukerImportTest : ICmdLinePlugin
                 CreateCard.Request request = new(
                     user.Id,
                     paukerCard.Front.Text.Trim(),
-                    Array.Empty<Guid>(),
                     paukerCard.Reverse.Text.Trim(),
-                    Array.Empty<Guid>(),
                     "",
-                    Array.Empty<Guid>(),
                     "",
                     cardLanguage.Id,
                     Array.Empty<Guid>(),

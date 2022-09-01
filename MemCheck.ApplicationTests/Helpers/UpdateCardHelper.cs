@@ -17,11 +17,8 @@ public static class UpdateCardHelper
             card.Id,
             card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             tagIds,
@@ -35,11 +32,8 @@ public static class UpdateCardHelper
             card.Id,
              versionCreator ?? card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -53,11 +47,8 @@ public static class UpdateCardHelper
             card.Id,
             versionCreator ?? card.VersionCreator.Id,
             frontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -71,11 +62,8 @@ public static class UpdateCardHelper
             card.Id,
             versionCreator ?? card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             backSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -89,11 +77,8 @@ public static class UpdateCardHelper
             card.Id,
             versionCreator ?? card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             additionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -107,11 +92,8 @@ public static class UpdateCardHelper
             card.Id,
             versionCreator ?? card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             references,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -125,85 +107,10 @@ public static class UpdateCardHelper
             card.Id,
             versionCreator ?? card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             newLanguageId,
-            card.TagsInCards.Select(t => t.TagId),
-            card.UsersWithView.Select(uwv => uwv.UserId),
-            versionDescription ?? RandomHelper.String()
-            );
-    }
-    public static UpdateCard.Request RequestForFrontSideImageChange(Card card, Guid[] images, Guid? versionCreator = null, string? versionDescription = null)
-    {
-        return new UpdateCard.Request(
-            card.Id,
-            versionCreator ?? card.VersionCreator.Id,
-            card.FrontSide,
-            images,
-            card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
-            card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
-            card.References,
-            card.CardLanguage.Id,
-            card.TagsInCards.Select(t => t.TagId),
-            card.UsersWithView.Select(uwv => uwv.UserId),
-            versionDescription ?? RandomHelper.String()
-            );
-    }
-    public static UpdateCard.Request RequestForBackSideImageChange(Card card, IEnumerable<Guid> images, Guid? versionCreator = null, string? versionDescription = null)
-    {
-        return new UpdateCard.Request(
-            card.Id,
-            versionCreator ?? card.VersionCreator.Id,
-            card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
-            card.BackSide,
-            images,
-            card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
-            card.References,
-            card.CardLanguage.Id,
-            card.TagsInCards.Select(t => t.TagId),
-            card.UsersWithView.Select(uwv => uwv.UserId),
-            versionDescription ?? RandomHelper.String()
-            );
-    }
-    public static UpdateCard.Request RequestForAdditionalSideImageChange(Card card, IEnumerable<Guid> images, Guid? versionCreator = null, string? versionDescription = null)
-    {
-        return new UpdateCard.Request(
-            card.Id,
-            versionCreator ?? card.VersionCreator.Id,
-            card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
-            card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
-            card.AdditionalInfo,
-            images,
-            card.References,
-            card.CardLanguage.Id,
-            card.TagsInCards.Select(t => t.TagId),
-            card.UsersWithView.Select(uwv => uwv.UserId),
-            versionDescription ?? RandomHelper.String()
-            );
-    }
-    public static UpdateCard.Request RequestForImageChange(Card card, IEnumerable<Guid> frontImages, IEnumerable<Guid> backImages, IEnumerable<Guid> additionalInfoImages, Guid? versionCreator = null, string? versionDescription = null)
-    {
-        return new UpdateCard.Request(
-            card.Id,
-            versionCreator ?? card.VersionCreator.Id,
-            card.FrontSide,
-            frontImages,
-            card.BackSide,
-            backImages,
-            card.AdditionalInfo,
-            additionalInfoImages,
-            card.References,
-            card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
             card.UsersWithView.Select(uwv => uwv.UserId),
             versionDescription ?? RandomHelper.String()

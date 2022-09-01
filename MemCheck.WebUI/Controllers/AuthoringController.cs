@@ -81,7 +81,7 @@ public class AuthoringController : MemCheckController
         CheckBodyParameter(card);
         var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
         var versionDescription = GetLocalized("InitialCardVersionCreation");
-        var request = new CreateCard.Request(userId, card.FrontSide!, card.FrontSideImageList, card.BackSide!, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+        var request = new CreateCard.Request(userId, card.FrontSide!, card.BackSide!, card.AdditionalInfo, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
         var cardId = (await new CreateCard(callContext).RunAsync(request)).CardId;
         if (card.AddToDeck != Guid.Empty)
             await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));
@@ -90,12 +90,9 @@ public class AuthoringController : MemCheckController
     public sealed class PostCardOfUserRequest
     {
         public string FrontSide { get; set; } = null!;
-        public IEnumerable<Guid> FrontSideImageList { get; set; } = null!;
         public string BackSide { get; set; } = null!;
-        public IEnumerable<Guid> BackSideImageList { get; set; } = null!;
         public string AdditionalInfo { get; set; } = null!;
         public string References { get; set; } = null!;
-        public IEnumerable<Guid> AdditionalInfoImageList { get; set; } = null!;
         public Guid LanguageId { get; set; }
         public Guid AddToDeck { get; set; }
         public IEnumerable<Guid> Tags { get; set; } = null!;
@@ -108,18 +105,15 @@ public class AuthoringController : MemCheckController
     {
         CheckBodyParameter(card);
         var user = await userManager.GetUserAsync(HttpContext.User);
-        var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.FrontSideImageList, card.BackSide, card.BackSideImageList, card.AdditionalInfo, card.AdditionalInfoImageList, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
+        var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.BackSide, card.AdditionalInfo, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
         await new UpdateCard(callContext).RunAsync(request);
         return ControllerResultWithToast.Success(GetLocalized("CardSavedOk"), this);
     }
     public sealed class UpdateCardRequest
     {
         public string FrontSide { get; set; } = null!;
-        public IEnumerable<Guid> FrontSideImageList { get; set; } = null!;
         public string BackSide { get; set; } = null!;
-        public IEnumerable<Guid> BackSideImageList { get; set; } = null!;
         public string AdditionalInfo { get; set; } = null!;
-        public IEnumerable<Guid> AdditionalInfoImageList { get; set; } = null!;
         public string References { get; set; } = null!;
         public Guid LanguageId { get; set; }
         public Guid AddToDeck { get; set; }
@@ -169,7 +163,6 @@ public class AuthoringController : MemCheckController
             CreationUtcDate = applicationResult.FirstVersionUtcDate;
             LastChangeUtcDate = applicationResult.LastVersionUtcDate;
             InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Any() ? localizer.GetLocalized("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.GetLocalized("NotIncludedInAnyDeck");
-            Images = applicationResult.Images.Select(applicationImage => new GetCardForEditImageViewModel(applicationImage));
             CurrentUserRating = applicationResult.UserRating;
             AverageRating = Math.Round(applicationResult.AverageRating, 1);
             CountOfUserRatings = applicationResult.CountOfUserRatings;
@@ -184,24 +177,9 @@ public class AuthoringController : MemCheckController
         public DateTime CreationUtcDate { get; }
         public DateTime LastChangeUtcDate { get; }
         public string InfoAboutUsage { get; }
-        public IEnumerable<GetCardForEditImageViewModel> Images { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
-    }
-    public sealed class GetCardForEditImageViewModel
-    {
-        internal GetCardForEditImageViewModel(GetCardForEdit.ResultImageModel appResult)
-        {
-            ImageId = appResult.ImageId;
-            Name = appResult.Name;
-            Source = appResult.Source;
-            CardSide = appResult.CardSide;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public string Source { get; }
-        public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
     }
     #endregion
     #endregion
@@ -345,21 +323,6 @@ public class AuthoringController : MemCheckController
             var cardVisibility = card.UsersWithVisibility.Any() ? string.Join(",", card.UsersWithVisibility.Select(u => u.UserName).OrderBy(name => name)) : localizer.GetLocalized("Public");
             var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.GetLocalized("Public");
             AddField(changedFields, unChangedFields, "Visibility", cardVisibility, versionVisibility, localizer);
-
-            var cardFrontSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Name).OrderBy(name => name);
-            var cardFrontSideImageNamesJoined = cardFrontSideImageNames.Any() ? string.Join(",", cardFrontSideImageNames) : localizer.GetLocalized("NoneFeminine");
-            var versionFrontSideImages = selectedVersion.FrontSideImageNames.Any() ? string.Join(",", selectedVersion.FrontSideImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
-            AddField(changedFields, unChangedFields, "FrontSideImages", cardFrontSideImageNamesJoined, versionFrontSideImages, localizer);
-
-            var cardBackSideImageNames = card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Name).OrderBy(name => name);
-            var cardBackSideImageNamesJoined = cardBackSideImageNames.Any() ? string.Join(",", cardBackSideImageNames) : localizer.GetLocalized("NoneFeminine");
-            var versionBackSideImages = selectedVersion.BackSideImageNames.Any() ? string.Join(",", selectedVersion.BackSideImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
-            AddField(changedFields, unChangedFields, "BackSideImages", cardBackSideImageNamesJoined, versionBackSideImages, localizer);
-
-            var cardAdditionalImageNames = card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Name).OrderBy(name => name);
-            var cardAdditionalImageNamesJoined = cardAdditionalImageNames.Any() ? string.Join(",", cardAdditionalImageNames) : localizer.GetLocalized("NoneFeminine");
-            var versionAdditionalImages = selectedVersion.AdditionalInfoImageNames.Any() ? string.Join(",", selectedVersion.AdditionalInfoImageNames.OrderBy(name => name)) : localizer.GetLocalized("NoneFeminine");
-            AddField(changedFields, unChangedFields, "AdditionalInfoImages", cardAdditionalImageNamesJoined, versionAdditionalImages, localizer);
 
             ChangedFields = changedFields;
             UnchangedFields = unChangedFields;

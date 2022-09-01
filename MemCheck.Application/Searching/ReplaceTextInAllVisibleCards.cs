@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application.Cards;
 using MemCheck.Application.QueryValidation;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Immutable;
@@ -51,11 +50,8 @@ public sealed class ReplaceTextInAllVisibleCards : RequestRunner<ReplaceTextInAl
                 cardId,
                 request.UserId,
                 card.FrontSide.Replace(request.TextToReplace, request.ReplacementText, StringComparison.OrdinalIgnoreCase),
-                card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
                 card.BackSide.Replace(request.TextToReplace, request.ReplacementText, StringComparison.OrdinalIgnoreCase),
-                card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
                 card.AdditionalInfo.Replace(request.TextToReplace, request.ReplacementText, StringComparison.OrdinalIgnoreCase),
-                card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
                 card.References.Replace(request.TextToReplace, request.ReplacementText, StringComparison.OrdinalIgnoreCase),
                 card.CardLanguage.Id,
                 card.TagsInCards.Select(t => t.TagId),

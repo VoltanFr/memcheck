@@ -7,11 +7,8 @@ public interface ICardInput : IRequest
 {
     public Guid VersionCreatorId { get; }
     public string FrontSide { get; }
-    public IEnumerable<Guid> FrontSideImageList { get; }
     public string BackSide { get; }
-    public IEnumerable<Guid> BackSideImageList { get; }
     public string AdditionalInfo { get; }
-    public IEnumerable<Guid> AdditionalInfoImageList { get; }
     public string References { get; }
     public Guid LanguageId { get; }
     public IEnumerable<Guid> Tags { get; }

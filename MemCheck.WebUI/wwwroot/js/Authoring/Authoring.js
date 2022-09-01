@@ -1,14 +1,8 @@
 ﻿import { MarkdownEditor } from '../MarkdownEditor.js';
 import { BigSizeImage } from '../big-size-image.js';
 import { TagButton } from '../TagButton.js';
-import { ImageChoice } from '../ImageChoice.js';
 import { CardRating } from '../CardRating.js';
 import { dateTime } from '../Common.js';
-import { imageSizeMedium } from '../Common.js';
-import { imageSideFront } from '../Common.js';
-import { imageSideBack } from '../Common.js';
-import { imageSideAdditional } from '../Common.js';
-import { toast } from '../Common.js';
 import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
 import { sortTagArray } from '../Common.js';
@@ -22,7 +16,6 @@ const authoringApp = Vue.createApp({
         'markdown-editor': MarkdownEditor,
         'big-size-image': BigSizeImage,
         'card-rating': CardRating,
-        'image-choice': ImageChoice,
         'tag-button': TagButton,
     },
     data() {
@@ -67,15 +60,6 @@ const authoringApp = Vue.createApp({
             addToSingleDeck: true,  // meaningful only if singleDeckDisplay
             decksOfUser: [],    // AuthoringController.DecksOfUserViewModel
             singleDeckDisplay: false,
-            imageToAddFront: '', // string (name of image)
-            imageToAddBack: '',
-            imageToAddAdditional: '',
-            frontSideImageList: [],   // 'MyImageType': see loadImage
-            backSideImageList: [],   // MyImageType
-            additionalInfoImageList: [],   // MyImageType
-            originalFrontSideImageList: [],   // MyImageType
-            originalBackSideImageList: [],   // MyImageType
-            originalAdditionalInfoImageList: [],   // MyImageType
             currentFullScreenImage: null,   // MyImageType
             saving: false,
             showInfoPopover: false,
@@ -189,12 +173,9 @@ const authoringApp = Vue.createApp({
                 const deckToAddTo = this.singleDeckDisplay ? (this.addToSingleDeck ? this.decksOfUser[1].deckId : undefined) : this.addToDeck.deckId;
                 const postCard = {
                     FrontSide: this.card.frontSide,
-                    FrontSideImageList: this.frontSideImageList.map(img => img.imageId),
                     BackSide: this.card.backSide,
-                    BackSideImageList: this.backSideImageList.map(img => img.imageId),
                     AdditionalInfo: this.card.additionalInfo,
                     References: this.card.references,
-                    AdditionalInfoImageList: this.additionalInfoImageList.map(img => img.imageId),
                     LanguageId: this.card.languageId,
                     Tags: this.card.tags.map(tag => tag.tagId),
                     UsersWithVisibility: this.card.usersWithView.map(user => user.userId),
@@ -227,9 +208,6 @@ const authoringApp = Vue.createApp({
             this.card.additionalInfo = '';
             this.card.references = '';
             this.card.tags = [];
-            this.frontSideImageList = [];
-            this.backSideImageList = [];
-            this.additionalInfoImageList = [];
             this.makePrivate();
             this.creatingNewCard = true;
             this.copyAllInfoToOriginalCard();
@@ -242,9 +220,6 @@ const authoringApp = Vue.createApp({
             this.originalCard.languageId = this.card.languageId;
             this.originalCard.tags = this.card.tags.slice();
             this.originalCard.usersWithView = this.card.usersWithView.slice();
-            this.originalFrontSideImageList = this.frontSideImageList.slice();
-            this.originalBackSideImageList = this.backSideImageList.slice();
-            this.originalAdditionalInfoImageList = this.additionalInfoImageList.slice();
         },
         cardContainsTag(tagId) {
             return this.card.tags.some(t => t.tagId === tagId);
@@ -289,17 +264,6 @@ const authoringApp = Vue.createApp({
             authoringAppInstance.currentFullScreenImage = image;
             history.pushState('ShowingImageDetails', 'BackToCard');
         },
-        removeImageFromArray(image, array) {
-            const index = array.indexOf(image);
-            if (index > -1)
-                array.splice(index, 1);
-        },
-        removeFullScreenImageFromCard() {
-            this.removeImageFromArray(this.currentFullScreenImage, this.frontSideImageList);
-            this.removeImageFromArray(this.currentFullScreenImage, this.backSideImageList);
-            this.removeImageFromArray(this.currentFullScreenImage, this.additionalInfoImageList);
-            this.currentFullScreenImage = null;
-        },
         removeUser(userId) {
             const index = this.card.usersWithView.findIndex(user => user.userId === userId);
             if (index > -1) {
@@ -322,8 +286,6 @@ const authoringApp = Vue.createApp({
                 return;
             }
 
-            let images = [];
-
             await axios.get(`/Authoring/GetCardForEdit/${cardId}`)
                 .then(result => {
                     this.editingCardId = cardId;
@@ -341,115 +303,11 @@ const authoringApp = Vue.createApp({
                     this.editingCardLastChangeDate = dateTime(result.data.lastChangeUtcDate);
                     this.infoAboutUsage = result.data.infoAboutUsage;
                     this.creatingNewCard = false;
-                    images = result.data.images;
                 })
                 .catch(error => {
                     this.clearAll();
                     this.errorDebugInfoLines.push(`Failed to get card to edit: ${error}`);
                     tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToGetCardToEdit}`);
-                });
-
-            for (let i = 0; i < images.length; i++)
-                await this.loadImage(images[i].imageId, images[i].name, images[i].source, images[i].cardSide);
-        },
-        imageIsInCard(imageId) {
-            for (let i = 0; i < this.frontSideImageList.length; i++)
-                if (this.frontSideImageList[i].imageId === imageId)
-                    return true;
-            for (let i = 0; i < this.backSideImageList.length; i++)
-                if (this.backSideImageList[i].imageId === imageId)
-                    return true;
-            for (let i = 0; i < this.additionalInfoImageList.length; i++)
-                if (this.additionalInfoImageList[i].imageId === imageId)
-                    return true;
-            return false;
-        },
-        async loadImage(imageId, name, source, side) {
-            await axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
-                .then(result => {
-                    let xml = '';
-                    const bytes = new Uint8Array(result.data);
-                    for (let j = 0; j < bytes.byteLength; j++)
-                        xml += String.fromCharCode(bytes[j]);
-                    const base64 = `data:image/jpeg;base64,${window.btoa(xml)}`;
-                    const img = {
-                        imageId: imageId,
-                        blob: base64,
-                        name: name,
-                        source: source,
-                    };
-                    switch (side) {
-                        case imageSideFront:
-                            this.frontSideImageList.push(img);
-                            break;
-                        case imageSideBack:
-                            this.backSideImageList.push(img);
-                            break;
-                        case imageSideAdditional:
-                            this.additionalInfoImageList.push(img);
-                            break;
-                        default:
-                            return;
-                    }
-                })
-                .catch(error => {
-                    this.clearAll();
-                    this.errorDebugInfoLines.push(`Failed to load image: ${error}`);
-                    tellAxiosError(error, `${localized.NetworkError} - ${localized.FailedToLoadImage}`);
-                });
-        },
-        async addFrontImage(imageName) {
-            await this.addImage(imageName, imageSideFront);
-        },
-        async addBackImage(imageName) {
-            await this.addImage(imageName, imageSideBack);
-        },
-        async addAdditionalImage(imageName) {
-            await this.addImage(imageName, imageSideAdditional);
-        },
-        async addImage(imageName, side) {
-            await axios.post('/Authoring/GetImageInfo/', { imageName: imageName })
-                .then((getImageInfoResult) => {
-                    if (this.imageIsInCard(getImageInfoResult.data.imageId)) {
-                        toast(localized.ImageAlreadyInCard, localized.Failure, false);
-                        return;
-                    }
-
-                    this.loadImage(
-                        getImageInfoResult.data.imageId,
-                        getImageInfoResult.data.name,
-                        getImageInfoResult.data.source,
-                        side
-                    );
-                })
-                .catch(error => {
-                    tellAxiosError(error);
-                });
-        },
-        async pasteImageName(side) {
-            await navigator.clipboard.readText()
-                .then(text => {
-                    if (!text)
-                        return;
-
-                    switch (side) {
-                        case imageSideFront:
-                            this.imageToAddFront = text;
-                            break;
-                        case imageSideBack:
-                            this.imageToAddBack = text;
-                            break;
-                        case imageSideAdditional:
-                            this.imageToAddAdditional = text;
-                            break;
-                        default:
-                            return;
-                    }
-
-                    this.addImage(side);
-                })
-                .catch(err => {
-                    tellAxiosError(err);
                 });
         },
         onBeforeUnload(event) {
@@ -467,9 +325,6 @@ const authoringApp = Vue.createApp({
             result = result || (this.card.languageId !== this.originalCard.languageId);
             result = result || (!this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId)));
             result = result || (!this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId)));
-            result = result || (!this.sameSetOfIds(this.frontSideImageList.map(img => img.imageId), this.originalFrontSideImageList.map(img => img.imageId)));
-            result = result || (!this.sameSetOfIds(this.backSideImageList.map(img => img.imageId), this.originalBackSideImageList.map(img => img.imageId)));
-            result = result || (!this.sameSetOfIds(this.additionalInfoImageList.map(img => img.imageId), this.originalAdditionalInfoImageList.map(img => img.imageId)));
             return result;
         },
         sameSetOfIds(arrayA, arrayB) {

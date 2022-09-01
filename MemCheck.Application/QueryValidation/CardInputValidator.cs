@@ -14,7 +14,6 @@ internal static class CardInputValidator
     private const int maxBackSideLength = 5000;
     private const int minAdditionalInfoLength = 0;
     private const int maxAdditionalInfoLength = 20000;
-    private const int maxImageCountPerSide = 10;
     #endregion
     public const int MinVersionDescriptionLength = 3;
     public const int MaxVersionDescriptionLength = 1000;
@@ -31,22 +30,16 @@ internal static class CardInputValidator
             throw new InvalidOperationException("Invalid front side: not trimmed");
         if (input.FrontSide.Length is < minFrontSideLength or > maxFrontSideLength)
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideLength") + $" {input.FrontSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minFrontSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxFrontSideLength}");
-        if (input.FrontSideImageList.Count() > maxImageCountPerSide)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideImageCount") + $" {input.FrontSideImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
         if (input.BackSide != input.BackSide.Trim())
             throw new InvalidOperationException("Invalid back side: not trimmed");
-        if ((input.BackSide.Length < minBackSideLength || input.BackSide.Length > maxBackSideLength) && !(input.BackSide.Length == 0 && input.BackSideImageList.Any()))
+        if (input.BackSide.Length is < minBackSideLength or > maxBackSideLength)
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideLength") + $" {input.BackSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minBackSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxBackSideLength}");
-        if (input.BackSideImageList.Count() > maxImageCountPerSide)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideImageCount") + $" {input.BackSideImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
         if (input.AdditionalInfo != input.AdditionalInfo.Trim())
             throw new InvalidOperationException("Invalid additional info: not trimmed");
         if (input.AdditionalInfo.Length is < minAdditionalInfoLength or > maxAdditionalInfoLength)
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minAdditionalInfoLength} " + callContext.Localized.GetLocalized("And") + $" {maxAdditionalInfoLength}");
-        if (input.AdditionalInfoImageList.Count() > maxImageCountPerSide)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoImageCount") + $" {input.AdditionalInfoImageList.Count()}" + callContext.Localized.GetLocalized("MustBeNotBeAvove") + $" {maxImageCountPerSide}");
 
         if (input.References != input.References.Trim())
             throw new InvalidOperationException("Invalid References: not trimmed");
@@ -57,10 +50,6 @@ internal static class CardInputValidator
             throw new InvalidOperationException(ExceptionMesg_VersionDescriptionNotTrimmed);
         if (input.VersionDescription.Length is < MinVersionDescriptionLength or > MaxVersionDescriptionLength)
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidVersionDescriptionLength") + $" {input.VersionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinVersionDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxVersionDescriptionLength}");
-
-        var unionedImageLists = input.FrontSideImageList.Concat(input.BackSideImageList).Concat(input.AdditionalInfoImageList);
-        if (unionedImageLists.GroupBy(guid => guid).Any(guid => guid.Count() > 1))
-            throw new RequestInputException(callContext.Localized.GetLocalized("ImageDuplicated"));
 
         if (QueryValidationHelper.IsReservedGuid(input.LanguageId))
             throw new RequestInputException(callContext.Localized.GetLocalized("InvalidInputLanguage"));

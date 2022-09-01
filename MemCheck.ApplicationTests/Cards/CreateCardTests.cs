@@ -16,39 +16,6 @@ namespace MemCheck.Application.Cards;
 public class CreateCardTests
 {
     [TestMethod()]
-    public async Task WithOneImage()
-    {
-        var testDB = DbHelper.GetEmptyTestDB();
-        var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: false);
-        var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var imageId = await ImageHelper.CreateAsync(testDB, ownerId);
-
-        var cardGuid = Guid.Empty;
-        using (var dbContext = new MemCheckDbContext(testDB))
-        {
-            var request = new CreateCard.Request(
-                ownerId,
-                RandomHelper.String(),
-                new Guid[] { imageId },
-                RandomHelper.String(),
-                Array.Empty<Guid>(),
-                RandomHelper.String(),
-                Array.Empty<Guid>(),
-                RandomHelper.String(),
-                languageId,
-                Array.Empty<Guid>(),
-                Array.Empty<Guid>(),
-                RandomHelper.String());
-            cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
-        }
-
-        using (var dbContext = new MemCheckDbContext(testDB))
-        {
-            var card = dbContext.Cards.Include(c => c.Images).Single(c => c.Id == cardGuid);
-            Assert.AreEqual(ImageInCard.FrontSide, card.Images.Single(i => i.ImageId == imageId).CardSide);
-        }
-    }
-    [TestMethod()]
     public async Task WithAllData()
     {
         var testDB = DbHelper.GetEmptyTestDB();
@@ -75,11 +42,8 @@ public class CreateCardTests
             var request = new CreateCard.Request(
                 ownerId,
                 frontSide,
-                new Guid[] { imageOnFrontSideId },
                 backSide,
-                new Guid[] { imageOnBackSide1Id, imageOnBackSide2Id },
                 additionalInfo,
-                new Guid[] { imageOnAdditionalInfoId },
                 references,
                 languageId,
                 new Guid[] { tagId },
@@ -107,10 +71,6 @@ public class CreateCardTests
             Assert.AreEqual(languageId, card.CardLanguage.Id);
             Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == ownerId));
             Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == userWithViewId));
-            Assert.AreEqual(ImageInCard.FrontSide, card.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
-            Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide1Id).CardSide);
-            Assert.AreEqual(ImageInCard.BackSide, card.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
-            Assert.AreEqual(ImageInCard.AdditionalInfo, card.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
             Assert.IsTrue(card.TagsInCards.Any(t => t.TagId == tagId));
             Assert.AreEqual(0, card.RatingCount);
             Assert.AreEqual(0, card.AverageRating);
@@ -131,11 +91,8 @@ public class CreateCardTests
             var request = new CreateCard.Request(
                 ownerId,
                 RandomHelper.String(),
-                Array.Empty<Guid>(),
                 RandomHelper.String(),
-                Array.Empty<Guid>(),
                 RandomHelper.String(),
-                Array.Empty<Guid>(),
                 RandomHelper.String(),
                 languageId,
                 Array.Empty<Guid>(),
@@ -160,11 +117,8 @@ public class CreateCardTests
         var request = new CreateCard.Request(
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             Array.Empty<Guid>(),
@@ -176,78 +130,6 @@ public class CreateCardTests
         Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
     }
     [TestMethod()]
-    public async Task MultipleImagesOnAdditionalSide()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var language = await CardLanguageHelper.CreateAsync(db);
-        var image1 = await ImageHelper.CreateAsync(db, user);
-        var image2 = await ImageHelper.CreateAsync(db, user);
-
-        Guid cardGuid;
-        var createRequest = new CreateCard.Request(
-            user,
-            RandomHelper.String(),
-            Array.Empty<Guid>(),
-            RandomHelper.String(),
-            Array.Empty<Guid>(),
-            RandomHelper.String(),
-            new Guid[] { image1, image2 },
-            RandomHelper.String(),
-            language,
-            Array.Empty<Guid>(),
-            Array.Empty<Guid>(),
-            RandomHelper.String());
-        using (var dbContext = new MemCheckDbContext(db))
-            cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(createRequest)).CardId;
-
-        var deck = await DeckHelper.CreateAsync(db, user);
-        var addToDeckDate = RandomHelper.Date();
-        await DeckHelper.AddCardAsync(db, deck, cardGuid, 1, addToDeckDate);
-
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), 10);
-            var card = (await new GetCardsToRepeat(dbContext.AsCallContext(), addToDeckDate.AddDays(1)).RunAsync(request)).Cards.Single();
-
-            var images = card.Images;
-            Assert.AreEqual(2, images.Count());
-
-            var first = card.Images.First();
-            Assert.AreEqual(ImageInCard.AdditionalInfo, first.CardSide);
-            Assert.AreEqual(image1, first.ImageDetails.Id);
-
-            var last = card.Images.Last();
-            Assert.AreEqual(ImageInCard.AdditionalInfo, last.CardSide);
-            Assert.AreEqual(image2, last.ImageDetails.Id);
-        }
-    }
-    [TestMethod()]
-    public async Task SameImageUsedTwice()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var language = await CardLanguageHelper.CreateAsync(db);
-        var image = await ImageHelper.CreateAsync(db, user);
-
-        var request = new CreateCard.Request(
-            user,
-            RandomHelper.String(),
-            Array.Empty<Guid>(),
-            RandomHelper.String(),
-            image.AsArray(),
-            RandomHelper.String(),
-            image.AsArray(),
-            RandomHelper.String(),
-            language,
-            Array.Empty<Guid>(),
-            Array.Empty<Guid>(),
-            RandomHelper.String());
-
-        using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext()).RunAsync(request));
-    }
-    [TestMethod()]
     public async Task ReferencesTooLong()
     {
         var testDB = DbHelper.GetEmptyTestDB();
@@ -257,11 +139,8 @@ public class CreateCardTests
         var request = new CreateCard.Request(
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(CardInputValidator.MaxReferencesLength + 1),
             languageId,
             Array.Empty<Guid>(),
@@ -285,11 +164,8 @@ public class CreateCardTests
         var request = new CreateCard.Request(
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -314,11 +190,8 @@ public class CreateCardTests
         var request = new CreateCard.Request(
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -342,11 +215,8 @@ public class CreateCardTests
         var request = new CreateCard.Request(
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),

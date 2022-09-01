@@ -117,7 +117,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
         var request = new StoreImage.Request(user.Id, region.ImageDbName, $"Région {region.Name} dans la carte de France", region.ImageSource, "image/svg+xml", blob);
         await new StoreImage(dbContext.AsCallContext()).RunAsync(request);
     }
-    private async Task CreateCard_WhatIsThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
+    private async Task CreateCard_WhatIsThisRegionAsync(Region region, MemCheckUser user, Guid frenchLanguageId, Guid tagId)
     {
         var frontSide = "Comment s'appelle cette région française ?";
         var backSide = region.Name;
@@ -128,10 +128,10 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
             return;
         }
 
-        var frontSideImages = new[] { region.GetImageDbId(dbContext) };
-        var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
+        //var frontSideImages = new[] { region.GetImageDbId(dbContext) };
+        //var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
         var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
-        var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, Array.Empty<Guid>(), "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+        var request = new CreateCard.Request(user.Id, frontSide, backSide, additionalInfo, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
         await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
     }
     private async Task CreateCard_WhereIsThisRegionAsync(Region region, MemCheckUser user, Guid regionsWithoutNamesImageId, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -149,7 +149,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
         var backSideImages = new[] { region.GetImageDbId(dbContext) };
         var additionalInfo = $"Elle est constituée de ces {region.Departments.Length} départements :{Environment.NewLine}{string.Join(Environment.NewLine, region.Departments)}{Environment.NewLine}{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
         var additionalInfoImages = new[] { regionsAndDepartmentsWithNamesImageId };
-        var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+        var request = new CreateCard.Request(user.Id, frontSide, backSide, additionalInfo, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
         await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
     }
     private async Task CreateCard_HowManyDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -167,7 +167,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
         var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
         var additionalInfo = string.Join(Environment.NewLine, region.Departments);
         var additionalInfoImages = Array.Empty<Guid>();
-        var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+        var request = new CreateCard.Request(user.Id, frontSide, backSide, additionalInfo, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
         await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
     }
     private async Task CreateCard_WhatAreTheDepartmentsInThisRegionAsync(Region region, MemCheckUser user, Guid regionsAndDepartmentsWithNamesImageId, Guid frenchLanguageId, Guid tagId)
@@ -185,7 +185,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
         var backSideImages = new[] { regionsAndDepartmentsWithNamesImageId };
         var additionalInfo = $"La région {region.Name} est constituée de {region.Departments.Length} départements.{Environment.NewLine}En 2017, sa densité était de {region.Density} habitants par km² (la moyenne métropolitaine étant de 168 h/km²).";
         var additionalInfoImages = Array.Empty<Guid>();
-        var request = new CreateCard.Request(user.Id, frontSide, frontSideImages, backSide, backSideImages, additionalInfo, additionalInfoImages, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
+        var request = new CreateCard.Request(user.Id, frontSide, backSide, additionalInfo, "", frenchLanguageId, tagId.AsArray(), Array.Empty<Guid>(), CardVersionDescription);
         await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
     }
     #endregion
@@ -214,7 +214,7 @@ internal sealed class RegionsCardCreator : ICmdLinePlugin
             logger.LogDebug($"Working on region '{region.Name}'");
 
             await InsertImageInDbAsync(region, user);
-            await CreateCard_WhatIsThisRegionAsync(region, user, regionsAndDepartmentsWithNamesImageId, frenchLanguageId, tagId);
+            await CreateCard_WhatIsThisRegionAsync(region, user, frenchLanguageId, tagId);
             await CreateCard_WhereIsThisRegionAsync(region, user, regionsWithoutNamesImageId, regionsAndDepartmentsWithNamesImageId, frenchLanguageId, tagId);
             await CreateCard_HowManyDepartmentsInThisRegionAsync(region, user, regionsAndDepartmentsWithNamesImageId, frenchLanguageId, tagId);
             await CreateCard_WhatAreTheDepartmentsInThisRegionAsync(region, user, regionsAndDepartmentsWithNamesImageId, frenchLanguageId, tagId);

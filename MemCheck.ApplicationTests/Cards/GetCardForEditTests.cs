@@ -118,7 +118,6 @@ public class GetCardForEditTests
         Assert.AreEqual(versionDescription, loaded.LastVersionDescription);
         Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Count());
         Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUserName);
-        Assert.AreEqual(0, loaded.Images.Count());
         Assert.AreEqual(0, loaded.UserRating);
         Assert.AreEqual(0, loaded.AverageRating);
         Assert.AreEqual(0, loaded.CountOfUserRatings);

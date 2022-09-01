@@ -10,15 +10,6 @@ namespace MemCheck.Application.Cards;
 
 public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Result>
 {
-    #region Private methods
-    private void AddImage(Guid cardId, Guid imageId, int cardSide, List<ImageInCard> cardImageList)
-    {
-        var imageFromDb = DbContext.Images.Where(img => img.Id == imageId).Single();
-        var img = new ImageInCard() { ImageId = imageId, Image = imageFromDb, CardId = cardId, CardSide = cardSide };
-        DbContext.ImagesInCards.Add(img);
-        cardImageList.Add(img);
-    }
-    #endregion
     public CreateCard(CallContext callContext) : base(callContext)
     {
     }
@@ -61,14 +52,7 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
         }
         card.TagsInCards = tagsInCards;
 
-        var cardImageList = new List<ImageInCard>();
-        foreach (var image in request.FrontSideImageList)
-            AddImage(card.Id, image, 1, cardImageList);
-        foreach (var image in request.BackSideImageList)
-            AddImage(card.Id, image, 2, cardImageList);
-        foreach (var image in request.AdditionalInfoImageList)
-            AddImage(card.Id, image, 3, cardImageList);
-        card.Images = cardImageList;
+        card.Images = new List<ImageInCard>();
 
         if (versionCreator.SubscribeToCardOnEdit)
             AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
@@ -82,16 +66,13 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
     #region Request class
     public sealed class Request : ICardInput
     {
-        public Request(Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+        public Request(Guid versionCreatorId, string frontSide, string backSide, string additionalInfo, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
         {
             VersionCreatorId = versionCreatorId;
             FrontSide = frontSide.Trim();
             BackSide = backSide.Trim();
             AdditionalInfo = additionalInfo.Trim();
             References = references.Trim();
-            FrontSideImageList = frontSideImageList;
-            BackSideImageList = backSideImageList;
-            AdditionalInfoImageList = additionalInfoImageList;
             LanguageId = languageId;
             Tags = tags;
             UsersWithVisibility = usersWithVisibility;
@@ -99,11 +80,8 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
         }
         public Guid VersionCreatorId { get; }
         public string FrontSide { get; }
-        public IEnumerable<Guid> FrontSideImageList { get; }
         public string BackSide { get; }
-        public IEnumerable<Guid> BackSideImageList { get; }
         public string AdditionalInfo { get; }
-        public IEnumerable<Guid> AdditionalInfoImageList { get; }
         public string References { get; }
         public Guid LanguageId { get; }
         public IEnumerable<Guid> Tags { get; }

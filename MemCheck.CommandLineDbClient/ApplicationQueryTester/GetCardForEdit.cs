@@ -35,7 +35,7 @@ internal sealed class GetCardForEdit : ICmdLinePlugin
             var runner = new Application.Cards.GetCardForEdit(callContext);
             var oneRunChrono = Stopwatch.StartNew();
             var card = await runner.RunAsync(request);
-            logger.LogInformation($"Got a card with {card.Images.Count()} images, {card.CountOfUserRatings} ratings, {card.Tags.Count()} tags, {card.UsersOwningDeckIncluding.Count()} users, {card.UsersWithVisibility} users with access in {oneRunChrono.Elapsed}");
+            logger.LogInformation($"Got a card with {card.CountOfUserRatings} ratings, {card.Tags.Count()} tags, {card.UsersOwningDeckIncluding.Count()} users, {card.UsersWithVisibility} users with access in {oneRunChrono.Elapsed}");
             chronos.Add(oneRunChrono.Elapsed.TotalSeconds);
         }
 

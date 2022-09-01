@@ -20,7 +20,6 @@ export const BigSizeImage = Vue.defineComponent({
                     <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_CopyToClipboard" v-on:click="copyToClipboard()"><i class="far fa-copy"></i></button></li>
                     <li class="big-size-image-top-li" v-if="hasEditListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_EditButtonTitle" v-on:click="$emit('edit')"><i class="fas fa-pen"></i></button></li>
                     <li class="big-size-image-top-li" v-if="hasVersionHistoryListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_VersionHistoryButtonTitle" v-on:click="$emit('versionhistory')"><i class="fas fa-history"></i></button></li>
-                    <li class="big-size-image-top-li" v-if="hasRemoveListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_Remove" v-on:click="$emit('remove')"><i class="fas fa-trash-alt"></i></button></li>
                     <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_CloseButtonTitle" v-on:click="$emit('close')"><i class="far fa-times-circle"></i></button></li>
                 </ul>
             </div>
@@ -50,9 +49,6 @@ export const BigSizeImage = Vue.defineComponent({
     methods: {
         copyToClipboard() {
             copyToClipboardAndToast(this.image.name, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure);
-        },
-        hasRemoveListener() {
-            return this.$attrs && this.$attrs.onRemove;
         },
         hasEditListener() {
             return this.$attrs && this.$attrs.onEdit;

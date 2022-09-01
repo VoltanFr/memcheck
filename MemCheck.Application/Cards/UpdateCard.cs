@@ -48,27 +48,10 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         }
         card.TagsInCards = tagsInCards;
     }
-    private async Task UpdateImagesAsync(Request request, Card card)
+    private static async Task UpdateImagesAsync(Card card)
     {
-        var imagesBeforeUpdate = DbContext.ImagesInCards.Where(image => image.CardId == request.CardId);
-        DbContext.ImagesInCards.RemoveRange(imagesBeforeUpdate);
-
-        var cardImageList = new List<ImageInCard>();
-        foreach (var image in request.FrontSideImageList)
-            await AddImageAsync(card.Id, image, 1, cardImageList);
-        foreach (var image in request.BackSideImageList)
-            await AddImageAsync(card.Id, image, 2, cardImageList);
-        foreach (var image in request.AdditionalInfoImageList)
-            await AddImageAsync(card.Id, image, 3, cardImageList);
-
-        card.Images = cardImageList;
-    }
-    private async Task AddImageAsync(Guid cardId, Guid imageId, int cardSide, List<ImageInCard> cardImageList)
-    {
-        var imageFromDb = DbContext.Images.Where(img => img.Id == imageId).Single();    //To be reviewed: it sounds stupid that we have to load the whole image info, with the blob, while we only need an id???
-        var img = new ImageInCard() { ImageId = imageId, Image = imageFromDb, CardId = cardId, CardSide = cardSide };
-        await DbContext.ImagesInCards.AddAsync(img);
-        cardImageList.Add(img);
+        card.Images = new List<ImageInCard>();
+        await Task.CompletedTask;
     }
     #endregion
     public UpdateCard(CallContext callContext, DateTime? cardNewVersionUtcDate = null) : base(callContext)
@@ -87,7 +70,7 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         card.References = request.References;
         await UpdateTagsAsync(request, card);
         await UpdateUsersWithViewAsync(request, card);
-        await UpdateImagesAsync(request, card);
+        await UpdateImagesAsync(card);
 
         await DbContext.SaveChangesAsync();
 
@@ -97,12 +80,6 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
     public sealed record Request : ICardInput
     {
         #region Private methods
-        private bool SameImageLists(IEnumerable<ImageInCard> originalImages)
-        {
-            return FrontSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.FrontSide).Select(img => img.ImageId))
-                && BackSideImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.BackSide).Select(img => img.ImageId))
-                && AdditionalInfoImageList.SequenceEqual(originalImages.Where(img => img.CardSide == ImageInCard.AdditionalInfo).Select(img => img.ImageId));
-        }
         private void CheckAtLeastOneFieldDifferent(Card card, ILocalized localizer)
         {
             var dataBeforeUpdate = new
@@ -123,8 +100,7 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
                 && (dataBeforeUpdate.AdditionalInfo == AdditionalInfo)
                 && (dataBeforeUpdate.References == References)
                 && Enumerable.SequenceEqual(dataBeforeUpdate.TagIds.OrderBy(tagId => tagId), Tags.OrderBy(tagId => tagId))
-                && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId))
-                && SameImageLists(dataBeforeUpdate.Images))
+                && Enumerable.SequenceEqual(dataBeforeUpdate.UserWithVisibilityIds.OrderBy(userId => userId), UsersWithVisibility.OrderBy(userId => userId)))
                 throw new RequestInputException(localizer.GetLocalized("CanNotUpdateBecauseNoDifference"));
         }
         private async Task<IEnumerable<Guid>> GetAllAuthorsAsync(Card card, MemCheckDbContext dbContext)
@@ -160,16 +136,13 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
             await CheckVisibilityForUsersAsync(userIds, localizer, "HeHasThisCardInADeck", dbContext);
         }
         #endregion
-        public Request(Guid cardId, Guid versionCreatorId, string frontSide, IEnumerable<Guid> frontSideImageList, string backSide, IEnumerable<Guid> backSideImageList, string additionalInfo, IEnumerable<Guid> additionalInfoImageList, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
+        public Request(Guid cardId, Guid versionCreatorId, string frontSide, string backSide, string additionalInfo, string references, Guid languageId, IEnumerable<Guid> tags, IEnumerable<Guid> usersWithVisibility, string versionDescription)
         {
             CardId = cardId;
             VersionCreatorId = versionCreatorId;
             FrontSide = frontSide.Trim();
             BackSide = backSide.Trim();
             AdditionalInfo = additionalInfo.Trim();
-            FrontSideImageList = frontSideImageList;
-            BackSideImageList = backSideImageList;
-            AdditionalInfoImageList = additionalInfoImageList;
             References = references.Trim();
             LanguageId = languageId;
             Tags = tags;
@@ -179,11 +152,8 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         public Guid CardId { get; }
         public Guid VersionCreatorId { get; set; }
         public string FrontSide { get; }
-        public IEnumerable<Guid> FrontSideImageList { get; }
         public string BackSide { get; init; }
-        public IEnumerable<Guid> BackSideImageList { get; }
         public string AdditionalInfo { get; init; }
-        public IEnumerable<Guid> AdditionalInfoImageList { get; init; }
         public string References { get; init; }
         public Guid LanguageId { get; }
         public IEnumerable<Guid> Tags { get; init; }

@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -52,7 +51,6 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
                         card.VersionCreator.UserName,
                         card.VersionDescription,
                         ownersOfDecksWithThisCard,
-                        card.Images.Select(img => new ResultImageModel(img)),
                         userRatingValue,
                         card.AverageRating,
                         card.RatingCount
@@ -89,7 +87,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
     public sealed class ResultModel
     {
         public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
-            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings)
+            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings)
         {
             FrontSide = frontSide;
             BackSide = backSide;
@@ -104,7 +102,6 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             LastVersionCreatorName = lastVersionCreator;
             LastVersionDescription = lastVersionDescription;
             UsersOwningDeckIncluding = usersOwningDeckIncluding;
-            Images = images;
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
@@ -122,7 +119,6 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         public string LastVersionCreatorName { get; }
         public string LastVersionDescription { get; }
         public IEnumerable<string> UsersOwningDeckIncluding { get; }
-        public IEnumerable<ResultImageModel> Images { get; }
         public int UserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
@@ -146,20 +142,6 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         }
         public Guid UserId { get; }
         public string UserName { get; }
-    }
-    public sealed class ResultImageModel
-    {
-        public ResultImageModel(ImageInCard img)
-        {
-            ImageId = img.ImageId;
-            Name = img.Image.Name;
-            Source = img.Image.Source;
-            CardSide = img.CardSide;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public string Source { get; }
-        public int CardSide { get; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
     }
     #endregion
 }

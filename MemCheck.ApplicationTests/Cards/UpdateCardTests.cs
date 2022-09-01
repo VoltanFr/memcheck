@@ -48,7 +48,7 @@ public class UpdateCardTests
         var user = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        var r = new UpdateCard.Request(Guid.NewGuid(), user, RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Array.Empty<Guid>(), RandomHelper.String(), Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
+        var r = new UpdateCard.Request(Guid.NewGuid(), user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
         await Assert.ThrowsExceptionAsync<ArgumentException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
     }
     [TestMethod()]
@@ -169,11 +169,8 @@ public class UpdateCardTests
                 originalCard.Id,
                 newVersionCreator,
                 frontSide,
-                new Guid[] { imageOnFrontSideId },
                 backSide,
-                new Guid[] { imageOnBackSide1Id, imageOnBackSide2Id },
                 additionalInfo,
-                new Guid[] { imageOnAdditionalInfoId },
                 references,
                 languageId,
                 new Guid[] { tagId },
@@ -198,10 +195,6 @@ public class UpdateCardTests
             Assert.AreEqual(references, updatedCard.References);
             Assert.AreEqual(versionDescription, updatedCard.VersionDescription);
             Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
-            Assert.AreEqual(ImageInCard.FrontSide, updatedCard.Images.Single(i => i.ImageId == imageOnFrontSideId).CardSide);
-            Assert.AreEqual(ImageInCard.BackSide, updatedCard.Images.Single(i => i.ImageId == imageOnBackSide1Id).CardSide);
-            Assert.AreEqual(ImageInCard.BackSide, updatedCard.Images.Single(i => i.ImageId == imageOnBackSide2Id).CardSide);
-            Assert.AreEqual(ImageInCard.AdditionalInfo, updatedCard.Images.Single(i => i.ImageId == imageOnAdditionalInfoId).CardSide);
             Assert.IsTrue(updatedCard.TagsInCards.Any(t => t.TagId == tagId));
         }
 
@@ -224,11 +217,8 @@ public class UpdateCardTests
             card.Id,
             card.VersionCreator.Id,
             card.FrontSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.ImageId),
             card.BackSide,
-            card.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.ImageId),
             card.AdditionalInfo,
-            card.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.ImageId),
             card.References,
             card.CardLanguage.Id,
             card.TagsInCards.Select(t => t.TagId),
@@ -517,11 +507,8 @@ public class UpdateCardTests
                 originalCard.Id,
                 cardCreator,
                 newFrontSide + ' ',
-                Array.Empty<Guid>(),
                 originalCard.BackSide,
-                Array.Empty<Guid>(),
                 originalCard.AdditionalInfo,
-                Array.Empty<Guid>(),
                 originalCard.References,
                 languageId,
                 Array.Empty<Guid>(),
@@ -566,11 +553,8 @@ public class UpdateCardTests
                 originalCard.Id,
                 cardCreator,
                 originalCard.FrontSide,
-                Array.Empty<Guid>(),
                 originalCard.BackSide,
-                Array.Empty<Guid>(),
                 originalCard.AdditionalInfo,
-                Array.Empty<Guid>(),
                 " " + newReferences,
                 languageId,
                 Array.Empty<Guid>(),
@@ -613,11 +597,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -645,11 +626,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -676,11 +654,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -711,11 +686,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -744,11 +716,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -775,11 +744,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
@@ -809,11 +775,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             new[] { aTagId, persoTagId },
@@ -842,11 +805,8 @@ public class UpdateCardTests
             cardId,
             creatorId,
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
-            Array.Empty<Guid>(),
             RandomHelper.String(),
             languageId,
             new[] { aTagId, persoTagId },
