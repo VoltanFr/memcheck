@@ -198,7 +198,6 @@ public class LearnController : MemCheckController
             }
             else
                 VisibleTo = VisibleToCount == 0 ? localizer.GetLocalized("AllUsers") : string.Join(',', applicationResult.VisibleTo);
-            Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
             MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                     new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                 ).OrderBy(heapModel => heapModel.HeapId);
@@ -235,7 +234,6 @@ public class LearnController : MemCheckController
             }
             else
                 VisibleTo = VisibleToCount == 0 ? localizer.GetLocalized("AllUsers") : string.Join(',', applicationResult.VisibleTo);
-            Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
             MoveToHeapTargets = applicationResult.MoveToHeapExpiryInfos.Select(moveToHeapInfo =>
                     new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                 ).OrderBy(heapModel => heapModel.HeapId);
@@ -264,7 +262,6 @@ public class LearnController : MemCheckController
             CountOfUserRatings = applicationResult.CountOfUserRatings;
             IsInFrench = applicationResult.IsInFrench;
             VisibleTo = localizer.GetLocalized("AllUsers");
-            Images = applicationResult.Images.Select(applicationImage => new GetCardsImageViewModel(applicationImage));
             MoveToHeapTargets = Array.Empty<GetCardsHeapModel>();
             RegisteredForNotifications = false;
         }
@@ -286,84 +283,11 @@ public class LearnController : MemCheckController
         public string VisibleTo { get; }
         public string RemoveAlertMessage { get; }
         public DateTime AddToDeckUtcTime { get; }
-        public IEnumerable<GetCardsImageViewModel> Images { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
         public bool RegisteredForNotifications { get; }
         public bool IsInFrench { get; }
-    }
-    public sealed class GetCardsImageViewModel
-    {
-        public GetCardsImageViewModel(GetUnknownCardsToLearn.ResultImageModel appResult)
-        {
-            ImageId = appResult.ImageDetails.Id;
-            Name = appResult.ImageDetails.Name;
-            Description = appResult.ImageDetails.Description;
-            Source = appResult.ImageDetails.Source;
-            CardSide = appResult.CardSide;
-            InitialUploadUtcDate = appResult.ImageDetails.InitialUploadUtcDate;
-            InitialVersionCreator = appResult.ImageDetails.UploaderUserName;
-            CurrentVersionUtcDate = appResult.ImageDetails.LastChangeUtcDate;
-            CurrentVersionDescription = appResult.ImageDetails.VersionDescription;
-            CardCount = appResult.ImageDetails.CardCount;
-            OriginalImageContentType = appResult.ImageDetails.OriginalImageContentType;
-            OriginalImageSize = appResult.ImageDetails.OriginalImageSize;
-            SmallSize = appResult.ImageDetails.SmallSize;
-            MediumSize = appResult.ImageDetails.MediumSize;
-            BigSize = appResult.ImageDetails.BigSize;
-        }
-        public GetCardsImageViewModel(GetCardsToRepeat.ResultImageModel appResult)
-        {
-            ImageId = appResult.ImageDetails.Id;
-            Name = appResult.ImageDetails.Name;
-            Description = appResult.ImageDetails.Description;
-            Source = appResult.ImageDetails.Source;
-            CardSide = appResult.CardSide;
-            InitialUploadUtcDate = appResult.ImageDetails.InitialUploadUtcDate;
-            InitialVersionCreator = appResult.ImageDetails.UploaderUserName;
-            CurrentVersionUtcDate = appResult.ImageDetails.LastChangeUtcDate;
-            CurrentVersionDescription = appResult.ImageDetails.VersionDescription;
-            CardCount = appResult.ImageDetails.CardCount;
-            OriginalImageContentType = appResult.ImageDetails.OriginalImageContentType;
-            OriginalImageSize = appResult.ImageDetails.OriginalImageSize;
-            SmallSize = appResult.ImageDetails.SmallSize;
-            MediumSize = appResult.ImageDetails.MediumSize;
-            BigSize = appResult.ImageDetails.BigSize;
-        }
-        public GetCardsImageViewModel(GetCardsForDemo.ResultImageModel appResult)
-        {
-            ImageId = appResult.ImageDetails.Id;
-            Name = appResult.ImageDetails.Name;
-            Description = appResult.ImageDetails.Description;
-            Source = appResult.ImageDetails.Source;
-            CardSide = appResult.CardSide;
-            InitialUploadUtcDate = appResult.ImageDetails.InitialUploadUtcDate;
-            InitialVersionCreator = appResult.ImageDetails.UploaderUserName;
-            CurrentVersionUtcDate = appResult.ImageDetails.LastChangeUtcDate;
-            CurrentVersionDescription = appResult.ImageDetails.VersionDescription;
-            CardCount = appResult.ImageDetails.CardCount;
-            OriginalImageContentType = appResult.ImageDetails.OriginalImageContentType;
-            OriginalImageSize = appResult.ImageDetails.OriginalImageSize;
-            SmallSize = appResult.ImageDetails.SmallSize;
-            MediumSize = appResult.ImageDetails.MediumSize;
-            BigSize = appResult.ImageDetails.BigSize;
-        }
-        public Guid ImageId { get; }
-        public string Name { get; }
-        public string Description { get; }
-        public string Source { get; }
-        public int CardSide { get; }
-        public DateTime InitialUploadUtcDate { get; }
-        public string InitialVersionCreator { get; }
-        public DateTime CurrentVersionUtcDate { get; }
-        public string CurrentVersionDescription { get; }
-        public int CardCount { get; }
-        public string OriginalImageContentType { get; }
-        public int OriginalImageSize { get; }
-        public int SmallSize { get; }
-        public int MediumSize { get; }
-        public int BigSize { get; }
     }
     public sealed class GetCardsHeapModel
     {

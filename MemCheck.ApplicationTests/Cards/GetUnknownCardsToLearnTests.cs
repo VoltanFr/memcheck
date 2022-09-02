@@ -327,21 +327,9 @@ public class GetUnknownCardsToLearnTests
         var otherLanguage = await CardLanguageHelper.CreateAsync(db);
         var tagName = RandomHelper.String();
         var tag = await TagHelper.CreateAsync(db, tagName);
-        var image1Name = RandomHelper.String();
-        var image1VersionDescription = RandomHelper.String();
-        var image1LastChangeTime = RandomHelper.Date();
-        var image1Source = RandomHelper.String();
-        var image1Description = RandomHelper.String();
-        var image1 = await ImageHelper.CreateAsync(db, user, image1Name, image1VersionDescription, image1LastChangeTime, image1Source, image1Description);
-        var image2Name = RandomHelper.String();
-        var image2VersionDescription = RandomHelper.String();
-        var image2LastChangeTime = RandomHelper.Date();
-        var image2Source = RandomHelper.String();
-        var image2Description = RandomHelper.String();
-        var image2 = await ImageHelper.CreateAsync(db, user, image2Name, image2VersionDescription, image2LastChangeTime, image2Source, image2Description);
 
         var card1VersionDate = RandomHelper.Date();
-        var card1 = await CardHelper.CreateAsync(db, user, versionDate: card1VersionDate, language: french, tagIds: tag.AsArray(), userWithViewIds: user.AsArray(), frontSideImages: image1.AsArray(), additionalSideImages: image2.AsArray());
+        var card1 = await CardHelper.CreateAsync(db, user, versionDate: card1VersionDate, language: french, tagIds: tag.AsArray(), userWithViewIds: user.AsArray());
         var card1AddToDeckTime = RandomHelper.Date(card1VersionDate);
         var card1LastLearnTime = CardInDeck.NeverLearntLastLearnTime;
         var card1BiggestHeapReached = RandomHelper.Heap();
@@ -388,39 +376,6 @@ public class GetUnknownCardsToLearnTests
                 Assert.AreEqual(tagName, card1FromResult.Tags.Single());
                 Assert.AreEqual(1, card1FromResult.VisibleTo.Count());
                 Assert.AreEqual(userName, card1FromResult.VisibleTo.Single());
-                Assert.AreEqual(2, card1FromResult.Images.Count());
-                {
-                    var image1FromResult = card1FromResult.Images.Single(img => img.ImageId == image1);
-                    Assert.AreEqual(userName, image1FromResult.ImageDetails.UploaderUserName);
-                    Assert.AreEqual(image1Name, image1FromResult.ImageDetails.Name);
-                    Assert.AreEqual(image1Description, image1FromResult.ImageDetails.Description);
-                    Assert.AreEqual(image1Source, image1FromResult.ImageDetails.Source);
-                    Assert.AreEqual(image1LastChangeTime, image1FromResult.ImageDetails.InitialUploadUtcDate);
-                    Assert.AreEqual(image1LastChangeTime, image1FromResult.ImageDetails.LastChangeUtcDate);
-                    Assert.AreEqual(image1VersionDescription, image1FromResult.ImageDetails.VersionDescription);
-                    Assert.AreEqual(1, image1FromResult.ImageDetails.CardCount);
-                    Assert.AreEqual(ImageHelper.contentType, image1FromResult.ImageDetails.OriginalImageContentType);
-                    Assert.AreEqual(ImageHelper.originalBlobSize, image1FromResult.ImageDetails.OriginalImageSize);
-                    Assert.AreEqual(ImageHelper.smallBlobSize, image1FromResult.ImageDetails.SmallSize);
-                    Assert.AreEqual(ImageHelper.mediumBlobSize, image1FromResult.ImageDetails.MediumSize);
-                    Assert.AreEqual(ImageHelper.bigBlobSize, image1FromResult.ImageDetails.BigSize);
-                }
-                {
-                    var image2FromResult = card1FromResult.Images.Single(img => img.ImageId == image2);
-                    Assert.AreEqual(userName, image2FromResult.ImageDetails.UploaderUserName);
-                    Assert.AreEqual(image2Name, image2FromResult.ImageDetails.Name);
-                    Assert.AreEqual(image2Description, image2FromResult.ImageDetails.Description);
-                    Assert.AreEqual(image2Source, image2FromResult.ImageDetails.Source);
-                    Assert.AreEqual(image2LastChangeTime, image2FromResult.ImageDetails.InitialUploadUtcDate);
-                    Assert.AreEqual(image2LastChangeTime, image2FromResult.ImageDetails.LastChangeUtcDate);
-                    Assert.AreEqual(image2VersionDescription, image2FromResult.ImageDetails.VersionDescription);
-                    Assert.AreEqual(1, image2FromResult.ImageDetails.CardCount);
-                    Assert.AreEqual(ImageHelper.contentType, image2FromResult.ImageDetails.OriginalImageContentType);
-                    Assert.AreEqual(ImageHelper.originalBlobSize, image2FromResult.ImageDetails.OriginalImageSize);
-                    Assert.AreEqual(ImageHelper.smallBlobSize, image2FromResult.ImageDetails.SmallSize);
-                    Assert.AreEqual(ImageHelper.mediumBlobSize, image2FromResult.ImageDetails.MediumSize);
-                    Assert.AreEqual(ImageHelper.bigBlobSize, image2FromResult.ImageDetails.BigSize);
-                }
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card1FromResult.MoveToHeapExpiryInfos.Length);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
@@ -447,7 +402,6 @@ public class GetUnknownCardsToLearnTests
                 Assert.IsFalse(card2FromResult.IsInFrench);
                 Assert.IsFalse(card2FromResult.Tags.Any());
                 Assert.IsFalse(card2FromResult.VisibleTo.Any());
-                Assert.IsFalse(card2FromResult.Images.Any());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card2FromResult.MoveToHeapExpiryInfos.Length);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {

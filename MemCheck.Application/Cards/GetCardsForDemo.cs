@@ -22,13 +22,12 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
     private readonly DateTime? now;
     #endregion
     #region Private method
-    private async Task<ImmutableArray<ResultCard>> GetCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount)
+    private async Task<ImmutableArray<ResultCard>> GetCardsAsync(Guid tagId, IEnumerable<Guid> excludedCardIds, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> tagNames, int cardCount)
     {
         var cards = await DbContext.TagsInCards
             .AsNoTracking()
             .Include(tagInCard => tagInCard.Card)
             .Include(tagInCard => tagInCard.Card.VersionCreator)
-            .Include(tagInCard => tagInCard.Card.Images)
             .Include(tagInCard => tagInCard.Card.CardLanguage)
             .Include(tagInCard => tagInCard.Card.TagsInCards)
             .Where(tagInCard => tagInCard.TagId == tagId && !excludedCardIds.Contains(tagInCard.CardId))
@@ -44,7 +43,6 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
                 tagInCard.Card.VersionUtcDate,
                 userNames[tagInCard.Card.VersionCreator.Id],
                 tagInCard.Card.TagsInCards.Select(tag => tagNames[tag.TagId]),
-                tagInCard.Card.Images.Select(img => new ResultImageModel(img.ImageId, img.CardSide, imageDetails[img.ImageId])),
                 tagInCard.Card.AverageRating,
                 tagInCard.Card.RatingCount,
                 tagInCard.Card.CardLanguage.Name == "Français" // Questionable hardcoding
@@ -70,7 +68,7 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
         var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
         var tagNames = TagLoadingHelper.Run(DbContext);
 
-        var result = await GetCardsAsync(request.TagId, request.ExcludedCardIds, userNames, imageNames, tagNames, request.CardsToDownload);
+        var result = await GetCardsAsync(request.TagId, request.ExcludedCardIds, userNames, tagNames, request.CardsToDownload);
 
         var auditEntry = new DemoDownloadAuditTrailEntry()
         {
@@ -114,8 +112,7 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
     public sealed record Result(IEnumerable<ResultCard> Cards);
     public sealed class ResultCard
     {
-        public ResultCard(Guid cardId, string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string versionCreator, IEnumerable<string> tags,
-            IEnumerable<ResultImageModel> images, double averageRating, int countOfUserRatings, bool isInFrench)
+        public ResultCard(Guid cardId, string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string versionCreator, IEnumerable<string> tags, double averageRating, int countOfUserRatings, bool isInFrench)
         {
             CardId = cardId;
             LastChangeUtcTime = lastChangeUtcTime;
@@ -125,7 +122,6 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
             AdditionalInfo = additionalInfo;
             References = references;
             Tags = tags;
-            Images = images;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
             IsInFrench = isInFrench;
@@ -141,8 +137,6 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
         public int CountOfUserRatings { get; }
         public bool IsInFrench { get; }
         public IEnumerable<string> Tags { get; }
-        public IEnumerable<ResultImageModel> Images { get; }
     }
-    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
     #endregion
 }

@@ -29,7 +29,7 @@
     </div>
     <div id="After mount and not loading" v-if="mountFinished && !loading">
         <div id="FullImage" v-if="currentFullScreenImage">
-            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:remove="deleteImage(currentFullScreenImage.imageId)" v-on:versionhistory="imageHistory(currentFullScreenImage.imageId)" v-on:edit="edit(currentFullScreenImage.imageId)" v-on:close="closeFullScreenImage()" />
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" @*v-on:remove="deleteImage(currentFullScreenImage.imageId)"*@ v-on:versionhistory="imageHistory(currentFullScreenImage.imageId)" v-on:edit="edit(currentFullScreenImage.imageId)" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="NormalMode" v-else>
             <div id="Title" class="container">
@@ -48,27 +48,13 @@
                     {{totalCount}}&nbsp;<label>@Localizer["Images"]</label>
                 </span>
             </div>
-            <div id="ListAsTable" class="container" v-if="TableFormat">
-                <table class="table table-responsive" width="100%">
-                    <tr>
-                        <th>@Localizer["Name"]</th>
-                        <th>@Localizer["CardCount"]</th>
-                        <th>@Localizer["Thumbnail"]</th>
-                    </tr>
-                    <tr v-for="image in images">
-                        <td>{{image.imageName}} <button class="toolbar-button-circle toolbar-button" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button></td>
-                        <td><button class="toolbar-button" @@click="showCardsWithImage(image.imageId)">{{image.cardCount}}</button></td>
-                        <td><a href="#" @@click="showImageFull(image)"><img class="thumbnail-image" :src="image.thumbnail" /></a></td>
-                    </tr>
-                </table>
-            </div>
-            <div id="ListAsCards" class="image-list-card-columns" v-if="!TableFormat">
+            <div id="ListAsCards" class="image-list-card-columns">
                 <div id="ListAsCardsEntry" class="card image-list-card" v-for="image in images">
                     <div id="CardHeader" class="card-header image-list-card-header">
                         {{image.imageName}}
                         <button class="toolbar-button-circle toolbar-button" @@click="copyToClipboard(image.imageName)"><i class="far fa-copy"></i></button>
                         <button class="toolbar-button-circle toolbar-button" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button>
-                        <button class="toolbar-button-circle toolbar-button" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
+                        @*<button class="toolbar-button-circle toolbar-button" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>*@
                     </div>
                     <div id="CardBody" class="card-body image-list-card-body">
                         <a href="#" @@click="showImageFull(image)"><img class="thumbnail-image" :src="image.thumbnail" /></a>

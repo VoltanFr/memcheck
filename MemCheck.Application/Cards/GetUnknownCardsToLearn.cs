@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
@@ -25,7 +24,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
     private readonly DateTime runDate;
     #endregion
     #region Private methods
-    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
+    private async Task<IEnumerable<ResultCard>> GetUnknownCardsAsync(Guid userId, Guid deckId, IEnumerable<Guid> excludedCardIds, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> tagNames, int cardCount, bool neverLearnt)
     {
         var cardsOfDeck = DbContext.CardsInDecks.AsNoTracking()
             .Include(card => card.Card).AsSingleQuery()
@@ -52,7 +51,6 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             VersionCreator = cardInDeck.Card.VersionCreator.Id,
             tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
             userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-            imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
             cardInDeck.Card.AverageRating,
             cardInDeck.Card.RatingCount,
             LanguageName = cardInDeck.Card.CardLanguage.Name
@@ -78,7 +76,6 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             userNames[cardInDeck.VersionCreator],
             cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
             cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            cardInDeck.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageIdAndCardSide.CardSide, imageDetails[imageIdAndCardSide.ImageId])),
             userRatings.ContainsKey(cardInDeck.CardId) ? userRatings[cardInDeck.CardId] : 0,
             cardInDeck.AverageRating,
             cardInDeck.RatingCount,
@@ -103,12 +100,11 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
     {
         var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
         var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-        var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
         var tagNames = TagLoadingHelper.Run(DbContext);
 
         var result = new List<ResultCard>();
-        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload, true));
-        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, imageNames, tagNames, request.CardsToDownload - result.Count, false));
+        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, tagNames, request.CardsToDownload, true));
+        result.AddRange(await GetUnknownCardsAsync(request.CurrentUserId, request.DeckId, request.ExcludedCardIds, heapingAlgorithm, userNames, tagNames, request.CardsToDownload - result.Count, false));
 
         return new ResultWithMetrologyProperties<Result>(new Result(result),
             ("DeckId", request.DeckId.ToString()),
@@ -148,7 +144,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
     {
         public ResultCard(Guid cardId, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-            IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings,
+            int userRating, double averageRating, int countOfUserRatings,
             bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
@@ -165,7 +161,6 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             References = references;
             Tags = tags;
             VisibleTo = visibleTo;
-            Images = images;
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
@@ -191,10 +186,8 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
         public bool IsInFrench { get; }
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
-        public IEnumerable<ResultImageModel> Images { get; }
         public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
     }
-    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
     public sealed record MoveToHeapExpiryInfo(int HeapId, DateTime UtcExpiryDate);
     #endregion
 }

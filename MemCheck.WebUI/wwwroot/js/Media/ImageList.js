@@ -23,7 +23,6 @@ const imageListApp = Vue.createApp({
             mountFinished: false,
             loading: false,
             currentFullScreenImage: null,   // Medium sized
-            TableFormat: false,
         };
     },
     async mounted() {

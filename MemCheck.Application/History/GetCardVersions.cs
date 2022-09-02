@@ -19,14 +19,11 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
     public const string References = nameof(References);
     private const string Tags = nameof(Tags);
     public const string UsersWithView = nameof(UsersWithView);
-    private const string FrontSideImages = nameof(FrontSideImages);
-    private const string BackSideImages = nameof(BackSideImages);
-    private const string AdditionalInfoImages = nameof(AdditionalInfoImages);
     #endregion
     #region Private classes
     private sealed class CardVersionFromDb
     {
-        public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, string references, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds, IEnumerable<Guid> frontSideImages, IEnumerable<Guid> backSideImages, IEnumerable<Guid> additionalInfoImages)
+        public CardVersionFromDb(Guid id, bool isCurrent, Guid? previousVersion, DateTime versionUtcDate, MemCheckUser versionCreator, string versionDescription, Guid languageId, string frontSide, string backSide, string additionalInfo, string references, IEnumerable<Guid> tagIds, IEnumerable<Guid> userWithViewIds)
         {
             Id = id;
             IsCurrent = isCurrent;
@@ -41,9 +38,6 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
             References = references;
             TagIds = tagIds;
             UserWithViewIds = userWithViewIds;
-            FrontSideImages = frontSideImages;
-            BackSideImages = backSideImages;
-            AdditionalInfoImages = additionalInfoImages;
         }
         public Guid Id { get; }
         public bool IsCurrent { get; }  //True means that this is the card. False means this is a previous version of the card
@@ -58,9 +52,6 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
         public string References { get; }
         public IEnumerable<Guid> TagIds { get; }
         public IEnumerable<Guid> UserWithViewIds { get; }
-        public IEnumerable<Guid> FrontSideImages { get; }
-        public IEnumerable<Guid> BackSideImages { get; }
-        public IEnumerable<Guid> AdditionalInfoImages { get; }
     }
     private sealed class ResultCardVersion : IResultCardVersion
     {
@@ -79,8 +70,6 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
                 if (!string.IsNullOrEmpty(dbVersion.AdditionalInfo)) changedFieldNames.Add(AdditionalInfo);
                 if (!string.IsNullOrEmpty(dbVersion.References)) changedFieldNames.Add(References);
                 if (dbVersion.TagIds.Any()) changedFieldNames.Add(Tags);
-                if (dbVersion.BackSideImages.Any()) changedFieldNames.Add(BackSideImages);
-                if (dbVersion.AdditionalInfoImages.Any()) changedFieldNames.Add(AdditionalInfoImages);
             }
             else
             {
@@ -91,9 +80,6 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
                 if (dbVersion.References != preceedingVersion.References) changedFieldNames.Add(References);
                 if (!Enumerable.SequenceEqual(dbVersion.TagIds, preceedingVersion.TagIds)) changedFieldNames.Add(Tags);
                 if (!Enumerable.SequenceEqual(dbVersion.UserWithViewIds, preceedingVersion.UserWithViewIds)) changedFieldNames.Add(UsersWithView);
-                if (!Enumerable.SequenceEqual(dbVersion.FrontSideImages, preceedingVersion.FrontSideImages)) changedFieldNames.Add(FrontSideImages);
-                if (!Enumerable.SequenceEqual(dbVersion.BackSideImages, preceedingVersion.BackSideImages)) changedFieldNames.Add(BackSideImages);
-                if (!Enumerable.SequenceEqual(dbVersion.AdditionalInfoImages, preceedingVersion.AdditionalInfoImages)) changedFieldNames.Add(AdditionalInfoImages);
             }
             ChangedFieldNames = changedFieldNames;
         }
@@ -124,10 +110,7 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
                 card.AdditionalInfo,
                 card.References,
                 card.TagsInCards.Select(tag => tag.TagId),
-                card.UsersWithView.Select(user => user.UserId),
-                card.Images.Where(img => img.CardSide == ImageInCard.FrontSide).Select(img => img.ImageId),
-                card.Images.Where(img => img.CardSide == ImageInCard.BackSide).Select(img => img.ImageId),
-                card.Images.Where(img => img.CardSide == ImageInCard.AdditionalInfo).Select(img => img.ImageId)
+                card.UsersWithView.Select(user => user.UserId)
                 )
             ).SingleAsync();
 
@@ -146,10 +129,7 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
                 card.AdditionalInfo,
                 card.References,
                 card.Tags.Select(tag => tag.TagId),
-                card.UsersWithView.Select(u => u.AllowedUserId),
-                card.Images.Where(img => img.CardSide == 1).Select(img => img.ImageId),
-                card.Images.Where(img => img.CardSide == 2).Select(img => img.ImageId),
-                card.Images.Where(img => img.CardSide == 3).Select(img => img.ImageId)
+                card.UsersWithView.Select(u => u.AllowedUserId)
                 )
             );
 

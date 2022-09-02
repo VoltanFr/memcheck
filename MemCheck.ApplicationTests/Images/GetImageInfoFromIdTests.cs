@@ -43,7 +43,7 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
     }
     [TestMethod()]
-    public async Task UsedInCards()
+    public async Task UsedInCards_InfoNotRefreshed()
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
@@ -53,10 +53,6 @@ public class GetImageInfoFromIdTests
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
         var image = await ImageHelper.CreateAsync(db, user, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
-        var otherImage = await ImageHelper.CreateAsync(db, user);
-        await CardHelper.CreateAsync(db, user, frontSideImages: new[] { image, otherImage });
-        await CardHelper.CreateAsync(db, user, frontSideImages: new[] { image });
-        await CardHelper.CreateAsync(db, user, frontSideImages: new[] { otherImage });
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
@@ -64,7 +60,7 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(name, loaded.Name);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
-        Assert.AreEqual(2, loaded.CardCount);
+        Assert.AreEqual(0, loaded.CardCount);
         Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
         Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);

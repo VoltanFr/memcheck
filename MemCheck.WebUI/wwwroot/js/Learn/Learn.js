@@ -6,7 +6,6 @@ import { dateTime } from '../Common.js';
 import { dateTimeWithTime } from '../Common.js';
 import { emptyGuid } from '../Common.js';
 import { imageSizeMedium } from '../Common.js';
-import { imageSideAdditional } from '../Common.js';
 import { toast } from '../Common.js';
 import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
@@ -366,7 +365,7 @@ const learnApp = Vue.createApp({
             return this.userDecks.length > 0 && this.userDecks[0].showDebugInfo;
         },
         currentCardHasAdditionalSide() {
-            return this.currentCard.additionalInfo || this.currentCard.images.some(img => img.cardSide === imageSideAdditional);
+            return this.currentCard.additionalInfo;
         },
         currentCardHasReferences() {
             return this.currentCard.references;

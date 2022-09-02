@@ -4,10 +4,6 @@ export const imageSizeSmall = 1;
 export const imageSizeMedium = 2;
 export const imageSizeBig = 3;
 
-export const imageSideFront = 1;
-export const imageSideBack = 2;
-export const imageSideAdditional = 3;
-
 const toastShortDuration = 4000;
 const toastLongDuration = 10000;
 

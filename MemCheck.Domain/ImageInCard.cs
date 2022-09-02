@@ -5,10 +5,6 @@ namespace MemCheck.Domain;
 
 public sealed class ImageInCard
 {
-    public const int FrontSide = 1;
-    public const int BackSide = 2;
-    public const int AdditionalInfo = 3;
-
     [Key] public Guid ImageId { get; set; }
     public Image Image { get; set; } = null!;
 

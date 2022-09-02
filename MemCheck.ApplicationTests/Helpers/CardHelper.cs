@@ -13,9 +13,7 @@ public static class CardHelper
 {
     public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB,
         Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
-        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null,
-        IEnumerable<Guid>? frontSideImages = null, IEnumerable<Guid>? additionalSideImages = null,
-        string? versionDescription = null)
+        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
     {
         //userWithViewIds null means public card
 
@@ -68,34 +66,15 @@ public static class CardHelper
                 tags.Add(tagInCard);
             }
         result.TagsInCards = tags;
-
-        var images = new List<ImageInCard>();
-        if (frontSideImages != null)
-            foreach (var frontSideImage in frontSideImages)
-            {
-                var img = new ImageInCard() { ImageId = frontSideImage, CardId = result.Id, CardSide = ImageInCard.FrontSide };
-                dbContext.ImagesInCards.Add(img);
-                images.Add(img);
-            }
-        if (additionalSideImages != null)
-            foreach (var additionalSideImage in additionalSideImages)
-            {
-                var img = new ImageInCard() { ImageId = additionalSideImage, CardId = result.Id, CardSide = ImageInCard.AdditionalInfo };
-                dbContext.ImagesInCards.Add(img);
-                images.Add(img);
-            }
-        result.Images = images;
-
+        result.Images = new List<ImageInCard>();
         await dbContext.SaveChangesAsync();
         return result;
     }
     public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
         Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
-        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null,
-        IEnumerable<Guid>? frontSideImages = null, IEnumerable<Guid>? additionalSideImages = null,
-        string? versionDescription = null)
+        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
     {
-        return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, references, frontSideImages, additionalSideImages, versionDescription)).Id;
+        return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, references, versionDescription)).Id;
     }
     public static async Task AssertCardHasFrontSide(DbContextOptions<MemCheckDbContext> testDB, Guid cardId, string expected)
     {

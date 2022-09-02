@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,9 +31,6 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
 
         var userWithViewNames = version.UsersWithView.Select(userWithView => DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
         var tagNames = version.Tags.Select(t => t.Tag.Name);
-        var frontSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.FrontSide).Select(i => i.Image.Name);
-        var backSideImageNames = version.Images.Where(i => i.CardSide == ImageInCard.BackSide).Select(i => i.Image.Name);
-        var additionalInfoImageNames = version.Images.Where(i => i.CardSide == ImageInCard.AdditionalInfo).Select(i => i.Image.Name);
 
         var result = new Result(
             version.FrontSide,
@@ -46,9 +42,6 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
             tagNames,
             userWithViewNames,
             version.VersionUtcDate,
-            frontSideImageNames,
-            backSideImageNames,
-            additionalInfoImageNames,
             version.VersionDescription,
             version.VersionCreator.UserName
             );
@@ -68,8 +61,7 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
                 throw new InvalidOperationException("Original not visible to user");
         }
     }
-    public sealed record Result(string FrontSide, string BackSide, string AdditionalInfo, string References, Guid LanguageId, string LanguageName, IEnumerable<string> Tags, IEnumerable<string> UsersWithVisibility, DateTime VersionUtcDate,
-            IEnumerable<string> FrontSideImageNames, IEnumerable<string> BackSideImageNames, IEnumerable<string> AdditionalInfoImageNames, string VersionDescription, string CreatorName);
+    public sealed record Result(string FrontSide, string BackSide, string AdditionalInfo, string References, Guid LanguageId, string LanguageName, IEnumerable<string> Tags, IEnumerable<string> UsersWithVisibility, DateTime VersionUtcDate, string VersionDescription, string CreatorName);
     #endregion
 }
 

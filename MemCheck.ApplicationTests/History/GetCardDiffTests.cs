@@ -135,9 +135,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -176,9 +173,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -216,9 +210,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -257,9 +248,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -297,9 +285,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.Language);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -339,9 +324,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -382,9 +364,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.Language);
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -420,9 +399,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.Language);
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.Tags);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
     [TestMethod()]
@@ -443,7 +419,7 @@ public class GetCardDiffTests
         var originalTagId1 = await TagHelper.CreateAsync(db, originalTagName1);
         var originalTagName2 = RandomHelper.String();
         var originalTagId2 = await TagHelper.CreateAsync(db, originalTagName2);
-        var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSide: originalFrontSide, backSide: originalBackSide, references: originalReferences, tagIds: new[] { originalTagId1, originalTagId2 }, additionalSideImages: originalVersionImage.AsArray(), versionDescription: originalVersionDescription);
+        var card = await CardHelper.CreateAsync(db, userId, originalVersionDate, language: language, frontSide: originalFrontSide, backSide: originalBackSide, references: originalReferences, tagIds: new[] { originalTagId1, originalTagId2 }, versionDescription: originalVersionDescription);
 
         var newVersionDescription = RandomHelper.String();
         var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -483,8 +459,6 @@ public class GetCardDiffTests
         Assert.IsNull(result.Language);
         Assert.IsNull(result.AdditionalInfo);
         Assert.IsNull(result.UsersWithView);
-        Assert.IsNull(result.ImagesOnFrontSide);
-        Assert.IsNull(result.ImagesOnBackSide);
     }
     [TestMethod()]
     public async Task MultipleVersions()
@@ -533,9 +507,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -553,9 +524,6 @@ public class GetCardDiffTests
             Assert.IsNull(result.Tags);
             Assert.IsNull(result.AdditionalInfo);
             Assert.IsNull(result.UsersWithView);
-            Assert.IsNull(result.ImagesOnFrontSide);
-            Assert.IsNull(result.ImagesOnBackSide);
-            Assert.IsNull(result.ImagesOnAdditionalSide);
         }
     }
 }
