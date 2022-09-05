@@ -37,17 +37,6 @@ internal sealed class PreviousVersionCreator
         }
         cardPreviousVersion.UsersWithView = usersInCards;
     }
-    private async Task CreatePreviousVersionImagesWithViewAsync(CardPreviousVersion cardPreviousVersion, IEnumerable<ImageInCard> originalCardImages)
-    {
-        var imagesInCards = new List<ImageInCardPreviousVersion>();
-        foreach (var imageToAdd in originalCardImages)
-        {
-            var imageInCard = new ImageInCardPreviousVersion() { ImageId = imageToAdd.ImageId, CardPreviousVersionId = cardPreviousVersion.Id, CardSide = imageToAdd.CardSide };
-            await dbContext.ImagesInCardPreviousVersions.AddAsync(imageInCard);
-            imagesInCards.Add(imageInCard);
-        }
-        cardPreviousVersion.Images = imagesInCards;
-    }
     private static CardPreviousVersionType CardPreviousVersionTypeFromCard(Card c)
     {
         return c.VersionType switch
@@ -76,7 +65,6 @@ internal sealed class PreviousVersionCreator
         await dbContext.CardPreviousVersions.AddAsync(previousVersion);
         await CreatePreviousVersionTagsAsync(previousVersion, card.TagsInCards);
         await CreatePreviousVersionUsersWithViewAsync(previousVersion, card.UsersWithView);
-        await CreatePreviousVersionImagesWithViewAsync(previousVersion, card.Images);
 
         return previousVersion;
     }

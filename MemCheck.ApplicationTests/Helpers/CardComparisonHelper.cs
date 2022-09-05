@@ -10,7 +10,6 @@ namespace MemCheck.Application.Helpers;
 public static class CardComparisonHelper
 {
     #region private record ImageWithSide
-    private record ImageWithSide(Guid ImageId, int CardSide);
     private record UserWithRating(Guid UserId, int Rating);
     #endregion
     public static void AssertSameContent(Card card, CardPreviousVersion firstVersion, bool includeCreator)
@@ -24,7 +23,6 @@ public static class CardComparisonHelper
         Assert.AreEqual(card.References, firstVersion.References);
         AssertSameTagSet(card.TagsInCards, firstVersion.Tags);
         AssertSameUserWithViewSet(card.UsersWithView, firstVersion.UsersWithView);
-        AssertSameImageSet(card.Images, firstVersion.Images);
     }
     public static void AssertSameContent(Card expectedCard, Card actualCard, bool versionCreator = true, bool frontSide = true, bool backSide = true, bool additionalInfo = true, bool references = true, bool versionDate = true, bool versionDescription = true, bool versionType = true, bool previousVersion = true)
     {
@@ -45,7 +43,6 @@ public static class CardComparisonHelper
         if (versionDate)
             Assert.AreEqual(expectedCard.VersionUtcDate, actualCard.VersionUtcDate);
         AssertSameUserWithViewSet(expectedCard.UsersWithView, actualCard.UsersWithView);
-        AssertSameImageSet(expectedCard.Images, actualCard.Images);
         if (versionDescription)
             Assert.AreEqual(expectedCard.VersionDescription, actualCard.VersionDescription);
         if (versionType)
@@ -89,18 +86,6 @@ public static class CardComparisonHelper
     public static void AssertSameUserWithViewSet(IEnumerable<UserWithViewOnCard> card1AllowedUsers, IEnumerable<UserWithViewOnCard> card2AllowedUsers)
     {
         Assert.IsTrue(ComparisonHelper.SameSetOfGuid(card1AllowedUsers.Select(u => u.UserId), card2AllowedUsers.Select(u => u.UserId)));
-    }
-    public static void AssertSameImageSet(IEnumerable<ImageInCard> cardImages, IEnumerable<ImageInCardPreviousVersion> cardPreviousVersionImages)
-    {
-        var cardImageSet = cardImages.Select(i => new ImageWithSide(i.ImageId, i.CardSide)).ToHashSet();
-        var cardPreviousVersionImageSet = cardPreviousVersionImages.Select(i => new ImageWithSide(i.ImageId, i.CardSide)).ToHashSet();
-        Assert.IsTrue(cardImageSet.SetEquals(cardPreviousVersionImageSet));
-    }
-    public static void AssertSameImageSet(IEnumerable<ImageInCard> card1Images, IEnumerable<ImageInCard> card2Images)
-    {
-        var card1ImageSet = card1Images.Select(i => new ImageWithSide(i.ImageId, i.CardSide)).ToHashSet();
-        var card2ImageSet = card2Images.Select(i => new ImageWithSide(i.ImageId, i.CardSide)).ToHashSet();
-        Assert.IsTrue(card1ImageSet.SetEquals(card2ImageSet));
     }
     public static void AssertSameRatingSet(IEnumerable<UserCardRating> card1Ratings, IEnumerable<UserCardRating> card2Ratings)
     {
