@@ -120,7 +120,6 @@ public class DeleteCardsTests
             .Include(version => version.CardLanguage)
             .Include(version => version.Tags)
             .Include(version => version.UsersWithView)
-            .Include(version => version.Images)
             .Single(version => version.Card == card.Id && version.PreviousVersion == null);
         Assert.AreEqual(CardPreviousVersionType.Creation, firstVersion.VersionType);
         CardComparisonHelper.AssertSameContent(card, firstVersion, true);
@@ -131,7 +130,6 @@ public class DeleteCardsTests
             .Include(version => version.CardLanguage)
             .Include(version => version.Tags)
             .Include(version => version.UsersWithView)
-            .Include(version => version.Images)
             .Single(version => version.Card == card.Id && version.PreviousVersion != null);
         Assert.AreEqual(CardPreviousVersionType.Deletion, deletionVersion.VersionType);
         Assert.AreEqual(firstVersion.Id, deletionVersion.PreviousVersion!.Id);

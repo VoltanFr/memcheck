@@ -66,7 +66,6 @@ public static class CardHelper
                 tags.Add(tagInCard);
             }
         result.TagsInCards = tags;
-        result.Images = new List<ImageInCard>();
         await dbContext.SaveChangesAsync();
         return result;
     }
@@ -93,7 +92,6 @@ public static class CardHelper
             .ThenInclude(cardInDeck => cardInDeck.Deck)
             .Include(card => card.TagsInCards)
             .Include(card => card.UsersWithView)
-            .Include(card => card.Images)
             .Include(card => card.UserCardRating)
             .Include(card => card.PreviousVersion)
             .SingleAsync(card => card.Id == cardId);

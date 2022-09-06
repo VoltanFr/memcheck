@@ -242,7 +242,7 @@ public class StoreImageTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var image = await dbContext.Images.Include(img => img.Owner).Include(img => img.Cards).SingleAsync();
+            var image = await dbContext.Images.Include(img => img.Owner).SingleAsync();
             Assert.AreEqual(user, image.Owner.Id);
             Assert.AreEqual(name, image.Name);
             Assert.AreEqual(description, image.Description);
@@ -261,7 +261,6 @@ public class StoreImageTests
             Assert.AreEqual(image.MediumBlobSize, image.MediumBlob.Length);
             Assert.IsTrue(image.BigBlobSize > 0);
             Assert.AreEqual(image.BigBlobSize, image.BigBlob.Length);
-            Assert.IsFalse(image.Cards.Any());
             Assert.IsNull(image.PreviousVersion);
         }
     }
@@ -285,7 +284,7 @@ public class StoreImageTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var image = await dbContext.Images.Include(img => img.Owner).Include(img => img.Cards).SingleAsync();
+            var image = await dbContext.Images.Include(img => img.Owner).SingleAsync();
             Assert.AreEqual(user, image.Owner.Id);
             Assert.AreEqual(name, image.Name);
             Assert.AreEqual(description, image.Description);
@@ -304,7 +303,6 @@ public class StoreImageTests
             Assert.AreEqual(image.MediumBlobSize, image.MediumBlob.Length);
             Assert.IsTrue(image.BigBlobSize > 0);
             Assert.AreEqual(image.BigBlobSize, image.BigBlob.Length);
-            Assert.IsFalse(image.Cards.Any());
             Assert.IsNull(image.PreviousVersion);
         }
     }

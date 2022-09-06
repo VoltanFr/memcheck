@@ -62,7 +62,6 @@ public class GetImageListTests
         var loaded = result.Images.Single();
         Assert.AreEqual(image, loaded.ImageId);
         Assert.AreEqual(imageName, loaded.ImageName);
-        Assert.AreEqual(0, loaded.CardCount);
         Assert.AreEqual("InvalidForUnitTests", loaded.OriginalImageContentType);
         Assert.AreEqual(userName, loaded.Uploader);
         Assert.AreEqual(description, loaded.Description);

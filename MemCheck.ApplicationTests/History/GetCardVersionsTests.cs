@@ -138,7 +138,6 @@ public class GetCardVersionsTests
             var cardFromDb = await dbContext.Cards
                 .Include(c => c.VersionCreator)
                 .Include(c => c.VersionCreator)
-                .Include(c => c.Images)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.TagsInCards)
                 .Include(c => c.UsersWithView)

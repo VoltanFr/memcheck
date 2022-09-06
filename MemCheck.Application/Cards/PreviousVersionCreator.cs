@@ -76,7 +76,6 @@ internal sealed class PreviousVersionCreator
     public async Task<Card> RunAsync(Guid cardId, Guid newVersionCreatorId, string newVersionDescription, DateTime? cardNewVersionUtcDate = null)
     {
         var card = await dbContext.Cards
-            .Include(card => card.Images)
             .Include(card => card.UsersWithView)
             .ThenInclude(userWithView => userWithView.User)
             .Include(card => card.PreviousVersion)

@@ -16,8 +16,6 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
     {
         var version = await DbContext.CardPreviousVersions
             .Include(card => card.VersionCreator)
-            .Include(card => card.Images)
-            .ThenInclude(img => img.Image)
             .Include(card => card.CardLanguage)
             .Include(card => card.Tags)
             .ThenInclude(tagInCard => tagInCard.Tag)

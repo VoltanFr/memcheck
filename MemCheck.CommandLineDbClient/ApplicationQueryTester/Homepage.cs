@@ -132,18 +132,13 @@ internal sealed class Homepage : ICmdLinePlugin
                     .Include(cardInDeck => cardInDeck.Card.TagsInCards)
                     .ThenInclude(tagInCard => tagInCard.Tag)
                     .Include(cardInDeck => cardInDeck.Card.UsersWithView)
-                    .ThenInclude(userWithViewOnCard => userWithViewOnCard.User)
-                    .Include(cardInDeck => cardInDeck.Card.Images);
-                //.ThenInclude(imageInCard => imageInCard.Image.Id);
-                //.ThenInclude(image => image.Owner);
+                    .ThenInclude(userWithViewOnCard => userWithViewOnCard.User);
 
                 var withDetailsListed = await withDetails.ToListAsync();
                 var resultCardIds = withDetailsListed.Select(cardInDeck => cardInDeck.CardId).ToHashSet();
                 //var (averageRatings, userRatings, countOfUserRatings) = await GetRatingsAsync(userId, resultCardIds);
 
                 var emptyStringArray = Array.Empty<string>();
-                var emptyResultImageModelArray = Array.Empty<ResultImageModel>();
-
 
                 var thisHeapResult = withDetailsListed.Select(oldestCard => new ResultCard(oldestCard.CardId, oldestCard.CurrentHeap, oldestCard.LastLearnUtcTime, oldestCard.AddToDeckUtcTime,
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
@@ -152,8 +147,7 @@ internal sealed class Homepage : ICmdLinePlugin
                     oldestCard.Card.VersionCreator.UserName,
             oldestCard.Card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
                  oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.UserName),
-               //emptyResultImageModelArray,
-               oldestCard.Card.Images.Select(img => new ResultImageModel(img.ImageId, img.CardSide, dbContext)),
+                    //emptyResultImageModelArray,
                     heapingAlgorithm,
           0,//          userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
               0,//      averageRatings.ContainsKey(oldestCard.CardId) ? averageRatings[oldestCard.CardId] : 0,
@@ -191,7 +185,7 @@ internal sealed class Homepage : ICmdLinePlugin
     {
         public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-            IEnumerable<ResultImageModel> images, HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings)
+            HeapingAlgorithm heapingAlgorithm, int userRating, double averageRating, int countOfUserRatings)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
             CardId = cardId;
@@ -207,7 +201,6 @@ internal sealed class Homepage : ICmdLinePlugin
             AdditionalInfo = additionalInfo;
             Tags = tags;
             VisibleTo = visibleTo;
-            Images = images;
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
@@ -232,27 +225,7 @@ internal sealed class Homepage : ICmdLinePlugin
         public int CountOfUserRatings { get; }
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
-        public IEnumerable<ResultImageModel> Images { get; }
         public IEnumerable<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
-    }
-    public sealed class ResultImageModel
-    {
-        public ResultImageModel(Guid imageId, int cardSide, MemCheckDbContext dbContext)
-        {
-            ImageId = imageId;
-            var img = dbContext.Images.Where(i => i.Id == imageId).Select(i => new { i.Name, i.Owner, i.Description, i.Source }).Single();
-            Owner = img.Owner;
-            Name = img.Name;
-            Description = img.Description;
-            Source = img.Source;
-            CardSide = cardSide;
-        }
-        public Guid ImageId { get; }
-        public MemCheckUser Owner { get; }
-        public string Name { get; }
-        public string Description { get; }
-        public string Source { get; }
-        public int CardSide { get; set; }   //1 = front side ; 2 = back side ; 3 = AdditionalInfo
     }
     public sealed class MoveToHeapExpiryInfo
     {

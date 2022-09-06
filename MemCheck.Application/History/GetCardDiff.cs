@@ -19,15 +19,11 @@ public sealed class GetCardDiff : RequestRunner<GetCardDiff.Request, GetCardDiff
             .Include(c => c.CardLanguage)
             .Include(c => c.TagsInCards)
             .ThenInclude(t => t.Tag)
-            .Include(c => c.Images)
-            .ThenInclude(i => i.Image)
             .SingleAsync(c => c.Id == request.CurrentCardId);
         var original = await DbContext.CardPreviousVersions
             .Include(c => c.CardLanguage)
             .Include(c => c.Tags)
             .ThenInclude(t => t.Tag)
-            .Include(c => c.Images)
-            .ThenInclude(i => i.Image)
             .SingleAsync(c => c.Id == request.OriginalVersionId);
 
         var result = new Result(current.VersionCreator.UserName, original.VersionCreator.UserName, current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);

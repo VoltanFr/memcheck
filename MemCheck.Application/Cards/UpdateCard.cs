@@ -48,11 +48,6 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         }
         card.TagsInCards = tagsInCards;
     }
-    private static async Task UpdateImagesAsync(Card card)
-    {
-        card.Images = new List<ImageInCard>();
-        await Task.CompletedTask;
-    }
     #endregion
     public UpdateCard(CallContext callContext, DateTime? cardNewVersionUtcDate = null) : base(callContext)
     {
@@ -70,7 +65,6 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         card.References = request.References;
         await UpdateTagsAsync(request, card);
         await UpdateUsersWithViewAsync(request, card);
-        await UpdateImagesAsync(card);
 
         await DbContext.SaveChangesAsync();
 
@@ -90,8 +84,7 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
                 card.AdditionalInfo,
                 card.References,
                 TagIds = card.TagsInCards.Select(tag => tag.TagId),
-                UserWithVisibilityIds = card.UsersWithView.Select(u => u.UserId),
-                card.Images
+                UserWithVisibilityIds = card.UsersWithView.Select(u => u.UserId)
             };
 
             if ((dataBeforeUpdate.CardLanguageId == LanguageId)
@@ -168,7 +161,6 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
             var card = await callContext.DbContext.Cards
                 .Include(card => card.VersionCreator)
                 .Include(card => card.CardLanguage)
-                .Include(card => card.Images)
                 .Include(card => card.TagsInCards)
                 .ThenInclude(tag => tag.Tag)
                 .Include(card => card.UsersWithView)

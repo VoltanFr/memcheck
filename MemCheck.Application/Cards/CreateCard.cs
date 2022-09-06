@@ -52,8 +52,6 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
         }
         card.TagsInCards = tagsInCards;
 
-        card.Images = new List<ImageInCard>();
-
         if (versionCreator.SubscribeToCardOnEdit)
             AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
 

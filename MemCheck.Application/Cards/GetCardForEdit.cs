@@ -17,8 +17,6 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         var card = await DbContext.Cards
             .AsNoTracking()
             .Include(card => card.VersionCreator)
-            .Include(card => card.Images)
-            .ThenInclude(img => img.Image)
             .Include(card => card.CardLanguage)
             .Include(card => card.TagsInCards)
             .ThenInclude(tagInCard => tagInCard.Tag)

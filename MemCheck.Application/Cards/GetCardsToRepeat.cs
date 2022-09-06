@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.Heaping;
-using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Tags;
 using MemCheck.Basics;
@@ -19,19 +18,19 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
     private readonly DateTime? now;
     #endregion
     #region Private methods
-    private async Task<List<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, DateTime now)
+    private async Task<List<ResultCard>> RunAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> tagNames, DateTime now)
     {
         var result = new List<ResultCard>();
 
         for (var heap = CardInDeck.MaxHeapValue; heap > 0 && result.Count < request.CardsToDownload; heap--)
         {
-            var heapResults = await RunForHeapAsync(request, heapingAlgorithm, userNames, imageDetails, tagNames, now, heap, request.CardsToDownload - result.Count);
+            var heapResults = await RunForHeapAsync(request, heapingAlgorithm, userNames, tagNames, now, heap, request.CardsToDownload - result.Count);
             result.AddRange(heapResults);
         }
 
         return result;
     }
-    private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, ImageDetails> imageDetails, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
+    private async Task<IEnumerable<ResultCard>> RunForHeapAsync(Request request, HeapingAlgorithm heapingAlgorithm, ImmutableDictionary<Guid, string> userNames, ImmutableDictionary<Guid, string> tagNames, DateTime now, int heap, int maxCount)
     {
         var cardsOfHeap = DbContext.CardsInDecks.AsNoTracking()
             .Include(cardInDeck => cardInDeck.Card)
@@ -57,7 +56,6 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
                 VersionCreator = cardInDeck.Card.VersionCreator.Id,
                 tagIds = cardInDeck.Card.TagsInCards.Select(tag => tag.TagId),
                 userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
-                imageIdAndCardSides = cardInDeck.Card.Images.Select(img => new { img.ImageId, img.CardSide }),
                 cardInDeck.Card.AverageRating,
                 cardInDeck.Card.RatingCount,
                 LanguageName = cardInDeck.Card.CardLanguage.Name
@@ -76,7 +74,6 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             userNames[oldestCard.VersionCreator],
             oldestCard.tagIds.Select(tagId => tagNames[tagId]),
             oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            oldestCard.imageIdAndCardSides.Select(imageIdAndCardSide => new ResultImageModel(imageIdAndCardSide.ImageId, imageIdAndCardSide.CardSide, imageDetails[imageIdAndCardSide.ImageId])),
             userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
             oldestCard.AverageRating,
             oldestCard.RatingCount,
@@ -103,10 +100,9 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
     {
         var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
         var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
-        var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
         var tagNames = TagLoadingHelper.Run(DbContext);
 
-        var result = await RunAsync(request, heapingAlgorithm, userNames, imageNames, tagNames, now == null ? DateTime.UtcNow : now.Value);
+        var result = await RunAsync(request, heapingAlgorithm, userNames, tagNames, now == null ? DateTime.UtcNow : now.Value);
 
         return new ResultWithMetrologyProperties<Result>(new Result(result),
             ("DeckId", request.DeckId.ToString()),
@@ -143,7 +139,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
     {
         public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
-            IEnumerable<ResultImageModel> images, int userRating, double averageRating, int countOfUserRatings,
+            int userRating, double averageRating, int countOfUserRatings,
             bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
@@ -161,7 +157,6 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             References = references;
             Tags = tags;
             VisibleTo = visibleTo;
-            Images = images;
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
@@ -188,10 +183,8 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
         public bool IsInFrench { get; }
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
-        public IEnumerable<ResultImageModel> Images { get; }
         public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }
     }
-    public sealed record ResultImageModel(Guid ImageId, int CardSide, ImageDetails ImageDetails);
     public sealed record MoveToHeapExpiryInfo(int HeapId, DateTime UtcExpiryDate);
     #endregion
 }

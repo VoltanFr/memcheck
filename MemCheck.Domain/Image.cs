@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,9 +32,6 @@ public sealed class Image
     public int MediumBlobSize { get; set; }
     public byte[] BigBlob { get; set; } = null!;    //Width=1600px
     public int BigBlobSize { get; set; }
-
-    public IEnumerable<ImageInCard> Cards { get; set; } = null!;
-    public IEnumerable<ImageInCardPreviousVersion> CardPreviousVersions { get; set; } = null!;
 
     public ImagePreviousVersion? PreviousVersion { get; set; }  //null for initial version (VersionType == Creation)
 }

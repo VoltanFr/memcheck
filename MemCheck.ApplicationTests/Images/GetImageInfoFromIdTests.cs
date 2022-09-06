@@ -37,7 +37,6 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(name, loaded.Name);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
-        Assert.AreEqual(0, loaded.CardCount);
         Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
         Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
@@ -60,7 +59,6 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(name, loaded.Name);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
-        Assert.AreEqual(0, loaded.CardCount);
         Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
         Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);

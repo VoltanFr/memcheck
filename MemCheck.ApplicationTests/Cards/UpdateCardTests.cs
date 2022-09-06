@@ -185,7 +185,6 @@ public class UpdateCardTests
                 .Include(c => c.VersionCreator)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.UsersWithView)
-                .Include(c => c.Images)
                 .Include(c => c.TagsInCards)
                 .Single(c => c.Id == originalCard.Id);
             Assert.AreEqual(newVersionCreator, updatedCard.VersionCreator.Id);
@@ -523,7 +522,6 @@ public class UpdateCardTests
                 .Include(c => c.VersionCreator)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.UsersWithView)
-                .Include(c => c.Images)
                 .Include(c => c.TagsInCards)
                 .Single();
             Assert.AreEqual(cardCreator, updatedCard.VersionCreator.Id);
@@ -532,7 +530,6 @@ public class UpdateCardTests
             Assert.AreEqual(originalCard.AdditionalInfo, updatedCard.AdditionalInfo);
             Assert.AreEqual(originalCard.References, updatedCard.References);
             Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
-            Assert.IsFalse(updatedCard.Images.Any());
             Assert.IsFalse(updatedCard.TagsInCards.Any());
             Assert.IsFalse(updatedCard.UsersWithView.Any());
         }
@@ -569,7 +566,6 @@ public class UpdateCardTests
                 .Include(c => c.VersionCreator)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.UsersWithView)
-                .Include(c => c.Images)
                 .Include(c => c.TagsInCards)
                 .Single();
             Assert.AreEqual(cardCreator, updatedCard.VersionCreator.Id);
@@ -578,7 +574,6 @@ public class UpdateCardTests
             Assert.AreEqual(originalCard.AdditionalInfo, updatedCard.AdditionalInfo);
             Assert.AreEqual(newReferences, updatedCard.References);
             Assert.AreEqual(languageId, updatedCard.CardLanguage.Id);
-            Assert.IsFalse(updatedCard.Images.Any());
             Assert.IsFalse(updatedCard.TagsInCards.Any());
             Assert.IsFalse(updatedCard.UsersWithView.Any());
         }

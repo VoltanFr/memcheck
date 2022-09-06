@@ -32,7 +32,6 @@ public class PreviousVersionCreatorTests
                 .Include(card => card.CardLanguage)
                 .Include(card => card.Tags)
                 .Include(card => card.UsersWithView)
-                .Include(card => card.Images)
                 .Where(previous => previous.Card == card.Id)
                 .SingleAsync();
             Assert.AreNotEqual(card.Id, previousVersion.Id);
@@ -63,7 +62,6 @@ public class PreviousVersionCreatorTests
                 .Include(card => card.CardLanguage)
                 .Include(card => card.Tags)
                 .Include(card => card.UsersWithView)
-                .Include(card => card.Images)
                 .Where(previous => previous.Card == card.Id)
                 .SingleAsync();
             Assert.AreNotEqual(card.Id, previousVersion.Id);

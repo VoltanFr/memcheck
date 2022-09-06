@@ -15,9 +15,9 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var result = await DbContext.Images.Include(img => img.Cards)
+        var result = await DbContext.Images
             .Where(image => EF.Functions.Like(image.Name, $"{request.ImageName}"))
-            .Select(img => new Result(img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.Owner.UserName, img.LastChangeUtcDate, img.VersionDescription, img.Cards.Count(), img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize))
+            .Select(img => new Result(img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.Owner.UserName, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize))
             .SingleAsync();
         return new ResultWithMetrologyProperties<Result>(result, ("ImageName", request.ImageName));
     }
@@ -36,6 +36,6 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
 
         }
     }
-    public sealed record Result(Guid Id, string Description, string Source, DateTime InitialUploadUtcDate, string InitialVersionCreator, DateTime CurrentVersionUtcDate, string CurrentVersionDescription, int CardCount, string OriginalImageContentType, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize);
+    public sealed record Result(Guid Id, string Description, string Source, DateTime InitialUploadUtcDate, string InitialVersionCreator, DateTime CurrentVersionUtcDate, string CurrentVersionDescription, string OriginalImageContentType, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize);
     #endregion
 }

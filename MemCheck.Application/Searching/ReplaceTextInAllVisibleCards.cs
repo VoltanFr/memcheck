@@ -43,7 +43,6 @@ public sealed class ReplaceTextInAllVisibleCards : RequestRunner<ReplaceTextInAl
                 .Include(card => card.CardLanguage)
                 .Include(card => card.TagsInCards)
                 .Include(card => card.UsersWithView)
-                .Include(card => card.Images)
                 .SingleAsync(card => card.Id == cardId);
 
             var updateRequest = new UpdateCard.Request(

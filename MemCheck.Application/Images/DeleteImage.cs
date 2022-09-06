@@ -22,11 +22,6 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
             _ => throw new NotImplementedException(),
         };
     }
-    private void DeleteFromCardPreviousVersions(Guid imageId)
-    {
-        var cardPreviousVersions = DbContext.ImagesInCardPreviousVersions.Where(imageInCardPreviousVersions => imageInCardPreviousVersions.ImageId == imageId);
-        DbContext.ImagesInCardPreviousVersions.RemoveRange(cardPreviousVersions);
-    }
     #endregion
     public DeleteImage(CallContext callContext, DateTime? runDate = null) : base(callContext)
     {
@@ -36,8 +31,6 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
     {
         var image = await DbContext.Images.Where(img => img.Id == request.ImageId).SingleAsync();
         var user = await DbContext.Users.SingleAsync(u => u.Id == request.UserId);
-
-        DeleteFromCardPreviousVersions(request.ImageId);
 
         //For a deletion, we create two previous versions:
         //- one for the last known operation (described in the image)
@@ -103,9 +96,10 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
             if (QueryValidationHelper.IsReservedGuid(ImageId))
                 throw new RequestInputException("InvalidImageId");
 
-            var image = await callContext.DbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
-            if (image.Cards.Any())
-                throw new RequestInputException(callContext.Localized.GetLocalized("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + callContext.Localized.GetLocalized("ImageUsedInCardsPart2"));
+            //The following check needs that we implement ImageInCard
+            //var image = await callContext.DbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
+            //if (image.Cards.Any())
+            //    throw new RequestInputException(callContext.Localized.GetLocalized("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + callContext.Localized.GetLocalized("ImageUsedInCardsPart2"));
         }
     }
     public sealed record Result(string ImageName);

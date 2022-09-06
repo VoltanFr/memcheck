@@ -47,7 +47,6 @@ internal sealed class AddReferences : ICmdLinePlugin
         var tagId = await dbContext.Tags.Where(tag => tag.Name == "Échelle de Beaufort").Select(tag => tag.Id).SingleAsync();
 
         var cardsToUpdate = dbContext.Cards
-            .Include(card => card.Images)
             .Include(card => card.UsersWithView)
             .Include(card => card.TagsInCards)
             .Include(card => card.CardLanguage)

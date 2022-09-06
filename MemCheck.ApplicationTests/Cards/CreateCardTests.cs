@@ -59,7 +59,6 @@ public class CreateCardTests
                 .Include(c => c.VersionCreator)
                 .Include(c => c.CardLanguage)
                 .Include(c => c.UsersWithView)
-                .Include(c => c.Images)
                 .Include(c => c.TagsInCards)
                 .Single(c => c.Id == cardGuid);
             Assert.AreEqual(ownerId, card.VersionCreator.Id);

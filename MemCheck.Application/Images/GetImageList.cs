@@ -15,7 +15,7 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        IQueryable<Domain.Image>? images = DbContext.Images.AsNoTracking().Include(img => img.Cards);
+        var images = DbContext.Images.AsNoTracking();
         if (request.Filter.Length > 0)
             images = images.Where(image =>
                 EF.Functions.Like(image.Name, $"%{request.Filter}%")
@@ -30,7 +30,6 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
                         pageImages.Select(img => new ResultImage(
                             img.Id,
                             img.Name,
-                            img.Cards.Count(),
                             img.OriginalContentType,
                             img.Owner.UserName,
                             img.Description,
@@ -69,7 +68,7 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
         }
     }
     public sealed record Result(int TotalCount, int PageCount, IEnumerable<ResultImage> Images);
-    public sealed record ResultImage(Guid ImageId, string ImageName, int CardCount, string OriginalImageContentType,
+    public sealed record ResultImage(Guid ImageId, string ImageName, string OriginalImageContentType,
             string Uploader, string Description, string Source, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize,
             DateTime InitialUploadUtcDate, DateTime LastChangeUtcDate, string CurrentVersionDescription);
     #endregion

@@ -33,8 +33,6 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public DbSet<UserWithViewOnCard> UsersWithViewOnCards { get; set; } = null!;
     public DbSet<Image> Images { get; set; } = null!;
     public DbSet<ImagePreviousVersion> ImagePreviousVersions { get; set; } = null!;
-    public DbSet<ImageInCard> ImagesInCards { get; set; } = null!;
-    public DbSet<ImageInCardPreviousVersion> ImagesInCardPreviousVersions { get; set; } = null!;
     public DbSet<UserWithViewOnCardPreviousVersion> UsersWithViewOnCardPreviousVersions { get; set; } = null!;
     public DbSet<UserCardRating> UserCardRatings { get; set; } = null!;
     public DbSet<CardNotificationSubscription> CardNotifications { get; set; } = null!;
@@ -62,20 +60,12 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
         builder.Entity<UserWithViewOnCard>().HasOne(e => e.Card).WithMany(e => e.UsersWithView).HasForeignKey(e => e.CardId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<UserWithViewOnCard>().HasOne(e => e.User).WithMany(e => e.UsersWithView).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.NoAction);
 
-        builder.Entity<ImageInCard>().HasKey(imageInCard => new { imageInCard.CardId, imageInCard.ImageId });
-        builder.Entity<ImageInCard>().HasOne(e => e.Card).WithMany(e => e.Images).HasForeignKey(e => e.CardId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<ImageInCard>().HasOne(e => e.Image).WithMany(e => e.Cards).HasForeignKey(e => e.ImageId).OnDelete(DeleteBehavior.NoAction);
-
         builder.Entity<Image>().HasIndex(img => img.Name).IsUnique();
         builder.Entity<TagInPreviousCardVersion>().HasKey(tagInPreviousCardVersion => new { tagInPreviousCardVersion.CardPreviousVersionId, tagInPreviousCardVersion.TagId });
 
         builder.Entity<UserWithViewOnCardPreviousVersion>().HasKey(userWithViewOnCardPreviousVersion => new { userWithViewOnCardPreviousVersion.CardPreviousVersionId, userWithViewOnCardPreviousVersion.AllowedUserId });
         builder.Entity<UserWithViewOnCardPreviousVersion>().HasOne(e => e.CardPreviousVersion).WithMany(e => e.UsersWithView).HasForeignKey(e => e.CardPreviousVersionId).OnDelete(DeleteBehavior.Cascade);
         builder.Entity<UserWithViewOnCardPreviousVersion>().HasOne(e => e.AllowedUser).WithMany(e => e.UsersWithViewOnPreviousVersion).HasForeignKey(e => e.AllowedUserId).OnDelete(DeleteBehavior.NoAction);
-
-        builder.Entity<ImageInCardPreviousVersion>().HasKey(img => new { img.ImageId, img.CardPreviousVersionId });
-        builder.Entity<ImageInCardPreviousVersion>().HasOne(e => e.CardPreviousVersion).WithMany(e => e.Images).HasForeignKey(e => e.CardPreviousVersionId).OnDelete(DeleteBehavior.Cascade);
-        builder.Entity<ImageInCardPreviousVersion>().HasOne(e => e.Image).WithMany(e => e.CardPreviousVersions).HasForeignKey(e => e.ImageId).OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<UserCardRating>().HasKey(userCardRating => new { userCardRating.CardId, userCardRating.UserId });
         builder.Entity<UserCardRating>().HasOne(e => e.Card).WithMany(e => e.UserCardRating).HasForeignKey(e => e.CardId).OnDelete(DeleteBehavior.NoAction);
