@@ -19,21 +19,14 @@ public class CreateCardTests
     public async Task WithAllData()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-
         var userWithViewId = await UserHelper.CreateInDbAsync(testDB);
-
         var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: false);
         var frontSide = RandomHelper.String();
         var backSide = RandomHelper.String();
         var additionalInfo = RandomHelper.String();
         var references = RandomHelper.String();
         var versionDescription = RandomHelper.String();
-
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var imageOnFrontSideId = await ImageHelper.CreateAsync(testDB, ownerId);
-        var imageOnBackSide1Id = await ImageHelper.CreateAsync(testDB, ownerId);
-        var imageOnBackSide2Id = await ImageHelper.CreateAsync(testDB, ownerId);
-        var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(testDB, ownerId);
         var tagId = await TagHelper.CreateAsync(testDB);
 
         var cardGuid = Guid.Empty;
