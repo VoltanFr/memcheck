@@ -15,7 +15,7 @@ internal static class QueryValidationHelper
 {
     #region Fields
     private static readonly ImmutableHashSet<Guid> reservedGuids = GetReservedGuids();
-    private const string charsAllowedInImageName = "[-' _.();!@&=+$/%#A-Za-z0-9\u00C0-\u017F]"; //This is a copy of the same info in MarkdownConversion.js, which is the reference info
+    public const string charsAllowedInImageName = "[-' _.();!@&=+$/%#A-Za-z0-9\u00C0-\u017F]"; //This is a copy of the same info in MarkdownConversion.js, which is the reference info
     #endregion
     #region Private methods
     private static ImmutableHashSet<Guid> GetReservedGuids()
