@@ -1,6 +1,8 @@
-﻿using MemCheck.Application.Notifiying;
+﻿using MemCheck.Application.Images;
+using MemCheck.Application.Notifiying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,17 @@ namespace MemCheck.Application.Cards;
 
 public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Result>
 {
-    public CreateCard(CallContext callContext) : base(callContext)
+    #region Fields
+    private readonly DateTime? runDate;
+    #endregion
+    public CreateCard(CallContext callContext, DateTime? runDate = null) : base(callContext)
     {
+        this.runDate = runDate;
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
+        var versionDate = runDate ?? DateTime.UtcNow;
+
         var language = DbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();
         var versionCreator = DbContext.Users.Where(user => user.Id == request.VersionCreatorId).Single();
 
@@ -26,8 +34,8 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
             References = request.References,
             CardLanguage = language,
             VersionCreator = versionCreator,
-            InitialCreationUtcDate = DateTime.Now.ToUniversalTime(),
-            VersionUtcDate = DateTime.Now.ToUniversalTime(),
+            InitialCreationUtcDate = versionDate,
+            VersionUtcDate = versionDate,
             VersionDescription = request.VersionDescription
         };
         DbContext.Cards.Add(card);
@@ -54,6 +62,14 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
 
         if (versionCreator.SubscribeToCardOnEdit)
             AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
+
+        var imageNames = ImageLoadingHelper.GetMnesiosImagesFromCard(card);
+        foreach (var imageName in imageNames)
+        {
+            var image = await DbContext.Images.AsNoTracking().Select(image => new { image.Id, image.Name }).SingleOrDefaultAsync(image => EF.Functions.Like(image.Name, $"{imageName}"));
+            if (image != null)
+                DbContext.ImagesInCards.Add(new ImageInCard() { CardId = card.Id, ImageId = image.Id });
+        }
 
         await DbContext.SaveChangesAsync();
 

@@ -6,6 +6,7 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -222,6 +223,154 @@ public class CreateCardTests
         {
             var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
             Assert.AreEqual(creatorId, card.VersionCreator.Id);
+        }
+    }
+    [TestMethod()]
+    public async Task CardWithImage()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+        var imageName = RandomHelper.String();
+
+        var imageId = await ImageHelper.CreateAsync(testDB, creatorId, name: imageName);
+
+        var request = new CreateCard.Request(
+            creatorId,
+            $"![Mnesios:{imageName}]",
+            RandomHelper.String(),
+            RandomHelper.String(),
+            RandomHelper.String(),
+            languageId,
+            Array.Empty<Guid>(),
+            creatorId.AsArray(),
+            RandomHelper.String());
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+        {
+            var card = await dbContext.Cards.SingleAsync();
+            Assert.IsTrue(await dbContext.ImagesInCards.AnyAsync());
+            var imageInCard = await dbContext.ImagesInCards.SingleAsync();
+            Assert.AreEqual(imageId, imageInCard.ImageId);
+            Assert.AreEqual(card.Id, imageInCard.CardId);
+        }
+    }
+    [TestMethod()]
+    public async Task CardWithImageNotInDb()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+
+        var request = new CreateCard.Request(
+            creatorId,
+            $"![Mnesios:{RandomHelper.String()}]",
+            RandomHelper.String(),
+            RandomHelper.String(),
+            RandomHelper.String(),
+            languageId,
+            Array.Empty<Guid>(),
+            creatorId.AsArray(),
+            RandomHelper.String());
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            await new CreateCard(dbContext.AsCallContext()).RunAsync(request);
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            Assert.IsFalse(await dbContext.ImagesInCards.AnyAsync());
+    }
+    [TestMethod()]
+    public async Task CardsWithMultipleImages()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+
+        var image1Name = RandomHelper.String();
+        var image1Id = await ImageHelper.CreateAsync(testDB, creatorId, name: image1Name);
+
+        var image2Name = RandomHelper.String();
+        var image2Id = await ImageHelper.CreateAsync(testDB, creatorId, name: image2Name);
+
+        var image3Name = RandomHelper.String();
+        var image3Id = await ImageHelper.CreateAsync(testDB, creatorId, name: image3Name);
+
+        Guid card1Id;   //Card 1 contains image1, image2 and image3
+        Guid card2Id;   //Card 2 contains image1 and image2
+        Guid card3Id;   //Card 3 contains image2 and image3
+        Guid card4Id;   //Card 4 contains no image
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            card1Id = (await new CreateCard(dbContext.AsCallContext()).RunAsync(new CreateCard.Request(
+                creatorId,
+                $"![Mnesios:{image1Name}]",
+                RandomHelper.String(),
+                $"some text ![Mnesios:{image1Name}] ![Mnesios:{image3Name}] ![Mnesios:{image2Name}]",
+                RandomHelper.String(),
+                languageId,
+                Array.Empty<Guid>(),
+                creatorId.AsArray(),
+                RandomHelper.String()))).CardId;
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            card2Id = (await new CreateCard(dbContext.AsCallContext()).RunAsync(new CreateCard.Request(
+                creatorId,
+                "![Mnesios:DoesNotExist]",
+                RandomHelper.String(),
+                $"some text ![Mnesios:{image1Name}] ![Mnesios:{image2Name}] ![Mnesios:{image2Name}]",
+                RandomHelper.String(),
+                languageId,
+                Array.Empty<Guid>(),
+                creatorId.AsArray(),
+                RandomHelper.String()))).CardId;
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            card3Id = (await new CreateCard(dbContext.AsCallContext()).RunAsync(new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                $"![Mnesios:{image2Name}] ![Mnesios:{image3Name}]",
+                $"![Mnesios:{image2Name}] ![Mnesios:{image3Name}]",
+                RandomHelper.String(),
+                languageId,
+                Array.Empty<Guid>(),
+                creatorId.AsArray(),
+                RandomHelper.String()))).CardId;
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+            card4Id = (await new CreateCard(dbContext.AsCallContext()).RunAsync(new CreateCard.Request(
+                creatorId,
+                RandomHelper.String(),
+                RandomHelper.String(),
+                RandomHelper.String(),
+                RandomHelper.String(),
+                languageId,
+                Array.Empty<Guid>(),
+                creatorId.AsArray(),
+                RandomHelper.String()))).CardId;
+
+        using (var dbContext = new MemCheckDbContext(testDB))
+        {
+            var imagesInCard1 = dbContext.ImagesInCards.Where(imageInCard => imageInCard.CardId == card1Id).ToImmutableArray();
+            Assert.AreEqual(3, imagesInCard1.Length);
+            Assert.IsTrue(imagesInCard1.Any(imageInCard => imageInCard.ImageId == image1Id));
+            Assert.IsTrue(imagesInCard1.Any(imageInCard => imageInCard.ImageId == image2Id));
+            Assert.IsTrue(imagesInCard1.Any(imageInCard => imageInCard.ImageId == image3Id));
+
+            var imagesInCard2 = dbContext.ImagesInCards.Where(imageInCard => imageInCard.CardId == card2Id).ToImmutableArray();
+            Assert.AreEqual(2, imagesInCard2.Length);
+            Assert.IsTrue(imagesInCard2.Any(imageInCard => imageInCard.ImageId == image1Id));
+            Assert.IsTrue(imagesInCard2.Any(imageInCard => imageInCard.ImageId == image2Id));
+
+            var imagesInCard3 = dbContext.ImagesInCards.Where(imageInCard => imageInCard.CardId == card3Id).ToImmutableArray();
+            Assert.AreEqual(2, imagesInCard3.Length);
+            Assert.IsTrue(imagesInCard3.Any(imageInCard => imageInCard.ImageId == image3Id));
+            Assert.IsTrue(imagesInCard3.Any(imageInCard => imageInCard.ImageId == image2Id));
+
+            var imagesInCard4 = dbContext.ImagesInCards.Where(imageInCard => imageInCard.CardId == card4Id).ToImmutableArray();
+            Assert.IsFalse(imagesInCard4.Any());
         }
     }
 }

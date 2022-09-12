@@ -27,6 +27,7 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public DbSet<Deck> Decks { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<CardInDeck> CardsInDecks { get; set; } = null!;
+    public DbSet<ImageInCard> ImagesInCards { get; set; } = null!;
     public DbSet<TagInCard> TagsInCards { get; set; } = null!;
     public DbSet<TagInPreviousCardVersion> TagInPreviousCardVersions { get; set; } = null!;
     public DbSet<CardLanguage> CardLanguages { get; set; } = null!;
@@ -61,7 +62,14 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
         builder.Entity<UserWithViewOnCard>().HasOne(e => e.User).WithMany(e => e.UsersWithView).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.NoAction);
 
         builder.Entity<Image>().HasIndex(img => img.Name).IsUnique();
+
         builder.Entity<TagInPreviousCardVersion>().HasKey(tagInPreviousCardVersion => new { tagInPreviousCardVersion.CardPreviousVersionId, tagInPreviousCardVersion.TagId });
+
+        builder.Entity<ImageInCard>().HasKey(imageInCard => new { imageInCard.CardId, imageInCard.ImageId });
+        builder.Entity<ImageInCard>().HasOne(imageInCard => imageInCard.Card).WithMany(card => card.ImagesInCards).HasForeignKey(imageInCard => imageInCard.CardId).OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<ImageInCard>().HasOne(imageInCard => imageInCard.Image).WithMany(image => image.ImagesInCards).HasForeignKey(imageInCard => imageInCard.ImageId).OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<ImageInCard>().HasIndex(imageInCard => imageInCard.CardId);
+        builder.Entity<ImageInCard>().HasIndex(imageInCard => imageInCard.ImageId);
 
         builder.Entity<UserWithViewOnCardPreviousVersion>().HasKey(userWithViewOnCardPreviousVersion => new { userWithViewOnCardPreviousVersion.CardPreviousVersionId, userWithViewOnCardPreviousVersion.AllowedUserId });
         builder.Entity<UserWithViewOnCardPreviousVersion>().HasOne(e => e.CardPreviousVersion).WithMany(e => e.UsersWithView).HasForeignKey(e => e.CardPreviousVersionId).OnDelete(DeleteBehavior.Cascade);

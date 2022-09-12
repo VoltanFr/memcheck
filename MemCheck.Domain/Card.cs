@@ -18,6 +18,7 @@ public sealed class Card
     public string References { get; set; } = null!;
     public IEnumerable<CardInDeck> CardInDecks { get; set; } = null!;
     public IEnumerable<TagInCard> TagsInCards { get; set; } = null!;
+    public IEnumerable<ImageInCard> ImagesInCards { get; set; } = null!;
     public DateTime InitialCreationUtcDate { get; set; } //This field is immutable accross versions, but keeping it avoids the need to walk all the versions to find the initial creation date
     public DateTime VersionUtcDate { get; set; }
     public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)

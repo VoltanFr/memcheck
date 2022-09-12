@@ -13,9 +13,9 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
 {
     #region Fields
     public const string LanguageName = nameof(LanguageName);
-    private const string FrontSide = nameof(FrontSide);
-    private const string BackSide = nameof(BackSide);
-    private const string AdditionalInfo = nameof(AdditionalInfo);
+    public const string FrontSide = nameof(FrontSide);
+    public const string BackSide = nameof(BackSide);
+    public const string AdditionalInfo = nameof(AdditionalInfo);
     public const string References = nameof(References);
     private const string Tags = nameof(Tags);
     public const string UsersWithView = nameof(UsersWithView);
