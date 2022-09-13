@@ -84,7 +84,9 @@ public sealed class MailSender
     public static string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {
         var listItems = new List<string> {
-            $"<li>Sent by Azure func '{azureFunctionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
+            $"<li>Sent by Azure func {azureFunctionName}</li>",
+            $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
+            $"<li>Started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
             $"<li>Function schedule: {timer.Schedule}</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
         };
