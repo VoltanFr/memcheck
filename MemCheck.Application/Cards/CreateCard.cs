@@ -63,7 +63,7 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
         if (versionCreator.SubscribeToCardOnEdit)
             AddCardSubscriptions.CreateSubscription(DbContext, versionCreator.Id, card.Id, card.VersionUtcDate, CardNotificationSubscription.CardNotificationRegistrationMethodVersionCreation);
 
-        var imageNames = ImageLoadingHelper.GetMnesiosImagesFromCard(card);
+        var imageNames = ImageLoadingHelper.GetMnesiosImagesFromSides(card.FrontSide, card.BackSide, card.AdditionalInfo);
         foreach (var imageName in imageNames)
         {
             var image = await DbContext.Images.AsNoTracking().Select(image => new { image.Id, image.Name }).SingleOrDefaultAsync(image => EF.Functions.Like(image.Name, $"{imageName}"));

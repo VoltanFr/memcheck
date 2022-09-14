@@ -1,6 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -37,12 +36,12 @@ internal static class ImageLoadingHelper
 
         return result.ToImmutableHashSet();
     }
-    public static ImmutableHashSet<string> GetMnesiosImagesFromCard(Card card)
+    public static ImmutableHashSet<string> GetMnesiosImagesFromSides(string frontSide, string backSide, string additionalInfo)
     {
         var result = new List<string>();
-        result.AddRange(GetMnesiosImagesFromText(card.FrontSide));
-        result.AddRange(GetMnesiosImagesFromText(card.BackSide));
-        result.AddRange(GetMnesiosImagesFromText(card.AdditionalInfo));
+        result.AddRange(GetMnesiosImagesFromText(frontSide));
+        result.AddRange(GetMnesiosImagesFromText(backSide));
+        result.AddRange(GetMnesiosImagesFromText(additionalInfo));
         return result.ToImmutableHashSet();
     }
 }

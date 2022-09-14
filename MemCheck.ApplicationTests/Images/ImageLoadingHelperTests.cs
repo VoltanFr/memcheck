@@ -65,7 +65,7 @@ public class ImageLoadingHelperTests
     public void ComplexCaseInCard(string[] expectedImageNames, string frontSide, string backSide, string additionalInfo)
     {
         var card = new Card() { FrontSide = frontSide, BackSide = backSide, AdditionalInfo = additionalInfo };
-        var imageNames = ImageLoadingHelper.GetMnesiosImagesFromCard(card);
+        var imageNames = ImageLoadingHelper.GetMnesiosImagesFromSides(card.FrontSide, card.BackSide, card.AdditionalInfo);
         Assert.IsTrue(imageNames.SetEquals(expectedImageNames));
     }
 }
