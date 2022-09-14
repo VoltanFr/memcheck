@@ -11,7 +11,7 @@ public static class ProcessServices
     {
         try
         {
-            return Process.GetCurrentProcess().PeakWorkingSet64.ToString(CultureInfo.InvariantCulture);
+            return Process.GetCurrentProcess().PeakWorkingSet64.ToString("N0", CultureInfo.GetCultureInfo("en"));
         }
         catch (Exception e)
         {

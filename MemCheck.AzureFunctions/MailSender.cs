@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -85,7 +86,7 @@ public sealed class MailSender
     {
         var listItems = new List<string> {
             $"<li>Sent by Azure func {azureFunctionName}</li>",
-            $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
+            $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
             $"<li>Started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
             $"<li>Function schedule: {timer.Schedule}</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
