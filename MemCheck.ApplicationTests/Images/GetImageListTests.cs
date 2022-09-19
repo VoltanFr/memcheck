@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -44,7 +45,7 @@ public class GetImageListTests
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "  " + RandomHelper.String())));
     }
     [TestMethod()]
-    public async Task OneImageInDb()
+    public async Task OneImageInDb_NotUsed()
     {
         var db = DbHelper.GetEmptyTestDB();
         var imageName = RandomHelper.String();
@@ -54,25 +55,65 @@ public class GetImageListTests
         var source = RandomHelper.String();
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+        var imageId = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
         Assert.AreEqual(1, result.PageCount);
         Assert.AreEqual(1, result.TotalCount);
-        var loaded = result.Images.Single();
-        Assert.AreEqual(image, loaded.ImageId);
-        Assert.AreEqual(imageName, loaded.ImageName);
-        Assert.AreEqual("InvalidForUnitTests", loaded.OriginalImageContentType);
-        Assert.AreEqual(userName, loaded.Uploader);
-        Assert.AreEqual(description, loaded.Description);
-        Assert.AreEqual(source, loaded.Source);
-        Assert.AreEqual(4, loaded.OriginalImageSize);
-        Assert.AreEqual(1, loaded.SmallSize);
-        Assert.AreEqual(2, loaded.MediumSize);
-        Assert.AreEqual(3, loaded.BigSize);
-        Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
-        Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
-        Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
+        var loadedImage = result.Images.Single();
+        Assert.AreEqual(imageId, loadedImage.ImageId);
+        Assert.AreEqual(imageName, loadedImage.ImageName);
+        Assert.AreEqual("InvalidForUnitTests", loadedImage.OriginalImageContentType);
+        Assert.AreEqual(userName, loadedImage.Uploader);
+        Assert.AreEqual(description, loadedImage.Description);
+        Assert.AreEqual(source, loadedImage.Source);
+        Assert.AreEqual(4, loadedImage.OriginalImageSize);
+        Assert.AreEqual(1, loadedImage.SmallSize);
+        Assert.AreEqual(2, loadedImage.MediumSize);
+        Assert.AreEqual(3, loadedImage.BigSize);
+        Assert.AreEqual(uploadDate, loadedImage.InitialUploadUtcDate);
+        Assert.AreEqual(uploadDate, loadedImage.LastChangeUtcDate);
+        Assert.AreEqual(versionDescription, loadedImage.CurrentVersionDescription);
+        Assert.AreEqual(0, loadedImage.CardCount);
+    }
+    [TestMethod()]
+    public async Task OneImageInDb_Used()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var imageName = RandomHelper.String();
+        var userName = RandomHelper.String();
+        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var description = RandomHelper.String();
+        var source = RandomHelper.String();
+        var uploadDate = RandomHelper.Date();
+        var versionDescription = RandomHelper.String();
+        var imageId = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+
+        await RandomHelper.Int(3, 10).TimesAsync(async () => await CardHelper.CreateAsync(db, user)); //Cards which don't use the image
+
+        var usingCardCount = RandomHelper.Int(3, 10);
+        await usingCardCount.TimesAsync(async () => await CardHelper.CreateAsync(db, user, frontSide: $"![Mnesios:{imageName}]"));
+
+        using var dbContext = new MemCheckDbContext(db);
+        var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
+        Assert.AreEqual(1, result.PageCount);
+        Assert.AreEqual(1, result.TotalCount);
+        var loadedImage = result.Images.Single();
+        Assert.AreEqual(imageId, loadedImage.ImageId);
+        Assert.AreEqual(imageName, loadedImage.ImageName);
+        Assert.AreEqual("InvalidForUnitTests", loadedImage.OriginalImageContentType);
+        Assert.AreEqual(userName, loadedImage.Uploader);
+        Assert.AreEqual(description, loadedImage.Description);
+        Assert.AreEqual(source, loadedImage.Source);
+        Assert.AreEqual(4, loadedImage.OriginalImageSize);
+        Assert.AreEqual(1, loadedImage.SmallSize);
+        Assert.AreEqual(2, loadedImage.MediumSize);
+        Assert.AreEqual(3, loadedImage.BigSize);
+        Assert.AreEqual(uploadDate, loadedImage.InitialUploadUtcDate);
+        Assert.AreEqual(uploadDate, loadedImage.LastChangeUtcDate);
+        Assert.AreEqual(versionDescription, loadedImage.CurrentVersionDescription);
+        Assert.AreEqual(usingCardCount, loadedImage.CardCount);
     }
     [TestMethod()]
     public async Task OnePage()
@@ -85,7 +126,7 @@ public class GetImageListTests
             var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
-            Assert.AreEqual(1, result.Images.Count());
+            Assert.AreEqual(1, result.Images.Length);
         }
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -146,14 +187,81 @@ public class GetImageListTests
             var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, imageName));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
-            Assert.AreEqual(1, result.Images.Count());
+            Assert.AreEqual(1, result.Images.Length);
         }
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, imageName.Substring(1, 5)));
             Assert.AreEqual(1, result.PageCount);
             Assert.AreEqual(1, result.TotalCount);
-            Assert.AreEqual(1, result.Images.Count());
+            Assert.AreEqual(1, result.Images.Length);
+        }
+    }
+    [TestMethod()]
+    public async Task ComplexTest()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var filteredString = RandomHelper.String();
+
+        var image1MatchingFilterName = RandomHelper.String();
+        var image1IdMatchingFilter = await ImageHelper.CreateAsync(db, userId, name: image1MatchingFilterName, description: filteredString + RandomHelper.String());
+
+        var image2MatchingFilterName = filteredString + RandomHelper.String();
+        var image2IdMatchingFilter = await ImageHelper.CreateAsync(db, userId, name: image2MatchingFilterName);
+
+        var image3MatchingFilterName = RandomHelper.String();
+        var image3IdMatchingFilter = await ImageHelper.CreateAsync(db, userId, name: image3MatchingFilterName, source: RandomHelper.String() + filteredString);
+
+        var image4NotMatchingFilterName = RandomHelper.String();
+        var image4IdNotMatchingFilter = await ImageHelper.CreateAsync(db, userId, name: image4NotMatchingFilterName);
+
+        var image5NotMatchingFilterName = RandomHelper.String();
+        var image5IdNotMatchingFilter = await ImageHelper.CreateAsync(db, userId, name: image5NotMatchingFilterName);
+
+        var image6IdNotUsed = await ImageHelper.CreateAsync(db, userId);
+
+        await RandomHelper.Int(3, 10).TimesAsync(async () => await CardHelper.CreateAsync(db, userId)); //Cards which don't use any image
+
+        var cardsUsingImage1Count = RandomHelper.Int(3, 10);
+        await cardsUsingImage1Count.TimesAsync(async () => await CardHelper.CreateAsync(db, userId, frontSide: $"![Mnesios:{image1MatchingFilterName}]"));
+
+        var cardsUsingImage2Count = RandomHelper.Int(3, 10);
+        await cardsUsingImage2Count.TimesAsync(async () => await CardHelper.CreateAsync(db, userId, frontSide: $"![Mnesios:{image2MatchingFilterName}]"));
+
+        var cardsUsingImage3Count = RandomHelper.Int(3, 10);
+        await cardsUsingImage3Count.TimesAsync(async () => await CardHelper.CreateAsync(db, userId, frontSide: $"![Mnesios:{image3MatchingFilterName}]"));
+
+        var cardsUsingImage4Count = RandomHelper.Int(3, 10);
+        await cardsUsingImage4Count.TimesAsync(async () => await CardHelper.CreateAsync(db, userId, frontSide: $"![Mnesios:{image4NotMatchingFilterName}]"));
+
+        var cardsUsingImage5Count = RandomHelper.Int(3, 10);
+        await cardsUsingImage5Count.TimesAsync(async () => await CardHelper.CreateAsync(db, userId, frontSide: $"![Mnesios:{image5IdNotMatchingFilter}]"));
+
+        using var dbContext = new MemCheckDbContext(db);
+        var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(100, 1, filteredString));
+
+        Assert.AreEqual(1, result.PageCount);
+        Assert.AreEqual(3, result.TotalCount);
+        Assert.AreEqual(3, result.Images.Length);
+
+        {
+            var image1InResult = result.Images.Single(img => img.ImageId == image1IdMatchingFilter);
+            Assert.AreEqual(image1MatchingFilterName, image1InResult.ImageName);
+            Assert.AreEqual(cardsUsingImage1Count, image1InResult.CardCount);
+        }
+
+        {
+            var image2InResult = result.Images.Single(img => img.ImageId == image2IdMatchingFilter);
+            Assert.AreEqual(image2MatchingFilterName, image2InResult.ImageName);
+            Assert.AreEqual(cardsUsingImage2Count, image2InResult.CardCount);
+        }
+
+        {
+            var image3InResult = result.Images.Single(img => img.ImageId == image3IdMatchingFilter);
+            Assert.AreEqual(image3MatchingFilterName, image3InResult.ImageName);
+            Assert.AreEqual(cardsUsingImage3Count, image3InResult.CardCount);
         }
     }
 }

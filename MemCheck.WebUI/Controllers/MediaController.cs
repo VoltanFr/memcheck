@@ -91,6 +91,7 @@ public class MediaController : MemCheckController
         {
             ImageId = img.ImageId;
             ImageName = img.ImageName;
+            CardCount = img.CardCount;
             UploaderUserName = img.Uploader;
             Description = img.Description;
             Source = img.Source;
@@ -106,6 +107,7 @@ public class MediaController : MemCheckController
         }
         public Guid ImageId { get; }
         public string ImageName { get; }
+        public int CardCount { get; }
         public string UploaderUserName { get; }
         public string Description { get; }
         public string Source { get; }
