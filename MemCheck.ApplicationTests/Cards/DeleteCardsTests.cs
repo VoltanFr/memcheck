@@ -283,4 +283,59 @@ public class DeleteCardsTests
             Assert.AreEqual(nonDeletedCardId, dbContext.Cards.Single().Id);
         }
     }
+    [TestMethod()]
+    public async Task DeleteCardContainingImage()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var imageName = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, imageName);
+
+        var cardId = await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{imageName}]");
+        await CardHelper.CreateIdAsync(db, userId, frontSide: $"![Mnesios:{imageName}]");
+        await CardHelper.CreateIdAsync(db, userId, backSide: $"![Mnesios:{imageName}]");
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(3, dbContext.ImagesInCards.Count());
+
+        using (var dbContext = new MemCheckDbContext(db))
+            await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(userId, new[] { cardId }));
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(2, dbContext.ImagesInCards.Count());
+    }
+    [TestMethod()]
+    public async Task DeleteCardsContainingImages()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var image1Name = RandomHelper.String();
+        var image1Id = await ImageHelper.CreateAsync(db, userId, image1Name);
+
+        var image2Name = RandomHelper.String();
+        var image2Id = await ImageHelper.CreateAsync(db, userId, image2Name);
+
+        var image3Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, image3Name);
+
+        var card1Id = await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{image1Name}]");
+        var card2Id = await CardHelper.CreateIdAsync(db, userId, frontSide: $"![Mnesios:{image2Name}]", additionalInfo: $"![Mnesios:{image3Name}]");
+        await CardHelper.CreateIdAsync(db, userId, frontSide: $"![Mnesios:{image1Name}]");
+        await CardHelper.CreateIdAsync(db, userId, backSide: $"![Mnesios:{image2Name}]");
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(5, dbContext.ImagesInCards.Count());
+
+        using (var dbContext = new MemCheckDbContext(db))
+            await new DeleteCards(dbContext.AsCallContext()).RunAsync(new DeleteCards.Request(userId, new[] { card1Id, card2Id }));
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            Assert.AreEqual(2, dbContext.ImagesInCards.Count());
+            Assert.AreEqual(1, dbContext.ImagesInCards.Count(imageInCard => imageInCard.ImageId == image1Id));
+            Assert.AreEqual(1, dbContext.ImagesInCards.Count(imageInCard => imageInCard.ImageId == image2Id));
+        }
+    }
 }
