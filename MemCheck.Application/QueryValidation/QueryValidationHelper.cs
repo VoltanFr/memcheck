@@ -85,7 +85,7 @@ internal static class QueryValidationHelper
         if (user == null || user.DeletionDate != null)
             throw new InvalidOperationException("User not found");
         if (!await roleChecker.UserIsAdminAsync(user))
-            throw new InvalidOperationException("User not admin");
+            throw new UnsatisfactoryUserRoleException("User not admin");
     }
     public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
     {

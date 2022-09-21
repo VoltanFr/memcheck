@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
+        var e = await Assert.ThrowsExceptionAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual("User not admin", e.Message);
     }
     [TestMethod()]

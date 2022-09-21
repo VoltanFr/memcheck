@@ -33,13 +33,23 @@ public class DeleteImageTests
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
     }
     [TestMethod()]
+    public async Task UserNotAdmin()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateInDbAsync(db);
+        var image = await ImageHelper.CreateAsync(db, user);
+
+        using var dbContext = new MemCheckDbContext(db);
+        await Assert.ThrowsExceptionAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String())));
+    }
+    [TestMethod()]
     public async Task ImageDoesNotExist()
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { user }))).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionTooShort()
@@ -71,17 +81,57 @@ public class DeleteImageTests
         using var dbContext = new MemCheckDbContext(db);
         await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength) + Environment.NewLine)));
     }
-    //[TestMethod()]
-    //public async Task UsedInCard()
-    //{
-    //    var db = DbHelper.GetEmptyTestDB();
-    //    var user = await UserHelper.CreateInDbAsync(db);
-    //    var image = await ImageHelper.CreateAsync(db, user);
-    //    await CardHelper.CreateAsync(db, user, additionalSideImages: image.AsArray());
+    [TestMethod()]
+    public async Task UsedInCard()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
 
-    //    using var dbContext = new MemCheckDbContext(db);
-    //    await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String())));
-    //}
+        var imageName = RandomHelper.String();
+        var imageId = await ImageHelper.CreateAsync(db, userId, imageName);
+
+        await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{imageName}]");
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(1, dbContext.ImagesInCards.Count());
+
+        using (var dbContext = new MemCheckDbContext(db))
+            await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { userId }))).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String()));
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(0, dbContext.ImagesInCards.Count());
+    }
+    [TestMethod()]
+    public async Task UsedInCards()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var image1Name = RandomHelper.String();
+        var imageId = await ImageHelper.CreateAsync(db, userId, image1Name);
+
+        var image2Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, image2Name);
+
+        var image3Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, image3Name);
+
+        await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{image1Name}]![Mnesios:{image2Name}]");
+        await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{image1Name}]![Mnesios:{image1Name}]");
+        await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{image3Name}]![Mnesios:{image3Name}]");
+
+        using (var dbContext = new MemCheckDbContext(db))
+            Assert.AreEqual(4, dbContext.ImagesInCards.Count());
+
+        using (var dbContext = new MemCheckDbContext(db))
+            await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { userId }))).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String()));
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            Assert.AreEqual(2, dbContext.ImagesInCards.Count());
+            Assert.AreEqual(0, dbContext.ImagesInCards.Count(imageInCard => imageInCard.ImageId == imageId));
+        }
+    }
     [TestMethod()]
     public async Task Simple()
     {
@@ -95,7 +145,7 @@ public class DeleteImageTests
         var deletionDescription = RandomHelper.String();
         var deletionDate = RandomHelper.Date(imageUploadDate);
         using (var dbContext = new MemCheckDbContext(db))
-            await new DeleteImage(dbContext.AsCallContext(), deletionDate).RunAsync(new DeleteImage.Request(user, image, deletionDescription));
+            await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { user })), deletionDate).RunAsync(new DeleteImage.Request(user, image, deletionDescription));
 
         using (var dbContext = new MemCheckDbContext(db))
         {

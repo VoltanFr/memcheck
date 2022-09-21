@@ -72,6 +72,10 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
 
         DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
         DbContext.ImagePreviousVersions.Add(deletionVersion);
+
+        var imagesInCardsToDelete = DbContext.ImagesInCards.Where(imageInCard => imageInCard.ImageId == request.ImageId);
+        DbContext.ImagesInCards.RemoveRange(imagesInCardsToDelete);
+
         DbContext.Images.Remove(image);
 
         await DbContext.SaveChangesAsync();
@@ -91,15 +95,10 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
             if (DeletionDescription.Length is < MinDescriptionLength or > MaxDescriptionLength)
                 throw new RequestInputException(callContext.Localized.GetLocalized("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxDescriptionLength}");
 
-            await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+            await QueryValidationHelper.CheckUserExistsAndIsAdminAsync(callContext.DbContext, UserId, callContext.RoleChecker);
 
             if (QueryValidationHelper.IsReservedGuid(ImageId))
                 throw new RequestInputException("InvalidImageId");
-
-            //The following check needs that we implement ImageInCard
-            //var image = await callContext.DbContext.Images.Include(img => img.Cards).SingleAsync(img => img.Id == ImageId);
-            //if (image.Cards.Any())
-            //    throw new RequestInputException(callContext.Localized.GetLocalized("ImageUsedInCardsPart1") + ' ' + image.Cards.Count() + ' ' + callContext.Localized.GetLocalized("ImageUsedInCardsPart2"));
         }
     }
     public sealed record Result(string ImageName);
