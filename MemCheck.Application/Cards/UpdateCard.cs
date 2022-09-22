@@ -1,4 +1,5 @@
-﻿using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.Images;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,21 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
         card.References = request.References;
         await UpdateTagsAsync(request, card);
         await UpdateUsersWithViewAsync(request, card);
+
+        var imageInCardNames = ImageLoadingHelper.GetMnesiosImagesFromSides(card.FrontSide, card.BackSide, card.AdditionalInfo);
+        var imageInCardIds = new HashSet<Guid>();
+        foreach (var imageName in imageInCardNames)
+        {
+            var image = await DbContext.Images.AsNoTracking().Select(image => new { image.Id, image.Name }).SingleOrDefaultAsync(image => EF.Functions.Like(image.Name, $"{imageName}"));
+            if (image != null)
+            {
+                if (!await DbContext.ImagesInCards.AnyAsync(imageInCard => imageInCard.ImageId == image.Id && imageInCard.CardId == card.Id))
+                    DbContext.ImagesInCards.Add(new ImageInCard() { CardId = card.Id, ImageId = image.Id });
+                imageInCardIds.Add(image.Id);
+            }
+        }
+        var imagesInCardsToDelete = DbContext.ImagesInCards.Where(imageInCard => !imageInCardIds.Contains(imageInCard.ImageId) && imageInCard.CardId == card.Id);
+        DbContext.ImagesInCards.RemoveRange(imagesInCardsToDelete);
 
         await DbContext.SaveChangesAsync();
 
