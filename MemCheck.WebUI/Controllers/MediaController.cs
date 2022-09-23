@@ -149,7 +149,7 @@ public class MediaController : MemCheckController
     {
         var appRequest = new GetImageInfoFromName(callContext);
         var result = await appRequest.RunAsync(new GetImageInfoFromName.Request(request.ImageName));
-        return Ok(new GetImageMetadataFromNameViewModel(result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        return Ok(new GetImageMetadataFromNameViewModel(result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
     }
     public sealed class GetImageMetadataFromNameRequest
     {
@@ -157,7 +157,7 @@ public class MediaController : MemCheckController
     }
     public sealed class GetImageMetadataFromNameViewModel
     {
-        public GetImageMetadataFromNameViewModel(string description, string source, DateTime initialUploadUtcDate, string initialVersionCreator, DateTime currentVersionUtcDate, string currentVersionDescription, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
+        public GetImageMetadataFromNameViewModel(string description, string source, DateTime initialUploadUtcDate, string initialVersionCreator, DateTime currentVersionUtcDate, string currentVersionDescription, int cardCount, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
         {
             Description = description;
             Source = source;
@@ -165,6 +165,7 @@ public class MediaController : MemCheckController
             InitialVersionCreator = initialVersionCreator;
             CurrentVersionUtcDate = currentVersionUtcDate;
             CurrentVersionDescription = currentVersionDescription;
+            CardCount = cardCount;
             OriginalImageContentType = originalImageContentType;
             OriginalImageSize = originalImageSize;
             SmallSize = smallSize;
@@ -177,6 +178,7 @@ public class MediaController : MemCheckController
         public string InitialVersionCreator { get; }
         public DateTime CurrentVersionUtcDate { get; }
         public string CurrentVersionDescription { get; }
+        public int CardCount { get; }
         public string OriginalImageContentType { get; }
         public int OriginalImageSize { get; }
         public int SmallSize { get; }

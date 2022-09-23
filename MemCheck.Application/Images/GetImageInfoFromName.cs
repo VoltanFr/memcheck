@@ -15,10 +15,19 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var result = await DbContext.Images
+        var img = await DbContext.Images
+            .AsNoTracking()
             .Where(image => EF.Functions.Like(image.Name, $"{request.ImageName}"))
-            .Select(img => new Result(img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.Owner.UserName, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize))
+            .Select(img => new { img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.Owner.UserName, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize })
             .SingleAsync();
+
+        var cardCount = await DbContext.ImagesInCards
+            .AsNoTracking()
+            .Where(imageInCard => imageInCard.ImageId == img.Id)
+            .CountAsync();
+
+        var result = new Result(img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.UserName, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize, cardCount);
+
         return new ResultWithMetrologyProperties<Result>(result, ("ImageName", request.ImageName));
     }
     #region Request and Result types
@@ -36,6 +45,6 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
 
         }
     }
-    public sealed record Result(Guid Id, string Description, string Source, DateTime InitialUploadUtcDate, string InitialVersionCreator, DateTime CurrentVersionUtcDate, string CurrentVersionDescription, string OriginalImageContentType, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize);
+    public sealed record Result(Guid Id, string Description, string Source, DateTime InitialUploadUtcDate, string InitialVersionCreator, DateTime CurrentVersionUtcDate, string CurrentVersionDescription, string OriginalImageContentType, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize, int CardCount);
     #endregion
 }

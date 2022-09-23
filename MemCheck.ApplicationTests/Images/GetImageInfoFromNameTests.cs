@@ -41,7 +41,7 @@ public class GetImageInfoFromNameTests
         await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String())));
     }
     [TestMethod()]
-    public async Task Success()
+    public async Task Success_ImageNotUsed()
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
@@ -52,6 +52,22 @@ public class GetImageInfoFromNameTests
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(name));
         Assert.AreEqual(source, loaded.Source);
+        Assert.AreEqual(0, loaded.CardCount);
+    }
+    [TestMethod()]
+    public async Task Success_ImageUsed()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var imageName = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, name: imageName);
+
+        await CardHelper.CreateAsync(db, userId, backSide: $"![Mnesios:{imageName}]");
+
+        using var dbContext = new MemCheckDbContext(db);
+        var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(imageName));
+        Assert.AreEqual(1, loaded.CardCount);
     }
     [TestMethod()]
     public async Task CaseInsensitivity()
@@ -64,5 +80,42 @@ public class GetImageInfoFromNameTests
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("imagEname"));
         Assert.AreEqual(userName, loaded.InitialVersionCreator);
+    }
+    [TestMethod()]
+    public async Task ComplexCase()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+
+        var image1Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, name: image1Name);
+
+        var image2Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, name: image2Name);
+
+        var image3Name = RandomHelper.String();
+        await ImageHelper.CreateAsync(db, userId, name: image3Name);
+
+        await CardHelper.CreateAsync(db, userId, backSide: $"![Mnesios:{image1Name}]");
+        await CardHelper.CreateAsync(db, userId, backSide: $"![Mnesios:{image1Name}]![Mnesios:{image2Name}]");
+        await CardHelper.CreateAsync(db, userId);
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(image1Name));
+            Assert.AreEqual(2, loaded.CardCount);
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(image2Name));
+            Assert.AreEqual(1, loaded.CardCount);
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(image3Name));
+            Assert.AreEqual(0, loaded.CardCount);
+        }
     }
 }
