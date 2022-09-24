@@ -149,7 +149,7 @@ public class MediaController : MemCheckController
     {
         var appRequest = new GetImageInfoFromName(callContext);
         var result = await appRequest.RunAsync(new GetImageInfoFromName.Request(request.ImageName));
-        return Ok(new GetImageMetadataFromNameViewModel(result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        return Ok(new GetImageMetadataFromNameViewModel(result.Id, result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
     }
     public sealed class GetImageMetadataFromNameRequest
     {
@@ -157,8 +157,9 @@ public class MediaController : MemCheckController
     }
     public sealed class GetImageMetadataFromNameViewModel
     {
-        public GetImageMetadataFromNameViewModel(string description, string source, DateTime initialUploadUtcDate, string initialVersionCreator, DateTime currentVersionUtcDate, string currentVersionDescription, int cardCount, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
+        public GetImageMetadataFromNameViewModel(Guid imageId, string description, string source, DateTime initialUploadUtcDate, string initialVersionCreator, DateTime currentVersionUtcDate, string currentVersionDescription, int cardCount, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
         {
+            ImageId = imageId;
             Description = description;
             Source = source;
             InitialUploadUtcDate = initialUploadUtcDate;
@@ -172,6 +173,7 @@ public class MediaController : MemCheckController
             MediumSize = mediumSize;
             BigSize = bigSize;
         }
+        public Guid ImageId { get; }
         public string Description { get; }
         public string Source { get; }
         public DateTime InitialUploadUtcDate { get; }

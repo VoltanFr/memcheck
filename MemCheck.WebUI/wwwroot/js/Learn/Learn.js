@@ -43,7 +43,7 @@ const learnApp = Vue.createApp({
             backSideVisible: false,
             mountFinished: false,
             loading: false,
-            currentFullScreenImage: null,   // LearnController.GetCardsImageViewModel
+            currentFullScreenImage: null,   // An image entry of the `downloadedCards` array (see below for details)
             pendingMoveOperations: [],  // {deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
             currentMovingCard: null,    // {deckId: Guid, cardId: Guid, targetHeap: int, manualMove: bool, nbAttempts: int}
             currentMovePromise: null, // promise
@@ -51,7 +51,7 @@ const learnApp = Vue.createApp({
             currentRatingPromise: null, // promise
             pendingNotificationRegistrations: [],  // {cardId: Guid, notify: bool}
             currentNotificationRegistrationPromise: null, // promise
-            downloadedCards: [],    // LearnController.GetCardsCardViewModel
+            downloadedCards: [], // LearnController.GetCardsCardViewModel, to which we add an `images` field: in method `downloadCardsIfNeeded`, this field is setup as a list of object with a single field `name`. Each image is later completed (methods `spawnDownloadImageBlob` and `spawnDownloadImageDetails`). We use `cardIsReady`, to know if all the info has been downloaded for each image of a card.
             remainingCardsInLesson: 0,
             cardDownloadOperation: null,
             currentImageLoadingPromise: null,
@@ -144,9 +144,10 @@ const learnApp = Vue.createApp({
                 }
         },
         cardIsReady(card) { // card is an entry of downloadedCards
-            // A card is ready when all its images have been loaded (or it has no image)
+            // A card is ready when all its images have been loaded. For each image, we must have loaded the blob (method `spawnDownloadImageBlob`) and the details (method `spawnDownloadImageDetails`)
+            // The details are a set of fields for each image, among which there is the field `imageId`
             for (let i = 0; i < card.images.length; i++)
-                if (!card.images[i].blob || !card.images[i].description)
+                if (!card.images[i].blob || !card.images[i].imageId)
                     return false;
             return true;
         },
@@ -172,21 +173,7 @@ const learnApp = Vue.createApp({
         editUrl() {
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
-        spawnDownloadImageBlob(image) {// image is LearnController.GetCardsImageViewModel
-            if (image.imageId) {
-                // Old image format
-                this.currentImageLoadingPromise = axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
-                    .then(result => {
-                        image.blob = base64FromBytes(result.data);
-                        this.currentImageLoadingPromise = null;
-                        if (!this.currentCard)
-                            this.getCard();
-                    })
-                    .catch(() => {
-                        this.currentImageLoadingPromise = null;
-                    });
-            }
-            else {
+        spawnDownloadImageBlob(image) { // image is an entry of the `downloadedCards` array
                 const request = { imageName: image.name, size: imageSizeMedium };
                 this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
                     .then(result => {
@@ -198,12 +185,12 @@ const learnApp = Vue.createApp({
                     .catch(() => {
                         this.currentImageLoadingPromise = null;
                     });
-            }
         },
-        spawnDownloadImageDetails(image) {// image is LearnController.GetCardsImageViewModel
+        spawnDownloadImageDetails(image) { // image is an entry of the `downloadedCards` array
             const request = { imageName: image.name };
             this.currentImageDetailsLoadingPromise = axios.post('/Media/GetImageMetadataFromName/', request)
                 .then(result => {
+                    image.imageId = result.data.imageId;
                     image.description = result.data.description;
                     image.source = result.data.source;
                     image.initialUploadUtcDate = result.data.initialUploadUtcDate;
@@ -216,6 +203,7 @@ const learnApp = Vue.createApp({
                     image.smallSize = result.data.smallSize;
                     image.mediumSize = result.data.mediumSize;
                     image.bigSize = result.data.bigSize;
+                    image.cardCount = result.data.cardCount;
                     this.currentImageDetailsLoadingPromise = null;
                     if (!this.currentCard)
                         this.getCard();
@@ -312,10 +300,10 @@ const learnApp = Vue.createApp({
 
                             // We don't discover images in card text on server side because we want the same code to be used at card authoring time
                             card.images = [];
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { imageId: null, name: imageName, blob: null, cardSide: 0 }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { name: imageName }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { name: imageName }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { name: imageName }; }));
+                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { name: imageName }; }));
 
                             this.downloadedCards.push(card);
                         }
@@ -340,7 +328,7 @@ const learnApp = Vue.createApp({
             for (let cardIndex = 0; !this.currentImageDetailsLoadingPromise && cardIndex < this.downloadedCards.length; cardIndex++) {
                 const card = this.downloadedCards[cardIndex];
                 for (let imageIndex = 0; !this.currentImageDetailsLoadingPromise && imageIndex < card.images.length; imageIndex++) {
-                    if (!card.images[imageIndex].description)
+                    if (!card.images[imageIndex].imageId)
                         this.spawnDownloadImageDetails(card.images[imageIndex]);
                 }
             }
