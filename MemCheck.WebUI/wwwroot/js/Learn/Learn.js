@@ -174,17 +174,17 @@ const learnApp = Vue.createApp({
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
         spawnDownloadImageBlob(image) { // image is an entry of the `downloadedCards` array
-                const request = { imageName: image.name, size: imageSizeMedium };
-                this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
-                    .then(result => {
-                        image.blob = base64FromBytes(result.data);
-                        this.currentImageLoadingPromise = null;
-                        if (!this.currentCard)
-                            this.getCard();
-                    })
-                    .catch(() => {
-                        this.currentImageLoadingPromise = null;
-                    });
+            const request = { imageName: image.name, size: imageSizeMedium };
+            this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
+                .then(result => {
+                    image.blob = base64FromBytes(result.data);
+                    this.currentImageLoadingPromise = null;
+                    if (!this.currentCard)
+                        this.getCard();
+                })
+                .catch(() => {
+                    this.currentImageLoadingPromise = null;
+                });
         },
         spawnDownloadImageDetails(image) { // image is an entry of the `downloadedCards` array
             const request = { imageName: image.name };
