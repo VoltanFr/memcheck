@@ -105,7 +105,14 @@ public sealed class UpdateImageMetadata : RequestRunner<UpdateImageMetadata.Requ
                 throw new RequestInputException(callContext.Localized.GetLocalized("CanNotUpdateMetadataBecauseSameAsOriginal"));
 
             if (imageDataBeforeUpdate.nameBeforeUpdate != Name)
+            {
+                //This needs work. Image names are used in card text. Renaming an image needs that we edit all cards containing the old name in the DB.
+                //It requires access to private cards, so it can only be done by an admin. It will create a new version of the card.
+                //This is not implemented yet (even for administrators).
+
                 await QueryValidationHelper.CheckCanCreateImageWithNameAsync(Name, callContext.DbContext, callContext.Localized);
+                throw new RequestInputException(callContext.Localized.GetLocalized("ImageRenamingOnlyByAdmin"));
+            }
 
             QueryValidationHelper.CheckCanCreateImageWithSource(Source, callContext.Localized);
             QueryValidationHelper.CheckCanCreateImageWithDescription(Description, callContext.Localized);
