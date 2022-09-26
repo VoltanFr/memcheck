@@ -72,18 +72,18 @@ internal static class QueryValidationHelper
     {
         var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
         if (user == null || user.DeletionDate != null)
-            throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
+            throw new NonexistentUserException(ExceptionMesg_UserDoesNotExist);
     }
     public static async Task CheckUsersExistAsync(MemCheckDbContext dbContext, IEnumerable<Guid> userIds)
     {
         if (await dbContext.Users.AsNoTracking().Where(user => userIds.Contains(user.Id)).CountAsync() != userIds.Count())
-            throw new InvalidOperationException(ExceptionMesg_UserDoesNotExist);
+            throw new NonexistentUserException(ExceptionMesg_UserDoesNotExist);
     }
     public static async Task CheckUserExistsAndIsAdminAsync(MemCheckDbContext dbContext, Guid userId, IRoleChecker roleChecker)
     {
         var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
         if (user == null || user.DeletionDate != null)
-            throw new InvalidOperationException("User not found");
+            throw new NonexistentUserException("User not found");
         if (!await roleChecker.UserIsAdminAsync(user))
             throw new UnsatisfactoryUserRoleException("User not admin");
     }

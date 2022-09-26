@@ -20,7 +20,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserNotAdmin()

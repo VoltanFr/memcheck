@@ -23,7 +23,7 @@ public class ReplaceTextInAllVisibleCardsTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new ReplaceTextInAllVisibleCards.Request(Guid.Empty, RandomHelper.String(), RandomHelper.String(), RandomHelper.String());
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new ReplaceTextInAllVisibleCards(dbContext.AsCallContext()).RunAsync(request));
+        var exception = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new ReplaceTextInAllVisibleCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, exception.Message);
     }
     [TestMethod()]
@@ -35,7 +35,7 @@ public class ReplaceTextInAllVisibleCardsTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new ReplaceTextInAllVisibleCards.Request(Guid.NewGuid(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String());
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new ReplaceTextInAllVisibleCards(dbContext.AsCallContext()).RunAsync(request));
+        var exception = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new ReplaceTextInAllVisibleCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, exception.Message);
     }
     [TestMethod()]

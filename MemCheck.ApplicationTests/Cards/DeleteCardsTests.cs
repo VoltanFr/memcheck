@@ -22,7 +22,7 @@ public class DeleteCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var card = await CardHelper.CreateAsync(db, user);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await CardDeletionHelper.DeleteCardAsync(db, Guid.NewGuid(), card.Id));
+        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await CardDeletionHelper.DeleteCardAsync(db, Guid.NewGuid(), card.Id));
         Assert.AreEqual("User not found", e.Message);
     }
     [TestMethod()]
@@ -56,7 +56,7 @@ public class DeleteCardsTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext());
-            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
+            var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
             Assert.AreEqual("User not found", e.Message);
         }
     }

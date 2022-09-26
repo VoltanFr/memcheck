@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -15,13 +16,13 @@ public class GetDecksWithLearnCountsTests
     public async Task EmptyDB_UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task EmptyDB_UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task OneEmptyDeck()

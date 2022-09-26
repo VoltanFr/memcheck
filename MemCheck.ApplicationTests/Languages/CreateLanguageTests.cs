@@ -15,13 +15,13 @@ public class CreateLanguageTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserIsNotAdmin()

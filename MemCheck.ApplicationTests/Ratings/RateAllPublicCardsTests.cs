@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Cards;
 using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,7 +20,7 @@ public class RateAllPublicCardsTests
         await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RateAllPublicCards(dbContext.AsCallContext()).RunAsync(new RateAllPublicCards.Request(Guid.Empty)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new RateAllPublicCards(dbContext.AsCallContext()).RunAsync(new RateAllPublicCards.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -28,7 +29,7 @@ public class RateAllPublicCardsTests
         await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RateAllPublicCards(dbContext.AsCallContext()).RunAsync(new RateAllPublicCards.Request(Guid.NewGuid())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new RateAllPublicCards(dbContext.AsCallContext()).RunAsync(new RateAllPublicCards.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task SingleCardWithoutPreviousRating()

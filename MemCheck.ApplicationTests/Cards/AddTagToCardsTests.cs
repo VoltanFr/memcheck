@@ -23,7 +23,7 @@ public class AddTagToCardsTests
         var cardCreatorId = await UserHelper.CreateInDbAsync(db);
         var cardId = await CardHelper.CreateIdAsync(db, cardCreatorId);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -35,7 +35,7 @@ public class AddTagToCardsTests
         var cardId = await CardHelper.CreateIdAsync(db, cardCreatorId);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -49,7 +49,7 @@ public class AddTagToCardsTests
         await UserHelper.DeleteAsync(db, cardCreatorId);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreatorId, tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreatorId, tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]

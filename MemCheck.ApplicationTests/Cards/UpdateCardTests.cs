@@ -25,7 +25,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), Guid.Empty);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -38,7 +38,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), Guid.NewGuid());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         await CardHelper.AssertCardHasFrontSide(db, card.Id, frontSide);
     }
     [TestMethod()]

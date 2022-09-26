@@ -100,7 +100,7 @@ public class CreateTagTests
     {
         var db = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(Guid.Empty, RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(Guid.Empty, RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UnknownUser()
@@ -109,6 +109,6 @@ public class CreateTagTests
         await UserHelper.CreateInDbAsync(db);
         var userId = Guid.NewGuid();
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(userId, RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(userId, RandomHelper.String(), RandomHelper.String())));
     }
 }

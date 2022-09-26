@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,7 +20,7 @@ public class GetTagsOfDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -29,7 +30,7 @@ public class GetTagsOfDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
     }
     [TestMethod()]
     public async Task UserNotOwner()

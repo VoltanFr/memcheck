@@ -172,7 +172,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, name);
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String())));
+            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
@@ -188,7 +188,7 @@ public class UpdateTagTests
         await UserHelper.CreateInDbAsync(db);
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String())));
+            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
