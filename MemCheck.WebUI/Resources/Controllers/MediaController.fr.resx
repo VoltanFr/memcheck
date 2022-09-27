@@ -147,6 +147,12 @@
   <data name="ImageDescription" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="ImageIsUsedByCardsAfterCount" xml:space="preserve">
+    <value> cartes.</value>
+  </data>
+  <data name="ImageIsUsedByCardsBeforeCount" xml:space="preserve">
+    <value>Cette image est utilisée par </value>
+  </data>
   <data name="ImageName" xml:space="preserve">
     <value>Nom</value>
   </data>

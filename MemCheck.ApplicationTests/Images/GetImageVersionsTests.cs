@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -18,7 +19,7 @@ public class GetImageVersionsTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageVersions(dbContext.AsCallContext()).RunAsync(new GetImageVersions.Request(Guid.NewGuid())));
+        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImageVersions(dbContext.AsCallContext()).RunAsync(new GetImageVersions.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task Versionning()

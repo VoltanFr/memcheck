@@ -2,7 +2,6 @@
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Images;
@@ -18,7 +17,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("")));
+        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("")));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -28,7 +27,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' ')));
+        await Assert.ThrowsExceptionAsync<ImageNameNotTrimmedException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' ')));
     }
     [TestMethod()]
     public async Task ImageDoesNotExist()
@@ -38,7 +37,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String())));
     }
     [TestMethod()]
     public async Task Success_ImageNotUsed()

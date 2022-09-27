@@ -236,6 +236,7 @@ public class MediaController : MemCheckController
         public GetImageInfoForDeletionResult(GetImageInfoFromId.Result appResult, ILocalized localizer)
         {
             ImageName = appResult.Name;
+            CardCount = appResult.CardCount;
             CurrentVersionUserName = appResult.Owner.UserName;
             Description = appResult.Description;
             Source = appResult.Source;
@@ -245,6 +246,7 @@ public class MediaController : MemCheckController
             CurrentVersionDescription = appResult.CurrentVersionDescription;
         }
         public string ImageName { get; }
+        public int CardCount { get; }
         public string CurrentVersionUserName { get; }
         public string Description { get; }
         public string Source { get; }

@@ -35,13 +35,10 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
     {
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            if (ImageName != ImageName.Trim())
-                throw new InvalidOperationException($"Name not trimmed: '{ImageName}'");
-            if (ImageName.Length == 0)
-                throw new RequestInputException(callContext.Localized.GetLocalized("PleaseEnterAnImageName"));
+            QueryValidationHelper.CheckImageNameValidity(ImageName, callContext.Localized);
 
             if (!await callContext.DbContext.Images.AnyAsync(image => EF.Functions.Like(image.Name, $"{ImageName}")))
-                throw new RequestInputException(callContext.Localized.GetLocalized("ImageNotFound") + ' ' + ImageName);
+                throw new ImageNotFoundException(callContext.Localized.GetLocalized("ImageNotFound") + ' ' + ImageName);
 
         }
     }

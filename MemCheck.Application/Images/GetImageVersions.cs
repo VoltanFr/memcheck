@@ -1,4 +1,5 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ public sealed class GetImageVersions : RequestRunner<GetImageVersions.Request, I
     {
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            await Task.CompletedTask;
+            await QueryValidationHelper.CheckImageExistsAsync(callContext.DbContext, ImageId);
         }
     }
     public sealed class ImageVersionFromDb

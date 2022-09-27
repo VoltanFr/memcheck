@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MemCheck.Application.QueryValidation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -29,7 +30,7 @@ public sealed class GetImage : RequestRunner<GetImage.Request, GetImage.Result>
     {
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            await Task.CompletedTask;
+            await QueryValidationHelper.CheckImageExistsAsync(callContext.DbContext, ImageId);
         }
         public enum ImageSize { Small, Medium, Big };
     }

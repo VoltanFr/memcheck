@@ -90,10 +90,8 @@ public sealed class UpdateImageMetadata : RequestRunner<UpdateImageMetadata.Requ
         public string VersionDescription { get; }
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            if (QueryValidationHelper.IsReservedGuid(UserId))
-                throw new InvalidOperationException("Invalid user id");
-            if (QueryValidationHelper.IsReservedGuid(ImageId))
-                throw new InvalidOperationException("Invalid image id");
+            await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+            await QueryValidationHelper.CheckImageExistsAsync(callContext.DbContext, ImageId);
 
             var imageDataBeforeUpdate = await callContext.DbContext.Images
                 .AsNoTracking()

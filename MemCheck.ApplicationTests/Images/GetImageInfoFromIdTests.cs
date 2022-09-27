@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -17,7 +18,7 @@ public class GetImageInfoFromIdTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
+        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task NotUsedInCards()

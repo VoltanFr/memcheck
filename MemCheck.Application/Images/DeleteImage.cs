@@ -73,9 +73,6 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
         DbContext.ImagePreviousVersions.Add(versionFromCurrentImage);
         DbContext.ImagePreviousVersions.Add(deletionVersion);
 
-        var imagesInCardsToDelete = DbContext.ImagesInCards.Where(imageInCard => imageInCard.ImageId == request.ImageId);
-        DbContext.ImagesInCards.RemoveRange(imagesInCardsToDelete);
-
         DbContext.Images.Remove(image);
 
         await DbContext.SaveChangesAsync();
@@ -90,15 +87,10 @@ public sealed class DeleteImage : RequestRunner<DeleteImage.Request, DeleteImage
         public const int MaxDescriptionLength = 1000;
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            if (DeletionDescription != DeletionDescription.Trim())
-                throw new InvalidOperationException("Invalid name: not trimmed");
-            if (DeletionDescription.Length is < MinDescriptionLength or > MaxDescriptionLength)
-                throw new RequestInputException(callContext.Localized.GetLocalized("InvalidDeletionDescriptionLength") + $" {DeletionDescription.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinDescriptionLength} " + callContext.Localized.GetLocalized("And") + $" {MaxDescriptionLength}");
-
-            await QueryValidationHelper.CheckUserExistsAndIsAdminAsync(callContext.DbContext, UserId, callContext.RoleChecker);
-
-            if (QueryValidationHelper.IsReservedGuid(ImageId))
-                throw new RequestInputException("InvalidImageId");
+            await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
+            QueryValidationHelper.CheckCanCreateImageWithVersionDescription(DeletionDescription, callContext.Localized);
+            await QueryValidationHelper.CheckImageExistsAsync(callContext.DbContext, ImageId);
+            await QueryValidationHelper.CheckImageIsNotUsedByAnyCardAsync(callContext.DbContext, ImageId, callContext.Localized);
         }
     }
     public sealed record Result(string ImageName);

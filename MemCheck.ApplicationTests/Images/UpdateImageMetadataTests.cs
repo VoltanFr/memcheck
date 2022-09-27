@@ -21,7 +21,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, Guid.Empty, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, Guid.Empty, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -33,7 +33,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user, name);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, Guid.NewGuid(), name, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, Guid.NewGuid(), name, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task ImageDoesNotExist()
@@ -43,7 +43,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(Guid.NewGuid(), user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(Guid.NewGuid(), user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooShort()
@@ -53,7 +53,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength - 1), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength - 1), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -63,7 +63,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMaxNameLength + 1), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMaxNameLength + 1), RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -73,7 +73,7 @@ public class UpdateImageMetadataTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength) + "\t\t", RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<ImageNameNotTrimmedException>(async () => await new UpdateImageMetadata(dbContext.AsCallContext()).RunAsync(new UpdateImageMetadata.Request(image, user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength) + "\t\t", RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task SourceTooShort()

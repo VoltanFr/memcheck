@@ -56,7 +56,7 @@ public class StoreImageTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new StoreImage.Request(user, RandomHelper.String(QueryValidationHelper.ImageMinNameLength - 1), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -66,7 +66,7 @@ public class StoreImageTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new StoreImage.Request(user, RandomHelper.String(QueryValidationHelper.ImageMaxNameLength + 1), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -76,7 +76,7 @@ public class StoreImageTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new StoreImage.Request(user, "   " + RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExceptionAsync<ImageNameNotTrimmedException>(async () => await new StoreImage(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task DescriptionTooShort()
@@ -218,7 +218,7 @@ public class StoreImageTests
         var errorString = RandomHelper.String();
         var localizer = new TestLocalizer("IsForbidden".PairedWith(errorString));
         var request = new StoreImage.Request(user, name, RandomHelper.String(), RandomHelper.String(), StoreImage.pngImageContentType, pngImage);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var e = await Assert.ThrowsExceptionAsync<InvalidImageNameCharException>(async () => await new StoreImage(dbContext.AsCallContext(localizer)).RunAsync(request));
         StringAssert.Contains(e.Message, errorString);
         StringAssert.Contains(e.Message, c.ToString());
     }

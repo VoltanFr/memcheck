@@ -36,7 +36,7 @@ internal static class QueryValidationHelper
     public const int DeckMaxNameLength = 36;
     public const int LanguageMinNameLength = 2;
     public const int LanguageMaxNameLength = 36;
-    public const string ExceptionMesg_CardDoesNotExist = "Card noes not exist";
+    public const string ExceptionMesg_CardDoesNotExist = "Card does not exist";
     public const string ExceptionMesg_TagDoesNotExist = "Tag not found";
     public const string ExceptionMesg_UserDoesNotExist = "User not found";
     public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
@@ -86,6 +86,11 @@ internal static class QueryValidationHelper
             throw new NonexistentUserException("User not found");
         if (!await roleChecker.UserIsAdminAsync(user))
             throw new UnsatisfactoryUserRoleException("User not admin");
+    }
+    public static async Task CheckImageExistsAsync(MemCheckDbContext dbContext, Guid imageId)
+    {
+        if (!await dbContext.Images.AsNoTracking().AnyAsync(image => image.Id == imageId))
+            throw new ImageNotFoundException("Image does not exist");
     }
     public static void CheckUserIsOwnerOfDeck(MemCheckDbContext dbContext, Guid userId, Guid deckId)
     {
@@ -194,16 +199,22 @@ internal static class QueryValidationHelper
         if (await dbContext.Images.AsNoTracking().Where(img => EF.Functions.Like(img.Name, name)).AnyAsync())
             throw new RequestInputException(localizer.GetLocalized("AnImageWithName") + " '" + name + "' " + localizer.GetLocalized("AlreadyExistsCaseInsensitive"));
     }
+    public static async Task CheckImageIsNotUsedByAnyCardAsync(MemCheckDbContext dbContext, Guid imageId, ILocalized localizer)
+    {
+        var imagesInCardsCount = await dbContext.ImagesInCards.AsNoTracking().Where(imageInCard => imageInCard.ImageId == imageId).CountAsync();
+        if (imagesInCardsCount > 0)
+            throw new ImageUsedInCardException(localizer.GetLocalized("ImageIsUsedByCardsBeforeCount") + imagesInCardsCount + localizer.GetLocalized("ImageIsUsedByCardsAfterCount"));
+    }
     public static void CheckImageNameValidity(string name, ILocalized localizer)
     {
         if (name != name.Trim())
-            throw new InvalidOperationException("Invalid Name: not trimmed");
+            throw new ImageNameNotTrimmedException("Invalid Name: not trimmed");
         if (name.Length is < ImageMinNameLength or > ImageMaxNameLength)
-            throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinNameLength} " + localizer.GetLocalized("And") + $" {ImageMaxNameLength}");
+            throw new InvalidImageNameLengthException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {ImageMinNameLength} " + localizer.GetLocalized("And") + $" {ImageMaxNameLength}");
         var regexp = new Regex(charsAllowedInImageName);
         foreach (var nameChar in name)
             if (!regexp.IsMatch(nameChar.ToString()))
-                throw new RequestInputException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + nameChar + ' ' + (string?)localizer.GetLocalized("IsForbidden") + ")");
+                throw new InvalidImageNameCharException(localizer.GetLocalized("InvalidImageName") + " '" + name + "' ('" + nameChar + ' ' + (string?)localizer.GetLocalized("IsForbidden") + ")");
     }
     public static void CheckCanCreateImageWithSource(string source, ILocalized localizer)
     {
