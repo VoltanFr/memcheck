@@ -130,9 +130,6 @@
                     <div class="markdown-render markdown-body">
                         <span v-html="currentCardFrontSide()"></span>
                     </div>
-                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==1"><img class="imageincard" :src="image.blob" /></a>
-                    </div>
                     <div v-if="!backSideVisible" class="learning-card-footer">
                         <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
                     </div>
@@ -143,9 +140,6 @@
                     </div>
                     <div class="markdown-render markdown-body">
                         <span v-html="currentCardBackSide()"></span>
-                    </div>
-                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==2"><img class="imageincard" :src="image.blob" /></a>
                     </div>
                 </div>
                 <div id="Knew Forgot" v-if="backSideVisible" class="memcheck-bottom-button-div">
@@ -160,9 +154,6 @@
                     </div>
                     <div class="markdown-render markdown-body">
                         <span v-html="currentCardAdditionalInfo()"></span>
-                    </div>
-                    <div class="learning-card-body-image-div" v-for="image in currentCard.images">
-                        <a href="#" @@click="showImageFull(image)" v-if="image.cardSide==3"><img class="imageincard" :src="image.blob" /></a>
                     </div>
                 </div>
                 <div id="References" v-if="currentCard && backSideVisible && currentCardHasReferences()" class="memcheck-input-div card-side-div">
