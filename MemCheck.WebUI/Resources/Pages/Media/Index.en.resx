@@ -228,6 +228,15 @@
   <data name="FullScreenImageName" xml:space="preserve">
     <value>Name:</value>
   </data>
+  <data name="ImageForCardBigToClipboard" xml:space="preserve">
+    <value>Copy for card usage, big</value>
+  </data>
+  <data name="ImageForCardMediumToClipboard" xml:space="preserve">
+    <value>Copy for card usage, medium</value>
+  </data>
+  <data name="ImageForCardSmallToClipboard" xml:space="preserve">
+    <value>Copy for card usage, small</value>
+  </data>
   <data name="InitialVersionCreatedOn" xml:space="preserve">
     <value>Added to MemCheck on:</value>
   </data>

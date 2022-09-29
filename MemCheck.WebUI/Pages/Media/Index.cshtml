@@ -52,7 +52,13 @@
                 <div id="ListAsCardsEntry" class="card image-list-card" v-for="image in images">
                     <div id="CardHeader" class="card-header image-list-card-header">
                         {{image.imageName}}
-                        <button class="toolbar-button-circle toolbar-button" @@click="copyToClipboard(image.imageName)"><i class="far fa-copy"></i></button>
+                        <button class="toolbar-button-circle toolbar-button dropdown-toggle" href="#" id="CopyToClipboardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-copy"></i></button>
+                        <div class="dropdown-menu" role="menu" aria-labelledby="CopyToClipboardDropdown">
+                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=small]')">@Localizer["ImageForCardSmallToClipboard"]</a>
+                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=medium]')">@Localizer["ImageForCardMediumToClipboard"]</a>
+                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=big]')">@Localizer["ImageForCardBigToClipboard"]</a>
+                        </div>
+
                         <button class="toolbar-button-circle toolbar-button" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button>
                         <button class="toolbar-button-circle toolbar-button" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
                     </div>
