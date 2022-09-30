@@ -291,4 +291,13 @@
   <data name="PleaseReload" xml:space="preserve">
     <value>Rechargez la page lorsque votre connection sera meilleure</value>
   </data>
+  <data name="ImageForCardBigToClipboard" xml:space="preserve">
+    <value>Copier pour une carte, taille : grande</value>
+  </data>
+  <data name="ImageForCardMediumToClipboard" xml:space="preserve">
+    <value>Copier pour une carte, taille : moyenne</value>
+  </data>
+  <data name="ImageForCardSmallToClipboard" xml:space="preserve">
+    <value>Copier pour une carte, taille : petite</value>
+  </data>
 </root>

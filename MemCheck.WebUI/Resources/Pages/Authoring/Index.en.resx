@@ -288,4 +288,13 @@
   <data name="PleaseReload" xml:space="preserve">
     <value>Please reload when the connection improves</value>
   </data>
+  <data name="ImageForCardBigToClipboard" xml:space="preserve">
+    <value>Copy for card usage, big</value>
+  </data>
+  <data name="ImageForCardMediumToClipboard" xml:space="preserve">
+    <value>Copy for card usage, medium</value>
+  </data>
+  <data name="ImageForCardSmallToClipboard" xml:space="preserve">
+    <value>Copy for card usage, small</value>
+  </data>
 </root>

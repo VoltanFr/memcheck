@@ -17,7 +17,14 @@ export const BigSizeImage = Vue.defineComponent({
             <div id="TitleAndSmallButtons" class="big-size-image-top-div">
                 <ul class="big-size-image-top-ul">
                     <li class="big-size-image-top-li big-size-image-name">{{image.name}}</li>
-                    <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_CopyToClipboard" v-on:click="copyToClipboard()"><i class="far fa-copy"></i></button></li>
+                    <li class="big-size-image-top-li">
+                        <button class="toolbar-button-circle toolbar-button dropdown-toggle" href="#" id="BigSizeImageCopyToClipboardDropdown" role="button" v-bind:title="labellocalizer.BigSizeImageLabel_CopyToClipboard" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-copy"></i></button>
+                        <div class="dropdown-menu" role="menu" aria-labelledby="CopyToClipboardDropdown">
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.name + ',size=small]')">{{labellocalizer.ImageForCardSmallToClipboard}}</a>
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.name + ',size=medium]')">{{labellocalizer.ImageForCardMediumToClipboard}}</a>
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.name + ',size=big]')">{{labellocalizer.ImageForCardBigToClipboard}}</a>
+                        </div>
+                    </li>
                     <li class="big-size-image-top-li" v-if="hasEditListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_EditButtonTitle" v-on:click="$emit('edit')"><i class="fas fa-pen"></i></button></li>
                     <li class="big-size-image-top-li" v-if="hasVersionHistoryListener()"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_VersionHistoryButtonTitle" v-on:click="$emit('versionhistory')"><i class="fas fa-history"></i></button></li>
                     <li class="big-size-image-top-li"><button class="toolbar-button-circle toolbar-button" v-bind:title="labellocalizer.BigSizeImageLabel_CloseButtonTitle" v-on:click="$emit('close')"><i class="far fa-times-circle"></i></button></li>
@@ -47,8 +54,8 @@ export const BigSizeImage = Vue.defineComponent({
         </div>
     `,
     methods: {
-        copyToClipboard() {
-            copyToClipboardAndToast(this.image.name, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure);
+        copyToClipboard(text) {
+            copyToClipboardAndToast(text, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess, this.labellocalizer.BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure);
         },
         hasEditListener() {
             return this.$attrs && this.$attrs.onEdit;
