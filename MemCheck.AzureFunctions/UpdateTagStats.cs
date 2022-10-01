@@ -27,7 +27,7 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
         var result = await updater.RunAsync(new RefreshTagStats.Request());
 
         var reportMailMainPart = new StringBuilder()
-            .Append(CultureInfo.InvariantCulture, $"<h1>{result.Tags.Length} MemCheck tags</h1>")
+            .Append(CultureInfo.InvariantCulture, $"<h1>{result.Tags.Length} Mnesios tags</h1>")
             .Append("<p><table>")
             .Append("<thead><tr><th>Name</th><th>Previous count</th><th>Previous average</th><th>New count</th><th>New average</th></tr></thead>");
 

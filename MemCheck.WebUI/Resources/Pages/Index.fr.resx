@@ -166,7 +166,7 @@
     <value>la doc</value>
   </data>
   <data name="ToUseMemCheck" xml:space="preserve">
-    <value>pour utiliser MemCheck</value>
+    <value>pour utiliser Mnesios</value>
   </data>
   <data name="UnknownCard" xml:space="preserve">
     <value>carte non apprise</value>
@@ -235,6 +235,6 @@
     <value>vous pouvez utiliser le bouton Démo (👁) sur le label de votre choix - conseil : choisissez un label qui a une évaluation moyenne élevée</value>
   </data>
   <data name="WantADemo" xml:space="preserve">
-    <value>Vous voulez un apperçu de MemCheck ?</value>
+    <value>Vous voulez un apperçu de Mnesios ?</value>
   </data>
 </root>

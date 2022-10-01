@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AfterHyperLink" xml:space="preserve">
-    <value>This will open the web site and allow you to validate the creation of your account, giving you full access to MemCheck.</value>
+    <value>This will open the web site and allow you to validate the creation of your account, giving you full access to Mnesios.</value>
   </data>
   <data name="BeforeHyperLink" xml:space="preserve">
-    <value>You have requested the creation of your MemCheck account.</value>
+    <value>You have requested the creation of your Mnesios account.</value>
   </data>
   <data name="Final" xml:space="preserve">
     <value>Thank you!</value>
@@ -133,6 +133,6 @@
     <value>Please click here to validate</value>
   </data>
   <data name="MailSubject" xml:space="preserve">
-    <value>MemCheck: Confirm your email address</value>
+    <value>Mnesios: Confirm your email address</value>
   </data>
 </root>

@@ -121,7 +121,7 @@
     <value>Merci !</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
-    <value>Création de votre compte MemCheck : plus qu'une étape !</value>
+    <value>Création de votre compte Mnesios : plus qu'une étape !</value>
   </data>
   <data name="Paragraph1AfterUserAddress" xml:space="preserve">
     <value>pour confirmer qu'il s'agit bien de votre compte de messagerie.</value>
@@ -136,6 +136,6 @@
     <value>Nous vous invitons à clicker sur le lien dans le mail. L'adresse d'expédition est </value>
   </data>
   <data name="Paragraph3" xml:space="preserve">
-    <value>Vous aurez ensuite accès à tout MemCheck !</value>
+    <value>Vous aurez ensuite accès à tout Mnesios !</value>
   </data>
 </root>

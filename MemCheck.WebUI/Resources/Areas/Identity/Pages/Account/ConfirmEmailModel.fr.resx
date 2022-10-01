@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppLine" xml:space="preserve">
-    <value>Pour ouvrir MemCheck,</value>
+    <value>Pour ouvrir Mnesios,</value>
   </data>
   <data name="AppLinkText" xml:space="preserve">
     <value>cliquez ici</value>
@@ -142,9 +142,9 @@
     <value>Merci pour la confirmation de votre adresse électronique.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
-    <value>Bienvenue dans MemCheck !</value>
+    <value>Bienvenue dans Mnesios !</value>
   </data>
   <data name="WelcomeMailSubject" xml:space="preserve">
-    <value>MemCheck : compte créé !</value>
+    <value>Mnesios : compte créé !</value>
   </data>
 </root>

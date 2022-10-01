@@ -33,7 +33,7 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     {
         public string GetAbsoluteAddress(string relativeUri)
         {
-            return "https://memcheckfr.azurewebsites.net" + (relativeUri.StartsWith("/", StringComparison.InvariantCulture) ? "" : "/") + relativeUri;
+            return "https://www.Mnesios.com" + (relativeUri.StartsWith("/", StringComparison.InvariantCulture) ? "" : "/") + relativeUri;
         }
     }
     #endregion

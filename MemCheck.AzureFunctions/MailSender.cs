@@ -51,12 +51,12 @@ public sealed class MailSender
     public async Task SendFailureInfoMailAsync(string functionName, Exception e)
     {
         var body = new StringBuilder()
-            .Append(CultureInfo.InvariantCulture, $"<h1>MemCheck function '{functionName}' failure</h1>")
+            .Append(CultureInfo.InvariantCulture, $"<h1>Mnesios function '{functionName}' failure</h1>")
             .Append(CultureInfo.InvariantCulture, $"<p>Sent by Azure func '{functionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {functionStartTime}, mail constructed at {DateTime.UtcNow}</p>");
 
         AddExceptionDetailsToMailBody(body, e);
 
-        await SendAsync("MemCheck Azure function failure", body.ToString(), SenderEmail.AsArray());
+        await SendAsync("Mnesios Azure function failure", body.ToString(), SenderEmail.AsArray());
     }
     public async Task SendAsync(string subject, string body, IEnumerable<EmailAddress> to)
     {

@@ -157,7 +157,7 @@
     <value>Nom</value>
   </data>
   <data name="ImageRenamingOnlyByAdmin" xml:space="preserve">
-    <value>Le renommage d'image ne peut être fait que par un administrateur de MemCheck. Contactez nous.</value>
+    <value>Le renommage d'image ne peut être fait que par un administrateur de Mnesios. Contactez nous.</value>
   </data>
   <data name="Images" xml:space="preserve">
     <value>images</value>

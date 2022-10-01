@@ -319,13 +319,13 @@
     <value>On</value>
   </data>
   <data name="OnDidNotKnowToastMessage" xml:space="preserve">
-    <value>If you were using MemCheck with an account, you would learn that card again in your next learning session.</value>
+    <value>If you were using Mnesios with an account, you would learn that card again in your next learning session.</value>
   </data>
   <data name="OnDidNotKnowToastTitle" xml:space="preserve">
     <value>You did not know</value>
   </data>
   <data name="OnKnewToastMessage" xml:space="preserve">
-    <value>If you were using MemCheck with an account, you would rehearse that card in 2 days (a delay which increases as you rehearse).</value>
+    <value>If you were using Mnesios with an account, you would rehearse that card in 2 days (a delay which increases as you rehearse).</value>
   </data>
   <data name="OnKnewToastTitle" xml:space="preserve">
     <value>You knew</value>

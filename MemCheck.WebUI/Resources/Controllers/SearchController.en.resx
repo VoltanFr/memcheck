@@ -160,10 +160,10 @@
     <value>WARNING: you are about to DELETE</value>
   </data>
   <data name="AlertDeleteCardsPart2Plural" xml:space="preserve">
-    <value>cards from MemCheck. No user will be able to access them.</value>
+    <value>cards from Mnesios. No user will be able to access them.</value>
   </data>
   <data name="AlertDeleteCardsPart2Single" xml:space="preserve">
-    <value>a card from MemCheck. No user will be able to access it.</value>
+    <value>a card from Mnesios. No user will be able to access it.</value>
   </data>
   <data name="AlertMoveCardsToHeapPart1" xml:space="preserve">
     <value>Move</value>

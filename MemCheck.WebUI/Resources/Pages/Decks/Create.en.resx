@@ -139,7 +139,7 @@
     <value>Please wait, initializing data...</value>
   </data>
   <data name="AdviceForSingleDeck" xml:space="preserve">
-    <value>We advise you to have only one deck with the current version of MemCheck, because the GUI is not optimized yet for working with multiple decks.</value>
+    <value>We advise you to have only one deck with the current version of Mnesios, because the GUI is not optimized yet for working with multiple decks.</value>
   </data>
   <data name="Deck" xml:space="preserve">
     <value>deck</value>

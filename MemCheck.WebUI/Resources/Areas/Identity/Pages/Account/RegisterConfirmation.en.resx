@@ -121,7 +121,7 @@
     <value>Thank you!</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
-    <value>MemCheck account creation: one last step</value>
+    <value>Mnesios account creation: one last step</value>
   </data>
   <data name="Paragraph1AfterUserAddress" xml:space="preserve">
     <value> to confirm that the email address is truely yours.</value>
@@ -136,6 +136,6 @@
     <value>Please check your email account and follow the link. The sending address is </value>
   </data>
   <data name="Paragraph3" xml:space="preserve">
-    <value>After that step, you will have full access to MemCheck.</value>
+    <value>After that step, you will have full access to Mnesios.</value>
   </data>
 </root>

@@ -320,13 +320,13 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
     <value>Le</value>
   </data>
   <data name="OnDidNotKnowToastMessage" xml:space="preserve">
-    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans votre prochaine session d'apprentissage.</value>
+    <value>Si vous utilisiez Mnesios avec un compte, cette carte vous serez présentée à nouveau dans votre prochaine session d'apprentissage.</value>
   </data>
   <data name="OnDidNotKnowToastTitle" xml:space="preserve">
     <value>Vous ne saviez pas</value>
   </data>
   <data name="OnKnewToastMessage" xml:space="preserve">
-    <value>Si vous utilisiez MemCheck avec un compte, cette carte vous serez présentée à nouveau dans deux jours (cet intervalle augmentant au fur et à mesure de vos répétitions).</value>
+    <value>Si vous utilisiez Mnesios avec un compte, cette carte vous serez présentée à nouveau dans deux jours (cet intervalle augmentant au fur et à mesure de vos répétitions).</value>
   </data>
   <data name="OnKnewToastTitle" xml:space="preserve">
     <value>Vous saviez</value>

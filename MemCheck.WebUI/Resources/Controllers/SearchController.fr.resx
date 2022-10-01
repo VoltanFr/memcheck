@@ -160,10 +160,10 @@
     <value>ATTENTION : vous allez effacer</value>
   </data>
   <data name="AlertDeleteCardsPart2Plural" xml:space="preserve">
-    <value>cartes de MemCheck. Elles ne seront plus accessibles pour aucune utilisateur.</value>
+    <value>cartes de Mnesios. Elles ne seront plus accessibles pour aucune utilisateur.</value>
   </data>
   <data name="AlertDeleteCardsPart2Single" xml:space="preserve">
-    <value>une carte de MemCheck. Elle ne sera plus accessible pour aucun utilisateur.</value>
+    <value>une carte de Mnesios. Elle ne sera plus accessible pour aucun utilisateur.</value>
   </data>
   <data name="AlertMoveCardsToHeapPart1" xml:space="preserve">
     <value>Déplacer</value>

@@ -27,7 +27,7 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
             .Append("<p><ul>");
 
         foreach (var changedCard in changedCardGuids)
-            writer = writer.Append(CultureInfo.InvariantCulture, $"<li>https://memcheckfr.azurewebsites.net/Authoring?CardId={changedCard}</li>");
+            writer = writer.Append(CultureInfo.InvariantCulture, $"<li>https://www.Mnesios.com/Authoring?CardId={changedCard}</li>");
 
         writer = writer.Append("</ul></p>");
 
