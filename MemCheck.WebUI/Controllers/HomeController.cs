@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using MemCheck.Application;
+using MemCheck.Application.Tags;
 
 namespace MemCheck.WebUI.Controllers;
 
@@ -32,18 +33,21 @@ public class HomeController : MemCheckController
     {
         var user = await userManager.GetUserAsync(HttpContext.User);
         if (user == null)
-            return Ok(new GetAllViewModel(null, false, 0, Array.Empty<GetAllDeckViewModel>(), DateTime.UtcNow));
+        {
+            var recommendedTagsForDemo = await new GetRecommendedTagsForDemo(callContext).RunAsync(new GetRecommendedTagsForDemo.Request(100, 4.7));
+            return Ok(new GetAllResult(null, false, 0, Array.Empty<GetAllResult_Deck>(), DateTime.UtcNow, recommendedTagsForDemo.Tags.Select(resultTag => new GetAllResult_Tag(resultTag.TagId, resultTag.TagName))));
+        }
 
         var userDecks = await new GetDecksWithLearnCounts(callContext).RunAsync(new GetDecksWithLearnCounts.Request(user.Id));
         var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
         var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-        return Ok(new GetAllViewModel(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllDeckViewModel(deck, userDecks.Count() == 1, this)), DateTime.UtcNow));
+        return Ok(new GetAllResult(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllResult_Deck(deck, userDecks.Count() == 1, this)), DateTime.UtcNow, Array.Empty<GetAllResult_Tag>()));
     }
     #region Result classes
-    public sealed class GetAllViewModel
+    public sealed class GetAllResult
     {
-        private static TimeSpan GetReloadWaitTime(IEnumerable<GetAllDeckViewModel> userDecks)
+        private static TimeSpan GetReloadWaitTime(IEnumerable<GetAllResult_Deck> userDecks)
         {
             if (!userDecks.Any())
                 //Refreshing is useless
@@ -55,7 +59,7 @@ public class HomeController : MemCheckController
             var sleepTimeForDecks = userDecks.Select(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow).Min();
             return new[] { TimeSpan.FromMinutes(1), sleepTimeForDecks }.Max().Add(TimeSpan.FromMinutes(1));    //Not less than 2'
         }
-        public GetAllViewModel(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllDeckViewModel> userDecks, DateTime dataUTCDate)
+        public GetAllResult(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllResult_Deck> userDecks, DateTime dataUTCDate, IEnumerable<GetAllResult_Tag> recommendedTagsForDemo)
         {
             UserName = userName;
             AnythingToLearn = anythingToLearn;
@@ -64,17 +68,19 @@ public class HomeController : MemCheckController
             ReloadWaitTime = (int)GetReloadWaitTime(userDecks).TotalMilliseconds;
             UserDecks = userDecks;
             DataUTCDate = dataUTCDate;
+            RecommendedTagsForDemo = recommendedTagsForDemo;
         }
         public string? UserName { get; }    //null if no user
         public bool AnythingToLearn { get; }
         public int TotalCardCountInDecksOfUser { get; }
         public int ReloadWaitTime { get; }  //milliseconds
-        public IEnumerable<GetAllDeckViewModel> UserDecks { get; }
+        public IEnumerable<GetAllResult_Deck> UserDecks { get; }
         public DateTime DataUTCDate { get; }
+        public IEnumerable<GetAllResult_Tag> RecommendedTagsForDemo { get; } //Empty if a user is logged in
     }
-    public sealed class GetAllDeckViewModel
+    public sealed class GetAllResult_Deck
     {
-        public GetAllDeckViewModel(GetDecksWithLearnCounts.Result applicationDeck, bool isTheOnlyDeck, ILocalized localizer)
+        public GetAllResult_Deck(GetDecksWithLearnCounts.Result applicationDeck, bool isTheOnlyDeck, ILocalized localizer)
         {
             NextExpiryUTCDate = applicationDeck.NextExpiryUTCDate;
 
@@ -139,6 +145,7 @@ public class HomeController : MemCheckController
         public string HeadLine { get; }
         public IEnumerable<string> Lines { get; }
     }
+    public sealed record GetAllResult_Tag(Guid TagId, string TagName);
     #endregion
     #endregion
 }

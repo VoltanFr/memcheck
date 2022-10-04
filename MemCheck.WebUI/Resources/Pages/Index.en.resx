@@ -231,10 +231,7 @@
   <data name="TagListPage" xml:space="preserve">
     <value>tag list</value>
   </data>
-  <data name="UseTheDemoButtonOnTheLabelOfYourChoice" xml:space="preserve">
-    <value>use the Demo button for the label of your choice</value>
-  </data>
   <data name="WantADemo" xml:space="preserve">
-    <value>Want a demo?</value>
+    <value>Want a demo? Select your subject...</value>
   </data>
 </root>

@@ -37,4 +37,31 @@ public class IntExtensionsTests
         await count.TimesAsync(async () => { await Task.Delay(1); list.Add(0); });
         Assert.AreEqual(count, list.Count);
     }
+    [TestMethod()]
+    public async Task TimesWithResult_Zero()
+    {
+        var result = await 0.TimesAsync(async () => { await Task.CompletedTask; return 12; });
+        Assert.IsFalse(result.Any());
+    }
+    [TestMethod()]
+    public async Task TimessWithResult_Negative()
+    {
+        await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await (-1).TimesAsync(async () => { await Task.CompletedTask; return 1; }));
+    }
+    [TestMethod()]
+    public async Task TimesWithResult_Once()
+    {
+        var result = await 1.TimesAsync(async () => { await Task.CompletedTask; return 1; });
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(1, result[0]);
+    }
+    [TestMethod()]
+    public async Task TimesWithResult_Random()
+    {
+        var expectedCount = RandomNumberGenerator.GetInt32(3, 10);
+        var result = await expectedCount.TimesAsync(async () => { await Task.CompletedTask; return expectedCount; });
+        Assert.AreEqual(expectedCount, result.Length);
+        foreach (var item in result)
+            Assert.AreEqual(expectedCount, item);
+    }
 }

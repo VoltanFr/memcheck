@@ -1,4 +1,5 @@
-﻿using MemCheck.Database;
+﻿using MemCheck.Application.Tags;
+using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,5 +16,10 @@ public static class TagHelper
         dbContext.Tags.Add(result);
         await dbContext.SaveChangesAsync();
         return result.Id;
+    }
+    public static async Task RefreshAllAsync(DbContextOptions<MemCheckDbContext> db)
+    {
+        using var tmpDbContext = new MemCheckDbContext(db);
+        await new RefreshTagStats(tmpDbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
     }
 }
