@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MemCheck.Basics;
 
 public static class EnumerableExtensions
 {
-    public static void ForEach<T>(this IEnumerable<T> sequence, Action<T> action)
+    public static async Task ForEachWaitingForEachAsync<TElementType>(this IEnumerable<TElementType> sequence, Func<TElementType, Task> action)
     {
         foreach (var item in sequence)
-            action(item);
+            await action(item);
     }
 }

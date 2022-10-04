@@ -38,7 +38,7 @@ public class GetRecommendedTagsForDemoTests
         var userId = await UserHelper.CreateInDbAsync(db);
         var tagId = await TagHelper.CreateAsync(db);
         var cardIds = await 10.TimesAsync(async () => await CardHelper.CreateIdAsync(db, userId, tagIds: tagId.AsArray()));
-        cardIds.ForEach(async cardId => await RatingHelper.RecordForUserAsync(db, userId, cardId, RandomHelper.Int(1, 3)));
+        await cardIds.ForEachWaitingForEachAsync(async cardId => await RatingHelper.RecordForUserAsync(db, userId, cardId, RandomHelper.Int(1, 3)));
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetRecommendedTagsForDemo(dbContext.AsCallContext()).RunAsync(new GetRecommendedTagsForDemo.Request(10, 4));
@@ -51,7 +51,7 @@ public class GetRecommendedTagsForDemoTests
         var userId = await UserHelper.CreateInDbAsync(db);
         var tagId = await TagHelper.CreateAsync(db);
         var cardIds = await 10.TimesAsync(async () => await CardHelper.CreateIdAsync(db, userId, tagIds: tagId.AsArray()));
-        cardIds.ForEach(async cardId => await RatingHelper.RecordForUserAsync(db, userId, cardId, RandomHelper.Int(4, 5)));
+        await cardIds.ForEachWaitingForEachAsync(async cardId => await RatingHelper.RecordForUserAsync(db, userId, cardId, RandomHelper.Int(4, 5)));
         await TagHelper.RefreshAllAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
