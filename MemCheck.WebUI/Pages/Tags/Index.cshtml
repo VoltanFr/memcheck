@@ -46,10 +46,7 @@
                         <table class="tag-list-in-row-table">
                             <tr class="tag-list-in-row-row">
                                 <td class="tag-list-column-header-name">@Localizer["Name"]</td>
-                                <td class="tag-list-column-header-edit">
-                                    <span v-if="userLoggedIn">@Localizer["Edit"]</span>
-                                    <span v-else>@Localizer["Demo"]</span>
-                                </td>
+                                <td class="tag-list-column-header-edit"><span v-if="userLoggedIn">@Localizer["Edit"]</span></td>
                                 <td class="tag-list-column-header-count">@Localizer["CardCount"]</td>
                                 <td class="tag-list-column-header-rating">@Localizer["Rating"]</td>
                             </tr>
@@ -68,10 +65,6 @@
                                 </td>
                                 <td class="tag-list-column-data-edit">
                                     <button class="toolbar-button-circle toolbar-button" @@click="edit(tag.tagId)" v-if="userLoggedIn"><i class="fas fa-pen"></i></button>
-                                    <span v-else>
-                                        <button class="toolbar-button-circle toolbar-button" @@click="demo(tag.tagId)" v-if="tag.cardCount > 0"><i class="far fa-eye"></i></button>
-                                        <button class="toolbar-button-circle toolbar-button" @@click="demo(tag.tagId)" disabled v-else><i class="far fa-eye"></i></button>
-                                    </span>
                                 </td>
                                 <td class="tag-list-column-data-count">
                                     <button class="toolbar-button data-count-button" @@click="showCardsWithTag(tag.tagId)" v-if="userLoggedIn || tag.cardCount > 0">{{tag.cardCount}}</button>
