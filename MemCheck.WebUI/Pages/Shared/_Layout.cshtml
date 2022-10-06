@@ -36,10 +36,10 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light layout-header-navbar">
             <div class="container navbar-container">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#Collapsable" aria-controls="Collapsable" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="fas fa-bars"></i>&nbsp;<span class="hamburger-menu-text">Mnesios</span>
+                    <i class="fas fa-bars"></i>
                 </button>
+                <a class="navbar-toggler navbar-brand navbar-memcheck-link" asp-page="/Index">Mnesios</a>
                 <div id="Collapsable" class="collapse navbar-collapse navbar-part">
-                    <a class="navbar-brand navbar-memcheck-link" asp-page="/Index">Mnesios</a>
                     <ul class="navbar-nav mr-auto">
                         <li id="Learn" class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
@@ -105,6 +105,9 @@
                                 }
                             </div>
                         </li>
+                        <li id="Doc" class="nav-item dropdown">
+                            <a class="nav-link dropdown-item" href="https://userdoc.mnesios.com/" target="_blank">@Localizer["Documentation"]</a>
+                        </li>
                         <li id="Language" class="nav-item">
                             <div id="SelectLanguageDiv">
                                 <select class="nav-item" v-model="activeLanguage" style="border-radius: 10px;width:auto">
@@ -125,12 +128,11 @@
         @RenderBody()
     </main>
 
-    <footer class="footer layout-footer">
+@*    <footer class="footer layout-footer">
         <div class="container">
             <nav class="navbar navbar-expand-sm navbar-light border-top nav-fill nav-justified layout-footer-navbar">
                 <a class="nav-item nav-link" asp-page="/Index">@Localizer["Home"]</a>
-                @*<a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>*@
-                <a class="nav-item nav-link" href="/Doc">@Localizer["Doc"]</a>
+                <a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>
                 @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
                 {
                     <a class="nav-item nav-link" asp-page="/Admin/Index">@Localizer["Admin"]</a>
@@ -141,7 +143,7 @@
             </nav>
         </div>
     </footer>
-
+*@
     <div id="scripts">
         <environment include="Development">
             <script src="~/lib/bootstrap/js/bootstrap.bundle.js" asp-append-version="true"></script>

@@ -192,4 +192,7 @@
   <data name="Home" xml:space="preserve">
     <value>Démarrage</value>
   </data>
+  <data name="Documentation" xml:space="preserve">
+    <value>❓</value>
+  </data>
 </root>
