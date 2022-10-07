@@ -195,4 +195,7 @@
   <data name="Documentation" xml:space="preserve">
     <value>❓</value>
   </data>
+  <data name="AboutCookies" xml:space="preserve">
+    <value>About cookies</value>
+  </data>
 </root>

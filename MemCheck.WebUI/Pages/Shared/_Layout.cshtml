@@ -38,7 +38,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#Collapsable" aria-controls="Collapsable" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a class="navbar-toggler navbar-brand navbar-memcheck-link" asp-page="/Index">Mnesios</a>
+                <a class="navbar-brand navbar-memcheck-link" asp-page="/Index">Mnesios</a>
                 <div id="Collapsable" class="collapse navbar-collapse navbar-part">
                     <ul class="navbar-nav mr-auto">
                         <li id="Learn" class="nav-item dropdown">
@@ -94,15 +94,21 @@
                                 @if (SignInManager.IsSignedIn(User) && User.Identity != null)
                                 {
                                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">@User.Identity.Name</a>
-                                    <form class="nav-item form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="/" method="post">
-                                        <button type="submit" class="dropdown-item">@Localizer["Logout"]</button>
-                                    </form>
+                                    <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">@Localizer["Logout"]</a>
+                                    @if (User.IsInRole(IRoleChecker.AdminRoleName))
+                                    {
+                                        <a class="dropdown-item" asp-page="/Admin/Index">@Localizer["Admin"]</a>
+                                        <button class="dropdown-item" type="button" data-bs-toggle="collapse" data-bs-target="#DebugInfo" aria-controls="DebugInfo" aria-expanded="false" aria-label="Toggle navigation">
+                                            <i class="fas fa-bug debug-toggler"></i>
+                                        </button>
+                                    }
                                 }
                                 else
                                 {
                                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a>
                                     <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["Login"]</a>
                                 }
+                                <a class="dropdown-item" asp-page="/Privacy" asp-route-returnUrl="/">@Localizer["AboutCookies"]</a>
                             </div>
                         </li>
                         <li id="Doc" class="nav-item dropdown">
@@ -128,22 +134,6 @@
         @RenderBody()
     </main>
 
-@*    <footer class="footer layout-footer">
-        <div class="container">
-            <nav class="navbar navbar-expand-sm navbar-light border-top nav-fill nav-justified layout-footer-navbar">
-                <a class="nav-item nav-link" asp-page="/Index">@Localizer["Home"]</a>
-                <a class="nav-item nav-link text-primary" asp-page="/Privacy">@Localizer["Privacy"]</a>
-                @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole(IRoleChecker.AdminRoleName))
-                {
-                    <a class="nav-item nav-link" asp-page="/Admin/Index">@Localizer["Admin"]</a>
-                    <button class="debug-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#DebugInfo" aria-controls="DebugInfo" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fas fa-bug debug-toggler"></i>
-                    </button>
-                }
-            </nav>
-        </div>
-    </footer>
-*@
     <div id="scripts">
         <environment include="Development">
             <script src="~/lib/bootstrap/js/bootstrap.bundle.js" asp-append-version="true"></script>

@@ -17,8 +17,10 @@ public class LogoutModel : PageModel
         _signInManager = signInManager;
     }
 
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
+        await _signInManager.SignOutAsync();
+        return LocalRedirect("/");
     }
 
     public async Task<IActionResult> OnPost(string returnAddress = "/")
