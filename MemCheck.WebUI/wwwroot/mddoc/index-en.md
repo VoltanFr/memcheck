@@ -1,2 +1,0 @@
-﻿# Welcome !
-MemCheck is bla

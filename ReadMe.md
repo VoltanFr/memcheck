@@ -2,9 +2,8 @@
 
 # MemCheck
 
-This repo holds the source code for the [MemCheck web site](https://memcheckfr.azurewebsites.net/).
-MemCheck is a flashcard web site, a tool to help you know things by heart.
-The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRoute=%2F&cultureName=fr) is available from links at the bottom of each page in MemCheck, providing contextual information.
+This repo holds the MemCheck project, source for the [Mnesios web site](https://www.mnesios.com/).
+Mnesios is a flashcard web site, a tool to help you know things by heart. The [end user doc](https://userdoc.mnesios.com/) (in French only) is made of GitHub pages generated from the [memcheck-user-doc repo](https://github.com/VoltanFr/memcheck-user-doc).
 
 ## Development
 
@@ -18,7 +17,7 @@ The [end user doc](https://memcheckfr.azurewebsites.net/Doc/MdRenderer?refererRo
 
 - Your dev environment, probably one of:
   - [Visual Studio Code](https://code.visualstudio.com/). Needed extension: [C#](https://github.com/OmniSharp/omnisharp-vscode).
-  - [Visual Studio](https://visualstudio.microsoft.com/en/vs/), my recommendation (the free Community edition is ok). Needed workload: `ASP.NET and web development` (with at least the default components).
+  - [Visual Studio](https://visualstudio.microsoft.com/en/vs/), my recommendation (the free Community edition is ok). Needed workload: `ASP.NET and web development` (with at least the default components). I currently use Microsoft Visual Studio Community 2022, version 17.3.3.
 - A database server. I recommend [SQL Server Express](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb) for simplicity (the basic setup is ok). After installation, run `SqlLocalDB.msi` (it should be in `C:\SQL2019\ExpressAdv_ENU\1033_ENU_LP\x64\Setup\x64`). **Already included if you installed Visual Studio**.
 - [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) (you probably want to use the x64 installer). **Already included if you installed Visual Studio**.
 - [Entity Framework .NET CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet): install by running this command: `dotnet tool install --global dotnet-ef`.

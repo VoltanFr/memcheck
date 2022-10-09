@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
-using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -25,14 +24,12 @@ public class ConfirmEmailModel : PageModel
         var hello = localizer["Hello"];
         var welcome = localizer["Welcome"];
         var docLine = localizer["DocLine"];
-        var url = Url.Page(pageName: $"/Doc/MdRenderer", pageHandler: null, values: null, protocol: Request.Scheme);
-        url += $"?cultureName={CultureInfo.CurrentCulture.TwoLetterISOLanguageName}";
         var docLinkText = localizer["DocLinkText"];
         var appLine = localizer["AppLine"];
         var appUrl = HtmlEncoder.Default.Encode(Url.Page(pageName: "/Index", pageHandler: null, values: null, protocol: Request.Scheme)!);
         var appLinkText = localizer["AppLinkText"];
         var thank = localizer["Thank"];
-        var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='{HtmlEncoder.Default.Encode(url)}'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
+        var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='https://userdoc.mnesios.com/'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
         await emailSender.SendEmailAsync(user.Email, localizer["WelcomeMailSubject"], body);
     }
 
