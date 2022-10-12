@@ -124,7 +124,7 @@
     <value>Create a new account</value>
   </data>
   <data name="EMailAddress" xml:space="preserve">
-    <value>EMail address</value>
+    <value>EMail address (will remain strictly internal, usable only by Mnesios to get in touch with you)</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
@@ -133,6 +133,6 @@
     <value>Register</value>
   </data>
   <data name="UserName" xml:space="preserve">
-    <value>User name</value>
+    <value>User name (public information)</value>
   </data>
 </root>

@@ -7,5 +7,12 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+@{
+    var statusMessageClass = Model.StatusMessage.StartsWith("Error") ? "danger" : "success";
+    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+        @Model.StatusMessage
+    </div>
+}
+
 <p><a asp-page="./Login" asp-route-returnUrl="/Index">@Localizer["PleaseLogin"]</a>.</p>

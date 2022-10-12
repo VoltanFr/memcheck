@@ -124,7 +124,7 @@
     <value>Création d'un nouveau compte</value>
   </data>
   <data name="EMailAddress" xml:space="preserve">
-    <value>Adresse électronique</value>
+    <value>Adresse électronique (cette information ne sera visible par personne, utilisable seulement par Mnesios pour vous contacter)</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Mot de passe</value>
@@ -133,6 +133,6 @@
     <value>Inscription</value>
   </data>
   <data name="UserName" xml:space="preserve">
-    <value>Nom d'utilisateur</value>
+    <value>Nom d'utilisateur (cette information sera publique)</value>
   </data>
 </root>

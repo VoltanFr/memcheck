@@ -139,7 +139,7 @@
     <value>Thank you</value>
   </data>
   <data name="ThankYou" xml:space="preserve">
-    <value>Thank you for confirming your email.</value>
+    <value>Thank you for confirming your email. Your password has been hashed and can not be read anymore. If you forget it we will only be able to reset it.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Welcome to Mnesios!</value>

@@ -139,7 +139,7 @@
     <value>Merci !</value>
   </data>
   <data name="ThankYou" xml:space="preserve">
-    <value>Merci pour la confirmation de votre adresse électronique.</value>
+    <value>Merci pour la confirmation de votre adresse électronique. Votre mot de passe a été haché est ne peut plus être lu: si vous le perdez nous ne pourrons que le réinitialiser.</value>
   </data>
   <data name="Welcome" xml:space="preserve">
     <value>Bienvenue dans Mnesios !</value>
