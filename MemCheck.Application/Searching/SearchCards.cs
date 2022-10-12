@@ -275,6 +275,8 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
                 if (Deck != Guid.Empty)
                     await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, Deck);
             }
+            if (RequiredText != RequiredText.Trim())
+                throw new SearchTextNotTrimmedException("Invalid required text: not trimmed");
         }
     }
     public sealed class Result

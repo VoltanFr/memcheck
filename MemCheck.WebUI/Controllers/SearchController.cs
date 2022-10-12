@@ -365,7 +365,7 @@ public class SearchController : MemCheckController
             DeckIsInclusive = request.DeckIsInclusive,
             PageNo = request.PageNo,
             PageSize = request.PageSize,
-            RequiredText = request.RequiredText,
+            RequiredText = request.RequiredText.Trim(),
             RequiredTags = request.RequiredTags,
             ExcludedTags = excludedTags,
             Visibility = AppVisibility(request),
