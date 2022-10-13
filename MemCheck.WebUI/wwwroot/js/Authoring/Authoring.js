@@ -78,8 +78,10 @@ const authoringApp = Vue.createApp({
             const task6 = this.getDecksOfUser();
             this.getReturnAddressFromPageParameter();
             await Promise.all([task1, task2, task3, task4, task5, task6]);
-            if (this.initializationFailure())
+            if (this.initializationFailure()) {
+                this.copyAllInfoToOriginalCard(); // So that isDirty is false and we don't display an alert message about losing changes
                 return;
+            }
             if (this.creatingNewCard) {
                 this.makePrivate();
                 this.card.languageId = this.userPreferredCardCreationLanguageId;
