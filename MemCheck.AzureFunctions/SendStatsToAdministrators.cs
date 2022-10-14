@@ -51,7 +51,7 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     {
         var result = d.AsIso();
         if (d.IsWithinPreviousDays(7))
-            result = $"**{result}**";
+            result = $"<strong>{result}</strong>";
         return result;
     }
     private static string GetUsersPart(ImmutableList<GetAllUsersStats.ResultUserModel> allUsers)
