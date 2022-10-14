@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application.Tags;
@@ -31,7 +32,7 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
             .Append("<p><table>")
             .Append("<thead><tr><th>Name</th><th>Previous count</th><th>Previous average</th><th>New count</th><th>New average</th></tr></thead>");
 
-        foreach (var tag in result.Tags)
+        foreach (var tag in result.Tags.OrderBy(tag => tag.TagName))
         {
             reportMailMainPart = reportMailMainPart
                 .Append("<tr>")
