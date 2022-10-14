@@ -238,19 +238,16 @@
     height: 30px;
     padding-top: 0px;
     padding-bottom: 0px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
     border-radius: 3px;
-    font-size: .75rem;
     text-align: center;
     color: white;
     background-color: #17a2b8;
     border-color: #17a2b8;
-    border-width: 2px;
     border-style: solid;
     border-image: stretch;
     text-align: center;
     vertical-align: middle;
+    border-width: 1px;
 }
 
 .memcheck-input-div {
@@ -336,10 +333,10 @@
     }
 
     .btn-nav-pages {
-        padding-left: 0.25rem;
-        padding-right: 0.25rem;
-        font-size: .7rem;
-        border-width: 1px;
+        padding-left: 3px;
+        padding-right: 3px;
+        font-size: 11px;
+        margin-right: 3px;
     }
 
     .memcheck-input-div {
@@ -410,6 +407,13 @@
     .memcheck-bottom-button-div {
         margin-bottom: 30px;
     }
+
+    .btn-nav-pages {
+        padding-left: 6px;
+        padding-right: 6px;
+        font-size: 12px;
+        margin-right: 6px;
+    }
 }
 
 @media (min-width: 979px) {
@@ -431,6 +435,13 @@
 
     .memcheck-bottom-button-div {
         margin-bottom: 50px;
+    }
+
+    .btn-nav-pages {
+        padding-left: 9px;
+        padding-right: 9px;
+        font-size: 14px;
+        margin-right: 9px;
     }
 }
 

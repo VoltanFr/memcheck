@@ -27,6 +27,7 @@
         border-radius: 1px;
         font-size: 14px;
         border-width: 1px;
+        margin-right: 3px;
     }
 
     .toolbar-button-content {
@@ -47,6 +48,7 @@
         border-radius: 3px;
         font-size: 15px;
         border-width: 1px;
+        margin-right: 6px;
     }
 
     .toolbar-button-content {
@@ -67,6 +69,7 @@
         border-radius: 6px;
         font-size: 16px;
         border-width: 2px;
+        margin-right: 9px;
     }
 
     .toolbar-button-content {
