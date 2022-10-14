@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application.Cards;
 using MemCheck.Application.Users;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.WebJobs;
@@ -46,6 +47,13 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
     {
         return NewCallContext().DbContext.Tags.AsNoTracking().Select(t => new { t.Id, t.Name }).ToImmutableDictionary(t => t.Id, t => t.Name);
     }
+    private static string DateAsStringWithBoldIfRecent(DateTime d)
+    {
+        var result = d.AsIso();
+        if (d.IsWithinPreviousDays(7))
+            result = $"**{result}**";
+        return result;
+    }
     private static string GetUsersPart(ImmutableList<GetAllUsersStats.ResultUserModel> allUsers)
     {
         var writer = new StringBuilder();
@@ -55,21 +63,14 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
             .Append(@"<thead><tr><th scope=""col"">Name</th><th scope=""col"">Last seen</th><th scope=""col"">Registration</th><th scope=""col"">Decks</th></tr></thead>")
             .Append("<tbody>");
 
-        foreach (var user in allUsers)
-        {
+        foreach (var user in allUsers.OrderBy(user => user.UserName))
             writer = writer
                 .Append("<tr>")
                 .Append(CultureInfo.InvariantCulture, $"<td>{user.UserName}</td>")
-                .Append(CultureInfo.InvariantCulture, $"<td>{user.LastSeenUtcDate}</td>")
-                .Append(CultureInfo.InvariantCulture, $"<td>{user.RegistrationUtcDate}</td>")
-                .Append("<td><ul>");
-
-            foreach (var deck in user.Decks)
-                writer = writer.Append(CultureInfo.InvariantCulture, $"<li>{deck.Name}: {deck.CardCount} cards</li>");
-
-            writer = writer
-                .Append("</ul></td></tr>");
-        }
+                .Append(CultureInfo.InvariantCulture, $"<td>{DateAsStringWithBoldIfRecent(user.LastSeenUtcDate)}</td>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{DateAsStringWithBoldIfRecent(user.RegistrationUtcDate)}</td>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{string.Join(',', user.Decks.Select(deck => $"{deck.Name}: {deck.CardCount} cards"))}</td>")
+                .Append("</tr>");
 
         writer = writer
             .Append("</tbody>")
