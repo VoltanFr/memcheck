@@ -209,7 +209,7 @@ public sealed class NotificationMailer
 
         return mailBody.ToString();
     }
-    private static string GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
+    private static StringBuilder GetAdminMailBody(int sentEmailCount, List<string> performanceIndicators)
     {
         var mailBody = new StringBuilder()
             .Append(CultureInfo.InvariantCulture, $"<p>Sent {sentEmailCount} emails.</p>")
@@ -220,7 +220,7 @@ public sealed class NotificationMailer
         mailBody = mailBody
             .Append("</ul>")
             .Append(CultureInfo.InvariantCulture, $"<p>Finished at {DateTime.UtcNow} (UTC)</p>");
-        return mailBody.ToString();
+        return mailBody;
     }
     private static bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
     {
@@ -241,7 +241,7 @@ public sealed class NotificationMailer
         this.emailSender = emailSender;
         this.linkGenerator = linkGenerator;
     }
-    public async Task<string> RunAndCreateReportMailMainPartAsync()
+    public async Task<StringBuilder> RunAndCreateReportMailMainPartAsync()
     {
         var mailSendingsToWaitFor = new List<Task>();
         var performanceIndicators = new List<string>();

@@ -20,7 +20,7 @@ public sealed class RateAllPublicCards : AbstractMemCheckAzureFunction
     {
         await RunAsync(timer, context);
     }
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var rater = new Application.Ratings.RateAllPublicCards(NewCallContext());
         var result = await rater.RunAsync(new Application.Ratings.RateAllPublicCards.Request(BotUserId));
@@ -31,6 +31,6 @@ public sealed class RateAllPublicCards : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>Changed the bot's ratings for {result.ChangedRatingCount} cards</li>")
             .Append("</p>");
 
-        return reportMailMainPart.ToString();
+        return new RunResult(defaultMailSubject, reportMailMainPart);
     }
 }

@@ -21,7 +21,7 @@ public sealed class RefreshImageUsages : AbstractMemCheckAzureFunction
     {
         await RunAsync(timer, context);
     }
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var updater = new RefreshImagesInCards(NewCallContext());
         var result = await updater.RunAsync(new RefreshImagesInCards.Request());
@@ -33,8 +33,11 @@ public sealed class RefreshImageUsages : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>{result.TotalCardCount} cards in DB</li>")
             .Append(CultureInfo.InvariantCulture, $"<li>{result.ImagesInCardsCountOnStart} image usages on start</li>")
             .Append(CultureInfo.InvariantCulture, $"<li>{result.ImagesInCardsCountOnEnd} image usages on end</li>")
+            .Append(CultureInfo.InvariantCulture, $"<li>{result.ChangeCount} total changes</li>")
             .Append("</ul></p>");
 
-        return reportMailMainPart.ToString();
+        var mailSubject = $"{defaultMailSubject} ({result.ChangeCount} changes)";
+
+        return new RunResult(mailSubject, reportMailMainPart);
     }
 }

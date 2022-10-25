@@ -101,18 +101,22 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
 
         return writer.ToString();
     }
-    private static string GetMailBody(ImmutableList<GetAllUsersStats.ResultUserModel> allUsers, GetRecentDemoUses.Result recentDemos, ImmutableDictionary<Guid, string> tagNames)
+    private static StringBuilder GetMailBody(ImmutableList<GetAllUsersStats.ResultUserModel> allUsers, GetRecentDemoUses.Result recentDemos, ImmutableDictionary<Guid, string> tagNames)
     {
-        return GetUsersPart(allUsers) + GetRecentDemosPart(recentDemos, tagNames);
+        var result = new StringBuilder();
+        result.Append(GetUsersPart(allUsers));
+        result.Append(GetRecentDemosPart(recentDemos, tagNames));
+        return result;
     }
     #endregion
     #region Protected override methods
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var allUsers = await GetAllUsersAsync();
         var recentDemos = await GetRecentDemosAsync();
         var tagNames = GetTagNames();
-        return GetMailBody(allUsers, recentDemos, tagNames);
+        var body = GetMailBody(allUsers, recentDemos, tagNames);
+        return new RunResult(defaultMailSubject, body);
     }
     #endregion
     public SendStatsToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)

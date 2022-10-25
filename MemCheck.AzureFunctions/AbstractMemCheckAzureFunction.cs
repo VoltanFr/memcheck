@@ -17,6 +17,8 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
+public sealed record RunResult(string MailSubject, StringBuilder MailBodyMainPart);
+
 public abstract class AbstractMemCheckAzureFunction
 {
     #region Fields
@@ -96,7 +98,7 @@ public abstract class AbstractMemCheckAzureFunction
         {
             logger.LogInformation($"{context.FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
             telemetryClient.TrackEvent($"{context.FunctionName} Azure func start");
-            var reportMailMainPart = await RunAndCreateReportMailMainPartAsync();
+            var runResult = await RunAndCreateReportMailMainPartAsync(context.FunctionName);
 
             var reportMailBody = new StringBuilder()
                 .Append("<style>")
@@ -107,12 +109,12 @@ public abstract class AbstractMemCheckAzureFunction
                 .Append("tr:nth-child(odd) {background-color: lavender;}")
                 .Append("</style>")
                 .Append(CultureInfo.InvariantCulture, $"<h1>{context.FunctionName}</h1>")
-                .Append(reportMailMainPart)
+                .Append(runResult.MailBodyMainPart)
                 .Append(MailSender.GetMailFooter(context.FunctionName, timer, StartTime, await AdminsAsync()));
 
             var bodyText = reportMailBody.ToString();
 
-            await MailSender.SendAsync(context.FunctionName, bodyText, await AdminsAsync());
+            await MailSender.SendAsync(runResult.MailSubject, bodyText, await AdminsAsync());
         }
         catch (Exception ex)
         {
@@ -123,7 +125,7 @@ public abstract class AbstractMemCheckAzureFunction
             logger.LogInformation($"Function '{context.FunctionName}' ending, {DateTime.Now}");
         }
     }
-    protected abstract Task<string> RunAndCreateReportMailMainPartAsync();
+    protected abstract Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject);
     protected DateTime StartTime { get; }
     protected MailSender MailSender { get; }
     protected Guid AdminUserId { get; }

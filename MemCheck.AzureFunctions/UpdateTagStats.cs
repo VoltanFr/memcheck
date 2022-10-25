@@ -22,7 +22,7 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
     {
         await RunAsync(timer, context);
     }
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var updater = new RefreshTagStats(NewCallContext());
         var result = await updater.RunAsync(new RefreshTagStats.Request());
@@ -75,6 +75,6 @@ public sealed class UpdateTagStats : AbstractMemCheckAzureFunction
         }
 
         reportMailMainPart = reportMailMainPart.Append("</table></p>");
-        return reportMailMainPart.ToString();
+        return new RunResult(defaultMailSubject, reportMailMainPart);
     }
 }

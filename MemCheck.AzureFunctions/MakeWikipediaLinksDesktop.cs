@@ -35,22 +35,22 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
     }
     #endregion
     #region Protected override methods
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var callContext = NewCallContext();
 
-        var result = "";
+        var result = new StringBuilder();
         var replacer = new ReplaceTextInAllVisibleCards(callContext);
 
         var wikipediaRequest = new ReplaceTextInAllVisibleCards.Request(BotUserId, "https://fr.m.wikipedia.org/wiki/", "https://fr.wikipedia.org/wiki/", "Utilisation de liens Wikipédia par défaut au lieu de la version mobile");
         var wikipediaResult = await replacer.RunAsync(wikipediaRequest);
-        result += GetMailBody(wikipediaResult.ChangedCardGuids, "Wikipédia");
+        result.Append(GetMailBody(wikipediaResult.ChangedCardGuids, "Wikipédia"));
 
         var wiktionaryRequest = new ReplaceTextInAllVisibleCards.Request(BotUserId, "https://fr.m.wiktionary.org/wiki/", "https://fr.wiktionary.org/wiki/", "Utilisation de liens Wiktionnaire par défaut au lieu de la version mobile");
         var wiktionaryResult = await replacer.RunAsync(wiktionaryRequest);
-        result += GetMailBody(wiktionaryResult.ChangedCardGuids, "Wiktionnaire");
+        result.Append(GetMailBody(wiktionaryResult.ChangedCardGuids, "Wiktionnaire"));
 
-        return result;
+        return new RunResult(defaultMailSubject, result);
     }
     #endregion
     public MakeWikipediaLinksDesktop(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)

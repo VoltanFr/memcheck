@@ -46,9 +46,10 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     {
         await RunAsync(timer, context).ConfigureAwait(false);
     }
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var mailer = new NotificationMailer(NewCallContext(), new MemCheckMailSender(MailSender), new MemCheckLinkGenerator());
-        return await mailer.RunAndCreateReportMailMainPartAsync().ConfigureAwait(false);
+        var body = await mailer.RunAndCreateReportMailMainPartAsync().ConfigureAwait(false);
+        return new RunResult(defaultMailSubject, body);
     }
 }

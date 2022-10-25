@@ -27,6 +27,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(0, result.TotalCardCount);
             Assert.AreEqual(0, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(0, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(0, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -53,6 +54,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(0, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(0, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(0, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -82,6 +84,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(1, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(0, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -112,6 +115,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(1, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(1, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(0, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -146,6 +150,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(0, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(1, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -186,6 +191,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(2, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(2, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(0, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -226,6 +232,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(1, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(2, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -267,6 +274,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(3, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(2, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -319,6 +327,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(2, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(1, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -360,6 +369,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(0, result.TotalCardCount);
             Assert.AreEqual(0, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(0, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(0, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -395,6 +405,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(1, result.TotalCardCount);
             Assert.AreEqual(2, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(1, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(1, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -448,6 +459,7 @@ public class RefreshImagesInCardsTests
             Assert.AreEqual(4, result.TotalCardCount);
             Assert.AreEqual(6, result.ImagesInCardsCountOnStart);
             Assert.AreEqual(5, result.ImagesInCardsCountOnEnd);
+            Assert.AreEqual(5, result.ChangeCount);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))

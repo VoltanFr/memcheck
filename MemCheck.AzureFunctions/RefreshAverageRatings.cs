@@ -20,7 +20,7 @@ public sealed class RefreshAverageRatings : AbstractMemCheckAzureFunction
     {
         await RunAsync(timer, context);
     }
-    protected override async Task<string> RunAndCreateReportMailMainPartAsync()
+    protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
         var refresher = new Application.Ratings.RefreshAverageRatings(NewCallContext());
         var result = await refresher.RunAsync(new Application.Ratings.RefreshAverageRatings.Request());
@@ -31,6 +31,6 @@ public sealed class RefreshAverageRatings : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>Changed the average ratings for {result.ChangedAverageRatingCount} cards</li>")
             .Append("</p>");
 
-        return reportMailMainPart.ToString();
+        return new RunResult(defaultMailSubject, reportMailMainPart);
     }
 }
