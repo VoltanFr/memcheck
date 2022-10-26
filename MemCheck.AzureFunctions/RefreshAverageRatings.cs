@@ -31,6 +31,15 @@ public sealed class RefreshAverageRatings : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>Changed the average ratings for {result.ChangedAverageRatingCount} cards</li>")
             .Append("</p>");
 
-        return new RunResult(defaultMailSubject, reportMailMainPart);
+        var changeInfo = result.ChangedAverageRatingCount switch
+        {
+            0 => "no change",
+            1 => "1 change",
+            _ => $"{result.ChangedAverageRatingCount} changes",
+        };
+
+        var mailSubject = $"{defaultMailSubject} ({changeInfo})";
+
+        return new RunResult(mailSubject, reportMailMainPart);
     }
 }

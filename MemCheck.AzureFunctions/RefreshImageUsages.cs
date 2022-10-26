@@ -36,7 +36,14 @@ public sealed class RefreshImageUsages : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>{result.ChangeCount} total changes</li>")
             .Append("</ul></p>");
 
-        var mailSubject = $"{defaultMailSubject} ({result.ChangeCount} changes)";
+        var changeInfo = result.ChangeCount switch
+        {
+            0 => "no change",
+            1 => "1 change",
+            _ => $"{result.ChangeCount} changes",
+        };
+
+        var mailSubject = $"{defaultMailSubject} ({changeInfo})";
 
         return new RunResult(mailSubject, reportMailMainPart);
     }

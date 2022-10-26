@@ -50,7 +50,18 @@ public sealed class MakeWikipediaLinksDesktop : AbstractMemCheckAzureFunction
         var wiktionaryResult = await replacer.RunAsync(wiktionaryRequest);
         result.Append(GetMailBody(wiktionaryResult.ChangedCardGuids, "Wiktionnaire"));
 
-        return new RunResult(defaultMailSubject, result);
+        var changeCount = wikipediaResult.ChangedCardGuids.Length + wiktionaryResult.ChangedCardGuids.Length;
+
+        var changeInfo = changeCount switch
+        {
+            0 => "no change",
+            1 => "1 change",
+            _ => $"{changeCount} changes",
+        };
+
+        var mailSubject = $"{defaultMailSubject} ({changeInfo})";
+
+        return new RunResult(mailSubject, result);
     }
     #endregion
     public MakeWikipediaLinksDesktop(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)

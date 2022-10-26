@@ -31,6 +31,15 @@ public sealed class RateAllPublicCards : AbstractMemCheckAzureFunction
             .Append(CultureInfo.InvariantCulture, $"<li>Changed the bot's ratings for {result.ChangedRatingCount} cards</li>")
             .Append("</p>");
 
-        return new RunResult(defaultMailSubject, reportMailMainPart);
+        var changeInfo = result.ChangedRatingCount switch
+        {
+            0 => "no change",
+            1 => "1 change",
+            _ => $"{result.ChangedRatingCount} changes",
+        };
+
+        var mailSubject = $"{defaultMailSubject} ({changeInfo})";
+
+        return new RunResult(mailSubject, reportMailMainPart);
     }
 }
