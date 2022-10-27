@@ -508,11 +508,40 @@ const searchApp = Vue.createApp({
                 this.runQuery();
             }
         },
-        addToDeckEnabled() {
-            return !this.filteringOnDeckInclusive() && (this.possibleTargetDecksForAdd.length > 0);
+        canAddToDeck(deckId) {
+            if (this.runResult.cardsWithSelectionInfo.length === 0)
+                return false;
+
+            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
+                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
+                    return false;
+
+            return true;
+        },
+        canRemoveFromDeck(deckId) {
+            if (this.runResult.cardsWithSelectionInfo.length === 0)
+                return false;
+
+            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
+                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && !this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
+                    return false;
+
+            return true;
         },
         moveToHeapEnabled() {
-            return this.filteringOnDeckInclusive();
+            if (this.possibleTargetDecksForAdd.length !== 1) // Currently implemented only for single deck
+                return false;
+
+            if (this.runResult.cardsWithSelectionInfo.length === 0)
+                return false;
+
+            const deckId = this.possibleTargetDecksForAdd[0].deckId;
+
+            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
+                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && !this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
+                    return false;
+
+            return true;
         },
         async moveSelectedCardsToHeap(targetHeap) {
             if (!this.filteringOnDeckInclusive()) {

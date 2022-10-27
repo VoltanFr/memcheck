@@ -62,23 +62,23 @@
                         <span v-if="deckActionDropDownButtonEnabled()">
                             <a href="#" id="DeckActionDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></a>
                             <span class="dropdown-menu" role="menu">
-                                <span id="AddToDeck" v-if="addToDeckEnabled()">
+                                <span id="AddToDeck">
                                     <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                        <a class="dropdown-item" @@click="addSelectedCardsToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToDeck"]</a>
+                                        <a class="dropdown-item" @@click="addSelectedCardsToDeck(possibleTargetDecksForAdd[0])" v-if="canAddToDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-plus"></i> @Localizer["AddToDeck"]</a>
                                     </span>
                                     <span id="MultiDeckAddToDeck" v-else>
                                         <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                            <a class="dropdown-item" @@click="addSelectedCardsToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
+                                            <a class="dropdown-item" @@click="addSelectedCardsToDeck(targetDeck)" v-if="canAddToDeck(targetDeck.deckId)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
                                         </span>
                                     </span>
                                 </span>
-                                <span id="RemoveFromDeck" v-if="possibleTargetDecksForAdd.length > 0">
+                                <span id="RemoveFromDeck">
                                     <span id="SingleDeckRemoveFromDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                        <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-minus"></i> @Localizer["RemoveFromDeck"]</a>
+                                        <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(possibleTargetDecksForAdd[0])" v-if="canRemoveFromDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFromDeck"]</a>
                                     </span>
                                     <span id="MultiDeckRemoveFromDeck" v-else>
                                         <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                            <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(targetDeck)"><i class="fas fa-minus"></i> @Localizer["RemoveFrom"] {{targetDeck.deckName}}</a>
+                                            <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(targetDeck)" v-if="canRemoveFromDeck(targetDeck.deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFrom"] {{targetDeck.deckName}}</a>
                                         </span>
                                     </span>
                                 </span>
