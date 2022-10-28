@@ -26,7 +26,7 @@ const searchApp = Vue.createApp({
             allStaticData: '',   // SearchController.GetAllStaticDataViewModel - We never mute this field after mounted has finished
             possibleDecks: [],   // SearchController.GetAllStaticDataDeckViewModel - This array changes according to the selected deck. It contains in first position a fake deck named "Not filtering" with Guid zero.
             selectedDeck: '',  // SearchController.GetAllStaticDataDeckViewModel - See selectedDeckIsForInclusion
-            possibleTargetDecksForAdd: [], // SearchController.GetAllStaticDataDeckForAddViewModel
+            possibleTargetDecksForAdd: [], // SearchController.GetAllStaticDataDeckForAddViewModel, this contains all the decks of the user
             possibleDecksInclusionChoices: [],   // {selectedDeckIsInclusive: bool, choiceText: string}. This field only makes sense when selectedDeck is not null. Tells if the query will report the cards of selectedDeckor exclude the cards of the selected deck
             deckSelectionIsInclusive: true,
             possibleHeaps: [],  // SearchController.GetAllStaticDataHeapViewModel. Available only when filtering inclusive on a deck, this shows the heaps which exist in the deck. There is a first heap named "ignore" with id -1.
@@ -346,11 +346,26 @@ const searchApp = Vue.createApp({
             return result;
         },
         getSelectedCardIds() {
-            const result = [];
-            for (let i = 0; i < this.runResult.cardsWithSelectionInfo.length; i++)
-                if (this.runResult.cardsWithSelectionInfo[i].selected)
-                    result.push(this.runResult.cardsWithSelectionInfo[i].card.cardId);
-            return result;
+            return this.getSelectedCards().map(card => card.cardId);
+        },
+        getSelectedCards() {
+            return this.runResult.cardsWithSelectionInfo.filter(card => card.selected).map(card => card.card);
+        },
+        getOnlyDeckIdOfCard(card) {
+            // returns the only deck of the card: if the card is not exactly in one deck, returns null
+            return card.decks.length === 1 ? card.decks[0].deckId : null;
+        },
+        getFirstSelectedCard() {
+            // returns the first selected card. If there is no selected card, returns null
+            return this.runResult.cardsWithSelectionInfo.find(card => card.selected)?.card;
+        },
+        getOnlyDeckIdOfFirstSelectedCard() {
+            // returns the only deck of the first selected card:
+            // - if there is no selected card, returns null
+            // - if the first selected card is not exactly in one deck, returns null
+
+            const card = this.getFirstSelectedCard();
+            return !card ? null : this.getOnlyDeckIdOfCard(card);
         },
         async addTagToSelectedCards(tag) {
             const selectedCardIds = this.getSelectedCardIds();
@@ -448,11 +463,11 @@ const searchApp = Vue.createApp({
             }
         },
         cardIsInDeck(card, deckId) {    // card is SearchController.RunQueryCardViewModel
-            const cardDecks = card.decks;
-            for (let decksIndex = 0; decksIndex < cardDecks.length; decksIndex++)
-                if (cardDecks[decksIndex].deckId === deckId)
-                    return true;
-            return false;
+            return card.decks.some(cardDeck => cardDeck.deckId === deckId);
+        },
+        cardIsOnlyInDeck(card, deckId) {    // true if and only if the card is in the deck and in no other
+            const cardDeckId = this.getOnlyDeckIdOfCard(card);
+            return deckId === cardDeckId;
         },
         async removeSelectedCardsFromDeck(deck) {     // deck is SearchController.GetAllStaticDataDeckForAddViewModel
             const selectedCardIds = this.getSelectedCardIds();
@@ -509,75 +524,44 @@ const searchApp = Vue.createApp({
             }
         },
         canAddToDeck(deckId) {
-            if (this.runResult.cardsWithSelectionInfo.length === 0)
-                return false;
-
-            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
-                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
-                    return false;
-
-            return true;
+            const selectedCards = this.getSelectedCards();
+            return selectedCards.length && !selectedCards.some(selectedCard => this.cardIsInDeck(selectedCard, deckId));
         },
         canRemoveFromDeck(deckId) {
-            if (this.runResult.cardsWithSelectionInfo.length === 0)
-                return false;
-
-            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
-                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && !this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
-                    return false;
-
-            return true;
+            const selectedCards = this.getSelectedCards();
+            return selectedCards.length && !selectedCards.some(selectedCard => !this.cardIsInDeck(selectedCard, deckId));
         },
         moveToHeapEnabled() {
-            if (this.possibleTargetDecksForAdd.length !== 1) // Currently implemented only for single deck
+            // Returns true if there is at least one card selected, and all the selected cards are in the same only deck (ie if a card is not in the deck or is in multiple decks, we return false)
+            const expectedDeckId = this.getOnlyDeckIdOfFirstSelectedCard();
+
+            if (!expectedDeckId) // This takes care of the case of no selected card
                 return false;
 
-            if (this.runResult.cardsWithSelectionInfo.length === 0)
-                return false;
-
-            const deckId = this.possibleTargetDecksForAdd[0].deckId;
-
-            for (let cardsIndex = 0; cardsIndex < this.runResult.cardsWithSelectionInfo.length; cardsIndex++)
-                if (this.runResult.cardsWithSelectionInfo[cardsIndex].selected && !this.cardIsInDeck(this.runResult.cardsWithSelectionInfo[cardsIndex].card, deckId))
-                    return false;
-
-            return true;
+            return !this.getSelectedCards().some(selectedCard => !this.cardIsOnlyInDeck(selectedCard, expectedDeckId));
         },
         async moveSelectedCardsToHeap(targetHeap) {
-            if (!this.filteringOnDeckInclusive()) {
-                alert(this.allStaticData.localizedText.operationIsForFilteringOnDeckInclusive);
+            if (!this.moveToHeapEnabled()) {
+                alert(this.allStaticData.localizedText.operationIsForSelectedCardsWithSingleDeck);
                 return;
             }
 
-            let selectedCardIds = [];
-            let nbSelectedCardsAlreadyInTargetHeap = 0;
+            const deckId = this.getOnlyDeckIdOfFirstSelectedCard();
+            const selectedCards = this.getSelectedCards();
+            const nbSelectedCardsAlreadyInTargetHeap = selectedCards.filter(selectedCard => selectedCard.decks[0].heapId === targetHeap.heapId).length;
 
-            for (let i = 0; i < this.runResult.cardsWithSelectionInfo.length; i++) {
-                const cardWithSelectionInfo = this.runResult.cardsWithSelectionInfo[i];
-                if (cardWithSelectionInfo.selected) {
-                    selectedCardIds.push(cardWithSelectionInfo.card.cardId);
-                    if (cardWithSelectionInfo.card.decks[0].heapId === targetHeap.heapId) // We know we are filtering on deck inclusive, so the card is exactly in one deck
-                        nbSelectedCardsAlreadyInTargetHeap++;
-                }
-            }
-
-            if (selectedCardIds.length === 0) {
-                alert(this.allStaticData.localizedText.operationIsForSelectedCards);
-                return;
-            }
-
-            if (selectedCardIds.length === nbSelectedCardsAlreadyInTargetHeap) {
-                const badTargetHeapMesg = (selectedCardIds.length === 1) ? this.allStaticData.localizedText.cardAlreadyInTargetHeap : this.allStaticData.localizedText.cardsAlreadyInTargetHeap;
+            if (selectedCards.length === nbSelectedCardsAlreadyInTargetHeap) {
+                const badTargetHeapMesg = (selectedCards.length === 1) ? this.allStaticData.localizedText.cardAlreadyInTargetHeap : this.allStaticData.localizedText.cardsAlreadyInTargetHeap;
                 alert(`${badTargetHeapMesg} ${targetHeap.heapName}`);
                 return;
             }
 
             let mesg;
 
-            if (selectedCardIds.length === 1)
+            if (selectedCards.length === 1)
                 mesg = `${this.allStaticData.localizedText.alertMoveOneCardToHeap} ${targetHeap.heapName}`;
             else {
-                const cardsToMoveCount = selectedCardIds.length - nbSelectedCardsAlreadyInTargetHeap;
+                const cardsToMoveCount = selectedCards.length - nbSelectedCardsAlreadyInTargetHeap;
                 if (cardsToMoveCount === 1)
                     mesg = this.allStaticData.localizedText.alertMoveOneCardToHeap;
                 else
@@ -596,7 +580,9 @@ const searchApp = Vue.createApp({
             if (confirm(mesg)) {
                 this.loadingQuery = true;
 
-                await axios.post(`/Search/MoveCardsToHeap/${this.selectedDeck.deckId}/${targetHeap.heapId}`, { cardIds: selectedCardIds })
+                const selectedCardIds = selectedCards.map(card => card.cardId);
+
+                await axios.post(`/Search/MoveCardsToHeap/${deckId}/${targetHeap.heapId}`, { cardIds: selectedCardIds })
                     .then(result => {
                         tellControllerSuccess(result);
                     })

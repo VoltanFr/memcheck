@@ -345,11 +345,11 @@
   <data name="OneUserHasCardWithFrontSide" xml:space="preserve">
     <value>One other user has in a deck the card with front side</value>
   </data>
-  <data name="OperationIsForFilteringOnDeckInclusive" xml:space="preserve">
-    <value>This operation requires filtering and including a single deck</value>
-  </data>
   <data name="OperationIsForSelectedCards" xml:space="preserve">
     <value>This applies to selected cards</value>
+  </data>
+  <data name="OperationIsForSelectedCardsWithSingleDeck" xml:space="preserve">
+    <value>This applies to selected cards in a single deck</value>
   </data>
   <data name="PersoTagAllowedOnlyOnPrivateCards" xml:space="preserve">
     <value>Tag 'Perso' is allowed only on private cards.</value>

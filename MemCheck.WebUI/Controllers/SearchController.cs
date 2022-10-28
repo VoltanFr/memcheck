@@ -191,7 +191,6 @@ public class SearchController : MemCheckController
             AlertRemoveCardsFromDeckPart3 = localizer.GetLocalized("AlertRemoveCardsFromDeckPart3");
             AlertRemoveCardFromDeckPart3 = localizer.GetLocalized("AlertRemoveCardFromDeckPart3");
 
-            OperationIsForFilteringOnDeckInclusive = localizer.GetLocalized("OperationIsForFilteringOnDeckInclusive");
             CardAlreadyInTargetHeap = localizer.GetLocalized("CardAlreadyInTargetHeap");
             CardsAlreadyInTargetHeap = localizer.GetLocalized("CardsAlreadyInTargetHeap");
             AlertMoveOneCardToHeap = localizer.GetLocalized("AlertMoveOneCardToHeap");
@@ -260,7 +259,6 @@ public class SearchController : MemCheckController
         public string AlertRemoveCardsFromDeckPart2 { get; }
         public string AlertRemoveCardsFromDeckPart3 { get; }
         public string AlertRemoveCardFromDeckPart3 { get; }
-        public string OperationIsForFilteringOnDeckInclusive { get; }
         public string CardAlreadyInTargetHeap { get; }
         public string CardsAlreadyInTargetHeap { get; }
         public string AlertMoveOneCardToHeap { get; }
