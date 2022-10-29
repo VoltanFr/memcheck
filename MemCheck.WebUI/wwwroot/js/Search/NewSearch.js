@@ -308,10 +308,14 @@ const searchApp = Vue.createApp({
             this.resetSelectedHeapIfNotValid();
             this.selectedAddToDeckDateChoice = 0;
             this.selectedExpiryDateChoice = 0;
-            this.selectedRequiredTags = [];
             this.selectedRequiredTagToAdd = '';
-            this.selectedExcludedTags = [];
             this.selectedExcludedTagToAdd = '';
+
+            const invalidRequiredTags = this.selectedRequiredTags.filter(selectedTag => !this.possibleRequiredTags.some(possibleTag => possibleTag.tagId === selectedTag.tagId));
+            invalidRequiredTags.forEach(tag => this.removeRequiredTag(tag.tagId));
+
+            const invalidExcludedTags = this.selectedExcludedTags.filter(selectedTag => !this.possibleExcludedTags.some(possibleTag => possibleTag.tagId === selectedTag.tagId));
+            invalidExcludedTags.forEach(tag => this.removeExcludedTag(tag.tagId));
         },
         htmlClassForCard(c) {   // c is SearchController.RunQueryCardViewModel
             // We need a class name for an HMTL which uniquely identifies a card, in order to be able to collapse it individually
