@@ -33,7 +33,7 @@
         </div>
         <div id="NormalMode" v-else>
             <div id="Title" class="container">
-                <h1 class="title">@Localizer["PageTitle"]</h1>
+                <h1 class="title"><i class="fa-solid fa-image"></i>&nbsp;@Localizer["PageTitle"]</h1>
             </div>
             <div id="Inputs" class="container image-list-inputs-container" style="border: 1px solid black;padding:5px">
                 <label>@Localizer["Filter"]</label><input class="form-control responsive-padding-edit" v-model="request.filter" v-on:keyup.enter="getImages()" />

@@ -31,7 +31,7 @@
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
     <div id="After mount" v-else>
-        <h1 class="title"><span v-if="editedTag">@Localizer["TagEdition"]</span><span v-else>@Localizer["TagCreation"]</span></h1>
+        <h1 class="title"><span v-if="editedTag"><i class="fas fa-tags"></i>&nbsp;@Localizer["TagEdition"]</span><span v-else><i class="fas fa-plus"></i>&nbsp;@Localizer["TagCreation"]</span></h1>
 
         <div id="CurrentVersion" class="memcheck-input-div" v-if="editedTag">
             <h2>@Localizer["CurrentVersion"]</h2>

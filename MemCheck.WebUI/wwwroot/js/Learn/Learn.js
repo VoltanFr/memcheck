@@ -483,15 +483,6 @@ const learnApp = Vue.createApp({
         offerDeckChoice() {
             return !this.demoMode() && !this.singleDeckDisplay;
         },
-        getLessonTitle() {
-            if (this.rehearsing())
-                return localized.Rehearsing;
-            if (this.learningUnknowns())
-                return localized.Learning;
-            if (this.demoMode())
-                return localized.Demo;
-            return `ERROR ${this.learnMode}`;
-        },
         showEditButton() {
             return !this.demoMode();
         },

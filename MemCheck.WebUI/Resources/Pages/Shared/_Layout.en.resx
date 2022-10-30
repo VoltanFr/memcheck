@@ -183,12 +183,6 @@
   <data name="PleaseWaitForMount" xml:space="preserve">
     <value>Please wait, initializing data...</value>
   </data>
-  <data name="BrowseMedia" xml:space="preserve">
-    <value>Browse images</value>
-  </data>
-  <data name="UploadMedia" xml:space="preserve">
-    <value>Add image</value>
-  </data>
   <data name="Home" xml:space="preserve">
     <value>Home</value>
   </data>
@@ -197,5 +191,14 @@
   </data>
   <data name="AboutCookies" xml:space="preserve">
     <value>About cookies</value>
+  </data>
+  <data name="BrowseImages" xml:space="preserve">
+    <value>Browse images</value>
+  </data>
+  <data name="CreateImage" xml:space="preserve">
+    <value>Add an image</value>
+  </data>
+  <data name="Media" xml:space="preserve">
+    <value>Media</value>
   </data>
 </root>

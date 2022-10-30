@@ -50,7 +50,7 @@
         <div id="CardEditMode" v-if="!initializationFailure() && !currentFullScreenImage">
             <div id="TitleAndTopButtons">
                 <h1 class="title">
-                    <span id="Title" v-if="creatingNewCard">@Localizer["Create"]</span><span v-else>@Localizer["Edit"]</span>
+                    <span id="Title" v-if="creatingNewCard"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</span><span v-else><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["Edit"]</span>
                     &nbsp;
                     <span id="Info button" v-if="!creatingNewCard">
                         <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>

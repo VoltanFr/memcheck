@@ -42,37 +42,40 @@
                 <div id="Collapsable" class="collapse navbar-collapse navbar-part">
                     <ul class="navbar-nav mr-auto">
                         <li id="Learn" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Learn"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="LearnDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-graduation-cap"></i>&nbsp;@Localizer["Learn"]</a>
                             <div class="dropdown-menu" aria-labelledby="LearnDropdown">
-                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Unknown">@Localizer["Unknown"]</a>
-                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Expired">@Localizer["Expired"]</a>
+                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Unknown"><i class="fa-solid fa-chalkboard-user"></i>&nbsp;@Localizer["Unknown"]</a>
+                                <a class="dropdown-item" href="/Learn/Index?LearnMode=Expired"><i class="fas fa-repeat"></i>&nbsp;@Localizer["Expired"]</a>
                             </div>
                         </li>
                         <li id="Decks" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="DecksDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Decks"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="DecksDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-inbox"></i>&nbsp;@Localizer["Decks"]</a>
                             <div class="dropdown-menu" aria-labelledby="DecksDropdown">
-                                <a class="dropdown-item" href="/Decks/Index">@Localizer["Browse"]</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/Decks/Create">@Localizer["Create"]</a>
-                                <a class="dropdown-item" href="/Decks/Delete">@Localizer["Delete"]</a>
-                                <a class="dropdown-item" href="/Decks/Settings">@Localizer["Settings"]</a>
+                                <a class="dropdown-item" href="/Decks/Index"><i class="fa-solid fa-window-restore"></i>&nbsp;@Localizer["Browse"]</a>
+                                <a class="dropdown-item" href="/Decks/Create"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</a>
+                                <a class="dropdown-item" href="/Decks/Delete"><i class="fa-solid fa-trash"></i>&nbsp;@Localizer["Delete"]</a>
+                                <a class="dropdown-item" href="/Decks/Settings"><i class="fa-solid fa-gear"></i>&nbsp;@Localizer["Settings"]</a>
                             </div>
                         </li>
                         <li id="Cards" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Cards"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-address-card"></i>&nbsp;@Localizer["Cards"]</a>
                             <div class="dropdown-menu" aria-labelledby="CardDropdown">
-                                <a class="dropdown-item" href="/Search/Index"><i class="fas fa-search"></i> @Localizer["Browse"]</a>
-                                <a class="dropdown-item" href="/Authoring/Index"><i class="fas fa-plus"></i> @Localizer["Create"]</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/Media/Index">@Localizer["BrowseMedia"]</a>
-                                <a class="dropdown-item" href="/Media/Upload">@Localizer["UploadMedia"]</a>
+                                <a class="dropdown-item" href="/Search/Index"><i class="fas fa-search"></i>&nbsp;@Localizer["Browse"]</a>
+                                <a class="dropdown-item" href="/Authoring/Index"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</a>
+                            </div>
+                        </li>
+                        <li id="Media" class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="CardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-image"></i>&nbsp;@Localizer["Media"]</a>
+                            <div class="dropdown-menu" aria-labelledby="CardDropdown">
+                                <a class="dropdown-item" href="/Media/Index"><i class="fas fa-search"></i>&nbsp;@Localizer["BrowseImages"]</a>
+                                <a class="dropdown-item" href="/Media/Upload"><i class="fas fa-plus"></i>&nbsp;@Localizer["CreateImage"]</a>
                             </div>
                         </li>
                         <li id="Tags" class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="TagDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Localizer["Tags"]</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="TagDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-tags"></i>&nbsp;@Localizer["Tags"]</a>
                             <div class="dropdown-menu" aria-labelledby="TagDropdown">
-                                <a class="dropdown-item" href="/Tags/Authoring">@Localizer["Create"]</a>
-                                <a class="dropdown-item" href="/Tags/Index">@Localizer["Browse"]</a>
+                                <a class="dropdown-item" href="/Tags/Index"><i class="fas fa-search"></i>&nbsp;@Localizer["Browse"]</a>
+                                <a class="dropdown-item" href="/Tags/Authoring"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</a>
                             </div>
                         </li>
                     </ul>

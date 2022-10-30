@@ -13,7 +13,7 @@
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
     <div id="After mount" v-else>
-        <h1 class="title">@Localizer["MainCaption"]</h1>
+        <h1 class="title"><i class="fas fa-plus"></i>&nbsp;@Localizer["MainCaption"]</h1>
         <div id="Description" class="memcheck-input-div">
             <label>@Localizer["Description"]</label>
             <input type="text" class="form-control responsive-padding-edit" v-model="description">
@@ -29,14 +29,15 @@
             <small class="form-text text-muted">{{heapingAlgorithm.descriptionInCurrentLanguage}}</small>
         </div>
         <div id="AdviceForSingleDeck" class="memcheck-input-div" v-if="userHasDecks()">
-            <small class="form-text text-muted">
+            <strong><small class="form-text text-muted">
                 @Localizer["YouAlreadyHave"]
                 {{userDeckNames.length}}
                 <span v-if="userDeckNames.length == 1">@Localizer["Deck"]</span>
                 <span v-if="userDeckNames.length > 1">@Localizer["Decks"]</span>
                 (<span v-for="(userDeckName, index) in userDeckNames">"{{userDeckName}}"<span v-if="index != userDeckNames.length - 1">, </span></span>).
                 @Localizer["AdviceForSingleDeck"]
-            </small>
+                </small>
+            </strong>
         </div>
         <button type="submit" class="btn btn-primary btn-success" @@click="create">@Localizer["Save"]</button>
     </div>
