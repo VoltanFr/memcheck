@@ -135,21 +135,13 @@ const learnApp = Vue.createApp({
         },
         getCard() {
             this.backSideVisible = false;
-            this.currentCard = null;
-
-            for (let i = 0; !this.currentCard && i < this.downloadedCards.length; i++)
-                if (this.cardIsReady(this.downloadedCards[i])) {
-                    const spliced = this.downloadedCards.splice(i, 1);
-                    this.currentCard = spliced[0];
-                }
+            this.currentCard = this.downloadedCards.find(card => this.cardIsReady(card));
+            this.downloadedCards = this.downloadedCards.filter(card => card !== this.currentCard);
         },
         cardIsReady(card) { // card is an entry of downloadedCards
             // A card is ready when all its images have been loaded. For each image, we must have loaded the blob (method `spawnDownloadImageBlob`) and the details (method `spawnDownloadImageDetails`)
             // The details are a set of fields for each image, among which there is the field `imageId`
-            for (let i = 0; i < card.images.length; i++)
-                if (!card.images[i].blob || !card.images[i].imageId)
-                    return false;
-            return true;
+            return card.images.every(img => img.blob && img.imageId);
         },
         openDeckSettingsPage() {
             if (this.activeDeck)
@@ -183,7 +175,9 @@ const learnApp = Vue.createApp({
                         this.getCard();
                 })
                 .catch(() => {
-                    this.currentImageLoadingPromise = null;
+                    sleep(1000).then(() => {
+                        this.currentImageLoadingPromise = null;
+                    });
                 });
         },
         spawnDownloadImageDetails(image) { // image is an entry of the `downloadedCards` array
@@ -209,7 +203,9 @@ const learnApp = Vue.createApp({
                         this.getCard();
                 })
                 .catch(() => {
-                    this.currentImageDetailsLoadingPromise = null;
+                    sleep(1000).then(() => {
+                        this.currentImageDetailsLoadingPromise = null;
+                    });
                 });
         },
         onCardRemoved() {
@@ -265,6 +261,15 @@ const learnApp = Vue.createApp({
                     });
             }
         },
+        getCardsToExcludeForDownload() {
+            let result = this.downloadedCards.map(card => card.cardId);
+            if (this.currentMovePromise)
+                result.push(this.currentMovingCard.cardId);
+            if (this.currentCard)
+                result.push(this.currentCard.cardId);
+            result = result.concat(this.pendingMoveOperations.map(pendingMoveOperation => pendingMoveOperation.cardId));
+            return result;
+        },
         downloadCardsIfNeeded() {
             if (this.demoMode() && this.reachedMaxCountOfCardsForDemo) {
                 this.lastDownloadIsEmpty = true;
@@ -273,13 +278,7 @@ const learnApp = Vue.createApp({
             }
 
             if ((this.demoMode() || this.activeDeck) && !this.cardDownloadOperation && this.downloadedCards.length < 30) {
-                let excludedCardIds = this.downloadedCards.map(card => card.cardId);
-                if (this.currentMovePromise)
-                    excludedCardIds.push(this.currentMovingCard.cardId);
-                if (this.currentCard)
-                    excludedCardIds.push(this.currentCard.cardId);
-                for (let i = 0; i < this.pendingMoveOperations.length; i++)
-                    excludedCardIds.push(this.pendingMoveOperations[i].cardId);
+                const excludedCardIds = this.getCardsToExcludeForDownload();
 
                 const query = {
                     deckId: this.activeDeck ? this.activeDeck.deckId : this.tagIdForDemo,
@@ -295,18 +294,17 @@ const learnApp = Vue.createApp({
                                 window.location.href = '/';
                             this.lastDownloadIsEmpty = true;
                         }
-                        for (let i = 0; i < result.data.cards.length; i++) {
-                            const card = result.data.cards[i];
 
+                        result.data.cards.forEach(downloadedCard => {
                             // We don't discover images in card text on server side because we want the same code to be used at card authoring time
-                            card.images = [];
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.frontSide)].map(imageName => { return { name: imageName }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.backSide)].map(imageName => { return { name: imageName }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.additionalInfo)].map(imageName => { return { name: imageName }; }));
-                            card.images = card.images.concat([...getMnesiosImageNamesFromSourceText(card.references)].map(imageName => { return { name: imageName }; }));
+                            downloadedCard.images = [];
+                            downloadedCard.images = downloadedCard.images.concat([...getMnesiosImageNamesFromSourceText(downloadedCard.frontSide)].map(imageName => { return { name: imageName }; }));
+                            downloadedCard.images = downloadedCard.images.concat([...getMnesiosImageNamesFromSourceText(downloadedCard.backSide)].map(imageName => { return { name: imageName }; }));
+                            downloadedCard.images = downloadedCard.images.concat([...getMnesiosImageNamesFromSourceText(downloadedCard.additionalInfo)].map(imageName => { return { name: imageName }; }));
+                            downloadedCard.images = downloadedCard.images.concat([...getMnesiosImageNamesFromSourceText(downloadedCard.references)].map(imageName => { return { name: imageName }; }));
+                            this.downloadedCards.push(downloadedCard);
+                        });
 
-                            this.downloadedCards.push(card);
-                        }
                         this.cardDownloadOperation = null;
                         this.updateRemainingCardsInLesson();
                     })
