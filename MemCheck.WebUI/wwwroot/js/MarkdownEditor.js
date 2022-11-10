@@ -151,6 +151,7 @@ export const MarkdownEditor = Vue.defineComponent({
             const getImageMetadataFromNameRequest = { imageName: imageName };
             const getImageMetadataFromNamePromise = axios.post('/Media/GetImageMetadataFromName/', getImageMetadataFromNameRequest)
                 .then(result => {
+                    imageDetails.imageId = result.data.imageId;
                     imageDetails.description = result.data.description;
                     imageDetails.source = result.data.source;
                     imageDetails.initialUploadUtcDate = result.data.initialUploadUtcDate;
