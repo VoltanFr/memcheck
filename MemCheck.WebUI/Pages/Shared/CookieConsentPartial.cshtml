@@ -11,7 +11,7 @@
 @if (showBanner)
 {
     <div id="cookieConsent" class="alert alert-info alert-dismissible fade show" role="alert">
-        @Localizer["MemCheckNeedsYourAuthorization"] <a asp-page="/Privacy">@Localizer["LearnMore"]</a>
+        @Localizer["MemCheckNeedsYourAuthorization"] <a href="https://userdoc.mnesios.com/cookies">@Localizer["LearnMore"]</a>
         <button class="accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
             <span aria-hidden="true">@Localizer["Accept"]</span>
         </button>

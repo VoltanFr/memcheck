@@ -5,6 +5,7 @@
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    ViewData["HelpPage"] = "/delete-personal-data";
 }
 
 <h4>@ViewData["Title"]</h4>
@@ -12,7 +13,7 @@
 <div class="alert alert-warning" role="alert">
     <p>
         <strong>@Localizer["Alert"]</strong><br />
-        <a href="/Doc">@Localizer["ReadTheDoc"]</a>
+        <a href="https://userdoc.mnesios.com/delete-personal-data">@Localizer["ReadTheDoc"]</a>
     </p>
 </div>
 

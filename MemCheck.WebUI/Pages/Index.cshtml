@@ -3,6 +3,7 @@
 @inject IViewLocalizer Localizer
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
+    ViewData["HelpPage"] = "/";
 }
 @section head {
     <link href="@Url.Content("~/css/homepage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
@@ -39,7 +40,7 @@
                 <ul>
                     <li v-for="tag in allData.recommendedTagsForDemo"><a v-bind:href="'/Learn/Index?LearnMode=Demo&TagId='+tag.tagId">{{tag.tagName}}</a></li>
                 </ul>
-                <p>@Localizer["YouMayAlsoWantToRead"] <a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>.</p>
+                <p>@Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</p>
             </div>
         </div>
         <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">

@@ -163,7 +163,7 @@
     <value>the Decks page</value>
   </data>
   <data name="TheDoc" xml:space="preserve">
-    <value>the doc</value>
+    <value>the documentation</value>
   </data>
   <data name="ToUseMemCheck" xml:space="preserve">
     <value>to use Mnesios</value>
@@ -189,8 +189,8 @@
   <data name="YouHaveIn" xml:space="preserve">
     <value>You have in</value>
   </data>
-  <data name="YouMayAlsoWantToRead" xml:space="preserve">
-    <value>You may also want to read</value>
+  <data name="BeforeDocLink" xml:space="preserve">
+    <value>In each Mnesios page, ❓ is a link to </value>
   </data>
   <data name="YouNeedTo" xml:space="preserve">
     <value>You need to</value>
@@ -233,5 +233,8 @@
   </data>
   <data name="WantADemo" xml:space="preserve">
     <value>Want a demo? Select your subject...</value>
+  </data>
+  <data name="AfterDocLink" xml:space="preserve">
+    <value> for the context.</value>
   </data>
 </root>
