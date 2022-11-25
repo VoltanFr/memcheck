@@ -252,7 +252,7 @@ public sealed class NotificationMailer
             if (MustSendForNotifications(userNotifications))
             {
                 var mailBody = GetMailBodyForUser(userNotifications);
-                mailSendingsToWaitFor.Add(emailSender.SendAsync(userNotifications.UserEmail, "MemCheck notifications", mailBody));
+                mailSendingsToWaitFor.Add(emailSender.SendAsync(userNotifications.UserEmail, "Mnesios notifications", mailBody));
                 sentEmailCount++;
             }
 
