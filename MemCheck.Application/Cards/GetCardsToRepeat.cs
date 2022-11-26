@@ -74,7 +74,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             userNames[oldestCard.VersionCreator],
             oldestCard.tagIds.Select(tagId => tagNames[tagId]),
             oldestCard.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
+            userRatings.TryGetValue(oldestCard.CardId, out var value) ? value : 0,
             oldestCard.AverageRating,
             oldestCard.RatingCount,
             notifications[oldestCard.CardId],

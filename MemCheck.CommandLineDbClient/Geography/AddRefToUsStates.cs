@@ -19,7 +19,7 @@ internal sealed class AddRefToUsStates : ICmdLinePlugin
     private readonly ILogger<AddRefToUsStates> logger;
     private readonly MemCheckDbContext dbContext;
     private readonly Dictionary<string, WikipediaUrlAndTitle?> urlCache = new();
-    private record WikipediaUrlAndTitle(string Url, string PageTitle);
+    private sealed record WikipediaUrlAndTitle(string Url, string PageTitle);
     private readonly ImmutableArray<string> possibleEndsOfStateName = GetPossibleEndsOfStateName();
     private readonly ImmutableArray<string> possiblePrefixesOfStateName = GetPossiblePrefixesOfStateName();
     #endregion
@@ -64,8 +64,8 @@ internal sealed class AddRefToUsStates : ICmdLinePlugin
     }
     private async Task<WikipediaUrlAndTitle?> GetActualWikipediaUrlAsync(string url)
     {
-        if (urlCache.ContainsKey(url))
-            return urlCache[url];
+        if (urlCache.TryGetValue(url, out var value))
+            return value;
         var result = await GetActualWikipediaUrlWithoutCacheAsync(url);
         urlCache.Add(url, result);
         return result;

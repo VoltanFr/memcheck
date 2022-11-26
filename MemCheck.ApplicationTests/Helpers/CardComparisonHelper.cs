@@ -10,7 +10,7 @@ namespace MemCheck.Application.Helpers;
 public static class CardComparisonHelper
 {
     #region private record ImageWithSide
-    private record UserWithRating(Guid UserId, int Rating);
+    private sealed record UserWithRating(Guid UserId, int Rating);
     #endregion
     public static void AssertSameContent(Card card, CardPreviousVersion firstVersion, bool includeCreator)
     {

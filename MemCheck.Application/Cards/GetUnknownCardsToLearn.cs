@@ -76,7 +76,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             userNames[cardInDeck.VersionCreator],
             cardInDeck.tagIds.Select(tagId => tagNames[tagId]),
             cardInDeck.userWithViewIds.Select(userWithView => userNames[userWithView]),
-            userRatings.ContainsKey(cardInDeck.CardId) ? userRatings[cardInDeck.CardId] : 0,
+            userRatings.TryGetValue(cardInDeck.CardId, out var value) ? value : 0,
             cardInDeck.AverageRating,
             cardInDeck.RatingCount,
             notifications[cardInDeck.CardId],

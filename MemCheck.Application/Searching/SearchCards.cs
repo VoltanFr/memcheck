@@ -100,7 +100,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             card.VersionCreator,
             card.VersionUtcDate,
             card.VersionDescription,
-            allUserRatings.ContainsKey(card.Id) ? allUserRatings[card.Id] : 0,
+            allUserRatings.TryGetValue(card.Id, out var value) ? value : 0,
             card.AverageRating,
             card.RatingCount
             )

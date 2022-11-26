@@ -44,7 +44,7 @@ public sealed class RefreshImagesInCards : RequestRunner<RefreshImagesInCards.Re
             var imageNamesInTheCard = ImageLoadingHelper.GetMnesiosImagesFromSides(candidateCard.FrontSide, candidateCard.BackSide, candidateCard.AdditionalInfo);
             var imageIdsInTheCard = imageNamesInTheCard.Where(imageName => imageIdsFromNames.ContainsKey(imageName)).Select(imageName => imageIdsFromNames[imageName]).ToImmutableArray();
 
-            var imageIdsInThisCardInTheDbIds = imagesInCardsIdsInTheDb.ContainsKey(candidateCard.Id) ? imagesInCardsIdsInTheDb[candidateCard.Id] : ImmutableHashSet<Guid>.Empty;
+            var imageIdsInThisCardInTheDbIds = imagesInCardsIdsInTheDb.TryGetValue(candidateCard.Id, out var value) ? value : ImmutableHashSet<Guid>.Empty;
 
             foreach (var imageIdInTheCard in imageIdsInTheCard)
                 if (!imageIdsInThisCardInTheDbIds.Contains(imageIdInTheCard))
@@ -53,7 +53,7 @@ public sealed class RefreshImagesInCards : RequestRunner<RefreshImagesInCards.Re
                     changeCount++;
                 }
 
-            var imagesInThisCardInTheDb = imagesPerCardFromTheDb.ContainsKey(candidateCard.Id) ? imagesPerCardFromTheDb[candidateCard.Id] : ImmutableHashSet<ImageInCard>.Empty;
+            var imagesInThisCardInTheDb = imagesPerCardFromTheDb.TryGetValue(candidateCard.Id, out var fromDico) ? fromDico : ImmutableHashSet<ImageInCard>.Empty;
 
             foreach (var imageInThisCardInTheDb in imagesInThisCardInTheDb)
                 if (!imageIdsInTheCard.Contains(imageInThisCardInTheDb.ImageId))

@@ -195,9 +195,7 @@ public class StoreImageTests
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
-#pragma warning disable CA1308 // Normalize strings to uppercase
         var name = RandomHelper.String().ToLowerInvariant();
-#pragma warning restore CA1308 // Normalize strings to uppercase
         await ImageHelper.CreateAsync(db, user, name: name);
 
         using var dbContext = new MemCheckDbContext(db);

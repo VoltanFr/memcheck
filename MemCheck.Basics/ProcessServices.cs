@@ -6,7 +6,6 @@ namespace MemCheck.Basics;
 
 public static class ProcessServices
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
     public static string GetPeakProcessMemoryUsage()
     {
         try

@@ -17,6 +17,6 @@ internal sealed class TestLocalizer : ILocalized
     [DebuggerStepThrough]
     public string GetLocalized(string resourceName)
     {
-        return values.ContainsKey(resourceName) ? values[resourceName] : "";
+        return values.TryGetValue(resourceName, out var value) ? value : "";
     }
 }

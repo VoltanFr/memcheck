@@ -58,8 +58,8 @@ internal sealed class PaukerLesson
             var currentStack = ReadStack(stackNodes[i]!, i);
             Stacks.Add(currentStack);
             foreach (var c in currentStack.Cards)
-                if (cardsInStacks.ContainsKey(c))
-                    cardsInStacks[c].Add(currentStack);
+                if (cardsInStacks.TryGetValue(c, out var value))
+                    value.Add(currentStack);
                 else
                     cardsInStacks.Add(c, new List<PaukerStack>() { currentStack });
         }

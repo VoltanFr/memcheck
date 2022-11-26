@@ -43,7 +43,7 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
         var cardCounts = DbContext.ImagesInCards.AsNoTracking().Where(imageInCard => pageImageIds.Contains(imageInCard.ImageId)).Select(imageInCard => imageInCard.ImageId).ToImmutableArray();
         var cardCountPerImageId = cardCounts.GroupBy(imageInCard => imageInCard).ToImmutableDictionary(imageCardGroup => imageCardGroup.Key, imageCardGroup => imageCardGroup.Count());
 
-        var result = new Result(totalCount, pageCount, pageImages.Select(img => img with { CardCount = cardCountPerImageId.ContainsKey(img.ImageId) ? cardCountPerImageId[img.ImageId] : 0 }).ToImmutableArray());
+        var result = new Result(totalCount, pageCount, pageImages.Select(img => img with { CardCount = cardCountPerImageId.TryGetValue(img.ImageId, out var value) ? value : 0 }).ToImmutableArray());
 
         return new ResultWithMetrologyProperties<Result>(result,
             IntMetric("PageSize", request.PageSize),

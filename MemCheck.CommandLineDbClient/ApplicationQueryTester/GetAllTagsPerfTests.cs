@@ -18,7 +18,7 @@ internal sealed class GetAllTagsPerfTests : ICmdLinePlugin
     private readonly ILogger<GetCardForEdit> logger;
     private readonly CallContext callContext;
     #endregion
-    private record TestDefinition(string Description, GetAllTags.Request Request)
+    private sealed record TestDefinition(string Description, GetAllTags.Request Request)
     {
         public List<double> RunSpentSeconds = new();
         public int TagCount { get; set; }

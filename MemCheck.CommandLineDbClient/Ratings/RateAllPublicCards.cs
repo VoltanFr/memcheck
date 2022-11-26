@@ -20,7 +20,7 @@ internal sealed class RateAllPublicCards : ICmdLinePlugin
     private readonly ImmutableDictionary<Guid, int> userRatings;
     #endregion
     #region Private record CardFromDb
-    private record CardFromDb(Guid Id, string FrontSide, string AdditionalInfo, string References, ImmutableHashSet<Guid> TagIds);
+    private sealed record CardFromDb(Guid Id, string FrontSide, string AdditionalInfo, string References, ImmutableHashSet<Guid> TagIds);
     #endregion
     #region Private methods
     private async Task RateEnglishCardsAsync()

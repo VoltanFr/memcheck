@@ -23,7 +23,7 @@ public sealed class RefreshAverageRatings : RequestRunner<RefreshAverageRatings.
         var changedAverageRatingCount = 0;
         foreach (var cardId in cardsFromDb.Keys)
         {
-            var newAverage = averageRatingsFromRealValues.ContainsKey(cardId) ? averageRatingsFromRealValues[cardId] : 0;
+            var newAverage = averageRatingsFromRealValues.TryGetValue(cardId, out var value) ? value : 0;
 
             if (cardsFromDb[cardId].AverageRating != newAverage)
             {

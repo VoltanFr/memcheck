@@ -19,7 +19,6 @@ namespace MemCheck.Application.Helpers;
 
 public sealed class UserHelper
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Will be disposed by MemCheckUserManager")]
     public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
     {
         var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);

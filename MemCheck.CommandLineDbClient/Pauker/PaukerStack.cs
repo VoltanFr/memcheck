@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MemCheck.CommandLineDbClient.Pauker;
 
-internal class PaukerStack
+internal sealed class PaukerStack
 {
     public PaukerStack(string name, List<PaukerCard> cards)
     {
