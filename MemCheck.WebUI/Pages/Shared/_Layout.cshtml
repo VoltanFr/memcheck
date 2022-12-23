@@ -28,6 +28,15 @@
 
     <link rel="stylesheet" href="~/css/site.css" type="text/css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" type="text/css" asp-append-version="true" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
     @RenderSection("head", required: false)
 </head>
 <body class="site-body">
@@ -38,7 +47,7 @@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#Collapsable" aria-controls="Collapsable" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a class="navbar-brand navbar-memcheck-link" asp-page="/Index">Mnesios</a>&nbsp;🐘
+                <a class="navbar-brand navbar-memcheck-link" asp-page="/Index"><i class="mnesios-logo"></i>Mnesios</a>
                 <div id="Collapsable" class="collapse navbar-collapse navbar-part">
                     <ul class="navbar-nav mr-auto">
                         <li id="Learn" class="nav-item dropdown">

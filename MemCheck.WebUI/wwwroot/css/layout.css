@@ -93,6 +93,7 @@
 .navbar-memcheck-link {
     z-index: var(--z-index-menu);
     padding: 0px;
+    margin: 0 10px 0 0;
 }
 
     .navbar-memcheck-link:hover {
@@ -190,4 +191,15 @@
     .right-part-ul {
         align-items: center;
     }
+}
+
+.mnesios-logo {
+    width: 20px;
+    height: 20px;
+    background-image: url("/favicon-32x32.png");
+    display: inline-block;
+    margin: 0 5px 0 0;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    vertical-align:text-bottom;
 }
