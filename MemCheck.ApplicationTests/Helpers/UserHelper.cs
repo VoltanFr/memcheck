@@ -21,6 +21,7 @@ public sealed class UserHelper
 {
     public static UserManager<MemCheckUser> GetUserManager(MemCheckDbContext dbContext)
     {
+#pragma warning disable CA2000 // Dispose objects before losing scope
         var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
         var optionsAccessor = Options.Create(new IdentityOptions());
         var passwordHasher = new PasswordHasher<MemCheckUser>();
@@ -33,6 +34,7 @@ public sealed class UserHelper
         var serviceProvider = services.BuildServiceProvider();
         var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
         return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
+#pragma warning restore CA2000 // Dispose objects before losing scope
     }
     public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
     {

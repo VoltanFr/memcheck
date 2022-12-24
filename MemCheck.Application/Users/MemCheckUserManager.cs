@@ -1,7 +1,6 @@
 ﻿using MemCheck.Application.Decks;
 using MemCheck.Application.Heaping;
 using MemCheck.Application.QueryValidation;
-using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
@@ -40,7 +39,7 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     public override async Task<IdentityResult> CreateAsync(MemCheckUser user)
     {
         if (user.UserName.Length is > MaxUserNameLength or < MinUserNameLength)
-            return IdentityResult.Failed(new IdentityError() { Code = BadUserNameLengthErrorCode, Description = $"User name must contain between {MinUserNameLength} and {MaxUserNameLength} chars" }.AsArray());
+            return IdentityResult.Failed(new IdentityError() { Code = BadUserNameLengthErrorCode, Description = $"User name must contain between {MinUserNameLength} and {MaxUserNameLength} chars" });
 
         user.RegistrationUtcDate = DateTime.UtcNow;
         var result = await base.CreateAsync(user);

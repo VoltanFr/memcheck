@@ -45,7 +45,7 @@ internal static class CardVisibilityHelper
             throw new RequestInputException("At least one non-private card");
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Too complicated")]
     public static bool CardIsPrivateToSingleUser(Guid userId, IEnumerable<Guid> usersWithView)
     {
         if (QueryValidationHelper.IsReservedGuid(userId))

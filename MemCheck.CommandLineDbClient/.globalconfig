@@ -1,4 +1,4 @@
-# There are a lot of rules which don't matter a lot for this
+﻿# There are a lot of rules which don't matter a lot for this
 # project, in which I am a bit relaxed about code quality
 
 # I don't care about not using the logger very well
@@ -12,6 +12,3 @@ dotnet_diagnostic.CA1310.severity = none
 
 # Ok with classes never used
 dotnet_diagnostic.CA1812.severity = none
-
-# Ok to catch Exception
-dotnet_diagnostic.CA1031.severity = none

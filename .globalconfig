@@ -7,6 +7,12 @@ dotnet_diagnostic.CA1014.severity = none
 # Allow properties to return arrays
 dotnet_diagnostic.CA1819.severity = none
 
+# Allow multiple iterations of enumerables: very often we have very little enumerables, where it is not a problem to iterate multiple times
+dotnet_diagnostic.CA1851.severity = none
+
+# Allow catching all exceptions: it is not rare that I don't want to take any risk of unexpected exception
+dotnet_diagnostic.CA1031.severity = none
+
 # Allow mutable properties
 dotnet_diagnostic.CA2227.severity = none
 
