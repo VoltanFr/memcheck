@@ -9,47 +9,48 @@
     <link href="@Url.Content("~/css/homepage.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 
-    <div id="HomeDiv" class="page-responsive-padding" v-cloak>
-        <div id="WaitingForData" v-if="!allData">
-            <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
-        </div>
-        <div id="DataLoaded" v-else>
-            <div id="UserLoggedIn" v-if="allData.userName">
-                <p>@Localizer["Welcome"] <a href="/Identity/Account/Manage">{{allData.userName}}</a></p>
-                <div id="User has decks" v-if="allData.userDecks.length > 0">
-                    <div v-for="deck in allData.userDecks">
-                        <p v-html="deck.headLine" />
-                        <ul>
-                            <li v-for="line in deck.lines"><span v-html="line" /></li>
-                            <li v-if="isValidDt(deck.nextExpiryUTCDate)">@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}</li>
-                        </ul>
-                    </div>
+<div id="HomeDiv" class="page-responsive-padding" v-cloak>
+    <div id="WaitingForData" v-if="!allData" class="wait-div">
+        <i class="mnesios-logo-big"></i>
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="DataLoaded" v-else>
+        <div id="UserLoggedIn" v-if="allData.userName">
+            <p>@Localizer["Welcome"] <a href="/Identity/Account/Manage">{{allData.userName}}</a></p>
+            <div id="User has decks" v-if="allData.userDecks.length > 0">
+                <div v-for="deck in allData.userDecks">
+                    <p v-html="deck.headLine" />
+                    <ul>
+                        <li v-for="line in deck.lines"><span v-html="line" /></li>
+                        <li v-if="isValidDt(deck.nextExpiryUTCDate)">@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}</li>
+                    </ul>
                 </div>
-                <div id="No deck" v-else>
-                    <p>@Localizer["YouDontHaveADeckYet"]. @Localizer["YouCanCreateOneOn"] <a asp-page="/Decks/Create">@Localizer["TheDecksPage"]</a>.</p>
-                    <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
-                </div>
-                <footer id="Data time" style="padding-top:50px">
-                    <small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.</small>
-                </footer>
             </div>
-            <div id="User not loggedin" v-else>
-                <p>@Localizer["Welcome"] !</p>
-                <p>@Localizer["YouNeedTo"] <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["LogIn"]</a> @Localizer["ToUseMemCheck"] (<a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a> @Localizer["IfYouDontHaveAnAccount"]).</p>
-                <p>@Localizer["WantADemo"]</p>
-                <ul>
-                    <li v-for="tag in allData.recommendedTagsForDemo"><a v-bind:href="'/Learn/Index?LearnMode=Demo&TagId='+tag.tagId">{{tag.tagName}}</a></li>
-                </ul>
-                <p>@Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</p>
+            <div id="No deck" v-else>
+                <p>@Localizer["YouDontHaveADeckYet"]. @Localizer["YouCanCreateOneOn"] <a asp-page="/Decks/Create">@Localizer["TheDecksPage"]</a>.</p>
+                <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
             </div>
+            <footer id="Data time" style="padding-top:50px">
+                <small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.</small>
+            </footer>
         </div>
-        <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
-            <p>window.innerWidth: {{window.innerWidth}}</p>
-            <p>screen.width: {{screen.width}}</p>
+        <div id="User not loggedin" v-else>
+            <p>@Localizer["Welcome"] !</p>
+            <p>@Localizer["YouNeedTo"] <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/">@Localizer["LogIn"]</a> @Localizer["ToUseMemCheck"] (<a asp-area="Identity" asp-page="/Account/Register" asp-route-returnUrl="/">@Localizer["Register"]</a> @Localizer["IfYouDontHaveAnAccount"]).</p>
+            <p>@Localizer["WantADemo"]</p>
+            <ul>
+                <li v-for="tag in allData.recommendedTagsForDemo"><a v-bind:href="'/Learn/Index?LearnMode=Demo&TagId='+tag.tagId">{{tag.tagName}}</a></li>
+            </ul>
+            <p>@Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</p>
         </div>
     </div>
+    <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">
+        <p>window.innerWidth: {{window.innerWidth}}</p>
+        <p>screen.width: {{screen.width}}</p>
+    </div>
+</div>
 
-    @section scripts
+@section scripts
     {
     <script type="module" src="~/js/Home/Home.js" asp-append-version="true"></script>
 }

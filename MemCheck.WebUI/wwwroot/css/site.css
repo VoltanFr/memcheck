@@ -82,7 +82,7 @@
 }
 
 [v-cloak]::before {
-    content: "Loading, please wait…"
+    content: "Chargement…"
 }
 
 .page-responsive-padding {
@@ -228,10 +228,6 @@
 .thumbnail-image {
     width: 100px;
     height: auto;
-}
-
-.wait-message {
-    font-weight: bolder;
 }
 
 .btn-nav-pages {
@@ -457,4 +453,20 @@ br {
     margin: 0px;
     display: block;
     content: ''
+}
+
+.wait-div {
+    text-align: center;
+}
+
+.wait-message {
+    font-weight: bolder;
+}
+
+.mnesios-logo-big {
+    width: 144px;
+    height: 144px;
+    background-image: url("/android-chrome-144x144.png");
+    display: inline-block;
+    margin-bottom: 10px;
 }

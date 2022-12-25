@@ -193,7 +193,7 @@
     }
 }
 
-.mnesios-logo {
+.mnesios-logo-tiny {
     width: 20px;
     height: 20px;
     background-image: url("/favicon-32x32.png");
@@ -201,5 +201,5 @@
     margin: 0 5px 0 0;
     background-size: 100%;
     background-repeat: no-repeat;
-    vertical-align:text-bottom;
+    vertical-align: text-bottom;
 }
