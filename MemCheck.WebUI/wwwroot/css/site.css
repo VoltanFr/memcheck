@@ -82,7 +82,10 @@
 }
 
 [v-cloak]::before {
-    content: "Chargement…"
+    content: "Chargement…";
+    text-align: center;
+    font-weight: bolder;
+    align-self: center;
 }
 
 .page-responsive-padding {

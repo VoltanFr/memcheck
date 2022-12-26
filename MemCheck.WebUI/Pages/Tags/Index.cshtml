@@ -17,7 +17,8 @@
 }
 
 <div id="TagsMainDiv" class="page-responsive-padding" v-cloak>
-    <div id="Waiting for mount" v-if="!mountFinished">
+    <div id="WaitingForData" v-if="!mountFinished" class="wait-div">
+        <i class="mnesios-logo-big"></i>
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
     <div id="After mount" v-else>
