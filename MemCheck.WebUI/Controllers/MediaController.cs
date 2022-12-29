@@ -48,8 +48,11 @@ public class MediaController : MemCheckController
         using var reader = new BinaryReader(stream);
         var fileContent = reader.ReadBytes((int)request.File.Length);
         var applicationRequest = new StoreImage.Request(userId, request.Name.Trim(), request.Description.Trim(), request.Source.Trim(), request.File.ContentType, fileContent);
-        await new StoreImage(callContext).RunAsync(applicationRequest);
-        return ControllerResultWithToast.Success($"{GetLocalized("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'", this);
+        var appResult = await new StoreImage(callContext).RunAsync(applicationRequest);
+        var toastTitle = GetLocalized("Success");
+        var toastMesg = $"{GetLocalized("ImageSavedWithName")} '{applicationRequest.Name.Trim()}'";
+        var result = new UploadImageResult(toastTitle, toastMesg, appResult.ImageId);
+        return Ok(result);
     }
     public sealed class UploadImageRequest
     {
@@ -58,6 +61,7 @@ public class MediaController : MemCheckController
         public string? Source { get; set; }
         public IFormFile? File { get; set; }
     }
+    public sealed record UploadImageResult(string ToastTitle, string ToastText, Guid ImageId);
     #endregion
     #region GetImageList
     [HttpPost("GetImageList")]

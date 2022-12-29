@@ -104,14 +104,14 @@ public sealed class StoreImage : RequestRunner<StoreImage.Request, StoreImage.Re
         DbContext.Images.Add(image);
         await DbContext.SaveChangesAsync();
 
-        return new ResultWithMetrologyProperties<Result>(new Result(),
+        return new ResultWithMetrologyProperties<Result>(new Result(image.Id),
             ("ImageName", request.Name.ToString()),
             IntMetric("DescriptionLength", request.Description.Length),
             IntMetric("SourceFieldLength", request.Source.Length),
             ("ContentType", request.ContentType),
             IntMetric("ImageSize", image.OriginalSize));
     }
-    #region Request class
+    #region Request & Result
     public sealed class Request : IRequest
     {
         #region Fields
@@ -151,6 +151,6 @@ public sealed class StoreImage : RequestRunner<StoreImage.Request, StoreImage.Re
                 throw new IOException($"This image is already in the database, with name '{existing.Name}'");
         }
     }
-    public sealed record Result();
+    public sealed record Result(Guid ImageId);
     #endregion
 }

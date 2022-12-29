@@ -24,7 +24,8 @@
         <i class="mnesios-logo-big"></i>
         <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
     </div>
-    <div id="Waiting for upload" v-if="mountFinished && uploading">
+    <div id="Waiting for upload" v-if="mountFinished && uploading" class="wait-div">
+        <i class="mnesios-logo-big"></i>
         <p class="wait-message">@Localizer["PleaseWaitWhileUploading"]</p>
     </div>
     <div id="After mount" v-if="mountFinished && !uploading">
