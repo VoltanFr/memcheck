@@ -126,17 +126,17 @@ public class MediaController : MemCheckController
         public string CurrentVersionDescription { get; }
     }
     #endregion
-    #region GetImageMetadata
-    [HttpGet("GetImageMetadata/{imageId}")]
-    public async Task<IActionResult> GetImageMetadata(Guid imageId)
+    #region GetImageMetadataForEdit
+    [HttpGet("GetImageMetadataForEdit/{imageId}")]
+    public async Task<IActionResult> GetImageMetadataForEdit(Guid imageId)
     {
         var appRequest = new GetImageInfoFromId(callContext);
         var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
-        return Ok(new GetImageMetadataViewModel(result.Name, result.Source, result.Description));
+        return Ok(new GetImageMetadataForEditViewModel(result.Name, result.Source, result.Description));
     }
-    public sealed class GetImageMetadataViewModel
+    public sealed class GetImageMetadataForEditViewModel
     {
-        public GetImageMetadataViewModel(string imageName, string source, string description)
+        public GetImageMetadataForEditViewModel(string imageName, string source, string description)
         {
             ImageName = imageName;
             Source = source;

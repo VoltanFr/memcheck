@@ -109,7 +109,7 @@ const uploadMediaApp = Vue.createApp({
             if (!imageId)
                 return;
 
-            await axios.get(`/Media/GetImageMetadata/${imageId}`)
+            await axios.get(`/Media/GetImageMetadataForEdit/${imageId}`)
                 .then(result => {
                     this.editingImageId = imageId;
                     this.name = result.data.imageName;
