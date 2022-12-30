@@ -19,7 +19,7 @@ const imageListApp = Vue.createApp({
             totalCount: -1, // int
             pageCount: 0,   // int
             offeredPageSizes: [10, 50, 100],
-            images: [],
+            imageList: [],
             mountFinished: false,
             loading: false,
             currentFullScreenImage: null,   // Medium sized
@@ -28,7 +28,7 @@ const imageListApp = Vue.createApp({
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
-            await this.getImages();
+            await this.getImageList();
         }
         finally {
             this.mountFinished = true;
@@ -39,19 +39,19 @@ const imageListApp = Vue.createApp({
     },
     methods: {
         setImageThumbnail(index, data) {
-            this.images[index].thumbnail = base64FromBytes(data);
+            this.imageList[index].thumbnail = base64FromBytes(data);
         },
         onAxiosError(error) {
             tellAxiosError(error);
         },
-        async getImages() {
+        async getImageList() {
             this.loading = true;
-            this.images = [];
+            this.imageList = [];
             await axios.post('/Media/GetImageList', this.request)
                 .then(result => {
                     this.totalCount = result.data.totalCount;
                     this.pageCount = result.data.pageCount;
-                    this.images = result.data.images.map(image => {
+                    this.imageList = result.data.images.map(image => {
                         return {
                             imageName: image.imageName,
                             uploaderUserName: image.uploaderUserName,
@@ -75,8 +75,8 @@ const imageListApp = Vue.createApp({
                     tellAxiosError(error);
                 });
 
-            for (let i = 0; i < this.images.length; i++)
-                await axios.get(`/Learn/GetImage/${this.images[i].imageId}/${imageSizeSmall}`, { responseType: 'arraybuffer' })
+            for (let i = 0; i < this.imageList.length; i++)
+                await axios.get(`/Learn/GetImage/${this.imageList[i].imageId}/${imageSizeSmall}`, { responseType: 'arraybuffer' })
                     .then(result => this.setImageThumbnail(i, result.data))
                     .catch(error => this.onAxiosError(error));
 
@@ -85,7 +85,7 @@ const imageListApp = Vue.createApp({
             if (this.request.pageNo > this.pageCount) {
                 this.request.pageNo = 1;
                 if (this.totalCount > 0)
-                    await this.getImages();
+                    await this.getImageList();
             }
         },
         canMovePage(shift) {
@@ -93,15 +93,15 @@ const imageListApp = Vue.createApp({
         },
         async moveToFirstPage() {
             this.request.pageNo = 1;
-            await this.getImages();
+            await this.getImageList();
         },
         async moveToLastPage() {
             this.request.pageNo = this.pageCount;
-            await this.getImages();
+            await this.getImageList();
         },
         async movePage(shift) {
             this.request.pageNo = this.request.pageNo + shift;
-            await this.getImages();
+            await this.getImageList();
         },
         edit(imageId) {
             window.location.href = `/Media/Upload?ImageId=${imageId}&ReturnAddress=${window.location}`;
