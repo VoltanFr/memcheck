@@ -103,7 +103,7 @@ const imageListApp = Vue.createApp({
         async showImageFull(imageId) {
             this.loading = true;
             try {
-                var imageWithDetails = { imageId: imageId };
+                let imageWithDetails = { imageId: imageId };
 
                 const blobPromise = axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                     .then(result => {
