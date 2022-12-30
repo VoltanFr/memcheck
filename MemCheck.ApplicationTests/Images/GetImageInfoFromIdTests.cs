@@ -24,7 +24,8 @@ public class GetImageInfoFromIdTests
     public async Task NotUsedInCards()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
+        var userName = RandomHelper.String();
+        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
         var name = RandomHelper.String();
         var source = RandomHelper.String();
         var description = RandomHelper.String();
@@ -34,19 +35,28 @@ public class GetImageInfoFromIdTests
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
-        Assert.AreEqual(user, loaded.Owner.Id);
-        Assert.AreEqual(name, loaded.Name);
+        Assert.AreEqual(userName, loaded.CurrentVersionCreatorName);
+        Assert.AreEqual(name, loaded.ImageName);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
         Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
         Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
+        Assert.AreEqual(0, loaded.CardCount);
+        Assert.AreEqual(ImageHelper.contentType, loaded.OriginalImageContentType);
+        Assert.IsTrue(loaded.OriginalImageSize > 0);
+        Assert.IsTrue(loaded.SmallSize > 0);
+        Assert.IsTrue(loaded.MediumSize > 0);
+        Assert.IsTrue(loaded.BigSize > 0);
+        Assert.IsTrue(loaded.MediumSize > loaded.SmallSize);
+        Assert.IsTrue(loaded.BigSize > loaded.SmallSize);
     }
     [TestMethod()]
-    public async Task UsedInCards_InfoNotRefreshed()
+    public async Task UsedInCards()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
+        var userName = RandomHelper.String();
+        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
         var name = RandomHelper.String();
         var source = RandomHelper.String();
         var description = RandomHelper.String();
@@ -54,14 +64,92 @@ public class GetImageInfoFromIdTests
         var versionDescription = RandomHelper.String();
         var image = await ImageHelper.CreateAsync(db, user, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
+        await CardHelper.CreateIdAsync(db, user, frontSide: $"![Mnesios:{name},size=small]");
+        await CardHelper.CreateIdAsync(db, user, frontSide: $"![Mnesios:{name},size=big]");
+
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
-        Assert.AreEqual(user, loaded.Owner.Id);
-        Assert.AreEqual(name, loaded.Name);
+        Assert.AreEqual(userName, loaded.CurrentVersionCreatorName);
+        Assert.AreEqual(name, loaded.ImageName);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
         Assert.AreEqual(uploadDate, loaded.InitialUploadUtcDate);
         Assert.AreEqual(uploadDate, loaded.LastChangeUtcDate);
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
+        Assert.AreEqual(2, loaded.CardCount);
+        Assert.AreEqual(ImageHelper.contentType, loaded.OriginalImageContentType);
+        Assert.IsTrue(loaded.OriginalImageSize > 0);
+        Assert.IsTrue(loaded.SmallSize > 0);
+        Assert.IsTrue(loaded.MediumSize > 0);
+        Assert.IsTrue(loaded.BigSize > 0);
+        Assert.IsTrue(loaded.MediumSize > loaded.SmallSize);
+        Assert.IsTrue(loaded.BigSize > loaded.SmallSize);
+    }
+    [TestMethod()]
+    public async Task HasNewVersion()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+
+        var originalVersionCreatorName = RandomHelper.String();
+        var originalVersionCreator = await UserHelper.CreateInDbAsync(db, userName: originalVersionCreatorName);
+        var originalVersionImageName = RandomHelper.String();
+        var originalVersionSource = RandomHelper.String();
+        var originalVersionDescription = RandomHelper.String();
+        var originalVersionUploadDate = RandomHelper.Date();
+        var originalVersionVersionDescription = RandomHelper.String();
+        var originalBlob = StoreImageTests.GetPngImage();
+
+        Guid imageId;
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var localizer = new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("InitialImageVersionCreation", originalVersionVersionDescription));
+            var storer = new StoreImage(dbContext.AsCallContext(localizer), originalVersionUploadDate);
+            var storeRequest = new StoreImage.Request(originalVersionCreator, originalVersionImageName, originalVersionDescription, originalVersionSource, StoreImage.pngImageContentType, originalBlob);
+            imageId = (await storer.RunAsync(storeRequest)).ImageId;
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(imageId));
+            Assert.AreEqual(originalVersionCreatorName, loaded.CurrentVersionCreatorName);
+            Assert.AreEqual(originalVersionImageName, loaded.ImageName);
+            Assert.AreEqual(originalVersionDescription, loaded.Description);
+            Assert.AreEqual(originalVersionSource, loaded.Source);
+            Assert.AreEqual(originalVersionUploadDate, loaded.InitialUploadUtcDate);
+            Assert.AreEqual(originalVersionUploadDate, loaded.LastChangeUtcDate);
+            Assert.AreEqual(originalVersionVersionDescription, loaded.CurrentVersionDescription);
+            Assert.AreEqual(0, loaded.CardCount);
+            Assert.AreEqual(StoreImage.pngImageContentType, loaded.OriginalImageContentType);
+            Assert.AreEqual(originalBlob.Length, loaded.OriginalImageSize);
+        }
+
+        var newVersionUserName = RandomHelper.String();
+        var newVersionser = await UserHelper.CreateInDbAsync(db, userName: newVersionUserName);
+        var newVersionSource = RandomHelper.String();
+        var newVersionDescription = RandomHelper.String();
+        var newVersionUploadDate = RandomHelper.Date();
+        var newVersionVersionDescription = RandomHelper.String();
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var updater = new UpdateImageMetadata(dbContext.AsCallContext(), newVersionUploadDate);
+            var updateRequest = new UpdateImageMetadata.Request(imageId, newVersionser, originalVersionImageName, newVersionSource, newVersionDescription, newVersionVersionDescription);
+            await updater.RunAsync(updateRequest);
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(imageId));
+            Assert.AreEqual(newVersionUserName, loaded.CurrentVersionCreatorName);
+            Assert.AreEqual(originalVersionImageName, loaded.ImageName);
+            Assert.AreEqual(newVersionDescription, loaded.Description);
+            Assert.AreEqual(newVersionSource, loaded.Source);
+            Assert.AreEqual(originalVersionUploadDate, loaded.InitialUploadUtcDate);
+            Assert.AreEqual(newVersionUploadDate, loaded.LastChangeUtcDate);
+            Assert.AreEqual(newVersionVersionDescription, loaded.CurrentVersionDescription);
+            Assert.AreEqual(0, loaded.CardCount);
+            Assert.AreEqual(StoreImage.pngImageContentType, loaded.OriginalImageContentType);
+            Assert.AreEqual(originalBlob.Length, loaded.OriginalImageSize);
+        }
     }
 }

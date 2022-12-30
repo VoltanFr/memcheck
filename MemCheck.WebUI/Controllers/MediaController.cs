@@ -69,7 +69,7 @@ public class MediaController : MemCheckController
     {
         CheckBodyParameter(request);
         var result = await new GetImageList(callContext).RunAsync(new GetImageList.Request(request.PageSize, request.PageNo, request.Filter == null ? "" : request.Filter.Trim()));
-        return Ok(new GetImageListViewModel(result, this));
+        return Ok(new GetImageListViewModel(result));
     }
     public sealed class GetImageListRequest
     {
@@ -79,11 +79,11 @@ public class MediaController : MemCheckController
     }
     public sealed class GetImageListViewModel
     {
-        public GetImageListViewModel(GetImageList.Result applicationResult, ILocalized localizer)
+        public GetImageListViewModel(GetImageList.Result applicationResult)
         {
             TotalCount = applicationResult.TotalCount;
             PageCount = applicationResult.PageCount;
-            Images = applicationResult.Images.Select(img => new GetImageListImageViewModel(img, localizer));
+            Images = applicationResult.Images.Select(img => new GetImageListImageViewModel(img));
         }
         public int TotalCount { get; }
         public int PageCount { get; }
@@ -91,39 +91,15 @@ public class MediaController : MemCheckController
     }
     public sealed class GetImageListImageViewModel
     {
-        public GetImageListImageViewModel(GetImageList.ResultImage img, ILocalized localizer)
+        public GetImageListImageViewModel(GetImageList.ResultImage img)
         {
             ImageId = img.ImageId;
             ImageName = img.ImageName;
             CardCount = img.CardCount;
-            UploaderUserName = img.Uploader;
-            Description = img.Description;
-            Source = img.Source;
-            OriginalImageContentType = img.OriginalImageContentType;
-            OriginalImageSize = img.OriginalImageSize;
-            SmallSize = img.SmallSize;
-            MediumSize = img.MediumSize;
-            BigSize = img.BigSize;
-            InitialUploadUtcDate = img.InitialUploadUtcDate;
-            LastChangeUtcDate = img.LastChangeUtcDate;
-            RemoveAlertMessage = $"{localizer.GetLocalized("SureYouWantToDeletePart1")} '{ImageName}' ? {localizer.GetLocalized("SureYouWantToDeletePart2")} {UploaderUserName} {localizer.GetLocalized("SureYouWantToDeletePart3")} ";
-            CurrentVersionDescription = img.CurrentVersionDescription;
         }
         public Guid ImageId { get; }
         public string ImageName { get; }
         public int CardCount { get; }
-        public string UploaderUserName { get; }
-        public string Description { get; }
-        public string Source { get; }
-        public string OriginalImageContentType { get; }
-        public int OriginalImageSize { get; }
-        public int SmallSize { get; }
-        public int MediumSize { get; }
-        public int BigSize { get; }
-        public DateTime InitialUploadUtcDate { get; }
-        public string RemoveAlertMessage { get; }
-        public DateTime LastChangeUtcDate { get; }
-        public string CurrentVersionDescription { get; }
     }
     #endregion
     #region GetImageMetadataForEdit
@@ -132,7 +108,7 @@ public class MediaController : MemCheckController
     {
         var appRequest = new GetImageInfoFromId(callContext);
         var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
-        return Ok(new GetImageMetadataForEditViewModel(result.Name, result.Source, result.Description));
+        return Ok(new GetImageMetadataForEditViewModel(result.ImageName, result.Source, result.Description));
     }
     public sealed class GetImageMetadataForEditViewModel
     {
@@ -192,6 +168,53 @@ public class MediaController : MemCheckController
         public int BigSize { get; }
     }
     #endregion
+    #region GetImageMetadataFromId
+    [HttpGet("GetImageMetadataFromId/{imageId}")]
+    public async Task<IActionResult> GetImageMetadataFromId(Guid imageId)
+    {
+        var appRequest = new GetImageInfoFromId(callContext);
+        var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
+        return Ok(new GetImageMetadataFromIdViewModel(imageId, result.ImageName, result.Description, result.Source, result.InitialUploadUtcDate, result.CurrentVersionCreatorName, result.LastChangeUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+    }
+    public sealed class GetImageMetadataFromIdRequest
+    {
+        public string ImageName { get; set; } = null!;
+    }
+    public sealed class GetImageMetadataFromIdViewModel
+    {
+        public GetImageMetadataFromIdViewModel(Guid imageId, string imageName, string description, string source, DateTime initialUploadUtcDate, string currentVersionCreatorName, DateTime currentVersionUtcDate, string currentVersionDescription, int cardCount, string originalImageContentType, int originalImageSize, int smallSize, int mediumSize, int bigSize)
+        {
+            ImageId = imageId;
+            ImageName = imageName;
+            Description = description;
+            Source = source;
+            InitialUploadUtcDate = initialUploadUtcDate;
+            CurrentVersionCreatorName = currentVersionCreatorName;
+            CurrentVersionUtcDate = currentVersionUtcDate;
+            CurrentVersionDescription = currentVersionDescription;
+            CardCount = cardCount;
+            OriginalImageContentType = originalImageContentType;
+            OriginalImageSize = originalImageSize;
+            SmallSize = smallSize;
+            MediumSize = mediumSize;
+            BigSize = bigSize;
+        }
+        public Guid ImageId { get; }
+        public string ImageName { get; }
+        public string Description { get; }
+        public string Source { get; }
+        public DateTime InitialUploadUtcDate { get; }
+        public string CurrentVersionCreatorName { get; }
+        public DateTime CurrentVersionUtcDate { get; }
+        public string CurrentVersionDescription { get; }
+        public int CardCount { get; }
+        public string OriginalImageContentType { get; }
+        public int OriginalImageSize { get; }
+        public int SmallSize { get; }
+        public int MediumSize { get; }
+        public int BigSize { get; }
+    }
+    #endregion
     #region Update
     [HttpPost("Update/{imageId}")]
     public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
@@ -239,9 +262,9 @@ public class MediaController : MemCheckController
     {
         public GetImageInfoForDeletionResult(GetImageInfoFromId.Result appResult, ILocalized localizer)
         {
-            ImageName = appResult.Name;
+            ImageName = appResult.ImageName;
             CardCount = appResult.CardCount;
-            CurrentVersionUserName = appResult.Owner.UserName;
+            CurrentVersionCreatorName = appResult.CurrentVersionCreatorName;
             Description = appResult.Description;
             Source = appResult.Source;
             InitialUploadUtcDate = appResult.InitialUploadUtcDate;
@@ -251,7 +274,7 @@ public class MediaController : MemCheckController
         }
         public string ImageName { get; }
         public int CardCount { get; }
-        public string CurrentVersionUserName { get; }
+        public string CurrentVersionCreatorName { get; }
         public string Description { get; }
         public string Source { get; }
         public DateTime InitialUploadUtcDate { get; }

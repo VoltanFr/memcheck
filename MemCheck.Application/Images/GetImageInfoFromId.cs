@@ -1,5 +1,4 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -27,7 +26,7 @@ public sealed class GetImageInfoFromId : RequestRunner<GetImageInfoFromId.Reques
             .Where(imageInCard => imageInCard.ImageId == img.Id)
             .CountAsync();
 
-        var result = new Result(img.Owner, img.Name, img.Description, img.Source, cardCount, img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription);
+        var result = new Result(img.Name, img.Description, img.Source, cardCount, img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.Owner.UserName, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize);
 
         return new ResultWithMetrologyProperties<Result>(result, ("ImageId", request.ImageId.ToString()));
     }
@@ -39,6 +38,10 @@ public sealed class GetImageInfoFromId : RequestRunner<GetImageInfoFromId.Reques
             await QueryValidationHelper.CheckImageExistsAsync(callContext.DbContext, ImageId);
         }
     }
-    public sealed record Result(MemCheckUser Owner, string Name, string Description, string Source, int CardCount, DateTime InitialUploadUtcDate, DateTime LastChangeUtcDate, string CurrentVersionDescription);
+    public sealed record Result(string ImageName, string Description, string Source, int CardCount,
+        DateTime InitialUploadUtcDate, DateTime LastChangeUtcDate,
+        string CurrentVersionDescription, string OriginalImageContentType,
+        string CurrentVersionCreatorName,
+        int OriginalImageSize, int SmallSize, int MediumSize, int BigSize);
     #endregion
 }

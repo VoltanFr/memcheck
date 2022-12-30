@@ -156,8 +156,8 @@
   <data name="BigSizeImageLabel_EditButtonTitle" xml:space="preserve">
     <value>Edit</value>
   </data>
-  <data name="BigSizeImageLabel_InitialVersionCreatedBy" xml:space="preserve">
-    <value>Uploaded by:</value>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedBy" xml:space="preserve">
+    <value>Current version created by:</value>
   </data>
   <data name="BigSizeImageLabel_InitialVersionCreatedOn" xml:space="preserve">
     <value>Uploaded on:</value>

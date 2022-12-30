@@ -64,10 +64,10 @@
                         <button class="toolbar-button-circle toolbar-button" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
                     </div>
                     <div id="CardBody" class="card-body image-list-card-body">
-                        <a href="#" @@click="showImageFull(image)"><img class="thumbnail-image" :src="image.thumbnail" /></a>
+                        <a href="#" @@click="showImageFull(image.imageId)"><img class="thumbnail-image" :src="image.imageThumbnail" /></a>
                     </div>
                     <div id="CardFooter" class="card-footer image-list-card-footer">
-                        <button class="toolbar-button" @@click="showCardsWithImage(image.imageId)">{{image.cardCount}} <span v-if="image.cardCount > 1">@Localizer["Cards"]</span><span v-else>@Localizer["Card"]</span></button>
+                        <button class="toolbar-button" @@click="showCardsWithImage(image.imageId)">{{image.imageCardCount}} <span v-if="image.imageCardCount > 1">@Localizer["Cards"]</span><span v-else>@Localizer["Card"]</span></button>
                     </div>
                 </div>
             </div>

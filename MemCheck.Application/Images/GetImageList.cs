@@ -23,21 +23,7 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
         var pageImages = images
             .Skip((request.PageNo - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(img => new ResultImage(
-                            img.Id,
-                            img.Name,
-                            img.OriginalContentType,
-                            img.Owner.UserName,
-                            img.Description,
-                            img.Source,
-                            img.OriginalSize,
-                            img.SmallBlobSize,
-                            img.MediumBlobSize,
-                            img.BigBlobSize,
-                            img.InitialUploadUtcDate,
-                            img.LastChangeUtcDate,
-                            img.VersionDescription
-                            ))
+            .Select(img => new ResultImage(img.Id, img.Name))
             .ToImmutableArray();
         var pageImageIds = pageImages.Select(resultImage => resultImage.ImageId).ToImmutableHashSet();
         var cardCounts = DbContext.ImagesInCards.AsNoTracking().Where(imageInCard => pageImageIds.Contains(imageInCard.ImageId)).Select(imageInCard => imageInCard.ImageId).ToImmutableArray();
@@ -69,9 +55,7 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
         }
     }
     public sealed record Result(int TotalCount, int PageCount, ImmutableArray<ResultImage> Images);
-    public sealed record ResultImage(Guid ImageId, string ImageName, string OriginalImageContentType,
-            string Uploader, string Description, string Source, int OriginalImageSize, int SmallSize, int MediumSize, int BigSize,
-            DateTime InitialUploadUtcDate, DateTime LastChangeUtcDate, string CurrentVersionDescription)
+    public sealed record ResultImage(Guid ImageId, string ImageName)
     {
         public int CardCount { get; internal set; }
     }

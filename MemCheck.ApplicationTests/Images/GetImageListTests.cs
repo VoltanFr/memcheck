@@ -64,17 +64,6 @@ public class GetImageListTests
         var loadedImage = result.Images.Single();
         Assert.AreEqual(imageId, loadedImage.ImageId);
         Assert.AreEqual(imageName, loadedImage.ImageName);
-        Assert.AreEqual("InvalidForUnitTests", loadedImage.OriginalImageContentType);
-        Assert.AreEqual(userName, loadedImage.Uploader);
-        Assert.AreEqual(description, loadedImage.Description);
-        Assert.AreEqual(source, loadedImage.Source);
-        Assert.AreEqual(4, loadedImage.OriginalImageSize);
-        Assert.AreEqual(1, loadedImage.SmallSize);
-        Assert.AreEqual(2, loadedImage.MediumSize);
-        Assert.AreEqual(3, loadedImage.BigSize);
-        Assert.AreEqual(uploadDate, loadedImage.InitialUploadUtcDate);
-        Assert.AreEqual(uploadDate, loadedImage.LastChangeUtcDate);
-        Assert.AreEqual(versionDescription, loadedImage.CurrentVersionDescription);
         Assert.AreEqual(0, loadedImage.CardCount);
     }
     [TestMethod()]
@@ -102,17 +91,6 @@ public class GetImageListTests
         var loadedImage = result.Images.Single();
         Assert.AreEqual(imageId, loadedImage.ImageId);
         Assert.AreEqual(imageName, loadedImage.ImageName);
-        Assert.AreEqual("InvalidForUnitTests", loadedImage.OriginalImageContentType);
-        Assert.AreEqual(userName, loadedImage.Uploader);
-        Assert.AreEqual(description, loadedImage.Description);
-        Assert.AreEqual(source, loadedImage.Source);
-        Assert.AreEqual(4, loadedImage.OriginalImageSize);
-        Assert.AreEqual(1, loadedImage.SmallSize);
-        Assert.AreEqual(2, loadedImage.MediumSize);
-        Assert.AreEqual(3, loadedImage.BigSize);
-        Assert.AreEqual(uploadDate, loadedImage.InitialUploadUtcDate);
-        Assert.AreEqual(uploadDate, loadedImage.LastChangeUtcDate);
-        Assert.AreEqual(versionDescription, loadedImage.CurrentVersionDescription);
         Assert.AreEqual(usingCardCount, loadedImage.CardCount);
     }
     [TestMethod()]

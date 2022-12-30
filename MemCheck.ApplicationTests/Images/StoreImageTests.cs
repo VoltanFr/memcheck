@@ -20,7 +20,7 @@ public class StoreImageTests
     private static readonly ImmutableArray<byte> pngImage = GetPngImage();
     #endregion
     #region Private methods
-    private static ImmutableArray<byte> GetPngImage()
+    public static ImmutableArray<byte> GetPngImage()
     {
         using var resFilestream = typeof(StoreImageTests).Assembly.GetManifestResourceStream("MemCheck.Application.Resources.Gray.png")!;
         var result = new byte[resFilestream.Length];

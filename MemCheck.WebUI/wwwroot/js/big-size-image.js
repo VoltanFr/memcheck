@@ -39,10 +39,10 @@ export const BigSizeImage = Vue.defineComponent({
                     <li v-if="image.description"><strong>{{labellocalizer.BigSizeImageLabel_Description}}</strong> {{image.description}}</li>
                     <li v-if="image.source"><strong>{{labellocalizer.BigSizeImageLabel_Source}}</strong> {{image.source}}</li>
                     <li v-if="image.initialUploadUtcDate"><strong>{{labellocalizer.BigSizeImageLabel_InitialVersionCreatedOn}}</strong> {{dateTime(image.initialUploadUtcDate)}}</li>
-                    <li v-if="image.initialVersionCreator"><strong>{{labellocalizer.BigSizeImageLabel_InitialVersionCreatedBy}}</strong> {{image.initialVersionCreator}}</li>
+                    <li v-if="image.currentVersionCreator"><strong>{{labellocalizer.BigSizeImageLabel_CurrentVersionCreatedBy}}</strong> {{image.currentVersionCreator}}</li>
                     <li v-if="image.currentVersionUtcDate"><strong>{{labellocalizer.BigSizeImageLabel_CurrentVersionCreatedOn}}</strong> {{dateTime(image.currentVersionUtcDate)}}</li>
                     <li v-if="image.currentVersionDescription"><strong>{{labellocalizer.BigSizeImageLabel_CurrentVersionDescription}}</strong> {{image.currentVersionDescription}}</li>
-                    <li v-if="image.cardCount"><strong>{{labellocalizer.BigSizeImageLabel_NumberOfCards}}</strong> {{image.cardCount}}</li>
+                    <li v-if="image.cardCount || image.cardCount === 0"><strong>{{labellocalizer.BigSizeImageLabel_NumberOfCards}}</strong> {{image.cardCount}}</li>
                     <li v-if="image.originalImageContentType"><strong>{{labellocalizer.BigSizeImageLabel_originalImageContentType}}</strong> {{image.originalImageContentType}}</li>
                     <li v-if="image.originalImageSize"><strong>{{labellocalizer.BigSizeImageLabel_OriginalImageSize}}</strong> {{image.originalImageSize}}</li>
                     <li v-if="image.smallSize"><strong>{{labellocalizer.BigSizeImageLabel_SmallSize}}</strong> {{image.smallSize}}</li>

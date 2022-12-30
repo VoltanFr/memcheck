@@ -19,10 +19,10 @@ const imageListApp = Vue.createApp({
             totalCount: -1, // int
             pageCount: 0,   // int
             offeredPageSizes: [10, 50, 100],
-            imageList: [],
+            imageList: [], // Each entry has fields imageId, imageName, imageCardCount, imageThumbnail (this one is set image par image, as we load the bitmaps)
             mountFinished: false,
             loading: false,
-            currentFullScreenImage: null,   // Medium sized
+            currentFullScreenImage: null, // Fields: see method showImageFull
         };
     },
     async mounted() {
@@ -39,7 +39,7 @@ const imageListApp = Vue.createApp({
     },
     methods: {
         setImageThumbnail(index, data) {
-            this.imageList[index].thumbnail = base64FromBytes(data);
+            this.imageList[index].imageThumbnail = base64FromBytes(data);
         },
         onAxiosError(error) {
             tellAxiosError(error);
@@ -53,21 +53,9 @@ const imageListApp = Vue.createApp({
                     this.pageCount = result.data.pageCount;
                     this.imageList = result.data.images.map(image => {
                         return {
-                            imageName: image.imageName,
-                            uploaderUserName: image.uploaderUserName,
-                            description: image.description,
-                            currentVersionDescription: image.currentVersionDescription,
-                            source: image.source,
-                            originalImageContentType: image.originalImageContentType,
-                            originalImageSize: image.originalImageSize,
-                            smallSize: image.smallSize,
-                            mediumSize: image.mediumSize,
-                            bigSize: image.bigSize,
                             imageId: image.imageId,
-                            cardCount: image.cardCount,
-                            initialUploadUtcDate: image.initialUploadUtcDate,
-                            lastChangeUtcDate: image.lastChangeUtcDate,
-                            currentVersionCreator: image.currentVersionCreator,
+                            imageName: image.imageName,
+                            imageCardCount: image.cardCount,
                         };
                     });
                 })
@@ -112,33 +100,42 @@ const imageListApp = Vue.createApp({
         imageHistory(imageId) {
             window.location.href = `/Media/History?ImageId=${imageId}`;
         },
-        async showImageFull(image) {  // {imageName: string, imageId: Guid, cardCount: int, thumbnail: base64 string}
+        async showImageFull(imageId) {
             this.loading = true;
             try {
-                await axios.get(`/Learn/GetImage/${image.imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
+                var imageWithDetails = { imageId: imageId };
+
+                const blobPromise = axios.get(`/Learn/GetImage/${imageId}/${imageSizeMedium}`, { responseType: 'arraybuffer' })
                     .then(result => {
-                        this.currentFullScreenImage = {
-                            imageId: image.imageId,
-                            blob: base64FromBytes(result.data),
-                            name: image.imageName,
-                            description: image.description,
-                            source: image.source,
-                            initialUploadUtcDate: image.initialUploadUtcDate,
-                            initialVersionCreator: image.uploaderUserName,
-                            currentVersionUtcDate: image.lastChangeUtcDate,
-                            currentVersionCreator: image.currentVersionCreator,
-                            currentVersionDescription: image.currentVersionDescription,
-                            cardCount: image.cardCount,
-                            originalImageContentType: image.originalImageContentType,
-                            originalImageSize: image.originalImageSize,
-                            smallSize: image.smallSize,
-                            mediumSize: image.mediumSize,
-                            bigSize: image.bigSize,
-                        };
+                        imageWithDetails.blob = base64FromBytes(result.data);
                     })
                     .catch(error => {
                         tellAxiosError(error);
                     });
+
+                const detailsPromise = axios.get(`/Media/GetImageMetadataFromId/${imageId}`)
+                    .then(result => {
+                        imageWithDetails.name = result.data.imageName;
+                        imageWithDetails.description = result.data.description;
+                        imageWithDetails.source = result.data.source;
+                        imageWithDetails.initialUploadUtcDate = result.data.initialUploadUtcDate;
+                        imageWithDetails.currentVersionUtcDate = result.data.currentVersionUtcDate;
+                        imageWithDetails.currentVersionCreator = result.data.currentVersionCreatorName;
+                        imageWithDetails.currentVersionDescription = result.data.currentVersionDescription;
+                        imageWithDetails.cardCount = result.data.cardCount;
+                        imageWithDetails.originalImageContentType = result.data.originalImageContentType;
+                        imageWithDetails.originalImageSize = result.data.originalImageSize;
+                        imageWithDetails.smallSize = result.data.smallSize;
+                        imageWithDetails.mediumSize = result.data.mediumSize;
+                        imageWithDetails.bigSize = result.data.bigSize;
+                    })
+                    .catch(error => {
+                        tellAxiosError(error);
+                    });
+
+                await Promise.all([blobPromise, detailsPromise]);
+
+                this.currentFullScreenImage = imageWithDetails;
             }
             finally {
                 this.loading = false;
