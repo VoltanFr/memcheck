@@ -1,6 +1,7 @@
 ﻿@page
 @using Microsoft.AspNetCore.Mvc.Localization
 @using System.Web
+@model IndexModel
 @inject IViewLocalizer Localizer
 @section head {
     <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
@@ -20,6 +21,8 @@
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["HelpPage"] = "/media";
 }
+
+<input type="text" asp-for="ImageId" id="ImageIdInput" hidden="hidden" />
 
 <div id="MediaMainDiv" class="page-responsive-padding" v-cloak>
     <div id="WaitingForData" v-if="!mountFinished" class="wait-div">

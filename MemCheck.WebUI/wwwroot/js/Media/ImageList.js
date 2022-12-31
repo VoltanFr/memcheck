@@ -28,7 +28,9 @@ const imageListApp = Vue.createApp({
     async mounted() {
         try {
             window.addEventListener('popstate', this.onPopState);
-            await this.getImageList();
+            const getCurrentFullScreenImageFromPageParameterPromise = this.getCurrentFullScreenImageFromPageParameter();
+            const getImageListPromise = this.getImageList();
+            await Promise.all([getCurrentFullScreenImageFromPageParameterPromise, getImageListPromise]);
         }
         finally {
             this.mountFinished = true;
@@ -153,6 +155,15 @@ const imageListApp = Vue.createApp({
         },
         bigSizeImageLabelsLocalizer() {
             return localized;
+        },
+        async getCurrentFullScreenImageFromPageParameter() {
+            const imageId = document.getElementById('ImageIdInput').value;
+            if (!imageId) {
+                this.currentFullScreenImage = null;
+                return;
+            }
+
+            await this.showImageFull(imageId);
         },
     },
 });

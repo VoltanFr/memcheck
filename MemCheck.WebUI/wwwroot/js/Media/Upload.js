@@ -62,6 +62,7 @@ const uploadMediaApp = Vue.createApp({
                 .then((result) => {
                     tellControllerSuccess(result);
                     this.clearAll();
+                    window.location = `/Media/Index?ImageId=${result.data.imageId}`;
                 })
                 .catch(error => {
                     tellAxiosError(error);
