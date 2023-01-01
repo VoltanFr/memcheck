@@ -29,7 +29,7 @@ export const MarkdownEditor = Vue.defineComponent({
                 {{title}}&nbsp;&nbsp;
                 <button class="markdown-edit-button" v-on:click="bold()" title="Gras"><i class="fas fa-bold"></i></button>
                 <button class="markdown-edit-button" v-on:click="italic()" title="Italique"><i class="fas fa-italic"></i></button>
-                <button class="markdown-edit-button" v-on:click="insertNbsp()" title="Espace insécable">_</button>
+                <button class="markdown-edit-button" v-on:click="insertNbsp()" title="Espace insécable">␣</button>
                 <button class="markdown-edit-button" v-on:click="insertTable()" title="Modèle de table"><i class="fas fa-table"></i></button>
                 <button class="markdown-edit-button" v-on:click="togglePreview()" title="Apperçu du rendu Markdown"><i class="fab fa-markdown"></i></button>
             </div>
