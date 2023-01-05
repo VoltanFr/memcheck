@@ -297,4 +297,7 @@
   <data name="ImageForCardSmallToClipboard" xml:space="preserve">
     <value>Copy for card usage, small</value>
   </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Direct URL:</value>
+  </data>
 </root>

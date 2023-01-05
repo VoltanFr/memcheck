@@ -48,6 +48,7 @@ export const BigSizeImage = Vue.defineComponent({
                     <li v-if="image.smallSize"><strong>{{labellocalizer.BigSizeImageLabel_SmallSize}}</strong> {{image.smallSize}}</li>
                     <li v-if="image.mediumSize"><strong>{{labellocalizer.BigSizeImageLabel_MediumSize}}</strong> {{image.mediumSize}}</li>
                     <li v-if="image.bigSize"><strong>{{labellocalizer.BigSizeImageLabel_BigSize}}</strong> {{image.bigSize}}</li>
+                    <li v-if="image.imageId"><strong>{{labellocalizer.BigSizeImageLabel_URL}}</strong> <a v-bind:href="'/Media/Index/?ImageId='+image.imageId">https://www.mnesios.com/Media/Index/?ImageId={{image.imageId}}</a></li>
                 </ul>
                 <p><a target="_blank" rel="noopener noreferrer" v-bind:href="'/Media/FullScreen/?ImageId='+image.imageId">{{labellocalizer.BigSizeImageLabel_DownloadBiggestSize}}</a></p>
             </div>

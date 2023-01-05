@@ -300,4 +300,7 @@
   <data name="ImageForCardSmallToClipboard" xml:space="preserve">
     <value>Copier pour une carte, taille : petite</value>
   </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Lien direct :</value>
+  </data>
 </root>

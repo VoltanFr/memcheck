@@ -391,4 +391,7 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="YourRating" xml:space="preserve">
     <value>Votre évaluation :</value>
   </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Lien direct :</value>
+  </data>
 </root>

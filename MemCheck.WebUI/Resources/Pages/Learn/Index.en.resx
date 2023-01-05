@@ -390,4 +390,7 @@
   <data name="YourRating" xml:space="preserve">
     <value>Your rating:</value>
   </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Direct URL:</value>
+  </data>
 </root>

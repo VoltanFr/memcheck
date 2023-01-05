@@ -273,4 +273,7 @@
   <data name="UsedBy" xml:space="preserve">
     <value>Utilisée dans</value>
   </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Lien direct :</value>
+  </data>
 </root>
