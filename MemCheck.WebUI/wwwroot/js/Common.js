@@ -4,7 +4,7 @@ export const imageSizeSmall = 1;
 export const imageSizeMedium = 2;
 export const imageSizeBig = 3;
 
-const toastShortDuration = 4000;
+export const toastShortDuration = 4000;
 const toastLongDuration = 10000;
 
 export function isValidDateTime(utcFromDotNet) {

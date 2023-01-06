@@ -1,5 +1,8 @@
 ﻿import { MarkdownEditor } from '../MarkdownEditor.js';
 import { tellAxiosError } from '../Common.js';
+import { tellControllerSuccess } from '../Common.js';
+import { sleep } from '../Common.js';
+import { toastShortDuration } from '../Common.js';
 import { convertMarkdown } from '../MarkdownConversion.js';
 
 const tagAuthoringApp = Vue.createApp({
@@ -16,7 +19,7 @@ const tagAuthoringApp = Vue.createApp({
             newDescription: '',    // string
             mountFinished: false,
             returnAddress: '', // string
-            toastVisible: false,
+            readOnly: false,
         };
     },
     async mounted() {
@@ -52,7 +55,6 @@ const tagAuthoringApp = Vue.createApp({
                 });
         },
         async save() {
-            this.toastVisible = false;
             this.onNameChanged();
 
             if (this.newNameProblem)
@@ -73,17 +75,15 @@ const tagAuthoringApp = Vue.createApp({
                     return;
                 });
         },
-        async afterSave(axiosResult) {
-            tellControllerSuccess(axiosResult);
-            this.toastVisible = true;
-            this.editedTag = '';
-            this.newName = '';
-            this.newDescription = '';
-            this.newNameProblem = '';
-            if (this.returnAddress)
-                window.location = this.returnAddress;
-            else
-                window.location = '/Tags/Index';
+        async afterSave(controllerResult) {
+            this.readOnly = true;
+            tellControllerSuccess(controllerResult);
+            sleep(toastShortDuration).then(() => {
+                if (this.returnAddress)
+                    window.location = this.returnAddress;
+                else
+                    window.location = '/Tags/Index';
+            });
         },
         getReturnAddressFromPageParameter() {
             this.returnAddress = document.getElementById('ReturnAddressInput').value;
@@ -111,10 +111,6 @@ const tagAuthoringApp = Vue.createApp({
             return convertMarkdown(this.editedTag.description, true); // Questionable hardcoding of French
         },
         onNameChanged() {
-            if (this.toastVisible) {
-                this.newNameProblem = '';
-                return;
-            }
             if (this.newName !== this.editedTag.tagName && this.existingTagNames.has(this.newName)) {
                 this.newNameProblem = localized.AlreadyExistsErrMesg;
                 return;

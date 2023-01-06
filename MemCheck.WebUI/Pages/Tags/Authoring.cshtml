@@ -54,10 +54,10 @@
             <h2 v-if="editedTag">@Localizer["NewVersion"]</h2>
             <div id="Name" class="field-div">
                 <label class="field-caption"><span v-if="editedTag">@Localizer["NewName"]</span><span v-else>@Localizer["Name"]</span></label>
-                <input class="form-control responsive-padding-edit" v-model="newName" />
+                <input class="form-control responsive-padding-edit" v-model="newName" v-bind:readonly="readOnly" />
             </div>
             <div id="Description" class="field-div">
-                <markdown-editor v-model="newDescription" v-bind:isinfrench="true" title="@Localizer["NewDescription"]" />
+                <markdown-editor v-model="newDescription" v-bind:isinfrench="true" title="@Localizer["NewDescription"]" v-bind:readonly="readOnly" />
             </div>
         </div>
 
