@@ -67,6 +67,12 @@
     <EmbeddedResource Update="Resources\Controllers\SearchController.fr.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Pages\Authoring\Index.en.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Pages\Authoring\Index.fr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Pages\Decks\Create.en.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

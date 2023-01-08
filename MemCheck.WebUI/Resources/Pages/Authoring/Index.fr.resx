@@ -303,4 +303,7 @@
   <data name="BigSizeImageLabel_URL" xml:space="preserve">
     <value>Lien direct :</value>
   </data>
+    <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
+    <value>Détails</value>
+  </data>
 </root>

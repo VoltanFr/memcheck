@@ -394,4 +394,7 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="BigSizeImageLabel_URL" xml:space="preserve">
     <value>Lien direct :</value>
   </data>
+  <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
+    <value>Détails</value>
+  </data>
 </root>
