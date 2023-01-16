@@ -23,7 +23,9 @@ public sealed class UserHelper
     {
 #pragma warning disable CA2000 // Dispose objects before losing scope
         var userStore = new UserStore<MemCheckUser, MemCheckUserRole, MemCheckDbContext, Guid>(dbContext);
-        var optionsAccessor = Options.Create(new IdentityOptions());
+        var identityOptions = new IdentityOptions();
+        MemCheckUserManager.SetupIdentityOptions(identityOptions);
+        var optionsAccessor = Options.Create(identityOptions);
         var passwordHasher = new PasswordHasher<MemCheckUser>();
         var userValidators = new UserValidator<MemCheckUser>().AsArray();
         var passwordValidators = new PasswordValidator<MemCheckUser>().AsArray();
@@ -49,14 +51,16 @@ public sealed class UserHelper
         await dbContext.SaveChangesAsync();
         return result.Id;
     }
-    public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null)
+    public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? email = null)
     {
         return new MemCheckUser
         {
             MinimumCountOfDaysBetweenNotifs = minimumCountOfDaysBetweenNotifs,
             LastNotificationUtcDate = lastNotificationUtcDate ?? DateTime.MinValue,
             SubscribeToCardOnEdit = subscribeToCardOnEdit,
-            UserName = userName ?? RandomHelper.String()
+            UserName = userName ?? RandomHelper.String(firstCharMustBeLetter: true),
+            Email = email ?? RandomHelper.Email(),
+            EmailConfirmed = true,
         };
     }
     public static async Task SetRandomPasswordAsync(DbContextOptions<MemCheckDbContext> db, Guid userId)

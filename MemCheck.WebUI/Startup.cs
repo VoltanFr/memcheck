@@ -69,12 +69,7 @@ public sealed class Startup
 
         services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
-        services.AddIdentity<MemCheckUser, MemCheckUserRole>(
-            options =>
-                {
-                    options.SignIn.RequireConfirmedAccount = true;
-                    options.User.RequireUniqueEmail = false;
-                })
+        services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => MemCheckUserManager.SetupIdentityOptions(options))
             .AddEntityFrameworkStores<MemCheckDbContext>()
             .AddDefaultTokenProviders()
             .AddUserManager<MemCheckUserManager>()

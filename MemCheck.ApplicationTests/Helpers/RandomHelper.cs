@@ -33,9 +33,11 @@ internal static class RandomHelper
     {
         return EntryOfEnumerable(HeapingAlgorithms.Instance.Ids);
     }
-    public static string String(int? length = null) //if length is null, result will be 36 chars
+    public static string String(int? length = null, bool firstCharMustBeLetter = false) //if length is null, result will be 36 chars
     {
         var result = new StringBuilder();
+        if (firstCharMustBeLetter)
+            result.Append(Letter());
         do
         {
             result.Append(Guid().ToString());
@@ -82,5 +84,22 @@ internal static class RandomHelper
     public static int Int(int fromInclusive, int toExclusive)
     {
         return RandomNumberGenerator.GetInt32(fromInclusive, toExclusive);
+    }
+    public static char Letter()
+    {
+        while (true)
+        {
+            var result = (char)Int(255);
+            if (char.IsLetter(result))
+                return result;
+        }
+    }
+    public static string Password()
+    {
+        return String().ToUpperInvariant() + String();
+    }
+    public static string Email()
+    {
+        return String(5) + '@' + String(5);
     }
 }

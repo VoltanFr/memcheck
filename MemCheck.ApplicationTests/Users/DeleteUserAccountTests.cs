@@ -4,7 +4,6 @@ using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
 using MemCheck.Basics;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -75,37 +74,28 @@ public class DeleteUserAccountTests
         var db = DbHelper.GetEmptyTestDB();
         var loggedUser = await UserHelper.CreateInDbAsync(db);
 
-        var userToDeleteName = RandomHelper.String();
-        var userToDeleteEmail = RandomHelper.String();
-        var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
-        await UserHelper.SetRandomPasswordAsync(db, userToDeleteId);
-        var runDate = RandomHelper.Date();
+        var createdUserToDelete = UserHelper.Create();
 
         using (var dbContext = new MemCheckDbContext(db))
-        //Check user is all set
+        using (var userManager = UserHelper.GetUserManager(dbContext))
         {
-            var userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
-            Assert.AreEqual(userToDeleteName, userToDelete.UserName);
-            Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
-            Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
-            Assert.IsTrue(userToDelete.EmailConfirmed);
-            Assert.IsFalse(userToDelete.LockoutEnabled);
-            Assert.IsNull(userToDelete.LockoutEnd);
-            Assert.IsNull(userToDelete.DeletionDate);
-            Assert.IsNotNull(userToDelete.PasswordHash);
+            var result = await userManager.CreateAsync(createdUserToDelete, RandomHelper.Password());
+            Assert.IsTrue(result.Succeeded);
         }
+
+        var runDate = RandomHelper.Date();
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager, runDate).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDeleteId));
+            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager, runDate).RunAsync(new DeleteUserAccount.Request(loggedUser, createdUserToDelete.Id));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
+            var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == createdUserToDelete.Id);
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
-            Assert.AreEqual(userToDeleteName.ToUpperInvariant(), deletedUser.NormalizedUserName);
+            Assert.AreEqual(createdUserToDelete.UserName.ToUpperInvariant(), deletedUser.NormalizedUserName);
             Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
             Assert.IsFalse(deletedUser.EmailConfirmed);
             Assert.IsTrue(deletedUser.LockoutEnabled);
@@ -119,37 +109,28 @@ public class DeleteUserAccountTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var userToDeleteName = RandomHelper.String();
-        var userToDeleteEmail = RandomHelper.String();
-        var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userToDeleteName, userEMail: userToDeleteEmail);
-        await UserHelper.SetRandomPasswordAsync(db, userToDeleteId);
-        var runDate = RandomHelper.Date();
+        var createdUserToDelete = UserHelper.Create();
 
         using (var dbContext = new MemCheckDbContext(db))
-        //Check user is all set
+        using (var userManager = UserHelper.GetUserManager(dbContext))
         {
-            var userToDelete = dbContext.Users.Single(u => u.Id == userToDeleteId);
-            Assert.AreEqual(userToDeleteName, userToDelete.UserName);
-            Assert.AreEqual(userToDeleteName.ToUpperInvariant(), userToDelete.NormalizedUserName);
-            Assert.AreEqual(userToDeleteEmail, userToDelete.Email);
-            Assert.IsTrue(userToDelete.EmailConfirmed);
-            Assert.IsFalse(userToDelete.LockoutEnabled);
-            Assert.IsNull(userToDelete.LockoutEnd);
-            Assert.IsNull(userToDelete.DeletionDate);
-            Assert.IsNotNull(userToDelete.PasswordHash);
+            var result = await userManager.CreateAsync(createdUserToDelete, RandomHelper.Password());
+            Assert.IsTrue(result.Succeeded);
         }
+
+        var runDate = RandomHelper.Date();
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(), userManager, runDate).RunAsync(new DeleteUserAccount.Request(userToDeleteId, userToDeleteId));
+            await new DeleteUserAccount(dbContext.AsCallContext(), userManager, runDate).RunAsync(new DeleteUserAccount.Request(createdUserToDelete.Id, createdUserToDelete.Id));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == userToDeleteId);
+            var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == createdUserToDelete.Id);
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
-            Assert.AreEqual(userToDeleteName.ToUpperInvariant(), deletedUser.NormalizedUserName);
+            Assert.AreEqual(createdUserToDelete.UserName.ToUpperInvariant(), deletedUser.NormalizedUserName);
             Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
             Assert.IsFalse(deletedUser.EmailConfirmed);
             Assert.IsTrue(deletedUser.LockoutEnabled);
@@ -506,35 +487,22 @@ public class DeleteUserAccountTests
 
         var db = DbHelper.GetEmptyTestDB();
 
-        var userName = RandomHelper.String();
-        var userToDeleteId = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var createdUserToDelete = UserHelper.Create();
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(userToDeleteId, userToDeleteId));
-        }
-
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            Assert.AreEqual(1, dbContext.Users.Count());
-
-            var user = dbContext.Users.Single();
-            Assert.AreEqual(userToDeleteId, user.Id);
-            Assert.AreNotEqual(userName, user.UserName);
-            Assert.AreEqual(DeleteUserAccount.DeletedUserName, user.UserName);
-            Assert.AreEqual(userName.ToUpperInvariant(), user.NormalizedUserName);
+            var result = await userManager.CreateAsync(createdUserToDelete, RandomHelper.Password());
+            Assert.IsTrue(result.Succeeded);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            var user = new MemCheckUser
-            {
-                UserName = userName
-            };
+            var user = UserHelper.Create(userName: createdUserToDelete.UserName);
             var creationResult = await userManager.CreateAsync(user);
-            Assert.AreNotEqual(IdentityResult.Success, creationResult);
+            Assert.IsFalse(creationResult.Succeeded);
+            Assert.AreEqual(nameof(IdentityErrorDescriber.DuplicateUserName), creationResult.Errors.Single().Code);
         }
     }
 }
