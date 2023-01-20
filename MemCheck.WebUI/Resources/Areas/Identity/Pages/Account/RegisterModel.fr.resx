@@ -120,8 +120,17 @@
   <data name="AfterHyperLink" xml:space="preserve">
     <value>Vous serez redirigé vers le site Mnesios et vous pourrez confirmer la création de votre compte.</value>
   </data>
+  <data name="BadUserNameLength" xml:space="preserve">
+    <value>La longueur du nom d'utilisateur doit être entre 3 et 50 caractères.</value>
+  </data>
   <data name="BeforeHyperLink" xml:space="preserve">
     <value>Vous avez demandé la création de votre compte Mnesios.</value>
+  </data>
+  <data name="DefaultError" xml:space="preserve">
+    <value>Échec de la création de compte: {0}.</value>
+  </data>
+  <data name="DuplicateUserName" xml:space="preserve">
+    <value>Nom d'utilisateur déjà réservé.</value>
   </data>
   <data name="Final" xml:space="preserve">
     <value>Merci !</value>
@@ -132,7 +141,43 @@
   <data name="HyperLinkText" xml:space="preserve">
     <value>Suivez ce lien pour valider</value>
   </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Adresse électronique incorrecte : {0}.</value>
+  </data>
+  <data name="InvalidUserName" xml:space="preserve">
+    <value>Nom d'utilisateur incorrect : {0}.</value>
+  </data>
+  <data name="LoginAlreadyAssociated" xml:space="preserve">
+    <value>Nom d'utilisateur déjà réservé.</value>
+  </data>
   <data name="MailSubject" xml:space="preserve">
     <value>Mnesios : confirmation de votre adresse électronique</value>
+  </data>
+  <data name="PasswordRequiresDigit" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins un chiffre.</value>
+  </data>
+  <data name="PasswordRequiresLower" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins une lettre minuscule.</value>
+  </data>
+  <data name="PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins un caractère non alphanumérique.</value>
+  </data>
+  <data name="PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Le mot de passe ne contient pas assez de caractères différents.</value>
+  </data>
+  <data name="PasswordRequiresUpper" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins une lettre majuscule.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>Mot de passe trop court.</value>
+  </data>
+  <data name="UserNameContainsControlChar" xml:space="preserve">
+    <value>Le nom d'utilisateur contient un caractère interdit (caractère de contrôle).</value>
+  </data>
+  <data name="UserNameContainsForbiddenChar" xml:space="preserve">
+    <value>Le nom d'utilisateur contient un caractère interdit : '{0}'.</value>
+  </data>
+  <data name="UserNameNameDoesNotStartWithALetter" xml:space="preserve">
+    <value>Le nom d'utilisateur doit commencer par une lettre.</value>
   </data>
 </root>

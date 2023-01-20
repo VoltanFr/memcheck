@@ -120,8 +120,17 @@
   <data name="AfterHyperLink" xml:space="preserve">
     <value>This will open the web site and allow you to validate the creation of your account, giving you full access to Mnesios.</value>
   </data>
+  <data name="BadUserNameLength" xml:space="preserve">
+    <value>Bad user name length (must be between 3 and 50).</value>
+  </data>
   <data name="BeforeHyperLink" xml:space="preserve">
     <value>You have requested the creation of your Mnesios account.</value>
+  </data>
+  <data name="DefaultError" xml:space="preserve">
+    <value>Registration error: {0}.</value>
+  </data>
+  <data name="DuplicateUserName" xml:space="preserve">
+    <value>User name already used.</value>
   </data>
   <data name="Final" xml:space="preserve">
     <value>Thank you!</value>
@@ -132,7 +141,43 @@
   <data name="HyperLinkText" xml:space="preserve">
     <value>Please click here to validate</value>
   </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>Invalid email: {0}.</value>
+  </data>
+  <data name="InvalidUserName" xml:space="preserve">
+    <value>Invalid user name: {0}.</value>
+  </data>
+  <data name="LoginAlreadyAssociated" xml:space="preserve">
+    <value>User name already used.</value>
+  </data>
   <data name="MailSubject" xml:space="preserve">
     <value>Mnesios: Confirm your email address</value>
+  </data>
+  <data name="PasswordRequiresDigit" xml:space="preserve">
+    <value>Password requires at least one digit.</value>
+  </data>
+  <data name="PasswordRequiresLower" xml:space="preserve">
+    <value>Password requires at least one lower letter</value>
+  </data>
+  <data name="PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Password requires at least one non alphanumeric char.</value>
+  </data>
+  <data name="PasswordRequiresUniqueChars" xml:space="preserve">
+    <value>Password requires unique chars.</value>
+  </data>
+  <data name="PasswordRequiresUpper" xml:space="preserve">
+    <value>Password requires at least one upper letter.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>Password too short: {0}.</value>
+  </data>
+  <data name="UserNameContainsControlChar" xml:space="preserve">
+    <value>User name contains an invalid char (control char).</value>
+  </data>
+  <data name="UserNameContainsForbiddenChar" xml:space="preserve">
+    <value>User name contains an invalid char: '{0}'.</value>
+  </data>
+  <data name="UserNameNameDoesNotStartWithALetter" xml:space="preserve">
+    <value>The user name must start with a letter.</value>
   </data>
 </root>

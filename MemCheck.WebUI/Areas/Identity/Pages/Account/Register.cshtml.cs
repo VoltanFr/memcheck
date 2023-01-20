@@ -92,7 +92,11 @@ public class RegisterModel : PageModel
             }
             foreach (var error in result.Errors)
             {
-                ModelState.AddModelError(string.Empty, error.Description);
+                var errorMesgLocalized = localizer.GetString(error.Code);
+                var errorMesg = errorMesgLocalized.ResourceNotFound
+                    ? localizer.GetString(nameof(IdentityErrorDescriber.DefaultError)) + '(' + error.Code + ')'
+                    : errorMesgLocalized.Value;
+                ModelState.AddModelError(string.Empty, string.Format(CultureInfo.InvariantCulture, errorMesg, error.Description));
             }
         }
 
