@@ -1,10 +1,19 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text.Json;
 
 namespace MemCheck.WebUI;
+
+public static class IConfigurationExtensions
+{
+    public static string RequiredValue(this IConfiguration configuration, string valueName)
+    {
+        var result = configuration[valueName];
+        return result ?? throw new InvalidOperationException($"Configuration does not contain a value for {valueName}");
+    }
+}
 
 public sealed class AppSettings
 {
@@ -18,25 +27,25 @@ public sealed class AppSettings
         if (prodEnvironment)
         {
             dbInfoLogMessage(logger, "prod DB from app settings", null);
-            return configuration["ConnectionStrings:AzureDbConnection"];
+            return configuration.RequiredValue("ConnectionStrings:AzureDbConnection");
         }
-        var debuggingDb = configuration["ConnectionStrings:DebuggingDb"];
+        var debuggingDb = configuration.RequiredValue("ConnectionStrings:DebuggingDb");
         if (debuggingDb == "Azure")
         {
             dbInfoLogMessage(logger, "Azure prod DB from private file", null);
             return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureConnectionString.txt").Trim();
         }
         dbInfoLogMessage(logger, $"DB '{debuggingDb}'", null);
-        return configuration[$"ConnectionStrings:{debuggingDb}"];
+        return configuration.RequiredValue($"ConnectionStrings:{debuggingDb}");
     }
     private static SendGridSettings GetSendGrid(IConfiguration configuration, bool prodEnvironment, ILogger logger)
     {
         if (prodEnvironment)
         {
             sendGridLogMessage(logger, "prod settings from app settings", null);
-            return new SendGridSettings(configuration["SendGrid:User"], configuration["SendGrid:Key"], configuration["SendGrid:Sender"]);
+            return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
         }
-        var debuggingDb = configuration["ConnectionStrings:DebuggingDb"];
+        var debuggingDb = configuration.RequiredValue("ConnectionStrings:DebuggingDb");
         if (debuggingDb is "AlternativeProdDbConnection" or "Azure")
         {
             var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\SendGridSecrets.json"));
@@ -44,7 +53,7 @@ public sealed class AppSettings
             return new SendGridSettings(secrets!.SendGridUser, secrets.SendGridKey, secrets.SendGridSender);
         }
         sendGridLogMessage(logger, "debug settings", null);
-        return new SendGridSettings(configuration["SendGrid:User"], configuration["SendGrid:Key"], configuration["SendGrid:Sender"]);
+        return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
     }
     #endregion
     public AppSettings(IConfiguration configuration, bool prodEnvironment, ILogger<AppSettings> logger)
