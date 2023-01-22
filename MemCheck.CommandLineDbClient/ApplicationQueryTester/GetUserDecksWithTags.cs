@@ -145,7 +145,7 @@ internal sealed class GetUserDecksWithTags : ICmdLinePlugin
                     oldestCard.Card.VersionUtcDate,
                     oldestCard.Card.VersionCreator.UserName,
             oldestCard.Card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
-                 oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.UserName),
+                 oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.GetUserName()),
                     //emptyResultImageModelArray,
                     heapingAlgorithm,
           0,//          userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,

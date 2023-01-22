@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
                           new CardVersion(
                               cardToReport.card.Id,
                               cardToReport.card.FrontSide,
-                              cardToReport.card.VersionCreator.UserName,
+                              cardToReport.card.VersionCreator.GetUserName(),
                               cardToReport.card.VersionUtcDate,
                               cardToReport.card.VersionDescription,
                               CardVisibilityHelper.CardIsVisibleToUser(userId, cardToReport.card),

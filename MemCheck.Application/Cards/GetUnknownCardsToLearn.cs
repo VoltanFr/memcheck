@@ -99,7 +99,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
         var heapingAlgorithm = await HeapingAlgorithm.OfDeckAsync(DbContext, request.DeckId);
-        var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
+        var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, UserName = u.GetUserName() }).ToImmutableDictionary(u => u.Id, u => u.UserName);
         var tagNames = TagLoadingHelper.Run(DbContext);
 
         var result = new List<ResultCard>();

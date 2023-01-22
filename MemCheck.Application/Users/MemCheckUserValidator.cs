@@ -28,7 +28,7 @@ public sealed class MemCheckUserValidator : UserValidator<MemCheckUser>
     }
     private async Task ValidateUserName(UserManager<MemCheckUser> manager, MemCheckUser user, ICollection<IdentityError> errors)
     {
-        if (user.UserName.Trim() != user.UserName)
+        if (user.GetUserName().Trim() != user.UserName)
         {
             errors.Add(new IdentityError() { Code = UserNameNotTrimmedErrorCode, Description = "User name must not start or end with blank chars" });
             return; // This is a bug, the client code should have trimmed: let's exit
@@ -60,6 +60,11 @@ public sealed class MemCheckUserValidator : UserValidator<MemCheckUser>
     private async Task ValidateEmail(UserManager<MemCheckUser> manager, MemCheckUser user, List<IdentityError> errors)
     {
         var email = await manager.GetEmailAsync(user);
+        if (email == null)
+        {
+            errors.Add(new IdentityError() { Code = nameof(IdentityErrorDescriber.InvalidEmail), Description = "Email address must be provided" });
+            return;
+        }
         if (email.Trim() != email)
         {
             errors.Add(new IdentityError() { Code = EmailNotTrimmedErrorCode, Description = "Email address must not start or end with blank chars" });

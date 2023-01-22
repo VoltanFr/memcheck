@@ -144,14 +144,14 @@ internal sealed class Homepage : ICmdLinePlugin
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
                     oldestCard.Card.FrontSide, oldestCard.Card.BackSide, oldestCard.Card.AdditionalInfo,
                     oldestCard.Card.VersionUtcDate,
-                    oldestCard.Card.VersionCreator.UserName,
+                    oldestCard.Card.VersionCreator.GetUserName(),
             oldestCard.Card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
-                 oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.UserName),
+                 oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.GetUserName()),
                     //emptyResultImageModelArray,
                     heapingAlgorithm,
-          0,//          userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
-              0,//      averageRatings.ContainsKey(oldestCard.CardId) ? averageRatings[oldestCard.CardId] : 0,
-                 0//   countOfUserRatings.ContainsKey(oldestCard.CardId) ? countOfUserRatings[oldestCard.CardId] : 0
+                    0,//          userRatings.ContainsKey(oldestCard.CardId) ? userRatings[oldestCard.CardId] : 0,
+                    0,//      averageRatings.ContainsKey(oldestCard.CardId) ? averageRatings[oldestCard.CardId] : 0,
+                    0//   countOfUserRatings.ContainsKey(oldestCard.CardId) ? countOfUserRatings[oldestCard.CardId] : 0
                     )
                 );
 

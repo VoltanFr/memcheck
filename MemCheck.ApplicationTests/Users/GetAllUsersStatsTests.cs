@@ -59,9 +59,11 @@ public class GetAllUsersStatsTests
     public async Task OnlyUser_NoDeck()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userEMail = RandomHelper.String();
+        var userName = RandomHelper.UserName();
+        var userEMail = RandomHelper.Email();
+
         var user = await UserHelper.CreateInDbAsync(db, userName: userName, userEMail: userEMail);
+
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, 10, 1, ""));
         Assert.AreEqual(1, loaded.TotalCount);

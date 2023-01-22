@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         var ownersOfDecksWithThisCard = DbContext.CardsInDecks
             .AsNoTracking()
             .Where(cardInDeck => cardInDeck.CardId == request.CardId)
-            .Select(cardInDeck => cardInDeck.Deck.Owner.UserName)
+            .Select(cardInDeck => cardInDeck.Deck.Owner.GetUserName())
             .Distinct();
 
         var result = new ResultModel(
@@ -43,10 +44,10 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
                         card.CardLanguage.Id,
                         card.CardLanguage.Name,
                         card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
-                        card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.UserName)),
+                        card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.GetUserName())),
                         card.InitialCreationUtcDate,
                         card.VersionUtcDate,
-                        card.VersionCreator.UserName,
+                        card.VersionCreator.GetUserName(),
                         card.VersionDescription,
                         ownersOfDecksWithThisCard,
                         userRatingValue,

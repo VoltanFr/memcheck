@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -26,7 +27,7 @@ public sealed class GetImageInfoFromId : RequestRunner<GetImageInfoFromId.Reques
             .Where(imageInCard => imageInCard.ImageId == img.Id)
             .CountAsync();
 
-        var result = new Result(img.Name, img.Description, img.Source, cardCount, img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.Owner.UserName, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize);
+        var result = new Result(img.Name, img.Description, img.Source, cardCount, img.InitialUploadUtcDate, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.Owner.GetUserName(), img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize);
 
         return new ResultWithMetrologyProperties<Result>(result, ("ImageId", request.ImageId.ToString()));
     }

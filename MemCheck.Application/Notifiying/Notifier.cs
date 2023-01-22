@@ -37,8 +37,8 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
         await userLastNotifDateUpdater.RunAsync(user.Id);
 
         return new UserNotifications(
-            user.UserName,
-            user.Email,
+            user.GetUserName(),
+            user.GetEmail(),
             subscribedCardCount,
             cardVersions,
             cardDeletions,

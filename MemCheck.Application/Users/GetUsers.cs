@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MemCheck.Domain;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ public sealed class GetUsers : RequestRunner<GetUsers.Request, IEnumerable<GetUs
     }
     protected override async Task<ResultWithMetrologyProperties<IEnumerable<ViewModel>>> DoRunAsync(Request request)
     {
-        var result = await DbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.UserName)).ToListAsync();
+        var result = await DbContext.Users.AsNoTracking().Select(user => new ViewModel(user.Id, user.GetUserName())).ToListAsync();
         return new ResultWithMetrologyProperties<IEnumerable<ViewModel>>(result, IntMetric("ResultCount", result.Count));
     }
     #region Request & Result

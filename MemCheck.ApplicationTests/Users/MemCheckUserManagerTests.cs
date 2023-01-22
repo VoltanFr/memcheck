@@ -2,6 +2,7 @@
 using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -326,7 +327,7 @@ public class MemCheckUserManagerTests
             var userFromDb = await userManager.FindByIdAsync(userToCreate.Id.ToString());
             Assert.IsNotNull(userFromDb);
             Assert.AreEqual(userToCreate.UserName, userFromDb.UserName);
-            Assert.AreEqual(userToCreate.UserName.ToUpperInvariant(), userFromDb.NormalizedUserName);
+            Assert.AreEqual(userToCreate.GetUserName().ToUpperInvariant(), userFromDb.NormalizedUserName);
             Assert.AreEqual(userToCreate.Email, userFromDb.Email);
             Assert.IsNull(userFromDb.DeletionDate);
             Assert.IsTrue(userFromDb.EmailConfirmed);
@@ -372,7 +373,7 @@ public class MemCheckUserManagerTests
                 var user1FromDb = await userManager.FindByIdAsync(user1.Id.ToString());
                 Assert.IsNotNull(user1FromDb);
                 Assert.AreEqual(user1.UserName, user1FromDb.UserName);
-                Assert.AreEqual(user1.UserName.ToUpperInvariant(), user1FromDb.NormalizedUserName);
+                Assert.AreEqual(user1.GetUserName().ToUpperInvariant(), user1FromDb.NormalizedUserName);
                 Assert.AreEqual(user1.Email, user1FromDb.Email);
                 Assert.IsNull(user1FromDb.DeletionDate);
                 Assert.IsTrue(user1FromDb.EmailConfirmed);
@@ -390,7 +391,7 @@ public class MemCheckUserManagerTests
                 var user2FromDb = await userManager.FindByIdAsync(user2.Id.ToString());
                 Assert.IsNotNull(user2FromDb);
                 Assert.AreEqual(user2.UserName, user2FromDb.UserName);
-                Assert.AreEqual(user2.UserName.ToUpperInvariant(), user2FromDb.NormalizedUserName);
+                Assert.AreEqual(user2.GetUserName().ToUpperInvariant(), user2FromDb.NormalizedUserName);
                 Assert.AreEqual(user2.Email, user2FromDb.Email);
                 Assert.IsNull(user2FromDb.DeletionDate);
                 Assert.IsTrue(user2FromDb.EmailConfirmed);

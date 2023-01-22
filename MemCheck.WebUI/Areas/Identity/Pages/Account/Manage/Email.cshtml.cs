@@ -52,11 +52,11 @@ public partial class EmailModel : PageModel
     private async Task LoadAsync(MemCheckUser user)
     {
         var email = await _userManager.GetEmailAsync(user);
-        Email = email;
+        Email = email ?? "";
 
         Input = new InputModel
         {
-            NewEmail = email,
+            NewEmail = email ?? "",
         };
 
         IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -112,9 +112,7 @@ public partial class EmailModel : PageModel
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
-        {
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-        }
 
         if (!ModelState.IsValid)
         {
@@ -123,7 +121,7 @@ public partial class EmailModel : PageModel
         }
 
         var userId = await _userManager.GetUserIdAsync(user);
-        var email = await _userManager.GetEmailAsync(user);
+        var email = user.GetEmail();
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId, code }, protocol: Request.Scheme)!;

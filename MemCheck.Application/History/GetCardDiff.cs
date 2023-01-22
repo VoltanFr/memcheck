@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -26,7 +27,7 @@ public sealed class GetCardDiff : RequestRunner<GetCardDiff.Request, GetCardDiff
             .ThenInclude(t => t.Tag)
             .SingleAsync(c => c.Id == request.OriginalVersionId);
 
-        var result = new Result(current.VersionCreator.UserName, original.VersionCreator.UserName, current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);
+        var result = new Result(current.VersionCreator.GetUserName(), original.VersionCreator.GetUserName(), current.VersionUtcDate, original.VersionUtcDate, current.VersionDescription, original.VersionDescription);
         if (current.FrontSide != original.FrontSide)
             result = result with { FrontSide = new(current.FrontSide, original.FrontSide) };
         if (current.BackSide != original.BackSide)

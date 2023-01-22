@@ -54,7 +54,7 @@ internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
         var result = deletedCards.Select(cardToReport =>
                          new CardDeletion(
                              cardToReport.previousVersion.FrontSide,
-                             cardToReport.previousVersion.VersionCreator.UserName,
+                             cardToReport.previousVersion.VersionCreator.GetUserName(),
                              cardToReport.previousVersion.VersionUtcDate,
                              cardToReport.previousVersion.VersionDescription,
                              !cardToReport.previousVersion.UsersWithView.Any() || cardToReport.previousVersion.UsersWithView.Any(u => u.AllowedUserId == userId)

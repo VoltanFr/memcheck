@@ -95,7 +95,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
                 searchResult.Cards.Select(card => new CardVersion(
                     card.CardId,
                     card.FrontSide,
-                    card.VersionCreator.UserName,
+                    card.VersionCreator.GetUserName(),
                     card.VersionUtcDate,
                     card.VersionDescription,
                     CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, card),
@@ -157,7 +157,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
                 if (CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, card))
                 {
                     countOfCardsNotFoundAnymore_StillExists_UserAllowedToView++;
-                    cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.UserName, card.VersionUtcDate, card.VersionDescription, true, null));
+                    cardsNotFoundAnymore_StillExists_UserAllowedToView.Add(new CardVersion(card.Id, card.FrontSide, card.VersionCreator.GetUserName(), card.VersionUtcDate, card.VersionDescription, true, null));
                 }
                 else
                     countOfCardsNotFoundAnymore_StillExists_UserNotAllowedToView++;
@@ -177,7 +177,7 @@ internal sealed class UserSearchNotifier : IUserSearchNotifier
                     if (CardVisibilityHelper.CardIsVisibleToUser(subscription.UserId, previousVersion))
                     {
                         countOfCardsNotFoundAnymore_Deleted_UserAllowedToView++;
-                        cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.UserName, previousVersion.VersionUtcDate, previousVersion.VersionDescription, true));
+                        cardsNotFoundAnymore_Deleted_UserAllowedToView.Add(new CardDeletion(previousVersion.FrontSide, previousVersion.VersionCreator.GetUserName(), previousVersion.VersionUtcDate, previousVersion.VersionDescription, true));
                     }
                     else
                         countOfCardsNotFoundAnymore_Deleted_UserNotAllowedToView++;

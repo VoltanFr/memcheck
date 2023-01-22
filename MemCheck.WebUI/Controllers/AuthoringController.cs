@@ -65,7 +65,7 @@ public class AuthoringController : MemCheckController
         public GetCurrentUserViewModel(MemCheckUser user, MemCheckDbContext dbContext)
         {
             UserId = user.Id;
-            UserName = user.UserName;
+            UserName = user.GetUserName();
             var cardLanguage = user.PreferredCardCreationLanguage ?? dbContext.CardLanguages.OrderBy(lang => lang.Name).First();
             PreferredCardCreationLanguageId = cardLanguage.Id;
         }

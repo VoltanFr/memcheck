@@ -4,6 +4,7 @@ using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -95,7 +96,7 @@ public class DeleteUserAccountTests
         {
             var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == createdUserToDelete.Id);
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
-            Assert.AreEqual(createdUserToDelete.UserName.ToUpperInvariant(), deletedUser.NormalizedUserName);
+            Assert.AreEqual(createdUserToDelete.GetUserName().ToUpperInvariant(), deletedUser.NormalizedUserName);
             Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
             Assert.IsFalse(deletedUser.EmailConfirmed);
             Assert.IsTrue(deletedUser.LockoutEnabled);
@@ -130,7 +131,7 @@ public class DeleteUserAccountTests
         {
             var deletedUser = await dbContext.Users.SingleAsync(u => u.Id == createdUserToDelete.Id);
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, deletedUser.UserName);
-            Assert.AreEqual(createdUserToDelete.UserName.ToUpperInvariant(), deletedUser.NormalizedUserName);
+            Assert.AreEqual(createdUserToDelete.GetUserName().ToUpperInvariant(), deletedUser.NormalizedUserName);
             Assert.AreEqual(DeleteUserAccount.DeletedUserEmail, deletedUser.Email);
             Assert.IsFalse(deletedUser.EmailConfirmed);
             Assert.IsTrue(deletedUser.LockoutEnabled);

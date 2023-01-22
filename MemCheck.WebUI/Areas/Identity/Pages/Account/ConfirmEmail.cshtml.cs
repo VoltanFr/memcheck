@@ -30,7 +30,7 @@ public class ConfirmEmailModel : PageModel
         var appLinkText = localizer["AppLinkText"];
         var thank = localizer["Thank"];
         var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='https://userdoc.mnesios.com/'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
-        await emailSender.SendEmailAsync(user.Email, localizer["WelcomeMailSubject"], body);
+        await emailSender.SendEmailAsync(user.GetEmail(), localizer["WelcomeMailSubject"], body);
     }
 
     public ConfirmEmailModel(UserManager<MemCheckUser> userManager, IStringLocalizer<ConfirmEmailModel> localizer, IEmailSender emailSender)

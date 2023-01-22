@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, G
     }
     protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)
     {
-        var users = DbContext.Users.AsNoTracking().Where(user => EF.Functions.Like(user.UserName, $"%{request.Filter}%")).OrderBy(user => user.UserName);
+        var normalizedFilter = request.Filter.ToUpperInvariant();
+        var users = DbContext.Users.AsNoTracking().Where(user => user.NormalizedUserName != null && user.NormalizedUserName.Contains(normalizedFilter)).OrderBy(user => user.UserName);
 
         var totalCount = users.Count();
         var pageCount = (int)Math.Ceiling((double)totalCount / request.PageSize);
@@ -26,7 +28,7 @@ public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, G
         {
             var roles = await RoleChecker.GetRolesAsync(user);
             var decks = DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == user.Id).Select(deck => new ResultDeckModel(deck.Description, deck.CardInDecks.Count));
-            resultUsers.Add(new ResultUserModel(user.UserName, user.Id, string.Join(',', roles), user.Email, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate, decks));
+            resultUsers.Add(new ResultUserModel(user.GetUserName(), user.Id, string.Join(',', roles), user.GetEmail(), user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate, decks));
         }
         var result = new ResultModel(totalCount, pageCount, resultUsers);
         return new ResultWithMetrologyProperties<ResultModel>(result,

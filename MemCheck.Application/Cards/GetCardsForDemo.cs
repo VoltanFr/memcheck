@@ -64,7 +64,7 @@ public sealed class GetCardsForDemo : RequestRunner<GetCardsForDemo.Request, Get
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, u.UserName }).ToImmutableDictionary(u => u.Id, u => u.UserName);
+        var userNames = DbContext.Users.AsNoTracking().Select(u => new { u.Id, UserName = u.GetUserName() }).ToImmutableDictionary(u => u.Id, u => u.UserName);
         var imageNames = ImageLoadingHelper.GetAllImageNames(DbContext);
         var tagNames = TagLoadingHelper.Run(DbContext);
 

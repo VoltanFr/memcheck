@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ public sealed class GetAdminEmailAddesses : RequestRunner<GetAdminEmailAddesses.
     protected override async Task<ResultWithMetrologyProperties<ResultModel>> DoRunAsync(Request request)
     {
         var users = await DbContext.Users.AsNoTracking().ToListAsync();
-        var admins = users.Where(u => RoleChecker.UserIsAdminAsync(u).Result).Select(u => new ResultUserModel(u.UserName, u.Email));
+        var admins = users.Where(u => RoleChecker.UserIsAdminAsync(u).Result).Select(u => new ResultUserModel(u.GetUserName(), u.GetEmail()));
         var result = new ResultModel(admins);
         return new ResultWithMetrologyProperties<ResultModel>(result, ("LoggedUser", request.UserId.ToString()), IntMetric("ResultCount", result.Users.Count()));
     }

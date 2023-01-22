@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-        <VersionPrefix>0.18.2</VersionPrefix>
+        <VersionPrefix>0.18.3</VersionPrefix>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />

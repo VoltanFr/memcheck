@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
         if (version == null)
             throw new RequestInputException($"Card version not found: '{request.VersionId}'");
 
-        var userWithViewNames = version.UsersWithView.Select(userWithView => DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).UserName);
+        var userWithViewNames = version.UsersWithView.Select(userWithView => DbContext.Users.Single(u => u.Id == userWithView.AllowedUserId).GetUserName());
         var tagNames = version.Tags.Select(t => t.Tag.Name);
 
         var result = new Result(
@@ -41,7 +42,7 @@ public sealed class GetCardVersion : RequestRunner<GetCardVersion.Request, GetCa
             userWithViewNames,
             version.VersionUtcDate,
             version.VersionDescription,
-            version.VersionCreator.UserName
+            version.VersionCreator.GetUserName()
             );
         return new ResultWithMetrologyProperties<Result>(result, ("VersionId", request.VersionId.ToString()));
     }

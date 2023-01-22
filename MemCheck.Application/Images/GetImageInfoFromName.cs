@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -18,7 +19,7 @@ public sealed class GetImageInfoFromName : RequestRunner<GetImageInfoFromName.Re
         var img = await DbContext.Images
             .AsNoTracking()
             .Where(image => EF.Functions.Like(image.Name, $"{request.ImageName}"))
-            .Select(img => new { img.Id, img.Description, img.Source, img.InitialUploadUtcDate, img.Owner.UserName, img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize })
+            .Select(img => new { img.Id, img.Description, img.Source, img.InitialUploadUtcDate, UserName = img.Owner.GetUserName(), img.LastChangeUtcDate, img.VersionDescription, img.OriginalContentType, img.OriginalSize, img.SmallBlobSize, img.MediumBlobSize, img.BigBlobSize })
             .SingleAsync();
 
         var cardCount = await DbContext.ImagesInCards

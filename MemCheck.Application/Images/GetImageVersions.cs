@@ -98,7 +98,7 @@ public sealed class GetImageVersions : RequestRunner<GetImageVersions.Request, I
         internal ResultImageVersion(ImageVersionFromDb dbVersion, ImageVersionFromDb? preceedingVersion)
         {
             VersionUtcDate = dbVersion.VersionUtcDate;
-            Author = dbVersion.Author.UserName;
+            Author = dbVersion.Author.GetUserName();
             VersionDescription = dbVersion.VersionDescription;
             var changedFieldNames = new List<string>();
             if (preceedingVersion == null)

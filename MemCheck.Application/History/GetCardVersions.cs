@@ -59,7 +59,7 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
         {
             VersionId = dbVersion.IsCurrent ? null : dbVersion.Id;
             VersionUtcDate = dbVersion.VersionUtcDate;
-            VersionCreator = dbVersion.VersionCreator.UserName;
+            VersionCreator = dbVersion.VersionCreator.GetUserName();
             VersionDescription = dbVersion.VersionDescription;
             var changedFieldNames = new List<string>();
             if (preceedingVersion == null)

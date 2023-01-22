@@ -115,7 +115,7 @@ public class LearnController : MemCheckController
                 {
                     var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, 30);
                     var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
-                    var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                    var result = new GetCardsViewModel(applicationResult, this, user.GetUserName());
                     return Ok(result);
                 }
             case learnModeExpired:
@@ -123,7 +123,7 @@ public class LearnController : MemCheckController
                     var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
                     var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, cardsToDownload);
                     var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
-                    var result = new GetCardsViewModel(applicationResult, this, user.UserName);
+                    var result = new GetCardsViewModel(applicationResult, this, user.GetUserName());
                     return Ok(result);
                 }
             case learnModeDemo:
