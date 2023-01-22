@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -23,11 +24,10 @@ internal static class Program
             return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureConnectionString.txt").Trim();
         }
 
-
         var db = config["ConnectionStrings:DebuggingDb"];
         if (!string.IsNullOrEmpty(config[$"ConnectionStrings:{db}"]))
             db = config[$"ConnectionStrings:{db}"];
-        return db;
+        return db ?? throw new ConfigurationErrorsException("Unable to read connection string");
     }
     private static IConfiguration GetConfig()
     {

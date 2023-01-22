@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -22,8 +22,9 @@ public sealed class DatabaseUsabilityTests : IDisposable
     #region Private method
     private static IConfigurationRoot GetIConfigurationRoot()
     {
+        var basePath = Path.GetDirectoryName(typeof(DatabaseUsabilityTests).Assembly.Location)!;
         return new ConfigurationBuilder()
-            .SetBasePath(Path.GetDirectoryName(typeof(DatabaseUsabilityTests).Assembly.Location))
+            .SetBasePath(basePath)
             .AddJsonFile("appsettings.json", optional: true)
             .Build();
     }
