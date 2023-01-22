@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Users;
@@ -54,5 +55,15 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
         options.SignIn.RequireConfirmedAccount = true;
         options.User.RequireUniqueEmail = false;
         options.Lockout.AllowedForNewUsers = false;
+    }
+    public async Task<MemCheckUser> GetExistingUserAsync(ClaimsPrincipal principal)
+    {
+        if (principal == null)
+            throw new ArgumentNullException(nameof(principal));
+        var id = GetUserId(principal);
+        if (id == null)
+            throw new InvalidOperationException("User id");
+        var result = await FindByIdAsync(id);
+        return result ?? throw new InvalidOperationException("User not found");
     }
 }

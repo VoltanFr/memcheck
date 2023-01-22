@@ -6,11 +6,11 @@ using MemCheck.Application.Images;
 using MemCheck.Application.Notifiying;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
+using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -27,13 +27,13 @@ public class LearnController : MemCheckController
 {
     #region Fields
     private readonly CallContext callContext;
-    private readonly UserManager<MemCheckUser> userManager;
+    private readonly MemCheckUserManager userManager;
     private static readonly Guid noTagFakeGuid = Guid.Empty;
     private const int learnModeExpired = 1;
     private const int learnModeUnknown = 2;
     private const int learnModeDemo = 3;
     #endregion
-    public LearnController(MemCheckDbContext dbContext, IStringLocalizer<LearnController> localizer, UserManager<MemCheckUser> userManager, TelemetryClient telemetryClient) : base(localizer)
+    public LearnController(MemCheckDbContext dbContext, IStringLocalizer<LearnController> localizer, MemCheckUserManager userManager, TelemetryClient telemetryClient) : base(localizer)
     {
         callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
         this.userManager = userManager;
@@ -107,7 +107,7 @@ public class LearnController : MemCheckController
     public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
     {
         CheckBodyParameter(request);
-        var user = await userManager.GetUserAsync(HttpContext.User);
+        var user = await userManager.GetExistingUserAsync(HttpContext.User);
 
         switch (request.LearnMode)
         {
@@ -324,7 +324,7 @@ public class LearnController : MemCheckController
     public async Task<IActionResult> GetRemainingCardsInLessonAsync([FromBody] GetRemainingCardsInLessonRequest request)
     {
         CheckBodyParameter(request);
-        var user = await userManager.GetUserAsync(HttpContext.User);
+        var user = await userManager.GetExistingUserAsync(HttpContext.User);
         var remainingCardsInLesson = await new GetRemainingCardsInLesson(callContext).RunAsync(new GetRemainingCardsInLesson.Request(user.Id, request.DeckId, request.LearnModeIsUnknown));
         var result = new GetRemainingCardsInLessonResult(remainingCardsInLesson.Count);
         return Ok(result);

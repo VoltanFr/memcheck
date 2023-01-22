@@ -7,7 +7,6 @@ using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -58,9 +57,9 @@ public class AdminController : MemCheckController
     private readonly CallContext callContext;
     private readonly IEmailSender emailSender;
     private readonly LinkGenerator linkGenerator;
-    private readonly UserManager<MemCheckUser> userManager;
+    private readonly MemCheckUserManager userManager;
     #endregion
-    public AdminController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
+    public AdminController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AdminController> localizer, IEmailSender emailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
     {
         callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
         this.emailSender = emailSender;
@@ -124,7 +123,7 @@ public class AdminController : MemCheckController
     [HttpPost("LaunchNotifier")]
     public async Task<IActionResult> LaunchNotifier()
     {
-        var launchingUser = await userManager.GetUserAsync(HttpContext.User);
+        var launchingUser = await userManager.GetExistingUserAsync(HttpContext.User);
         try
         {
             var mailer = new NotificationMailer(callContext, new MemCheckMailSender(emailSender), new MemCheckLinkGenerator(linkGenerator, HttpContext));

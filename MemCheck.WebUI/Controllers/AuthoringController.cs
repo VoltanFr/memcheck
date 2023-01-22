@@ -11,7 +11,6 @@ using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -28,9 +27,9 @@ public class AuthoringController : MemCheckController
 {
     #region Fields
     private readonly CallContext callContext;
-    private readonly UserManager<MemCheckUser> userManager;
+    private readonly MemCheckUserManager userManager;
     #endregion
-    public AuthoringController(MemCheckDbContext dbContext, UserManager<MemCheckUser> userManager, IStringLocalizer<AuthoringController> localizer, TelemetryClient telemetryClient) : base(localizer)
+    public AuthoringController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AuthoringController> localizer, TelemetryClient telemetryClient) : base(localizer)
     {
         callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
         this.userManager = userManager;
@@ -57,7 +56,7 @@ public class AuthoringController : MemCheckController
     [HttpGet("GetCurrentUser")]
     public async Task<IActionResult> GetCurrentUser()
     {
-        var user = await userManager.GetUserAsync(HttpContext.User);
+        var user = await userManager.GetExistingUserAsync(HttpContext.User);
         return Ok(new GetCurrentUserViewModel(user, callContext.DbContext));
     }
     public sealed class GetCurrentUserViewModel
@@ -104,7 +103,7 @@ public class AuthoringController : MemCheckController
     public async Task<IActionResult> UpdateCard(Guid cardId, [FromBody] UpdateCardRequest card)
     {
         CheckBodyParameter(card);
-        var user = await userManager.GetUserAsync(HttpContext.User);
+        var user = await userManager.GetExistingUserAsync(HttpContext.User);
         var request = new UpdateCard.Request(cardId, user.Id, card.FrontSide, card.BackSide, card.AdditionalInfo, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, card.VersionDescription);
         await new UpdateCard(callContext).RunAsync(request);
         return ControllerResultWithToast.Success(GetLocalized("CardSavedOk"), this);
