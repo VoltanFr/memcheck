@@ -111,6 +111,10 @@ internal static class RandomHelper
     {
         return String(5) + '@' + String(5);
     }
+    public static string UserName()
+    {
+        return String(firstCharMustBeLetter: true);
+    }
 }
 
 [TestClass()]
