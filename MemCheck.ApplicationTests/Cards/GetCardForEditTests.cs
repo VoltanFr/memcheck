@@ -48,17 +48,16 @@ public class GetCardForEditTests
         var db = DbHelper.GetEmptyTestDB();
         var language = await CardLanguageHelper.CreateAsync(db);
 
-        var firstVersionCreatorId = await UserHelper.CreateInDbAsync(db);
+        var firstVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         var firstVersionDate = RandomHelper.Date();
-        var card = await CardHelper.CreateAsync(db, firstVersionCreatorId, language: language, versionDate: firstVersionDate);
+        var card = await CardHelper.CreateAsync(db, firstVersionCreator.Id, language: language, versionDate: firstVersionDate);
 
-        var lastVersionCreatorName = RandomHelper.String();
-        var lastVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: lastVersionCreatorName);
+        var lastVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         var lastVersionDate = RandomHelper.Date();
         var lastVersionDescription = RandomHelper.String();
         var lastVersionFrontSide = RandomHelper.String();
         using (var dbContext = new MemCheckDbContext(db))
-            await new UpdateCard(dbContext.AsCallContext(), lastVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, lastVersionFrontSide, versionCreator: lastVersionCreatorId, versionDescription: lastVersionDescription));
+            await new UpdateCard(dbContext.AsCallContext(), lastVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, lastVersionFrontSide, versionCreator: lastVersionCreator.Id, versionDescription: lastVersionDescription));
 
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
@@ -68,7 +67,7 @@ public class GetCardForEditTests
 
             Assert.AreEqual(firstVersionDate, loaded.FirstVersionUtcDate);
             Assert.AreEqual(lastVersionDate, loaded.LastVersionUtcDate);
-            Assert.AreEqual(lastVersionCreatorName, loaded.LastVersionCreatorName);
+            Assert.AreEqual(lastVersionCreator.UserName, loaded.LastVersionCreatorName);
             Assert.AreEqual(lastVersionDescription, loaded.LastVersionDescription);
             Assert.AreEqual(lastVersionFrontSide, loaded.FrontSide);
         }
@@ -79,8 +78,7 @@ public class GetCardForEditTests
         var db = DbHelper.GetEmptyTestDB();
         var languageName = RandomHelper.String();
         var language = await CardLanguageHelper.CreateAsync(db, languageName);
-        var creatorName = RandomHelper.String();
-        var creatorId = await UserHelper.CreateInDbAsync(db, userName: creatorName);
+        var creator = await UserHelper.CreateUserInDbAsync(db);
         var creationDate = RandomHelper.Date();
         var frontSide = RandomHelper.String();
         var backSide = RandomHelper.String();
@@ -88,16 +86,15 @@ public class GetCardForEditTests
         var references = RandomHelper.String();
         var tagName = RandomHelper.String();
         var tag = await TagHelper.CreateAsync(db, tagName);
-        var otherUserName = RandomHelper.String();
-        var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
+        var otherUser = await UserHelper.CreateUserInDbAsync(db);
         var versionDescription = RandomHelper.String();
-        var card = await CardHelper.CreateAsync(db, creatorId, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, references: references, tagIds: tag.AsArray(), userWithViewIds: new[] { creatorId, otherUserId }, versionDescription: versionDescription);
+        var card = await CardHelper.CreateAsync(db, creator.Id, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, references: references, tagIds: tag.AsArray(), userWithViewIds: new[] { creator.Id, otherUser.Id }, versionDescription: versionDescription);
 
-        var deck = await DeckHelper.CreateAsync(db, otherUserId);
+        var deck = await DeckHelper.CreateAsync(db, otherUser.Id);
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
+        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creator.Id, card.Id));
 
         Assert.AreEqual(frontSide, loaded.FrontSide);
         Assert.AreEqual(backSide, loaded.BackSide);
@@ -108,16 +105,16 @@ public class GetCardForEditTests
         Assert.AreEqual(tag, loaded.Tags.Single().TagId);
         Assert.AreEqual(tagName, loaded.Tags.Single().TagName);
         Assert.AreEqual(2, loaded.UsersWithVisibility.Count());
-        Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creatorId) == 1);
-        Assert.AreEqual(creatorName, loaded.UsersWithVisibility.Single(u => u.UserId == creatorId).UserName);
-        Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUserId) == 1);
-        Assert.AreEqual(otherUserName, loaded.UsersWithVisibility.Single(u => u.UserId == otherUserId).UserName);
+        Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creator.Id) == 1);
+        Assert.AreEqual(creator.UserName, loaded.UsersWithVisibility.Single(u => u.UserId == creator.Id).UserName);
+        Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUser.Id) == 1);
+        Assert.AreEqual(otherUser.UserName, loaded.UsersWithVisibility.Single(u => u.UserId == otherUser.Id).UserName);
         Assert.AreEqual(creationDate, loaded.FirstVersionUtcDate);
         Assert.AreEqual(creationDate, loaded.LastVersionUtcDate);
-        Assert.AreEqual(creatorName, loaded.LastVersionCreatorName);
+        Assert.AreEqual(creator.UserName, loaded.LastVersionCreatorName);
         Assert.AreEqual(versionDescription, loaded.LastVersionDescription);
         Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Count());
-        Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUserName);
+        Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUser.UserName);
         Assert.AreEqual(0, loaded.UserRating);
         Assert.AreEqual(0, loaded.AverageRating);
         Assert.AreEqual(0, loaded.CountOfUserRatings);

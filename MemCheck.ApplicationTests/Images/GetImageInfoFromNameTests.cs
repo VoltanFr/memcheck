@@ -72,13 +72,12 @@ public class GetImageInfoFromNameTests
     public async Task CaseInsensitivity()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
-        await ImageHelper.CreateAsync(db, user, name: "ImageName");
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        await ImageHelper.CreateAsync(db, user.Id, name: "ImageName");
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("imagEname"));
-        Assert.AreEqual(userName, loaded.InitialVersionCreator);
+        Assert.AreEqual(user.UserName, loaded.InitialVersionCreator);
     }
     [TestMethod()]
     public async Task ComplexCase()

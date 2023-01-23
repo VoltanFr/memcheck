@@ -324,83 +324,79 @@ public class UpdateCardTests
     public async Task ReduceVisibility_OtherUserHasInDeck_OnlyAuthor()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardCreatorName = RandomHelper.String();
-        var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorName);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
+        var card = await CardHelper.CreateAsync(db, cardCreator.Id, language: languageId, userWithViewIds: Array.Empty<Guid>());
 
-        var otherUserName = RandomHelper.String();
-        var otherUser = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
-        var otherUserDeck = await DeckHelper.CreateAsync(db, otherUser);
+        var otherUser = await UserHelper.CreateUserInDbAsync(db);
+        var otherUserDeck = await DeckHelper.CreateAsync(db, otherUser.Id);
         await DeckHelper.AddCardAsync(db, otherUserDeck, card.Id, 0);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray());
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(otherUserName));
+            Assert.IsTrue(e.Message.Contains(otherUser.UserName));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, otherUser.AsArray(), otherUser);
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, otherUser.Id.AsArray(), otherUser.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(cardCreatorName));
+            Assert.IsTrue(e.Message.Contains(cardCreator.UserName));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator, otherUser });
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator.Id, otherUser.Id });
             await new UpdateCard(dbContext.AsCallContext()).RunAsync(r);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id);
+            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator.Id, card.Id);
+            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser.Id, card.Id);
         }
     }
     [TestMethod()]
     public async Task ReduceVisibility_NoUserHasInDeck_OtherAuthor()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardCreatorName = RandomHelper.String();
-        var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorName);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
+        var card = await CardHelper.CreateAsync(db, cardCreator.Id, language: languageId, userWithViewIds: Array.Empty<Guid>());
 
-        var newVersionCreatorName = RandomHelper.String();
-        var newVersionCreator = await UserHelper.CreateInDbAsync(db, userName: newVersionCreatorName);
+        var newVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), newVersionCreator);
+            var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), newVersionCreator.Id);
             await new UpdateCard(dbContext.AsCallContext()).RunAsync(r);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray(), cardCreator);
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray(), cardCreator.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(newVersionCreatorName));
+            Assert.IsTrue(e.Message.Contains(newVersionCreator.UserName));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { newVersionCreator }, newVersionCreator);
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { newVersionCreator.Id }, newVersionCreator.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(cardCreatorName));
+            Assert.IsTrue(e.Message.Contains(cardCreator.UserName));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator, newVersionCreator });
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { cardCreator.Id, newVersionCreator.Id });
             await new UpdateCard(dbContext.AsCallContext()).RunAsync(r);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, newVersionCreator, card.Id);
+            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator.Id, card.Id);
+            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, newVersionCreator.Id, card.Id);
         }
     }
     [TestMethod()]

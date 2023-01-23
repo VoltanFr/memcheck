@@ -79,8 +79,9 @@ public class CreateDeckTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var deckFromDb = await dbContext.Decks.SingleAsync();
-            Assert.AreEqual(name, deckFromDb.Description);
+            Assert.AreEqual(2, await dbContext.Decks.CountAsync());
+
+            var deckFromDb = await dbContext.Decks.SingleAsync(deck => deck.Description == name);
             Assert.AreEqual(algo, deckFromDb.HeapingAlgorithmId);
         }
     }

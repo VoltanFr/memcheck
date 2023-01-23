@@ -49,13 +49,12 @@ public class GetImageListTests
     {
         var db = DbHelper.GetEmptyTestDB();
         var imageName = RandomHelper.String();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var description = RandomHelper.String();
         var source = RandomHelper.String();
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var imageId = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+        var imageId = await ImageHelper.CreateAsync(db, user.Id, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));
@@ -71,18 +70,17 @@ public class GetImageListTests
     {
         var db = DbHelper.GetEmptyTestDB();
         var imageName = RandomHelper.String();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var description = RandomHelper.String();
         var source = RandomHelper.String();
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var imageId = await ImageHelper.CreateAsync(db, user, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+        var imageId = await ImageHelper.CreateAsync(db, user.Id, name: imageName, description: description, source: source, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
-        await RandomHelper.Int(3, 10).TimesAsync(async () => await CardHelper.CreateAsync(db, user)); //Cards which don't use the image
+        await RandomHelper.Int(3, 10).TimesAsync(async () => await CardHelper.CreateAsync(db, user.Id)); //Cards which don't use the image
 
         var usingCardCount = RandomHelper.Int(3, 10);
-        await usingCardCount.TimesAsync(async () => await CardHelper.CreateAsync(db, user, frontSide: $"![Mnesios:{imageName}]"));
+        await usingCardCount.TimesAsync(async () => await CardHelper.CreateAsync(db, user.Id, frontSide: $"![Mnesios:{imageName}]"));
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, ""));

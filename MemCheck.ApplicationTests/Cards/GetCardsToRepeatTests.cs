@@ -210,16 +210,15 @@ public class GetCardsToRepeatTests
     public async Task TwoCardsWithCheckingOfAllFields()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
-        var deck = await DeckHelper.CreateAsync(db, user, algorithmId: UnitTestsHeapingAlgorithm.ID);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.CreateAsync(db, user.Id, algorithmId: UnitTestsHeapingAlgorithm.ID);
         var french = await CardLanguageHelper.CreateAsync(db, "Français");
         var otherLanguage = await CardLanguageHelper.CreateAsync(db);
         var tagName = RandomHelper.String();
         var tag = await TagHelper.CreateAsync(db, tagName);
 
         var card1VersionDate = RandomHelper.Date();
-        var card1 = await CardHelper.CreateAsync(db, user, versionDate: card1VersionDate, language: french, tagIds: tag.AsArray(), userWithViewIds: user.AsArray());
+        var card1 = await CardHelper.CreateAsync(db, user.Id, versionDate: card1VersionDate, language: french, tagIds: tag.AsArray(), userWithViewIds: user.Id.AsArray());
         var card1AddToDeckTime = RandomHelper.Date(card1VersionDate);
         var card1LastLearnTime = RandomHelper.Date(card1AddToDeckTime);
         var card1BiggestHeapReached = RandomHelper.Heap();
@@ -227,11 +226,11 @@ public class GetCardsToRepeatTests
         var card1Heap = RandomHelper.Heap(true);
         await DeckHelper.AddCardAsync(db, deck, card1.Id, lastLearnUtcTime: card1LastLearnTime, heap: card1Heap, addToDeckUtcTime: card1AddToDeckTime, biggestHeapReached: card1BiggestHeapReached, nbTimesInNotLearnedHeap: card1NbTimesInNotLearnedHeap);
         var card1Rating = RandomHelper.Rating();
-        await RatingHelper.RecordForUserAsync(db, user, card1.Id, card1Rating);
+        await RatingHelper.RecordForUserAsync(db, user.Id, card1.Id, card1Rating);
         var runDateFromCard1 = RandomHelper.Date(card1LastLearnTime.AddDays(card1Heap + 1));
 
         var card2VersionDate = RandomHelper.Date();
-        var card2 = await CardHelper.CreateAsync(db, user, versionDate: card2VersionDate, language: otherLanguage);
+        var card2 = await CardHelper.CreateAsync(db, user.Id, versionDate: card2VersionDate, language: otherLanguage);
         var card2AddToDeckTime = RandomHelper.Date(card2VersionDate);
         var card2LastLearnTime = RandomHelper.Date(card2AddToDeckTime);
         var card2BiggestHeapReached = RandomHelper.Heap();
@@ -239,12 +238,12 @@ public class GetCardsToRepeatTests
         var card2Heap = RandomHelper.Heap(true);
         await DeckHelper.AddCardAsync(db, deck, card2.Id, lastLearnUtcTime: card2LastLearnTime, heap: card2Heap, addToDeckUtcTime: card2AddToDeckTime, biggestHeapReached: card2BiggestHeapReached, nbTimesInNotLearnedHeap: card2NbTimesInNotLearnedHeap);
         using (var dbContext = new MemCheckDbContext(db))
-            await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(user, card2.Id.AsArray()));
+            await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(user.Id, card2.Id.AsArray()));
         var runDateFromCard2 = RandomHelper.Date(card2LastLearnTime.AddDays(card2Heap + 1));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var request = new GetCardsToRepeat.Request(user, deck, Array.Empty<Guid>(), 10);
+            var request = new GetCardsToRepeat.Request(user.Id, deck, Array.Empty<Guid>(), 10);
             var runDate = runDateFromCard1 > runDateFromCard2 ? runDateFromCard1 : runDateFromCard2;
             var result = (await new GetCardsToRepeat(dbContext.AsCallContext(), runDate).RunAsync(request)).Cards;
             Assert.AreEqual(2, result.Count());
@@ -260,7 +259,7 @@ public class GetCardsToRepeatTests
                 Assert.AreEqual(card1.BackSide, card1FromResult.BackSide);
                 Assert.AreEqual(card1.AdditionalInfo, card1FromResult.AdditionalInfo);
                 Assert.AreEqual(card1.References, card1FromResult.References);
-                Assert.AreEqual(userName, card1FromResult.Owner);
+                Assert.AreEqual(user.UserName, card1FromResult.Owner);
                 Assert.AreEqual(card1Rating, card1FromResult.UserRating);
                 Assert.AreEqual(card1Rating, card1FromResult.AverageRating);
                 Assert.AreEqual(1, card1FromResult.CountOfUserRatings);
@@ -269,7 +268,7 @@ public class GetCardsToRepeatTests
                 Assert.AreEqual(1, card1FromResult.Tags.Count());
                 Assert.AreEqual(tagName, card1FromResult.Tags.Single());
                 Assert.AreEqual(1, card1FromResult.VisibleTo.Count());
-                Assert.AreEqual(userName, card1FromResult.VisibleTo.Single());
+                Assert.AreEqual(user.UserName, card1FromResult.VisibleTo.Single());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card1FromResult.MoveToHeapExpiryInfos.Length);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
@@ -288,7 +287,7 @@ public class GetCardsToRepeatTests
                 Assert.AreEqual(card2.BackSide, card2FromResult.BackSide);
                 Assert.AreEqual(card2.AdditionalInfo, card2FromResult.AdditionalInfo);
                 Assert.AreEqual(card2.References, card2FromResult.References);
-                Assert.AreEqual(userName, card2FromResult.Owner);
+                Assert.AreEqual(user.UserName, card2FromResult.Owner);
                 Assert.AreEqual(0, card2FromResult.UserRating);
                 Assert.AreEqual(0, card2FromResult.AverageRating);
                 Assert.AreEqual(0, card2FromResult.CountOfUserRatings);

@@ -27,7 +27,6 @@ public sealed class UserHelper
         MemCheckUserManager.SetupIdentityOptions(identityOptions);
         var optionsAccessor = Options.Create(identityOptions);
         var passwordHasher = new PasswordHasher<MemCheckUser>();
-        var userValidators = new UserValidator<MemCheckUser>().AsArray();
         var passwordValidators = new PasswordValidator<MemCheckUser>().AsArray();
         var keyNormalizer = new UpperInvariantLookupNormalizer();
         var errors = new IdentityErrorDescriber();
@@ -35,21 +34,42 @@ public sealed class UserHelper
         var logger = new LoggerFactory().CreateLogger<UserManager<MemCheckUser>>();
         var serviceProvider = services.BuildServiceProvider();
         var telemetryClient = new TelemetryClient(new TelemetryConfiguration());
-        return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
+        return new MemCheckUserManager(userStore, optionsAccessor, passwordHasher, passwordValidators, keyNormalizer, errors, serviceProvider, logger, telemetryClient, dbContext);
 #pragma warning restore CA2000 // Dispose objects before losing scope
     }
     public static async Task<Guid> CreateInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
     {
-        using var dbContext = new MemCheckDbContext(db);
         var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate, subscribeToCardOnEdit, userName);
         if (userEMail != null)
         {
             result.Email = userEMail;
             result.EmailConfirmed = true;
         }
-        dbContext.Users.Add(result);
-        await dbContext.SaveChangesAsync();
+
+        using var dbContext = new MemCheckDbContext(db);
+        using var userManager = GetUserManager(dbContext);
+        var identityResult = await userManager.CreateAsync(result);
+
+        Assert.IsTrue(identityResult.Succeeded, $"First error: {identityResult.Errors.FirstOrDefault()?.Code}");
+
         return result.Id;
+    }
+    public static async Task<MemCheckUser> CreateUserInDbAsync(DbContextOptions<MemCheckDbContext> db, int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? userEMail = null)
+    {
+        var result = Create(minimumCountOfDaysBetweenNotifs, lastNotificationUtcDate, subscribeToCardOnEdit, userName);
+        if (userEMail != null)
+        {
+            result.Email = userEMail;
+            result.EmailConfirmed = true;
+        }
+
+        using var dbContext = new MemCheckDbContext(db);
+        using var userManager = GetUserManager(dbContext);
+        var identityResult = await userManager.CreateAsync(result);
+
+        Assert.IsTrue(identityResult.Succeeded, $"First error: {identityResult.Errors.FirstOrDefault()?.Code}");
+
+        return result;
     }
     public static MemCheckUser Create(int minimumCountOfDaysBetweenNotifs = 0, DateTime? lastNotificationUtcDate = null, bool subscribeToCardOnEdit = false, string? userName = null, string? email = null)
     {

@@ -452,24 +452,22 @@ public class SearchCardsTests
     public async Task TestResultContainsUserWithView()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var user1Name = RandomHelper.String();
-        var user1Id = await UserHelper.CreateInDbAsync(testDB, userName: user1Name);
-        var user2Name = RandomHelper.String();
-        var user2Id = await UserHelper.CreateInDbAsync(testDB, userName: user2Name);
-        await CardHelper.CreateIdAsync(testDB, user1Id, userWithViewIds: new[] { user1Id, user2Id });
+        var user1 = await UserHelper.CreateUserInDbAsync(testDB);
+        var user2 = await UserHelper.CreateUserInDbAsync(testDB);
+        await CardHelper.CreateIdAsync(testDB, user1.Id, userWithViewIds: new[] { user1.Id, user2.Id });
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var request = new SearchCards.Request { UserId = user2Id };
+        var request = new SearchCards.Request { UserId = user2.Id };
         var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
         Assert.AreEqual(1, result.TotalNbCards);
         var card = result.Cards.Single();
         Assert.AreEqual(2, card.VisibleTo.Count());
-        var visibleToUser1 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user1Id);
+        var visibleToUser1 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user1.Id);
         Assert.IsNotNull(visibleToUser1.User);
-        Assert.AreEqual(user1Name, visibleToUser1.User.UserName);
-        var visibleToUser2 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user2Id);
+        Assert.AreEqual(user1.UserName, visibleToUser1.User.UserName);
+        var visibleToUser2 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user2.Id);
         Assert.IsNotNull(visibleToUser2.User);
-        Assert.AreEqual(user2Name, visibleToUser2.User.UserName);
+        Assert.AreEqual(user2.UserName, visibleToUser2.User.UserName);
     }
     [TestMethod()]
     public async Task TestFind_ReferenceNotEmpty()

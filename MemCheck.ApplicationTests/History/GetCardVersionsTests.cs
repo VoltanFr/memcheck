@@ -54,19 +54,18 @@ public class GetCardVersionsTests
     public async Task SingleVersion()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var versionDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var card = await CardHelper.CreateAsync(db, userId, versionDate, versionDescription: versionDescription);
+        var card = await CardHelper.CreateAsync(db, user.Id, versionDate, versionDescription: versionDescription);
 
         using var dbContext = new MemCheckDbContext(db);
-        var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
+        var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(user.Id, card.Id));
         Assert.AreEqual(1, versions.Count());
 
         var version = versions.Single();
 
-        Assert.AreEqual(userName, version.VersionCreator);
+        Assert.AreEqual(user.UserName, version.VersionCreator);
         Assert.AreEqual(versionDate, version.VersionUtcDate);
         Assert.AreEqual(versionDescription, version.VersionDescription);
         Assert.AreEqual(6, version.ChangedFieldNames.Count());
@@ -117,20 +116,18 @@ public class GetCardVersionsTests
     public async Task ThreeVersions()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
         var oldestDate = RandomHelper.Date();
         var oldestDescription = RandomHelper.String();
-        var card = await CardHelper.CreateAsync(db, userId, language: language, versionDate: oldestDate, versionDescription: oldestDescription);
+        var card = await CardHelper.CreateAsync(db, user.Id, language: language, versionDate: oldestDate, versionDescription: oldestDescription);
 
-        var otherUserName = RandomHelper.String();
-        var otherUserId = await UserHelper.CreateInDbAsync(db, userName: otherUserName);
+        var otherUser = await UserHelper.CreateUserInDbAsync(db);
         var intermediaryDate = RandomHelper.Date();
         var intermediaryDescription = RandomHelper.String();
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: otherUserId, versionDescription: intermediaryDescription);
+            var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: otherUser.Id, versionDescription: intermediaryDescription);
             request = request with { AdditionalInfo = RandomHelper.String() };
             await new UpdateCard(dbContext.AsCallContext(), intermediaryDate).RunAsync(request);
         }
@@ -146,22 +143,22 @@ public class GetCardVersionsTests
                 .Include(c => c.TagsInCards)
                 .Include(c => c.UsersWithView)
                 .SingleAsync(c => c.Id == card.Id);
-            await new UpdateCard(dbContext.AsCallContext(), newestDate).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, RandomHelper.String(), versionDescription: newestDescription, versionCreator: userId));
+            await new UpdateCard(dbContext.AsCallContext(), newestDate).RunAsync(UpdateCardHelper.RequestForBackSideChange(cardFromDb, RandomHelper.String(), versionDescription: newestDescription, versionCreator: user.Id));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var versions = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id))).ToList();
+            var versions = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(otherUser.Id, card.Id))).ToList();
 
             Assert.AreEqual((await dbContext.CardPreviousVersions.SingleAsync(c => c.VersionUtcDate == oldestDate)).Id, versions[2].VersionId);
             Assert.AreEqual(oldestDate, versions[2].VersionUtcDate);
-            Assert.AreEqual(userName, versions[2].VersionCreator);
+            Assert.AreEqual(user.UserName, versions[2].VersionCreator);
             Assert.AreEqual(oldestDescription, versions[2].VersionDescription);
             Assert.AreEqual(6, versions[2].ChangedFieldNames.Count());
 
             Assert.AreEqual((await dbContext.CardPreviousVersions.SingleAsync(c => c.VersionUtcDate == intermediaryDate)).Id, versions[1].VersionId);
             Assert.AreEqual(intermediaryDate, versions[1].VersionUtcDate);
-            Assert.AreEqual(otherUserName, versions[1].VersionCreator);
+            Assert.AreEqual(otherUser.UserName, versions[1].VersionCreator);
             Assert.AreEqual(intermediaryDescription, versions[1].VersionDescription);
             Assert.AreEqual(2, versions[1].ChangedFieldNames.Count());
             Assert.IsTrue(versions[1].ChangedFieldNames.Any(f => f == "FrontSide"));
@@ -169,7 +166,7 @@ public class GetCardVersionsTests
 
             Assert.IsNull(versions[0].VersionId);
             Assert.AreEqual(newestDate, versions[0].VersionUtcDate);
-            Assert.AreEqual(userName, versions[0].VersionCreator);
+            Assert.AreEqual(user.UserName, versions[0].VersionCreator);
             Assert.AreEqual(newestDescription, versions[0].VersionDescription);
             Assert.AreEqual(1, versions[0].ChangedFieldNames.Count());
             Assert.AreEqual("BackSide", versions[0].ChangedFieldNames.First());

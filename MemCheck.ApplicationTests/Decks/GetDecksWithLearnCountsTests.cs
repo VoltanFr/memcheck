@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -29,16 +30,13 @@ public class GetDecksWithLearnCountsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
-        var description = RandomHelper.String();
-        var deck = await DeckHelper.CreateAsync(testDB, userId, description);
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(request);
         Assert.AreEqual(1, result.Count());
         var loaded = result.First();
-        Assert.AreEqual(deck, loaded.Id);
-        Assert.AreEqual(description, loaded.Description);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loaded.Description);
         Assert.AreEqual(0, loaded.UnknownCardCount);
         Assert.AreEqual(0, loaded.ExpiredCardCount);
         Assert.AreEqual(0, loaded.CardCount);
@@ -48,11 +46,11 @@ public class GetDecksWithLearnCountsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
-        var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String());
+        var deckId = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(testDB, userId);
 
         var addToDeckDate = RandomHelper.Date();
-        await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate);
-        await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate.AddHours(2));
+        await DeckHelper.AddCardAsync(testDB, deckId, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate);
+        await DeckHelper.AddCardAsync(testDB, deckId, (await CardHelper.CreateAsync(testDB, userId)).Id, 1, addToDeckDate.AddHours(2));
 
         using var dbContext = new MemCheckDbContext(testDB);
         var resultDeck = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(1).AddHours(1.5)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
@@ -66,10 +64,11 @@ public class GetDecksWithLearnCountsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
-        var deck1 = await DeckHelper.CreateAsync(testDB, userId, RandomHelper.String());
+        var deckId = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(testDB, userId);
+        var cardId = (await CardHelper.CreateAsync(testDB, userId)).Id;
 
         var addToDeckDate = RandomHelper.Date();
-        await DeckHelper.AddCardAsync(testDB, deck1, (await CardHelper.CreateAsync(testDB, userId)).Id, 4, addToDeckDate);
+        await DeckHelper.AddCardAsync(testDB, deckId, cardId, 4, addToDeckDate);
 
         using var dbContext = new MemCheckDbContext(testDB);
         var result = (await new GetDecksWithLearnCounts(dbContext.AsCallContext(), addToDeckDate.AddDays(4).AddMinutes(-61)).RunAsync(new GetDecksWithLearnCounts.Request(userId))).First();
@@ -107,9 +106,7 @@ public class GetDecksWithLearnCountsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
-
-        var deckDescription = RandomHelper.String();
-        var deck = await DeckHelper.CreateAsync(testDB, userId, deckDescription, UnitTestsHeapingAlgorithm.ID);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(testDB, userId);
 
         var jan01 = new DateTime(2030, 01, 01).ToUniversalTime();
         var jan30 = new DateTime(2030, 01, 30, 0, 0, 0).ToUniversalTime();
@@ -133,7 +130,7 @@ public class GetDecksWithLearnCountsTests
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext(), new DateTime(2030, 02, 01, 0, 30, 0)).RunAsync(request);
         var loaded = result.Single();
-        Assert.AreEqual(deckDescription, loaded.Description);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loaded.Description);
         Assert.AreEqual(2, loaded.UnknownCardCount);
         Assert.AreEqual(7, loaded.ExpiredCardCount);
         Assert.AreEqual(0, loaded.ExpiringNextHourCount);
@@ -147,8 +144,7 @@ public class GetDecksWithLearnCountsTests
         var testDB = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(testDB);
 
-        var deck1Description = RandomHelper.String();
-        var deck1 = await DeckHelper.CreateAsync(testDB, userId, deck1Description, UnitTestsHeapingAlgorithm.ID);
+        var deck1 = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(testDB, userId);
 
         var deck2Description = RandomHelper.String();
         var deck2 = await DeckHelper.CreateAsync(testDB, userId, deck2Description, UnitTestsHeapingAlgorithm.ID);
@@ -183,7 +179,7 @@ public class GetDecksWithLearnCountsTests
         Assert.AreEqual(2, result.Count());
 
         var loadedDeck1 = result.Single(d => d.Id == deck1);
-        Assert.AreEqual(deck1Description, loadedDeck1.Description);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loadedDeck1.Description);
         Assert.AreEqual(2, loadedDeck1.UnknownCardCount);
         Assert.AreEqual(7, loadedDeck1.ExpiredCardCount);
         Assert.AreEqual(0, loadedDeck1.ExpiringNextHourCount);

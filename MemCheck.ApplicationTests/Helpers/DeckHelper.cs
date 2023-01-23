@@ -85,4 +85,12 @@ public static class DeckHelper
         using var dbContext = new MemCheckDbContext(testDB);
         Assert.IsFalse(await dbContext.CardsInDecks.AsNoTracking().AnyAsync(cardInDeck => cardInDeck.DeckId == deck && card == cardInDeck.CardId));
     }
+    public static async Task<Guid> GetUserSingleDeckAndSetTestHeapingAlgoAsync(DbContextOptions<MemCheckDbContext> testDB, Guid userId, int algorithmId = UnitTestsHeapingAlgorithm.ID)
+    {
+        using var dbContext = new MemCheckDbContext(testDB);
+        var deck = dbContext.Decks.Single(deck => deck.Owner.Id == userId);
+        deck.HeapingAlgorithmId = algorithmId;
+        await dbContext.SaveChangesAsync();
+        return deck.Id;
+    }
 }

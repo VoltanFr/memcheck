@@ -24,18 +24,17 @@ public class GetImageInfoFromIdTests
     public async Task NotUsedInCards()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var name = RandomHelper.String();
         var source = RandomHelper.String();
         var description = RandomHelper.String();
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, user, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+        var image = await ImageHelper.CreateAsync(db, user.Id, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
-        Assert.AreEqual(userName, loaded.CurrentVersionCreatorName);
+        Assert.AreEqual(user.UserName, loaded.CurrentVersionCreatorName);
         Assert.AreEqual(name, loaded.ImageName);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
@@ -55,21 +54,20 @@ public class GetImageInfoFromIdTests
     public async Task UsedInCards()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var name = RandomHelper.String();
         var source = RandomHelper.String();
         var description = RandomHelper.String();
         var uploadDate = RandomHelper.Date();
         var versionDescription = RandomHelper.String();
-        var image = await ImageHelper.CreateAsync(db, user, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
+        var image = await ImageHelper.CreateAsync(db, user.Id, name: name, source: source, description: description, lastChangeUtcDate: uploadDate, versionDescription: versionDescription);
 
-        await CardHelper.CreateIdAsync(db, user, frontSide: $"![Mnesios:{name},size=small]");
-        await CardHelper.CreateIdAsync(db, user, frontSide: $"![Mnesios:{name},size=big]");
+        await CardHelper.CreateIdAsync(db, user.Id, frontSide: $"![Mnesios:{name},size=small]");
+        await CardHelper.CreateIdAsync(db, user.Id, frontSide: $"![Mnesios:{name},size=big]");
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(image));
-        Assert.AreEqual(userName, loaded.CurrentVersionCreatorName);
+        Assert.AreEqual(user.UserName, loaded.CurrentVersionCreatorName);
         Assert.AreEqual(name, loaded.ImageName);
         Assert.AreEqual(description, loaded.Description);
         Assert.AreEqual(source, loaded.Source);
@@ -90,8 +88,7 @@ public class GetImageInfoFromIdTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var originalVersionCreatorName = RandomHelper.String();
-        var originalVersionCreator = await UserHelper.CreateInDbAsync(db, userName: originalVersionCreatorName);
+        var originalVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         var originalVersionImageName = RandomHelper.String();
         var originalVersionSource = RandomHelper.String();
         var originalVersionDescription = RandomHelper.String();
@@ -105,14 +102,14 @@ public class GetImageInfoFromIdTests
         {
             var localizer = new TestLocalizer(new System.Collections.Generic.KeyValuePair<string, string>("InitialImageVersionCreation", originalVersionVersionDescription));
             var storer = new StoreImage(dbContext.AsCallContext(localizer), originalVersionUploadDate);
-            var storeRequest = new StoreImage.Request(originalVersionCreator, originalVersionImageName, originalVersionDescription, originalVersionSource, StoreImage.pngImageContentType, originalBlob);
+            var storeRequest = new StoreImage.Request(originalVersionCreator.Id, originalVersionImageName, originalVersionDescription, originalVersionSource, StoreImage.pngImageContentType, originalBlob);
             imageId = (await storer.RunAsync(storeRequest)).ImageId;
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(imageId));
-            Assert.AreEqual(originalVersionCreatorName, loaded.CurrentVersionCreatorName);
+            Assert.AreEqual(originalVersionCreator.UserName, loaded.CurrentVersionCreatorName);
             Assert.AreEqual(originalVersionImageName, loaded.ImageName);
             Assert.AreEqual(originalVersionDescription, loaded.Description);
             Assert.AreEqual(originalVersionSource, loaded.Source);
@@ -124,8 +121,7 @@ public class GetImageInfoFromIdTests
             Assert.AreEqual(originalBlob.Length, loaded.OriginalImageSize);
         }
 
-        var newVersionUserName = RandomHelper.String();
-        var newVersionser = await UserHelper.CreateInDbAsync(db, userName: newVersionUserName);
+        var newVersionUser = await UserHelper.CreateUserInDbAsync(db);
         var newVersionSource = RandomHelper.String();
         var newVersionDescription = RandomHelper.String();
         var newVersionUploadDate = RandomHelper.Date();
@@ -133,14 +129,14 @@ public class GetImageInfoFromIdTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var updater = new UpdateImageMetadata(dbContext.AsCallContext(), newVersionUploadDate);
-            var updateRequest = new UpdateImageMetadata.Request(imageId, newVersionser, originalVersionImageName, newVersionSource, newVersionDescription, newVersionVersionDescription);
+            var updateRequest = new UpdateImageMetadata.Request(imageId, newVersionUser.Id, originalVersionImageName, newVersionSource, newVersionDescription, newVersionVersionDescription);
             await updater.RunAsync(updateRequest);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var loaded = await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(imageId));
-            Assert.AreEqual(newVersionUserName, loaded.CurrentVersionCreatorName);
+            Assert.AreEqual(newVersionUser.UserName, loaded.CurrentVersionCreatorName);
             Assert.AreEqual(originalVersionImageName, loaded.ImageName);
             Assert.AreEqual(newVersionDescription, loaded.Description);
             Assert.AreEqual(newVersionSource, loaded.Source);

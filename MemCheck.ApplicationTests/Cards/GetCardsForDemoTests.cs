@@ -210,15 +210,14 @@ public class GetCardsForDemoTests
     public async Task TestResultFields()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var cardAuthor = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var cardAuthor = await UserHelper.CreateUserInDbAsync(db);
         await UserHelper.CreateInDbAsync(db);   //So that another user exists
         var tagName = RandomHelper.String();
         var tagId = await TagHelper.CreateAsync(db, tagName);
         var otherTagName = RandomHelper.String();
         var otherTagId = await TagHelper.CreateAsync(db, otherTagName);
-        var card = await CardHelper.CreateAsync(db, cardAuthor, tagIds: new[] { otherTagId, tagId });
-        await RatingHelper.RecordForUserAsync(db, cardAuthor, card.Id, 3);
+        var card = await CardHelper.CreateAsync(db, cardAuthor.Id, tagIds: new[] { otherTagId, tagId });
+        await RatingHelper.RecordForUserAsync(db, cardAuthor.Id, card.Id, 3);
         var otherUser = await UserHelper.CreateInDbAsync(db);
         await RatingHelper.RecordForUserAsync(db, otherUser, card.Id, 5);
 
@@ -233,7 +232,7 @@ public class GetCardsForDemoTests
         Assert.AreEqual(card.BackSide, resultCard.BackSide);
         Assert.AreEqual(card.AdditionalInfo, resultCard.AdditionalInfo);
         Assert.AreEqual(card.References, resultCard.References);
-        Assert.AreEqual(userName, resultCard.VersionCreator);
+        Assert.AreEqual(cardAuthor.UserName, resultCard.VersionCreator);
         Assert.AreEqual(4, resultCard.AverageRating);
         Assert.AreEqual(2, resultCard.CountOfUserRatings);
         Assert.IsFalse(resultCard.IsInFrench);
@@ -416,26 +415,25 @@ public class GetCardsForDemoTests
     public async Task TwoCardsWithCheckingOfAllFields()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
-        var deck = await DeckHelper.CreateAsync(db, user, algorithmId: UnitTestsHeapingAlgorithm.ID);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.CreateAsync(db, user.Id, algorithmId: UnitTestsHeapingAlgorithm.ID);
         var french = await CardLanguageHelper.CreateAsync(db, "Français");
         var otherLanguage = await CardLanguageHelper.CreateAsync(db);
         var searchedTagName = RandomHelper.String();
         var searchedTag = await TagHelper.CreateAsync(db, searchedTagName);
 
         var card1VersionDate = RandomHelper.Date();
-        var card1 = await CardHelper.CreateAsync(db, user, versionDate: card1VersionDate, language: french, tagIds: searchedTag.AsArray());
+        var card1 = await CardHelper.CreateAsync(db, user.Id, versionDate: card1VersionDate, language: french, tagIds: searchedTag.AsArray());
         var card1LastLearnTime = CardInDeck.NeverLearntLastLearnTime;
         var card1BiggestHeapReached = RandomHelper.Heap();
         var card1NbTimesInNotLearnedHeap = RandomHelper.Int(CardInDeck.MaxHeapValue);
         var card1Rating = RandomHelper.Rating();
-        await RatingHelper.RecordForUserAsync(db, user, card1.Id, card1Rating);
+        await RatingHelper.RecordForUserAsync(db, user.Id, card1.Id, card1Rating);
 
         var otherTagName = RandomHelper.String();
         var otherTag = await TagHelper.CreateAsync(db, otherTagName);
         var card2VersionDate = RandomHelper.Date();
-        var card2 = await CardHelper.CreateAsync(db, user, versionDate: card2VersionDate, language: otherLanguage, tagIds: new[] { searchedTag, otherTag });
+        var card2 = await CardHelper.CreateAsync(db, user.Id, versionDate: card2VersionDate, language: otherLanguage, tagIds: new[] { searchedTag, otherTag });
         var card2BiggestHeapReached = RandomHelper.Heap();
         var card2NbTimesInNotLearnedHeap = RandomHelper.Int(CardInDeck.MaxHeapValue);
 
@@ -452,7 +450,7 @@ public class GetCardsForDemoTests
             Assert.AreEqual(card1.BackSide, card1FromResult.BackSide);
             Assert.AreEqual(card1.AdditionalInfo, card1FromResult.AdditionalInfo);
             Assert.AreEqual(card1.References, card1FromResult.References);
-            Assert.AreEqual(userName, card1FromResult.VersionCreator);
+            Assert.AreEqual(user.UserName, card1FromResult.VersionCreator);
             Assert.AreEqual(card1Rating, card1FromResult.AverageRating);
             Assert.AreEqual(1, card1FromResult.CountOfUserRatings);
             Assert.IsTrue(card1FromResult.IsInFrench);

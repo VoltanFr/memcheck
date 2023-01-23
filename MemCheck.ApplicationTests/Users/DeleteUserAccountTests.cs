@@ -310,22 +310,21 @@ public class DeleteUserAccountTests
     public async Task NonPrivateCardNotDeleted_UserNotOwnerOfCurrentButOfPrevious()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var loggedUserName = RandomHelper.String();
-        var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
+        var loggedUser = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
         var userToDelete = await UserHelper.CreateInDbAsync(db);
-        var card = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: new[] { loggedUser, userToDelete });
-        await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: loggedUser));
+        var card = await CardHelper.CreateAsync(db, userToDelete, language: language, userWithViewIds: new[] { loggedUser.Id, userToDelete });
+        await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: loggedUser.Id));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser.Id)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser.Id, userToDelete));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            Assert.AreEqual(loggedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
+            Assert.AreEqual(loggedUser.UserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.CardPreviousVersions.Include(cardPreviousVersion => cardPreviousVersion.VersionCreator).Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
         }
     }
@@ -333,23 +332,22 @@ public class DeleteUserAccountTests
     public async Task NonPrivateCardNotDeleted_UserOwnerOfCurrentButNotPrevious()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var loggedUserName = RandomHelper.String();
-        var loggedUser = await UserHelper.CreateInDbAsync(db, userName: loggedUserName);
+        var loggedUser = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
-        var userToDelete = await UserHelper.CreateInDbAsync(db);
-        var card = await CardHelper.CreateAsync(db, loggedUser, language: language);
-        await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: userToDelete));
+        var userToDeleteId = await UserHelper.CreateInDbAsync(db);
+        var card = await CardHelper.CreateAsync(db, loggedUser.Id, language: language);
+        await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionCreator: userToDeleteId));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser.Id)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser.Id, userToDeleteId));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             Assert.AreEqual(DeleteUserAccount.DeletedUserName, dbContext.Cards.Include(card => card.VersionCreator).Single(card => card.Id == card.Id).VersionCreator.UserName);
-            Assert.AreEqual(loggedUserName, dbContext.CardPreviousVersions.Include(cardPreviousVersion => cardPreviousVersion.VersionCreator).Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
+            Assert.AreEqual(loggedUser.UserName, dbContext.CardPreviousVersions.Include(cardPreviousVersion => cardPreviousVersion.VersionCreator).Single(cardPreviousVersion => cardPreviousVersion.Card == card.Id).VersionCreator.UserName);
         }
     }
     [TestMethod()]

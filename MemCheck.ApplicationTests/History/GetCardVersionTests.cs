@@ -57,41 +57,39 @@ public class GetCardVersionTests
         var db = DbHelper.GetEmptyTestDB();
         var language = await CardLanguageHelper.CreateAsync(db);
 
-        var initialVersionCreatorName = RandomHelper.String();
-        var initialVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: initialVersionCreatorName);
+        var initialVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         var initialVersionDate = RandomHelper.Date();
         var initialVersionDescription = RandomHelper.String();
         var initialVersionFrontSide = RandomHelper.String();
-        var card = await CardHelper.CreateAsync(db, initialVersionCreatorId, language: language, versionDate: initialVersionDate, versionDescription: initialVersionDescription, frontSide: initialVersionFrontSide);
+        var card = await CardHelper.CreateAsync(db, initialVersionCreator.Id, language: language, versionDate: initialVersionDate, versionDescription: initialVersionDescription, frontSide: initialVersionFrontSide);
 
-        var intermediaryVersionCreatorName = RandomHelper.String();
-        var intermediaryVersionCreatorId = await UserHelper.CreateInDbAsync(db, userName: intermediaryVersionCreatorName);
+        var intermediaryVersionCreator = await UserHelper.CreateUserInDbAsync(db);
         var intermediaryVersionDate = RandomHelper.Date();
         var intermediaryVersionDescription = RandomHelper.String();
         var intermediaryVersionFrontSide = RandomHelper.String();
         using (var dbContext = new MemCheckDbContext(db))
-            await new UpdateCard(dbContext.AsCallContext(), intermediaryVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryVersionFrontSide, versionCreator: intermediaryVersionCreatorId, versionDescription: intermediaryVersionDescription));
+            await new UpdateCard(dbContext.AsCallContext(), intermediaryVersionDate).RunAsync(UpdateCardHelper.RequestForFrontSideChange(card, intermediaryVersionFrontSide, versionCreator: intermediaryVersionCreator.Id, versionDescription: intermediaryVersionDescription));
 
         using (var dbContext = new MemCheckDbContext(db))
             //We need a new version to exist but don't mind about its contents
-            await new UpdateCard(dbContext.AsCallContext(), RandomHelper.Date()).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(), versionCreator: initialVersionCreatorId));
+            await new UpdateCard(dbContext.AsCallContext(), RandomHelper.Date()).RunAsync(UpdateCardHelper.RequestForBackSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(), versionCreator: initialVersionCreator.Id));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var versions = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(intermediaryVersionCreatorId, card.Id))).Where(v => v.VersionId != null).Select(v => v.VersionId!.Value).ToList();
+            var versions = (await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(intermediaryVersionCreator.Id, card.Id))).Where(v => v.VersionId != null).Select(v => v.VersionId!.Value).ToList();
             var initialVersionId = versions[1];
             var intermediaryVersionId = versions[0];
 
-            var initialVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, initialVersionId));
+            var initialVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreator.Id, initialVersionId));
             Assert.AreEqual(initialVersionDescription, initialVersion.VersionDescription);
             Assert.AreEqual(initialVersionDate, initialVersion.VersionUtcDate);
-            Assert.AreEqual(initialVersionCreatorName, initialVersion.CreatorName);
+            Assert.AreEqual(initialVersionCreator.UserName, initialVersion.CreatorName);
             Assert.AreEqual(initialVersionFrontSide, initialVersion.FrontSide);
 
-            var intermediaryVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreatorId, intermediaryVersionId));
+            var intermediaryVersion = await new GetCardVersion(dbContext.AsCallContext()).RunAsync(new GetCardVersion.Request(initialVersionCreator.Id, intermediaryVersionId));
             Assert.AreEqual(intermediaryVersionDescription, intermediaryVersion.VersionDescription);
             Assert.AreEqual(intermediaryVersionDate, intermediaryVersion.VersionUtcDate);
-            Assert.AreEqual(intermediaryVersionCreatorName, intermediaryVersion.CreatorName);
+            Assert.AreEqual(intermediaryVersionCreator.UserName, intermediaryVersion.CreatorName);
             Assert.AreEqual(intermediaryVersionFrontSide, intermediaryVersion.FrontSide);
         }
     }

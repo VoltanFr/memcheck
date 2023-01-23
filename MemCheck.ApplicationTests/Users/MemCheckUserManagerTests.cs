@@ -187,21 +187,19 @@ public class MemCheckUserManagerTests
     public async Task DeleteMustFail()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var userName = RandomHelper.String();
-        var userId = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var createdUser = await UserHelper.CreateUserInDbAsync(db);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var user = await dbContext.Users.SingleAsync(u => u.Id == userId);
-
+            var userFromDb = await dbContext.Users.SingleAsync(u => u.Id == createdUser.Id);
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await userManager.DeleteAsync(user));
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await userManager.DeleteAsync(userFromDb));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var user = await dbContext.Users.SingleAsync();
-            Assert.AreEqual(userName, user.UserName);
+            Assert.AreEqual(createdUser.UserName, user.UserName);
         }
     }
     [TestMethod()]
@@ -407,4 +405,21 @@ public class MemCheckUserManagerTests
             }
         }
     }
+    //[DataTestMethod, DataRow(""), DataRow("gggg"), DataRow("@x"), DataRow("@x.com"), DataRow("dsq@")]
+    //public async Task InvalidEmail(string email)
+    //{
+    //    var db = DbHelper.GetEmptyTestDB();
+
+    //    using (var dbContext = new MemCheckDbContext(db))
+    //    {
+    //        using var userManager = UserHelper.GetUserManager(dbContext);
+    //        var user = UserHelper.Create(email: email);
+    //        var identityResult = await userManager.CreateAsync(user);
+    //        Assert.IsFalse(identityResult.Succeeded);
+    //        Assert.AreEqual(nameof(IdentityErrorDescriber.InvalidEmail), identityResult.Errors.Single().Code);
+    //    }
+
+    //    using (var dbContext = new MemCheckDbContext(db))
+    //        Assert.IsFalse(await dbContext.Users.AnyAsync());
+    //}
 }

@@ -353,18 +353,17 @@ public class UserSearchNotifierTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var userName = RandomHelper.String();
-        var user = await UserHelper.CreateInDbAsync(db, userName: userName);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
 
         for (var i = 0; i < SearchCards.Request.MaxPageSize * 2; i++)
-            await CardHelper.CreateAsync(db, user, language: language);
-        var card = await CardHelper.CreateAsync(db, user, language: language);
+            await CardHelper.CreateAsync(db, user.Id, language: language);
+        var card = await CardHelper.CreateAsync(db, user.Id, language: language);
 
         Guid subscriptionId;
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
+            var subscriberRequest = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
             subscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(subscriberRequest)).SearchId;
         }
 
@@ -386,7 +385,7 @@ public class UserSearchNotifierTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
-            await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
+            await deleter.RunAsync(new DeleteCards.Request(user.Id, card.Id.AsArray()));
         }
 
         var runDate = new DateTime(2050, 05, 04);
@@ -403,7 +402,7 @@ public class UserSearchNotifierTests
             var deletedCard = searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Single();
             Assert.IsNotNull(deletedCard.FrontSide);
             Assert.AreEqual(card.FrontSide, deletedCard.FrontSide!);
-            Assert.AreEqual(userName, deletedCard.DeletionAuthor);
+            Assert.AreEqual(user.UserName, deletedCard.DeletionAuthor);
             Assert.IsTrue(deletedCard.CardIsViewable);
             Assert.AreEqual(deletionDate, deletedCard.DeletionUtcDate);
             Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
@@ -503,10 +502,9 @@ public class UserSearchNotifierTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var cardCreatorUserName = RandomHelper.String();
-        var cardCreator = await UserHelper.CreateInDbAsync(db, userName: cardCreatorUserName);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, cardCreator, versionDate: new DateTime(2050, 03, 01), language: language);
+        var card = await CardHelper.CreateAsync(db, cardCreator.Id, versionDate: new DateTime(2050, 03, 01), language: language);
 
         var subscriber = await UserHelper.CreateInDbAsync(db);
 
@@ -520,7 +518,7 @@ public class UserSearchNotifierTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var deletionRequest = new DeleteCards.Request(cardCreator, card.Id.AsArray());
+            var deletionRequest = new DeleteCards.Request(cardCreator.Id, card.Id.AsArray());
             await new DeleteCards(dbContext.AsCallContext()).RunAsync(deletionRequest);
         }
 
@@ -538,7 +536,7 @@ public class UserSearchNotifierTests
             var deletedCard = searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Single();
             Assert.IsTrue(deletedCard.CardIsViewable);
             Assert.AreEqual(card.FrontSide, deletedCard.FrontSide);
-            Assert.AreEqual(cardCreatorUserName, deletedCard.DeletionAuthor);
+            Assert.AreEqual(cardCreator.UserName, deletedCard.DeletionAuthor);
             Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreStillExistsUserNotAllowedToView);
             Assert.AreEqual(0, searchResult.CountOfCardsNotFoundAnymoreDeletedUserNotAllowedToView);
         }

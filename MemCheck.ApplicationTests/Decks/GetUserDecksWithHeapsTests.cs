@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -38,9 +39,17 @@ public class GetUserDecksWithHeapsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
 
-        using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeaps.Request(user));
-        Assert.IsFalse(result.Any());
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var deck = dbContext.Decks.Single();
+            await new DeleteDeck(dbContext.AsCallContext()).RunAsync(new DeleteDeck.Request(user, deck.Id));
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeaps.Request(user));
+            Assert.IsFalse(result.Any());
+        }
     }
     [TestMethod()]
     public async Task OneDeck_Empty()
@@ -48,16 +57,14 @@ public class GetUserDecksWithHeapsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
 
-        var deckName = RandomHelper.String();
-        var deckAlgo = RandomHelper.HeapingAlgorithm();
-        var deck = await DeckHelper.CreateAsync(db, user, deckName, deckAlgo);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetUserDecksWithHeaps(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeaps.Request(user));
         var resultDeck = result.Single();
         Assert.AreEqual(deck, resultDeck.DeckId);
-        Assert.AreEqual(deckName, resultDeck.Description);
-        Assert.AreEqual(deckAlgo, resultDeck.HeapingAlgorithmId);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, resultDeck.Description);
+        Assert.AreEqual(UnitTestsHeapingAlgorithm.ID, resultDeck.HeapingAlgorithmId);
         Assert.AreEqual(0, resultDeck.CardCount);
         Assert.IsFalse(resultDeck.Heaps.Any());
     }
@@ -66,7 +73,7 @@ public class GetUserDecksWithHeapsTests
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.CreateAsync(db, user, algorithmId: HeapingAlgorithms.DefaultAlgoId);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user, algorithmId: HeapingAlgorithms.DefaultAlgoId);
 
         var runDate = RandomHelper.Date();
 

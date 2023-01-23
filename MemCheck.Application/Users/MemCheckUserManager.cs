@@ -24,7 +24,7 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     public const string DefaultDeckName = "Auto";
 
     public MemCheckUserManager(IUserStore<MemCheckUser> store, IOptions<IdentityOptions> optionsAccessor, IPasswordHasher<MemCheckUser> passwordHasher,
-        IEnumerable<IUserValidator<MemCheckUser>> _, IEnumerable<IPasswordValidator<MemCheckUser>> passwordValidators, ILookupNormalizer keyNormalizer,
+        IEnumerable<IPasswordValidator<MemCheckUser>> passwordValidators, ILookupNormalizer keyNormalizer,
         IdentityErrorDescriber errors, IServiceProvider services, ILogger<UserManager<MemCheckUser>> logger, TelemetryClient telemetryClient, MemCheckDbContext dbContext)
         : base(store, optionsAccessor, passwordHasher, new MemCheckUserValidator().AsArray(), passwordValidators, keyNormalizer, errors, services, logger)
     {

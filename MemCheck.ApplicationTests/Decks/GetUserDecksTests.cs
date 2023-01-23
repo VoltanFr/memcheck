@@ -1,5 +1,7 @@
-﻿using MemCheck.Application.Helpers;
+﻿using MemCheck.Application.Heaping;
+using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -37,26 +39,31 @@ public class GetUserDecksTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
 
-        using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
-        Assert.IsFalse(result.Any());
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var deck = dbContext.Decks.Single();
+            await new DeleteDeck(dbContext.AsCallContext()).RunAsync(new DeleteDeck.Request(user, deck.Id));
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
+            Assert.IsFalse(result.Any());
+        }
     }
     [TestMethod()]
     public async Task OneDeck()
     {
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
-
-        var deckName = RandomHelper.String();
-        var deckAlgo = RandomHelper.HeapingAlgorithm();
-        var deck = await DeckHelper.CreateAsync(db, user, deckName, deckAlgo);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
         var resultDeck = result.Single();
         Assert.AreEqual(deck, resultDeck.DeckId);
-        Assert.AreEqual(deckName, resultDeck.Description);
-        Assert.AreEqual(deckAlgo, resultDeck.HeapingAlgorithmId);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, resultDeck.Description);
+        Assert.AreEqual(UnitTestsHeapingAlgorithm.ID, resultDeck.HeapingAlgorithmId);
     }
     [TestMethod()]
     public async Task TwoDecks()
@@ -64,9 +71,7 @@ public class GetUserDecksTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
 
-        var deck1Name = RandomHelper.String();
-        var deck1Algo = RandomHelper.HeapingAlgorithm();
-        var deck1 = await DeckHelper.CreateAsync(db, user, deck1Name, deck1Algo);
+        var deck1 = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
 
         var deck2Name = RandomHelper.String();
         var deck2Algo = RandomHelper.HeapingAlgorithm();
@@ -76,8 +81,8 @@ public class GetUserDecksTests
         var result = await new GetUserDecks(dbContext.AsCallContext()).RunAsync(new GetUserDecks.Request(user));
         Assert.AreEqual(2, result.Count());
         var resultDeck1 = result.Single(d => d.DeckId == deck1);
-        Assert.AreEqual(deck1Name, resultDeck1.Description);
-        Assert.AreEqual(deck1Algo, resultDeck1.HeapingAlgorithmId);
+        Assert.AreEqual(MemCheckUserManager.DefaultDeckName, resultDeck1.Description);
+        Assert.AreEqual(UnitTestsHeapingAlgorithm.ID, resultDeck1.HeapingAlgorithmId);
         var resultDeck2 = result.Single(d => d.DeckId == deck2);
         Assert.AreEqual(deck2Name, resultDeck2.Description);
         Assert.AreEqual(deck2Algo, resultDeck2.HeapingAlgorithmId);
