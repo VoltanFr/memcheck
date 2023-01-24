@@ -1,4 +1,4 @@
-using MemCheck.Application.QueryValidation;
+﻿using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -22,6 +23,11 @@ public sealed class IndexModel : PageModel
     [BindProperty] public string EntryAssembly { get; set; } = null!;
     [BindProperty] public string EnvironmentName { get; set; } = null!;
     [BindProperty] public string SendGridEmailSender { get; set; } = null!;
+    [BindProperty] public bool Is64BitProcess { get; set; } = false;
+    [BindProperty] public string OSVersion { get; set; } = null!;
+    [BindProperty] public int ProcessorCount { get; set; } = 0;
+    [BindProperty] public string ProcessWorkingSet { get; set; } = null!;
+    [BindProperty] public string EnvironmentVersion { get; set; } = null!;
     [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
     public IndexModel(IWebHostEnvironment currentEnvironment, IEmailSender emailSender)
     {
@@ -33,6 +39,11 @@ public sealed class IndexModel : PageModel
         WebRootPath = currentEnvironment.WebRootPath;
         ApplicationName = currentEnvironment.ApplicationName;
         EnvironmentName = currentEnvironment.EnvironmentName;
+        Is64BitProcess = Environment.Is64BitProcess;
+        OSVersion = Environment.OSVersion.VersionString;
+        ProcessorCount = Environment.ProcessorCount;
+        EnvironmentVersion = Environment.Version.ToString();
+        ProcessWorkingSet = Environment.WorkingSet.ToString("N0", CultureInfo.CurrentCulture);
         EntryAssembly = AssemblyServices.GetDisplayInfoForAssembly(Assembly.GetEntryAssembly());
         var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName!.StartsWith("MemCheck", StringComparison.OrdinalIgnoreCase));
         MemCheckAssemblies = assemblies.Select(a => AssemblyServices.GetDisplayInfoForAssembly(a)).OrderBy(a => a);
