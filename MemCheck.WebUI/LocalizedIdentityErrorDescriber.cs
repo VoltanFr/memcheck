@@ -43,16 +43,16 @@ public sealed class LocalizedIdentityErrorDescriber : IdentityErrorDescriber
         Description = _localizer[nameof(LoginAlreadyAssociated)],
     };
 
-    public override IdentityError InvalidUserName(string userName) => new()
+    public override IdentityError InvalidUserName(string? userName) => new()
     {
         Code = nameof(InvalidUserName),
-        Description = _localizer.GetString(nameof(InvalidUserName), userName),
+        Description = _localizer.GetString(nameof(InvalidUserName), userName ?? ""),
     };
 
-    public override IdentityError InvalidEmail(string email) => new()
+    public override IdentityError InvalidEmail(string? email) => new()
     {
         Code = nameof(InvalidEmail),
-        Description = _localizer.GetString(nameof(InvalidEmail), email),
+        Description = _localizer.GetString(nameof(InvalidEmail), email ?? ""),
     };
 
     public override IdentityError DuplicateUserName(string userName) => new()
@@ -67,10 +67,10 @@ public sealed class LocalizedIdentityErrorDescriber : IdentityErrorDescriber
         Description = _localizer.GetString(nameof(DuplicateEmail), email),
     };
 
-    public override IdentityError InvalidRoleName(string role) => new()
+    public override IdentityError InvalidRoleName(string? role) => new()
     {
         Code = nameof(InvalidRoleName),
-        Description = _localizer.GetString(nameof(InvalidRoleName), role),
+        Description = _localizer.GetString(nameof(InvalidRoleName), role ?? ""),
     };
 
     public override IdentityError DuplicateRoleName(string role) => new()
