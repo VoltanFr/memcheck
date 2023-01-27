@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-        <VersionPrefix>0.18.3</VersionPrefix>
+        <VersionPrefix>0.18.4</VersionPrefix>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
-        <PackageReference Include="SendGrid" Version="9.27.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Extensions" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.NET.Sdk.Functions" />
+        <PackageReference Include="SendGrid" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
