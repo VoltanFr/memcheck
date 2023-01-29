@@ -1,29 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
-		<PackageReference Include="Serilog" />
-		<PackageReference Include="Serilog.Extensions.Logging" />
-		<PackageReference Include="Serilog.Settings.Configuration" />
-		<PackageReference Include="Serilog.Sinks.Async" />
-		<PackageReference Include="Serilog.Sinks.Console" />
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.Extensions.Logging" />
+        <PackageReference Include="Serilog.Settings.Configuration" />
+        <PackageReference Include="Serilog.Sinks.Async" />
+        <PackageReference Include="Serilog.Sinks.Console" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
-		<ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
-	</ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+        <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
+    </ItemGroup>
 
-	<ItemGroup>
-		<None Update="appsettings.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+    <ItemGroup>
+        <None Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

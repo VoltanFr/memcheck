@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Basics;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Mail;
@@ -74,8 +74,8 @@ public sealed class MailSender
         var sendGridClient = new SendGridClient(sendGridKey);
         var response = await sendGridClient.SendEmailAsync(msg);
 
-        logger.LogInformation($"Mail sent, status code {response.StatusCode}");
-        logger.LogInformation($"Response body: {await response.Body.ReadAsStringAsync()}");
+        logger.LogInformation("Mail sent, status code {StatusCode}", response.StatusCode);
+        logger.LogInformation("Response body: {ResponseBody}", await response.Body.ReadAsStringAsync());
     }
     public EmailAddress SenderEmail { get; }
     public static string GetAssemblyVersion()
@@ -88,7 +88,7 @@ public sealed class MailSender
             $"<li>Sent by Azure func {azureFunctionName}</li>",
             $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
             $"<li>Started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
-            $"<li>Function schedule: {timer.Schedule}</li>",
+            $"<li>Function schedule: {timer.ScheduleStatus}</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
         };
 

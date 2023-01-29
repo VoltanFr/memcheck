@@ -11,7 +11,7 @@ using MemCheck.Application.Users;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using SendGrid.Helpers.Mail;
 
@@ -36,12 +36,12 @@ public abstract class AbstractMemCheckAzureFunction
         var result = getterResult.Users;
         return result.Select(address => new EmailAddress(address.Email, address.Name)).ToImmutableList();
     }
-    private static Guid GetUserIdFromEnv(string envVarName, ILogger logger)
+    private Guid GetUserIdFromEnv(string envVarName)
     {
         var envVarValue = Environment.GetEnvironmentVariable(envVarName);
         if (envVarValue == null)
         {
-            logger.LogError($"{envVarName} is null");
+            logger.LogError("{EnvVarName} is null", envVarName);
             return Guid.Empty;
         }
         return new Guid(envVarValue);
@@ -54,8 +54,8 @@ public abstract class AbstractMemCheckAzureFunction
             telemetryClient = new TelemetryClient(telemetryConfiguration);
             this.memCheckDbContext = memCheckDbContext;
             this.logger = logger;
-            AdminUserId = GetUserIdFromEnv("AdminUserId", logger);
-            BotUserId = GetUserIdFromEnv("BotAccountUserId", logger);
+            AdminUserId = GetUserIdFromEnv("AdminUserId");
+            BotUserId = GetUserIdFromEnv("BotAccountUserId");
             roleChecker = new ProdRoleChecker(userManager);
             StartTime = DateTime.UtcNow;
             MailSender = new MailSender(StartTime, logger);
@@ -63,27 +63,27 @@ public abstract class AbstractMemCheckAzureFunction
         }
         catch (Exception e)
         {
-            logger.LogError($"Exception in AbstractMemCheckAzureFunction.Constructor for {GetType().Name}");
-            logger.LogError($"Caught {e.GetType().Name}");
-            logger.LogError($"Message: '{e.Message}'");
+            logger.LogError("Exception in AbstractMemCheckAzureFunction.Constructor for {FunctionType}", GetType().Name);
+            logger.LogError("Caught {ExceptionType}", e.GetType().Name);
+            logger.LogError("Message: '{Message}'", e.Message);
             logger.LogError("Stack");
             if (e.StackTrace != null)
-                logger.LogError(e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+                logger.LogError("{StackTrace}", e.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             if (e.InnerException != null)
             {
                 logger.LogError("****** Inner");
-                logger.LogError($"Caught {e.InnerException.GetType().Name}");
-                logger.LogError($"Message: '{e.InnerException.Message}'");
+                logger.LogError("Caught {InnerType}", e.InnerException.GetType().Name);
+                logger.LogError("Message: '{InnerMessage}'", e.InnerException.Message);
                 logger.LogError("Stack");
                 if (e.InnerException.StackTrace != null)
-                    logger.LogError(e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
+                    logger.LogError("{InnerStackTrace}", e.InnerException.StackTrace.Replace("\n", "<br/>\t", StringComparison.Ordinal));
             }
             else
                 logger.LogError("No inner");
             logger.LogError("****** Env vars");
             var envVars = Environment.GetEnvironmentVariables();
             foreach (DictionaryEntry envVar in envVars)
-                logger.LogError($"'{envVar.Key}'='{envVar.Value}'");
+                logger.LogError("'{EnvVarKey}'='{EnvVarValue}'", envVar.Key, envVar.Value);
             throw;
         }
     }
@@ -91,13 +91,13 @@ public abstract class AbstractMemCheckAzureFunction
     {
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
-    protected async Task RunAsync(TimerInfo timer, ExecutionContext context)
+    protected async Task RunAsync(TimerInfo timer, FunctionContext context)
     {
         try
         {
-            logger.LogInformation($"{context.FunctionName} Azure func starting at {DateTime.Now} on {Environment.MachineName}");
-            telemetryClient.TrackEvent($"{context.FunctionName} Azure func start");
-            var runResult = await RunAndCreateReportMailMainPartAsync(context.FunctionName);
+            logger.LogInformation("{FunctionName} Azure func starting at {StartTime} on {MachineName}", context.FunctionDefinition.Name, DateTime.Now, Environment.MachineName);
+            telemetryClient.TrackEvent($"{context.FunctionDefinition.Name} Azure func start");
+            var runResult = await RunAndCreateReportMailMainPartAsync(context.FunctionDefinition.Name);
 
             var reportMailBody = new StringBuilder()
                 .Append("<style>")
@@ -107,9 +107,9 @@ public abstract class AbstractMemCheckAzureFunction
                 .Append("td{border-width:1px;border-style:solid}")
                 .Append("tr:nth-child(odd) {background-color: lavender;}")
                 .Append("</style>")
-                .Append(CultureInfo.InvariantCulture, $"<h1>{context.FunctionName}</h1>")
+                .Append(CultureInfo.InvariantCulture, $"<h1>{context.FunctionDefinition.Name}</h1>")
                 .Append(runResult.MailBodyMainPart)
-                .Append(MailSender.GetMailFooter(context.FunctionName, timer, StartTime, await AdminsAsync()));
+                .Append(MailSender.GetMailFooter(context.FunctionDefinition.Name, timer, StartTime, await AdminsAsync()));
 
             var bodyText = reportMailBody.ToString();
 
@@ -117,11 +117,11 @@ public abstract class AbstractMemCheckAzureFunction
         }
         catch (Exception ex)
         {
-            await MailSender.SendFailureInfoMailAsync(context.FunctionName, ex);
+            await MailSender.SendFailureInfoMailAsync(context.FunctionDefinition.Name, ex);
         }
         finally
         {
-            logger.LogInformation($"Function '{context.FunctionName}' ending, {DateTime.Now}");
+            logger.LogInformation("Function '{FunctionName}' ending, {Now}", context.FunctionDefinition.Name, DateTime.Now);
         }
     }
     protected abstract Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject);

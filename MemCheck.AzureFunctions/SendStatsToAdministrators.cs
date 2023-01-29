@@ -10,7 +10,7 @@ using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -123,8 +123,8 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         : base(telemetryConfiguration, memCheckDbContext, userManager, logger)
     {
     }
-    [FunctionName(nameof(SendStatsToAdministrators))]
-    public async Task Run([TimerTrigger(Constants.Cron_SendStatsToAdministrators)] TimerInfo timer, ExecutionContext context)
+    [Function(nameof(SendStatsToAdministrators))]
+    public async Task Run([TimerTrigger(Constants.Cron_SendStatsToAdministrators)] TimerInfo timer, FunctionContext context)
     {
         await RunAsync(timer, context);
     }

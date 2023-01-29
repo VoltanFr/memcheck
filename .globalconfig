@@ -16,6 +16,9 @@ dotnet_diagnostic.CA1031.severity = none
 # Allow mutable properties
 dotnet_diagnostic.CA2227.severity = none
 
+# Allow simple uses of Logger
+dotnet_diagnostic.CA1848.severity = none
+
 # I want to use var
 dotnet_diagnostic.IDE0008.severity = none
 
