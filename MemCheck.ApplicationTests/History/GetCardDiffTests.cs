@@ -2,6 +2,7 @@
 using MemCheck.Application.Helpers;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -383,7 +384,7 @@ public class GetCardDiffTests
             Assert.AreEqual(originalVersionDate, result.OriginalVersionUtcDate);
             Assert.AreEqual(newVersionDescription, result.CurrentVersionDescription);
             Assert.AreEqual(originalVersionDescription, result.OriginalVersionDescription);
-            Assert.AreEqual(new("", user.UserName), result.UsersWithView);
+            Assert.AreEqual(new("", user.GetUserName()), result.UsersWithView);
             Assert.IsNull(result.FrontSide);
             Assert.IsNull(result.BackSide);
             Assert.IsNull(result.Language);

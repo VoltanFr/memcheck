@@ -336,14 +336,14 @@ public class UpdateCardTests
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray());
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(otherUser.UserName));
+            Assert.IsTrue(e.Message.Contains(otherUser.GetUserName()));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, otherUser.Id.AsArray(), otherUser.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(cardCreator.UserName));
+            Assert.IsTrue(e.Message.Contains(cardCreator.GetUserName()));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -377,14 +377,14 @@ public class UpdateCardTests
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray(), cardCreator.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(newVersionCreator.UserName));
+            Assert.IsTrue(e.Message.Contains(newVersionCreator.GetUserName()));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { newVersionCreator.Id }, newVersionCreator.Id);
             var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(cardCreator.UserName));
+            Assert.IsTrue(e.Message.Contains(cardCreator.GetUserName()));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
