@@ -124,7 +124,10 @@
     <value>Bad user name length (must be between 3 and 50).</value>
   </data>
   <data name="BeforeHyperLink" xml:space="preserve">
-    <value>You have requested the creation of your Mnesios account.</value>
+    <value>You have requested the creation of your account on </value>
+  </data>
+  <data name="CheckTheDoc" xml:space="preserve">
+    <value>You may also want to check the doc at </value>
   </data>
   <data name="DefaultError" xml:space="preserve">
     <value>Registration error: {0}.</value>

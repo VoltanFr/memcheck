@@ -124,7 +124,10 @@
     <value>La longueur du nom d'utilisateur doit être entre 3 et 50 caractères.</value>
   </data>
   <data name="BeforeHyperLink" xml:space="preserve">
-    <value>Vous avez demandé la création de votre compte Mnesios.</value>
+    <value>Vous avez demandé la création de votre compte </value>
+  </data>
+  <data name="CheckTheDoc" xml:space="preserve">
+    <value>Vous pouvez aussi consulter la documentation : </value>
   </data>
   <data name="DefaultError" xml:space="preserve">
     <value>Échec de la création de compte: {0}.</value>

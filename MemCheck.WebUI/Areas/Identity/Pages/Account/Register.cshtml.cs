@@ -75,11 +75,11 @@ public class RegisterModel : PageModel
 
                 var mailBody = new StringBuilder();
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Hello"].Value} {user.UserName}</p>");
-                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["BeforeHyperLink"].Value}</p>");
+                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["BeforeHyperLink"].Value} <a href='https://www.mnesios.com/'>Mnesios</a>.</p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p><a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["HyperLinkText"].Value}</a></p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["AfterHyperLink"].Value}</p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Final"].Value}</p>");
-
+                mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["CheckTheDoc"].Value} <a href='https://userdoc.mnesios.com/'>https://userdoc.mnesios.com/</a>.</p>");
                 await _emailSender.SendEmailAsync(Input.Email, localizer["MailSubject"].Value, mailBody.ToString());
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)

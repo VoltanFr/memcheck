@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CheckTheDoc" xml:space="preserve">
+    <value>Vous pouvez aussi consulter la documentation : </value>
+  </data>
   <data name="Final" xml:space="preserve">
     <value>Merci !</value>
   </data>
@@ -130,12 +133,12 @@
     <value>Nous avons envoyé un courrier électronique à l'adresse </value>
   </data>
   <data name="Paragraph2AfterSenderAddress" xml:space="preserve">
-    <value>. Si vous ne trouvez pas le message, il pourrait avoir été classé comme indésirable : jetez un coup d'œil dans le dossier spam.</value>
+    <value>. Si vous ne trouvez pas le message, il pourrait avoir été classé comme indésirable : jetez un coup d'œil dans votre dossier spam.</value>
   </data>
   <data name="Paragraph2BeforeSenderAddress" xml:space="preserve">
     <value>Nous vous invitons à clicker sur le lien dans le mail. L'adresse d'expédition est </value>
   </data>
   <data name="Paragraph3" xml:space="preserve">
-    <value>Vous aurez ensuite accès à tout Mnesios !</value>
+    <value>Vous aurez ensuite accès à tout </value>
   </data>
 </root>

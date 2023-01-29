@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CheckTheDoc" xml:space="preserve">
+    <value>You may also want to check the doc at </value>
+  </data>
   <data name="Final" xml:space="preserve">
     <value>Thank you!</value>
   </data>
@@ -136,6 +139,6 @@
     <value>Please check your email account and follow the link. The sending address is </value>
   </data>
   <data name="Paragraph3" xml:space="preserve">
-    <value>After that step, you will have full access to Mnesios.</value>
+    <value>After that step, you will have full access to </value>
   </data>
 </root>
