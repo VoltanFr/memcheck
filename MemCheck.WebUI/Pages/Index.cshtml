@@ -31,7 +31,8 @@
                 <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
             </div>
             <footer id="Data time" style="padding-top:50px">
-                <small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.</small>
+                <p><small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.<br/>
+                    @Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</small></p>
             </footer>
         </div>
         <div id="User not loggedin" v-else>

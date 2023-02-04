@@ -190,7 +190,7 @@
     <value>Vous avez dans</value>
   </data>
   <data name="BeforeDocLink" xml:space="preserve">
-    <value>Dans toutes les pages de Mnesios, le bouton ❓ vous donne accès à </value>
+    <value>Dans toutes les pages de Mnesios, le bouton ❓ du menu vous donne accès à </value>
   </data>
   <data name="YouNeedTo" xml:space="preserve">
     <value>Vous devez</value>
@@ -235,6 +235,6 @@
     <value>Vous voulez un apperçu de Mnesios ? Sélectionnez le thème qui vous intéresse...</value>
   </data>
   <data name="AfterDocLink" xml:space="preserve">
-    <value> pertinente.</value>
+    <value> contextuelle.</value>
   </data>
 </root>
