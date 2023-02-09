@@ -88,7 +88,9 @@ public sealed class MailSender
             $"<li>Sent by Azure func {azureFunctionName}</li>",
             $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
             $"<li>Started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
-            $"<li>Function schedule: {timer.ScheduleStatus}</li>",
+            $"<li>Function last schedule: {timer.ScheduleStatus?.Last}</li>",
+            $"<li>Function last schedule updated: {timer.ScheduleStatus?.LastUpdated}</li>",
+            $"<li>Function next schedule: {timer.ScheduleStatus?.Next}</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
         };
 

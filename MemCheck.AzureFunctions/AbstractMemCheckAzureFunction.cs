@@ -17,8 +17,6 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
-public sealed record RunResult(string MailSubject, StringBuilder MailBodyMainPart);
-
 public abstract class AbstractMemCheckAzureFunction
 {
     #region Fields
