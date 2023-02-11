@@ -12,7 +12,7 @@
     <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/authoring.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-    @section scripts {
+@section scripts {
     <script type="module" src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
     <script type="module" src="~/js/CardRating.js" asp-append-version="true"></script>
     <script type="module" src="~/js/big-size-image.js" asp-append-version="true"></script>
@@ -26,7 +26,7 @@
     </script>
     <script type="module" src="~/js/Authoring/Authoring.js" asp-append-version="true"></script>
 }
-    @{
+@{
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["HelpPage"] = "/authoring";
 }
@@ -75,13 +75,13 @@
             </div>
             <div id="The card" class="authoring-card-div">
                 <div id="FrontSideRow" class="memcheck-input-div">
-                        <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                 </div>
                 <div id="BackSideRow" class="memcheck-input-div">
-                        <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                 </div>
                 <div id="AdditionalInfoRow" class="memcheck-input-div">
-                        <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
                 </div>
                 <div id="ReferencesRow" class="memcheck-input-div">
                     <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
@@ -135,10 +135,16 @@
                     </div>
                 </div>
             </div>
-            <button id="Send card button" class="btn-success btn-lg authoring-send-button" @@click="sendCard">
-                <span v-if="creatingNewCard">@Localizer["Add"]</span>
-                <span v-else>@Localizer["Update"]</span>
-            </button>
+            <div id="AddCardButtonDiv">
+                <button id="AddCardButtonEnabled" class="btn-success btn-lg authoring-send-button" @@click="sendCard" v-if="isDirty()">
+                    <span v-if="creatingNewCard">@Localizer["Add"]</span>
+                    <span v-else>@Localizer["Update"]</span>
+                </button>
+                <button id="AddCardButtonDisabled" class="btn-success.disabled btn-lg authoring-send-button" disabled @@click="sendCard" v-else>
+                    <span v-if="creatingNewCard">@Localizer["Add"]</span>
+                    <span v-else>@Localizer["Update"]</span>
+                </button>
+            </div>
         </div>
     </div>
     <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
