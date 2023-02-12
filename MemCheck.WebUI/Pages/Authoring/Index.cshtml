@@ -75,16 +75,16 @@
             </div>
             <div id="The card" class="authoring-card-div">
                 <div id="FrontSideRow" class="memcheck-input-div">
-                    <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.frontSide" v-bind:isinfrench="isInFrench()" title="@Localizer["FrontSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' v-bind:images="images" />
                 </div>
                 <div id="BackSideRow" class="memcheck-input-div">
-                    <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.backSide" v-bind:isinfrench="isInFrench()" title="@Localizer["BackSide"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' v-bind:images="images" />
                 </div>
                 <div id="AdditionalInfoRow" class="memcheck-input-div">
-                    <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.additionalInfo" v-bind:isinfrench="isInFrench()" title="@Localizer["AdditionalInfo"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' v-bind:images="images" />
                 </div>
                 <div id="ReferencesRow" class="memcheck-input-div">
-                    <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' />
+                    <markdown-editor v-model="card.references" v-bind:isinfrench="isInFrench()" title="@Localizer["References"]" v-bind:onimageclickfunctiontext='onImageClickFunctionText()' v-bind:images="images" />
                 </div>
                 <div id="LanguageInputRow" class="memcheck-input-div">
                     <p class="authoring-row-caption">@Localizer["Language"]</p>

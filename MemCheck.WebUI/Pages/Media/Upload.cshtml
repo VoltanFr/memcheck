@@ -38,7 +38,7 @@
         </div>
         <div class="memcheck-input-div">
             <label>@Localizer["Description"]</label>
-            <markdown-editor v-model="description" isinfrench title="" />
+            <markdown-editor v-model="description" isinfrench title="" v-bind:images="imagesInDescription" />
         </div>
         <div class="memcheck-input-div">
             <label>@Localizer["Source"]</label>

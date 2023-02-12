@@ -20,6 +20,7 @@ const tagAuthoringApp = Vue.createApp({
             mountFinished: false,
             returnAddress: '', // string
             readOnly: false,
+            images: [], // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
         };
     },
     async mounted() {

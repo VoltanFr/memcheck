@@ -23,6 +23,7 @@ const uploadMediaApp = Vue.createApp({
             originalName: '',
             originalDescription: '',  // string
             originalSource: '',  // string
+            imagesInDescription: [], // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
         };
     },
     async mounted() {

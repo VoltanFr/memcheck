@@ -64,6 +64,7 @@ const authoringApp = Vue.createApp({
             saving: false,
             showInfoPopover: false,
             errorDebugInfoLines: [], // strings
+            images: [], // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
         };
     },
     async mounted() {

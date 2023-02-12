@@ -57,7 +57,7 @@
                 <input class="form-control responsive-padding-edit" v-model="newName" v-bind:readonly="readOnly" />
             </div>
             <div id="Description" class="field-div">
-                <markdown-editor v-model="newDescription" v-bind:isinfrench="true" title="@Localizer["NewDescription"]" v-bind:readonly="readOnly" />
+                <markdown-editor v-model="newDescription" v-bind:isinfrench="true" title="@Localizer["NewDescription"]" v-bind:readonly="readOnly" v-bind:images="images" />
             </div>
         </div>
 

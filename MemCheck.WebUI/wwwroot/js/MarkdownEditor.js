@@ -13,6 +13,7 @@ export const MarkdownEditor = Vue.defineComponent({
         title: { required: true, type: String },
         isinfrench: { required: true, type: Boolean },
         onimageclickfunctiontext: { required: false, type: String },
+        images: { required: true, type: Array }, // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
     },
     mounted() {
         this.adaptTextAreaSize();
@@ -46,7 +47,6 @@ export const MarkdownEditor = Vue.defineComponent({
         return {
             content: this.modelValue,
             previewVisible: false,
-            images: new Map(), // Keys: image names, Values: all image detail fields
             preview: '',
         };
     },
@@ -150,6 +150,7 @@ export const MarkdownEditor = Vue.defineComponent({
                     imageDetails.blob = base64FromBytes(result.data);
                 })
                 .catch(() => {
+                    // Just ignore, and the blob won't be available
                 });
 
             const getImageMetadataFromNameRequest = { imageName: imageName };
@@ -175,22 +176,19 @@ export const MarkdownEditor = Vue.defineComponent({
 
             await Promise.all([getImageByNamePromise, getImageMetadataFromNamePromise]);
 
-            this.images.set(imageName, imageDetails);
+            const indexOfImageToReplace = this.images.findIndex(img => img.name === imageName);
+            this.images.splice(indexOfImageToReplace, 1, imageDetails);
         },
         async renderedHtmlAsync() {
             const neededImageNames = getMnesiosImageNamesFromSourceText(this.content);
-            const newImageNames = [...neededImageNames].filter(imageName => !this.images.has(imageName));
-            newImageNames.forEach(newImageName => this.images.set(newImageName, null));
+            const newImageNames = [...neededImageNames].filter(imageName => !this.images.find(imageDefinition => imageDefinition.name === imageName));
+            newImageNames.forEach(newImageName => this.images.push({ name: newImageName }));
 
             const loadsToWait = [];
-            this.images.forEach((value, key) => { if (!value || !value.blob) { const loadPromise = this.loadImage(key); loadsToWait.push(loadPromise); } });
+            this.images.forEach(img => { if (!img.blob) { const loadPromise = this.loadImage(img.name); loadsToWait.push(loadPromise); } });
             await Promise.all(loadsToWait);
 
-            const imageArray = Array.from(this.images, ([_key, value]) => {
-                return value;
-            });
-
-            this.preview = convertMarkdown(this.content, this.isinfrench, imageArray, this.onimageclickfunctiontext);
+            this.preview = convertMarkdown(this.content, this.isinfrench, this.images, this.onimageclickfunctiontext);
         },
     },
 });
