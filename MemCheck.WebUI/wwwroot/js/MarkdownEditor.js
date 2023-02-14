@@ -1,7 +1,5 @@
-﻿import { imageSizeMedium } from './Common.js';
-import { base64FromBytes } from './Common.js';
-import { getMnesiosImageNamesFromSourceText } from './MarkdownConversion.js';
-import { convertMarkdown } from './MarkdownConversion.js';
+﻿import { convertMarkdown } from './MarkdownConversion.js';
+import { downloadMissingImages } from './ImageDownloading.js';
 
 export const MarkdownEditor = Vue.defineComponent({
     components: {
@@ -141,53 +139,8 @@ export const MarkdownEditor = Vue.defineComponent({
             if (this.previewVisible)
                 this.renderedHtmlAsync();
         },
-        async loadImage(imageName) {
-            const imageDetails = { name: imageName };
-
-            const getImageByNameRequest = { imageName: imageName, size: imageSizeMedium };
-            const getImageByNamePromise = axios.post('/Learn/GetImageByName/', getImageByNameRequest, { responseType: 'arraybuffer' })
-                .then(result => {
-                    imageDetails.blob = base64FromBytes(result.data);
-                })
-                .catch(() => {
-                    // Just ignore, and the blob won't be available
-                });
-
-            const getImageMetadataFromNameRequest = { imageName: imageName };
-            const getImageMetadataFromNamePromise = axios.post('/Media/GetImageMetadataFromName/', getImageMetadataFromNameRequest)
-                .then(result => {
-                    imageDetails.imageId = result.data.imageId;
-                    imageDetails.description = result.data.description;
-                    imageDetails.source = result.data.source;
-                    imageDetails.initialUploadUtcDate = result.data.initialUploadUtcDate;
-                    imageDetails.initialVersionCreator = result.data.initialVersionCreator;
-                    imageDetails.currentVersionUtcDate = result.data.currentVersionUtcDate;
-                    imageDetails.currentVersionDescription = result.data.currentVersionDescription;
-                    imageDetails.cardCount = result.data.cardCount;
-                    imageDetails.originalImageContentType = result.data.originalImageContentType;
-                    imageDetails.originalImageSize = result.data.originalImageSize;
-                    imageDetails.smallSize = result.data.smallSize;
-                    imageDetails.mediumSize = result.data.mediumSize;
-                    imageDetails.bigSize = result.data.bigSize;
-                })
-                .catch(() => {
-                    // Just ignore, and the details won't be available
-                });
-
-            await Promise.all([getImageByNamePromise, getImageMetadataFromNamePromise]);
-
-            const indexOfImageToReplace = this.images.findIndex(img => img.name === imageName);
-            this.images.splice(indexOfImageToReplace, 1, imageDetails);
-        },
         async renderedHtmlAsync() {
-            const neededImageNames = getMnesiosImageNamesFromSourceText(this.content);
-            const newImageNames = [...neededImageNames].filter(imageName => !this.images.find(imageDefinition => imageDefinition.name === imageName));
-            newImageNames.forEach(newImageName => this.images.push({ name: newImageName }));
-
-            const loadsToWait = [];
-            this.images.forEach(img => { if (!img.blob) { const loadPromise = this.loadImage(img.name); loadsToWait.push(loadPromise); } });
-            await Promise.all(loadsToWait);
-
+            await downloadMissingImages(this.content, this.images);
             this.preview = convertMarkdown(this.content, this.isinfrench, this.images, this.onimageclickfunctiontext);
         },
     },
