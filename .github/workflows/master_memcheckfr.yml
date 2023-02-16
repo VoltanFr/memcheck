@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      NETCORE_VERSION: "7.0"
+      NETCORE_VERSION: "7.0.103"
       COMPIL_CONFIG: "Release"
       WEBUI_PUBLISH_FOLDER: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
@@ -41,7 +41,6 @@ jobs:
       uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
-        dotnet-quality: 'validated'
 
     - name: "Clean with dotnet"
       run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
