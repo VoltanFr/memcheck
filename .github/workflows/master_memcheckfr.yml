@@ -12,7 +12,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      NETCORE_VERSION: "7.0.103"
+      NETCORE_VERSION: "7.0"
+      NETCORE_REVISION: "103"
       COMPIL_CONFIG: "Release"
       WEBUI_PUBLISH_FOLDER: "./Published"
       AZURE_WEBAPP_NAME: "memcheckfr"
@@ -37,7 +38,7 @@ jobs:
         echo "GITHUB_REF: $env:GITHUB_REF"
         echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
-    - name: "Set up .NET on machine (version ${{env.NETCORE_VERSION}})"
+    - name: "Set up .NET on machine (version ${{env.NETCORE_VERSION}}.${{NETCORE_REVISION}})"
       uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
