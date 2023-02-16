@@ -38,7 +38,7 @@ jobs:
         echo "GITHUB_REF: $env:GITHUB_REF"
         echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
-    - name: "Set up .NET on machine (version ${{env.NETCORE_VERSION}}.${{NETCORE_REVISION}})"
+    - name: "Set up .NET on machine (version ${{env.NETCORE_VERSION}}.${{env.NETCORE_REVISION}})"
       uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
