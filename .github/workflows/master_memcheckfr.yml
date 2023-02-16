@@ -37,10 +37,11 @@ jobs:
         echo "GITHUB_REF: $env:GITHUB_REF"
         echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
-    - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
-      uses: actions/setup-dotnet@v3.0.1
+    - name: "Set up .NET on machine (version ${{env.NETCORE_VERSION}})"
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
+        dotnet-quality: 'validated'
 
     - name: "Clean with dotnet"
       run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
