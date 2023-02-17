@@ -120,7 +120,7 @@ public class LearnController : MemCheckController
                 }
             case learnModeExpired:
                 {
-                    var cardsToDownload = request.CurrentCardCount == 0 ? 1 : 5;   //loading cards to repeat is much more time consuming
+                    var cardsToDownload = request.CurrentCardCount == 0 ? 10 : 20; // We don't want too many cards on first download, to give results fast. But we don't want too few, to increase our chances to give cards without the need to download images, so that the user can start asap
                     var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, cardsToDownload);
                     var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
                     var result = new GetCardsViewModel(applicationResult, this, user.GetUserName());
