@@ -127,7 +127,7 @@
                         </li>
                     </ul>
                 </div>
-                <div id="Front side" class="memcheck-input-div card-side-div" v-if="currentCard">
+                <div id="Front side" class="memcheck-input-div" v-if="currentCard">
                     <div class="learning-card-header">
                         <p>@Localizer["FrontSide"]</p>
                     </div>
@@ -138,7 +138,7 @@
                         <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
                     </div>
                 </div>
-                <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div card-side-div">
+                <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div">
                     <div class="learning-card-header">
                         <p>@Localizer["BackSide"]</p>
                     </div>
@@ -152,7 +152,7 @@
                         <li class="ms-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learnMode == 2">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
-                <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div card-side-div">
+                <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div">
                     <div class="learning-card-header">
                         <p>@Localizer["AdditionalInfo"]</p>
                     </div>
@@ -160,7 +160,7 @@
                         <span v-html="currentCardAdditionalInfo()"></span>
                     </div>
                 </div>
-                <div id="References" v-if="currentCard && backSideVisible && currentCardHasReferences()" class="memcheck-input-div card-side-div">
+                <div id="References" v-if="currentCard && backSideVisible && currentCardHasReferences()" class="memcheck-input-div">
                     <details>
                         <summary class="learning-card-header">@Localizer["References"]</summary>
                         <div class="markdown-render markdown-body">
