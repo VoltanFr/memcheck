@@ -133,7 +133,7 @@ function replaceMnesiosImageWithBlob(wholeMatch, _image, imageName, _sizePart, q
     if (quote)
         return wholeMatch;
     const imageDefinitionFromGlobal = globalMnesiosImageDefinitions.find(imageDefinition => imageDefinition.name === imageName);
-    const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : 'image not loaded') : 'image unknown';
+    const blob = imageDefinitionFromGlobal ? (imageDefinitionFromGlobal.blob ? imageDefinitionFromGlobal.blob : '') : 'image unknown';
     const base64 = encodeImageDefinition(imageDefinitionFromGlobal);
     const alt = imageName.replace(/[']/g, '&#39;'); // Quotes would close the attribute value
     return `<div class='${imageDivCssClass}'><img src='${blob}' alt='${alt}' class='${globalCssClass}' onclick='${globalImageOnClickFunction} imageClicked("${base64}");` + '\'/></div>';

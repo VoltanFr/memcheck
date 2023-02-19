@@ -147,7 +147,7 @@
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
   </data>
-  <data name="Update" xml:space="preserve">
+  <data name="ConfirmUpdate" xml:space="preserve">
     <value>Update</value>
   </data>
   <data name="Users" xml:space="preserve">
@@ -259,7 +259,7 @@
     <value>Image already in the card (you can't use the same image twice)</value>
   </data>
   <data name="SureCreateWithoutTag" xml:space="preserve">
-    <value>Save without tag?</value>
+    <value>Continue without tag?</value>
   </data>
   <data name="FailedToGetCardToEdit" xml:space="preserve">
     <value>Failed to get card to edit</value>
@@ -302,5 +302,23 @@
   </data>
   <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
     <value>Details</value>
+  </data>
+  <data name="ContinueEditing" xml:space="preserve">
+    <value>Continue editing</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>New version</value>
+  </data>
+  <data name="OriginalVersion" xml:space="preserve">
+    <value>Original version</value>
+  </data>
+  <data name="ReviewChanges" xml:space="preserve">
+    <value>Review your changes</value>
+  </data>
+  <data name="PublicForReview" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="ReviewYourChanges" xml:space="preserve">
+    <value>Review your changes before saving</value>
   </data>
 </root>

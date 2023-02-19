@@ -49,7 +49,7 @@
         <div id="FullImage" v-if="!initializationFailure() && currentFullScreenImage">
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
-        <div id="CardEditMode" v-if="!initializationFailure() && !currentFullScreenImage">
+        <div id="CardEditMode" v-if="!initializationFailure() && !currentFullScreenImage && !changesInReview">
             <div id="TitleAndTopButtons">
                 <h1 class="title">
                     <span id="Title" v-if="creatingNewCard"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</span><span v-else><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["Edit"]</span>
@@ -138,12 +138,186 @@
             <div id="AddCardButtonDiv">
                 <button id="AddCardButtonEnabled" class="btn-success btn-lg authoring-send-button" @@click="sendCard" v-if="isDirty()">
                     <span v-if="creatingNewCard">@Localizer["Add"]</span>
-                    <span v-else>@Localizer["Update"]</span>
+                    <span v-else>@Localizer["ReviewChanges"]</span>
                 </button>
                 <button id="AddCardButtonDisabled" class="btn-success.disabled btn-lg authoring-send-button" disabled @@click="sendCard" v-else>
                     <span v-if="creatingNewCard">@Localizer["Add"]</span>
-                    <span v-else>@Localizer["Update"]</span>
+                    <span v-else>@Localizer["ReviewChanges"]</span>
                 </button>
+            </div>
+        </div>
+        <div id="ChangesReviewMode" v-if="changesInReview && !currentFullScreenImage">
+            <div id="ReviewMode_Title">
+                <h1 class="title"><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["ReviewYourChanges"]</h1>
+            </div>
+            <div id="ReviewMode_FrontSideRow" class="memcheck-input-div-container" v-if="frontSideIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["FrontSide"]</p>
+                </div>
+                <div id="ReviewMode_FrontSideRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedOriginalFrontSide()"></span>
+                    </div>
+                </div>
+                <div id="ReviewMode_FrontSideRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedNewFrontSide()"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_BackSideRow" class="memcheck-input-div-container" v-if="backSideIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["BackSide"]</p>
+                </div>
+                <div id="ReviewMode_BackSideRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedOriginalBackSide()"></span>
+                    </div>
+                </div>
+                <div id="ReviewMode_BackSideRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedNewBackSide()"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_AdditionalInfoRow" class="memcheck-input-div-container" v-if="additionalInfoIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["AdditionalInfo"]</p>
+                </div>
+                <div id="ReviewMode_AdditionalInfoRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedOriginalAdditionalInfo()"></span>
+                    </div>
+                </div>
+                <div id="ReviewMode_ReviewMode_AdditionalInfoRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedNewAdditionalInfo()"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_ReferencesRow" class="memcheck-input-div-container" v-if="referencesIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["References"]</p>
+                </div>
+                <div id="ReviewMode_ReferencesRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedOriginalReferences()"></span>
+                    </div>
+                </div>
+                <div id="ReviewMode_ReferencesRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedNewReferences()"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_LanguageRow" class="memcheck-input-div-container" v-if="languageIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["Language"]</p>
+                </div>
+                <div id="ReviewMode_LanguageRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div>
+                        <input class="authoring-textarea responsive-padding-edit" value="originalLanguageName()" rows="1" disabled />
+                    </div>
+                </div>
+                <div id="ReviewMode_LanguageRow" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div>
+                        <input class="authoring-textarea responsive-padding-edit" value="newLanguageName()" rows="1" disabled />
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_TagsRow" class="memcheck-input-div-container" v-if="tagsIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["Tags"]</p>
+                </div>
+                <div id="ReviewMode_TagsRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div>
+                        <tag-button v-for="tag in originalCard.tags" v-bind:name="tag.tagName"></tag-button>
+                    </div>
+                </div>
+                <div id="ReviewMode_TagsRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div>
+                        <tag-button v-for="tag in card.tags" v-bind:name="tag.tagName"></tag-button>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_VisibilityRow" class="memcheck-input-div-container" v-if="usersWithViewIsDirty()">
+                <div class="learning-card-header">
+                    <p>@Localizer["Users"]</p>
+                </div>
+                <div id="ReviewMode_VisibilityRow_Original" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["OriginalVersion"]</p>
+                    </div>
+                    <div>
+                        <div id="ReviewMode_OriginalVisibilityRow_Public" v-if="originalCard.usersWithView.length == 0">
+                            <tag-button additionalbuttonclass="warning" name='@Localizer["PublicForReview"]'></tag-button>
+                        </div>
+                        <div id="ReviewMode_OriginalVisibilityRow_Restricted" v-if="originalCard.usersWithView.length >= 1">
+                            <span v-for="user in originalCard.usersWithView">
+                                <tag-button v-if="user.userId == currentUser.userId" v-bind:name="user.userName"></tag-button>
+                                <tag-button v-if="user.userId !== currentUser.userId" v-bind:name="user.userName"></tag-button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div id="ReviewMode_VisibilityRow_New" class="memcheck-input-div">
+                    <div class="learning-card-header">
+                        <p>@Localizer["NewVersion"]</p>
+                    </div>
+                    <div>
+                        <div id="ReviewMode_NewVisibilityRow_Public" v-if="card.usersWithView.length == 0">
+                            <tag-button additionalbuttonclass="warning" name='@Localizer["PublicForReview"]'></tag-button>
+                        </div>
+                        <div id="ReviewMode_NewVisibilityRow_Restricted" v-if="card.usersWithView.length >= 1">
+                            <span v-for="user in card.usersWithView">
+                                <tag-button v-if="user.userId == currentUser.userId" v-bind:name="user.userName"></tag-button>
+                                <tag-button v-if="user.userId !== currentUser.userId" v-bind:name="user.userName"></tag-button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_BottomButtons">
+                <ul class="nav small">
+                    <li><button id="ConfirmChangesButton" class="btn-success btn-lg authoring-send-button" @@click="confirmChanges">@Localizer["ConfirmUpdate"]</button></li>
+                    <li class="ms-auto"><button id="ContinueEditingButton" class="btn-success btn-lg authoring-send-button" @@click="continueEditing">@Localizer["ContinueEditing"]</button></li>
+                </ul>
             </div>
         </div>
     </div>

@@ -7,6 +7,8 @@ import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
 import { sortTagArray } from '../Common.js';
 import { decodeImageDefinition } from '../MarkdownConversion.js';
+import { convertMarkdown } from '../MarkdownConversion.js';
+import { downloadMissingImages } from '../ImageDownloading.js';
 
 const authoringApp = Vue.createApp({
     components: {
@@ -64,6 +66,7 @@ const authoringApp = Vue.createApp({
             saving: false,
             showInfoPopover: false,
             errorDebugInfoLines: [], // strings
+            changesInReview: false, // When this is true, the user is reviewing changes after a click on the send button
             images: [], // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
         };
     },
@@ -166,10 +169,28 @@ const authoringApp = Vue.createApp({
             return localized;
         },
         async sendCard() {
-            if (this.card.tags.length === 0)
-                if (!confirm(localized.SureCreateWithoutTag))
-                    return;
+            // User clicks on AddCardButton
 
+            if (this.card.tags.length === 0 && !confirm(localized.SureCreateWithoutTag))
+                return;
+
+            if (this.creatingNewCard) {
+                await saveCard();
+            }
+            else {
+                this.switchToChangeReviewMode();
+            }
+        },
+        switchToChangeReviewMode() {
+            this.changesInReview = true;
+        },
+        async confirmChanges() {
+            await saveCard();
+        },
+        continueEditing() {
+            this.changesInReview = false;
+        },
+        async saveCard() {
             this.saving = true;
 
             try {
@@ -206,6 +227,7 @@ const authoringApp = Vue.createApp({
             }
         },
         clearAll() {
+            this.changesInReview = false;
             this.card.frontSide = '';
             this.card.backSide = '';
             this.card.additionalInfo = '';
@@ -321,13 +343,13 @@ const authoringApp = Vue.createApp({
             return null;
         },
         isDirty() {
-            let result = this.card.frontSide !== this.originalCard.frontSide;
-            result = result || (this.card.backSide !== this.originalCard.backSide);
-            result = result || (this.card.additionalInfo !== this.originalCard.additionalInfo);
-            result = result || (this.card.references !== this.originalCard.references);
-            result = result || (this.card.languageId !== this.originalCard.languageId);
-            result = result || (!this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId)));
-            result = result || (!this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId)));
+            let result = this.frontSideIsDirty();
+            result = result || this.backSideIsDirty();
+            result = result || this.additionalInfoIsDirty();
+            result = result || this.referencesIsDirty();
+            result = result || this.languageIsDirty();
+            result = result || this.tagsIsDirty();
+            result = result || this.usersWithViewIsDirty();
             return result;
         },
         sameSetOfIds(arrayA, arrayB) {
@@ -363,6 +385,10 @@ const authoringApp = Vue.createApp({
                 }
             return false;
         },
+        languageNameFromId(id) {
+            const language = this.allAvailableLanguages.find(lang => lang.id === id);
+            return language ? language.name : 'LANG';
+        },
         async updateRating(newValue) {
             await axios.patch(`/Authoring/SetCardRating/${this.editingCardId}/${newValue}`)
                 .then(response => {
@@ -374,7 +400,62 @@ const authoringApp = Vue.createApp({
         },
         async onRatingChange(newValue) {
             await this.updateRating(newValue);
-        }
+        },
+        renderedTextForReview(text) {
+            downloadMissingImages(text, this.images);
+            return convertMarkdown(text, this.isInFrench(), this.images, this.onImageClickFunctionText());
+        },
+        frontSideIsDirty() {
+            return this.card.frontSide !== this.originalCard.frontSide;
+        },
+        renderedOriginalFrontSide() {
+            return this.renderedTextForReview(this.originalCard.frontSide);
+        },
+        renderedNewFrontSide() {
+            return this.renderedTextForReview(this.card.frontSide);
+        },
+        backSideIsDirty() {
+            return this.card.backSide !== this.originalCard.backSide;
+        },
+        renderedOriginalBackSide() {
+            return this.renderedTextForReview(this.originalCard.backSide);
+        },
+        renderedNewBackSide() {
+            return this.renderedTextForReview(this.card.backSide);
+        },
+        additionalInfoIsDirty() {
+            return this.card.additionalInfo !== this.originalCard.additionalInfo;
+        },
+        renderedOriginalAdditionalInfo() {
+            return this.renderedTextForReview(this.originalCard.additionalInfo);
+        },
+        renderedNewAdditionalInfo() {
+            return this.renderedTextForReview(this.card.additionalInfo);
+        },
+        referencesIsDirty() {
+            return this.card.references !== this.originalCard.references;
+        },
+        renderedOriginalReferences() {
+            return this.renderedTextForReview(this.originalCard.references);
+        },
+        renderedNewReferences() {
+            return this.renderedTextForReview(this.card.references);
+        },
+        languageIsDirty() {
+            return this.card.languageId !== this.originalCard.languageId;
+        },
+        originalLanguageName() {
+            return this.languageNameFromId(this.originalCard.languageId);
+        },
+        newLanguageName() {
+            return this.languageNameFromId(this.card.languageId);
+        },
+        tagsIsDirty() {
+            return !this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId));
+        },
+        usersWithViewIsDirty() {
+            return !this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId));
+        },
     },
     watch: {
         selectedTagToAdd: {

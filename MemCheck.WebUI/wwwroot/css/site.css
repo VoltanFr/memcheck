@@ -245,6 +245,15 @@
     border-radius: 4px;
 }
 
+.memcheck-input-div-container {
+    background-color: white;
+    border-width: 2px;
+    border-style: double;
+    border-color: black;
+    padding: 1px;
+    border-radius: 4px;
+}
+
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;

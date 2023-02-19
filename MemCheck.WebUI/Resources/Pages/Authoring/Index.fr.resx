@@ -147,7 +147,7 @@
   <data name="Tags" xml:space="preserve">
     <value>Labels</value>
   </data>
-  <data name="Update" xml:space="preserve">
+  <data name="ConfirmUpdate" xml:space="preserve">
     <value>Mettre à jour</value>
   </data>
   <data name="Users" xml:space="preserve">
@@ -262,7 +262,7 @@
     <value>Cette image est déjà dans la carte (vous ne pouvez pas l'utiliser plus d'une fois).</value>
   </data>
   <data name="SureCreateWithoutTag" xml:space="preserve">
-    <value>Enregistrer sans label ?</value>
+    <value>Continuer sans label ?</value>
   </data>
   <data name="FailedToGetCardToEdit" xml:space="preserve">
     <value>Impossible de charger la carde à modifier</value>
@@ -303,7 +303,25 @@
   <data name="BigSizeImageLabel_URL" xml:space="preserve">
     <value>Lien direct :</value>
   </data>
-    <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
+  <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
     <value>Détails</value>
+  </data>
+  <data name="ContinueEditing" xml:space="preserve">
+    <value>Continuer à modifier</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>Après vos changements</value>
+  </data>
+  <data name="OriginalVersion" xml:space="preserve">
+    <value>Avant vos changements</value>
+  </data>
+  <data name="ReviewChanges" xml:space="preserve">
+    <value>Voir vos modifications</value>
+  </data>
+  <data name="PublicForReview" xml:space="preserve">
+    <value>Publique</value>
+  </data>
+  <data name="ReviewYourChanges" xml:space="preserve">
+    <value>Vérifiez vos modifications avant d'enregistrer</value>
   </data>
 </root>
