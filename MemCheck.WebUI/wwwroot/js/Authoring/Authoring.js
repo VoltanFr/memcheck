@@ -175,7 +175,7 @@ const authoringApp = Vue.createApp({
                 return;
 
             if (this.creatingNewCard) {
-                await saveCard();
+                await this.saveCard();
             }
             else {
                 this.switchToChangeReviewMode();
