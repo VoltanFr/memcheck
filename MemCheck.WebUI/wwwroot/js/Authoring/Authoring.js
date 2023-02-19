@@ -184,9 +184,6 @@ const authoringApp = Vue.createApp({
         switchToChangeReviewMode() {
             this.changesInReview = true;
         },
-        async confirmChanges() {
-            await saveCard();
-        },
         continueEditing() {
             this.changesInReview = false;
         },
