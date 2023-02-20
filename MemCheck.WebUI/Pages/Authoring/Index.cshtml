@@ -119,10 +119,6 @@
                         </div>
                     </div>
                 </div>
-                <div id="VersionDescriptionInputRow" class="memcheck-input-div" v-if="!creatingNewCard">
-                    <p class="authoring-row-caption">@Localizer["VersionDescription"]</p>
-                    <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
-                </div>
                 <div id="AddToDeckInputRow" v-if="creatingNewCard" class="memcheck-input-div">
                     <div v-if="singleDeckDisplay">
                         <input type="checkbox" v-model="addToSingleDeck" /> @Localizer["AddToYourDeck"]
@@ -312,6 +308,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div id="VersionDescriptionInputRow" class="memcheck-input-div">
+                <p class="authoring-row-caption">@Localizer["VersionDescription"]</p>
+                <input class="authoring-textarea responsive-padding-edit" v-model="card.versionDescription" rows="1" />
             </div>
             <div id="ReviewMode_BottomButtons">
                 <ul class="nav small">
