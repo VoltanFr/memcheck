@@ -107,6 +107,7 @@ public class TagsController : MemCheckController
         public Guid TagId { get; }
         public string TagName { get; } = null!;
         public string TagDescription { get; } = null!;
+        public string CreatingUserName { get; } = null!;
         public int CardCount { get; }
         public double AverageRating { get; }
     }
@@ -124,8 +125,8 @@ public class TagsController : MemCheckController
     public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
     {
         CheckBodyParameter(request);
-        var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-        await new CreateTag(callContext).RunAsync(new CreateTag.Request(userId, request.NewName.Trim(), request.NewDescription.Trim()));
+        var user = await UserServices.UserFromContextAsync(HttpContext, userManager);
+        await new CreateTag(callContext).RunAsync(new CreateTag.Request(user.Id, request.NewName.Trim(), request.NewDescription.Trim(), "Initial version"));
         return ControllerResultWithToast.Success(GetLocalized("TagRecorded") + ' ' + request.NewName, this);
 
     }
@@ -141,7 +142,7 @@ public class TagsController : MemCheckController
     {
         CheckBodyParameter(request);
         var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
-        await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim()));
+        await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(userId, tagId, request.NewName.Trim(), request.NewDescription.Trim(), "Update"));
         return ControllerResultWithToast.Success(GetLocalized("TagRecorded") + ' ' + request.NewName, this);
 
     }

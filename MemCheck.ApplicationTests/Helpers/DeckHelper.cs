@@ -27,6 +27,10 @@ public static class DeckHelper
         await dbContext.SaveChangesAsync();
         return result.Id;
     }
+    public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, MemCheckUser owner, string? description = null, int algorithmId = UnitTestsHeapingAlgorithm.ID)
+    {
+        return await CreateAsync(testDB, owner.Id, description, algorithmId);
+    }
     public static async Task AddCardAsync(DbContextOptions<MemCheckDbContext> testDB, Guid deckId, Guid cardId, int? heap = null, DateTime? lastLearnUtcTime = null, DateTime? addToDeckUtcTime = null, int? biggestHeapReached = null, int nbTimesInNotLearnedHeap = 1)
     {
         heap ??= RandomHelper.Heap();

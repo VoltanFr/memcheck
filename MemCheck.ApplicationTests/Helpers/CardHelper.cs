@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Helpers;
@@ -38,11 +39,23 @@ public static class CardHelper
         var result = await GetCardFromDbWithAllfieldsAsync(testDB, cardId);
         return result;
     }
+    public static async Task<Card> CreateAsync(DbContextOptions<MemCheckDbContext> testDB,
+        MemCheckUser versionCreator, DateTime? versionDate = null, IEnumerable<MemCheckUser>? usersWithView = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
+        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
+    {
+        return await CreateAsync(testDB, versionCreator.Id, versionDate, usersWithView?.Select(u => u.Id), language, tagIds, frontSide, backSide, additionalInfo, references, versionDescription);
+    }
     public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
         Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
         string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
     {
         return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, references, versionDescription)).Id;
+    }
+    public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
+        MemCheckUser versionCreator, DateTime? versionDate = null, IEnumerable<MemCheckUser>? usersWithView = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
+        string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
+    {
+        return await CreateIdAsync(testDB, versionCreator.Id, versionDate, usersWithView?.Select(u => u.Id), language, tagIds, frontSide, backSide, additionalInfo, references, versionDescription);
     }
     public static async Task AssertCardHasFrontSide(DbContextOptions<MemCheckDbContext> testDB, Guid cardId, string expected)
     {

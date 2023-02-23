@@ -224,18 +224,18 @@ public class UserSearchNotifierTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
-        var requiredTag = await TagHelper.CreateAsync(db);
-        var excludedTag = await TagHelper.CreateAsync(db);
+        var requiredTag = await TagHelper.CreateAsync(db, user);
+        var excludedTag = await TagHelper.CreateAsync(db, user);
 
-        var card1 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { requiredTag, excludedTag });
-        var card2 = await CardHelper.CreateAsync(db, user, language: language, tagIds: requiredTag.AsArray());
+        var card1 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: new[] { requiredTag, excludedTag });
+        var card2 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: requiredTag.AsArray());
 
         Guid subscriptionId;
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", requiredTag.AsArray(), new[] { excludedTag });
+            var subscriberRequest = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", requiredTag.AsArray(), new[] { excludedTag });
             var subscriber = new SubscribeToSearch(dbContext.AsCallContext());
             subscriptionId = (await subscriber.RunAsync(subscriberRequest)).SearchId;
         }
@@ -284,22 +284,22 @@ public class UserSearchNotifierTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var language = await CardLanguageHelper.CreateAsync(db);
-        var ignoredTag = await TagHelper.CreateAsync(db);
-        var requiredTag1 = await TagHelper.CreateAsync(db);
-        var requiredTag2 = await TagHelper.CreateAsync(db);
-        var excludedTag = await TagHelper.CreateAsync(db);
+        var ignoredTag = await TagHelper.CreateAsync(db, user);
+        var requiredTag1 = await TagHelper.CreateAsync(db, user);
+        var requiredTag2 = await TagHelper.CreateAsync(db, user);
+        var excludedTag = await TagHelper.CreateAsync(db, user);
 
-        var card1 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { ignoredTag, requiredTag1, requiredTag2, excludedTag });
-        var card2 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { ignoredTag, requiredTag1, requiredTag2 });
-        var card3 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { ignoredTag });
-        var card4 = await CardHelper.CreateAsync(db, user, language: language, tagIds: new[] { ignoredTag });
+        var card1 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: new[] { ignoredTag, requiredTag1, requiredTag2, excludedTag });
+        var card2 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: new[] { ignoredTag, requiredTag1, requiredTag2 });
+        var card3 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: new[] { ignoredTag });
+        var card4 = await CardHelper.CreateAsync(db, user.Id, language: language, tagIds: new[] { ignoredTag });
 
         Guid subscriptionId;
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var subscriberRequest = new SubscribeToSearch.Request(user, Guid.Empty, RandomHelper.String(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
+            var subscriberRequest = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", new[] { requiredTag1, requiredTag2 }, new[] { excludedTag });
             subscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(subscriberRequest)).SearchId;
         }
 

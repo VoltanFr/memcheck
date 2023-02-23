@@ -54,15 +54,15 @@ public class SearchCardsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
 
-        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var user = await UserHelper.CreateUserInDbAsync(testDB);
         var tag1Name = RandomHelper.String();
-        var tag1 = await TagHelper.CreateAsync(testDB, tag1Name);
+        var tag1 = await TagHelper.CreateAsync(testDB, user, tag1Name);
         var tag2Name = RandomHelper.String();
-        var tag2 = await TagHelper.CreateAsync(testDB, tag2Name);
-        var card = await CardHelper.CreateAsync(testDB, userId, tagIds: new[] { tag1, tag2 });
+        var tag2 = await TagHelper.CreateAsync(testDB, user, tag2Name);
+        var card = await CardHelper.CreateAsync(testDB, user.Id, tagIds: new[] { tag1, tag2 });
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var requestWithUser = new SearchCards.Request { UserId = userId };
+        var requestWithUser = new SearchCards.Request { UserId = user.Id };
         var resultWithUser = await new SearchCards(dbContext.AsCallContext()).RunAsync(requestWithUser);
         Assert.AreEqual(1, resultWithUser.TotalNbCards);
         Assert.AreEqual(1, resultWithUser.PageCount);
@@ -82,7 +82,7 @@ public class SearchCardsTests
         Assert.AreEqual(0, foundCard.CurrentUserRating);
         Assert.IsTrue(!foundCard.DeckInfo.Any());
         Assert.AreEqual(card.FrontSide, foundCard.FrontSide);
-        Assert.AreEqual(userId, foundCard.VersionCreator.Id);
+        Assert.AreEqual(user.Id, foundCard.VersionCreator.Id);
         Assert.AreEqual(card.VersionDescription, foundCard.VersionDescription);
         Assert.AreEqual(card.VersionUtcDate, foundCard.VersionUtcDate);
         Assert.IsTrue(!foundCard.VisibleTo.Any());

@@ -72,24 +72,24 @@ public class GetUserDecksWithHeapsAndTagsAndTagsTests
     public async Task OneDeck()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user.Id);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
 
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user, tagIds: tag1.AsArray())).Id, 0);
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 0);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id, tagIds: tag1.AsArray())).Id, 0);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id)).Id, 0);
 
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 1);
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user, tagIds: new[] { tag1, tag2 })).Id, 1);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id)).Id, 1);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id, tagIds: new[] { tag1, tag2 })).Id, 1);
 
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 2);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id)).Id, 2);
 
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 4);
-        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user)).Id, 4);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id)).Id, 4);
+        await DeckHelper.AddCardAsync(db, deck, (await CardHelper.CreateAsync(db, user.Id)).Id, 4);
 
         using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecksWithHeapsAndTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user));
+        var result = await new GetUserDecksWithHeapsAndTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
         var resultDeck = result.Single();
         Assert.AreEqual(deck, resultDeck.DeckId);
         Assert.IsTrue(resultDeck.Heaps.SequenceEqual(new[] { 0, 1, 2, 4 }));
@@ -101,11 +101,11 @@ public class GetUserDecksWithHeapsAndTagsAndTagsTests
     public async Task TwoDecks()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck1 = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck1 = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user.Id);
         var deck2 = await DeckHelper.CreateAsync(db, user, algorithmId: HeapingAlgorithms.DefaultAlgoId);
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
 
         await DeckHelper.AddCardAsync(db, deck1, (await CardHelper.CreateAsync(db, user, tagIds: tag1.AsArray())).Id, 0);
         await DeckHelper.AddCardAsync(db, deck1, (await CardHelper.CreateAsync(db, user)).Id, 0);
@@ -121,7 +121,7 @@ public class GetUserDecksWithHeapsAndTagsAndTagsTests
         await DeckHelper.AddCardAsync(db, deck1, (await CardHelper.CreateAsync(db, user)).Id, 4);
 
         using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecksWithHeapsAndTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user));
+        var result = await new GetUserDecksWithHeapsAndTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithHeapsAndTags.Request(user.Id));
         Assert.AreEqual(2, result.Count());
 
         var resultDeck1 = result.Single(deck => deck.DeckId == deck1);

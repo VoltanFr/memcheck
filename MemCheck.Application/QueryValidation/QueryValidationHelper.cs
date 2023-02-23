@@ -32,6 +32,8 @@ internal static class QueryValidationHelper
     public const int ImageMaxDescriptionLength = 5000;
     public const int ImageMinVersionDescriptionLength = 3;
     public const int ImageMaxVersionDescriptionLength = 1000;
+    public const int TagMinVersionDescriptionLength = 3;
+    public const int TagMaxVersionDescriptionLength = 1000;
     public const int DeckMinNameLength = 3;
     public const int DeckMaxNameLength = 36;
     public const int LanguageMinNameLength = 2;
@@ -71,6 +73,11 @@ internal static class QueryValidationHelper
     public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
     {
         var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
+        if (user == null || user.DeletionDate != null)
+            throw new NonexistentUserException(ExceptionMesg_UserDoesNotExist);
+    }
+    public static void CheckUserExists(MemCheckUser user)
+    {
         if (user == null || user.DeletionDate != null)
             throw new NonexistentUserException(ExceptionMesg_UserDoesNotExist);
     }
@@ -124,16 +131,24 @@ internal static class QueryValidationHelper
         if (await dbContext.Tags.AsNoTracking().Where(tag => tagIds.Contains(tag.Id)).CountAsync() != tagIds.Count())
             throw new RequestInputException(ExceptionMesg_TagDoesNotExist);
     }
-    public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer, IRoleChecker roleChecker, Guid userId)
+    public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer, IRoleChecker roleChecker, MemCheckUser user, string versionDescription)
+    {
+        await CheckCanCreateTag(name, description, updatingId, dbContext, localizer, roleChecker, user.Id, versionDescription);
+    }
+    public static async Task CheckCanCreateTag(string name, string description, Guid? updatingId, MemCheckDbContext dbContext, ILocalized localizer, IRoleChecker roleChecker, Guid userId, string versionDescription)
     {
         if (name != name.Trim())
             throw new InvalidOperationException("Invalid Name: not trimmed");
         if (description != description.Trim())
             throw new InvalidOperationException("Invalid Description: not trimmed");
+        if (versionDescription != versionDescription.Trim())
+            throw new InvalidOperationException("Invalid Version Description: not trimmed");
         if (name.Length is < Tag.MinNameLength or > Tag.MaxNameLength)
             throw new RequestInputException(localizer.GetLocalized("InvalidNameLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {Tag.MinNameLength} " + localizer.GetLocalized("And") + $" {Tag.MaxNameLength}");
         if (description.Length > Tag.MaxDescriptionLength)
             throw new RequestInputException(localizer.GetLocalized("InvalidDescriptionLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeNoMoreThan") + $" {Tag.MaxDescriptionLength}");
+        if (versionDescription.Length is < TagMinVersionDescriptionLength or > TagMaxVersionDescriptionLength)
+            throw new RequestInputException(localizer.GetLocalized("InvalidVersionDescriptionLength") + $" {name.Length}, " + localizer.GetLocalized("MustBeBetween") + $" {TagMinVersionDescriptionLength} " + localizer.GetLocalized("And") + $" {TagMaxVersionDescriptionLength}");
         foreach (var forbiddenChar in ForbiddenCharsInTags)
             if (name.Contains(forbiddenChar, StringComparison.OrdinalIgnoreCase))
                 throw new RequestInputException(localizer.GetLocalized("InvalidTagName") + " '" + name + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");

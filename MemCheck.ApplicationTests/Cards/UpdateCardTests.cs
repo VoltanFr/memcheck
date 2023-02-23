@@ -146,9 +146,9 @@ public class UpdateCardTests
     public async Task UpdateAllFields()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardCreator = await UserHelper.CreateInDbAsync(db);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var originalCard = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
+        var originalCard = await CardHelper.CreateAsync(db, cardCreator, language: languageId, usersWithView: Array.Empty<MemCheckUser>());
 
         var newVersionCreator = await UserHelper.CreateInDbAsync(db);
         var frontSide = RandomHelper.String();
@@ -157,11 +157,11 @@ public class UpdateCardTests
         var references = RandomHelper.String();
         var versionDescription = RandomHelper.String();
         var newLanguageId = await CardLanguageHelper.CreateAsync(db);
-        var imageOnFrontSideId = await ImageHelper.CreateAsync(db, cardCreator);
-        var imageOnBackSide1Id = await ImageHelper.CreateAsync(db, cardCreator);
-        var imageOnBackSide2Id = await ImageHelper.CreateAsync(db, cardCreator);
-        var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(db, cardCreator);
-        var tagId = await TagHelper.CreateAsync(db);
+        var imageOnFrontSideId = await ImageHelper.CreateAsync(db, cardCreator.Id);
+        var imageOnBackSide1Id = await ImageHelper.CreateAsync(db, cardCreator.Id);
+        var imageOnBackSide2Id = await ImageHelper.CreateAsync(db, cardCreator.Id);
+        var imageOnAdditionalInfoId = await ImageHelper.CreateAsync(db, cardCreator.Id);
+        var tagId = await TagHelper.CreateAsync(db, cardCreator);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -174,7 +174,7 @@ public class UpdateCardTests
                 references,
                 languageId,
                 new Guid[] { tagId },
-                new Guid[] { cardCreator, newVersionCreator },
+                new Guid[] { cardCreator.Id, newVersionCreator },
                 versionDescription);
             await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
         }
@@ -199,7 +199,7 @@ public class UpdateCardTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, originalCard.Id);
+            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator.Id, originalCard.Id);
             CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, newVersionCreator, originalCard.Id);
         }
     }
@@ -578,15 +578,15 @@ public class UpdateCardTests
     public async Task AddingPersoTagToPublicCardMustFail()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(db);
+        var creator = await UserHelper.CreateUserInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var cardId = await CardHelper.CreateIdAsync(db, creatorId, language: languageId, userWithViewIds: Array.Empty<Guid>());
+        var cardId = await CardHelper.CreateIdAsync(db, creator.Id, language: languageId, userWithViewIds: Array.Empty<Guid>());
 
-        var persoTagId = await TagHelper.CreateAsync(db, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(db, creator, name: Tag.Perso);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
@@ -606,23 +606,23 @@ public class UpdateCardTests
     public async Task AddingPersoTagToCardVisibleToOtherMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
-        var otherUserId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
+        var otherUser = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: new[] { creatorId, otherUserId });
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator, language: languageId, usersWithView: new[] { creator, otherUser });
 
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            new[] { creatorId, otherUserId },
+            new[] { creator.Id, otherUser.Id },
             RandomHelper.String());
 
         var errorMesg = RandomHelper.String();
@@ -635,22 +635,22 @@ public class UpdateCardTests
     public async Task AddingPersoTagToPrivateCardMustSucceed()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray());
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator, language: languageId, usersWithView: creator.AsArray());
 
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            creatorId.AsArray(),
+            creator.Id.AsArray(),
             RandomHelper.String());
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -659,23 +659,23 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
-            Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            Assert.AreEqual(creator.Id, card.VersionCreator.Id);
         }
     }
     [TestMethod()]
     public async Task ChangingAPersoCardToPublicAndAddingPersoTagMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var aTagId = await TagHelper.CreateAsync(testDB);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: aTagId.AsArray());
+        var aTagId = await TagHelper.CreateAsync(testDB, creator);
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator, language: languageId, usersWithView: creator.AsArray(), tagIds: aTagId.AsArray());
 
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
@@ -695,24 +695,24 @@ public class UpdateCardTests
     public async Task ChangingAPersoCardToCardVisibleToOtherAndAddingPersoTagMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var aTagId = await TagHelper.CreateAsync(testDB);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: aTagId.AsArray());
+        var aTagId = await TagHelper.CreateAsync(testDB, creator);
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator.Id, language: languageId, userWithViewIds: creator.Id.AsArray(), tagIds: aTagId.AsArray());
 
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
         var otherUserId = await UserHelper.CreateInDbAsync(testDB);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            new[] { creatorId, otherUserId },
+            new[] { creator.Id, otherUserId },
             RandomHelper.String());
 
         var errorMesg = RandomHelper.String();
@@ -725,22 +725,22 @@ public class UpdateCardTests
     public async Task ChangingAPublicCardToPrivateAndAddingPersoTagMustSucceed()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: Array.Empty<Guid>());
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator.Id, language: languageId, userWithViewIds: Array.Empty<Guid>());
 
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            creatorId.AsArray(),
+            creator.Id.AsArray(),
             RandomHelper.String());
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -749,22 +749,22 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
-            Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            Assert.AreEqual(creator.Id, card.VersionCreator.Id);
         }
     }
     [TestMethod()]
     public async Task ChangingAPersoCardWithPersoTagToPublicMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var aTagId = await TagHelper.CreateAsync(testDB);
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: new[] { aTagId, persoTagId });
+        var aTagId = await TagHelper.CreateAsync(testDB, creator);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator.Id, language: languageId, userWithViewIds: creator.Id.AsArray(), tagIds: new[] { aTagId, persoTagId });
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
@@ -784,24 +784,24 @@ public class UpdateCardTests
     public async Task ChangingAPersoCardWithPersoTagToLimitedVisibilityMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var aTagId = await TagHelper.CreateAsync(testDB);
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
-        var cardId = await CardHelper.CreateIdAsync(testDB, creatorId, language: languageId, userWithViewIds: creatorId.AsArray(), tagIds: new[] { aTagId, persoTagId });
+        var aTagId = await TagHelper.CreateAsync(testDB, creator);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
+        var cardId = await CardHelper.CreateIdAsync(testDB, creator, language: languageId, usersWithView: creator.AsArray(), tagIds: new[] { aTagId, persoTagId });
 
         var otherUserId = await UserHelper.CreateInDbAsync(testDB);
 
         var request = new UpdateCard.Request(
             cardId,
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             new[] { aTagId, persoTagId },
-            new[] { creatorId, otherUserId },
+            new[] { creator.Id, otherUserId },
             RandomHelper.String());
 
         var errorMesg = RandomHelper.String();

@@ -46,13 +46,13 @@ public class GetTagsOfDeckTests
     public async Task EmptyDeck()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.CreateAsync(db, user);
-        var tag = await TagHelper.CreateAsync(db);
-        await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.CreateAsync(db, user.Id);
+        var tag = await TagHelper.CreateAsync(db, user);
+        await CardHelper.CreateAsync(db, user.Id, tagIds: tag.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetTagsOfDeck.Request(user, deck);
+        var request = new GetTagsOfDeck.Request(user.Id, deck);
         var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
         Assert.IsFalse(result.Any());
     }
@@ -60,14 +60,14 @@ public class GetTagsOfDeckTests
     public async Task OneTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.CreateAsync(db, user);
-        var tag = await TagHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.CreateAsync(db, user.Id);
+        var tag = await TagHelper.CreateAsync(db, user);
+        var card = await CardHelper.CreateAsync(db, user.Id, tagIds: tag.AsArray());
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetTagsOfDeck.Request(user, deck);
+        var request = new GetTagsOfDeck.Request(user.Id, deck);
         var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
         Assert.AreEqual(tag, result.Single().TagId);
     }
@@ -75,25 +75,25 @@ public class GetTagsOfDeckTests
     public async Task Complex()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
-        var deck = await DeckHelper.CreateAsync(db, user);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var deck = await DeckHelper.CreateAsync(db, user.Id);
 
-        var tag1 = await TagHelper.CreateAsync(db);
-        var card1 = await CardHelper.CreateAsync(db, user, tagIds: tag1.AsArray());
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var card1 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag1.AsArray());
         await DeckHelper.AddCardAsync(db, deck, card1.Id);
 
-        var tag2 = await TagHelper.CreateAsync(db);
-        var card2 = await CardHelper.CreateAsync(db, user, tagIds: tag2.AsArray());
+        var tag2 = await TagHelper.CreateAsync(db, user);
+        var card2 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag2.AsArray());
         await DeckHelper.AddCardAsync(db, deck, card2.Id);
 
-        var card3 = await CardHelper.CreateAsync(db, user, tagIds: new[] { tag1, tag2 });
+        var card3 = await CardHelper.CreateAsync(db, user.Id, tagIds: new[] { tag1, tag2 });
         await DeckHelper.AddCardAsync(db, deck, card3.Id);
 
-        var card4 = await CardHelper.CreateAsync(db, user);
+        var card4 = await CardHelper.CreateAsync(db, user.Id);
         await DeckHelper.AddCardAsync(db, deck, card4.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var request = new GetTagsOfDeck.Request(user, deck);
+        var request = new GetTagsOfDeck.Request(user.Id, deck);
         var result = await new GetTagsOfDeck(dbContext).RunAsync(request);
         Assert.AreEqual(2, result.Count());
         Assert.IsTrue(result.Any(t => t.TagId == tag1));

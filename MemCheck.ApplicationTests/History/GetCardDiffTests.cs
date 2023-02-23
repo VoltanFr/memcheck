@@ -327,9 +327,9 @@ public class GetCardDiffTests
         var originalVersionDate = RandomHelper.Date();
         var originalVersionDescription = RandomHelper.String();
         var originalTagName1 = RandomHelper.String();
-        var originalTagId1 = await TagHelper.CreateAsync(db, originalTagName1);
+        var originalTagId1 = await TagHelper.CreateAsync(db, user, originalTagName1);
         var originalTagName2 = RandomHelper.String();
-        var originalTagId2 = await TagHelper.CreateAsync(db, originalTagName2);
+        var originalTagId2 = await TagHelper.CreateAsync(db, user, originalTagName2);
         var language = await CardLanguageHelper.CreateAsync(db);
         var card = await CardHelper.CreateAsync(db, user.Id, originalVersionDate, tagIds: new[] { originalTagId1, originalTagId2 }, language: language, versionDescription: originalVersionDescription);
         var newVersionDate = RandomHelper.Date(originalVersionDate);
@@ -406,9 +406,9 @@ public class GetCardDiffTests
         var originalBackSide = RandomHelper.String();
         var originalReferences = RandomHelper.String();
         var originalTagName1 = RandomHelper.String();
-        var originalTagId1 = await TagHelper.CreateAsync(db, originalTagName1);
+        var originalTagId1 = await TagHelper.CreateAsync(db, user, originalTagName1);
         var originalTagName2 = RandomHelper.String();
-        var originalTagId2 = await TagHelper.CreateAsync(db, originalTagName2);
+        var originalTagId2 = await TagHelper.CreateAsync(db, user, originalTagName2);
         var card = await CardHelper.CreateAsync(db, user.Id, originalVersionDate, language: language, frontSide: originalFrontSide, backSide: originalBackSide, references: originalReferences, tagIds: new[] { originalTagId1, originalTagId2 }, versionDescription: originalVersionDescription);
 
         var newVersionDescription = RandomHelper.String();

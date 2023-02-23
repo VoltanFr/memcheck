@@ -102,15 +102,15 @@ public class SubscribeToSearchTest
     public async Task TestSearchWithTag()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var user = await UserHelper.CreateUserInDbAsync(testDB);
         Guid tagId;
 
         using (var dbContext = new MemCheckDbContext(testDB))
-            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(userId, RandomHelper.String(), ""))).TagId;
+            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), "", RandomHelper.String()))).TagId;
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", new Guid[] { tagId }, Array.Empty<Guid>());
+            var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", new Guid[] { tagId }, Array.Empty<Guid>());
             await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request);
         }
 
@@ -120,7 +120,7 @@ public class SubscribeToSearchTest
                 .Include(subscription => subscription.ExcludedTags)
                 .Include(subscription => subscription.RequiredTags)
                 .SingleAsync();
-            Assert.AreEqual(userId, subscription.UserId);
+            Assert.AreEqual(user.Id, subscription.UserId);
             Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
             Assert.AreEqual("", subscription.RequiredText);
             Assert.AreEqual(tagId, subscription.RequiredTags.First().TagId);
@@ -132,18 +132,17 @@ public class SubscribeToSearchTest
     public async Task TestSearchWithoutTag()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var user = await UserHelper.CreateUserInDbAsync(testDB);
         Guid tagId;
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var user = await dbContext.Users.SingleAsync();
-            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
+            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), "", RandomHelper.String()))).TagId;
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { tagId });
+            var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { tagId });
             await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request);
         }
 
@@ -153,7 +152,7 @@ public class SubscribeToSearchTest
                 .Include(subscription => subscription.ExcludedTags)
                 .Include(subscription => subscription.RequiredTags)
                 .SingleAsync();
-            Assert.AreEqual(userId, subscription.UserId);
+            Assert.AreEqual(user.Id, subscription.UserId);
             Assert.AreEqual(Guid.Empty, subscription.ExcludedDeck);
             Assert.AreEqual("", subscription.RequiredText);
             Assert.AreEqual(0, subscription.RequiredTags.Count());
@@ -220,18 +219,17 @@ public class SubscribeToSearchTest
     public async Task TestSearchWithSameTagTwice()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var user = await UserHelper.CreateUserInDbAsync(testDB);
         Guid tagId;
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var user = await dbContext.Users.SingleAsync();
-            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
+            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), "", RandomHelper.String()))).TagId;
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", new Guid[] { tagId, tagId }, Array.Empty<Guid>());
+            var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", new Guid[] { tagId, tagId }, Array.Empty<Guid>());
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
         }
     }
@@ -239,18 +237,17 @@ public class SubscribeToSearchTest
     public async Task TestSearchWithSameExcludedTagTwice()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var user = await UserHelper.CreateUserInDbAsync(testDB);
         Guid tagId;
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var user = await dbContext.Users.SingleAsync();
-            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), ""))).TagId;
+            tagId = (await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), "", RandomHelper.String()))).TagId;
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { tagId, tagId });
+            var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { tagId, tagId });
             await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
         }
     }

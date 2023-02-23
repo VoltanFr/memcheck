@@ -71,4 +71,3 @@ public sealed class GetAllTags : RequestRunner<GetAllTags.Request, GetAllTags.Re
     public sealed record ResultTag(Guid TagId, string TagName, string TagDescription, int CardCount, double AverageRating);
     #endregion
 }
-

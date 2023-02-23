@@ -21,27 +21,27 @@ public class CreateCardTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var userWithViewId = await UserHelper.CreateInDbAsync(testDB);
-        var ownerId = await UserHelper.CreateInDbAsync(testDB, subscribeToCardOnEdit: false);
+        var owner = await UserHelper.CreateUserInDbAsync(testDB, subscribeToCardOnEdit: false);
         var frontSide = RandomHelper.String();
         var backSide = RandomHelper.String();
         var additionalInfo = RandomHelper.String();
         var references = RandomHelper.String();
         var versionDescription = RandomHelper.String();
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var tagId = await TagHelper.CreateAsync(testDB);
+        var tagId = await TagHelper.CreateAsync(testDB, owner);
 
         var cardGuid = Guid.Empty;
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new CreateCard.Request(
-                ownerId,
+                owner.Id,
                 frontSide,
                 backSide,
                 additionalInfo,
                 references,
                 languageId,
                 new Guid[] { tagId },
-                new Guid[] { ownerId, userWithViewId },
+                new Guid[] { owner.Id, userWithViewId },
                 versionDescription);
             cardGuid = (await new CreateCard(dbContext.AsCallContext()).RunAsync(request)).CardId;
             Assert.AreNotEqual(Guid.Empty, cardGuid);
@@ -55,20 +55,20 @@ public class CreateCardTests
                 .Include(c => c.UsersWithView)
                 .Include(c => c.TagsInCards)
                 .Single(c => c.Id == cardGuid);
-            Assert.AreEqual(ownerId, card.VersionCreator.Id);
+            Assert.AreEqual(owner.Id, card.VersionCreator.Id);
             Assert.AreEqual(frontSide, card.FrontSide);
             Assert.AreEqual(backSide, card.BackSide);
             Assert.AreEqual(additionalInfo, card.AdditionalInfo);
             Assert.AreEqual(references, card.References);
             Assert.AreEqual(versionDescription, card.VersionDescription);
             Assert.AreEqual(languageId, card.CardLanguage.Id);
-            Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == ownerId));
+            Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == owner.Id));
             Assert.IsTrue(card.UsersWithView.Any(u => u.UserId == userWithViewId));
             Assert.IsTrue(card.TagsInCards.Any(t => t.TagId == tagId));
             Assert.AreEqual(0, card.RatingCount);
             Assert.AreEqual(0, card.AverageRating);
         }
-        Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, ownerId, cardGuid));
+        Assert.IsFalse(await CardSubscriptionHelper.UserIsSubscribedToCardAsync(testDB, owner.Id, cardGuid));
     }
     [TestMethod()]
     public async Task WithUserSubscribingToCardOnEdit()
@@ -150,12 +150,12 @@ public class CreateCardTests
     public async Task PublicCardWithPersoTagMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new CreateCard.Request(
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
@@ -175,20 +175,20 @@ public class CreateCardTests
     public async Task CardVisibleToOtherWithPersoTagMustFail()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var otherUserId = await UserHelper.CreateInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new CreateCard.Request(
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            new[] { creatorId, otherUserId },
+            new[] { creator.Id, otherUserId },
             RandomHelper.String());
 
         var errorMesg = RandomHelper.String();
@@ -201,19 +201,19 @@ public class CreateCardTests
     public async Task PrivateCardWithPersoTagMustSucceed()
     {
         var testDB = DbHelper.GetEmptyTestDB();
-        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var creator = await UserHelper.CreateUserInDbAsync(testDB);
         var languageId = await CardLanguageHelper.CreateAsync(testDB);
-        var persoTagId = await TagHelper.CreateAsync(testDB, name: Tag.Perso);
+        var persoTagId = await TagHelper.CreateAsync(testDB, creator, name: Tag.Perso);
 
         var request = new CreateCard.Request(
-            creatorId,
+            creator.Id,
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             RandomHelper.String(),
             languageId,
             persoTagId.AsArray(),
-            creatorId.AsArray(),
+            creator.Id.AsArray(),
             RandomHelper.String());
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -222,7 +222,7 @@ public class CreateCardTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var card = dbContext.Cards.Include(card => card.VersionCreator).Single();
-            Assert.AreEqual(creatorId, card.VersionCreator.Id);
+            Assert.AreEqual(creator.Id, card.VersionCreator.Id);
         }
     }
     [TestMethod()]

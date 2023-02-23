@@ -10,8 +10,12 @@ internal static class UserServices
 {
     public static async Task<Guid> UserIdFromContextAsync(Microsoft.AspNetCore.Http.HttpContext httpContext, UserManager<MemCheckUser> userManager)
     {
+        return (await UserFromContextAsync(httpContext, userManager)).Id;
+    }
+    public static async Task<MemCheckUser> UserFromContextAsync(Microsoft.AspNetCore.Http.HttpContext httpContext, UserManager<MemCheckUser> userManager)
+    {
         var contextUser = httpContext.User;
         var user = await userManager.GetUserAsync(contextUser);
-        return user == null ? Guid.Empty : user.Id;
+        return user ?? throw new InvalidOperationException("No user");
     }
 }

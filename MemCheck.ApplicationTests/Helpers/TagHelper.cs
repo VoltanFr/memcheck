@@ -9,10 +9,22 @@ namespace MemCheck.Application.Helpers;
 
 public static class TagHelper
 {
-    public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, string? name = null, string? description = null)
+    public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, MemCheckUser creatingUser, string? name = null, string? description = null)
+    {
+        return await CreateAsync(testDB, creatingUser.Id, name, description);
+    }
+    public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatingUserId, string? name = null, string? description = null, DateTime? versionUtcDate = null)
     {
         using var dbContext = new MemCheckDbContext(testDB);
-        var result = new Tag { Name = name ?? RandomHelper.String(), Description = description ?? RandomHelper.String() };
+        var creatingUser = await dbContext.Users.SingleAsync(u => u.Id == creatingUserId);
+        var result = new Tag
+        {
+            Name = name ?? RandomHelper.String(),
+            Description = description ?? RandomHelper.String(),
+            CreatingUser = creatingUser,
+            VersionDescription = RandomHelper.String(),
+            VersionUtcDate = versionUtcDate ?? RandomHelper.Date(),
+        };
         dbContext.Tags.Add(result);
         await dbContext.SaveChangesAsync();
         return result.Id;

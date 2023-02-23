@@ -325,7 +325,7 @@ public class GetUnknownCardsToLearnTests
         var french = await CardLanguageHelper.CreateAsync(db, "Français");
         var otherLanguage = await CardLanguageHelper.CreateAsync(db);
         var tagName = RandomHelper.String();
-        var tag = await TagHelper.CreateAsync(db, tagName);
+        var tag = await TagHelper.CreateAsync(db, user, tagName);
 
         var card1VersionDate = RandomHelper.Date();
         var card1 = await CardHelper.CreateAsync(db, user.Id, versionDate: card1VersionDate, language: french, tagIds: tag.AsArray(), userWithViewIds: user.Id.AsArray());

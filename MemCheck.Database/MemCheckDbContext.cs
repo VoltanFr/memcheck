@@ -83,6 +83,9 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
         builder.Entity<RequiredTagInSearchSubscription>().HasKey(requiredTag => new { requiredTag.SearchSubscriptionId, requiredTag.TagId });
         builder.Entity<ExcludedTagInSearchSubscription>().HasKey(requiredTag => new { requiredTag.SearchSubscriptionId, requiredTag.TagId });
         builder.Entity<CardInSearchResult>().HasKey(cardInSearchResult => new { cardInSearchResult.SearchSubscriptionId, cardInSearchResult.CardId });
+
+        builder.Entity<Tag>().HasIndex(tag => tag.Name).IsUnique();
+        builder.Entity<Tag>().HasOne(tag => tag.CreatingUser).WithMany().OnDelete(DeleteBehavior.NoAction);
     }
     private static void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
     {

@@ -69,26 +69,26 @@ public class GetUserDecksWithTagsTests
     public async Task OneDeck_WithTags()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
 
-        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user);
+        var deck = await DeckHelper.GetUserSingleDeckAndSetTestHeapingAlgoAsync(db, user.Id);
 
-        var tag1 = await TagHelper.CreateAsync(db);
-        var card1 = await CardHelper.CreateAsync(db, user, tagIds: tag1.AsArray());
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var card1 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag1.AsArray());
         await DeckHelper.AddCardAsync(db, deck, card1.Id);
 
-        var tag2 = await TagHelper.CreateAsync(db);
-        var card2 = await CardHelper.CreateAsync(db, user, tagIds: tag2.AsArray());
+        var tag2 = await TagHelper.CreateAsync(db, user);
+        var card2 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag2.AsArray());
         await DeckHelper.AddCardAsync(db, deck, card2.Id);
 
-        var card3 = await CardHelper.CreateAsync(db, user, tagIds: new[] { tag1, tag2 });
+        var card3 = await CardHelper.CreateAsync(db, user.Id, tagIds: new[] { tag1, tag2 });
         await DeckHelper.AddCardAsync(db, deck, card3.Id);
 
-        var card4 = await CardHelper.CreateAsync(db, user);
+        var card4 = await CardHelper.CreateAsync(db, user.Id);
         await DeckHelper.AddCardAsync(db, deck, card4.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(user));
+        var result = await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(user.Id));
         var resultDeck = result.Single();
         Assert.AreEqual(deck, resultDeck.DeckId);
         Assert.AreEqual(MemCheckUserManager.DefaultDeckName, resultDeck.Description);
@@ -100,34 +100,34 @@ public class GetUserDecksWithTagsTests
     public async Task TwoDecks_WithTags()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
 
         var deck1Name = RandomHelper.String();
         var deck1Algo = RandomHelper.HeapingAlgorithm();
-        var deck1 = await DeckHelper.CreateAsync(db, user, deck1Name, deck1Algo);
+        var deck1 = await DeckHelper.CreateAsync(db, user.Id, deck1Name, deck1Algo);
 
         var deck2Name = RandomHelper.String();
         var deck2Algo = RandomHelper.HeapingAlgorithm();
-        var deck2 = await DeckHelper.CreateAsync(db, user, deck2Name, deck2Algo);
+        var deck2 = await DeckHelper.CreateAsync(db, user.Id, deck2Name, deck2Algo);
 
-        var tag1 = await TagHelper.CreateAsync(db);
-        var card1 = await CardHelper.CreateAsync(db, user, tagIds: tag1.AsArray());
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var card1 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag1.AsArray());
         await DeckHelper.AddCardAsync(db, deck1, card1.Id);
         await DeckHelper.AddCardAsync(db, deck2, card1.Id);
 
-        var tag2 = await TagHelper.CreateAsync(db);
-        var card2 = await CardHelper.CreateAsync(db, user, tagIds: tag2.AsArray());
+        var tag2 = await TagHelper.CreateAsync(db, user);
+        var card2 = await CardHelper.CreateAsync(db, user.Id, tagIds: tag2.AsArray());
         await DeckHelper.AddCardAsync(db, deck1, card2.Id);
 
-        var card3 = await CardHelper.CreateAsync(db, user, tagIds: new[] { tag1, tag2 });
+        var card3 = await CardHelper.CreateAsync(db, user.Id, tagIds: new[] { tag1, tag2 });
         await DeckHelper.AddCardAsync(db, deck1, card3.Id);
 
-        var card4 = await CardHelper.CreateAsync(db, user);
+        var card4 = await CardHelper.CreateAsync(db, user.Id);
         await DeckHelper.AddCardAsync(db, deck1, card4.Id);
         await DeckHelper.AddCardAsync(db, deck2, card4.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(user));
+        var result = await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(user.Id));
 
         var resultDeck1 = result.Single(d => d.DeckId == deck1);
         Assert.AreEqual(deck1, resultDeck1.DeckId);

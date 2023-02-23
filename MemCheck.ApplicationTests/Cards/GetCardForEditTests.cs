@@ -85,7 +85,7 @@ public class GetCardForEditTests
         var additionalInfo = RandomHelper.String();
         var references = RandomHelper.String();
         var tagName = RandomHelper.String();
-        var tag = await TagHelper.CreateAsync(db, tagName);
+        var tag = await TagHelper.CreateAsync(db, creator, tagName);
         var otherUser = await UserHelper.CreateUserInDbAsync(db);
         var versionDescription = RandomHelper.String();
         var card = await CardHelper.CreateAsync(db, creator.Id, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, references: references, tagIds: tag.AsArray(), userWithViewIds: new[] { creator.Id, otherUser.Id }, versionDescription: versionDescription);

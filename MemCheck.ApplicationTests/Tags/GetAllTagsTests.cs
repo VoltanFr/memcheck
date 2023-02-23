@@ -42,11 +42,11 @@ public class GetAllTagsTests
     public async Task OneTagInDbWithOneCardWithoutRating()
     {
         var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var name = RandomHelper.String();
         var description = RandomHelper.String();
-        var tag = await TagHelper.CreateAsync(db, name, description);
-        var user = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+        var tag = await TagHelper.CreateAsync(db, user, name, description);
+        await CardHelper.CreateAsync(db, user.Id, tagIds: tag.AsArray());
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -71,11 +71,11 @@ public class GetAllTagsTests
         var db = DbHelper.GetEmptyTestDB();
         var name = RandomHelper.String();
         var description = RandomHelper.String();
-        var tag = await TagHelper.CreateAsync(db, name, description);
-        var user = await UserHelper.CreateInDbAsync(db);
-        var card = await CardHelper.CreateAsync(db, user, tagIds: tag.AsArray());
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tag = await TagHelper.CreateAsync(db, user, name, description);
+        var card = await CardHelper.CreateAsync(db, user.Id, tagIds: tag.AsArray());
         var rating = RandomHelper.Rating();
-        await RatingHelper.RecordForUserAsync(db, user, card.Id, rating);
+        await RatingHelper.RecordForUserAsync(db, user.Id, card.Id, rating);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -104,7 +104,8 @@ public class GetAllTagsTests
     public async Task Paging()
     {
         var db = DbHelper.GetEmptyTestDB();
-        await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        await TagHelper.CreateAsync(db, user);
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 1, ""));
@@ -124,9 +125,10 @@ public class GetAllTagsTests
     public async Task NoUser_Filtering()
     {
         var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var tagName = RandomHelper.String(10);
-        await TagHelper.CreateAsync(db, tagName);
-        await TagHelper.CreateAsync(db);
+        await TagHelper.CreateAsync(db, user, tagName);
+        await TagHelper.CreateAsync(db, user);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -148,9 +150,10 @@ public class GetAllTagsTests
     public async Task User_Filtering()
     {
         var db = DbHelper.GetEmptyTestDB();
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var tagName = RandomHelper.String(10);
-        await TagHelper.CreateAsync(db, tagName);
-        await TagHelper.CreateAsync(db);
+        await TagHelper.CreateAsync(db, user, tagName);
+        await TagHelper.CreateAsync(db, user);
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -172,7 +175,8 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithNoCard()
     {
         var db = DbHelper.GetEmptyTestDB();
-        await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        await TagHelper.CreateAsync(db, user);
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -187,7 +191,8 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOnePublicCardWithTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var tagId = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, user);
         var cardCreatorId = await UserHelper.CreateInDbAsync(db);
         await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray());
 
@@ -204,9 +209,9 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOnePrivateCardWithTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var tagId = await TagHelper.CreateAsync(db);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, cardCreator);
+        await CardHelper.CreateAsync(db, cardCreator.Id, tagIds: tagId.AsArray(), userWithViewIds: cardCreator.Id.AsArray());
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -221,8 +226,9 @@ public class GetAllTagsTests
     public async Task CardCount_TwoTagsWithOnePublicCardWithOneTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
         var cardCreatorId = await UserHelper.CreateInDbAsync(db);
         await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tag1.AsArray());
 
@@ -241,9 +247,10 @@ public class GetAllTagsTests
     public async Task CardCount_ThreeTagsWithOnePublicCardWithTwoTags()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
-        var tag3 = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
+        var tag3 = await TagHelper.CreateAsync(db, user);
         var cardCreatorId = await UserHelper.CreateInDbAsync(db);
         await CardHelper.CreateAsync(db, cardCreatorId, tagIds: new[] { tag1, tag2 });
 
@@ -263,9 +270,9 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOnePublicCardWithoutTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        await TagHelper.CreateAsync(db);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        await TagHelper.CreateAsync(db, cardCreator);
+        await CardHelper.CreateAsync(db, cardCreator.Id);
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -280,9 +287,9 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOneNotOwnedPrivateCardWithTag()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var tagId = await TagHelper.CreateAsync(db);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, cardCreator);
+        await CardHelper.CreateAsync(db, cardCreator.Id, tagIds: tagId.AsArray(), userWithViewIds: cardCreator.Id.AsArray());
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -299,9 +306,9 @@ public class GetAllTagsTests
         var db = DbHelper.GetEmptyTestDB();
         var tagName = RandomHelper.String();
         var tagDescription = RandomHelper.String();
-        var tagId = await TagHelper.CreateAsync(db, tagName, tagDescription);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId, tagIds: tagId.AsArray(), userWithViewIds: cardCreatorId.AsArray());
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, cardCreator, tagName, tagDescription);
+        await CardHelper.CreateAsync(db, cardCreator.Id, tagIds: tagId.AsArray(), userWithViewIds: cardCreator.Id.AsArray());
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -325,9 +332,9 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOnePublicCardWithoutTag_CanView()
     {
         var db = DbHelper.GetEmptyTestDB();
-        await TagHelper.CreateAsync(db);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        await TagHelper.CreateAsync(db, cardCreator);
+        await CardHelper.CreateAsync(db, cardCreator.Id);
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -342,9 +349,9 @@ public class GetAllTagsTests
     public async Task CardCount_OneTagWithOnePublicCardWithoutTag_CantView()
     {
         var db = DbHelper.GetEmptyTestDB();
-        await TagHelper.CreateAsync(db);
-        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
-        await CardHelper.CreateAsync(db, cardCreatorId);
+        var cardCreator = await UserHelper.CreateUserInDbAsync(db);
+        await TagHelper.CreateAsync(db, cardCreator);
+        await CardHelper.CreateAsync(db, cardCreator.Id);
 
         using (var dbContext = new MemCheckDbContext(db))
             await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
@@ -360,22 +367,23 @@ public class GetAllTagsTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
-        var tag3 = await TagHelper.CreateAsync(db);
+        var user1 = await UserHelper.CreateUserInDbAsync(db);
 
-        var user1 = await UserHelper.CreateInDbAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user1);
+        var tag2 = await TagHelper.CreateAsync(db, user1);
+        var tag3 = await TagHelper.CreateAsync(db, user1);
+
         var user2 = await UserHelper.CreateInDbAsync(db);
         var user3 = await UserHelper.CreateInDbAsync(db);
 
         //public cards
-        var card1 = await CardHelper.CreateIdAsync(db, user1);
-        var card2 = await CardHelper.CreateIdAsync(db, user1, tagIds: tag1.AsArray());
-        await RatingHelper.RecordForUserAsync(db, user1, card2, 1);
-        var card3 = await CardHelper.CreateIdAsync(db, user1, tagIds: new[] { tag1, tag2 });
-        await RatingHelper.RecordForUserAsync(db, user1, card3, 1);
+        var card1 = await CardHelper.CreateIdAsync(db, user1.Id);
+        var card2 = await CardHelper.CreateIdAsync(db, user1.Id, tagIds: tag1.AsArray());
+        await RatingHelper.RecordForUserAsync(db, user1.Id, card2, 1);
+        var card3 = await CardHelper.CreateIdAsync(db, user1.Id, tagIds: new[] { tag1, tag2 });
+        await RatingHelper.RecordForUserAsync(db, user1.Id, card3, 1);
         await RatingHelper.RecordForUserAsync(db, user2, card3, 3);
-        var card4 = await CardHelper.CreateIdAsync(db, user1, tagIds: new[] { tag1, tag2, tag3 });
+        var card4 = await CardHelper.CreateIdAsync(db, user1.Id, tagIds: new[] { tag1, tag2, tag3 });
         await RatingHelper.RecordForUserAsync(db, user2, card4, 2);
         await RatingHelper.RecordForUserAsync(db, user3, card4, 4);
 

@@ -20,12 +20,12 @@ public sealed class UpdateTag : RequestRunner<UpdateTag.Request, UpdateTag.Resul
         return new ResultWithMetrologyProperties<Result>(new Result(), ("InitialName", initialName), ("NewName", request.NewName), ("NewDescription", request.NewDescription));
     }
     #region Request & Result
-    public sealed record Request(Guid UserId, Guid TagId, string NewName, string NewDescription) : IRequest
+    public sealed record Request(Guid UserId, Guid TagId, string NewName, string NewDescription, string VersionDescription) : IRequest
     {
         public async Task CheckValidityAsync(CallContext callContext)
         {
             await QueryValidationHelper.CheckUserExistsAsync(callContext.DbContext, UserId);
-            await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, callContext.DbContext, callContext.Localized, callContext.RoleChecker, UserId);
+            await QueryValidationHelper.CheckCanCreateTag(NewName, NewDescription, TagId, callContext.DbContext, callContext.Localized, callContext.RoleChecker, UserId, VersionDescription);
         }
     }
     public sealed record Result();

@@ -102,14 +102,14 @@ public class ReplaceTextInAllVisibleCardsTests
     public async Task UserHasNoVisibilityOnTheOnlyCard()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardOwnerId = await UserHelper.CreateInDbAsync(db);
+        var cardOwner = await UserHelper.CreateUserInDbAsync(db);
         var userWithCardInDeckId = await UserHelper.CreateInDbAsync(db);
-        var tagId = await TagHelper.CreateAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, cardOwner);
         var textToReplace = RandomHelper.String();
         var card = await CardHelper.CreateAsync(
             db,
-            cardOwnerId,
-            userWithViewIds: new[] { cardOwnerId, userWithCardInDeckId },
+            cardOwner.Id,
+            userWithViewIds: new[] { cardOwner.Id, userWithCardInDeckId },
             frontSide: textToReplace + RandomHelper.String(),
             backSide: RandomHelper.String() + textToReplace,
             additionalInfo: RandomHelper.String() + textToReplace + RandomHelper.String(),
@@ -141,9 +141,9 @@ public class ReplaceTextInAllVisibleCardsTests
     public async Task UserIsOwnerOfTheOnlyCard_CheckAllDetails()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardOwnerId = await UserHelper.CreateInDbAsync(db);
+        var cardOwner = await UserHelper.CreateUserInDbAsync(db);
         var userWithCardInDeckId = await UserHelper.CreateInDbAsync(db);
-        var tagId = await TagHelper.CreateAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, cardOwner);
         var textToReplace = RandomHelper.String();
         var frontSideSecondPart = RandomHelper.String();
         var backSideFirstPart = RandomHelper.String();
@@ -154,8 +154,8 @@ public class ReplaceTextInAllVisibleCardsTests
         var initialVersionDate = RandomHelper.Date();
         var card = await CardHelper.CreateAsync(
             db,
-            cardOwnerId,
-            userWithViewIds: new[] { cardOwnerId, userWithCardInDeckId },
+            cardOwner.Id,
+            userWithViewIds: new[] { cardOwner.Id, userWithCardInDeckId },
             frontSide: textToReplace + frontSideSecondPart,
             backSide: backSideFirstPart + textToReplace,
             additionalInfo: additionalInfoFirstPart + textToReplace + additionalInfoSecondPart,
@@ -174,7 +174,7 @@ public class ReplaceTextInAllVisibleCardsTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var request = new ReplaceTextInAllVisibleCards.Request(cardOwnerId, textToReplace, replacementText, newVersionDescription);
+            var request = new ReplaceTextInAllVisibleCards.Request(cardOwner.Id, textToReplace, replacementText, newVersionDescription);
             await new ReplaceTextInAllVisibleCards(dbContext.AsCallContext(), newVersionDate).RunAsync(request);
         }
 

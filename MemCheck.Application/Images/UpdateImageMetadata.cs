@@ -9,8 +9,8 @@ namespace MemCheck.Application.Images;
 
 public sealed class UpdateImageMetadata : RequestRunner<UpdateImageMetadata.Request, UpdateImageMetadata.Result>
 {
-    private readonly DateTime? runDate;
     #region Fields
+    private readonly DateTime? runDate;
     #endregion
     #region Private methods
     private static ImagePreviousVersionType ImagePreviousVersionTypeFromImage(Image i)

@@ -177,18 +177,18 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
     public async Task CascadeDeletionOfTagInPreviousCardVersion()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
-        var card = await CardHelper.CreateAsync(db, user, language: languageId, tagIds: new[] { tag1, tag2 });
-        var tag3 = await TagHelper.CreateAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
+        var card = await CardHelper.CreateAsync(db, user.Id, language: languageId, tagIds: new[] { tag1, tag2 });
+        var tag3 = await TagHelper.CreateAsync(db, user);
         await UpdateCardHelper.RunAsync(db, UpdateCardHelper.RequestForTagChange(card, tag3.AsArray()));
         var deletionDate = RandomHelper.Date();
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext(), deletionDate);
-            await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray()));
+            await deleter.RunAsync(new DeleteCards.Request(user.Id, card.Id.AsArray()));
         }
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -196,7 +196,7 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
             Assert.AreEqual(4, dbContext.TagInPreviousCardVersions.Count());
         }
         using (var dbContext = new MemCheckDbContext(db))
-            await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user, RandomHelper.Date(deletionDate)));
+            await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext(new TestRoleChecker(user.Id))).RunAsync(new DeleteCardPreviousVersionsOfDeletedCards.Request(user.Id, RandomHelper.Date(deletionDate)));
         using (var dbContext = new MemCheckDbContext(db))
         {
             Assert.AreEqual(0, dbContext.CardPreviousVersions.Count());

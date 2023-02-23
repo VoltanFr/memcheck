@@ -16,8 +16,8 @@ public class GetRecentDemoUsesTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
-        var tagId = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, user);
         await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
         var demoRunDate = RandomHelper.Date();
@@ -38,8 +38,8 @@ public class GetRecentDemoUsesTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
-        var tagId = await TagHelper.CreateAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, user);
         await CardHelper.CreateIdAsync(db, user, tagIds: tagId.AsArray());
 
         var demoRunDate = RandomHelper.Date();
@@ -64,12 +64,12 @@ public class GetRecentDemoUsesTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
-        var tagOnCardId = await TagHelper.CreateAsync(db);
-        await CardHelper.CreateIdAsync(db, user, tagIds: tagOnCardId.AsArray());
+        var user = await UserHelper.CreateUserInDbAsync(db);
+        var tagOnCardId = await TagHelper.CreateAsync(db, user);
+        await CardHelper.CreateIdAsync(db, user.Id, tagIds: tagOnCardId.AsArray());
 
         var demoRunDate = RandomHelper.Date();
-        var tagUsedInDemoId = await TagHelper.CreateAsync(db);
+        var tagUsedInDemoId = await TagHelper.CreateAsync(db, user);
 
         using (var dbContext = new MemCheckDbContext(db))
             await new GetCardsForDemo(dbContext.AsCallContext(), demoRunDate).RunAsync(new GetCardsForDemo.Request(tagUsedInDemoId, Array.Empty<Guid>(), 10));
@@ -91,14 +91,14 @@ public class GetRecentDemoUsesTests
     {
         var db = DbHelper.GetEmptyTestDB();
 
-        var user = await UserHelper.CreateInDbAsync(db);
+        var user = await UserHelper.CreateUserInDbAsync(db);
         var cardCount = RandomHelper.Int(50, 100);
 
-        var tag1 = await TagHelper.CreateAsync(db);
-        var tag2 = await TagHelper.CreateAsync(db);
+        var tag1 = await TagHelper.CreateAsync(db, user);
+        var tag2 = await TagHelper.CreateAsync(db, user);
 
-        await CardHelper.CreateIdAsync(db, user, tagIds: tag1.AsArray());
-        await CardHelper.CreateIdAsync(db, user, tagIds: tag2.AsArray());
+        await CardHelper.CreateIdAsync(db, user.Id, tagIds: tag1.AsArray());
+        await CardHelper.CreateIdAsync(db, user.Id, tagIds: tag2.AsArray());
 
         var countOfCardsWithTag1 = 1;
         var countOfCardsWithTag2 = 1;
@@ -109,20 +109,20 @@ public class GetRecentDemoUsesTests
             switch (tagChoice)
             {
                 case 1:
-                    await CardHelper.CreateIdAsync(db, user, tagIds: tag1.AsArray());
+                    await CardHelper.CreateIdAsync(db, user.Id, tagIds: tag1.AsArray());
                     countOfCardsWithTag1++;
                     break;
                 case 2:
-                    await CardHelper.CreateIdAsync(db, user, tagIds: tag2.AsArray());
+                    await CardHelper.CreateIdAsync(db, user.Id, tagIds: tag2.AsArray());
                     countOfCardsWithTag2++;
                     break;
                 case 3:
-                    await CardHelper.CreateIdAsync(db, user, tagIds: new[] { tag1, tag2 });
+                    await CardHelper.CreateIdAsync(db, user.Id, tagIds: new[] { tag1, tag2 });
                     countOfCardsWithTag1++;
                     countOfCardsWithTag2++;
                     break;
                 default:
-                    await CardHelper.CreateIdAsync(db, user, tagIds: Array.Empty<Guid>());
+                    await CardHelper.CreateIdAsync(db, user.Id, tagIds: Array.Empty<Guid>());
                     break;
             }
         }

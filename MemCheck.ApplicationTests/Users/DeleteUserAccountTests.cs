@@ -239,9 +239,9 @@ public class DeleteUserAccountTests
     public async Task SearchSubscriptions()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var loggedUser = await UserHelper.CreateInDbAsync(db);
+        var loggedUser = await UserHelper.CreateUserInDbAsync(db);
         var userToDelete = await UserHelper.CreateInDbAsync(db);
-        var tag = await TagHelper.CreateAsync(db);
+        var tag = await TagHelper.CreateAsync(db, loggedUser);
         await CardHelper.CreateAsync(db, userToDelete, tagIds: tag.AsArray());
         await CardHelper.CreateAsync(db, userToDelete);
         await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
@@ -250,7 +250,7 @@ public class DeleteUserAccountTests
         Guid userToDeleteSubscriptionId;
         using (var dbContext = new MemCheckDbContext(db))
         {
-            loggedUserSubscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(loggedUser, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()))).SearchId;
+            loggedUserSubscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(loggedUser.Id, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()))).SearchId;
             userToDeleteSubscriptionId = (await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(new SubscribeToSearch.Request(userToDelete, Guid.Empty, RandomHelper.String(), "", tag.AsArray(), Array.Empty<Guid>()))).SearchId;
         }
 
@@ -269,7 +269,7 @@ public class DeleteUserAccountTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser.Id)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser.Id, userToDelete));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -448,9 +448,9 @@ public class DeleteUserAccountTests
     public async Task CardNotificationSubscriptions()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var loggedUser = await UserHelper.CreateInDbAsync(db);
+        var loggedUser = await UserHelper.CreateUserInDbAsync(db);
         var userToDelete = await UserHelper.CreateInDbAsync(db);
-        var tag = await TagHelper.CreateAsync(db);
+        var tag = await TagHelper.CreateAsync(db, loggedUser);
         var card1 = await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
         var card2 = await CardHelper.CreateAsync(db, userToDelete);
         var card3 = await CardHelper.CreateAsync(db, loggedUser, tagIds: tag.AsArray());
@@ -458,24 +458,24 @@ public class DeleteUserAccountTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(userToDelete, new Guid[] { card1.Id, card2.Id }));
-            await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(loggedUser, new Guid[] { card2.Id, card3.Id }));
+            await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(loggedUser.Id, new Guid[] { card2.Id, card3.Id }));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser));
+            Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser.Id));
             Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == userToDelete));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete));
+            await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser.Id)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser.Id, userToDelete));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser));
+            Assert.AreEqual(2, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == loggedUser.Id));
             Assert.AreEqual(0, dbContext.CardNotifications.Count(cardNotifSubscription => cardNotifSubscription.UserId == userToDelete));
         }
     }
