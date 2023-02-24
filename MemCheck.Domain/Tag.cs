@@ -37,15 +37,3 @@ public sealed class Tag
         return Id.GetHashCode();
     }
 }
-
-public sealed class TagPreviousVersion
-{
-    [Key] public Guid Id { get; set; }
-    public Guid Tag { get; set; }
-    public MemCheckUser CreatingUser { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    public string VersionDescription { get; set; } = null!;
-    [Column(TypeName = "int")] public TagVersionType VersionType { get; set; }
-    public TagPreviousVersion? PreviousVersion { get; set; }  //null for initial version (VersionType == Creation)
-}

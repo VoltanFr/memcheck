@@ -4,6 +4,7 @@ using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MemCheck.Database.Migrations
 {
     [DbContext(typeof(MemCheckDbContext))]
-    partial class MemCheckDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230223124921_AddDateToTagPreviousVersion")]
+    partial class AddDateToTagPreviousVersion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -736,7 +739,7 @@ namespace MemCheck.Database.Migrations
 
                     b.HasIndex("PreviousVersionId");
 
-                    b.ToTable("TagPreviousVersions");
+                    b.ToTable("TagPreviousVersion");
                 });
 
             modelBuilder.Entity("MemCheck.Domain.UserCardRating", b =>

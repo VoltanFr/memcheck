@@ -26,6 +26,7 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public DbSet<CardPreviousVersion> CardPreviousVersions { get; set; } = null!;
     public DbSet<Deck> Decks { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
+    public DbSet<TagPreviousVersion> TagPreviousVersions { get; set; } = null!;
     public DbSet<CardInDeck> CardsInDecks { get; set; } = null!;
     public DbSet<ImageInCard> ImagesInCards { get; set; } = null!;
     public DbSet<TagInCard> TagsInCards { get; set; } = null!;
