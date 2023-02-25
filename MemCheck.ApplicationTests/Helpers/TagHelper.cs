@@ -15,6 +15,10 @@ public static class TagHelper
     }
     public static async Task<Guid> CreateAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatingUserId, string? name = null, string? description = null, DateTime? versionUtcDate = null)
     {
+        return (await CreateTagAsync(testDB, creatingUserId, name, description, versionUtcDate)).Id;
+    }
+    public static async Task<Tag> CreateTagAsync(DbContextOptions<MemCheckDbContext> testDB, Guid creatingUserId, string? name = null, string? description = null, DateTime? versionUtcDate = null)
+    {
         using var dbContext = new MemCheckDbContext(testDB);
         var creatingUser = await dbContext.Users.SingleAsync(u => u.Id == creatingUserId);
         var result = new Tag
@@ -27,7 +31,7 @@ public static class TagHelper
         };
         dbContext.Tags.Add(result);
         await dbContext.SaveChangesAsync();
-        return result.Id;
+        return result;
     }
     public static async Task RefreshAllAsync(DbContextOptions<MemCheckDbContext> db)
     {
