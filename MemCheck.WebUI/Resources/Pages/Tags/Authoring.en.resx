@@ -162,4 +162,10 @@
   <data name="TagEdition" xml:space="preserve">
     <value>Tag edition</value>
   </data>
+  <data name="VersionAuthor" xml:space="preserve">
+    <value>Last edited by:</value>
+  </data>
+  <data name="VersionDate" xml:space="preserve">
+    <value>Last edition:</value>
+  </data>
 </root>

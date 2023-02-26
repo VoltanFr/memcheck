@@ -44,6 +44,12 @@
                 <label class="field-caption">@Localizer["Description"]</label>
                 <span class="rendered-description" v-html="renderedDescription()"></span>
             </div>
+            <div id="VersionAuthor" class="field-div">
+                <label class="field-caption">@Localizer["VersionAuthor"]</label> {{editedTag.versionCreatorName}}
+            </div>
+            <div id="VersionDate" class="field-div">
+                <label class="field-caption">@Localizer["VersionDate"]</label> {{dateTime(editedTag.versionUtcDate)}}
+            </div>
         </div>
 
         <div id="Statistics" class="memcheck-input-div" v-if="editedTag">

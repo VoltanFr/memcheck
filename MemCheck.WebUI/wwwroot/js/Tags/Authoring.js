@@ -4,6 +4,7 @@ import { tellControllerSuccess } from '../Common.js';
 import { sleep } from '../Common.js';
 import { toastShortDuration } from '../Common.js';
 import { convertMarkdown } from '../MarkdownConversion.js';
+import { dateTime } from '../Common.js';
 
 const tagAuthoringApp = Vue.createApp({
     components: {
@@ -33,6 +34,9 @@ const tagAuthoringApp = Vue.createApp({
         finally {
             this.mountFinished = true;
         }
+    },
+    beforeCreate() {
+        this.dateTime = dateTime;
     },
     methods: {
         async getTagNames() {

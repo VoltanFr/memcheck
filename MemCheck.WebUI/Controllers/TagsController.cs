@@ -58,11 +58,15 @@ public class TagsController : MemCheckController
             TagName = tag.TagName;
             Description = tag.Description;
             CardCount = tag.CardCount;
+            VersionCreatorName = tag.CreatingUserName;
+            VersionUtcDate = tag.VersionUtcDate;
         }
         public Guid TagId { get; }
         public string TagName { get; }
         public string Description { get; }
         public int CardCount { get; }
+        public string VersionCreatorName { get; }
+        public DateTime VersionUtcDate { get; }
     }
     #endregion
     #region GetTags
