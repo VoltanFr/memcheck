@@ -22,7 +22,7 @@
                     <p v-html="deck.headLine" />
                     <ul>
                         <li v-for="line in deck.lines"><span v-html="line" /></li>
-                        <li v-if="isValidDt(deck.nextExpiryUTCDate)">@Localizer["NextExpiry"] {{dt(deck.nextExpiryUTCDate)}}</li>
+                        <li v-if="isValidDateTime(deck.nextExpiryUTCDate)">@Localizer["NextExpiry"] {{dateTime(deck.nextExpiryUTCDate)}}</li>
                     </ul>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                 <p>@Localizer["YouMayAlsoWantToRead"] <a href="/Doc">@Localizer["TheDoc"]</a>.</p>
             </div>
             <footer id="Data time" style="padding-top:50px">
-                <p><small class="form-text text-muted">@Localizer["DataTime"]: {{dt(allData.dataUTCDate)}}.<br/>
+                <p><small class="form-text text-muted">@Localizer["DataTime"]: {{dateTime(allData.dataUTCDate)}}.<br />
                     @Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</small></p>
             </footer>
         </div>

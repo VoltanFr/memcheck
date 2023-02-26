@@ -14,6 +14,10 @@ const app = Vue.createApp({
     async mounted() {
         await this.getAll();
     },
+    beforeCreate() {
+        this.dateTime = dateTime;
+        this.isValidDateTime = isValidDateTime;
+    },
     methods: {
         async getAll() {
             this.reload = false;
@@ -38,12 +42,6 @@ const app = Vue.createApp({
                         this.reload = true;
                     });
                 });
-        },
-        dt(utcFromDotNet) {
-            return dateTime(utcFromDotNet);
-        },
-        isValidDt(utcFromDotNet) {
-            return isValidDateTime(utcFromDotNet);
         },
         showDebugInfo() {
             return false;
