@@ -262,6 +262,9 @@ public class RefreshTagStatsTests
         await RatingHelper.RecordForUserAsync(db, user1.Id, card4.Id, RandomHelper.Rating());
 
         using (var dbContext = new MemCheckDbContext(db))
+            await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user2Id, tag1Id, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())); // Just to check that has no impact
+
+        using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new RefreshTagStats(dbContext.AsCallContext()).RunAsync(new RefreshTagStats.Request());
             Assert.AreEqual(2, result.Tags.Length);
