@@ -463,4 +463,55 @@ public class UpdateTagTests
             Assert.AreEqual(2, loadedTag.CountOfPublicCards);
         }
     }
+    [TestMethod()]
+    public async Task ThreeUpdates()
+    {
+        // Checks that the linked list of previous versions is correct
+
+        var db = DbHelper.GetEmptyTestDB();
+        var creatingUser = await UserHelper.CreateUserInDbAsync(db);
+        var tagId = await TagHelper.CreateAsync(db, creatingUser);
+
+        var firstUpdateUser = await UserHelper.CreateUserInDbAsync(db);
+        var nameAfterFirstUpdate = RandomHelper.String();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(firstUpdateUser.Id, tagId, nameAfterFirstUpdate, RandomHelper.String(), RandomHelper.String()));
+
+        var secondUpdateUser = await UserHelper.CreateUserInDbAsync(db);
+        var nameAfterSecondUpdate = RandomHelper.String();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(secondUpdateUser.Id, tagId, nameAfterSecondUpdate, RandomHelper.String(), RandomHelper.String()));
+
+        var thirdUpdateUser = await UserHelper.CreateUserInDbAsync(db);
+        var nameAfterThirdUpdate = RandomHelper.String();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(thirdUpdateUser.Id, tagId, nameAfterThirdUpdate, RandomHelper.String(), RandomHelper.String()));
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var currentTag = await dbContext.Tags
+                .Include(tag => tag.CreatingUser)
+                .Include(tag => tag.PreviousVersion)
+                .SingleAsync();
+            Assert.AreEqual(thirdUpdateUser.UserName, currentTag.CreatingUser.UserName);
+            Assert.AreEqual(nameAfterThirdUpdate, currentTag.Name);
+
+            var allPreviousVersions = await dbContext.TagPreviousVersions
+                .AsNoTracking()
+                .Include(tagPreviousVersion => tagPreviousVersion.CreatingUser)
+                .Include(tagPreviousVersion => tagPreviousVersion.PreviousVersion)
+                .ToImmutableDictionaryAsync(tagPreviousVersion => tagPreviousVersion.Id, tagPreviousVersion => tagPreviousVersion);
+
+            var firstPreviousVersion = allPreviousVersions[currentTag.PreviousVersion!.Id];
+            Assert.AreEqual(secondUpdateUser.UserName, firstPreviousVersion.CreatingUser.UserName);
+            Assert.AreEqual(nameAfterSecondUpdate, firstPreviousVersion.Name);
+
+            var secondPreviousVersion = allPreviousVersions[firstPreviousVersion.PreviousVersion!.Id];
+            Assert.AreEqual(firstUpdateUser.UserName, secondPreviousVersion.CreatingUser.UserName);
+            Assert.AreEqual(nameAfterFirstUpdate, secondPreviousVersion.Name);
+
+            var thirdPreviousVersion = allPreviousVersions[secondPreviousVersion.PreviousVersion!.Id];
+            Assert.AreEqual(creatingUser.UserName, thirdPreviousVersion.CreatingUser.UserName);
+        }
+    }
 }
