@@ -4,6 +4,7 @@ internal static class Constants
 {
     public const string Cron_RateAllPublicCards = "0 0 1 * * *";
     public const string Cron_SendStatsToAdministrators = "0 30 1 * * *";
+    public const string Cron_ReportTagUpdatesToAdministrators = "0 45 1 * * *";
     public const string Cron_RefreshAverageRatings = "0 0 2 * * *";
     public const string Cron_MakeWikipediaLinksDesktop = "0 30 2 * * *";
     public const string Cron_UpdateTagStats = "0 0 3 * * *";
