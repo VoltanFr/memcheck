@@ -39,15 +39,25 @@ public sealed class ReportTagUpdatesToAdministrators : AbstractMemCheckAzureFunc
     #region Protected override methods
     protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
-        var request = new GetModifiedTags.Request(DateTime.UtcNow.Subtract(TimeSpan.FromDays(3))); // We could have chosen to report only changes since the day before, but this is in case a day is missed for some reason (either reading the mail or running the function)
+        const int dayCount = 3;
+        var request = new GetModifiedTags.Request(DateTime.UtcNow.Subtract(TimeSpan.FromDays(dayCount)).Date); // We could have chosen to report only changes since the day before, but this is in case a day is missed for some reason (either reading the mail or running the function)
         var runner = new GetModifiedTags(NewCallContext());
         var result = await runner.RunAsync(request);
 
+        var changeInfo = result.Tags.Length switch
+        {
+            0 => "no tag change",
+            1 => "1 tag change",
+            _ => $"{result.Tags.Length} tag changes",
+        };
+
         var body = new StringBuilder();
-        body.AppendHtmlHeader(1, $"{result.Tags.Length} tags changed since {request.SinceUtcDate}");
+        body.AppendHtmlHeader(1, $"{changeInfo} in the last {dayCount} days");
         foreach (var tag in result.Tags)
             body.Append(GetTagMailPart(tag));
-        return new RunResult(defaultMailSubject, body);
+
+        return new RunResult($"Mnesios: {changeInfo}", body);
+
     }
     #endregion
     public ReportTagUpdatesToAdministrators(TelemetryConfiguration telemetryConfiguration, MemCheckDbContext memCheckDbContext, MemCheckUserManager userManager, ILogger<SendStatsToAdministrators> logger)
