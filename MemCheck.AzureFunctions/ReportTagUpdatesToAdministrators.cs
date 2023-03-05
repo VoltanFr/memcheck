@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application.Tags;
 using MemCheck.Application.Users;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
@@ -21,18 +22,48 @@ public sealed class ReportTagUpdatesToAdministrators : AbstractMemCheckAzureFunc
         {
             writer.AppendHtmlText($"<strong>Id:</strong> {tag.TagId}", true);
             writer.AppendHtmlText($"<strong>Count of public cards:</strong> {tag.CountOfPublicCards}", true);
-            writer.AppendHtmlText($"<strong>Average rating of public cards:</strong> {tag.AverageRatingOfPublicCards}", true);
+            writer.AppendHtmlText($"<strong>Average rating of public cards:</strong> {tag.AverageRatingOfPublicCards:F2}", true);
         }
-        foreach (var tagVersion in tag.Versions)
-            using (writer.HtmlLi())
+        using (writer.HtmlUl())
+            for (var versionIndex = 0; versionIndex < tag.Versions.Length; versionIndex++)
             {
-                writer.AppendHtmlText($"<strong>Tag version on {tagVersion.UtcDate}: {tagVersion.VersionType}</strong>", true);
-                writer.AppendHtmlText($"<strong>Tag name:</strong> {tagVersion.TagName}", true);
-                writer.AppendHtmlText($"<strong>Created by</strong> {tagVersion.CreatorName}", true);
-                writer.AppendHtmlText($"<strong>Description:</strong> {tagVersion.Description}", true);
-                writer.AppendHtmlText($"<strong>Version description:</strong> {tagVersion.VersionDescription}", true);
-            }
+                var tagVersion = tag.Versions[versionIndex];
+                var tagNextVersion = versionIndex + 1 < tag.Versions.Length ? tag.Versions[versionIndex + 1] : tag.Versions[versionIndex];
 
+                using (writer.HtmlLi())
+                {
+                    {
+                        var versionType = tagVersion.VersionType.ToString();
+                        if (tagNextVersion != null && tagVersion.VersionType != tagNextVersion.VersionType)
+                            versionType = $"<i>{tagVersion.VersionType}</i>";
+                        writer.AppendHtmlText($"<strong>Tag version on {DateServices.AsIsoWithHHmm(tagVersion.UtcDate)}: {versionType}</strong>", true);
+                    }
+                    {
+                        var tagName = tagVersion.TagName;
+                        if (tagNextVersion != null && tagVersion.TagName != tagNextVersion.TagName)
+                            tagName = $"<i>{tagVersion.TagName}</i>";
+                        writer.AppendHtmlText($"<strong>Tag name:</strong> {tagName}", true);
+                    }
+                    {
+                        var creatorName = tagVersion.CreatorName;
+                        if (tagNextVersion != null && tagVersion.CreatorName != tagNextVersion.CreatorName)
+                            creatorName = $"<i>{tagVersion.CreatorName}</i>";
+                        writer.AppendHtmlText($"<strong>Created by</strong> {creatorName}", true);
+                    }
+                    {
+                        var description = tagVersion.Description;
+                        if (tagNextVersion != null && tagVersion.Description != tagNextVersion.Description)
+                            description = $"<i>{tagVersion.Description}</i>";
+                        writer.AppendHtmlText($"<strong>Description:</strong> {description}", true);
+                    }
+                    {
+                        var versionDescription = tagVersion.VersionDescription;
+                        if (tagNextVersion != null && tagVersion.VersionDescription != tagNextVersion.VersionDescription)
+                            versionDescription = $"<i>{tagVersion.VersionDescription}</i>";
+                        writer.AppendHtmlText($"<strong>Version description:</strong> {versionDescription}", true);
+                    }
+                }
+            }
         return writer.ToString();
     }
     #endregion

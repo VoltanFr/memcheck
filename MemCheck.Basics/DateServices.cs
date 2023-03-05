@@ -14,6 +14,14 @@ public static class DateServices
     {
         return d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
+    public static string AsIsoWithHHmm(this DateTime d)
+    {
+        return d.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+    }
+    public static string AsIsoWithHHmmss(this DateTime d)
+    {
+        return d.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+    }
     public static bool IsWithinPreviousDays(this DateTime d, uint dayCount)
     {
         return (DateTime.UtcNow - d).TotalDays <= dayCount;

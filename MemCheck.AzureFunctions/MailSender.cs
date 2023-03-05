@@ -82,17 +82,21 @@ public sealed class MailSender
     {
         return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     }
-    public static string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
+    public string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {
         var listItems = new List<string> {
-            $"<li>Sent by Azure func {azureFunctionName}</li>",
+            $"<li>Sent by Azure func {azureFunctionName} ({AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly)})</li>",
             $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
-            $"<li>Started on {azureFunctionStartTime}, mail constructed at {DateTime.UtcNow} (Elapsed: {DateTime.UtcNow-azureFunctionStartTime})</li>",
-            $"<li>Function last schedule: {timer.ScheduleStatus?.Last}</li>",
-            $"<li>Function last schedule updated: {timer.ScheduleStatus?.LastUpdated}</li>",
-            $"<li>Function next schedule: {timer.ScheduleStatus?.Next}</li>",
+            $"<li>Started on {DateServices.AsIsoWithHHmmss( azureFunctionStartTime)}, mail constructed at {DateServices.AsIsoWithHHmmss(DateTime.UtcNow)} (Elapsed: {(DateTime.UtcNow - azureFunctionStartTime).ToStringWithoutMs()})</li>",
             $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
         };
+        if (timer.ScheduleStatus != null)
+            listItems.AddRange(new[]
+                {
+                    $"<li>Function last schedule: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.Last)}</li>",
+                    $"<li>Function last schedule updated: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.LastUpdated)}</li>",
+                    $"<li>Function next schedule: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.Next)}</li>",
+                });
 
         var writer = new StringBuilder()
             .Append("<h2>Info</h2>")

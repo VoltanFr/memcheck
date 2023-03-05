@@ -7,30 +7,19 @@ namespace MemCheck.AzureFunctions;
 internal static class StringBuilderExtensions
 {
     #region Private classes
-    private sealed class Li : IDisposable
+    private sealed class HtmlTagwithCloser : IDisposable
     {
         private readonly StringBuilder builder;
-        public Li(StringBuilder builder)
+        private readonly string tag;
+        public HtmlTagwithCloser(StringBuilder builder, string tag)
         {
-            builder.Append("<li>");
+            builder.Append(CultureInfo.InvariantCulture, $"<{tag}>");
             this.builder = builder;
+            this.tag = tag;
         }
         public void Dispose()
         {
-            builder.Append("</li>");
-        }
-    }
-    private sealed class Paragraph : IDisposable
-    {
-        private readonly StringBuilder builder;
-        public Paragraph(StringBuilder builder)
-        {
-            builder.Append("<p>");
-            this.builder = builder;
-        }
-        public void Dispose()
-        {
-            builder.Append("</p>");
+            builder.Append(CultureInfo.InvariantCulture, $"</{tag}>");
         }
     }
     #endregion
@@ -49,12 +38,16 @@ internal static class StringBuilderExtensions
         if (addBr)
             builder.Append("<br/>");
     }
+    public static IDisposable HtmlUl(this StringBuilder builder)
+    {
+        return new HtmlTagwithCloser(builder, "ul");
+    }
     public static IDisposable HtmlLi(this StringBuilder builder)
     {
-        return new Li(builder);
+        return new HtmlTagwithCloser(builder, "li");
     }
     public static IDisposable HtmlParagraph(this StringBuilder builder)
     {
-        return new Paragraph(builder);
+        return new HtmlTagwithCloser(builder, "p");
     }
 }
