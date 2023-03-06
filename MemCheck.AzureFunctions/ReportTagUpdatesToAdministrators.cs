@@ -26,44 +26,26 @@ public sealed class ReportTagUpdatesToAdministrators : AbstractMemCheckAzureFunc
         }
         using (writer.HtmlUl())
             for (var versionIndex = 0; versionIndex < tag.Versions.Length; versionIndex++)
-            {
-                var tagVersion = tag.Versions[versionIndex];
-                var tagNextVersion = versionIndex + 1 < tag.Versions.Length ? tag.Versions[versionIndex + 1] : tag.Versions[versionIndex];
-
                 using (writer.HtmlLi())
                 {
-                    {
-                        var versionType = tagVersion.VersionType.ToString();
-                        if (tagNextVersion != null && tagVersion.VersionType != tagNextVersion.VersionType)
-                            versionType = $"<i>{tagVersion.VersionType}</i>";
-                        writer.AppendHtmlText($"<strong>Tag version on {DateServices.AsIsoWithHHmm(tagVersion.UtcDate)}: {versionType}</strong>", true);
-                    }
-                    {
-                        var tagName = tagVersion.TagName;
-                        if (tagNextVersion != null && tagVersion.TagName != tagNextVersion.TagName)
-                            tagName = $"<i>{tagVersion.TagName}</i>";
-                        writer.AppendHtmlText($"<strong>Tag name:</strong> {tagName}", true);
-                    }
-                    {
-                        var creatorName = tagVersion.CreatorName;
-                        if (tagNextVersion != null && tagVersion.CreatorName != tagNextVersion.CreatorName)
-                            creatorName = $"<i>{tagVersion.CreatorName}</i>";
-                        writer.AppendHtmlText($"<strong>Created by</strong> {creatorName}", true);
-                    }
-                    {
-                        var description = tagVersion.Description;
-                        if (tagNextVersion != null && tagVersion.Description != tagNextVersion.Description)
-                            description = $"<i>{tagVersion.Description}</i>";
-                        writer.AppendHtmlText($"<strong>Description:</strong> {description}", true);
-                    }
-                    {
-                        var versionDescription = tagVersion.VersionDescription;
-                        if (tagNextVersion != null && tagVersion.VersionDescription != tagNextVersion.VersionDescription)
-                            versionDescription = $"<i>{tagVersion.VersionDescription}</i>";
-                        writer.AppendHtmlText($"<strong>Version description:</strong> {versionDescription}", true);
-                    }
+                    var tagVersion = tag.Versions[versionIndex];
+
+                    writer.AppendHtmlText($"<strong>Tag version on {DateServices.AsIsoWithHHmm(tagVersion.UtcDate)}: {tagVersion.VersionType}</strong>", true);
+                    writer.AppendHtmlText($"<strong>Created by</strong> {tagVersion.CreatorName}", true);
+                    writer.AppendHtmlText($"<strong>Version description:</strong> {tagVersion.VersionDescription}", true);
+
+                    var tagNextVersion = versionIndex + 1 < tag.Versions.Length ? tag.Versions[versionIndex + 1] : tag.Versions[versionIndex];
+
+                    var tagName = tagVersion.TagName;
+                    if (tagNextVersion != null && tagVersion.TagName != tagNextVersion.TagName)
+                        tagName = $"<i>{tagVersion.TagName}</i>";
+                    writer.AppendHtmlText($"<strong>Tag name:</strong> {tagName}", true);
+
+                    var description = tagVersion.Description;
+                    if (tagNextVersion != null && tagVersion.Description != tagNextVersion.Description)
+                        description = $"<i>{tagVersion.Description}</i>";
+                    writer.AppendHtmlText($"<strong>Description:</strong> {description}", true);
                 }
-            }
         return writer.ToString();
     }
     #endregion
