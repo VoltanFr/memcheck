@@ -21,7 +21,7 @@ Mnesios is a flashcard web site, a tool to help you know things by heart. The [e
 - A database server. I recommend [SQL Server Express](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/sql-server-express-localdb) for simplicity (the basic setup is ok). After installation, run `SqlLocalDB.msi` (it should be in `C:\SQL2019\ExpressAdv_ENU\1033_ENU_LP\x64\Setup\x64`). **Already included if you installed Visual Studio**.
 - [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) (you probably want to use the x64 installer). **Already included if you installed Visual Studio**.
 - [Entity Framework .NET CLI](https://docs.microsoft.com/en-us/ef/core/cli/dotnet): install by running this command: `dotnet tool install --global dotnet-ef`.
-- To run the web site, you will need to trust the local issued certificate. For that, run this command: `dotnet dev-certs https --trust`. Again, **Visual Studio will deal with that on the first launch of the web site project**.
+- To run the web site, you will need to trust the local issued certificate. For that, run this command: `dotnet dev-certs https --trust`. Again, **Visual Studio will deal with that on the first launch of the web site project**. This is the command to use as a fix if you get the error message `Failed to authenticate HTTPS connection` at debug time.
 
 ### Tests
 
