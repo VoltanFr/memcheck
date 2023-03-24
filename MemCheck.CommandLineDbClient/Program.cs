@@ -5,8 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serilog;
-using System;
+using Microsoft.Extensions.Logging;
 using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
@@ -19,10 +18,7 @@ internal static class Program
     private static string GetConnectionString(IConfiguration config)
     {
         if (config["ConnectionStrings:DebuggingDb"] == "Azure")
-        {
-            Log.Warning("Using Azure DB");
             return File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureConnectionString.txt").Trim();
-        }
 
         var db = config["ConnectionStrings:DebuggingDb"];
         if (!string.IsNullOrEmpty(config[$"ConnectionStrings:{db}"]))
@@ -33,20 +29,14 @@ internal static class Program
     {
         return new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
     }
-    private static void SetupStaticLogger(IConfiguration config)
-    {
-        Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
-    }
     private static IHostBuilder CreateHostBuilder(IConfiguration config)
     {
         IHostBuilder hostBuilder = new HostBuilder();
         var connectionString = GetConnectionString(config);
-        Log.Information($"Using DB '{connectionString}'");
+
         hostBuilder = hostBuilder.ConfigureServices((hostContext, services) =>
                {
                    services
-                   // Setup Dependency Injection container.
-                   //.AddTransient(typeof(ClassThatLogs))
                    .AddHostedService<Engine>()
                    .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
 
@@ -59,25 +49,19 @@ internal static class Program
                     .AddDefaultUI();
                }
             );
-        hostBuilder = hostBuilder.ConfigureLogging((hostContext, logging) => logging.AddSerilog());
+
+        hostBuilder = hostBuilder.ConfigureLogging(logging =>
+        {
+            logging.AddConfiguration(config.GetSection("Logging"));
+            logging.AddConsole();
+        });
+
         return hostBuilder;
     }
     #endregion
     public static async Task Main()
     {
         var config = GetConfig();
-        SetupStaticLogger(config);
-        try
-        {
-            await CreateHostBuilder(config).RunConsoleAsync();
-        }
-        catch (Exception ex)
-        {
-            Log.Fatal(ex, "An unhandled exception occurred.");
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
+        await CreateHostBuilder(config).RunConsoleAsync();
     }
 }

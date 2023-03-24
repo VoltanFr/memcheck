@@ -1,4 +1,7 @@
-﻿using MemCheck.CommandLineDbClient.Referencing;
+﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Search;
+using MemCheck.Database;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,22 +14,27 @@ namespace MemCheck.CommandLineDbClient;
 internal sealed class Engine : IHostedService
 {
     #region Fields
-    private readonly ILogger<Engine> logger;
     private readonly IServiceProvider serviceProvider;
+    private readonly ILogger<Engine> logger;
     #endregion
     #region Private method
     private ICmdLinePlugin GetPlugin()
     {
-        return new AddReferences(serviceProvider);
+        return new TextSearchPerfMeasurements(serviceProvider);
     }
     #endregion
-    public Engine(ILogger<Engine> logger, IServiceProvider serviceProvider)
+    public Engine(IServiceProvider serviceProvider)
     {
-        this.logger = logger;
         this.serviceProvider = serviceProvider;
+        logger = serviceProvider.GetRequiredService<ILogger<Engine>>();
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        var dbContext = serviceProvider.GetRequiredService<MemCheckDbContext>();
+        var connectionString = dbContext.Database.GetConnectionString()!;
+        var logLevel = connectionString.Contains("memcheck-db-server-fr.database.windows.net", StringComparison.OrdinalIgnoreCase) ? LogLevel.Warning : LogLevel.Information;
+        logger.Log(logLevel, $"DB: {connectionString}");
+
         var test = GetPlugin();
         test.DescribeForOpportunityToCancel();
         GetConfirmationOrCancel(logger);
