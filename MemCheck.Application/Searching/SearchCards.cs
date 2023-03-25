@@ -229,7 +229,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             ("WithMinimumUtcDateOfCard", (request.MinimumUtcDateOfCards != null).ToString()),
             IntMetric("ResultTotalCardCount", result.TotalNbCards),
             IntMetric("ResultPageCount", result.PageCount),
-            IntMetric("ResultCardCount", result.Cards.Count())
+            IntMetric("ResultCardCount", result.Cards.Length)
             );
     }
     #region Request and result classes
@@ -281,7 +281,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     }
     public sealed class Result
     {
-        public Result(int totalNbCards, int totalPageCount, IEnumerable<ResultCard> cards)
+        public Result(int totalNbCards, int totalPageCount, ImmutableArray<ResultCard> cards)
         {
             TotalNbCards = totalNbCards;
             PageCount = totalPageCount;
@@ -289,7 +289,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         }
         public int TotalNbCards { get; }
         public int PageCount { get; }
-        public IEnumerable<ResultCard> Cards { get; }
+        public ImmutableArray<ResultCard> Cards { get; }
     }
     public sealed class ResultCard
     {
