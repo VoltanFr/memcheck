@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -34,21 +35,13 @@ internal static class Program
         IHostBuilder hostBuilder = new HostBuilder();
         var connectionString = GetConnectionString(config);
 
-        hostBuilder = hostBuilder.ConfigureServices((hostContext, services) =>
-               {
-                   services
-                   .AddHostedService<Engine>()
-                   .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString));
-
-                   services.AddIdentity<MemCheckUser, MemCheckUserRole>(options =>
-                   {
-                       options.SignIn.RequireConfirmedAccount = true;
-                   })
-                    .AddEntityFrameworkStores<MemCheckDbContext>()
-                    .AddDefaultTokenProviders()
-                    .AddDefaultUI();
-               }
-            );
+        hostBuilder = hostBuilder.ConfigureServices((hostContext, services) => services
+            .AddHostedService<Engine>()
+            .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString))
+            .AddIdentity<MemCheckUser, MemCheckUserRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddEntityFrameworkStores<MemCheckDbContext>()
+            .AddDefaultTokenProviders()
+            .AddDefaultUI());
 
         hostBuilder = hostBuilder.ConfigureLogging(logging =>
         {
@@ -63,5 +56,6 @@ internal static class Program
     {
         var config = GetConfig();
         await CreateHostBuilder(config).RunConsoleAsync();
+        Debugger.Break();
     }
 }
