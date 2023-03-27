@@ -497,4 +497,30 @@ public class SearchCardsTests
         Assert.AreEqual(1, result.TotalNbCards);
         Assert.AreEqual(cardWithoutRef.Id, result.Cards.Single().CardId);
     }
+    [TestMethod()]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Really want to use lower case for test")]
+    public async Task TestCaseInsensitive()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var searchedString = RandomHelper.String().ToUpperInvariant() + RandomHelper.String().ToLowerInvariant(); //searchedString contains both upper and lower case chars
+
+        var cardWithSameCasingInText = await CardHelper.CreateAsync(testDB, userId, frontSide: RandomHelper.String() + searchedString + RandomHelper.String());
+        var cardWithUpperCasingInText = await CardHelper.CreateAsync(testDB, userId, backSide: RandomHelper.String() + searchedString.ToUpperInvariant() + RandomHelper.String());
+        var cardWithLowerCasingInText = await CardHelper.CreateAsync(testDB, userId, references: RandomHelper.String() + searchedString.ToLowerInvariant() + RandomHelper.String());
+
+        //Three cards not to be found...
+        await CardHelper.CreateAsync(testDB, userId);
+        await CardHelper.CreateAsync(testDB, userId);
+        await CardHelper.CreateAsync(testDB, userId);
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var request = new SearchCards.Request { RequiredText = searchedString };
+        var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+
+        Assert.AreEqual(3, result.TotalNbCards);
+        Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithSameCasingInText.Id));
+        Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithUpperCasingInText.Id));
+        Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithLowerCasingInText.Id));
+    }
 }
