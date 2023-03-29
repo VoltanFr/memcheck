@@ -7,14 +7,12 @@ namespace MemCheck.Application.QueryValidation;
 
 internal static class CardInputValidator
 {
-    #region Fields
-    private const int minFrontSideLength = 3;
-    private const int maxFrontSideLength = 5000;
-    private const int minBackSideLength = 1;    //A digit may be ok
-    private const int maxBackSideLength = 5000;
-    private const int minAdditionalInfoLength = 0;
-    private const int maxAdditionalInfoLength = 20000;
-    #endregion
+    public const int MinFrontSideLength = 3;
+    public const int MaxFrontSideLength = 1000;
+    public const int MinBackSideLength = 1;    //A digit may be ok
+    public const int MaxBackSideLength = 2000;
+    public const int MinAdditionalInfoLength = 0;
+    public const int MaxAdditionalInfoLength = 10000;
     public const int MinVersionDescriptionLength = 3;
     public const int MaxVersionDescriptionLength = 1000;
     public const int MinReferencesLength = 0;
@@ -28,18 +26,18 @@ internal static class CardInputValidator
 
         if (input.FrontSide != input.FrontSide.Trim())
             throw new InvalidOperationException("Invalid front side: not trimmed");
-        if (input.FrontSide.Length is < minFrontSideLength or > maxFrontSideLength)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideLength") + $" {input.FrontSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minFrontSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxFrontSideLength}");
+        if (input.FrontSide.Length is < MinFrontSideLength or > MaxFrontSideLength)
+            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidFrontSideLength") + $" {input.FrontSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinFrontSideLength} " + callContext.Localized.GetLocalized("And") + $" {MaxFrontSideLength}");
 
         if (input.BackSide != input.BackSide.Trim())
             throw new InvalidOperationException("Invalid back side: not trimmed");
-        if (input.BackSide.Length is < minBackSideLength or > maxBackSideLength)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideLength") + $" {input.BackSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minBackSideLength} " + callContext.Localized.GetLocalized("And") + $" {maxBackSideLength}");
+        if (input.BackSide.Length is < MinBackSideLength or > MaxBackSideLength)
+            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidBackSideLength") + $" {input.BackSide.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinBackSideLength} " + callContext.Localized.GetLocalized("And") + $" {MaxBackSideLength}");
 
         if (input.AdditionalInfo != input.AdditionalInfo.Trim())
             throw new InvalidOperationException("Invalid additional info: not trimmed");
-        if (input.AdditionalInfo.Length is < minAdditionalInfoLength or > maxAdditionalInfoLength)
-            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {minAdditionalInfoLength} " + callContext.Localized.GetLocalized("And") + $" {maxAdditionalInfoLength}");
+        if (input.AdditionalInfo.Length is < MinAdditionalInfoLength or > MaxAdditionalInfoLength)
+            throw new RequestInputException(callContext.Localized.GetLocalized("InvalidAdditionalInfoLength") + $" {input.AdditionalInfo.Length}" + callContext.Localized.GetLocalized("MustBeBetween") + $" {MinAdditionalInfoLength} " + callContext.Localized.GetLocalized("And") + $" {MaxAdditionalInfoLength}");
 
         if (input.References != input.References.Trim())
             throw new InvalidOperationException("Invalid References: not trimmed");

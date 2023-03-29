@@ -123,6 +123,78 @@ public class CreateCardTests
         Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
     }
     [TestMethod()]
+    public async Task FrontSideTooLong()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+
+        var request = new CreateCard.Request(
+            creatorId,
+            RandomHelper.String(CardInputValidator.MaxFrontSideLength + 1),
+            RandomHelper.String(),
+            RandomHelper.String(),
+            RandomHelper.String(),
+            languageId,
+            Array.Empty<Guid>(),
+            Array.Empty<Guid>(),
+            RandomHelper.String());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        StringAssert.Contains(exception.Message, CardInputValidator.MinFrontSideLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, CardInputValidator.MaxFrontSideLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, (CardInputValidator.MaxFrontSideLength + 1).ToString(CultureInfo.InvariantCulture));
+    }
+    [TestMethod()]
+    public async Task BackSideTooLong()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+
+        var request = new CreateCard.Request(
+            creatorId,
+            RandomHelper.String(),
+            RandomHelper.String(CardInputValidator.MaxBackSideLength + 1),
+            RandomHelper.String(),
+            RandomHelper.String(),
+            languageId,
+            Array.Empty<Guid>(),
+            Array.Empty<Guid>(),
+            RandomHelper.String());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        StringAssert.Contains(exception.Message, CardInputValidator.MinBackSideLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, CardInputValidator.MaxBackSideLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, (CardInputValidator.MaxBackSideLength + 1).ToString(CultureInfo.InvariantCulture));
+    }
+    [TestMethod()]
+    public async Task AdditionalInfoTooLong()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(testDB);
+        var languageId = await CardLanguageHelper.CreateAsync(testDB);
+
+        var request = new CreateCard.Request(
+            creatorId,
+            RandomHelper.String(),
+            RandomHelper.String(),
+            RandomHelper.String(CardInputValidator.MaxAdditionalInfoLength + 1),
+            RandomHelper.String(),
+            languageId,
+            Array.Empty<Guid>(),
+            Array.Empty<Guid>(),
+            RandomHelper.String());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        StringAssert.Contains(exception.Message, CardInputValidator.MinAdditionalInfoLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, CardInputValidator.MaxAdditionalInfoLength.ToString(CultureInfo.InvariantCulture));
+        StringAssert.Contains(exception.Message, (CardInputValidator.MaxAdditionalInfoLength + 1).ToString(CultureInfo.InvariantCulture));
+    }
+    [TestMethod()]
     public async Task ReferencesTooLong()
     {
         var testDB = DbHelper.GetEmptyTestDB();
