@@ -200,7 +200,7 @@ Elle est actuellement dans le tas</value>
     <value>Inconnu</value>
   </data>
   <data name="UnknownCardsHeap" xml:space="preserve">
-    <value>Cartes non apprises</value>
+    <value>Non apprises</value>
   </data>
   <data name="YouOnly" xml:space="preserve">
     <value>Vous seulement</value>
