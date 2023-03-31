@@ -204,6 +204,19 @@
     flex-direction: row-reverse;
 }
 
+.deck-table {
+    width: 100%;
+    border-top:5px solid black;
+    text-align:center;
+    padding: 0px;
+}
+
+.deck-table-cell {
+    padding-top: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
 .fullscreen-image-div {
     display: block;
     text-align: center;

@@ -54,21 +54,21 @@
         </div>
 
         <div id="Heaps" class="table-responsive" v-if="activeDeck">
-            <table class="table table-responsive" width="100%" style="border-top:5px solid black;text-align:center">
+            <table class="table-responsive deck-table">
                 <tbody>
                     <tr id="Headers for column size">
-                        <th width="10%">@Localizer["Heap"]</th>
-                        <th width="10%">@Localizer["TotalCardCount"]</th>
-                        <th width="10%">@Localizer["ExpiredCardCount"]</th>
-                        <th width="10%">@Localizer["NextExpiry"]</th>
+                        <th class="deck-table-cell">@Localizer["Heap"]</th>
+                        <th class="deck-table-cell">@Localizer["TotalCardCount"]</th>
+                        <th class="deck-table-cell">@Localizer["ExpiredCardCount"]</th>
+                        <th class="deck-table-cell">@Localizer["NextExpiry"]</th>
                     </tr>
                     <tr id="Row for a heap" v-for="heap in activeDeck.heaps">
-                        <td><a v-bind:href="'/Search/Index?DeckId='+activeDeck.deckId+'&HeapId='+heap.id">{{heap.name}}</a></td>
-                        <td>{{heap.totalCardCount}}</td>
-                        <td v-if="heap.id!=0">{{heap.expiredCardCount}}</td>
-                        <td v-else></td>
-                        <td v-if="heap.id!=0">{{dt(heap.nextExpiryUtcDate)}}</td>
-                        <td v-else></td>
+                        <td class="deck-table-cell"><a v-bind:href="'/Search/Index?DeckId='+activeDeck.deckId+'&HeapId='+heap.id">{{heap.name}}</a></td>
+                        <td class="deck-table-cell">{{heap.totalCardCount}}</td>
+                        <td class="deck-table-cell" v-if="heap.id!=0">{{heap.expiredCardCount}}</td>
+                        <td class="deck-table-cell" v-else></td>
+                        <td class="deck-table-cell" v-if="heap.id!=0">{{dt(heap.nextExpiryUtcDate)}}</td>
+                        <td class="deck-table-cell" v-else></td>
                     </tr>
                 </tbody>
             </table>
