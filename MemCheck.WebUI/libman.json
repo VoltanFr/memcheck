@@ -3,7 +3,7 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "showdown@2.0.0",
+      "library": "showdown@2.1.0",
       "destination": "wwwroot/lib/showdown/"
     },
     {
