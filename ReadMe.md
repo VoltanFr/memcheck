@@ -61,7 +61,6 @@ I plan to check that but did not have time yet: development on a Mac or Linux ma
 
 - [Svg](https://www.nuget.org/packages/Svg/) for handling SVG image files.
 - [Serilog](https://www.nuget.org/packages/Serilog/) for logging.
-- [Markdig](https://www.nuget.org/packages/Markdig/) for MarkDown.
 - [Showdown](http://showdownjs.com/) for Markdown.
 - [Vue.js](https://vuejs.org/) for javascript with components.
 - [SendGrid](https://www.nuget.org/packages/SendGrid/) for mailing.
