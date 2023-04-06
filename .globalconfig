@@ -48,3 +48,6 @@ dotnet_diagnostic.CA1707.severity = none
 
 # I allow litteral strings
 dotnet_diagnostic.CA1303.severity = none
+
+# I allow type names as identifiers, because I have existing code with that
+dotnet_diagnostic.CA1720.severity = none

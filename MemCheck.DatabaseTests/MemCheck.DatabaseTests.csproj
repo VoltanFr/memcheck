@@ -25,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\MemCheck.ApplicationTests\MemCheck.ApplicationTests.csproj" />
 		<ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
 	</ItemGroup>
 

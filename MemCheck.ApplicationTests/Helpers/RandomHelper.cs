@@ -8,7 +8,7 @@ using System.Text;
 
 namespace MemCheck.Application.Helpers;
 
-internal static class RandomHelper
+public static class RandomHelper
 {
     #region Private methods
     private static T EntryOfEnumerable<T>(IEnumerable<T> values)
