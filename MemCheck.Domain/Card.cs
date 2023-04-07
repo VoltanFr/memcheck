@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace MemCheck.Domain;
 
 public enum CardVersionType { Creation, Changes }
 
+[Index(nameof(VersionUtcDate))]
 public sealed class Card
 {
     [Key] public Guid Id { get; set; }
