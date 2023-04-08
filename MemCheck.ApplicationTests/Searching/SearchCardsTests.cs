@@ -74,7 +74,7 @@ public class SearchCardsTests
         Assert.AreEqual(1, resultWithoutUser.PageCount);
         var foundCard = resultWithoutUser.Cards.First();
         Assert.AreEqual(card.Id, foundCard.CardId);
-        Assert.AreEqual(card.TagsInCards.Count(), foundCard.Tags.Count());
+        Assert.AreEqual(card.TagsInCards.Count(), foundCard.Tags.Length);
         Assert.IsTrue(foundCard.Tags.Any(t => t == tag1Name));
         Assert.IsTrue(foundCard.Tags.Any(t => t == tag2Name));
         Assert.AreEqual(0, foundCard.CountOfUserRatings);
@@ -461,7 +461,7 @@ public class SearchCardsTests
         var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
         Assert.AreEqual(1, result.TotalNbCards);
         var card = result.Cards.Single();
-        Assert.AreEqual(2, card.VisibleTo.Count());
+        Assert.AreEqual(2, card.VisibleTo.Length);
         var visibleToUser1 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user1.Id);
         Assert.IsNotNull(visibleToUser1.User);
         Assert.AreEqual(user1.UserName, visibleToUser1.User.UserName);

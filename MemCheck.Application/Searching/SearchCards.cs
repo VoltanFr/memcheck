@@ -12,16 +12,41 @@ namespace MemCheck.Application.Searching;
 
 public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards.Result>
 {
-    #region Private class ResultCardBeforeDeckInfo
+    #region Private classes
+    private sealed class ResultCardOutOfRequest
+    {
+        public ResultCardOutOfRequest(Guid id, string frontSide, ImmutableArray<string> tagNames, ImmutableArray<UserWithViewOnCard> usersWithView, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, double averageRating, int ratingCount)
+        {
+            Id = id;
+            FrontSide = frontSide;
+            TagNames = tagNames;
+            UsersWithView = usersWithView;
+            AverageRating = averageRating;
+            CountOfUserRatings = ratingCount;
+            VersionCreator = versionCreator;
+            VersionUtcDate = versionUtcDate;
+            VersionDescription = versionDescription;
+            RatingCount = ratingCount;
+        }
+        public Guid Id { get; }
+        public string FrontSide { get; }
+        public ImmutableArray<string> TagNames { get; }
+        public ImmutableArray<UserWithViewOnCard> UsersWithView { get; }
+        public double AverageRating { get; }
+        public int CountOfUserRatings { get; }
+        public MemCheckUser VersionCreator { get; }
+        public DateTime VersionUtcDate { get; }
+        public string VersionDescription { get; }
+        public int RatingCount { get; }
+    }
     private sealed class ResultCardBeforeDeckInfo
     {
-        public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, int userRating, double averageRating, int ratingCount)
+        public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, ImmutableArray<string> tags, ImmutableArray<UserWithViewOnCard> visibleTo, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, int userRating, double averageRating, int ratingCount)
         {
             CardId = cardId;
             FrontSide = frontSide;
             Tags = tags;
             VisibleTo = visibleTo;
-
             CurrentUserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = ratingCount;
@@ -31,8 +56,8 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         }
         public Guid CardId { get; }
         public string FrontSide { get; }
-        public IEnumerable<string> Tags { get; }
-        public IEnumerable<UserWithViewOnCard> VisibleTo { get; }
+        public ImmutableArray<string> Tags { get; }
+        public ImmutableArray<UserWithViewOnCard> VisibleTo { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
@@ -88,14 +113,14 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
 
         return result.ToImmutableArray();
     }
-    private async Task<ImmutableArray<ResultCardBeforeDeckInfo>> AddUserRatings(Guid userId, ImmutableArray<Card> cards)
+    private async Task<ImmutableArray<ResultCardBeforeDeckInfo>> AddUserRatings(Guid userId, ImmutableArray<ResultCardOutOfRequest> cards)
     {
         var allUserRatings = (await DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating)).ToImmutableDictionary();
 
         var resultCards = cards.Select(card => new ResultCardBeforeDeckInfo(
             card.Id,
             card.FrontSide,
-            card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
+            card.TagNames,
             card.UsersWithView,
             card.VersionCreator,
             card.VersionUtcDate,
@@ -208,7 +233,12 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         var totalNbCards = finalResult.Count();
         var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-        var pageCards = (await finalResult.Skip((request.PageNo - 1) * request.PageSize).Take(request.PageSize).ToListAsync()).ToImmutableArray();
+        var pageItems = finalResult
+            .Skip((request.PageNo - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(card => new { card.Id, card.FrontSide, tagNames = card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name).ToList(), UsersWithView = card.UsersWithView.ToList(), card.VersionCreator, card.VersionUtcDate, card.VersionDescription, card.AverageRating, card.RatingCount });
+        var pageEntries = pageItems.ToList();
+        var pageCards = pageEntries.Select(card => new ResultCardOutOfRequest(card.Id, card.FrontSide, card.tagNames.ToImmutableArray(), card.UsersWithView.ToImmutableArray(), card.VersionCreator, card.VersionUtcDate, card.VersionDescription, card.AverageRating, card.RatingCount)).ToImmutableArray();
 
         var resultCards = await AddUserRatings(request.UserId, pageCards);
         var withUserDeckInfo = await AddDeckInfosAsync(request.UserId, resultCards);
@@ -293,7 +323,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     }
     public sealed class ResultCard
     {
-        public ResultCard(Guid cardId, string frontSide, IEnumerable<string> tags, IEnumerable<UserWithViewOnCard> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
+        public ResultCard(Guid cardId, string frontSide, ImmutableArray<string> tags, ImmutableArray<UserWithViewOnCard> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
         {
             CardId = cardId;
             FrontSide = frontSide.Truncate(150);
@@ -309,8 +339,8 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         }
         public Guid CardId { get; }
         public string FrontSide { get; }
-        public IEnumerable<string> Tags { get; }
-        public IEnumerable<UserWithViewOnCard> VisibleTo { get; }
+        public ImmutableArray<string> Tags { get; }
+        public ImmutableArray<UserWithViewOnCard> VisibleTo { get; }
         public IEnumerable<ResultCardDeckInfo> DeckInfo { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }    //0 if no rating

@@ -419,7 +419,7 @@ public class SearchController : MemCheckController
             CardId = card.CardId;
             FrontSide = card.FrontSide;
             Tags = card.Tags.OrderBy(tag => tag);
-            VisibleToCount = card.VisibleTo.Count();
+            VisibleToCount = card.VisibleTo.Length;
             AverageRating = card.AverageRating;
             CurrentUserRating = card.CurrentUserRating;
             CountOfUserRatings = card.CountOfUserRatings;
