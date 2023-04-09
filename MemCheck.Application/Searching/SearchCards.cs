@@ -67,42 +67,23 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     }
     #endregion
     #region private methods
-    private async Task<ImmutableArray<ResultCardDeckInfo>> GetCardDeckInfoAsync(ResultCardBeforeDeckInfo card, Guid userId)
-    {
-        var cardsInDecksForThisUserAndThisCard = await DbContext.CardsInDecks
-            .AsNoTracking()
-            .Include(card => card.Deck)
-            .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && cardInDeck.CardId == card.CardId)
-            .ToArrayAsync();
-
-        var result = cardsInDecksForThisUserAndThisCard.Select(cardInDeck => new ResultCardDeckInfo(
-            cardInDeck.DeckId,
-            cardInDeck.Deck.Description,
-            cardInDeck.CurrentHeap,
-            cardInDeck.BiggestHeapReached,
-            cardInDeck.NbTimesInNotLearnedHeap,
-            cardInDeck.AddToDeckUtcTime,
-            cardInDeck.LastLearnUtcTime,
-            cardInDeck.CurrentHeap == 0 || cardInDeck.ExpiryUtcTime <= DateTime.UtcNow,
-            cardInDeck.ExpiryUtcTime));
-
-        return result.ToImmutableArray();
-    }
     private async Task<ImmutableArray<ResultCard>> AddDeckInfosAsync(Guid userId, ImmutableArray<ResultCardBeforeDeckInfo> resultCards)
     {
-        var cardDeckInfos = new Dictionary<Guid, IEnumerable<ResultCardDeckInfo>>();
-        foreach (var card in resultCards)
-        {
-            var deckInfo = await GetCardDeckInfoAsync(card, userId);
-            cardDeckInfos.Add(card.CardId, deckInfo);
-        }
+        var resultCardIds = resultCards.Select(card => card.CardId).ToImmutableHashSet();
+
+        var cardDeckInfos = await DbContext.CardsInDecks
+            .AsNoTracking()
+            .Include(card => card.Deck)
+            .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && resultCardIds.Contains(cardInDeck.CardId))
+            .GroupBy(cardDeckInfo => cardDeckInfo.CardId, cardDeckInfo => new ResultCardDeckInfo(cardDeckInfo.DeckId, cardDeckInfo.Deck.Description, cardDeckInfo.CurrentHeap, cardDeckInfo.BiggestHeapReached, cardDeckInfo.NbTimesInNotLearnedHeap, cardDeckInfo.AddToDeckUtcTime, cardDeckInfo.LastLearnUtcTime, cardDeckInfo.CurrentHeap == 0 || cardDeckInfo.ExpiryUtcTime <= DateTime.UtcNow, cardDeckInfo.ExpiryUtcTime))
+            .ToImmutableDictionaryAsync(cardDeckInfoGroup => cardDeckInfoGroup.Key, cardDeckInfoGroup => cardDeckInfoGroup.ToImmutableArray());
 
         var result = resultCards.Select(card => new ResultCard(
             card.CardId,
             card.FrontSide,
             card.Tags,
             card.VisibleTo,
-            cardDeckInfos[card.CardId],
+            cardDeckInfos.TryGetValue(card.CardId, out var value) ? value : ImmutableArray<ResultCardDeckInfo>.Empty,
             card.CurrentUserRating,
             card.AverageRating,
             card.CountOfUserRatings,
@@ -115,7 +96,11 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     }
     private async Task<ImmutableArray<ResultCardBeforeDeckInfo>> AddUserRatings(Guid userId, ImmutableArray<ResultCardOutOfRequest> cards)
     {
-        var allUserRatings = (await DbContext.UserCardRatings.Where(r => r.UserId == userId).Select(r => new { r.CardId, r.Rating }).ToDictionaryAsync(r => r.CardId, r => r.Rating)).ToImmutableDictionary();
+        var allUserRatings = await DbContext.UserCardRatings
+            .AsNoTracking()
+            .Where(r => r.UserId == userId)
+            .Select(r => new { r.CardId, r.Rating })
+            .ToImmutableDictionaryAsync(r => r.CardId, r => r.Rating);
 
         var resultCards = cards.Select(card => new ResultCardBeforeDeckInfo(
             card.Id,
@@ -146,6 +131,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             .ThenInclude(tagInCard => tagInCard.Tag)
             .Include(card => card.VersionCreator)
             .Include(card => card.CardLanguage)
+            .Include(card => card.CardInDecks)
             .Include(card => card.UsersWithView)
             .ThenInclude(usersWithView => usersWithView.User)
             .AsSingleQuery();
@@ -323,7 +309,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     }
     public sealed class ResultCard
     {
-        public ResultCard(Guid cardId, string frontSide, ImmutableArray<string> tags, ImmutableArray<UserWithViewOnCard> visibleTo, IEnumerable<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
+        public ResultCard(Guid cardId, string frontSide, ImmutableArray<string> tags, ImmutableArray<UserWithViewOnCard> visibleTo, ImmutableArray<ResultCardDeckInfo> deckInfo, int currentUserRating, double averageRating, int countOfUserRatings, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription)
         {
             CardId = cardId;
             FrontSide = frontSide.Truncate(150);
@@ -341,7 +327,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         public string FrontSide { get; }
         public ImmutableArray<string> Tags { get; }
         public ImmutableArray<UserWithViewOnCard> VisibleTo { get; }
-        public IEnumerable<ResultCardDeckInfo> DeckInfo { get; }
+        public ImmutableArray<ResultCardDeckInfo> DeckInfo { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }    //0 if no rating
         public int CountOfUserRatings { get; }
