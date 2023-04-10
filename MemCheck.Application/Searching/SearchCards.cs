@@ -12,6 +12,9 @@ namespace MemCheck.Application.Searching;
 
 public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards.Result>
 {
+    #region Field: runDate
+    private readonly DateTime runDate;
+    #endregion
     #region Private classes
     private sealed class ResultCardOutOfRequest
     {
@@ -75,7 +78,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             .AsNoTracking()
             .Include(card => card.Deck)
             .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && resultCardIds.Contains(cardInDeck.CardId))
-            .GroupBy(cardDeckInfo => cardDeckInfo.CardId, cardDeckInfo => new ResultCardDeckInfo(cardDeckInfo.DeckId, cardDeckInfo.Deck.Description, cardDeckInfo.CurrentHeap, cardDeckInfo.BiggestHeapReached, cardDeckInfo.NbTimesInNotLearnedHeap, cardDeckInfo.AddToDeckUtcTime, cardDeckInfo.LastLearnUtcTime, cardDeckInfo.CurrentHeap == 0 || cardDeckInfo.ExpiryUtcTime <= DateTime.UtcNow, cardDeckInfo.ExpiryUtcTime))
+            .GroupBy(cardDeckInfo => cardDeckInfo.CardId, cardDeckInfo => new ResultCardDeckInfo(cardDeckInfo.DeckId, cardDeckInfo.Deck.Description, cardDeckInfo.CurrentHeap, cardDeckInfo.BiggestHeapReached, cardDeckInfo.NbTimesInNotLearnedHeap, cardDeckInfo.AddToDeckUtcTime, cardDeckInfo.LastLearnUtcTime, cardDeckInfo.CurrentHeap == 0 || cardDeckInfo.ExpiryUtcTime <= runDate, cardDeckInfo.ExpiryUtcTime))
             .ToImmutableDictionaryAsync(cardDeckInfoGroup => cardDeckInfoGroup.Key, cardDeckInfoGroup => cardDeckInfoGroup.ToImmutableArray());
 
         var result = resultCards.Select(card => new ResultCard(
@@ -119,8 +122,9 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         return resultCards.ToImmutableArray();
     }
     #endregion
-    public SearchCards(CallContext callContext) : base(callContext)
+    public SearchCards(CallContext callContext, DateTime? runDate = null) : base(callContext)
     {
+        this.runDate = runDate == null ? DateTime.UtcNow : runDate.Value;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Too complicated")]

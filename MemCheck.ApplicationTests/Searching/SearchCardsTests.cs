@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Decks;
+using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
@@ -497,8 +498,7 @@ public class SearchCardsTests
         Assert.AreEqual(1, result.TotalNbCards);
         Assert.AreEqual(cardWithoutRef.Id, result.Cards.Single().CardId);
     }
-    [TestMethod()]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Really want to use lower case for test")]
+    [TestMethod(), System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Really want to use lower case for test")]
     public async Task TestCaseInsensitive()
     {
         var testDB = DbHelper.GetEmptyTestDB();
@@ -522,5 +522,159 @@ public class SearchCardsTests
         Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithSameCasingInText.Id));
         Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithUpperCasingInText.Id));
         Assert.IsTrue(result.Cards.Any(card => card.CardId == cardWithLowerCasingInText.Id));
+    }
+    [TestMethod()]
+    public async Task TestDeckInfo_OneCard_InDeck_NotExpired()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        var deckName = RandomHelper.String();
+        var deckId = await DeckHelper.CreateAsync(db, userId, description: deckName);
+        const int heap = 3;
+        var biggestHeapReached = RandomHelper.Heap();
+        var lastLearnTime = RandomHelper.Date();
+        var searchedString = RandomHelper.String();
+        var addToDeckTime = RandomHelper.Date();
+        var nbTimesInNotLearnedHeap = RandomHelper.Int(100);
+
+        var cardId = await CardHelper.CreateIdAsync(db, userId, frontSide: searchedString);
+        await DeckHelper.AddCardAsync(db, deckId, cardId, heap, biggestHeapReached: biggestHeapReached, lastLearnUtcTime: lastLearnTime, addToDeckUtcTime: addToDeckTime, nbTimesInNotLearnedHeap: nbTimesInNotLearnedHeap);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var request = new SearchCards.Request { UserId = userId, RequiredText = searchedString };
+        var result = await new SearchCards(dbContext.AsCallContext(), lastLearnTime.AddDays(heap - 1)).RunAsync(request);
+        var deckInfo = result.Cards.Single().DeckInfo.Single();
+        Assert.AreEqual(deckId, deckInfo.DeckId);
+        Assert.AreEqual(deckName, deckInfo.DeckName);
+        Assert.AreEqual(heap, deckInfo.CurrentHeap);
+        Assert.AreEqual(biggestHeapReached, deckInfo.BiggestHeapReached);
+        Assert.AreEqual(nbTimesInNotLearnedHeap, deckInfo.NbTimesInNotLearnedHeap);
+        Assert.AreEqual(addToDeckTime, deckInfo.AddToDeckUtcTime);
+        Assert.AreEqual(lastLearnTime, deckInfo.LastLearnUtcTime);
+        Assert.IsFalse(deckInfo.Expired);
+        Assert.AreEqual(new UnitTestsHeapingAlgorithm().ExpiryUtcDate(heap, lastLearnTime), deckInfo.ExpiryUtcDate);
+    }
+    [TestMethod()]
+    public async Task TestDeckInfo_OneCard_InDeck_Expired()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        var deckName = RandomHelper.String();
+        var deckId = await DeckHelper.CreateAsync(db, userId, description: deckName);
+        const int heap = 3;
+        var biggestHeapReached = RandomHelper.Heap();
+        var lastLearnTime = RandomHelper.Date();
+        var searchedString = RandomHelper.String();
+        var addToDeckTime = RandomHelper.Date();
+        var nbTimesInNotLearnedHeap = RandomHelper.Int(100);
+
+        var cardId = await CardHelper.CreateIdAsync(db, userId, frontSide: searchedString);
+        await DeckHelper.AddCardAsync(db, deckId, cardId, heap, biggestHeapReached: biggestHeapReached, lastLearnUtcTime: lastLearnTime, addToDeckUtcTime: addToDeckTime, nbTimesInNotLearnedHeap: nbTimesInNotLearnedHeap);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var request = new SearchCards.Request { UserId = userId, RequiredText = searchedString };
+        var result = await new SearchCards(dbContext.AsCallContext(), lastLearnTime.AddDays(heap + 1)).RunAsync(request);
+        var deckInfo = result.Cards.Single().DeckInfo.Single();
+        Assert.AreEqual(deckId, deckInfo.DeckId);
+        Assert.AreEqual(deckName, deckInfo.DeckName);
+        Assert.AreEqual(heap, deckInfo.CurrentHeap);
+        Assert.AreEqual(biggestHeapReached, deckInfo.BiggestHeapReached);
+        Assert.AreEqual(nbTimesInNotLearnedHeap, deckInfo.NbTimesInNotLearnedHeap);
+        Assert.AreEqual(addToDeckTime, deckInfo.AddToDeckUtcTime);
+        Assert.AreEqual(lastLearnTime, deckInfo.LastLearnUtcTime);
+        Assert.IsTrue(deckInfo.Expired);
+        Assert.AreEqual(new UnitTestsHeapingAlgorithm().ExpiryUtcDate(heap, lastLearnTime), deckInfo.ExpiryUtcDate);
+    }
+    [TestMethod()]
+    public async Task TestDeckInfo_OneCard_NotInDeck()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        await DeckHelper.CreateAsync(db, userId);
+        var searchedString = RandomHelper.String();
+
+        await CardHelper.CreateIdAsync(db, userId, frontSide: searchedString);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var request = new SearchCards.Request { UserId = userId, RequiredText = searchedString };
+        var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+        Assert.IsFalse(result.Cards.Single().DeckInfo.Any());
+    }
+    [TestMethod()]
+    public async Task TestDeckInfo_ComplexCase()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var user1Id = await UserHelper.CreateInDbAsync(db);
+        var user1Deck1Id = await DeckHelper.CreateAsync(db, user1Id);
+        var user1Deck2Id = await DeckHelper.CreateAsync(db, user1Id);
+        var user2Id = await UserHelper.CreateInDbAsync(db);
+        var user2DeckId = await DeckHelper.CreateAsync(db, user2Id);
+
+        var card1Id = await CardHelper.CreateIdAsync(db, user1Id);
+        await DeckHelper.AddCardAsync(db, user1Deck1Id, card1Id);
+        await DeckHelper.AddCardAsync(db, user1Deck2Id, card1Id);
+        await DeckHelper.AddCardAsync(db, user2DeckId, card1Id);
+
+        var card2Id = await CardHelper.CreateIdAsync(db, user2Id);
+        await DeckHelper.AddCardAsync(db, user1Deck1Id, card2Id);
+        await DeckHelper.AddCardAsync(db, user2DeckId, card2Id);
+
+        var card3Id = await CardHelper.CreateIdAsync(db, user1Id);
+        await DeckHelper.AddCardAsync(db, user1Deck2Id, card3Id);
+
+        var card4Id = await CardHelper.CreateIdAsync(db, user2Id);
+        await DeckHelper.AddCardAsync(db, user2DeckId, card4Id);
+
+        //Search by user1
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var request = new SearchCards.Request { UserId = user1Id };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(4, result.Cards.Length);
+
+            {
+                var card1FromResults = result.Cards.Single(card => card.CardId == card1Id);
+                Assert.AreEqual(2, card1FromResults.DeckInfo.Length);
+                CollectionAssert.Contains(card1FromResults.DeckInfo.Select(deckInfo => deckInfo.DeckId).ToList(), user1Deck1Id);
+                CollectionAssert.Contains(card1FromResults.DeckInfo.Select(deckInfo => deckInfo.DeckId).ToList(), user1Deck2Id);
+            }
+            {
+                var card2FromResults = result.Cards.Single(card => card.CardId == card2Id);
+                Assert.AreEqual(user1Deck1Id, card2FromResults.DeckInfo.Single().DeckId);
+            }
+            {
+                var card3FromResults = result.Cards.Single(card => card.CardId == card3Id);
+                Assert.AreEqual(user1Deck2Id, card3FromResults.DeckInfo.Single().DeckId);
+            }
+            {
+                var card4FromResults = result.Cards.Single(card => card.CardId == card4Id);
+                Assert.IsFalse(card4FromResults.DeckInfo.Any());
+            }
+        }
+
+        //Search by user2
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var request = new SearchCards.Request { UserId = user2Id };
+            var result = await new SearchCards(dbContext.AsCallContext()).RunAsync(request);
+            Assert.AreEqual(4, result.Cards.Length);
+
+            {
+                var card1FromResults = result.Cards.Single(card => card.CardId == card1Id);
+                Assert.AreEqual(user2DeckId, card1FromResults.DeckInfo.Single().DeckId);
+            }
+            {
+                var card2FromResults = result.Cards.Single(card => card.CardId == card2Id);
+                Assert.AreEqual(user2DeckId, card2FromResults.DeckInfo.Single().DeckId);
+            }
+            {
+                var card3FromResults = result.Cards.Single(card => card.CardId == card3Id);
+                Assert.IsFalse(card3FromResults.DeckInfo.Any());
+            }
+            {
+                var card4FromResults = result.Cards.Single(card => card.CardId == card4Id);
+                Assert.AreEqual(user2DeckId, card4FromResults.DeckInfo.Single().DeckId);
+            }
+        }
     }
 }
