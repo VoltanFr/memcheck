@@ -15,113 +15,6 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
     #region Field: runDate
     private readonly DateTime runDate;
     #endregion
-    #region Private classes
-    private sealed class ResultCardOutOfRequest
-    {
-        public ResultCardOutOfRequest(Guid id, string frontSide, ImmutableArray<string> tagNames, ImmutableArray<UserWithViewOnCard> usersWithView, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, double averageRating, int ratingCount)
-        {
-            Id = id;
-            FrontSide = frontSide;
-            TagNames = tagNames;
-            UsersWithView = usersWithView;
-            AverageRating = averageRating;
-            CountOfUserRatings = ratingCount;
-            VersionCreator = versionCreator;
-            VersionUtcDate = versionUtcDate;
-            VersionDescription = versionDescription;
-            RatingCount = ratingCount;
-        }
-        public Guid Id { get; }
-        public string FrontSide { get; }
-        public ImmutableArray<string> TagNames { get; }
-        public ImmutableArray<UserWithViewOnCard> UsersWithView { get; }
-        public double AverageRating { get; }
-        public int CountOfUserRatings { get; }
-        public MemCheckUser VersionCreator { get; }
-        public DateTime VersionUtcDate { get; }
-        public string VersionDescription { get; }
-        public int RatingCount { get; }
-    }
-    private sealed class ResultCardBeforeDeckInfo
-    {
-        public ResultCardBeforeDeckInfo(Guid cardId, string frontSide, ImmutableArray<string> tags, ImmutableArray<UserWithViewOnCard> visibleTo, MemCheckUser versionCreator, DateTime versionUtcDate, string versionDescription, int userRating, double averageRating, int ratingCount)
-        {
-            CardId = cardId;
-            FrontSide = frontSide;
-            Tags = tags;
-            VisibleTo = visibleTo;
-            CurrentUserRating = userRating;
-            AverageRating = averageRating;
-            CountOfUserRatings = ratingCount;
-            VersionCreator = versionCreator;
-            VersionUtcDate = versionUtcDate;
-            VersionDescription = versionDescription;
-        }
-        public Guid CardId { get; }
-        public string FrontSide { get; }
-        public ImmutableArray<string> Tags { get; }
-        public ImmutableArray<UserWithViewOnCard> VisibleTo { get; }
-        public int CurrentUserRating { get; }
-        public double AverageRating { get; }
-        public int CountOfUserRatings { get; }
-        public MemCheckUser VersionCreator { get; }
-        public DateTime VersionUtcDate { get; }
-        public string VersionDescription { get; }
-    }
-    #endregion
-    #region private methods
-    private async Task<ImmutableArray<ResultCard>> AddDeckInfosAsync(Guid userId, ImmutableArray<ResultCardBeforeDeckInfo> resultCards)
-    {
-        var resultCardIds = resultCards.Select(card => card.CardId).ToImmutableHashSet();
-
-        var cardDeckInfos = await DbContext.CardsInDecks
-            .AsNoTracking()
-            .Include(card => card.Deck)
-            .Where(cardInDeck => cardInDeck.Deck.Owner.Id == userId && resultCardIds.Contains(cardInDeck.CardId))
-            .GroupBy(cardDeckInfo => cardDeckInfo.CardId, cardDeckInfo => new ResultCardDeckInfo(cardDeckInfo.DeckId, cardDeckInfo.Deck.Description, cardDeckInfo.CurrentHeap, cardDeckInfo.BiggestHeapReached, cardDeckInfo.NbTimesInNotLearnedHeap, cardDeckInfo.AddToDeckUtcTime, cardDeckInfo.LastLearnUtcTime, cardDeckInfo.CurrentHeap == 0 || cardDeckInfo.ExpiryUtcTime <= runDate, cardDeckInfo.ExpiryUtcTime))
-            .ToImmutableDictionaryAsync(cardDeckInfoGroup => cardDeckInfoGroup.Key, cardDeckInfoGroup => cardDeckInfoGroup.ToImmutableArray());
-
-        var result = resultCards.Select(card => new ResultCard(
-            card.CardId,
-            card.FrontSide,
-            card.Tags,
-            card.VisibleTo,
-            cardDeckInfos.TryGetValue(card.CardId, out var value) ? value : ImmutableArray<ResultCardDeckInfo>.Empty,
-            card.CurrentUserRating,
-            card.AverageRating,
-            card.CountOfUserRatings,
-            card.VersionCreator,
-            card.VersionUtcDate,
-            card.VersionDescription)
-        );
-
-        return result.ToImmutableArray();
-    }
-    private async Task<ImmutableArray<ResultCardBeforeDeckInfo>> AddUserRatings(Guid userId, ImmutableArray<ResultCardOutOfRequest> cards)
-    {
-        var allUserRatings = await DbContext.UserCardRatings
-            .AsNoTracking()
-            .Where(r => r.UserId == userId)
-            .Select(r => new { r.CardId, r.Rating })
-            .ToImmutableDictionaryAsync(r => r.CardId, r => r.Rating);
-
-        var resultCards = cards.Select(card => new ResultCardBeforeDeckInfo(
-            card.Id,
-            card.FrontSide,
-            card.TagNames,
-            card.UsersWithView,
-            card.VersionCreator,
-            card.VersionUtcDate,
-            card.VersionDescription,
-            allUserRatings.TryGetValue(card.Id, out var value) ? value : 0,
-            card.AverageRating,
-            card.RatingCount
-            )
-        );
-
-        return resultCards.ToImmutableArray();
-    }
-    #endregion
     public SearchCards(CallContext callContext, DateTime? runDate = null) : base(callContext)
     {
         this.runDate = runDate == null ? DateTime.UtcNow : runDate.Value;
@@ -135,7 +28,6 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             .ThenInclude(tagInCard => tagInCard.Tag)
             .Include(card => card.VersionCreator)
             .Include(card => card.CardLanguage)
-            .Include(card => card.CardInDecks)
             .Include(card => card.UsersWithView)
             .ThenInclude(usersWithView => usersWithView.User)
             .AsSingleQuery();
@@ -217,23 +109,44 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         else
             cardsFilteredWithReference = cardsFilteredWithNotifications.Where(card => request.Reference == Request.ReferenceFiltering.None ? card.References.Length == 0 : card.References.Length > 0);
 
-        var finalResult = cardsFilteredWithReference;
-        finalResult = finalResult.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
+        var allQueryResults = cardsFilteredWithReference;
+        allQueryResults = allQueryResults.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
 
-        var totalNbCards = finalResult.Count();
+        var totalNbCards = await allQueryResults.CountAsync();
         var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-        var pageItems = finalResult
+        var pageItems = allQueryResults
             .Skip((request.PageNo - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(card => new { card.Id, card.FrontSide, tagNames = card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name).ToList(), UsersWithView = card.UsersWithView.ToList(), card.VersionCreator, card.VersionUtcDate, card.VersionDescription, card.AverageRating, card.RatingCount });
-        var pageEntries = pageItems.ToList();
-        var pageCards = pageEntries.Select(card => new ResultCardOutOfRequest(card.Id, card.FrontSide, card.tagNames.ToImmutableArray(), card.UsersWithView.ToImmutableArray(), card.VersionCreator, card.VersionUtcDate, card.VersionDescription, card.AverageRating, card.RatingCount)).ToImmutableArray();
+            .Select(card => new ResultCard(
+                card.Id,
+                card.FrontSide,
+                card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name).ToImmutableArray(),
+                card.UsersWithView.ToList().ToImmutableArray(),
+                card.CardInDecks.Where(cardInDeck => cardInDeck.Deck.Owner.Id == request.UserId).Select(cardInDeck => new ResultCardDeckInfo(cardInDeck.DeckId, cardInDeck.Deck.Description, cardInDeck.CurrentHeap, cardInDeck.BiggestHeapReached, cardInDeck.NbTimesInNotLearnedHeap, cardInDeck.AddToDeckUtcTime, cardInDeck.LastLearnUtcTime, cardInDeck.CurrentHeap == 0 || cardInDeck.ExpiryUtcTime <= runDate, cardInDeck.ExpiryUtcTime)).ToImmutableArray(),
+                0,
+                card.AverageRating,
+                card.RatingCount,
+                card.VersionCreator,
+                card.VersionUtcDate,
+                card.VersionDescription
+                )
+            );
 
-        var resultCards = await AddUserRatings(request.UserId, pageCards);
-        var withUserDeckInfo = await AddDeckInfosAsync(request.UserId, resultCards);
+        var pageEntries = await pageItems.ToImmutableArrayAsync();
+        var cardIds = pageEntries.Select(card => card.CardId).ToImmutableHashSet();
 
-        var result = new Result(totalNbCards, totalPageCount, withUserDeckInfo);
+        // I don't understand why very well, but I get better perf by loading the user ratings separately than in a joint in the big query above
+        var allUserRatings = await DbContext.UserCardRatings
+            .AsNoTracking()
+            .Where(r => r.UserId == request.UserId && cardIds.Contains(r.CardId))
+            .Select(r => new { r.CardId, r.Rating })
+            .ToImmutableDictionaryAsync(r => r.CardId, r => r.Rating);
+
+        foreach (var card in pageEntries)
+            card.CurrentUserRating = allUserRatings.TryGetValue(card.CardId, out var value) ? value : 0;
+
+        var result = new Result(totalNbCards, totalPageCount, pageEntries);
         return new ResultWithMetrologyProperties<Result>(result,
             ("DeckMode", request.Deck == Guid.Empty ? "Ignore" : request.DeckIsInclusive ? "Inclusive" : "Exclusive"),
             ("InHeap", (request.Heap != null).ToString()),
@@ -332,7 +245,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         public ImmutableArray<string> Tags { get; }
         public ImmutableArray<UserWithViewOnCard> VisibleTo { get; }
         public ImmutableArray<ResultCardDeckInfo> DeckInfo { get; }
-        public int CurrentUserRating { get; }
+        public int CurrentUserRating { get; set; }
         public double AverageRating { get; }    //0 if no rating
         public int CountOfUserRatings { get; }
         public MemCheckUser VersionCreator { get; }
