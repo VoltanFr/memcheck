@@ -63,10 +63,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
 
         var cardsFilteredWithText = string.IsNullOrEmpty(request.RequiredText) ? cardsFilteredWithExludedTags :
             cardsFilteredWithExludedTags.Where(card =>
-                EF.Functions.Like(card.FrontSide, $"%{request.RequiredText}%")
-                || EF.Functions.Like(card.BackSide, $"%{request.RequiredText}%")
-                || EF.Functions.Like(card.AdditionalInfo, $"%{request.RequiredText}%")
-                || EF.Functions.Like(card.References, $"%{request.RequiredText}%")
+                EF.Functions.Like(card.WholeText, $"%{request.RequiredText}%")
             );
 
         IQueryable<Card> cardsFilteredWithVisibility;

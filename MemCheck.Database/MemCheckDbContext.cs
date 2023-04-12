@@ -49,6 +49,11 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
         CreateCompositePrimaryKeys(builder);
         AddIndexesRecomendedByAzureWebSite(builder);
         EnforceAllDatesUtc(builder);
+        CreateComputedColumns(builder);
+    }
+    private static void CreateComputedColumns(ModelBuilder builder)
+    {
+        builder.Entity<Card>().Property(p => p.WholeText).HasComputedColumnSql("[FrontSide] + [BackSide] + [AdditionalInfo] + [References]", true);
     }
     private static void CreateCompositePrimaryKeys(ModelBuilder builder)
     {
