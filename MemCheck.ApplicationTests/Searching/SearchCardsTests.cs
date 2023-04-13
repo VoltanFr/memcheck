@@ -3,6 +3,7 @@ using MemCheck.Application.Heaping;
 using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Ratings;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -464,6 +465,7 @@ public class SearchCardsTests
         var card = result.Cards.Single();
         Assert.AreEqual(2, card.VisibleTo.Length);
         var visibleToUser1 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user1.Id);
+        Assert.IsNotNull(visibleToUser1);
         Assert.IsNotNull(visibleToUser1.User);
         Assert.AreEqual(user1.UserName, visibleToUser1.User.UserName);
         var visibleToUser2 = card.VisibleTo.Single(visibleTo => visibleTo.UserId == user2.Id);
@@ -675,6 +677,75 @@ public class SearchCardsTests
                 var card4FromResults = result.Cards.Single(card => card.CardId == card4Id);
                 Assert.AreEqual(user2DeckId, card4FromResults.DeckInfo.Single().DeckId);
             }
+        }
+    }
+    [TestMethod()]
+    public async Task TestGetAllCardIdsVisibleByUser_AllCardsPublic()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var user1 = await UserHelper.CreateInDbAsync(testDB);
+        var user2 = await UserHelper.CreateInDbAsync(testDB);
+        await CardHelper.CreateIdAsync(testDB, user1);
+        await CardHelper.CreateIdAsync(testDB, user1);
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var searchCards = new SearchCards(dbContext.AsCallContext());
+        Assert.AreEqual(2, (await searchCards.GetAllCardIdsVisibleByUser(user1)).Count);
+        Assert.AreEqual(2, (await searchCards.GetAllCardIdsVisibleByUser(user2)).Count);
+    }
+    [TestMethod()]
+    public async Task TestGetAllCardIdsVisibleByUser_AllCardsPrivate()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var user1 = await UserHelper.CreateInDbAsync(testDB);
+        var user2 = await UserHelper.CreateInDbAsync(testDB);
+        await CardHelper.CreateIdAsync(testDB, user1, userWithViewIds: user1.AsArray());
+        await CardHelper.CreateIdAsync(testDB, user1, userWithViewIds: user1.AsArray());
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var searchCards = new SearchCards(dbContext.AsCallContext());
+        Assert.AreEqual(2, (await searchCards.GetAllCardIdsVisibleByUser(user1)).Count);
+        Assert.AreEqual(0, (await searchCards.GetAllCardIdsVisibleByUser(user2)).Count);
+    }
+    [TestMethod()]
+    public async Task TestGetAllCardIdsVisibleByUser_Complex()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var user1 = await UserHelper.CreateInDbAsync(testDB);
+        var user2 = await UserHelper.CreateInDbAsync(testDB);
+        var user3 = await UserHelper.CreateInDbAsync(testDB);
+
+        var cardVisibleToAllUsers = await CardHelper.CreateIdAsync(testDB, user1);
+        var cardVisibleToUser1Only = await CardHelper.CreateIdAsync(testDB, user1, userWithViewIds: user1.AsArray());
+        var cardVisibleToUser2Only = await CardHelper.CreateIdAsync(testDB, user2, userWithViewIds: user2.AsArray());
+        var cardVisibleToUser1And2 = await CardHelper.CreateIdAsync(testDB, user1, userWithViewIds: new[] { user1, user2 });
+        var cardVisibleToUser1And3 = await CardHelper.CreateIdAsync(testDB, user1, userWithViewIds: new[] { user1, user3 });
+        var cardVisibleToUser2And3 = await CardHelper.CreateIdAsync(testDB, user3, userWithViewIds: new[] { user2, user3 });
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var searchCards = new SearchCards(dbContext.AsCallContext());
+        {
+            var result = await searchCards.GetAllCardIdsVisibleByUser(user1);
+            Assert.AreEqual(4, result.Count);
+            Assert.IsTrue(result.Contains(cardVisibleToAllUsers));
+            Assert.IsTrue(result.Contains(cardVisibleToUser1Only));
+            Assert.IsTrue(result.Contains(cardVisibleToUser1And2));
+            Assert.IsTrue(result.Contains(cardVisibleToUser1And3));
+        }
+        {
+            var result = await searchCards.GetAllCardIdsVisibleByUser(user2);
+            Assert.AreEqual(4, result.Count);
+            Assert.IsTrue(result.Contains(cardVisibleToAllUsers));
+            Assert.IsTrue(result.Contains(cardVisibleToUser2Only));
+            Assert.IsTrue(result.Contains(cardVisibleToUser1And2));
+            Assert.IsTrue(result.Contains(cardVisibleToUser2And3));
+        }
+        {
+            var result = await searchCards.GetAllCardIdsVisibleByUser(user3);
+            Assert.AreEqual(3, result.Count);
+            Assert.IsTrue(result.Contains(cardVisibleToAllUsers));
+            Assert.IsTrue(result.Contains(cardVisibleToUser1And3));
+            Assert.IsTrue(result.Contains(cardVisibleToUser2And3));
         }
     }
 }

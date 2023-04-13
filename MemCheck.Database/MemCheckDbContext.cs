@@ -21,6 +21,8 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public MemCheckDbContext(DbContextOptions options)
         : base(options)
     {
+        // Use this for big DB operations (schema updates)
+        //Database.SetCommandTimeout(600);
     }
     public DbSet<Card> Cards { get; set; } = null!;
     public DbSet<CardPreviousVersion> CardPreviousVersions { get; set; } = null!;

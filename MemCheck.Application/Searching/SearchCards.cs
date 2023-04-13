@@ -20,21 +20,28 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         this.runDate = runDate == null ? DateTime.UtcNow : runDate.Value;
     }
 
+    internal async Task<ImmutableHashSet<Guid>> GetAllCardIdsVisibleByUser(Guid userId)
+    {
+        // To find the cars the user can access, you would think I'd use the following. But it is very slow:
+        //      allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));
+        // A query using !card.UsersWithView.Any() is a bit slow, so I use another way to find public cards
+
+        var usersWithViewOnCards = await DbContext.UsersWithViewOnCards.AsNoTracking().ToImmutableArrayAsync();
+        var nonPublicCardIds = usersWithViewOnCards.Select(userWithViewOnCard => userWithViewOnCard.CardId).ToImmutableHashSet();
+        var nonPublicCardIdsAllowedToCurrentUser = usersWithViewOnCards.Where(userWithViewOnCard => userWithViewOnCard.UserId == userId).Select(userWithViewOnCard => userWithViewOnCard.CardId).ToImmutableHashSet();
+        var allCardIds = await DbContext.Cards.AsNoTracking().Select(card => card.Id).ToImmutableArrayAsync();
+        var allCardIdsViewableByUser = allCardIds.Where(cardId => !nonPublicCardIds.Contains(cardId) || nonPublicCardIdsAllowedToCurrentUser.Contains(cardId)).ToImmutableHashSet();
+        return allCardIdsViewableByUser;
+    }
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Too complicated")]
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var allCards = DbContext.Cards.AsNoTracking()
-            .Include(card => card.TagsInCards)
-            .ThenInclude(tagInCard => tagInCard.Tag)
-            .Include(card => card.VersionCreator)
-            .Include(card => card.CardLanguage)
-            .Include(card => card.UsersWithView)
-            .ThenInclude(usersWithView => usersWithView.User)
-            .AsSingleQuery();
+        var allCardIdsViewableByUser = await GetAllCardIdsVisibleByUser(request.UserId);
 
-        var cardsViewableByUser = allCards.Where(card => !card.UsersWithView.Any() || card.UsersWithView.Any(userWithView => userWithView.UserId == request.UserId));
+        var allCards = DbContext.Cards.AsNoTracking().AsSingleQuery();
 
-        var cardsFilteredWithDate = request.MinimumUtcDateOfCards == null ? cardsViewableByUser : cardsViewableByUser.Where(card => card.VersionUtcDate >= request.MinimumUtcDateOfCards.Value);
+        var cardsFilteredWithDate = request.MinimumUtcDateOfCards == null ? allCards : allCards.Where(card => card.VersionUtcDate >= request.MinimumUtcDateOfCards.Value);
 
         IQueryable<Card> cardsFilteredWithDeck;
         if (request.Deck != Guid.Empty)
@@ -106,15 +113,26 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
         else
             cardsFilteredWithReference = cardsFilteredWithNotifications.Where(card => request.Reference == Request.ReferenceFiltering.None ? card.References.Length == 0 : card.References.Length > 0);
 
-        var allQueryResults = cardsFilteredWithReference;
-        allQueryResults = allQueryResults.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
+        var allQueryResultsOrdered = cardsFilteredWithReference.OrderByDescending(card => card.VersionUtcDate); //For Take() and Skip(), just below, to work, we need to have an order. In future versions we will offer the user some sorting
 
-        var totalNbCards = await allQueryResults.CountAsync();
+        var allResultCardIdsBeforeFilteringOnVisibility = await allQueryResultsOrdered.Select(card => card.Id).ToImmutableArrayAsync();
+
+        var allResultCardIdsForUser = allResultCardIdsBeforeFilteringOnVisibility.Where(cardId => allCardIdsViewableByUser.Contains(cardId)).ToImmutableArray();
+
+        var totalNbCards = allResultCardIdsForUser.Length;
         var totalPageCount = (int)Math.Ceiling(((double)totalNbCards) / request.PageSize);
 
-        var pageItems = allQueryResults
+        var pageCardIds = allResultCardIdsForUser
             .Skip((request.PageNo - 1) * request.PageSize)
             .Take(request.PageSize)
+            .ToImmutableArray();
+
+        var pageItems = DbContext.Cards
+            .AsNoTracking()
+            .Include(card => card.UsersWithView)
+            .ThenInclude(usersWithView => usersWithView.User)
+            .Where(card => pageCardIds.Contains(card.Id))
+            .OrderByDescending(card => card.VersionUtcDate)
             .Select(card => new ResultCard(
                 card.Id,
                 card.FrontSide,
@@ -127,16 +145,15 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
                 card.VersionCreator,
                 card.VersionUtcDate,
                 card.VersionDescription
-                )
-            );
+                ))
+            .AsSingleQuery();
 
         var pageEntries = await pageItems.ToImmutableArrayAsync();
-        var cardIds = pageEntries.Select(card => card.CardId).ToImmutableHashSet();
 
         // I don't understand why very well, but I get better perf by loading the user ratings separately than in a joint in the big query above
         var allUserRatings = await DbContext.UserCardRatings
             .AsNoTracking()
-            .Where(r => r.UserId == request.UserId && cardIds.Contains(r.CardId))
+            .Where(r => r.UserId == request.UserId && pageCardIds.Contains(r.CardId))
             .Select(r => new { r.CardId, r.Rating })
             .ToImmutableDictionaryAsync(r => r.CardId, r => r.Rating);
 
@@ -162,6 +179,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             IntMetric("ResultCardCount", result.Cards.Length)
             );
     }
+
     #region Request and result classes
     public sealed record Request : IRequest
     {

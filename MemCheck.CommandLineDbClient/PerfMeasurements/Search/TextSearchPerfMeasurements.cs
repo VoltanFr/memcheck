@@ -69,6 +69,7 @@ internal sealed class TextSearchPerfMeasurements : ICmdLinePlugin
     {
         var cardLanguage = await dbContext.CardLanguages.SingleAsync();
         var userVoltan = callContext.DbContext.Users.Single(u => u.UserName == "Voltan").Id;
+        //var tagQuartiersM = callContext.DbContext.Tags.Single(tag => tag.Name == "Quartiers maritimes").Id;
 
         var testDefinitions = new[] {
             new TestDefinition("Without text with user",new SearchCards.Request() { UserId = userVoltan }),
@@ -79,6 +80,7 @@ internal sealed class TextSearchPerfMeasurements : ICmdLinePlugin
             new TestDefinition("Tri without user",new SearchCards.Request() { RequiredText = "Tri", PageSize = 500 }),
             new TestDefinition("e with user",new SearchCards.Request() { UserId = userVoltan,RequiredText = "e", PageSize = 500 }),
             new TestDefinition("e without user",new SearchCards.Request() { RequiredText = "e", PageSize = 500 }),
+            //new TestDefinition("Rochelle with tag", new SearchCards.Request() { UserId = userVoltan,RequiredText = "Rochelle", PageSize = 50, RequiredTags=tagQuartiersM.AsArray() })
         };
 
         await 10.TimesAsync(async () =>
