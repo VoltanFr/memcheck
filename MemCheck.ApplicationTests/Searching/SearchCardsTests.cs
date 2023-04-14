@@ -748,4 +748,88 @@ public class SearchCardsTests
             Assert.IsTrue(result.Contains(cardVisibleToUser2And3));
         }
     }
+    [TestMethod()]
+    public async Task TestPaging_AllCardsMatch()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(testDB);
+
+        await 100.TimesAsync(async () => await CardHelper.CreateIdAsync(testDB, userId));
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var searchCards = new SearchCards(dbContext.AsCallContext());
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 100 });
+            Assert.AreEqual(100, result.TotalNbCards);
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(100, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 10 });
+            Assert.AreEqual(100, result.TotalNbCards);
+            Assert.AreEqual(10, result.PageCount);
+            Assert.AreEqual(10, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 10, PageNo = 10 });
+            Assert.AreEqual(100, result.TotalNbCards);
+            Assert.AreEqual(10, result.PageCount);
+            Assert.AreEqual(10, result.Cards.Length);
+        }
+    }
+    [TestMethod()]
+    public async Task TestPaging_WithFiltering()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(testDB);
+        var searchedString = RandomHelper.String();
+
+        await 50.TimesAsync(async () => await CardHelper.CreateIdAsync(testDB, userId));
+        await 50.TimesAsync(async () => await CardHelper.CreateIdAsync(testDB, userId, frontSide: searchedString));
+
+        using var dbContext = new MemCheckDbContext(testDB);
+        var searchCards = new SearchCards(dbContext.AsCallContext());
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 100, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(50, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 10, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(5, result.PageCount);
+            Assert.AreEqual(10, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 10, PageNo = 5, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(5, result.PageCount);
+            Assert.AreEqual(10, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 51, PageNo = 1, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(50, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 50, PageNo = 1, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(50, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 49, PageNo = 1, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(2, result.PageCount);
+            Assert.AreEqual(49, result.Cards.Length);
+        }
+        {
+            var result = await searchCards.RunAsync(new SearchCards.Request { UserId = userId, PageSize = 49, PageNo = 2, RequiredText = searchedString });
+            Assert.AreEqual(50, result.TotalNbCards);
+            Assert.AreEqual(2, result.PageCount);
+            Assert.AreEqual(1, result.Cards.Length);
+        }
+    }
 }
