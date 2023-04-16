@@ -22,7 +22,7 @@ internal sealed class Engine : IHostedService
     #region Private method
     private ICmdLinePlugin GetPlugin()
     {
-        return new TextSearchPerfMeasurements(serviceProvider);
+        return new CheckUserExistsPerfMeasurements(serviceProvider);
     }
     #endregion
     public Engine(IServiceProvider serviceProvider)

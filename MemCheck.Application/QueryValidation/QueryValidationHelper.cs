@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.QueryValidation;
 
-internal static class QueryValidationHelper
+public static class QueryValidationHelper
 {
     #region Fields
     private static readonly ImmutableHashSet<Guid> reservedGuids = GetReservedGuids();
@@ -72,7 +72,11 @@ internal static class QueryValidationHelper
     }
     public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
     {
-        var user = await dbContext.Users.AsNoTracking().Where(user => user.Id == userId).SingleOrDefaultAsync();
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .Where(user => user.Id == userId)
+            .Select(user => new { user.DeletionDate })
+            .FirstOrDefaultAsync();
         if (user == null || user.DeletionDate != null)
             throw new NonexistentUserException(ExceptionMesg_UserDoesNotExist);
     }
