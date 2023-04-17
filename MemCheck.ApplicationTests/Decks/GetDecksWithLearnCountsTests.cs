@@ -34,7 +34,7 @@ public class GetDecksWithLearnCountsTests
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(request);
-        Assert.AreEqual(1, result.Count());
+        Assert.AreEqual(1, result.Length);
         var loaded = result.First();
         Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loaded.Description);
         Assert.AreEqual(0, loaded.UnknownCardCount);
@@ -176,7 +176,7 @@ public class GetDecksWithLearnCountsTests
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext(), new DateTime(2030, 02, 01, 0, 30, 0)).RunAsync(request);
-        Assert.AreEqual(2, result.Count());
+        Assert.AreEqual(2, result.Length);
 
         var loadedDeck1 = result.Single(d => d.Id == deck1);
         Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loadedDeck1.Description);

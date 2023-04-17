@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CallContext = MemCheck.Application.CallContext;
 
-namespace MemCheck.CommandLineDbClient.PerfMeasurements.Search;
+namespace MemCheck.CommandLineDbClient.PerfMeasurements.QueryValidation;
 
 internal sealed class CheckUserExistsPerfMeasurements : AbstractPerfMeasurements<CheckUserExistsPerfMeasurements.TestDefinition>
 {

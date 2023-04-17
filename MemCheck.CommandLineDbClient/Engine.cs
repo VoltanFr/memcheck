@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Search;
+﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Decks;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +22,7 @@ internal sealed class Engine : IHostedService
     #region Private method
     private ICmdLinePlugin GetPlugin()
     {
-        return new CheckUserExistsPerfMeasurements(serviceProvider);
+        return new GetDecksWithLearnCountsPerfMeasurements(serviceProvider);
     }
     #endregion
     public Engine(IServiceProvider serviceProvider)

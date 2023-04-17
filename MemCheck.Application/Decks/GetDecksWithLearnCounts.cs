@@ -1,5 +1,7 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Decks;
 
-public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCounts.Request, IEnumerable<GetDecksWithLearnCounts.Result>>
+public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCounts.Request, ImmutableArray<GetDecksWithLearnCounts.Result>>
 {
     #region Fields
     private static readonly TimeSpan oneHour = TimeSpan.FromHours(1);
@@ -18,54 +20,66 @@ public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCou
     private readonly DateTime? runDate;
     #endregion
     #region Private methods
-    private static Result GetDeck(MemCheckDbContext dbContext, Guid deckId, string description, DateTime runDate)
+    private static async Task<Result> GetDeckAsync(MemCheckDbContext dbContext, Guid deckId, string description, DateTime runDate)
     {
-        var allCards = dbContext.CardsInDecks.AsNoTracking()
+        var allCards = await dbContext.CardsInDecks
+            .AsNoTracking()
             .Where(cardInDeck => cardInDeck.DeckId == deckId)
-            .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.LastLearnUtcTime, cardInDeck.DeckId, cardInDeck.ExpiryUtcTime })
-            .ToImmutableArray();
-        var groups = allCards.ToLookup(card => card.CurrentHeap == 0);
+            .Select(cardInDeck => new { cardInDeck.CurrentHeap, cardInDeck.ExpiryUtcTime })
+            .ToImmutableArrayAsync();
+
+        var unknownCardCount = 0;
         var expiredCardCount = 0;
         var nextExpiryUTCDate = DateTime.MaxValue;
         var expiringNextHourCount = 0;
         var expiringFollowing24hCount = 0;
         var expiringFollowing3DaysCount = 0;
-        foreach (var card in groups[false])
-        {
-            if (card.ExpiryUtcTime <= runDate)
-                expiredCardCount++;
+
+        foreach (var card in allCards)
+            if (card.CurrentHeap == CardInDeck.UnknownHeap)
+                unknownCardCount++;
             else
             {
-                var distanceToNow = card.ExpiryUtcTime - runDate;
-                if (distanceToNow <= oneHour)
-                    expiringNextHourCount++;
+                if (card.ExpiryUtcTime <= runDate)
+                    expiredCardCount++;
                 else
                 {
-                    if (distanceToNow <= twentyFiveHours)
-                        expiringFollowing24hCount++;
+                    var distanceToNow = card.ExpiryUtcTime - runDate;
+                    if (distanceToNow <= oneHour)
+                        expiringNextHourCount++;
                     else
                     {
-                        if (distanceToNow <= fourDays)
-                            expiringFollowing3DaysCount++;
+                        if (distanceToNow <= twentyFiveHours)
+                            expiringFollowing24hCount++;
+                        else
+                        {
+                            if (distanceToNow <= fourDays)
+                                expiringFollowing3DaysCount++;
+                        }
                     }
+                    if (card.ExpiryUtcTime < nextExpiryUTCDate)
+                        nextExpiryUTCDate = card.ExpiryUtcTime;
                 }
-                if (card.ExpiryUtcTime < nextExpiryUTCDate)
-                    nextExpiryUTCDate = card.ExpiryUtcTime;
             }
-        }
-        return new Result(deckId, description, groups[true].Count(), expiredCardCount, allCards.Length, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
+        return new Result(deckId, description, unknownCardCount, expiredCardCount, allCards.Length, expiringNextHourCount, expiringFollowing24hCount, expiringFollowing3DaysCount, nextExpiryUTCDate);
     }
     #endregion
     public GetDecksWithLearnCounts(CallContext callContext, DateTime? runDate = null) : base(callContext)
     {
         this.runDate = runDate;
     }
-    protected override async Task<ResultWithMetrologyProperties<IEnumerable<Result>>> DoRunAsync(Request request)
+    protected override async Task<ResultWithMetrologyProperties<ImmutableArray<Result>>> DoRunAsync(Request request)
     {
         var now = runDate == null ? DateTime.UtcNow : runDate;
-        var decks = await DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == request.UserId).Select(deck => new { deck.Id, deck.Description, deck.HeapingAlgorithmId }).ToListAsync();
-        var result = decks.Select(deck => GetDeck(DbContext, deck.Id, deck.Description, now.Value));
-        return new ResultWithMetrologyProperties<IEnumerable<Result>>(result, IntMetric("DeckCount", result.Count()));
+        var decks = await DbContext.Decks
+            .AsNoTracking()
+            .Where(deck => deck.Owner.Id == request.UserId)
+            .Select(deck => new { deck.Id, deck.Description })
+            .ToImmutableArrayAsync();
+        var result = new List<Result>();
+        foreach (var deck in decks)
+            result.Add(await GetDeckAsync(DbContext, deck.Id, deck.Description, now.Value));
+        return new ResultWithMetrologyProperties<ImmutableArray<Result>>(result.ToImmutableArray(), IntMetric("DeckCount", result.Count));
     }
     #region Request & Result
     public sealed record Request(Guid UserId) : IRequest
@@ -84,7 +98,6 @@ public sealed class GetDecksWithLearnCounts : RequestRunner<GetDecksWithLearnCou
         int ExpiringNextHourCount,
         int ExpiringFollowing24hCount,
         int ExpiringFollowing3DaysCount,
-        DateTime NextExpiryUTCDate);
-    //NextExpiryUTCDate is DateTime.MaxValue if all cards are unknown
+        DateTime NextExpiryUTCDate); //NextExpiryUTCDate is DateTime.MaxValue if all cards are unknown
     #endregion
 }

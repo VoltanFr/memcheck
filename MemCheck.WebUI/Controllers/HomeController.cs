@@ -42,7 +42,7 @@ public class HomeController : MemCheckController
         var anythingToLearn = userDecks.Any(deck => deck.ExpiredCardCount > 0 || deck.UnknownCardCount > 0);
         var cardCount = userDecks.Sum(deck => deck.CardCount);
 
-        return Ok(new GetAllResult(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllResult_Deck(deck, userDecks.Count() == 1, this)), DateTime.UtcNow, Array.Empty<GetAllResult_Tag>()));
+        return Ok(new GetAllResult(user.UserName, anythingToLearn, cardCount, userDecks.Select(deck => new GetAllResult_Deck(deck, userDecks.Length == 1, this)), DateTime.UtcNow, Array.Empty<GetAllResult_Tag>()));
     }
     #region Result classes
     public sealed class GetAllResult
