@@ -107,12 +107,14 @@ public class LearnController : MemCheckController
     public async Task<IActionResult> GetCardsAsync([FromBody] GetCardsRequest request)
     {
         CheckBodyParameter(request);
-        var user = await userManager.GetExistingUserAsync(HttpContext.User);
+        var user = await userManager.GetUserAsync(HttpContext.User);
 
         switch (request.LearnMode)
         {
             case learnModeUnknown:
                 {
+                    if (user == null)
+                        return BadRequest();
                     var applicationRequest = new GetUnknownCardsToLearn.Request(user.Id, request.DeckId, request.ExcludedCardIds, 30);
                     var applicationResult = (await new GetUnknownCardsToLearn(callContext).RunAsync(applicationRequest)).Cards;
                     var result = new GetCardsViewModel(applicationResult, this, user.GetUserName());
@@ -120,6 +122,8 @@ public class LearnController : MemCheckController
                 }
             case learnModeExpired:
                 {
+                    if (user == null)
+                        return BadRequest();
                     var cardsToDownload = request.CurrentCardCount == 0 ? 10 : 20; // We don't want too many cards on first download, to give results fast. But we don't want too few, to increase our chances to give cards without the need to download images, so that the user can start asap
                     var applicationRequest = new GetCardsToRepeat.Request(user.Id, request.DeckId, request.ExcludedCardIds, cardsToDownload);
                     var applicationResult = (await new GetCardsToRepeat(callContext).RunAsync(applicationRequest)).Cards;
