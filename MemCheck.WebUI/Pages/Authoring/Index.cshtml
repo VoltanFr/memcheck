@@ -136,7 +136,7 @@
                     <span v-if="creatingNewCard">@Localizer["Add"]</span>
                     <span v-else>@Localizer["ReviewChanges"]</span>
                 </button>
-                <button id="AddCardButtonDisabled" class="btn-success.disabled btn-lg authoring-send-button" disabled @@click="sendCard" v-else>
+                <button id="AddCardButtonDisabled" class="btn-success.disabled btn-lg authoring-send-button" disabled v-else>
                     <span v-if="creatingNewCard">@Localizer["Add"]</span>
                     <span v-else>@Localizer["ReviewChanges"]</span>
                 </button>
@@ -315,7 +315,8 @@
             </div>
             <div id="ReviewMode_BottomButtons">
                 <ul class="nav small">
-                    <li><button id="ConfirmChangesButton" class="btn-success btn-lg authoring-send-button" @@click="saveCard">@Localizer["ConfirmUpdate"]</button></li>
+                    <li v-if="changesDescriptionOk()"><button id="ConfirmChangesEnabledButton" class="btn-success btn-lg authoring-send-button" @@click="saveCard">@Localizer["ConfirmUpdate"]</button></li>
+                    <li v-else"><button id="ConfirmChangesDisabledButton" class="btn-success.disabled btn-lg authoring-send-button" disabled>@Localizer["ConfirmUpdate"]</button></li>
                     <li class="ms-auto"><button id="ContinueEditingButton" class="btn-success btn-lg authoring-send-button" @@click="continueEditing">@Localizer["ContinueEditing"]</button></li>
                 </ul>
             </div>

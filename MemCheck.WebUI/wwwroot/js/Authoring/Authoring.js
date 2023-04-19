@@ -450,6 +450,9 @@ const authoringApp = Vue.createApp({
         tagsIsDirty() {
             return !this.sameSetOfIds(this.card.tags.map(tag => tag.tagId), this.originalCard.tags.map(tag => tag.tagId));
         },
+        changesDescriptionOk() {
+            return this.card.versionDescription && this.card.versionDescription.length > 1;
+        },
         usersWithViewIsDirty() {
             return !this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId));
         },
