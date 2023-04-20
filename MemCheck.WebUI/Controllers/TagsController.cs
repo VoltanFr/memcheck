@@ -4,6 +4,7 @@ using MemCheck.Application.Tags;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -74,9 +75,9 @@ public class TagsController : MemCheckController
     public async Task<IActionResult> GetTagsAsync([FromBody] GetTagsRequest request)
     {
         CheckBodyParameter(request);
-        var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+        var user = await userManager.GetUserAsync(HttpContext.User);
         var result = await new GetAllTags(callContext).RunAsync(new GetAllTags.Request(request.PageSize, request.PageNo, request.Filter));
-        return Ok(new GetTagsViewModel(result, userId != Guid.Empty));
+        return Ok(new GetTagsViewModel(result, user != null));
     }
     public sealed class GetTagsRequest
     {
@@ -125,7 +126,7 @@ public class TagsController : MemCheckController
     }
     #endregion
     #region Create
-    [HttpPost("Create")]
+    [HttpPost("Create"), Authorize]
     public async Task<IActionResult> Create([FromBody] CreateRequestModel request)
     {
         CheckBodyParameter(request);
@@ -141,7 +142,7 @@ public class TagsController : MemCheckController
     }
     #endregion
     #region Update
-    [HttpPut("Update/{tagId}")]
+    [HttpPut("Update/{tagId}"), Authorize]
     public async Task<IActionResult> Update(Guid tagId, [FromBody] UpdateRequestModel request)
     {
         CheckBodyParameter(request);

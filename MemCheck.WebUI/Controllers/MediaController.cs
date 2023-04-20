@@ -17,7 +17,9 @@ using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Controllers;
 
-[Route("[controller]"), Authorize]
+// Some of the pages in this controller have specific authorizations, see Startup.ConfigureServices
+
+[Route("[controller]")]
 public class MediaController : MemCheckController
 {
     #region Fields
@@ -30,7 +32,7 @@ public class MediaController : MemCheckController
         this.userManager = userManager;
     }
     #region UploadImage
-    [HttpPost("UploadImage")]
+    [HttpPost("UploadImage"), Authorize]
     public async Task<IActionResult> UploadImage([FromForm] UploadImageRequest request)
     {
         if (request.Name == null)
@@ -64,7 +66,7 @@ public class MediaController : MemCheckController
     public sealed record UploadImageResult(string ToastTitle, string ToastText, Guid ImageId);
     #endregion
     #region GetImageList
-    [HttpPost("GetImageList")]
+    [HttpPost("GetImageList"), Authorize]
     public async Task<IActionResult> GetImageListAsync([FromBody] GetImageListRequest request)
     {
         CheckBodyParameter(request);
@@ -124,7 +126,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region GetImageMetadataFromName
-    [HttpPost("GetImageMetadataFromName")]
+    [HttpPost("GetImageMetadataFromName")] // No authorization: when running a demo without user, this is needed
     public async Task<IActionResult> GetImageMetadataFromName([FromBody] GetImageMetadataFromNameRequest request)
     {
         var appRequest = new GetImageInfoFromName(callContext);
@@ -169,7 +171,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region GetImageMetadataFromId
-    [HttpGet("GetImageMetadataFromId/{imageId}")]
+    [HttpGet("GetImageMetadataFromId/{imageId}"), Authorize]
     public async Task<IActionResult> GetImageMetadataFromId(Guid imageId)
     {
         var appRequest = new GetImageInfoFromId(callContext);
@@ -216,7 +218,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region Update
-    [HttpPost("Update/{imageId}")]
+    [HttpPost("Update/{imageId}"), Authorize]
     public async Task<IActionResult> Update(Guid imageId, [FromBody] UpdateRequestModel request)
     {
         CheckBodyParameter(request);
@@ -235,7 +237,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region Delete
-    [HttpPost("Delete/{imageId}")]
+    [HttpPost("Delete/{imageId}"), Authorize]
     public async Task<IActionResult> Delete(Guid imageId, [FromBody] DeleteRequest request)
     {
         CheckBodyParameter(request);
@@ -251,7 +253,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region GetImageInfoForDeletion
-    [HttpGet("GetImageInfoForDeletion/{imageId}")]
+    [HttpGet("GetImageInfoForDeletion/{imageId}"), Authorize]
     public async Task<IActionResult> GetImageInfoForDeletion(Guid imageId)
     {
         var runner = new GetImageInfoFromId(callContext);
@@ -284,7 +286,7 @@ public class MediaController : MemCheckController
     }
     #endregion
     #region ImageVersions
-    [HttpGet("ImageVersions/{imageId}")]
+    [HttpGet("ImageVersions/{imageId}"), Authorize]
     public async Task<IActionResult> ImageVersions(Guid imageId)
     {
         var appResults = await new GetImageVersions(callContext).RunAsync(new GetImageVersions.Request(imageId));
