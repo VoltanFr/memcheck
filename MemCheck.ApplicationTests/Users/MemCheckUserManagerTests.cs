@@ -316,7 +316,7 @@ public class MemCheckUserManagerTests
         using (var userManager = UserHelper.GetUserManager(dbContext))
         {
             var creationResult = await userManager.CreateAsync(userToCreate, RandomHelper.Password());
-            Assert.IsTrue(creationResult.Succeeded);
+            Assert.IsTrue(creationResult.Succeeded, string.Join(',', creationResult.Errors.Select(error => $"{error.Code}: {error.Description}")));
         }
 
         using (var dbContext = new MemCheckDbContext(db))

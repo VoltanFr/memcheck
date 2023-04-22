@@ -42,4 +42,23 @@ public class RandomHelperTests
         Assert.IsFalse(strings.All(s => s.ToUpperInvariant() == s), $"Among {attempts} attempts, short strings were only upper");
         Assert.IsFalse(strings.All(s => s.ToLowerInvariant() == s), $"Among {attempts} attempts, short strings were only lower");
     }
+    [TestMethod()]
+    public void Letter_AnyCase()
+    {
+        for (var i = 0; i < 100; i++)
+        {
+            var letter = RandomHelper.Letter();
+            Assert.IsTrue(char.IsLetter(letter), $"Not letter: '{letter}'");
+        }
+    }
+    [TestMethod()]
+    public void Letter_Lower()
+    {
+        for (var i = 0; i < 100; i++)
+        {
+            var letter = RandomHelper.Letter(true);
+            Assert.IsTrue(char.IsLetter(letter), $"Not letter: '{letter}'");
+            Assert.IsTrue(char.IsLower(letter), $"Not lower: '{letter}'");
+        }
+    }
 }

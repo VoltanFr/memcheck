@@ -91,18 +91,18 @@ public static class RandomHelper
     {
         return RandomNumberGenerator.GetInt32(fromInclusive, toExclusive);
     }
-    public static char Letter()
+    public static char Letter(bool lowerCase = false)
     {
         while (true)
         {
             var result = (char)Int(255);
-            if (char.IsLetter(result))
-                return result;
+            if (result is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z'))
+                return lowerCase ? char.ToLowerInvariant(result) : result;
         }
     }
     public static string Password()
     {
-        return String().ToUpperInvariant() + String();
+        return String().ToUpperInvariant() + Letter(true) + String();
     }
     public static string Email()
     {
