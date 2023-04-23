@@ -49,8 +49,19 @@ public sealed class DatabaseUsabilityTests : IDisposable
     #endregion
     public DatabaseUsabilityTests()
     {
-        var connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+        var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING_FOR_DB_USABILITY_CHECK");
+        string source;
+
+        if (!string.IsNullOrEmpty(connectionString))
+            source = "environment variable";
+        else
+        {
+            connectionString = GetIConfigurationRoot()[$"ConnectionStrings:Connection"];
+            source = "config file";
+        }
+
         dbContext = new MemCheckDbContext(new DbContextOptionsBuilder<MemCheckDbContext>().UseSqlServer(connectionString).Options);
+        Assert.IsTrue(dbContext.Database.CanConnect(), $"Unable to connect to DB with infro from {source}");
     }
     [TestMethod()]
     public void TestNoMigrationNeeded()

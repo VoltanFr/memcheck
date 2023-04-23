@@ -60,17 +60,9 @@ jobs:
     - name: "Build the root sln with dotnet"
       run: dotnet build --no-restore --configuration ${{env.COMPIL_CONFIG}} --version-suffix "$env:GITHUB_RUN_NUMBER"
 
-    # - name: "Show the directory tree"
-    #   run: tree /F /A
-
-    - name: "Substitute production appsettings entries to appsettings json file in project MemCheck.DatabaseTests"
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: 'MemCheck.DatabaseTests/bin/Release/net${{env.NETCORE_VERSION}}/appsettings.json'
-      env:
-        ConnectionStrings.Connection: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
-
     - name: "Run unit tests"
+      env:
+        CONNECTION_STRING_FOR_DB_USABILITY_CHECK: ${{secrets.MEMCHECK_PROD_DB_CONNECTION_STRING}}
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
     - name: "Publish: prepare the project WebUI for deployment"
