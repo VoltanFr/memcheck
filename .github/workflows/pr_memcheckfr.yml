@@ -19,7 +19,7 @@ jobs:
       AZURE_FUNCTION_NAME: "memcheck-notifier"
 
     steps:
-    - uses: actions/checkout@v3.5.0
+    - uses: actions/checkout@v3.5.2
 
     - name: "Tell environment variables"
       run: |
@@ -36,7 +36,7 @@ jobs:
         echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
-      uses: actions/setup-dotnet@v3.0.1
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
 
