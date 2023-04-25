@@ -78,7 +78,7 @@ public class GetCardForEditTests
         var db = DbHelper.GetEmptyTestDB();
         var languageName = RandomHelper.String();
         var language = await CardLanguageHelper.CreateAsync(db, languageName);
-        var creator = await UserHelper.CreateUserInDbAsync(db);
+        var creator = await UserHelper.CreateUserInDbAsync(db); // This creates a deck for creator
         var creationDate = RandomHelper.Date();
         var frontSide = RandomHelper.String();
         var backSide = RandomHelper.String();
@@ -86,11 +86,11 @@ public class GetCardForEditTests
         var references = RandomHelper.String();
         var tagName = RandomHelper.String();
         var tag = await TagHelper.CreateAsync(db, creator, tagName);
-        var otherUser = await UserHelper.CreateUserInDbAsync(db);
+        var otherUser = await UserHelper.CreateUserInDbAsync(db); // This creates a deck for otherUser
         var versionDescription = RandomHelper.String();
         var card = await CardHelper.CreateAsync(db, creator.Id, language: language, versionDate: creationDate, frontSide: frontSide, backSide: backSide, additionalInfo: additionalInfo, references: references, tagIds: tag.AsArray(), userWithViewIds: new[] { creator.Id, otherUser.Id }, versionDescription: versionDescription);
 
-        var deck = await DeckHelper.CreateAsync(db, otherUser.Id);
+        var deck = await DeckHelper.CreateAsync(db, otherUser.Id); // otherUser now has two decks
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
@@ -118,5 +118,86 @@ public class GetCardForEditTests
         Assert.AreEqual(0, loaded.UserRating);
         Assert.AreEqual(0, loaded.AverageRating);
         Assert.AreEqual(0, loaded.CountOfUserRatings);
+        Assert.AreEqual(1, loaded.PossibleTargetDecksForAdd.Length);
+    }
+    [TestMethod()]
+    public async Task NotInAuthorSingleDeck()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var languageName = RandomHelper.String();
+        var language = await CardLanguageHelper.CreateAsync(db, languageName);
+        var creatorId = await UserHelper.CreateInDbAsync(db);
+
+        var card = await CardHelper.CreateAsync(db, creatorId, language: language);
+
+        using (var deckFindDbContext = new MemCheckDbContext(db))
+        {
+            var initialDeck = deckFindDbContext.Decks.Single();
+            await DeckHelper.AddCardAsync(db, initialDeck.Id, card.Id);
+        }
+
+        var deckName = RandomHelper.String();
+        var deckId = await DeckHelper.CreateAsync(db, creatorId, deckName);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
+
+        Assert.AreEqual(1, loaded.PossibleTargetDecksForAdd.Length);
+        Assert.AreEqual(deckId, loaded.PossibleTargetDecksForAdd[0].DeckId);
+        Assert.AreEqual(deckName, loaded.PossibleTargetDecksForAdd[0].DeckName);
+    }
+    [TestMethod()]
+    public async Task NotInAuthorMultipleDecks()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var languageName = RandomHelper.String();
+        var language = await CardLanguageHelper.CreateAsync(db, languageName);
+        var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
+
+        var cardId = await CardHelper.CreateIdAsync(db, creatorId, language: language);
+
+        var deck1Name = RandomHelper.String();
+        var deck1Id = await DeckHelper.CreateAsync(db, creatorId, deck1Name); // creator now has two decks
+
+        var deck2Name = RandomHelper.String();
+        var deck2Id = await DeckHelper.CreateAsync(db, creatorId, deck2Name); // creator now has three decks
+
+        var deck3Id = await DeckHelper.CreateAsync(db, creatorId); // creator now has four decks
+
+        using var dbContext = new MemCheckDbContext(db);
+        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, cardId));
+
+        await DeckHelper.AddCardAsync(db, deck3Id, cardId);
+
+        Assert.AreEqual(4, loaded.PossibleTargetDecksForAdd.Length);
+
+        var deck1FromResult = loaded.PossibleTargetDecksForAdd.Single(deck => deck.DeckId == deck1Id);
+        Assert.AreEqual(deck1Name, deck1FromResult.DeckName);
+
+        var deck2FromResult = loaded.PossibleTargetDecksForAdd.Single(deck => deck.DeckId == deck2Id);
+        Assert.AreEqual(deck2Name, deck2FromResult.DeckName);
+    }
+    [TestMethod()]
+    public async Task NotInOtherUserSingleDeck()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var languageName = RandomHelper.String();
+        var language = await CardLanguageHelper.CreateAsync(db, languageName);
+        var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
+        var otherUserId = await UserHelper.CreateInDbAsync(db); // This creates a deck for otherUser
+        await DeckHelper.CreateAsync(db, creatorId); // creator now has two decks
+
+        await CardHelper.CreateAsync(db, creatorId, language: language);
+        var card = await CardHelper.CreateAsync(db, creatorId, language: language);
+        await CardHelper.CreateAsync(db, creatorId, language: language);
+
+        var deckName = RandomHelper.String();
+        var otherUserDeckId = await DeckHelper.CreateAsync(db, otherUserId, deckName); // otherUser now has two decks
+
+        using var dbContext = new MemCheckDbContext(db);
+        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id));
+
+        Assert.AreEqual(2, loaded.PossibleTargetDecksForAdd.Length);
+        Assert.IsTrue(loaded.PossibleTargetDecksForAdd.Any(deck => deck.DeckId == otherUserDeckId));
     }
 }

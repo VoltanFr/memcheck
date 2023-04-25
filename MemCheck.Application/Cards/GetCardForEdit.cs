@@ -3,6 +3,7 @@ using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -36,6 +37,12 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             .Select(cardInDeck => cardInDeck.Deck.Owner.GetUserName())
             .Distinct();
 
+        var possibleTargetDecksForAdd = DbContext.Decks
+            .AsNoTracking()
+            .Where(deck => deck.Owner.Id == request.CurrentUserId && !deck.CardInDecks.Any(card => card.CardId == request.CardId))
+            .Select(deck => new ResultDeckModel(deck.Id, deck.Description))
+            .ToImmutableArray();
+
         var result = new ResultModel(
                         card.FrontSide,
                         card.BackSide,
@@ -52,7 +59,8 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
                         ownersOfDecksWithThisCard,
                         userRatingValue,
                         card.AverageRating,
-                        card.RatingCount
+                        card.RatingCount,
+                        possibleTargetDecksForAdd
                         );
 
         return new ResultWithMetrologyProperties<ResultModel>(result,
@@ -86,7 +94,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
     public sealed class ResultModel
     {
         public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
-            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings)
+            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings, ImmutableArray<ResultDeckModel> possibleTargetDecksForAdd)
         {
             FrontSide = frontSide;
             BackSide = backSide;
@@ -104,6 +112,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
+            PossibleTargetDecksForAdd = possibleTargetDecksForAdd;
         }
         public string FrontSide { get; }
         public string BackSide { get; }
@@ -121,6 +130,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         public int UserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
+        public ImmutableArray<ResultDeckModel> PossibleTargetDecksForAdd { get; }
     }
     public sealed class ResultTagModel
     {
@@ -141,6 +151,16 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         }
         public Guid UserId { get; }
         public string UserName { get; }
+    }
+    public sealed class ResultDeckModel
+    {
+        public ResultDeckModel(Guid deckId, string deckName)
+        {
+            DeckId = deckId;
+            DeckName = deckName;
+        }
+        public Guid DeckId { get; }
+        public string DeckName { get; }
     }
     #endregion
 }
