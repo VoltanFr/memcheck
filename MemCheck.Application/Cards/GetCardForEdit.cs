@@ -26,7 +26,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             .ThenInclude(userWithView => userWithView.User)
             .Where(card => card.Id == request.CardId)
             .AsSingleQuery()
-            .SingleAsync();
+            .FirstAsync();
 
         var userRating = await DbContext.UserCardRatings.SingleOrDefaultAsync(c => c.CardId == card.Id && c.UserId == request.CurrentUserId);
         var userRatingValue = userRating == null ? 0 : userRating.Rating;
@@ -35,7 +35,8 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             .AsNoTracking()
             .Where(cardInDeck => cardInDeck.CardId == request.CardId)
             .Select(cardInDeck => cardInDeck.Deck.Owner.GetUserName())
-            .Distinct();
+            .Distinct()
+            .ToImmutableArray();
 
         var possibleTargetDecksForAdd = DbContext.Decks
             .AsNoTracking()
@@ -50,8 +51,8 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
                         card.References,
                         card.CardLanguage.Id,
                         card.CardLanguage.Name,
-                        card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)),
-                        card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.GetUserName())),
+                        card.TagsInCards.Select(tagInCard => new ResultTagModel(tagInCard.TagId, tagInCard.Tag.Name)).ToImmutableArray(),
+                        card.UsersWithView.Select(userWithView => new ResultUserModel(userWithView.UserId, userWithView.User.GetUserName())).ToImmutableArray(),
                         card.InitialCreationUtcDate,
                         card.VersionUtcDate,
                         card.VersionCreator.GetUserName(),
@@ -93,8 +94,8 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
     }
     public sealed class ResultModel
     {
-        public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, IEnumerable<ResultTagModel> tags, IEnumerable<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
-            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, IEnumerable<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings, ImmutableArray<ResultDeckModel> possibleTargetDecksForAdd)
+        public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, ImmutableArray<ResultTagModel> tags, ImmutableArray<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
+            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, ImmutableArray<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings, ImmutableArray<ResultDeckModel> possibleTargetDecksForAdd)
         {
             FrontSide = frontSide;
             BackSide = backSide;
@@ -120,13 +121,13 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         public string References { get; }
         public Guid LanguageId { get; }
         public string LanguageName { get; }
-        public IEnumerable<ResultTagModel> Tags { get; }
-        public IEnumerable<ResultUserModel> UsersWithVisibility { get; }
+        public ImmutableArray<ResultTagModel> Tags { get; }
+        public ImmutableArray<ResultUserModel> UsersWithVisibility { get; }
         public DateTime FirstVersionUtcDate { get; }
         public DateTime LastVersionUtcDate { get; }
         public string LastVersionCreatorName { get; }
         public string LastVersionDescription { get; }
-        public IEnumerable<string> UsersOwningDeckIncluding { get; }
+        public ImmutableArray<string> UsersOwningDeckIncluding { get; }
         public int UserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }

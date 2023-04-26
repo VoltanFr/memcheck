@@ -104,7 +104,7 @@ public class GetCardForEditTests
         Assert.AreEqual(languageName, loaded.LanguageName);
         Assert.AreEqual(tag, loaded.Tags.Single().TagId);
         Assert.AreEqual(tagName, loaded.Tags.Single().TagName);
-        Assert.AreEqual(2, loaded.UsersWithVisibility.Count());
+        Assert.AreEqual(2, loaded.UsersWithVisibility.Length);
         Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creator.Id) == 1);
         Assert.AreEqual(creator.UserName, loaded.UsersWithVisibility.Single(u => u.UserId == creator.Id).UserName);
         Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUser.Id) == 1);
@@ -113,7 +113,7 @@ public class GetCardForEditTests
         Assert.AreEqual(creationDate, loaded.LastVersionUtcDate);
         Assert.AreEqual(creator.UserName, loaded.LastVersionCreatorName);
         Assert.AreEqual(versionDescription, loaded.LastVersionDescription);
-        Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Count());
+        Assert.AreEqual(1, loaded.UsersOwningDeckIncluding.Length);
         Assert.IsTrue(loaded.UsersOwningDeckIncluding.Single() == otherUser.UserName);
         Assert.AreEqual(0, loaded.UserRating);
         Assert.AreEqual(0, loaded.AverageRating);

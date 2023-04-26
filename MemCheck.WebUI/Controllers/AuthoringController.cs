@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -157,8 +158,9 @@ public class AuthoringController : MemCheckController
             AdditionalInfo = applicationResult.AdditionalInfo;
             References = applicationResult.References;
             LanguageId = applicationResult.LanguageId;
-            Tags = applicationResult.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName));
-            UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName));
+            Tags = applicationResult.Tags.Select(tag => new GetAllAvailableTagsViewModel(tag.TagId, tag.TagName)).ToImmutableArray();
+            UsersWithVisibility = applicationResult.UsersWithVisibility.Select(user => new GetUsersViewModel(user.UserId, user.UserName)).ToImmutableArray();
+            PossibleTargetDecksForAdd = applicationResult.PossibleTargetDecksForAdd.Select(deck => new GetCardForEditDeckModel(deck.DeckId, deck.DeckName)).ToImmutableArray();
             CreationUtcDate = applicationResult.FirstVersionUtcDate;
             LastChangeUtcDate = applicationResult.LastVersionUtcDate;
             InfoAboutUsage = applicationResult.UsersOwningDeckIncluding.Any() ? localizer.GetLocalized("AppearsInDecksOf") + ' ' + string.Join(',', applicationResult.UsersOwningDeckIncluding) : localizer.GetLocalized("NotIncludedInAnyDeck");
@@ -171,14 +173,25 @@ public class AuthoringController : MemCheckController
         public string AdditionalInfo { get; }
         public string References { get; }
         public Guid LanguageId { get; }
-        public IEnumerable<GetAllAvailableTagsViewModel> Tags { get; }
-        public IEnumerable<GetUsersViewModel> UsersWithVisibility { get; }
+        public ImmutableArray<GetAllAvailableTagsViewModel> Tags { get; }
+        public ImmutableArray<GetUsersViewModel> UsersWithVisibility { get; }
+        public ImmutableArray<GetCardForEditDeckModel> PossibleTargetDecksForAdd { get; }
         public DateTime CreationUtcDate { get; }
         public DateTime LastChangeUtcDate { get; }
         public string InfoAboutUsage { get; }
         public int CurrentUserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
+    }
+    public sealed class GetCardForEditDeckModel
+    {
+        public GetCardForEditDeckModel(Guid deckId, string deckName)
+        {
+            DeckId = deckId;
+            DeckName = deckName;
+        }
+        public Guid DeckId { get; }
+        public string DeckName { get; }
     }
     #endregion
     #endregion
@@ -317,7 +330,7 @@ public class AuthoringController : MemCheckController
 
             var cardTags = card.Tags.Any() ? string.Join(",", card.Tags.Select(t => t.TagName).OrderBy(name => name)) : localizer.GetLocalized("NoneMasc");
             var versionTags = selectedVersion.Tags.Any() ? string.Join(",", selectedVersion.Tags.OrderBy(name => name)) : localizer.GetLocalized("NoneMasc");
-            AddField(changedFields, unChangedFields, card.Tags.Count() > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", cardTags, versionTags, localizer);
+            AddField(changedFields, unChangedFields, card.Tags.Length > 1 && selectedVersion.Tags.Count() > 1 ? "Tags" : "Tag", cardTags, versionTags, localizer);
 
             var cardVisibility = card.UsersWithVisibility.Any() ? string.Join(",", card.UsersWithVisibility.Select(u => u.UserName).OrderBy(name => name)) : localizer.GetLocalized("Public");
             var versionVisibility = selectedVersion.UsersWithVisibility.Any() ? string.Join(",", selectedVersion.UsersWithVisibility.OrderBy(name => name)) : localizer.GetLocalized("Public");
