@@ -138,6 +138,9 @@
   <data name="CanNotUpdateBecauseNoDifference" xml:space="preserve">
     <value>Can not update the card because you did not change anything.</value>
   </data>
+  <data name="CardAdded" xml:space="preserve">
+    <value>Card added</value>
+  </data>
   <data name="Cards" xml:space="preserve">
     <value>cards</value>
   </data>

@@ -54,6 +54,21 @@
                 <h1 class="title">
                     <span id="Title" v-if="creatingNewCard"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</span><span v-else><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["Edit"]</span>
                     &nbsp;
+                    <span v-if="addToDeckMenuVisible()">
+                        <button id="DeckActionDropdown" class="toolbar-button-circle toolbar-button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></button>
+                        <span class="dropdown-menu" role="menu">
+                            <span id="AddToDeck">
+                                <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
+                                    <a class="dropdown-item" @@click="addCardToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToYourDeck"]</a>
+                                </span>
+                                <span id="MultiDeckAddToDeck" v-else>
+                                    <span v-for="targetDeck in possibleTargetDecksForAdd">
+                                        <a class="dropdown-item" @@click="addCardToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
+                                    </span>
+                                </span>
+                            </span>
+                        </span>
+                    </span>
                     <span id="Info button" v-if="!creatingNewCard">
                         <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
                             <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />

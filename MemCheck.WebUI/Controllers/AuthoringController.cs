@@ -354,4 +354,14 @@ public class AuthoringController : MemCheckController
         public IEnumerable<string> UnchangedFields { get; }
     }
     #endregion
+    #region AddCardToDeck
+    [HttpPatch("AddCardToDeck/{cardId}/{deckId}")]
+    public async Task<IActionResult> AddCardToDeck(Guid cardId, Guid deckId)
+    {
+        var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+        var request = new AddCardsInDeck.Request(userId, deckId, cardId);
+        await new AddCardsInDeck(callContext).RunAsync(request);
+        return ControllerResultWithToast.Success(GetLocalized("CardAdded"), this);
+    }
+    #endregion
 }

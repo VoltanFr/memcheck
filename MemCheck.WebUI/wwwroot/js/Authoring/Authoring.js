@@ -68,6 +68,7 @@ const authoringApp = Vue.createApp({
             errorDebugInfoLines: [], // strings
             changesInReview: false, // When this is true, the user is reviewing changes after a click on the send button
             images: [], // each element represents an image object, with all details in fiels. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
+            possibleTargetDecksForAdd: [], // The decks of the user this card can be added to (ie the decks of the user in which the card is not)
         };
     },
     async mounted() {
@@ -324,6 +325,7 @@ const authoringApp = Vue.createApp({
                     this.editingCardCreationDate = dateTime(result.data.creationUtcDate);
                     this.editingCardLastChangeDate = dateTime(result.data.lastChangeUtcDate);
                     this.infoAboutUsage = result.data.infoAboutUsage;
+                    this.possibleTargetDecksForAdd = result.data.possibleTargetDecksForAdd;
                     this.creatingNewCard = false;
                 })
                 .catch(error => {
@@ -455,6 +457,23 @@ const authoringApp = Vue.createApp({
         },
         usersWithViewIsDirty() {
             return !this.sameSetOfIds(this.card.usersWithView.map(user => user.userId), this.originalCard.usersWithView.map(user => user.userId));
+        },
+        addToDeckMenuVisible() {
+            return !this.creatingNewCard && this.possibleTargetDecksForAdd.length > 0;
+        },
+        async addCardToDeck(targetDeckForAdd) {
+            await axios.patch(`/Authoring/AddCardToDeck/${this.editingCardId}/${targetDeckForAdd.deckId}`)
+                .then(response => {
+                    tellControllerSuccess(response);
+
+                    const index = this.possibleTargetDecksForAdd.findIndex(deck => deck.deckId === targetDeckForAdd.deckId);
+                    if (index > -1) {
+                        this.possibleTargetDecksForAdd.splice(index, 1); // Let's not offer adding to this deck anymore
+                    }
+                })
+                .catch(error => {
+                    tellAxiosError(error);
+                });
         },
     },
     watch: {

@@ -138,6 +138,9 @@
   <data name="CanNotUpdateBecauseNoDifference" xml:space="preserve">
     <value>Erreur : aucun changement détecté.</value>
   </data>
+  <data name="CardAdded" xml:space="preserve">
+    <value>Carte ajoutée</value>
+  </data>
   <data name="Cards" xml:space="preserve">
     <value>cartes</value>
   </data>
