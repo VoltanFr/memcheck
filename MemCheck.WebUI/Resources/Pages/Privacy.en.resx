@@ -120,7 +120,13 @@
   <data name="PageTitle" xml:space="preserve">
     <value>Privacy policy</value>
   </data>
-  <data name="Details" xml:space="preserve">
-    <value>Mnesios will store data in cookies only with your authorization. This is needed for correct behavior of language choice.</value>
+  <data name="AfterLink" xml:space="preserve">
+    <value>.</value>
+  </data>
+  <data name="BeforeLink" xml:space="preserve">
+    <value>See the</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>documentation about cookies</value>
   </data>
 </root>

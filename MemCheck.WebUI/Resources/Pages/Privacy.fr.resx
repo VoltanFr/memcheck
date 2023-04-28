@@ -120,7 +120,13 @@
   <data name="PageTitle" xml:space="preserve">
     <value>Stratégie concernant les cookies</value>
   </data>
-  <data name="Details" xml:space="preserve">
-    <value>Mnesios n'enregistre des données dans des cookies qu'avec votre permission. C'est nécessaire pour un bon fonctionnement de votre choix de langue.</value>
+  <data name="AfterLink" xml:space="preserve">
+    <value>.</value>
+  </data>
+  <data name="BeforeLink" xml:space="preserve">
+    <value>Voir la</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>section de la documentation dédiée aux cookies</value>
   </data>
 </root>
