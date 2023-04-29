@@ -162,9 +162,6 @@
   <data name="Logout" xml:space="preserve">
     <value>Se déconnecter</value>
   </data>
-  <data name="Privacy" xml:space="preserve">
-    <value>Confidentialité</value>
-  </data>
   <data name="Register" xml:space="preserve">
     <value>Créer un compte</value>
   </data>

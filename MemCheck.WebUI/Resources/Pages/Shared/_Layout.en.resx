@@ -162,9 +162,6 @@
   <data name="Logout" xml:space="preserve">
     <value>Logout</value>
   </data>
-  <data name="Privacy" xml:space="preserve">
-    <value>Privacy</value>
-  </data>
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>

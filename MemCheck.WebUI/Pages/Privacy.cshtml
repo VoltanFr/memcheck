@@ -1,9 +1,0 @@
-﻿@page
-@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-@model PrivacyModel
-@{
-    ViewData["Title"] = @Localizer["PageTitle"];
-}
-
-<p>@Localizer["BeforeLink"] <a href="https://userdoc.mnesios.com/rules.html#cookies" target="_blank">@Localizer["Link"]</a>@Localizer["AfterLink"]</p>
