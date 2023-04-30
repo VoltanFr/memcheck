@@ -13,7 +13,6 @@ namespace MemCheck.Application.QueryValidation;
 
 internal static class CardVisibilityHelper
 {
-    public const string ExceptionMesg_UserNotAllowedToViewCard = "User not allowed to view card";
     public static bool CardIsVisibleToUser(Guid userId, SearchCards.ResultCard card)
     {
         return CardIsVisibleToUser(userId, card.VisibleTo.Select(uwv => uwv.UserId));
@@ -74,7 +73,7 @@ internal static class CardVisibilityHelper
         if (cardIds.Any(cardId => !cardIdsFromDb.Contains(cardId)))
             throw new NonexistentCardException();
         if (cards.Any(card => !CardIsVisibleToUser(userId, card)))
-            throw new InvalidOperationException(ExceptionMesg_UserNotAllowedToViewCard);
+            throw new UserNotAllowedToAccessCardException();
     }
     public static bool CardsHaveSameUsersWithView(IEnumerable<UserWithViewOnCard> cardAllowedUsers, IEnumerable<UserWithViewOnCardPreviousVersion> cardPreviousVersionAllowedUsers)
     {

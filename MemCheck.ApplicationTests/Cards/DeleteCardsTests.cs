@@ -39,8 +39,7 @@ public class DeleteCardsTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfCurrentVersion".PairedWith("YouAreNotTheCreatorOfCurrentVersion"))));
-            var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
-            Assert.AreEqual("User not allowed to view card", e.Message);
+            await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
         }
     }
     [TestMethod()]

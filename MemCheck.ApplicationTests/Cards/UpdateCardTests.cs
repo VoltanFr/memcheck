@@ -290,7 +290,7 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            Assert.ThrowsException<InvalidOperationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
+            Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
         }
     }
     [TestMethod()]
@@ -317,7 +317,7 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            Assert.ThrowsException<InvalidOperationException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
+            Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
         }
     }
     [TestMethod()]

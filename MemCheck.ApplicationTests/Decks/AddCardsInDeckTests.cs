@@ -108,8 +108,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
-        Assert.AreEqual(CardVisibilityHelper.ExceptionMesg_UserNotAllowedToViewCard, e.Message);
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task UserNotAllowedToViewACard()
@@ -122,7 +121,7 @@ public class AddCardsInDeckTests
         var publicCard = await CardHelper.CreateAsync(db, cardCreator);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
     }
     [TestMethod()]
     public async Task Success()

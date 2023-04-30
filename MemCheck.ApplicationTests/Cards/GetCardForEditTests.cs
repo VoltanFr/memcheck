@@ -41,7 +41,7 @@ public class GetCardForEditTests
         var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray());
         var otherUserId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
     }
     [TestMethod()]
     public async Task CardWithPreviousVersion()

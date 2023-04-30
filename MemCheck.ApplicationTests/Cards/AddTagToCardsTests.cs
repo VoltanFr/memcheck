@@ -107,8 +107,7 @@ public class AddTagToCardsTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, card.Id.AsArray())));
-        Assert.AreEqual(CardVisibilityHelper.ExceptionMesg_UserNotAllowedToViewCard, e.Message);
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task ACardNotViewableMustFail_MultipleCards()
@@ -123,8 +122,7 @@ public class AddTagToCardsTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, new[] { card2Id, card.Id, card3Id })));
-        Assert.AreEqual(CardVisibilityHelper.ExceptionMesg_UserNotAllowedToViewCard, e.Message);
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, new[] { card2Id, card.Id, card3Id })));
     }
     [TestMethod()]
     public async Task CheckSuccessfullAdding()

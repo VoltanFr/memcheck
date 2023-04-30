@@ -1,5 +1,6 @@
 ﻿using MemCheck.Application.Helpers;
 using MemCheck.Application.Notifiying;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,6 @@ public class AddCardSubscriptionsTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
     }
 }
