@@ -72,7 +72,7 @@ internal static class CardVisibilityHelper
             .ToImmutableArray();
         var cardIdsFromDb = cards.Select(card => card.Id).ToImmutableHashSet();
         if (cardIds.Any(cardId => !cardIdsFromDb.Contains(cardId)))
-            throw new InvalidOperationException(QueryValidationHelper.ExceptionMesg_CardDoesNotExist);
+            throw new NonexistentCardException();
         if (cards.Any(card => !CardIsVisibleToUser(userId, card)))
             throw new InvalidOperationException(ExceptionMesg_UserNotAllowedToViewCard);
     }

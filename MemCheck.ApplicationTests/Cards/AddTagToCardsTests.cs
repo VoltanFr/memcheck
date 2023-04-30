@@ -82,8 +82,7 @@ public class AddTagToCardsTests
         var tagId = await TagHelper.CreateAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, RandomHelper.Guid().AsArray())));
-        Assert.AreEqual(QueryValidationHelper.ExceptionMesg_CardDoesNotExist, e.Message);
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, RandomHelper.Guid().AsArray())));
     }
     [TestMethod()]
     public async Task ACardDoesNotExistMustFail_MultipleCards()
@@ -95,8 +94,7 @@ public class AddTagToCardsTests
         var card2Id = await CardHelper.CreateIdAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, new[] { card1Id, RandomHelper.Guid(), card2Id })));
-        Assert.AreEqual(QueryValidationHelper.ExceptionMesg_CardDoesNotExist, e.Message);
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, new[] { card1Id, RandomHelper.Guid(), card2Id })));
     }
     [TestMethod()]
     public async Task ACardNotViewableMustFail_OneCard()

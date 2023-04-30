@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,7 +30,7 @@ public class GetCardForEditTests
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task FailIfUserCanNotView()

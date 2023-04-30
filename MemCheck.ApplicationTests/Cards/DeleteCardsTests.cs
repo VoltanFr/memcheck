@@ -71,7 +71,7 @@ public class DeleteCardsTests
         using var dbContext = new MemCheckDbContext(db);
         var deleter = new DeleteCards(dbContext.AsCallContext());
         var deletionRequest = new DeleteCards.Request(userId, new[] { cardId, RandomHelper.Guid() });
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await deleter.RunAsync(deletionRequest));
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await deleter.RunAsync(deletionRequest));
     }
     [TestMethod()]
     public async Task DeleteDeletedCardMustFail()
@@ -80,7 +80,7 @@ public class DeleteCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var card = await CardHelper.CreateAsync(db, user);
         await CardDeletionHelper.DeleteCardAsync(db, user, card.Id);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await CardDeletionHelper.DeleteCardAsync(db, user, card.Id));
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await CardDeletionHelper.DeleteCardAsync(db, user, card.Id));
     }
     [TestMethod()]
     public async Task DeletingMustNotDeleteCardNotifications()

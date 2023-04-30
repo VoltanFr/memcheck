@@ -59,8 +59,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, RandomHelper.Guid().AsArray())));
-        Assert.AreEqual(QueryValidationHelper.ExceptionMesg_CardDoesNotExist, e.Message);
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, RandomHelper.Guid().AsArray())));
     }
     [TestMethod()]
     public async Task ACardDoesNotExist()
@@ -70,8 +69,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
         var card = await CardHelper.CreateAsync(db, user);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, RandomHelper.Guid() })));
-        Assert.AreEqual(QueryValidationHelper.ExceptionMesg_CardDoesNotExist, e.Message);
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, RandomHelper.Guid() })));
     }
     [TestMethod()]
     public async Task CardAlreadyInDeck()

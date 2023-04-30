@@ -38,7 +38,6 @@ public static class QueryValidationHelper
     public const int DeckMaxNameLength = 36;
     public const int LanguageMinNameLength = 2;
     public const int LanguageMaxNameLength = 36;
-    public const string ExceptionMesg_CardDoesNotExist = "Card does not exist";
     public const string ExceptionMesg_TagDoesNotExist = "Tag not found";
     public const string ExceptionMesg_UserDoesNotExist = "User not found";
     public static readonly ImmutableHashSet<char> ForbiddenCharsInTags = new[] { '<', '>' }.ToImmutableHashSet();
@@ -63,12 +62,12 @@ public static class QueryValidationHelper
     public static async Task CheckCardExistsAsync(MemCheckDbContext dbContext, Guid cardId)
     {
         if (!await dbContext.Cards.AsNoTracking().AnyAsync(card => card.Id == cardId))
-            throw new InvalidOperationException(ExceptionMesg_CardDoesNotExist);
+            throw new NonexistentCardException();
     }
     public static async Task CheckCardsExistAsync(MemCheckDbContext dbContext, IEnumerable<Guid> cardIds)
     {
         if (await dbContext.Cards.AsNoTracking().Where(card => cardIds.Contains(card.Id)).CountAsync() != cardIds.Count())
-            throw new InvalidOperationException(ExceptionMesg_CardDoesNotExist);
+            throw new InvalidOperationException();
     }
     public static async Task CheckUserExistsAsync(MemCheckDbContext dbContext, Guid userId)
     {
