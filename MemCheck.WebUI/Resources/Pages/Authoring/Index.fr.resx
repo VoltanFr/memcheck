@@ -324,4 +324,22 @@
   <data name="ReviewYourChanges" xml:space="preserve">
     <value>Vérifiez vos modifications avant d'enregistrer</value>
   </data>
+  <data name="OpenDiscussionPage" xml:space="preserve">
+    <value>Discussion</value>
+  </data>
+  <data name="EmptyDiscussionPageInfo" xml:space="preserve">
+    <value>vide</value>
+  </data>
+  <data name="LatestDiscussionEntryCreationDate" xml:space="preserve">
+    <value>dernière intervention :</value>
+  </data>
+  <data name="Average" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>utilisateur</value>
+  </data>
+  <data name="YourRating" xml:space="preserve">
+    <value>Votre évaluation :</value>
+  </data>
 </root>
