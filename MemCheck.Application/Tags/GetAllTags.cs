@@ -48,11 +48,11 @@ public sealed class GetAllTags : RequestRunner<GetAllTags.Request, GetAllTags.Re
         public async Task CheckValidityAsync(CallContext callContext)
         {
             if (PageNo < 1)
-                throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
+                throw new PageIndexTooSmallException(PageNo);
             if (PageSize < 1)
-                throw new RequestInputException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
+                throw new PageSizeTooSmallException(PageSize, 1, MaxPageSize);
             if (PageSize > MaxPageSize)
-                throw new RequestInputException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+                throw new PageSizeTooBigException(PageSize, 1, MaxPageSize);
             await Task.CompletedTask;
         }
     }

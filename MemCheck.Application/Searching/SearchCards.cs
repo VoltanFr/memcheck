@@ -210,9 +210,11 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
             if (Heap != null && (Heap.Value < 0 || Heap.Value > CardInDeck.MaxHeapValue))
                 throw new RequestInputException($"Invalid heap {Heap}");
             if (PageNo < 1)
-                throw new RequestInputException($"First page is numbered 1, received a request for page {PageNo}");
+                throw new PageIndexTooSmallException(PageNo);
+            if (PageSize < 1)
+                throw new PageSizeTooSmallException(PageSize, 1, MaxPageSize);
             if (PageSize > MaxPageSize)
-                throw new RequestInputException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+                throw new PageSizeTooBigException(PageSize, 1, MaxPageSize);
             if ((RatingFiltering == RatingFilteringMode.AtLeast || RatingFiltering == RatingFilteringMode.AtMost) && (RatingFilteringValue < 1 || RatingFilteringValue > 5))
                 throw new RequestInputException($"Invalid RatingFilteringValue: {RatingFilteringValue}");
             if (UserId == Guid.Empty && Deck != Guid.Empty)
@@ -224,7 +226,7 @@ public sealed class SearchCards : RequestRunner<SearchCards.Request, SearchCards
                     await QueryValidationHelper.CheckUserIsOwnerOfDeckAsync(callContext.DbContext, UserId, Deck);
             }
             if (RequiredText != RequiredText.Trim())
-                throw new SearchTextNotTrimmedException("Invalid required text: not trimmed");
+                throw new TextNotTrimmedException();
         }
     }
     public sealed class Result

@@ -42,14 +42,14 @@ public class SearchCardsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<SearchTextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = ' ' + RandomHelper.String() }));
+        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = ' ' + RandomHelper.String() }));
     }
     [TestMethod()]
     public async Task TextNotTrimmed_AtEnd()
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<SearchTextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = RandomHelper.String() + '\n' }));
+        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = RandomHelper.String() + '\n' }));
     }
     [TestMethod()]
     public async Task TestDBWithOnePublicCard_FindAll()

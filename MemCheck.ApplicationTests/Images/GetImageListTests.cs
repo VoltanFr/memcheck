@@ -1,4 +1,5 @@
 ﻿using MemCheck.Application.Helpers;
+using MemCheck.Application.QueryValidation;
 using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,25 +25,39 @@ public class GetImageListTests
     public async Task Page0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 0, "")));
+        await Assert.ThrowsExceptionAsync<PageIndexTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 0, "")));
     }
     [TestMethod()]
     public async Task PageSize0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "")));
+        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "")));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, GetImageList.Request.MaxPageSize + 1, "")));
+        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(GetImageList.Request.MaxPageSize + 1, 1, "")));
+    }
+    [TestMethod()]
+    public async Task TextNotTrimmed_AtStart()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        using var dbContext = new MemCheckDbContext(testDB);
+        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
+    }
+    [TestMethod()]
+    public async Task TextNotTrimmed_AtEnd()
+    {
+        var testDB = DbHelper.GetEmptyTestDB();
+        using var dbContext = new MemCheckDbContext(testDB);
+        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, RandomHelper.String() + '\t')));
     }
     [TestMethod()]
     public async Task FilteredNotTrimmed()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "  " + RandomHelper.String())));
+        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
     }
     [TestMethod()]
     public async Task OneImageInDb_NotUsed()

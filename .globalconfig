@@ -51,3 +51,6 @@ dotnet_diagnostic.CA1303.severity = none
 
 # I allow type names as identifiers, because I have existing code with that
 dotnet_diagnostic.CA1720.severity = none
+
+# I allow exceptions without standard constructors
+dotnet_diagnostic.CA1032.severity = none

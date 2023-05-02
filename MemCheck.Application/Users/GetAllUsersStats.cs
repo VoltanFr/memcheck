@@ -47,10 +47,12 @@ public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, G
         public async Task CheckValidityAsync(CallContext callContext)
         {
             QueryValidationHelper.CheckNotReservedGuid(UserId);
-            if (PageSize is < 1 or > MaxPageSize)
-                throw new InvalidOperationException($"Invalid page size: {PageSize}");
+            if (PageSize < 1)
+                throw new PageSizeTooSmallException(PageSize, 1, MaxPageSize);
+            if (PageSize > MaxPageSize)
+                throw new PageSizeTooBigException(PageSize, 1, MaxPageSize);
             if (PageNo < 1)
-                throw new InvalidOperationException($"Invalid page index: {PageNo}");
+                throw new PageIndexTooSmallException(PageSize);
             var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
             if (!await callContext.RoleChecker.UserIsAdminAsync(user))
                 throw new InvalidOperationException($"User not admin: {user.UserName}");
@@ -95,4 +97,3 @@ public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, G
     public sealed record ResultDeckModel(string Name, int CardCount);
     #endregion
 }
-

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MemCheck.Application.QueryValidation;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -46,11 +47,13 @@ public sealed class GetImageList : RequestRunner<GetImageList.Request, GetImageL
         public async Task CheckValidityAsync(CallContext callContext)
         {
             if (PageNo < 1)
-                throw new InvalidOperationException($"First page is numbered 1, received a request for page {PageNo}");
+                throw new PageIndexTooSmallException(PageNo);
             if (PageSize < 1)
-                throw new InvalidOperationException($"PageSize too small: {PageSize} (max size: {MaxPageSize})");
+                throw new PageSizeTooSmallException(PageSize, 1, MaxPageSize);
             if (PageSize > MaxPageSize)
-                throw new InvalidOperationException($"PageSize too big: {PageSize} (max size: {MaxPageSize})");
+                throw new PageSizeTooBigException(PageSize, 1, MaxPageSize);
+            if (Filter != Filter.Trim())
+                throw new TextNotTrimmedException();
             await Task.CompletedTask;
         }
     }

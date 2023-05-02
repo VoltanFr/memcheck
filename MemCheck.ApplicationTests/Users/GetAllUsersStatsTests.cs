@@ -21,7 +21,7 @@ public class GetAllUsersStatsTests
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(Guid.NewGuid(), 1, 0, "")));
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(Guid.NewGuid(), 1, 1, "")));
     }
     [TestMethod()]
     public async Task UserIsNotAdmin()
@@ -29,7 +29,7 @@ public class GetAllUsersStatsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 1, 0, "")));
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 1, 1, "")));
     }
     [TestMethod()]
     public async Task Page0()
@@ -37,7 +37,7 @@ public class GetAllUsersStatsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 1, 0, "")));
+        await Assert.ThrowsExceptionAsync<PageIndexTooSmallException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 1, 0, "")));
     }
     [TestMethod()]
     public async Task PageSize0()
@@ -45,7 +45,7 @@ public class GetAllUsersStatsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 0, 0, "")));
+        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetAllUsersStats(dbContext.AsCallContext()).RunAsync(new GetAllUsersStats.Request(user, 0, 1, "")));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
@@ -53,7 +53,7 @@ public class GetAllUsersStatsTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, GetAllUsersStats.Request.MaxPageSize + 1, 0, "")));
+        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetAllUsersStats(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new GetAllUsersStats.Request(user, GetAllUsersStats.Request.MaxPageSize + 1, 1, "")));
     }
     [TestMethod()]
     public async Task OnlyUser_OneDeck()
