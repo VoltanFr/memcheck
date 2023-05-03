@@ -622,7 +622,7 @@ const searchApp = Vue.createApp({
             if (selectedCardIds.length === 1)
                 mesg += ` ${this.allStaticData.localizedText.alertDeleteCardsPart2Single}`;
             else
-                mesg += `${selectedCardIds.length} ${this.allStaticData.localizedText.alertDeleteCardsPart2Plural}`;
+                mesg += ` ${selectedCardIds.length} ${this.allStaticData.localizedText.alertDeleteCardsPart2Plural}`;
             if (confirm(mesg)) {
                 this.loadingQuery = true;
 
