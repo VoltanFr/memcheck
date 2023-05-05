@@ -55,11 +55,11 @@
                 </table>
             </div>
             <div id="The card" class="card learning-card" v-if="currentCard">
-                <div id="Lesson info" class="lesson-info-div">
-                    <span class="lesson-mode-span" v-if="learningUnknowns()"><i class="fa-solid fa-chalkboard-user"></i>&nbsp;@Localizer["Learning"]</span>
-                    <span class="lesson-mode-span" v-if="rehearsing()"><i class="fas fa-repeat"></i>&nbsp;@Localizer["Rehearsing"]</span>
-                    <span class="lesson-mode-span" v-if="demoMode()"><i class="fa-solid fa-eye"></i>&nbsp;@Localizer["Demo"]</span>
-                    (@Localizer["BeforeInQueueCount"]{{remainingCardsInLesson}} <span v-if="remainingCardsInLesson > 1">@Localizer["AfterInQueueCountMoreThanOne"]</span><span v-else>@Localizer["AfterInQueueCountOne"]</span>)
+                <div id="Lesson info" class="mnesios-page-title">
+                    <span v-if="learningUnknowns()"><i class="fa-solid fa-chalkboard-user"></i>&nbsp;@Localizer["Learning"]</span>
+                    <span v-if="rehearsing()"><i class="fas fa-repeat"></i>&nbsp;@Localizer["Rehearsing"]</span>
+                    <span v-if="demoMode()"><i class="fa-solid fa-eye"></i>&nbsp;@Localizer["Demo"]</span>
+                    <span class="mnesios-page-title-suffix">&nbsp;(@Localizer["BeforeInQueueCount"]{{remainingCardsInLesson}} <span v-if="remainingCardsInLesson > 1">@Localizer["AfterInQueueCountMoreThanOne"]</span><span v-else>@Localizer["AfterInQueueCountOne"]</span>)</span>
                 </div>
                 <div id="Small buttons" class="small-buttons-div">
                     <ul class="small-buttons-ul">

@@ -267,6 +267,15 @@
     border-radius: 4px;
 }
 
+.mnesios-page-title {
+    background-color: WhiteSmoke;
+    font-weight: bold;
+}
+
+.mnesios-page-title-suffix {
+    font-weight: normal;
+}
+
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
@@ -354,6 +363,15 @@
     .memcheck-bottom-button-div {
         margin-bottom: 10px;
     }
+
+    .mnesios-page-title {
+        margin-bottom: 2px;
+        font-size: 21px;
+    }
+
+    .mnesios-page-title-suffix {
+        font-size: 14px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -422,6 +440,15 @@
         font-size: 12px;
         margin-right: 6px;
     }
+
+    .mnesios-page-title {
+        margin-bottom: 4px;
+        font-size: 22px;
+    }
+
+    .mnesios-page-title-suffix {
+        font-size: 15px;
+    }
 }
 
 @media (min-width: 979px) {
@@ -450,6 +477,15 @@
         padding-right: 9px;
         font-size: 14px;
         margin-right: 9px;
+    }
+
+    .mnesios-page-title {
+        margin-bottom: 6px;
+        font-size: 24px;
+    }
+
+    .mnesios-page-title-suffix {
+        font-size: 16px;
     }
 }
 

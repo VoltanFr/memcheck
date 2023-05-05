@@ -50,43 +50,41 @@
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
         <div id="CardEditMode" v-if="!initializationFailure() && !currentFullScreenImage && !changesInReview">
-            <div id="TitleAndTopButtons">
-                <h1 class="title">
-                    <span id="Title" v-if="creatingNewCard"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</span><span v-else><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["Edit"]</span>
-                    &nbsp;
-                    <span v-if="addToDeckMenuVisible()">
-                        <button id="DeckActionDropdown" class="toolbar-button-circle toolbar-button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></button>
-                        <span class="dropdown-menu" role="menu">
-                            <span id="AddToDeck">
-                                <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                    <a class="dropdown-item" @@click="addCardToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToYourDeck"]</a>
-                                </span>
-                                <span id="MultiDeckAddToDeck" v-else>
-                                    <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                        <a class="dropdown-item" @@click="addCardToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
-                                    </span>
+            <div id="TitleAndTopButtons" class="mnesios-page-title">
+                <span id="Title" v-if="creatingNewCard"><i class="fas fa-plus"></i>&nbsp;@Localizer["Create"]</span><span v-else><i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["Edit"]</span>
+                &nbsp;
+                <span v-if="addToDeckMenuVisible()">
+                    <button id="DeckActionDropdown" class="toolbar-button-circle toolbar-button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Deck"]><i class="fas fa-inbox"></i></button>
+                    <span class="dropdown-menu" role="menu">
+                        <span id="AddToDeck">
+                            <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
+                                <a class="dropdown-item" @@click="addCardToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToYourDeck"]</a>
+                            </span>
+                            <span id="MultiDeckAddToDeck" v-else>
+                                <span v-for="targetDeck in possibleTargetDecksForAdd">
+                                    <a class="dropdown-item" @@click="addCardToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
                                 </span>
                             </span>
                         </span>
                     </span>
-                    <span id="Info button" v-if="!creatingNewCard">
-                        <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
-                            <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
-                            <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
-                            <span>{{infoAboutUsage}}</span><br />
-                            <template #reference>
-                                <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>
-                            </template>
-                        </van-popover>
-                    </span>
-                    <span id="HistoryButton" v-if="!creatingNewCard">
-                        <button class="toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
-                    </span>
-                    <span id="Rating" v-if="!creatingNewCard">
-                        <card-rating v-model="card.currentUserRating" v-bind:average="card.averageRating" v-bind:countinaverage="card.countOfUserRatings" v-on:update:model-value="onRatingChange"
-                                     yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' noevaluationstr='@Localizer["NoEvaluation"]' />
-                    </span>
-                </h1>
+                </span>
+                <span id="Info button" v-if="!creatingNewCard">
+                    <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
+                        <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
+                        <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
+                        <span>{{infoAboutUsage}}</span><br />
+                        <template #reference>
+                            <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>
+                        </template>
+                    </van-popover>
+                </span>
+                <span id="HistoryButton" v-if="!creatingNewCard">
+                    <button class="toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
+                </span>
+                <span id="Rating" v-if="!creatingNewCard">
+                    <card-rating v-model="card.currentUserRating" v-bind:average="card.averageRating" v-bind:countinaverage="card.countOfUserRatings" v-on:update:model-value="onRatingChange"
+                                 yourratingstr='@Localizer["YourRating"]' averagestr='@Localizer["Average"]' usersstr='@Localizer["Users"]' userstr='@Localizer["User"]' noevaluationstr='@Localizer["NoEvaluation"]' />
+                </span>
             </div>
             <div id="The card" class="authoring-card-div">
                 <div id="FrontSideRow" class="memcheck-input-div">
