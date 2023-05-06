@@ -8,7 +8,7 @@ export const toastShortDuration = 4000;
 const toastLongDuration = 10000;
 
 export function isValidDateTime(utcFromDotNet) {
-    return utcFromDotNet && (utcFromDotNet !== '0001-01-01T00:00:00Z') && (utcFromDotNet !== '9999-12-31T23:59:59.9999999');  // matches DateTime.MinValue and Max
+    return utcFromDotNet && (utcFromDotNet !== '0001-01-01T00:00:00Z') && (utcFromDotNet !== '0001-01-01T00:00:00') && (utcFromDotNet !== '9999-12-31T23:59:59.9999999');  // matches DateTime.MinValue and Max
 }
 
 function dateIsToday(d) {
