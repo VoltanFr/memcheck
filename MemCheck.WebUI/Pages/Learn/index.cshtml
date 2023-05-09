@@ -135,7 +135,7 @@
                         <span v-html="currentCardFrontSide()"></span>
                     </div>
                     <div v-if="!backSideVisible" class="learning-card-footer">
-                        <button class="btn btn-success btn-md" @@click="showBackSide">@Localizer["ShowBack"]</button>
+                        <button class="btn-success mnesios-in-page-button" @@click="showBackSide">@Localizer["ShowBack"]</button>
                     </div>
                 </div>
                 <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div">
@@ -146,10 +146,10 @@
                         <span v-html="currentCardBackSide()"></span>
                     </div>
                 </div>
-                <div id="Knew Forgot" v-if="backSideVisible" class="memcheck-bottom-button-div">
+                <div id="Knew Forgot" v-if="backSideVisible">
                     <ul class="nav small">
-                        <li><button class="btn btn-success btn-md" @@click="knew">@Localizer["Knew"]</button></li>
-                        <li class="ms-auto"><button class="btn btn-danger btn-md" @@click="forgot"><span v-if="learnMode == 2">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
+                        <li><button class="btn-success mnesios-in-page-button" @@click="knew">@Localizer["Knew"]</button></li>
+                        <li class="ms-auto"><button class="btn-danger mnesios-in-page-button" @@click="forgot"><span v-if="learnMode == 2">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
                 <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div">
@@ -186,7 +186,7 @@
     </div>
     <div id="UserQuitAttemptDisplayMode" v-if="userQuitAttemptDisplay">
         <p>@Localizer["ExplainMoveOperationsBeforeIcon"] <i class="fas fa-save"></i> @Localizer["ExplainMoveOperationsAfterIcon"]</p>
-        <button class="btn btn-success toolbar-button" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
+        <button class="btn-success mnesios-in-page-button" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
     </div>
     <div id="Processing info">
         <p v-if="preventQuittingPage()"><i class="fas fa-save"></i></p>

@@ -276,6 +276,11 @@
     font-weight: normal;
 }
 
+.mnesios-in-page-button {
+    border-radius: 5px;
+    border-width: 1px;
+}
+
 @media (max-width: 550px) {
     .small-screen-text {
         display: inline-block;
@@ -372,6 +377,18 @@
     .mnesios-page-title-suffix {
         font-size: 14px;
     }
+
+    .mnesios-in-page-button {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        margin-left: 4px;
+        margin-right: 4px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-left: 4px;
+        padding-right: 4px;
+        height: 35px;
+    }
 }
 
 @media (min-width: 551px) and (max-width: 978px) {
@@ -449,6 +466,18 @@
     .mnesios-page-title-suffix {
         font-size: 15px;
     }
+
+    .mnesios-in-page-button {
+        margin-top: 6px;
+        margin-bottom: 6px;
+        margin-left: 6px;
+        margin-right: 6px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-left: 6px;
+        padding-right: 6px;
+        height: 40px;
+    }
 }
 
 @media (min-width: 979px) {
@@ -486,6 +515,18 @@
 
     .mnesios-page-title-suffix {
         font-size: 16px;
+    }
+
+    .mnesios-in-page-button {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        margin-left: 8px;
+        margin-right: 8px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        padding-left: 8px;
+        padding-right: 8px;
+        height: 45px;
     }
 }
 
