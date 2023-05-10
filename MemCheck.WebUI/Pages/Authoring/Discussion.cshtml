@@ -1,0 +1,89 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
+@inject IViewLocalizer Localizer
+@model DiscussionModel
+@section head {
+    <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/discussion.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+}
+@section scripts {
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
+    <script type="module" src="~/js/Authoring/Discussion.js" asp-append-version="true"></script>
+}
+@{
+    ViewData["Title"] = @Localizer["PageTitle"];
+    ViewData["HelpPage"] = "/discussion";
+}
+
+<input type="text" asp-for="CardId" id="CardIdInput" hidden="hidden" />
+
+<div id="DiscussionMainDiv" v-cloak>
+    <div id="WaitingForData" v-if="!mountFinished" class="wait-div">
+        <i class="mnesios-logo-big"></i>
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="Failure" v-if="initializationFailure()">
+        <p class="wait-message">@Localizer["CardNotFound"]</p>
+    </div>
+    <div id="AfterMount" v-if="mountFinished && !initializationFailure()">
+        <div id="FullImage" v-if="!initializationFailure() && currentFullScreenImage">
+            <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
+        </div>
+        <div id="NormalMode" v-if="!initializationFailure() && !currentFullScreenImage && !newEntryInReview">
+            <div id="TitleAndSubtitle" class="mnesios-page-title">
+                @Localizer["MainTitle"]
+                <span class="mnesios-page-title-suffix">&nbsp;@Localizer["TalksAboutCard"] <a v-bind:href="editUrl()" target="_blank" class="discussion-cardid-link">{{cardId}}</a>.</span>
+            </div>
+            <div id="AddNewEntry">
+                <details>
+                    <summary class="discussion-entry-foldout-summary">
+                        <span class="discussion-entry-foldout-summary-caption">@Localizer["AddEntry"]</span>
+                    </summary>
+                    <div class="memcheck-input-div">
+                        <div>
+                            <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title=@Localizer["YourMessage"] v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
+                        </div>
+                        <div>
+                            <button class="btn-success mnesios-in-page-button" @@click="submitNewEntryForReview">@Localizer["ReviewYourChanges"]</button>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div>
+        <div id="EntryReviewMode" v-if="!initializationFailure() && !currentFullScreenImage && newEntryInReview">
+            <div id="ReviewMode_Title" class="mnesios-page-title">
+                <i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["ReviewYourChanges"]
+            </div>
+            <div id="ReviewMode_MessageRow" class="memcheck-input-div-container">
+                <p>@Localizer["YourMessage"]</p>
+                <div id="ReviewModeMessageRow_Original" class="memcheck-input-div">
+                    <div class="markdown-render markdown-body">
+                        <span v-html="renderedNewEntry()"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="ReviewMode_BottomButtons">
+                <ul class="nav small">
+                    <li><button class="btn-success btn-lg mnesios-in-page-button" @@click="postNewEntry">@Localizer["SaveNewEntry"]</button></li>
+                    <li class="ms-auto"><button class="btn-success btn-lg mnesios-in-page-button" @@click="continueEditing">@Localizer["ContinueEditing"]</button></li>
+                </ul>
+            </div>
+        </div>
+        <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
+            <ul>
+                <li v-for="errorDebugInfoLine in errorDebugInfoLines">{{errorDebugInfoLine}}</li>
+            </ul>
+        </div>
+    </div>
+</div>

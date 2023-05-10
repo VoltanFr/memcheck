@@ -32,6 +32,8 @@ public static class QueryValidationHelper
     public const int ImageMaxDescriptionLength = 5000;
     public const int ImageMinVersionDescriptionLength = 3;
     public const int ImageMaxVersionDescriptionLength = 1000;
+    public const int CardDiscussionMinTextLength = 1;
+    public const int CardDiscussionMaxTextLength = CardInputValidator.MaxAdditionalInfoLength;
     public const int TagMinVersionDescriptionLength = 3;
     public const int TagMaxVersionDescriptionLength = 1000;
     public const int DeckMinNameLength = 3;
@@ -263,6 +265,15 @@ public static class QueryValidationHelper
         foreach (var forbiddenChar in ForbiddenCharsInImageVersionDescription)
             if (versionDescription.Contains(forbiddenChar, StringComparison.Ordinal))
                 throw new RequestInputException(localizer.GetLocalized("InvalidImageVersionDescription") + " '" + versionDescription + "' ('" + forbiddenChar + ' ' + localizer.GetLocalized("IsForbidden") + ")");
+    }
+    public static void CheckCanCreateCardDiscussionEntryWithText(string text)
+    {
+        if (text != text.Trim())
+            throw new TextNotTrimmedException();
+        if (text.Length < CardDiscussionMinTextLength)
+            throw new TextTooShortException(text.Length, CardDiscussionMinTextLength, CardDiscussionMaxTextLength);
+        if (text.Length > CardDiscussionMaxTextLength)
+            throw new TextTooLongException(text.Length, CardDiscussionMinTextLength, CardDiscussionMaxTextLength);
     }
     public static bool TagIsPerso(Guid tagId, MemCheckDbContext dbContext)
     {

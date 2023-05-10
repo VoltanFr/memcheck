@@ -36,7 +36,8 @@ public sealed class CreateCard : RequestRunner<CreateCard.Request, CreateCard.Re
             VersionCreator = versionCreator,
             InitialCreationUtcDate = versionDate,
             VersionUtcDate = versionDate,
-            VersionDescription = request.VersionDescription
+            VersionDescription = request.VersionDescription,
+            LatestDiscussionEntry = null
         };
         DbContext.Cards.Add(card);
 

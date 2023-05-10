@@ -61,6 +61,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
                         userRatingValue,
                         card.AverageRating,
                         card.RatingCount,
+                        card.LatestDiscussionEntry?.CreationUtcDate,
                         possibleTargetDecksForAdd
                         );
 
@@ -95,7 +96,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
     public sealed class ResultModel
     {
         public ResultModel(string frontSide, string backSide, string additionalInfo, string references, Guid languageId, string languageName, ImmutableArray<ResultTagModel> tags, ImmutableArray<ResultUserModel> usersWithVisibility, DateTime creationUtcDate,
-            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, ImmutableArray<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings, ImmutableArray<ResultDeckModel> possibleTargetDecksForAdd)
+            DateTime lastVersionCreationUtcDate, string lastVersionCreator, string lastVersionDescription, ImmutableArray<string> usersOwningDeckIncluding, int userRating, double averageRating, int countOfUserRatings, DateTime? latestDiscussionEntryCreationUtcDate, ImmutableArray<ResultDeckModel> possibleTargetDecksForAdd)
         {
             FrontSide = frontSide;
             BackSide = backSide;
@@ -113,6 +114,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             UserRating = userRating;
             AverageRating = averageRating;
             CountOfUserRatings = countOfUserRatings;
+            LatestDiscussionEntryCreationUtcDate = latestDiscussionEntryCreationUtcDate;
             PossibleTargetDecksForAdd = possibleTargetDecksForAdd;
         }
         public string FrontSide { get; }
@@ -131,6 +133,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
         public int UserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
+        public DateTime? LatestDiscussionEntryCreationUtcDate { get; }
         public ImmutableArray<ResultDeckModel> PossibleTargetDecksForAdd { get; }
     }
     public sealed class ResultTagModel

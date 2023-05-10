@@ -167,6 +167,7 @@ public class AuthoringController : MemCheckController
             CurrentUserRating = applicationResult.UserRating;
             AverageRating = Math.Round(applicationResult.AverageRating, 1);
             CountOfUserRatings = applicationResult.CountOfUserRatings;
+            LatestDiscussionEntryCreationUtcDate = applicationResult.LatestDiscussionEntryCreationUtcDate ?? DateTime.MinValue;
         }
         public string FrontSide { get; }
         public string BackSide { get; }
@@ -182,6 +183,7 @@ public class AuthoringController : MemCheckController
         public int CurrentUserRating { get; }
         public double AverageRating { get; }
         public int CountOfUserRatings { get; }
+        public DateTime LatestDiscussionEntryCreationUtcDate { get; }
     }
     public sealed class GetCardForEditDeckModel
     {

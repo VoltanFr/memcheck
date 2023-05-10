@@ -120,6 +120,7 @@ public class GetCardForEditTests
         Assert.AreEqual(0, loaded.AverageRating);
         Assert.AreEqual(0, loaded.CountOfUserRatings);
         Assert.AreEqual(1, loaded.PossibleTargetDecksForAdd.Length);
+        Assert.IsNull(loaded.LatestDiscussionEntryCreationUtcDate);
     }
     [TestMethod()]
     public async Task NotInAuthorSingleDeck()
@@ -200,5 +201,25 @@ public class GetCardForEditTests
 
         Assert.AreEqual(2, loaded.PossibleTargetDecksForAdd.Length);
         Assert.IsTrue(loaded.PossibleTargetDecksForAdd.Any(deck => deck.DeckId == otherUserDeckId));
+    }
+    [TestMethod()]
+    public async Task CheckLatestDiscussionEntryCreationUtcDate()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
+        var cardId = await CardHelper.CreateIdAsync(db, creatorId);
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var discussionCreation = new AddEntryToCardDiscussion(dbContext.AsCallContext());
+            var request = new AddEntryToCardDiscussion.Request(creatorId, cardId, RandomHelper.String());
+            await discussionCreation.RunAsync(request);
+        }
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, cardId));
+            Assert.IsNull(loaded.LatestDiscussionEntryCreationUtcDate);
+        }
     }
 }

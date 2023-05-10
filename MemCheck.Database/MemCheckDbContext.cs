@@ -45,6 +45,9 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
     public DbSet<ExcludedTagInSearchSubscription> ExcludedTagInSearchSubscriptions { get; set; } = null!;
     public DbSet<CardInSearchResult> CardsInSearchResults { get; set; } = null!;
     public DbSet<DemoDownloadAuditTrailEntry> DemoDownloadAuditTrailEntries { get; set; } = null!;
+    public DbSet<CardDiscussionEntry> CardDiscussionEntries { get; set; } = null!;
+    public DbSet<CardDiscussionDeletedEntry> CardDiscussionDeletedEntries { get; set; } = null!;
+    public DbSet<CardDiscussionEntryPreviousVersion> CardDiscussionEntryPreviousVersions { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -94,6 +97,9 @@ public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRol
 
         builder.Entity<Tag>().HasIndex(tag => tag.Name).IsUnique();
         builder.Entity<Tag>().HasOne(tag => tag.CreatingUser).WithMany().OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<CardDiscussionEntryPreviousVersion>().HasOne(previousVersion => previousVersion.PreviousVersion).WithMany().OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<CardDiscussionDeletedEntry>().HasOne(deletedEntry => deletedEntry.PreviousVersion).WithMany().OnDelete(DeleteBehavior.NoAction);
     }
     private static void AddIndexesRecomendedByAzureWebSite(ModelBuilder builder)
     {

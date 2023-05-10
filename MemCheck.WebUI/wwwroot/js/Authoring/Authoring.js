@@ -3,6 +3,7 @@ import { BigSizeImage } from '../big-size-image.js';
 import { TagButton } from '../TagButton.js';
 import { CardRating } from '../CardRating.js';
 import { dateTime } from '../Common.js';
+import { isValidDateTime } from '../Common.js';
 import { tellAxiosError } from '../Common.js';
 import { tellControllerSuccess } from '../Common.js';
 import { sortTagArray } from '../Common.js';
@@ -55,6 +56,7 @@ const authoringApp = Vue.createApp({
             editingCardId: '',  // Guid, used only if !creatingNewCard
             editingCardCreationDate: '',  // string, used only if !creatingNewCard
             editingCardLastChangeDate: '',  // string, used only if !creatingNewCard
+            latestDiscussionEntryCreationDate: null,  // datetime, used only if !creatingNewCard
             infoAboutUsage: '',  // string, used only if !creatingNewCard
             returnAddress: '', // string
             mountFinished: false,
@@ -326,6 +328,7 @@ const authoringApp = Vue.createApp({
                     this.editingCardLastChangeDate = dateTime(result.data.lastChangeUtcDate);
                     this.infoAboutUsage = result.data.infoAboutUsage;
                     this.possibleTargetDecksForAdd = result.data.possibleTargetDecksForAdd;
+                    this.latestDiscussionEntryCreationDate = result.data.latestDiscussionEntryCreationUtcDate;
                     this.creatingNewCard = false;
                 })
                 .catch(error => {
@@ -474,6 +477,11 @@ const authoringApp = Vue.createApp({
                 .catch(error => {
                     tellAxiosError(error);
                 });
+        },
+        latestDiscussionInfo() {
+            if (isValidDateTime(this.latestDiscussionEntryCreationDate))
+                return `${localized.LatestDiscussionEntryCreationDate} ${dateTime(this.latestDiscussionEntryCreationDate)}`;
+            return `${localized.EmptyDiscussionPageInfo}`;
         },
     },
     watch: {

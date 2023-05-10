@@ -1,6 +1,6 @@
 ﻿# Run a migration of the DB
 In the folder of the DB csproj
-dotnet ef --startup-project ../MemCheck.WebUI migrations add IntroduceImageSha1
+dotnet ef --startup-project ../MemCheck.WebUI migrations add AddCardDiscussions
 
 # Updating the DB (following the add of a migration)
 dotnet ef --startup-project ../MemCheck.WebUI database update

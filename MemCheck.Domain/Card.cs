@@ -31,4 +31,5 @@ public sealed class Card
     public double AverageRating { get; set; } //The average of all ratings for this card (in the table UserCardRating). A rating is between 1 and 5, so the average is in this interval too. An average of 0 means that RatingCount is 0
     public IEnumerable<UserCardRating> UserCardRating { get; set; } = null!;
     public string WholeText { get; set; } = null!;
+    public CardDiscussionEntry? LatestDiscussionEntry { get; set; } //null for initial version (VersionType == Creation)
 }
