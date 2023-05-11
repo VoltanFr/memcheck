@@ -204,6 +204,9 @@
   <data name="PleaseWaitForMount" xml:space="preserve">
     <value>Chargement des données...</value>
   </data>
+  <data name="PleaseWaitForSave" xml:space="preserve">
+    <value>Enregistrement...</value>
+  </data>
   <data name="ReviewYourChanges" xml:space="preserve">
     <value>Voir vos modifications</value>
   </data>
@@ -212,6 +215,15 @@
   </data>
   <data name="TalksAboutCard" xml:space="preserve">
     <value>sur la carte</value>
+  </data>
+  <data name="ToastMessageForPostSuccessAfterCount" xml:space="preserve">
+    <value>° message à cette discussion</value>
+  </data>
+  <data name="ToastMessageForPostSuccessBeforeCount" xml:space="preserve">
+    <value>Vous avez ajouté le </value>
+  </data>
+  <data name="ToastTitleForPostSuccess" xml:space="preserve">
+    <value>Message enregistré</value>
   </data>
   <data name="YourMessage" xml:space="preserve">
     <value>Votre message</value>

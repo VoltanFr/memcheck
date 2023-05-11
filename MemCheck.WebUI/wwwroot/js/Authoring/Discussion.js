@@ -3,10 +3,12 @@ import { BigSizeImage } from '../big-size-image.js';
 import { TagButton } from '../TagButton.js';
 import { CardRating } from '../CardRating.js';
 import { tellAxiosError } from '../Common.js';
-import { tellControllerSuccess } from '../Common.js';
 import { decodeImageDefinition } from '../MarkdownConversion.js';
 import { convertMarkdown } from '../MarkdownConversion.js';
 import { downloadMissingImages } from '../ImageDownloading.js';
+import { toast } from '../Common.js';
+import { toastShortDuration } from '../Common.js';
+import { sleep } from '../Common.js';
 
 const discussionApp = Vue.createApp({
     components: {
@@ -53,6 +55,9 @@ const discussionApp = Vue.createApp({
             this.cardId = document.getElementById('CardIdInput').value;
             this.errorDebugInfoLines.push(`Card id: ${this.cardId}`);
         },
+        clearNewEntry() {
+            this.newEntryText = '';
+        },
         onBeforeUnload(event) {
             if (this.isDirty()) {
                 (event || window.event).returnValue = 'Sure you want to lose your edits?';
@@ -96,28 +101,31 @@ const discussionApp = Vue.createApp({
             this.newEntryInReview = true;
         },
         async postNewEntry() {
-            this.newEntryInReview = true;
+            this.saving = true;
 
-            try {
-                const body = {
-                    Text: this.newEntryText,
-                };
+            const body = {
+                CardId: this.cardId,
+                Text: this.newEntryText,
+            };
 
-                const task = axios.post('/Authoring/Discussion/', body);
+            const task = axios.post('/Authoring/PostDiscussionEntry/', body);
 
-                await task
-                    .then(result => {
+            await task
+                .then(result => {
+                    const toastMessage = `${localized.ToastMessageForPostSuccessBeforeCount}${result.data.entryCount}${localized.ToastMessageForPostSuccessAfterCount}`;
+                    toast(toastMessage, localized.ToastTitleForPostSuccess, true);
+                    sleep(toastShortDuration).then(() => {
                         this.clearNewEntry();
-                        tellControllerSuccess(result);
+                        this.newEntryInReview = false;
+                        this.saving = false;
                         location.reload();
-                    })
-                    .catch(error => {
-                        tellAxiosError(error);
                     });
-            }
-            finally {
-                this.newEntryInReview = false;
-            }
+                })
+                .catch(error => {
+                    tellAxiosError(error);
+                    this.newEntryInReview = false;
+                    this.saving = false;
+                });
         },
         renderedTextForReview(text) {
             downloadMissingImages(text, this.images);

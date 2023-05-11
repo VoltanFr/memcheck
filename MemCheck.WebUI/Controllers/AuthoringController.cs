@@ -366,4 +366,23 @@ public class AuthoringController : MemCheckController
         return ControllerResultWithToast.Success(GetLocalized("CardAdded"), this);
     }
     #endregion
+    #region PostDiscussionEntry
+    [HttpPost("PostDiscussionEntry")]
+    public async Task<IActionResult> PostDiscussionEntry([FromBody] PostDiscussionEntryRequest request)
+    {
+        CheckBodyParameter(request);
+        var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+        var appRequest = new AddEntryToCardDiscussion.Request(userId, request.CardId, request.Text);
+        var appResult = await new AddEntryToCardDiscussion(callContext).RunAsync(appRequest);
+        return Ok(new PostDiscussionEntryResult(appResult.EntryCountForCard));
+    }
+    #region Request and result classes
+    public sealed class PostDiscussionEntryRequest
+    {
+        public Guid CardId { get; set; }
+        public string Text { get; set; } = null!;
+    }
+    public sealed record PostDiscussionEntryResult(int EntryCount);
+    #endregion
+    #endregion
 }

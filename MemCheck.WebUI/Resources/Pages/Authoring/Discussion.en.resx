@@ -120,31 +120,112 @@
   <data name="AddEntry" xml:space="preserve">
     <value>Add a message</value>
   </data>
+  <data name="BigSizeImageLabel_BigSize" xml:space="preserve">
+    <value>Big size (bytes):</value>
+  </data>
+  <data name="BigSizeImageLabel_CloseButtonTitle" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnFailure" xml:space="preserve">
+    <value>Copy to clipboard failed</value>
+  </data>
+  <data name="BigSizeImageLabel_CopiedToClipboardToastTitleOnSuccess" xml:space="preserve">
+    <value>Copy to clipboard OK</value>
+  </data>
+  <data name="BigSizeImageLabel_CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedBy" xml:space="preserve">
+    <value>Current version created by:</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionCreatedOn" xml:space="preserve">
+    <value>Current version date:</value>
+  </data>
+  <data name="BigSizeImageLabel_CurrentVersionDescription" xml:space="preserve">
+    <value>Current version description:</value>
+  </data>
+  <data name="BigSizeImageLabel_Description" xml:space="preserve">
+    <value>Description:</value>
+  </data>
+  <data name="BigSizeImageLabel_DownloadBiggestSize" xml:space="preserve">
+    <value>Download in full size</value>
+  </data>
+  <data name="BigSizeImageLabel_EditButtonTitle" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="BigSizeImageLabel_InitialVersionCreatedOn" xml:space="preserve">
+    <value>Uploaded on:</value>
+  </data>
+  <data name="BigSizeImageLabel_MediumSize" xml:space="preserve">
+    <value>Medium size (bytes):</value>
+  </data>
+  <data name="BigSizeImageLabel_Name" xml:space="preserve">
+    <value>Image name:</value>
+  </data>
+  <data name="BigSizeImageLabel_NumberOfCards" xml:space="preserve">
+    <value>Cards using this image:</value>
+  </data>
+  <data name="BigSizeImageLabel_originalImageContentType" xml:space="preserve">
+    <value>Image type:</value>
+  </data>
+  <data name="BigSizeImageLabel_OriginalImageSize" xml:space="preserve">
+    <value>Original size (bytes):</value>
+  </data>
+  <data name="BigSizeImageLabel_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="BigSizeImageLabel_SmallSize" xml:space="preserve">
+    <value>Small size (bytes):</value>
+  </data>
+  <data name="BigSizeImageLabel_Source" xml:space="preserve">
+    <value>Source:</value>
+  </data>
+  <data name="BigSizeImageLabel_URL" xml:space="preserve">
+    <value>Direct URL:</value>
+  </data>
+  <data name="BigSizeImageLabel_VersionHistoryButtonTitle" xml:space="preserve">
+    <value>Version history</value>
+  </data>
   <data name="CardNotFound" xml:space="preserve">
-    <value>Carte non trouvée.</value>
+    <value>Card not found</value>
   </data>
   <data name="ContinueEditing" xml:space="preserve">
-    <value>Continuer à modifier</value>
+    <value>Continue editing</value>
   </data>
   <data name="MainTitle" xml:space="preserve">
     <value>Discussion</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
-    <value>Discussion sur la carte</value>
+    <value>Discussion</value>
   </data>
   <data name="PleaseWaitForMount" xml:space="preserve">
-    <value>Chargement des données...</value>
+    <value>Loading data...</value>
+  </data>
+  <data name="PleaseWaitForSave" xml:space="preserve">
+    <value>Please wait, saving message...</value>
   </data>
   <data name="ReviewYourChanges" xml:space="preserve">
-    <value>Voir vos modifications</value>
+    <value>Review your changes</value>
   </data>
   <data name="SaveNewEntry" xml:space="preserve">
-    <value>Enregistrer</value>
+    <value>Save</value>
   </data>
   <data name="TalksAboutCard" xml:space="preserve">
-    <value>sur la carte</value>
+    <value>about carf</value>
+  </data>
+  <data name="ToastMessageForPostSuccessAfterCount" xml:space="preserve">
+    <value> to this talk</value>
+  </data>
+  <data name="ToastMessageForPostSuccessBeforeCount" xml:space="preserve">
+    <value>You added message #</value>
+  </data>
+  <data name="ToastTitleForPostSuccess" xml:space="preserve">
+    <value>Message saved</value>
   </data>
   <data name="YourMessage" xml:space="preserve">
-    <value>Votre message</value>
+    <value>Your message</value>
   </data>
 </root>

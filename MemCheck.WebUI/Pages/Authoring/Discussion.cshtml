@@ -40,7 +40,7 @@
         <div id="FullImage" v-if="!initializationFailure() && currentFullScreenImage">
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
-        <div id="NormalMode" v-if="!initializationFailure() && !currentFullScreenImage && !newEntryInReview">
+        <div id="NormalMode" v-if="!initializationFailure() && !currentFullScreenImage && !newEntryInReview && !saving">
             <div id="TitleAndSubtitle" class="mnesios-page-title">
                 @Localizer["MainTitle"]
                 <span class="mnesios-page-title-suffix">&nbsp;@Localizer["TalksAboutCard"] <a v-bind:href="editUrl()" target="_blank" class="discussion-cardid-link">{{cardId}}</a>.</span>
@@ -52,7 +52,7 @@
                     </summary>
                     <div class="memcheck-input-div">
                         <div>
-                            <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title=@Localizer["YourMessage"] v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
+                            <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title="@Localizer["YourMessage"]" v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
                         </div>
                         <div>
                             <button class="btn-success mnesios-in-page-button" @@click="submitNewEntryForReview">@Localizer["ReviewYourChanges"]</button>
@@ -61,7 +61,10 @@
                 </details>
             </div>
         </div>
-        <div id="EntryReviewMode" v-if="!initializationFailure() && !currentFullScreenImage && newEntryInReview">
+        <div id="SavingMode" v-if="!initializationFailure() && saving">
+            <p class="wait-message">@Localizer["PleaseWaitForSave"]</p>
+        </div>
+        <div id="EntryReviewMode" v-if="!initializationFailure() && !currentFullScreenImage && newEntryInReview && !saving">
             <div id="ReviewMode_Title" class="mnesios-page-title">
                 <i class="fa-solid fa-file-pen"></i>&nbsp;@Localizer["ReviewYourChanges"]
             </div>
