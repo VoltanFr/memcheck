@@ -135,6 +135,7 @@ public class AddEntryToCardDiscussionTests
             var cardFromDb = await dbContext.Cards.SingleAsync();
             Assert.IsNotNull(cardFromDb.LatestDiscussionEntry);
             Assert.AreEqual(discussionEntryFromDb.Id, cardFromDb.LatestDiscussionEntry.Id);
+            Assert.AreEqual(runDate, cardFromDb.LatestDiscussionEntry.CreationUtcDate);
         }
     }
     [TestMethod()]

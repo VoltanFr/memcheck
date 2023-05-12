@@ -58,7 +58,8 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
                 userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
                 cardInDeck.Card.AverageRating,
                 cardInDeck.Card.RatingCount,
-                LanguageName = cardInDeck.Card.CardLanguage.Name
+                LanguageName = cardInDeck.Card.CardLanguage.Name,
+                cardInDeck.Card.LatestDiscussionEntry
 
             }).ToImmutableArray();
 
@@ -79,7 +80,8 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             oldestCard.RatingCount,
             notifications[oldestCard.CardId],
             oldestCard.LanguageName == "Français", //Questionable hardcoding
-            GetMoveToHeapExpiryInfos(heapingAlgorithm, oldestCard.LastLearnUtcTime)
+            GetMoveToHeapExpiryInfos(heapingAlgorithm, oldestCard.LastLearnUtcTime),
+            oldestCard.LatestDiscussionEntry?.CreationUtcDate
             )
         ).OrderBy(r => r.LastLearnUtcTime);
 
@@ -140,7 +142,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
         public ResultCard(Guid cardId, int heap, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
             int userRating, double averageRating, int countOfUserRatings,
-            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
+            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos, DateTime? latestDiscussionEntryCreationUtcDate)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
             CardId = cardId;
@@ -163,6 +165,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
             RegisteredForNotifications = registeredForNotifications;
             IsInFrench = isInFrench;
             MoveToHeapExpiryInfos = moveToHeapExpiryInfos;
+            LatestDiscussionEntryCreationUtcDate = latestDiscussionEntryCreationUtcDate;
         }
         public Guid CardId { get; }
         public int Heap { get; }
@@ -181,6 +184,7 @@ public sealed class GetCardsToRepeat : RequestRunner<GetCardsToRepeat.Request, G
         public int CountOfUserRatings { get; }
         public bool RegisteredForNotifications { get; }
         public bool IsInFrench { get; }
+        public DateTime? LatestDiscussionEntryCreationUtcDate { get; }
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
         public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }

@@ -72,7 +72,7 @@
                     <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay>
                         <span>@Localizer["CreationDate"] {{editingCardCreationDate}}</span><br />
                         <span>@Localizer["LastChangeDate"] {{editingCardLastChangeDate}}</span><br />
-                        <a v-bind:href="'/Authoring/Discussion?CardId='+editingCardId" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
+                        <a v-bind:href="discussionUrl()" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
                         <span>{{infoAboutUsage}}</span><br />
                         <template #reference>
                             <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>

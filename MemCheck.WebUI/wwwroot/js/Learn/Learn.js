@@ -511,6 +511,17 @@ const learnApp = Vue.createApp({
         showRatingReadonly() {
             return this.demoMode();
         },
+        discussionUrl() {
+            return `/Authoring/Discussion?CardId=${this.currentCard.cardId}`;
+        },
+        showDiscussionLink() {
+            return !this.demoMode();
+        },
+        latestDiscussionInfo() {
+            if (isValidDateTime(this.currentCard.latestDiscussionEntryCreationUtcDate))
+                return `${localized.LatestDiscussionEntryCreationDate} ${dateTime(this.currentCard.latestDiscussionEntryCreationUtcDate)}`;
+            return `${localized.EmptyDiscussionPageInfo}`;
+        },
     },
     watch: {
         pendingMoveOperations: {

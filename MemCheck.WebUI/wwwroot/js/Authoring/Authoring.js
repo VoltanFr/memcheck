@@ -483,6 +483,9 @@ const authoringApp = Vue.createApp({
                 return `${localized.LatestDiscussionEntryCreationDate} ${dateTime(this.latestDiscussionEntryCreationDate)}`;
             return `${localized.EmptyDiscussionPageInfo}`;
         },
+        discussionUrl() {
+            return `/Authoring/Discussion?CardId=${this.editingCardId}`;
+        },
     },
     watch: {
         selectedTagToAdd: {

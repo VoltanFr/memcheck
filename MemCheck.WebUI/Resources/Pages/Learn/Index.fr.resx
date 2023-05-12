@@ -397,4 +397,13 @@ Quitter la page dans ces conditions pourrait vous faire perdre des informations 
   <data name="BigSizeImageLabel_FoldoutCaption" xml:space="preserve">
     <value>Détails</value>
   </data>
+  <data name="EmptyDiscussionPageInfo" xml:space="preserve">
+    <value>vide</value>
+  </data>
+  <data name="LatestDiscussionEntryCreationDate" xml:space="preserve">
+    <value>dernier message :</value>
+  </data>
+  <data name="OpenDiscussionPage" xml:space="preserve">
+    <value>Discussion</value>
+  </data>
 </root>

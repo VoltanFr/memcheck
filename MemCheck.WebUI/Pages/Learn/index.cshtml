@@ -11,7 +11,7 @@
     <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
     <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
-    @section scripts {
+@section scripts {
     <script type="module" src="~/js/CardRating.js" asp-append-version="true"></script>
     <script type="module" src="~/js/big-size-image.js" asp-append-version="true"></script>
     <script type="module" src="~/js/TagButton.js" asp-append-version="true"></script>
@@ -24,7 +24,7 @@
     </script>
     <script type="module" src="~/js/Learn/Learn.js" asp-append-version="true"></script>
 }
-    @{
+@{
     ViewData["Title"] = @Localizer["PageTitle"];
     ViewData["HelpPage"] = "/learn";
 }
@@ -83,6 +83,8 @@
                                     <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a>
                                     <a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                                 </span>
+                                <br />
+                                <a v-bind:href="discussionUrl()" v-if="showDiscussionLink()" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
                                 <template #reference>
                                     <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>
                                 </template>

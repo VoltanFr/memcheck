@@ -53,7 +53,8 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             userWithViewIds = cardInDeck.Card.UsersWithView.Select(u => u.UserId),
             cardInDeck.Card.AverageRating,
             cardInDeck.Card.RatingCount,
-            LanguageName = cardInDeck.Card.CardLanguage.Name
+            LanguageName = cardInDeck.Card.CardLanguage.Name,
+            LatestDiscussionEntryCreationUtcDate = cardInDeck.Card.LatestDiscussionEntry
         });
 
         var listed = await withDetails.ToListAsync();
@@ -81,7 +82,8 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             cardInDeck.RatingCount,
             notifications[cardInDeck.CardId],
             cardInDeck.LanguageName == "Français", //Questionable hardcoding
-            GetMoveToHeapExpiryInfos(heapingAlgorithm, cardInDeck.LastLearnUtcTime)
+            GetMoveToHeapExpiryInfos(heapingAlgorithm, cardInDeck.LastLearnUtcTime),
+            cardInDeck.LatestDiscussionEntryCreationUtcDate?.CreationUtcDate
         ));
         return neverLearnt ? Shuffler.Shuffle(result).Take(cardCount) : result;
     }
@@ -145,7 +147,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
         public ResultCard(Guid cardId, DateTime lastLearnUtcTime, DateTime addToDeckUtcTime, int biggestHeapReached, int nbTimesInNotLearnedHeap,
             string frontSide, string backSide, string additionalInfo, string references, DateTime lastChangeUtcTime, string owner, IEnumerable<string> tags, IEnumerable<string> visibleTo,
             int userRating, double averageRating, int countOfUserRatings,
-            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos)
+            bool registeredForNotifications, bool isInFrench, ImmutableArray<MoveToHeapExpiryInfo> moveToHeapExpiryInfos, DateTime? latestDiscussionEntryCreationUtcDate)
         {
             DateServices.CheckUTC(lastLearnUtcTime);
             CardId = cardId;
@@ -167,6 +169,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
             RegisteredForNotifications = registeredForNotifications;
             IsInFrench = isInFrench;
             MoveToHeapExpiryInfos = moveToHeapExpiryInfos;
+            LatestDiscussionEntryCreationUtcDate = latestDiscussionEntryCreationUtcDate;
         }
         public Guid CardId { get; }
         public DateTime LastLearnUtcTime { get; }
@@ -184,6 +187,7 @@ public sealed class GetUnknownCardsToLearn : RequestRunner<GetUnknownCardsToLear
         public int CountOfUserRatings { get; }
         public bool RegisteredForNotifications { get; }
         public bool IsInFrench { get; }
+        public DateTime? LatestDiscussionEntryCreationUtcDate { get; }
         public IEnumerable<string> Tags { get; }
         public IEnumerable<string> VisibleTo { get; }
         public ImmutableArray<MoveToHeapExpiryInfo> MoveToHeapExpiryInfos { get; }

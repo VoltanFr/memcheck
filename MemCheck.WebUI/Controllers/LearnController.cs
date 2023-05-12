@@ -204,6 +204,7 @@ public class LearnController : MemCheckController
                     new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                 ).OrderBy(heapModel => heapModel.HeapId);
             RegisteredForNotifications = applicationResult.RegisteredForNotifications;
+            LatestDiscussionEntryCreationUtcDate = applicationResult.LatestDiscussionEntryCreationUtcDate;
         }
         public GetCardsCardViewModel(GetCardsToRepeat.ResultCard applicationResult, ILocalized localizer, string currentUser)
         {
@@ -240,6 +241,7 @@ public class LearnController : MemCheckController
                     new GetCardsHeapModel(moveToHeapInfo.HeapId, DisplayServices.HeapName(moveToHeapInfo.HeapId, localizer), moveToHeapInfo.UtcExpiryDate, localizer)
                 ).OrderBy(heapModel => heapModel.HeapId);
             RegisteredForNotifications = applicationResult.RegisteredForNotifications;
+            LatestDiscussionEntryCreationUtcDate = applicationResult.LatestDiscussionEntryCreationUtcDate;
         }
         public GetCardsCardViewModel(GetCardsForDemo.ResultCard applicationResult, ILocalized localizer)
         {
@@ -266,6 +268,7 @@ public class LearnController : MemCheckController
             VisibleTo = localizer.GetLocalized("AllUsers");
             MoveToHeapTargets = Array.Empty<GetCardsHeapModel>();
             RegisteredForNotifications = false;
+            LatestDiscussionEntryCreationUtcDate = DateTime.MinValue;
         }
         public Guid CardId { get; }
         public int HeapId { get; }
@@ -290,6 +293,7 @@ public class LearnController : MemCheckController
         public int CountOfUserRatings { get; }
         public bool RegisteredForNotifications { get; }
         public bool IsInFrench { get; }
+        public DateTime? LatestDiscussionEntryCreationUtcDate { get; }
     }
     public sealed class GetCardsHeapModel
     {

@@ -99,6 +99,7 @@ public class GetUnknownCardsToLearnTests
             Assert.AreEqual(heapIndex + 1, moveToHeapExpiryInfo.HeapId);
             Assert.AreEqual(runDate, moveToHeapExpiryInfo.UtcExpiryDate);
         }
+        Assert.IsNull(loadedCard.LatestDiscussionEntryCreationUtcDate);
     }
     [TestMethod()]
     public async Task OneLearnt()
@@ -109,19 +110,25 @@ public class GetUnknownCardsToLearnTests
         var card = await CardHelper.CreateAsync(db, user);
         var lastLearnUtcTime = RandomHelper.Date();
         await DeckHelper.AddCardAsync(db, deck, card.Id, 0, lastLearnUtcTime: lastLearnUtcTime);
+        var latestDiscussionEntryCreationDate = RandomHelper.Date();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), latestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user, card.Id, RandomHelper.String()));
 
-        using var dbContext = new MemCheckDbContext(db);
-        var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), 10);
-        var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards;
-        Assert.AreEqual(1, cards.Count());
-        var cardFromResult = cards.Single();
-        Assert.AreNotEqual(CardInDeck.NeverLearntLastLearnTime, cardFromResult.LastLearnUtcTime);
-        Assert.AreEqual(CardInDeck.MaxHeapValue, cardFromResult.MoveToHeapExpiryInfos.Length);
-        for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
+        using (var dbContext = new MemCheckDbContext(db))
         {
-            var moveToHeapExpiryInfo = cardFromResult.MoveToHeapExpiryInfos[heapIndex];
-            Assert.AreEqual(heapIndex + 1, moveToHeapExpiryInfo.HeapId);
-            Assert.AreEqual(lastLearnUtcTime.AddDays(heapIndex + 1), moveToHeapExpiryInfo.UtcExpiryDate);
+            var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), 10);
+            var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards;
+            Assert.AreEqual(1, cards.Count());
+            var cardFromResult = cards.Single();
+            Assert.AreNotEqual(CardInDeck.NeverLearntLastLearnTime, cardFromResult.LastLearnUtcTime);
+            Assert.AreEqual(CardInDeck.MaxHeapValue, cardFromResult.MoveToHeapExpiryInfos.Length);
+            for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
+            {
+                var moveToHeapExpiryInfo = cardFromResult.MoveToHeapExpiryInfos[heapIndex];
+                Assert.AreEqual(heapIndex + 1, moveToHeapExpiryInfo.HeapId);
+                Assert.AreEqual(lastLearnUtcTime.AddDays(heapIndex + 1), moveToHeapExpiryInfo.UtcExpiryDate);
+            }
+            Assert.AreEqual(latestDiscussionEntryCreationDate, cardFromResult.LatestDiscussionEntryCreationUtcDate);
         }
     }
     [TestMethod()]
@@ -336,6 +343,9 @@ public class GetUnknownCardsToLearnTests
         await DeckHelper.AddCardAsync(db, deck, card1.Id, lastLearnUtcTime: card1LastLearnTime, heap: 0, addToDeckUtcTime: card1AddToDeckTime, biggestHeapReached: card1BiggestHeapReached, nbTimesInNotLearnedHeap: card1NbTimesInNotLearnedHeap);
         var card1Rating = RandomHelper.Rating();
         await RatingHelper.RecordForUserAsync(db, user.Id, card1.Id, card1Rating);
+        var card1LatestDiscussionEntryCreationDate = RandomHelper.Date(card1AddToDeckTime);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card1LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card1.Id, RandomHelper.String()));
 
         var card2VersionDate = RandomHelper.Date();
         var card2 = await CardHelper.CreateAsync(db, user.Id, versionDate: card2VersionDate, language: otherLanguage);
@@ -346,6 +356,12 @@ public class GetUnknownCardsToLearnTests
         await DeckHelper.AddCardAsync(db, deck, card2.Id, lastLearnUtcTime: card2LastLearnTime, heap: 0, addToDeckUtcTime: card2AddToDeckTime, biggestHeapReached: card2BiggestHeapReached, nbTimesInNotLearnedHeap: card2NbTimesInNotLearnedHeap);
         using (var dbContext = new MemCheckDbContext(db))
             await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(user.Id, card2.Id.AsArray()));
+        var card2LatestDiscussionEntryCreationDate = RandomHelper.Date(card2AddToDeckTime);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card2LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card2.Id, RandomHelper.String()));
+        card2LatestDiscussionEntryCreationDate = RandomHelper.Date(card2LatestDiscussionEntryCreationDate);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card2LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card2.Id, RandomHelper.String()));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -376,6 +392,7 @@ public class GetUnknownCardsToLearnTests
                 Assert.AreEqual(1, card1FromResult.VisibleTo.Count());
                 Assert.AreEqual(user.UserName, card1FromResult.VisibleTo.Single());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card1FromResult.MoveToHeapExpiryInfos.Length);
+                Assert.AreEqual(card1LatestDiscussionEntryCreationDate, card1FromResult.LatestDiscussionEntryCreationUtcDate);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
                     Assert.AreEqual(heapIndex + 1, card1FromResult.MoveToHeapExpiryInfos[heapIndex].HeapId);
@@ -402,6 +419,7 @@ public class GetUnknownCardsToLearnTests
                 Assert.IsFalse(card2FromResult.Tags.Any());
                 Assert.IsFalse(card2FromResult.VisibleTo.Any());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card2FromResult.MoveToHeapExpiryInfos.Length);
+                Assert.AreEqual(card2LatestDiscussionEntryCreationDate, card2FromResult.LatestDiscussionEntryCreationUtcDate);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
                     Assert.AreEqual(heapIndex + 1, card2FromResult.MoveToHeapExpiryInfos[heapIndex].HeapId);

@@ -103,6 +103,7 @@ public class GetCardsToRepeatTests
         var loadedCard = cards.Cards.Single();
         Assert.AreEqual(card.Id, loadedCard.CardId);
         Assert.AreEqual(references, loadedCard.References);
+        Assert.IsNull(loadedCard.LatestDiscussionEntryCreationUtcDate);
     }
     [TestMethod()]
     public async Task RequestedCount()
@@ -228,6 +229,9 @@ public class GetCardsToRepeatTests
         var card1Rating = RandomHelper.Rating();
         await RatingHelper.RecordForUserAsync(db, user.Id, card1.Id, card1Rating);
         var runDateFromCard1 = RandomHelper.Date(card1LastLearnTime.AddDays(card1Heap + 1));
+        var card1LatestDiscussionEntryCreationDate = RandomHelper.Date(card1AddToDeckTime);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card1LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card1.Id, RandomHelper.String()));
 
         var card2VersionDate = RandomHelper.Date();
         var card2 = await CardHelper.CreateAsync(db, user.Id, versionDate: card2VersionDate, language: otherLanguage);
@@ -240,6 +244,12 @@ public class GetCardsToRepeatTests
         using (var dbContext = new MemCheckDbContext(db))
             await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(new AddCardSubscriptions.Request(user.Id, card2.Id.AsArray()));
         var runDateFromCard2 = RandomHelper.Date(card2LastLearnTime.AddDays(card2Heap + 1));
+        var card2LatestDiscussionEntryCreationDate = RandomHelper.Date(card2AddToDeckTime);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card2LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card2.Id, RandomHelper.String()));
+        card2LatestDiscussionEntryCreationDate = RandomHelper.Date(card2LatestDiscussionEntryCreationDate);
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), card2LatestDiscussionEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(user.Id, card2.Id, RandomHelper.String()));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -270,6 +280,7 @@ public class GetCardsToRepeatTests
                 Assert.AreEqual(1, card1FromResult.VisibleTo.Count());
                 Assert.AreEqual(user.UserName, card1FromResult.VisibleTo.Single());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card1FromResult.MoveToHeapExpiryInfos.Length);
+                Assert.AreEqual(card1LatestDiscussionEntryCreationDate, card1FromResult.LatestDiscussionEntryCreationUtcDate);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
                     Assert.AreEqual(heapIndex, card1FromResult.MoveToHeapExpiryInfos[heapIndex].HeapId);
@@ -296,6 +307,7 @@ public class GetCardsToRepeatTests
                 Assert.IsFalse(card2FromResult.Tags.Any());
                 Assert.IsFalse(card2FromResult.VisibleTo.Any());
                 Assert.AreEqual(CardInDeck.MaxHeapValue, card2FromResult.MoveToHeapExpiryInfos.Length);
+                Assert.AreEqual(card2LatestDiscussionEntryCreationDate, card2FromResult.LatestDiscussionEntryCreationUtcDate);
                 for (var heapIndex = 0; heapIndex < CardInDeck.MaxHeapValue; heapIndex++)
                 {
                     Assert.AreEqual(heapIndex, card2FromResult.MoveToHeapExpiryInfos[heapIndex].HeapId);
