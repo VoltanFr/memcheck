@@ -20,7 +20,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(Guid.Empty, cardId, 42, 1)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(Guid.Empty, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(RandomHelper.Guid(), cardId, 42, 1)));
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(RandomHelper.Guid(), cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -39,7 +39,7 @@ public class GetCardDiscussionEntriesTests
         var userId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, RandomHelper.Guid(), 42, 1)));
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, RandomHelper.Guid(), 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardIsDeleted()
@@ -51,7 +51,7 @@ public class GetCardDiscussionEntriesTests
         await CardDeletionHelper.DeleteCardAsync(db, userId, cardId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 42, 1)));
+        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardIsNotViewableByUser()
@@ -62,7 +62,7 @@ public class GetCardDiscussionEntriesTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(otherUserId, cardId, 42, 1)));
+        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(otherUserId, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task PageSizeTooSmall()
@@ -72,7 +72,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MinPageSize - 1, 1)));
+        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MinPageSize - 1, Guid.Empty)));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
@@ -82,34 +82,38 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MaxPageSize + 1, 1)));
+        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MaxPageSize + 1, Guid.Empty)));
     }
     [TestMethod()]
-    public async Task PageIndexZero()
+    public async Task Success_CardHasNoDiscussionEntry_LastObtainedEntryIsZero()
     {
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
         var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<PageIndexTooSmallException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, 0)));
-    }
-    [TestMethod()]
-    public async Task Success_CardHasNoDiscussionEntry()
-    {
-        var db = DbHelper.GetEmptyTestDB();
-        var userId = await UserHelper.CreateInDbAsync(db);
-        var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
-
-        using var dbContext = new MemCheckDbContext(db);
-        var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, 1));
+        var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, Guid.Empty));
 
         Assert.AreEqual(0, result.TotalCount);
         Assert.AreEqual(0, result.PageCount);
         Assert.AreEqual(0, result.Entries.Length);
     }
     [TestMethod()]
-    public async Task Success_CardHasSingleDiscussionEntry()
+    public async Task Success_CardHasNoDiscussionEntry_LastObtainedEntryIsRandom()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
+
+        using var dbContext = new MemCheckDbContext(db);
+        var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, RandomHelper.Guid()));
+
+        Assert.AreEqual(0, result.TotalCount);
+        Assert.AreEqual(0, result.PageCount);
+        Assert.AreEqual(0, result.Entries.Length);
+    }
+    [TestMethod()]
+    public async Task Success_CardHasSingleDiscussionEntry_LastObtainedEntryIsZero()
     {
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
@@ -122,7 +126,31 @@ public class GetCardDiscussionEntriesTests
 
         using (var dbContext = new MemCheckDbContext(db))
         {
-            var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, 1));
+            var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, Guid.Empty));
+
+            Assert.AreEqual(1, result.TotalCount);
+            Assert.AreEqual(1, result.PageCount);
+            Assert.AreEqual(1, result.Entries.Length);
+            Assert.AreEqual(text, result.Entries.Single().Text);
+            Assert.IsFalse(result.Entries.Single().HasBeenEdited);
+            Assert.AreEqual(userId, result.Entries.Single().Creator.Id);
+        }
+    }
+    [TestMethod()]
+    public async Task Success_CardHasSingleDiscussionEntry_LastObtainedEntryIsRandom()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
+        var text = RandomHelper.String();
+        var runDate = RandomHelper.Date();
+
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), runDate).RunAsync(new AddEntryToCardDiscussion.Request(userId, cardId, text));
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 2, RandomHelper.Guid()));
 
             Assert.AreEqual(1, result.TotalCount);
             Assert.AreEqual(1, result.PageCount);
@@ -171,8 +199,9 @@ public class GetCardDiscussionEntriesTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             { // Card 1
+                Guid page1LastObtaintedEntry;
                 { // Page 1
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, 1));
+                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, Guid.Empty));
 
                     Assert.AreEqual(5, result.TotalCount);
                     Assert.AreEqual(3, result.PageCount);
@@ -187,9 +216,12 @@ public class GetCardDiscussionEntriesTests
                     Assert.AreEqual(card1RunDate4, result.Entries[1].CreationUtcDate);
                     Assert.IsFalse(result.Entries[1].HasBeenEdited);
                     Assert.AreEqual(userId, result.Entries[1].Creator.Id);
+
+                    page1LastObtaintedEntry = result.Entries[1].Id;
                 }
+                Guid page2LastObtaintedEntry;
                 { // Page 2
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, 2));
+                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, page1LastObtaintedEntry));
 
                     Assert.AreEqual(5, result.TotalCount);
                     Assert.AreEqual(3, result.PageCount);
@@ -204,9 +236,11 @@ public class GetCardDiscussionEntriesTests
                     Assert.AreEqual(card1RunDate2, result.Entries[1].CreationUtcDate);
                     Assert.IsFalse(result.Entries[1].HasBeenEdited);
                     Assert.AreEqual(userId, result.Entries[1].Creator.Id);
+
+                    page2LastObtaintedEntry = result.Entries[1].Id;
                 }
                 { // Page 3
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, 3));
+                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, page2LastObtaintedEntry));
 
                     Assert.AreEqual(5, result.TotalCount);
                     Assert.AreEqual(3, result.PageCount);
@@ -217,39 +251,23 @@ public class GetCardDiscussionEntriesTests
                     Assert.IsFalse(result.Entries[0].HasBeenEdited);
                     Assert.AreEqual(userId, result.Entries[0].Creator.Id);
                 }
-                { // Page 4
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card1Id, 2, 4));
-
-                    Assert.AreEqual(5, result.TotalCount);
-                    Assert.AreEqual(3, result.PageCount);
-                    Assert.AreEqual(0, result.Entries.Length);
-                }
             }
             { // Card 2
-                { // Page 1
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card2Id, 2, 1));
+                var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card2Id, 2, Guid.Empty));
 
-                    Assert.AreEqual(2, result.TotalCount);
-                    Assert.AreEqual(1, result.PageCount);
-                    Assert.AreEqual(2, result.Entries.Length);
+                Assert.AreEqual(2, result.TotalCount);
+                Assert.AreEqual(1, result.PageCount);
+                Assert.AreEqual(2, result.Entries.Length);
 
-                    Assert.AreEqual(card2Text2, result.Entries[0].Text);
-                    Assert.AreEqual(card2RunDate2, result.Entries[0].CreationUtcDate);
-                    Assert.IsFalse(result.Entries[0].HasBeenEdited);
-                    Assert.AreEqual(userId, result.Entries[0].Creator.Id);
+                Assert.AreEqual(card2Text2, result.Entries[0].Text);
+                Assert.AreEqual(card2RunDate2, result.Entries[0].CreationUtcDate);
+                Assert.IsFalse(result.Entries[0].HasBeenEdited);
+                Assert.AreEqual(userId, result.Entries[0].Creator.Id);
 
-                    Assert.AreEqual(card2Text1, result.Entries[1].Text);
-                    Assert.AreEqual(card2RunDate1, result.Entries[1].CreationUtcDate);
-                    Assert.IsFalse(result.Entries[1].HasBeenEdited);
-                    Assert.AreEqual(userId, result.Entries[1].Creator.Id);
-                }
-                { // Page 2
-                    var result = await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, card2Id, 2, 2));
-
-                    Assert.AreEqual(2, result.TotalCount);
-                    Assert.AreEqual(1, result.PageCount);
-                    Assert.AreEqual(0, result.Entries.Length);
-                }
+                Assert.AreEqual(card2Text1, result.Entries[1].Text);
+                Assert.AreEqual(card2RunDate1, result.Entries[1].CreationUtcDate);
+                Assert.IsFalse(result.Entries[1].HasBeenEdited);
+                Assert.AreEqual(userId, result.Entries[1].Creator.Id);
             }
         }
     }

@@ -14,6 +14,17 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
 {
     #region Fields
     #endregion
+    private static ImmutableArray<Guid> OrderEntries(Guid? cardLatestDiscussionEntry, ImmutableDictionary<Guid, Guid?> allEntriesForCard)
+    {
+        var currentEntryId = cardLatestDiscussionEntry;
+        var allEntriesIdsOrderedList = new List<Guid>();
+        while (currentEntryId != null)
+        {
+            allEntriesIdsOrderedList.Add(currentEntryId.Value);
+            currentEntryId = allEntriesForCard[currentEntryId.Value];
+        }
+        return allEntriesIdsOrderedList.ToImmutableArray();
+    }
     public GetCardDiscussionEntries(CallContext callContext) : base(callContext)
     {
     }
@@ -27,17 +38,16 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
 
         var pageCount = (int)Math.Ceiling((double)allEntriesForCard.Count / request.PageSize);
 
-        var currentEntryId = card.LatestDiscussionEntry?.Id;
-        var allEntriesIdsOrderedList = new List<Guid>();
-        while (currentEntryId != null)
-        {
-            allEntriesIdsOrderedList.Add(currentEntryId.Value);
-            currentEntryId = allEntriesForCard[currentEntryId.Value];
-        }
-        var allEntriesIdsOrdered = allEntriesIdsOrderedList.ToImmutableArray();
+        var allEntriesIdsOrdered = OrderEntries(card.LatestDiscussionEntry?.Id, allEntriesForCard);
+
+        var skipCount = allEntriesIdsOrdered.IndexOf(request.LastObtainedEntry);
+        if (skipCount == -1) // This happens for the first load of a discussion (or for a bad call)
+            skipCount = 0;
+        else
+            skipCount++; // Because IndexOf is zero-based
 
         var resultEntryIds = allEntriesIdsOrdered
-            .Skip((request.PageNo - 1) * request.PageSize)
+            .Skip(skipCount)
             .Take(request.PageSize)
             .ToImmutableHashSet();
 
@@ -52,7 +62,6 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
 
         return new ResultWithMetrologyProperties<Result>(result,
             IntMetric("PageSize", request.PageSize),
-            IntMetric("PageNo", request.PageNo),
             GuidMetric("UserId", request.UserId),
             GuidMetric("CardId", request.CardId),
             IntMetric("ResultTotalCount", result.TotalCount),
@@ -60,14 +69,12 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
             IntMetric("ResultEntryCount", result.Entries.Length));
     }
     #region Request & Result types
-    public sealed record Request(Guid UserId, Guid CardId, int PageSize, int PageNo) : IRequest
+    public sealed record Request(Guid UserId, Guid CardId, int PageSize, Guid LastObtainedEntry) : IRequest
     {
         public const int MinPageSize = 1;
         public const int MaxPageSize = 100;
         public async Task CheckValidityAsync(CallContext callContext)
         {
-            if (PageNo < 1)
-                throw new PageIndexTooSmallException(PageNo);
             if (PageSize < MinPageSize)
                 throw new PageSizeTooSmallException(PageSize, MinPageSize, MaxPageSize);
             if (PageSize > MaxPageSize)

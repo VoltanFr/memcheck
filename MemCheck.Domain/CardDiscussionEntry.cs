@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MemCheck.Domain;
 
+// A CardDiscussionEntry can never be deleted, instead it can be marked as deleted
 public sealed class CardDiscussionEntry
 {
     [Key] public Guid Id { get; set; }  //id of the CardDiscussionEntry, not of the card
