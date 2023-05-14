@@ -45,12 +45,12 @@
                 @Localizer["MainTitle"]
                 <span class="mnesios-page-title-suffix">&nbsp;@Localizer["TalksAboutCard"] <a v-bind:href="editUrl()" target="_blank" class="discussion-cardid-link">{{cardId}}</a>.</span>
             </div>
-            <div id="AddNewEntry">
+            <div id="AddNewEntry" class="memcheck-input-div">
                 <details>
                     <summary class="discussion-entry-foldout-summary">
                         <span class="discussion-entry-foldout-summary-caption">@Localizer["AddEntry"]</span>
                     </summary>
-                    <div class="memcheck-input-div">
+                    <div>
                         <div>
                             <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title="@Localizer["YourMessage"]" v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
                         </div>
@@ -59,6 +59,22 @@
                         </div>
                     </div>
                 </details>
+            </div>
+            <div id="EntryList" class="memcheck-input-div" v-for="entry in entries">
+                <div class="discussion-entry-header">
+                    <p>@Localizer["EntryDate"] {{dateTimeWithTime(entry.utcDate)}} @Localizer["EntryAuthor"] {{entry.authorUserName}}</p>
+                </div>
+                <div class="markdown-render markdown-body">
+                    <span v-html="renderedText(entry.text)"></span>
+                </div>
+            </div>
+            <div id="ViewMore">
+                <button class="btn-success.disabled mnesios-in-page-button" disabled v-if="entries.length === 0">@Localizer["NoMessage"]</button>
+                <button class="btn-success mnesios-in-page-button" @@click="getNextEntries()" v-if="entries.length > 0 && canDownloadMore()">@Localizer["DownloadMore"]</button>
+                <button class="btn-success.disabled mnesios-in-page-button" disabled v-if="entries.length > 0 && !canDownloadMore()">@Localizer["NoMoreEntries"]</button>
+            </div>
+            <div id="LoadingEntries" v-if="loading" class="wait-div">
+                <i class="mnesios-logo-tiny"></i> @Localizer["LoadingEntries"]
             </div>
         </div>
         <div id="SavingMode" v-if="!initializationFailure() && saving">

@@ -385,4 +385,50 @@ public class AuthoringController : MemCheckController
     public sealed record PostDiscussionEntryResult(int EntryCount);
     #endregion
     #endregion
+    #region GetDiscussionEntries
+    [HttpPost("GetDiscussionEntries")]
+    public async Task<IActionResult> GetDiscussionEntries([FromBody] GetDiscussionEntriesRequest request)
+    {
+        var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
+        var applicationRequest = new GetCardDiscussionEntries.Request(userId, request.CardId, request.PageSize, request.LastObtainedEntry);
+        var applicationResult = await new GetCardDiscussionEntries(callContext).RunAsync(applicationRequest);
+        var result = new GetDiscussionEntriesResult(applicationResult);
+        return base.Ok(result);
+    }
+    #region Request and Result classes
+    public sealed class GetDiscussionEntriesRequest
+    {
+        public int PageSize { get; set; }
+        public Guid CardId { get; set; }
+        public Guid LastObtainedEntry { get; set; } // We don't receive a page index because if someone adds an entry in the meanwhile this index would be shifted, and the last obtained entry would be displayed twice
+    }
+    public sealed class GetDiscussionEntriesResult
+    {
+        public GetDiscussionEntriesResult(GetCardDiscussionEntries.Result applicationResult)
+        {
+            TotalEntryCount = applicationResult.TotalCount;
+            Entries = applicationResult.Entries.Select(entry => new GetDiscussionEntriesResultEntry(entry));
+        }
+        public int TotalEntryCount { get; }
+        public IEnumerable<GetDiscussionEntriesResultEntry> Entries { get; }
+    }
+    public sealed class GetDiscussionEntriesResultEntry
+    {
+        public GetDiscussionEntriesResultEntry(GetCardDiscussionEntries.ResultEntry applicationResultEntry)
+        {
+            EntryId = applicationResultEntry.Id;
+            AuthorUserName = applicationResultEntry.Creator.GetUserName();
+            Text = applicationResultEntry.Text;
+            UtcDate = applicationResultEntry.CreationUtcDate;
+            HasBeenEdited = applicationResultEntry.HasBeenEdited;
+        }
+        public Guid EntryId { get; }
+        public string AuthorUserName { get; }
+        public string Text { get; }
+        public DateTime UtcDate { get; }
+        public bool HasBeenEdited { get; }
+    }
+    public sealed record ResultEntry(Guid Id, MemCheckUser Creator, string Text, DateTime CreationUtcDate, bool HasBeenEdited);
+    #endregion
+    #endregion
 }

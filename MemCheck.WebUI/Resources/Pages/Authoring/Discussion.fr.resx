@@ -195,8 +195,26 @@
   <data name="ContinueEditing" xml:space="preserve">
     <value>Continuer à modifier</value>
   </data>
+  <data name="DownloadMore" xml:space="preserve">
+    <value>Messages suivants</value>
+  </data>
+  <data name="EntryAuthor" xml:space="preserve">
+    <value>par</value>
+  </data>
+  <data name="EntryDate" xml:space="preserve">
+    <value>Posté</value>
+  </data>
+  <data name="LoadingEntries" xml:space="preserve">
+    <value>Chargement...</value>
+  </data>
   <data name="MainTitle" xml:space="preserve">
     <value>Discussion</value>
+  </data>
+  <data name="NoMessage" xml:space="preserve">
+    <value>Aucun message</value>
+  </data>
+  <data name="NoMoreEntries" xml:space="preserve">
+    <value>Fin des messages</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
     <value>Discussion sur la carte</value>

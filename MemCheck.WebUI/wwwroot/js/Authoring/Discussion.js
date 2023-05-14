@@ -9,6 +9,7 @@ import { downloadMissingImages } from '../ImageDownloading.js';
 import { toast } from '../Common.js';
 import { toastShortDuration } from '../Common.js';
 import { sleep } from '../Common.js';
+import { dateTimeWithTime } from '../Common.js';
 
 const discussionApp = Vue.createApp({
     components: {
@@ -30,14 +31,20 @@ const discussionApp = Vue.createApp({
             images: [], // each element represents an image object, with all details in fields. At least 'name' must be defined. Additional fields include 'blob', 'imageId', 'description', etc.
             errorDebugInfoLines: [], // strings
             saving: false,
+            loading: false,
+            entries: [], // Elements are AuthoringController.GetDiscussionEntriesResultEntry
+            totalEntryCount: -1, // Count of all entries in DB (not dosnloaded entries)
         };
+    },
+    beforeCreate() {
+        this.dateTimeWithTime = dateTimeWithTime;
     },
     async mounted() {
         try {
             window.addEventListener('beforeunload', this.onBeforeUnload);
             window.addEventListener('popstate', this.onPopState);
             this.getCardIdFromPageParameter();
-            // this.getPageEntries
+            await this.getNextEntries();
         }
         finally {
             this.mountFinished = true;
@@ -127,15 +134,32 @@ const discussionApp = Vue.createApp({
                     this.saving = false;
                 });
         },
-        renderedTextForReview(text) {
+        renderedText(text) {
             downloadMissingImages(text, this.images);
             return convertMarkdown(text, this.isInFrench(), this.images, this.onImageClickFunctionText());
         },
         renderedNewEntry() {
-            return this.renderedTextForReview(this.newEntryText);
+            return this.renderedText(this.newEntryText);
         },
         continueEditing() {
             this.newEntryInReview = false;
+        },
+        async getNextEntries() {
+            this.loading = true;
+            const request = { pageSize: 10, cardId: this.cardId, lastObtainedEntry: this.entries.at(-1)?.entryId };
+            await axios.post('/Authoring/GetDiscussionEntries', request)
+                .then(result => {
+                    this.totalDiscussionEntries = result.data.totalEntryCount;
+                    this.entries.push(...result.data.entries);
+                    this.loading = false;
+                })
+                .catch(error => {
+                    tellAxiosError(error);
+                    this.loading = false;
+                });
+        },
+        canDownloadMore() {
+            return this.entries.length < this.totalDiscussionEntries;
         },
     },
 });

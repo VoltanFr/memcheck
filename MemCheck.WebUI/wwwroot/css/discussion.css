@@ -3,3 +3,16 @@
 
 .discussion-entry-foldout-summary-caption {
 }
+
+.discussion-entry-header {
+    height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: left;
+    background-color: darkgray;
+    color: white;
+}
