@@ -130,7 +130,7 @@
                     </ul>
                 </div>
                 <div id="Front side" class="memcheck-input-div" v-if="currentCard">
-                    <div class="learning-card-header">
+                    <div class="memcheck-input-div-header">
                         <p>@Localizer["FrontSide"]</p>
                     </div>
                     <div class="markdown-render markdown-body">
@@ -141,7 +141,7 @@
                     </div>
                 </div>
                 <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div">
-                    <div class="learning-card-header">
+                    <div class="memcheck-input-div-header">
                         <p>@Localizer["BackSide"]</p>
                     </div>
                     <div class="markdown-render markdown-body">
@@ -155,7 +155,7 @@
                     </ul>
                 </div>
                 <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div">
-                    <div class="learning-card-header">
+                    <div class="memcheck-input-div-header">
                         <p>@Localizer["AdditionalInfo"]</p>
                     </div>
                     <div class="markdown-render markdown-body">
@@ -164,7 +164,7 @@
                 </div>
                 <div id="References" v-if="currentCard && backSideVisible && currentCardHasReferences()" class="memcheck-input-div">
                     <details>
-                        <summary class="learning-card-header">@Localizer["References"]</summary>
+                        <summary class="memcheck-input-div-header">@Localizer["References"]</summary>
                         <div class="markdown-render markdown-body">
                             <span v-html="currentCardReferences()"></span>
                         </div>

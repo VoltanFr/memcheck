@@ -258,6 +258,19 @@
     border-radius: 4px;
 }
 
+.memcheck-input-div-header {
+    height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: left;
+    background-color: darkgray;
+    color: white;
+}
+
 .memcheck-input-div-container {
     background-color: white;
     border-width: 2px;
@@ -265,6 +278,20 @@
     border-color: black;
     padding: 1px;
     border-radius: 4px;
+}
+
+.memcheck-input-div-container-header {
+    height: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 75%;
+    line-height: 1;
+    text-align: left;
+    background-color: darkslategrey;
+    color: white;
 }
 
 .mnesios-page-title {

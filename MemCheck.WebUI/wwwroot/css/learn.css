@@ -2,19 +2,6 @@
     border: none;
 }
 
-.learning-card-header {
-    height: 20px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-left: 5px;
-    padding-right: 5px;
-    font-size: 75%;
-    line-height: 1;
-    text-align: left;
-    background-color: darkgray;
-    color: white;
-}
-
 .learning-card-footer {
     border: none;
     line-height: 1;
