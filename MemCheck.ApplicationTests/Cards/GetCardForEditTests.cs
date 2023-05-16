@@ -203,23 +203,51 @@ public class GetCardForEditTests
         Assert.IsTrue(loaded.PossibleTargetDecksForAdd.Any(deck => deck.DeckId == otherUserDeckId));
     }
     [TestMethod()]
-    public async Task CheckLatestDiscussionEntryCreationUtcDate()
+    public async Task CheckLatestDiscussionEntryCreationUtcDate_NoEntry()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
+        var cardId = await CardHelper.CreateIdAsync(db, creatorId);
+
+        using var dbContext = new MemCheckDbContext(db);
+        var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, cardId));
+        Assert.IsNull(loaded.LatestDiscussionEntryCreationUtcDate);
+    }
+    [TestMethod()]
+    public async Task CheckLatestDiscussionEntryCreationUtcDate_OneEntry()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
+        var cardId = await CardHelper.CreateIdAsync(db, creatorId);
+
+        var entryCreationDate = RandomHelper.Date();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), entryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(creatorId, cardId, RandomHelper.String()));
+
+        using (var dbContext = new MemCheckDbContext(db))
+        {
+            var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, cardId));
+            Assert.AreEqual(entryCreationDate, loaded.LatestDiscussionEntryCreationUtcDate);
+        }
+    }
+    [TestMethod()]
+    public async Task CheckLatestDiscussionEntryCreationUtcDate_MultipleEntries()
     {
         var db = DbHelper.GetEmptyTestDB();
         var creatorId = await UserHelper.CreateInDbAsync(db); // This creates a deck for creator
         var cardId = await CardHelper.CreateIdAsync(db, creatorId);
 
         using (var dbContext = new MemCheckDbContext(db))
-        {
-            var discussionCreation = new AddEntryToCardDiscussion(dbContext.AsCallContext());
-            var request = new AddEntryToCardDiscussion.Request(creatorId, cardId, RandomHelper.String());
-            await discussionCreation.RunAsync(request);
-        }
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext()).RunAsync(new AddEntryToCardDiscussion.Request(creatorId, cardId, RandomHelper.String()));
+
+        var lastEntryCreationDate = RandomHelper.Date();
+        using (var dbContext = new MemCheckDbContext(db))
+            await new AddEntryToCardDiscussion(dbContext.AsCallContext(), lastEntryCreationDate).RunAsync(new AddEntryToCardDiscussion.Request(creatorId, cardId, RandomHelper.String()));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, cardId));
-            Assert.IsNull(loaded.LatestDiscussionEntryCreationUtcDate);
+            Assert.AreEqual(lastEntryCreationDate, loaded.LatestDiscussionEntryCreationUtcDate);
         }
     }
 }

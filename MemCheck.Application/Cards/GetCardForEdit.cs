@@ -20,6 +20,7 @@ public sealed class GetCardForEdit : RequestRunner<GetCardForEdit.Request, GetCa
             .AsNoTracking()
             .Include(card => card.VersionCreator)
             .Include(card => card.CardLanguage)
+            .Include(card => card.LatestDiscussionEntry)
             .Include(card => card.TagsInCards)
             .ThenInclude(tagInCard => tagInCard.Tag)
             .Include(card => card.UsersWithView)
