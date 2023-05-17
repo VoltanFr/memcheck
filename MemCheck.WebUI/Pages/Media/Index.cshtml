@@ -48,7 +48,7 @@
                         <option v-for="offeredPageSize in offeredPageSizes" v-bind:value="offeredPageSize">{{offeredPageSize}}</option>
                     </select><br />
                 </span>
-                <button class="btn btn-success toolbar-button" @@click="getImageList">@Localizer["Run"]</button>
+                <button class="btn btn-success toolbar-button" v-on:click="getImageList">@Localizer["Run"]</button>
                 <span v-if="totalCount != -1">
                     {{totalCount}}&nbsp;<label>@Localizer["Images"]</label>
                 </span>
@@ -59,33 +59,33 @@
                         {{image.imageName}}
                         <button class="toolbar-button-circle toolbar-button dropdown-toggle" href="#" id="CopyToClipboardDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="far fa-copy"></i></button>
                         <div class="dropdown-menu" role="menu" aria-labelledby="CopyToClipboardDropdown">
-                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=small]')">@Localizer["ImageForCardSmallToClipboard"]</a>
-                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=medium]')">@Localizer["ImageForCardMediumToClipboard"]</a>
-                            <a class="dropdown-item" @@click="copyToClipboard('![Mnesios:' + image.imageName + ',size=big]')">@Localizer["ImageForCardBigToClipboard"]</a>
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.imageName + ',size=small]')">@Localizer["ImageForCardSmallToClipboard"]</a>
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.imageName + ',size=medium]')">@Localizer["ImageForCardMediumToClipboard"]</a>
+                            <a class="dropdown-item" v-on:click="copyToClipboard('![Mnesios:' + image.imageName + ',size=big]')">@Localizer["ImageForCardBigToClipboard"]</a>
                         </div>
-                        <button class="toolbar-button-circle toolbar-button" @@click="edit(image.imageId)"><i class="fas fa-pen"></i></button>
-                        <button class="toolbar-button-circle toolbar-button" @@click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
+                        <button class="toolbar-button-circle toolbar-button" v-on:click="edit(image.imageId)"><i class="fas fa-pen"></i></button>
+                        <button class="toolbar-button-circle toolbar-button" v-on:click="deleteImage(image.imageId)"><i class="far fa-trash-alt"></i></button>
                     </div>
                     <div id="CardBody" class="card-body image-list-card-body">
-                        <a href="#" @@click="showImageFull(image.imageId)"><img class="thumbnail-image" :src="image.imageThumbnail" /></a>
+                        <a href="#" v-on:click="showImageFull(image.imageId)"><img class="thumbnail-image" :src="image.imageThumbnail" /></a>
                     </div>
                     <div id="CardFooter" class="card-footer image-list-card-footer">
-                        <button class="toolbar-button" @@click="showCardsWithImage(image.imageId)">{{image.imageCardCount}} <span v-if="image.imageCardCount > 1">@Localizer["Cards"]</span><span v-else>@Localizer["Card"]</span></button>
+                        <button class="toolbar-button" v-on:click="showCardsWithImage(image.imageId)">{{image.imageCardCount}} <span v-if="image.imageCardCount > 1">@Localizer["Cards"]</span><span v-else>@Localizer["Card"]</span></button>
                     </div>
                 </div>
             </div>
             <div id="Paging" class="container" style="align-content:flex-end">
-                <button class="toolbar-button" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
-                <button class="toolbar-button" @@click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
-                <button class="toolbar-button" @@click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
-                <button class="toolbar-button" @@click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
-                <button class="toolbar-button" @@click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
+                <button class="toolbar-button" v-on:click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+                <button class="toolbar-button" v-on:click="movePage(-10)" v-if="canMovePage(-10)">{{request.pageNo - 10}}</button>
+                <button class="toolbar-button" v-on:click="movePage(-5)" v-if="canMovePage(-5)">{{request.pageNo - 5}}</button>
+                <button class="toolbar-button" v-on:click="movePage(-2)" v-if="canMovePage(-2)">{{request.pageNo - 2}}</button>
+                <button class="toolbar-button" v-on:click="movePage(-1)" v-if="canMovePage(-1)">{{request.pageNo - 1}}</button>
                 <button class="toolbar-button" disabled>{{request.pageNo}}</button>
-                <button class="toolbar-button" @@click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
-                <button class="toolbar-button" @@click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
-                <button class="toolbar-button" @@click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
-                <button class="toolbar-button" @@click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
-                <button class="toolbar-button" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
+                <button class="toolbar-button" v-on:click="movePage(+1)" v-if="canMovePage(+1)">{{request.pageNo + 1}}</button>
+                <button class="toolbar-button" v-on:click="movePage(+2)" v-if="canMovePage(+2)">{{request.pageNo + 2}}</button>
+                <button class="toolbar-button" v-on:click="movePage(+5)" v-if="canMovePage(+5)">{{request.pageNo + 5}}</button>
+                <button class="toolbar-button" v-on:click="movePage(+10)" v-if="canMovePage(+10)">{{request.pageNo + 10}}</button>
+                <button class="toolbar-button" v-on:click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{pageCount}}</button>
             </div>
         </div>
     </div>

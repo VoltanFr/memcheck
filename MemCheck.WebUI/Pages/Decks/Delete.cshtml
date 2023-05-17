@@ -35,6 +35,6 @@
                 </tbody>
             </table>
         </div>
-        <button class="btn btn-danger btn-md" @@click="deleteDeck" v-if="activeDeck">@Localizer["DeleteAndLoseAll"]</button>
+        <button class="btn btn-danger btn-md" v-on:click="deleteDeck" v-if="activeDeck">@Localizer["DeleteAndLoseAll"]</button>
     </div>
 </div>

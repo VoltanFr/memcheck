@@ -51,11 +51,11 @@
         <div class="memcheck-input-div" v-if="!editingImageId">
             <label>@Localizer["FilePath"]</label>
             <br/>
-            <input type="file" @@change="onFileSelected" style="display:none" ref="fileInput" />
+            <input type="file" v-on:change="onFileSelected" style="display:none" ref="fileInput" />
             <br/>
             <span v-if="selectedFile">{{selectedFile.name}}</span>
             <br/>
-            <button @@click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
+            <button v-on:click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
         </div>
         <div class="memcheck-input-div" v-if="imagePreview">
             <label>@Localizer["Preview"]</label>
@@ -63,6 +63,6 @@
         </div>
     </div>
     <div class="memcheck-bottom-button-div">
-        <button id="UploadButton" class="btn btn-success btn-lg" @@click="upload">@Localizer["Upload"]</button>
+        <button id="UploadButton" class="btn btn-success btn-lg" v-on:click="upload">@Localizer["Upload"]</button>
     </div>
 </div>

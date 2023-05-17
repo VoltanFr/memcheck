@@ -58,11 +58,11 @@
                     <span class="dropdown-menu" role="menu">
                         <span id="AddToDeck">
                             <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                <a class="dropdown-item" @@click="addCardToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToYourDeck"]</a>
+                                <a class="dropdown-item" v-on:click="addCardToDeck(possibleTargetDecksForAdd[0])"><i class="fas fa-plus"></i> @Localizer["AddToYourDeck"]</a>
                             </span>
                             <span id="MultiDeckAddToDeck" v-else>
                                 <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                    <a class="dropdown-item" @@click="addCardToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
+                                    <a class="dropdown-item" v-on:click="addCardToDeck(targetDeck)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
                                 </span>
                             </span>
                         </span>
@@ -80,7 +80,7 @@
                     </van-popover>
                 </span>
                 <span id="HistoryButton" v-if="!creatingNewCard">
-                    <button class="toolbar-button-circle toolbar-button" @@click="cardHistory()"><i class="fas fa-history"></i></button>
+                    <button class="toolbar-button-circle toolbar-button" v-on:click="cardHistory()"><i class="fas fa-history"></i></button>
                 </span>
                 <span id="Rating" v-if="!creatingNewCard">
                     <card-rating v-model="card.currentUserRating" v-bind:average="card.averageRating" v-bind:countinaverage="card.countOfUserRatings" v-on:update:model-value="onRatingChange"
@@ -146,7 +146,7 @@
                 </div>
             </div>
             <div id="AddCardButtonDiv">
-                <button id="AddCardButtonEnabled" class="btn-success mnesios-in-page-button" @@click="sendCard" v-if="isDirty()">
+                <button id="AddCardButtonEnabled" class="btn-success mnesios-in-page-button" v-on:click="sendCard" v-if="isDirty()">
                     <span v-if="creatingNewCard">@Localizer["Add"]</span>
                     <span v-else>@Localizer["ReviewChanges"]</span>
                 </button>
@@ -329,9 +329,9 @@
             </div>
             <div id="ReviewMode_BottomButtons">
                 <ul class="nav small">
-                    <li v-if="changesDescriptionOk()"><button id="ConfirmChangesEnabledButton" class="btn-success mnesios-in-page-button" @@click="saveCard">@Localizer["ConfirmUpdate"]</button></li>
+                    <li v-if="changesDescriptionOk()"><button id="ConfirmChangesEnabledButton" class="btn-success mnesios-in-page-button" v-on:click="saveCard">@Localizer["ConfirmUpdate"]</button></li>
                     <li v-else"><button id="ConfirmChangesDisabledButton" class="btn-success.disabled mnesios-in-page-button" disabled>@Localizer["ConfirmUpdate"]</button></li>
-                    <li class="ms-auto"><button id="ContinueEditingButton" class="btn-success mnesios-in-page-button" @@click="continueEditing">@Localizer["ContinueEditing"]</button></li>
+                    <li class="ms-auto"><button id="ContinueEditingButton" class="btn-success mnesios-in-page-button" v-on:click="continueEditing">@Localizer["ContinueEditing"]</button></li>
                 </ul>
             </div>
         </div>

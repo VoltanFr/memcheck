@@ -69,6 +69,6 @@
 
         <p v-if="newNameProblem" class="alert alert-danger">{{newNameProblem}}</p>
         <button class="btn btn-success" disabled v-if="newNameProblem">@Localizer["Save"]</button>
-        <button class="btn btn-success" @@click="save" v-else>@Localizer["Save"]</button>
+        <button class="btn btn-success" v-on:click="save" v-else>@Localizer["Save"]</button>
     </div>
 </div>

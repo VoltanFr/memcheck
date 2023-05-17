@@ -55,7 +55,7 @@
                             <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title="@Localizer["YourMessage"]" v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
                         </div>
                         <div>
-                            <button class="btn-success mnesios-in-page-button" @@click="submitNewEntryForReview">@Localizer["ReviewYourChanges"]</button>
+                            <button class="btn-success mnesios-in-page-button" v-on:click="submitNewEntryForReview">@Localizer["ReviewYourChanges"]</button>
                         </div>
                     </div>
                 </details>
@@ -70,7 +70,7 @@
             </div>
             <div id="ViewMore">
                 <button class="btn-success.disabled mnesios-in-page-button" disabled v-if="entries.length === 0">@Localizer["NoMessage"]</button>
-                <button class="btn-success mnesios-in-page-button" @@click="getNextEntries()" v-if="entries.length > 0 && canDownloadMore()">@Localizer["DownloadMore"]</button>
+                <button class="btn-success mnesios-in-page-button" v-on:click="getNextEntries()" v-if="entries.length > 0 && canDownloadMore()">@Localizer["DownloadMore"]</button>
                 <button class="btn-success.disabled mnesios-in-page-button" disabled v-if="entries.length > 0 && !canDownloadMore()">@Localizer["NoMoreEntries"]</button>
             </div>
             <div id="LoadingEntries" v-if="loading" class="wait-div">
@@ -94,8 +94,8 @@
             </div>
             <div id="ReviewMode_BottomButtons">
                 <ul class="nav small">
-                    <li><button class="btn-success btn-lg mnesios-in-page-button" @@click="postNewEntry">@Localizer["SaveNewEntry"]</button></li>
-                    <li class="ms-auto"><button class="btn-success btn-lg mnesios-in-page-button" @@click="continueEditing">@Localizer["ContinueEditing"]</button></li>
+                    <li><button class="btn-success btn-lg mnesios-in-page-button" v-on:click="postNewEntry">@Localizer["SaveNewEntry"]</button></li>
+                    <li class="ms-auto"><button class="btn-success btn-lg mnesios-in-page-button" v-on:click="continueEditing">@Localizer["ContinueEditing"]</button></li>
                 </ul>
             </div>
         </div>

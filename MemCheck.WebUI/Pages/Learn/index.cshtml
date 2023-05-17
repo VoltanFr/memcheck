@@ -48,7 +48,7 @@
                             <th>@Localizer["Deck"]</th>
                             <td>
                                 <select v-model="activeDeck"><option v-for="deck in userDecks" v-bind:value="deck">{{deck.description}}</option></select>
-                                <button class="toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] @@click="openDeckSettingsPage()"><i class="fas fa-pen"></i></button>
+                                <button class="toolbar-button-circle toolbar-button" data-bs-toggle="tooltip" data-placement="top" title=@Localizer["DeckSettings"] v-on:click="openDeckSettingsPage()"><i class="fas fa-pen"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -67,7 +67,7 @@
                             <a v-bind:href="editUrl()" class="toolbar-button-circle toolbar-button"><i class="fas fa-pen toolbar-button-content"></i></a>
                         </li>
                         <li id="Remove button" style="padding-right:5px" v-if="showRemoveButton()">
-                            <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["RemoveFromDeck"] @@click="removeCard"><i class="fas fa-trash-alt"></i></van-button>
+                            <van-button class="toolbar-button-circle toolbar-button" title=@Localizer["RemoveFromDeck"] v-on:click="removeCard"><i class="fas fa-trash-alt"></i></van-button>
                         </li>
                         <li id="Info button" style="padding-right:5px" title=@Localizer["Info"]>
                             <van-popover v-model:show="showInfoPopover" overlay close-on-click-outside close-on-click-overlay placement="right">
@@ -80,8 +80,8 @@
                                 @Localizer["OnDate"] {{dateTime(currentCard.lastChangeUtcTime)}}
                                 <hr class="menu-separation-line" v-if="showNotificationRegistration()" />
                                 <span v-if="showNotificationRegistration()">
-                                    <a v-if="currentCard.registeredForNotifications" href="nothin" @@click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a>
-                                    <a v-else href="nothin" @@click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
+                                    <a v-if="currentCard.registeredForNotifications" href="nothin" v-on:click.prevent="unregisterForNotif()">@Localizer["RegisteredForNotif"]</a>
+                                    <a v-else href="nothin" v-on:click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                                 </span>
                                 <br />
                                 <a v-bind:href="discussionUrl()" v-if="showDiscussionLink()" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
@@ -107,7 +107,7 @@
                                 <span v-if="showBiggestHeapReached()">@Localizer["BiggestHeapReached"] {{currentCard.biggestHeapReached}}</span>
                                 <hr class="menu-separation-line" v-if="showMoveToHeapMenu()" />
                                 <van-popover v-model:show="showMoveToHeapMenuPopover" v-if="showMoveToHeapMenu()" overlay close-on-click-outside close-on-click-overlay>
-                                    <van-button class="toolbar-button dropdown-item" v-for="targetHeap in currentCard.moveToHeapTargets" @@click="moveToHeap(targetHeap)">
+                                    <van-button class="toolbar-button dropdown-item" v-for="targetHeap in currentCard.moveToHeapTargets" v-on:click="moveToHeap(targetHeap)">
                                         <span v-if="targetHeap.heapId < currentCard.heapId"><i class="fas fa-angle-left"></i></span><span v-else><i class="fas fa-angle-right"></i></span>
                                         {{targetHeap.heapName}}
                                     </van-button>
@@ -137,7 +137,7 @@
                         <span v-html="currentCardFrontSide()"></span>
                     </div>
                     <div v-if="!backSideVisible" class="learning-card-footer">
-                        <button class="btn-success mnesios-in-page-button" @@click="showBackSide">@Localizer["ShowBack"]</button>
+                        <button class="btn-success mnesios-in-page-button" v-on:click="showBackSide">@Localizer["ShowBack"]</button>
                     </div>
                 </div>
                 <div id="Back side" v-if="currentCard && backSideVisible" class="memcheck-input-div">
@@ -150,8 +150,8 @@
                 </div>
                 <div id="Knew Forgot" v-if="backSideVisible">
                     <ul class="nav small">
-                        <li><button class="btn-success mnesios-in-page-button" @@click="knew">@Localizer["Knew"]</button></li>
-                        <li class="ms-auto"><button class="btn-danger mnesios-in-page-button" @@click="forgot"><span v-if="learnMode == 2">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
+                        <li><button class="btn-success mnesios-in-page-button" v-on:click="knew">@Localizer["Knew"]</button></li>
+                        <li class="ms-auto"><button class="btn-danger mnesios-in-page-button" v-on:click="forgot"><span v-if="learnMode == 2">@Localizer["DidNotKnow"]</span><span v-else>@Localizer["Forgot"]</span></button></li>
                     </ul>
                 </div>
                 <div id="Additional info" v-if="currentCard && backSideVisible && currentCardHasAdditionalSide()" class="memcheck-input-div">
@@ -188,7 +188,7 @@
     </div>
     <div id="UserQuitAttemptDisplayMode" v-if="userQuitAttemptDisplay">
         <p>@Localizer["ExplainMoveOperationsBeforeIcon"] <i class="fas fa-save"></i> @Localizer["ExplainMoveOperationsAfterIcon"]</p>
-        <button class="btn-success mnesios-in-page-button" @@click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
+        <button class="btn-success mnesios-in-page-button" v-on:click="userQuitAttemptDisplay = false">@Localizer["ExplainMoveOperationsOkButton"]</button>
     </div>
     <div id="Processing info">
         <p v-if="preventQuittingPage()"><i class="fas fa-save"></i></p>

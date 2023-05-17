@@ -19,7 +19,7 @@
                 <label>Name</label>
                 <div class="field"><div class="control"><input class="responsive-padding-edit" v-model="newLanguage.name" id="languageNameInput" /></div></div>
             </div>
-            <button class="btn btn-success btn-lg" @@click="createNewLanguage">Add</button>
+            <button class="btn btn-success btn-lg" v-on:click="createNewLanguage">Add</button>
         </div>
         <div class="section">
             <h1 class="title">All languages...</h1>
@@ -31,7 +31,7 @@
                     </tr>
                     <tr v-for="language in allLanguages">
                         <td>{{language.name}}</td>
-                        <td><button class="btn btn-info toolbar-button" @@click="showCardsWithLanguage(language.name)">{{language.cardCount}}</button></td>
+                        <td><button class="btn btn-info toolbar-button" v-on:click="showCardsWithLanguage(language.name)">{{language.cardCount}}</button></td>
                     </tr>
                 </table>
             </div>

@@ -51,10 +51,10 @@
                 </tr>
                 <tr id="Top row with search toggle and other controls" class="b-table-top-row" style="border-bottom:1px solid black;text-align:center;background-color:darkgray">
                     <td id="Select all checkbox" class="search-page-widget-td" style="text-align:left">
-                        <input type="checkbox" id="selectAllCheckBox" @@change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-bs-toggle="dropdown"></a>
+                        <input type="checkbox" id="selectAllCheckBox" v-on:change="onSelectAllCheckBoxClick()" /><a class="dropdown-toggle" href="#" id="CheckDropdown" role="button" data-bs-toggle="dropdown"></a>
                         <span class="dropdown-menu" role="menu">
-                            <a class="dropdown-item" @@click="selectAll()">@Localizer["SelectAll"]</a>
-                            <a class="dropdown-item" @@click="unselectAll()">@Localizer["SelectNone"]</a>
+                            <a class="dropdown-item" v-on:click="selectAll()">@Localizer["SelectAll"]</a>
+                            <a class="dropdown-item" v-on:click="unselectAll()">@Localizer["SelectNone"]</a>
                         </span>
                     </td>
                     <td id="Request row toggler" class="search-page-widget-td">
@@ -66,26 +66,26 @@
                             <span class="dropdown-menu" role="menu">
                                 <span id="AddToDeck">
                                     <span id="SingleDeckAddToDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                        <a class="dropdown-item" @@click="addSelectedCardsToDeck(possibleTargetDecksForAdd[0])" v-if="canAddToDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-plus"></i> @Localizer["AddToDeck"]</a>
+                                        <a class="dropdown-item" v-on:click="addSelectedCardsToDeck(possibleTargetDecksForAdd[0])" v-if="canAddToDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-plus"></i> @Localizer["AddToDeck"]</a>
                                     </span>
                                     <span id="MultiDeckAddToDeck" v-else>
                                         <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                            <a class="dropdown-item" @@click="addSelectedCardsToDeck(targetDeck)" v-if="canAddToDeck(targetDeck.deckId)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
+                                            <a class="dropdown-item" v-on:click="addSelectedCardsToDeck(targetDeck)" v-if="canAddToDeck(targetDeck.deckId)"><i class="fas fa-plus"></i> @Localizer["AddTo"] {{targetDeck.deckName}}</a>
                                         </span>
                                     </span>
                                 </span>
                                 <span id="RemoveFromDeck">
                                     <span id="SingleDeckRemoveFromDeck" v-if="possibleTargetDecksForAdd.length == 1">
-                                        <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(possibleTargetDecksForAdd[0])" v-if="canRemoveFromDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFromDeck"]</a>
+                                        <a class="dropdown-item" v-on:click="removeSelectedCardsFromDeck(possibleTargetDecksForAdd[0])" v-if="canRemoveFromDeck(possibleTargetDecksForAdd[0].deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFromDeck"]</a>
                                     </span>
                                     <span id="MultiDeckRemoveFromDeck" v-else>
                                         <span v-for="targetDeck in possibleTargetDecksForAdd">
-                                            <a class="dropdown-item" @@click="removeSelectedCardsFromDeck(targetDeck)" v-if="canRemoveFromDeck(targetDeck.deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFrom"] {{targetDeck.deckName}}</a>
+                                            <a class="dropdown-item" v-on:click="removeSelectedCardsFromDeck(targetDeck)" v-if="canRemoveFromDeck(targetDeck.deckId)"><i class="fas fa-minus"></i> @Localizer["RemoveFrom"] {{targetDeck.deckName}}</a>
                                         </span>
                                     </span>
                                 </span>
                                 <span id="MoveToHeap" v-if="moveToHeapEnabled()">
-                                    <a class="dropdown-item" v-for="targetHeap in possibleHeapsForMove" @@click="moveSelectedCardsToHeap(targetHeap)"> @Localizer["MoveToHeap"] {{targetHeap.heapName}}</a>
+                                    <a class="dropdown-item" v-for="targetHeap in possibleHeapsForMove" v-on:click="moveSelectedCardsToHeap(targetHeap)"> @Localizer["MoveToHeap"] {{targetHeap.heapName}}</a>
                                 </span>
                             </span>
                         </span>
@@ -95,42 +95,42 @@
                             <a href="#" id="NonDeckActionDropdown" role="button" data-bs-toggle="dropdown" data-placement="top" title=@Localizer["Card"]><i class="fas fa-ellipsis-h"></i></a>
                             <span class="dropdown-menu" role="menu">
                                 <span id="RegisterForNotifications" v-if="registerForNotificationsEnabled()">
-                                    <a class="dropdown-item" @@click="registerForNotifications()"><i class="fas fa-bell"></i> @Localizer["RegisterForNotifications"]</a>
+                                    <a class="dropdown-item" v-on:click="registerForNotifications()"><i class="fas fa-bell"></i> @Localizer["RegisterForNotifications"]</a>
                                 </span>
                                 <span id="UnregisterForNotifications" v-if="unRegisterForNotificationsEnabled()">
-                                    <a class="dropdown-item" @@click="unRegisterForNotifications()"><i class="fas fa-bell-slash"></i> @Localizer["UnregisterForNotifications"]</a>
+                                    <a class="dropdown-item" v-on:click="unRegisterForNotifications()"><i class="fas fa-bell-slash"></i> @Localizer["UnregisterForNotifications"]</a>
                                 </span>
                                 <span id="DeleteCard" v-if="deleteCardEnabled()">
                                     <span id="DeleteCard" v-if="selectionCount() == 1">
-                                        <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCard"]</a>
+                                        <a class="dropdown-item" v-on:click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCard"]</a>
                                     </span>
                                     <span id="DeleteCard" v-if="selectionCount() > 1">
-                                        <a class="dropdown-item" @@click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCards"]</a>
+                                        <a class="dropdown-item" v-on:click="deletedSelectedCards()"><i class="fas fa-trash-alt"></i> @Localizer["DeleteCards"]</a>
                                     </span>
                                 </span>
                                 <span id="OpenInTabs">
                                     <span v-if="selectionCount() == 1">
-                                        <a class="dropdown-item" @@click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTab"]</a>
+                                        <a class="dropdown-item" v-on:click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTab"]</a>
                                     </span>
                                     <span v-if="selectionCount() > 1">
-                                        <a class="dropdown-item" @@click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTabs"]</a>
+                                        <a class="dropdown-item" v-on:click="openSelectedCardsInTabs()"><i class="far fa-folder-open"></i> @Localizer["OpenInTabs"]</a>
                                     </span>
                                 </span>
                             </span>
                         </span>
                     </td>
                     <td id="PageNavigationButtonsCardCountAndTagButton" colspan="3" class="search-page-nav-column">
-                        <button class="btn-nav-pages" @@click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
-                        <button class="btn-nav-pages" id="MoveTenPagesBackward" @@click="movePage(-10)" v-if="canMovePage(-10)">{{pageNo - 10}}</button>
-                        <button class="btn-nav-pages" id="MoveFivePagesBackward" @@click="movePage(-5)" v-if="canMovePage(-5)">{{pageNo - 5}}</button>
-                        <button class="btn-nav-pages" id="MoveTwoPagesBackward" @@click="movePage(-2)" v-if="canMovePage(-2)">{{pageNo - 2}}</button>
-                        <button class="btn-nav-pages" @@click="movePage(-1)" v-if="canMovePage(-1)">{{pageNo - 1}}</button>
+                        <button class="btn-nav-pages" v-on:click="moveToFirstPage()">1 <i class="fas fa-fast-backward"></i></button>
+                        <button class="btn-nav-pages" id="MoveTenPagesBackward" v-on:click="movePage(-10)" v-if="canMovePage(-10)">{{pageNo - 10}}</button>
+                        <button class="btn-nav-pages" id="MoveFivePagesBackward" v-on:click="movePage(-5)" v-if="canMovePage(-5)">{{pageNo - 5}}</button>
+                        <button class="btn-nav-pages" id="MoveTwoPagesBackward" v-on:click="movePage(-2)" v-if="canMovePage(-2)">{{pageNo - 2}}</button>
+                        <button class="btn-nav-pages" v-on:click="movePage(-1)" v-if="canMovePage(-1)">{{pageNo - 1}}</button>
                         <button class="btn-nav-pages btn-success" disabled>{{pageNo}}</button>
-                        <button class="btn-nav-pages" @@click="movePage(+1)" v-if="canMovePage(+1)">{{pageNo + 1}}</button>
-                        <button class="btn-nav-pages" id="MoveTwoPagesForward" @@click="movePage(+2)" v-if="canMovePage(+2)">{{pageNo + 2}}</button>
-                        <button class="btn-nav-pages" id="MoveFivePagesForward" @@click="movePage(+5)" v-if="canMovePage(+5)">{{pageNo + 5}}</button>
-                        <button class="btn-nav-pages" id="MoveTenPagesForward" @@click="movePage(+10)" v-if="canMovePage(+10)">{{pageNo + 10}}</button>
-                        <button class="btn-nav-pages" @@click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{runResult.pageCount}}</button>
+                        <button class="btn-nav-pages" v-on:click="movePage(+1)" v-if="canMovePage(+1)">{{pageNo + 1}}</button>
+                        <button class="btn-nav-pages" id="MoveTwoPagesForward" v-on:click="movePage(+2)" v-if="canMovePage(+2)">{{pageNo + 2}}</button>
+                        <button class="btn-nav-pages" id="MoveFivePagesForward" v-on:click="movePage(+5)" v-if="canMovePage(+5)">{{pageNo + 5}}</button>
+                        <button class="btn-nav-pages" id="MoveTenPagesForward" v-on:click="movePage(+10)" v-if="canMovePage(+10)">{{pageNo + 10}}</button>
+                        <button class="btn-nav-pages" v-on:click="moveToLastPage()"><i class="fas fa-fast-forward"></i> {{runResult.pageCount}}</button>
                         <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard == 0">@Localizer["NoCard"]</span>
                         <span class="label" style="white-space:nowrap" v-if="runResult.totalNbCard > 0">{{runResult.totalNbCard}} <span class="small-screen-text">@Localizer["Cards_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Cards_MediumScreen"]</span><span class="big-screen-text">@Localizer["Cards_BigScreen"]</span></span>
                         <span class="label" style="white-space:nowrap" v-if="selectionCount() == 1">, {{selectionCount()}} <span class="small-screen-text">@Localizer["Selected_SmallScreen"]</span><span class="medium-screen-text">@Localizer["Selected_MediumScreen"]</span><span class="big-screen-text">@Localizer["Selected_BigScreen"]</span></span>
@@ -138,7 +138,7 @@
                         <span v-if="addTagDropDownButtonEnabled()" class="search-page-tag-button-column">
                             <a class="dropdown-toggle" href="#" id="TagDropdown" role="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i></a>
                             <span class="dropdown-menu pre-scrollable" role="menu" v-if="addTagDropDownButtonEnabled()">
-                                <a class="dropdown-item" v-for="tag in allStaticData.allApplicableTags" @@click="addTagToSelectedCards(tag)"><i class="fas fa-plus"></i>&nbsp;{{tag.tagName}}</a>
+                                <a class="dropdown-item" v-for="tag in allStaticData.allApplicableTags" v-on:click="addTagToSelectedCards(tag)"><i class="fas fa-plus"></i>&nbsp;{{tag.tagName}}</a>
                             </span>
                             <span class="dropdown-menu" role="menu" v-else>
                                 <span class="dropdown-item-text">{{addTagDropDownButtonDisabledReason}}</span>
@@ -190,7 +190,7 @@
                                     <td>
                                         <select v-model="selectedRequiredTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleRequiredTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddReqiredTagButton" v-if="canAddSelectedRequiredTag()">
-                                            <van-button class="toolbar-button" @@click="addRequiredTag">+</van-button>
+                                            <van-button class="toolbar-button" v-on:click="addRequiredTag">+</van-button>
                                         </span>
                                         <tag-button v-for="(tag,index) in selectedRequiredTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeRequiredTag"></tag-button>
                                     </td>
@@ -200,7 +200,7 @@
                                     <td>
                                         <select v-model="selectedExcludedTagToAdd" class="responsive-padding-edit"><option v-for="tag in possibleExcludedTags" v-bind:value="tag">{{tag.tagName}}</option></select>
                                         <span id="AddExcludedTagButton" v-if="canAddSelectedExcludedTag()">
-                                            <van-button class="toolbar-button" @@click="addExcludedTag">+</van-button>
+                                            <van-button class="toolbar-button" v-on:click="addExcludedTag">+</van-button>
                                         </span>
                                         <tag-button v-for="(tag,index) in selectedExcludedTags" v-bind:name="tag.tagName" v-bind:id="tag.tagId" v-on:click="removeExcludedTag"></tag-button>
                                     </td>
@@ -253,9 +253,9 @@
                                 <tr id="Run & Subscribe buttons">
                                     <td></td>
                                     <td>
-                                        <van-button class="toolbar-button" @@click="runQuery()"><i class="fas fa-search"></i> @Localizer["Run"]</van-button>
+                                        <van-button class="toolbar-button" v-on:click="runQuery()"><i class="fas fa-search"></i> @Localizer["Run"]</van-button>
                                         &nbsp;
-                                        <van-button class="toolbar-button" @@click="subscribe()">@Localizer["Subscribe"]</van-button>
+                                        <van-button class="toolbar-button" v-on:click="subscribe()">@Localizer["Subscribe"]</van-button>
                                     </td>
                                 </tr>
                             </tbody>
