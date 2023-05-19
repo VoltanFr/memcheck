@@ -84,7 +84,9 @@
                                     <a v-else href="nothin" v-on:click.prevent="registerForNotif()">@Localizer["NotRegisteredForNotif"]</a>
                                 </span>
                                 <br />
-                                <a v-bind:href="discussionUrl()" v-if="showDiscussionLink()" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
+                                <div v-if="showDiscussionLink()">
+                                    <a v-bind:href="discussionUrl()" target="_blank">@Localizer["OpenDiscussionPage"]</a> ({{latestDiscussionInfo()}})<br />
+                                </div>
                                 <template #reference>
                                     <van-button class="toolbar-button-circle toolbar-button"><i class="fas fa-info"></i></van-button>
                                 </template>
