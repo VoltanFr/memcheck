@@ -391,9 +391,16 @@ public class AuthoringController : MemCheckController
     {
         var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
         var applicationRequest = new GetCardDiscussionEntries.Request(userId, request.CardId, request.PageSize, request.LastObtainedEntry);
-        var applicationResult = await new GetCardDiscussionEntries(callContext).RunAsync(applicationRequest);
-        var result = new GetDiscussionEntriesResult(applicationResult);
-        return base.Ok(result);
+        try
+        {
+            var applicationResult = await new GetCardDiscussionEntries(callContext).RunAsync(applicationRequest);
+            var result = new GetDiscussionEntriesResult(applicationResult);
+            return base.Ok(result);
+        }
+        catch (NonexistentCardException)
+        {
+            return NotFound();
+        }
     }
     #region Request and Result classes
     public sealed class GetDiscussionEntriesRequest
