@@ -25,10 +25,15 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
     #region Private methods
     private async Task<UserNotifications> GetUserNotificationsAsync(MemCheckUser user)
     {
+        performanceIndicators.Add("Getting count of subscribed cards for user");
         var subscribedCardCount = await userCardSubscriptionCounter.RunAsync(user.Id);
-        var cardVersions = await userCardVersionsNotifier.RunAsync(user.Id);
+        performanceIndicators.Add("Getting card versions for user");
+        var versionsNotifierResult = await userCardVersionsNotifier.RunAsync(user.Id);
+        performanceIndicators.Add("Getting deleted cards for user");
         var cardDeletions = await userCardDeletionsNotifier.RunAsync(user.Id);
+        performanceIndicators.Add("Getting subscriptions for user");
         var subscribedSearches = await userSearchSubscriptionLister.RunAsync(user.Id);
+        performanceIndicators.Add("Creating notifications for user");
 
         var searchNotifs = new List<UserSearchNotifierResult>();
         foreach (var subscribedSearch in subscribedSearches)
@@ -40,7 +45,7 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
             user.GetUserName(),
             user.GetEmail(),
             subscribedCardCount,
-            cardVersions,
+            versionsNotifierResult.CardVersions,
             cardDeletions,
             searchNotifs
             );

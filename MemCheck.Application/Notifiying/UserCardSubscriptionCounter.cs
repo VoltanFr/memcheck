@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifiying;
 
+// Returns the number of cards the given user is subscribed to
+
 internal interface IUserCardSubscriptionCounter
 {
     public Task<int> RunAsync(Guid userId);
@@ -25,8 +27,8 @@ internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
     public async Task<int> RunAsync(Guid userId)
     {
         var chrono = Stopwatch.StartNew();
-        var result = await callContext.DbContext.CardNotifications.Where(notif => notif.UserId == userId).CountAsync();
-        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+        var result = await callContext.DbContext.CardNotifications.AsNoTracking().Where(notif => notif.UserId == userId).CountAsync();
+        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed:hh\\:mm\\:ss\\:fff} to list user's card subscriptions (result={result} cards)");
         callContext.TelemetryClient.TrackEvent("UserCardSubscriptionCounter", ClassWithMetrics.IntMetric("Result", result));
         return result;
     }

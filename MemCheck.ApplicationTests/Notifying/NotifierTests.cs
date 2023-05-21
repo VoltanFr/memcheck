@@ -53,7 +53,7 @@ public class NotifierTests
 
         var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
         var cardVersion = new CardVersion(Guid.NewGuid(), RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true, null);
-        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray.Create(cardVersion));
+        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new CardVersionsNotifierResult(ImmutableArray.Create(cardVersion), ImmutableArray<CardDiscussionEntryNotification>.Empty));
 
         var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
         userCardDeletionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray<CardDeletion>.Empty);
@@ -99,7 +99,7 @@ public class NotifierTests
         userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(1);
 
         var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
-        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray<CardVersion>.Empty);
+        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new CardVersionsNotifierResult(ImmutableArray<CardVersion>.Empty, ImmutableArray<CardDiscussionEntryNotification>.Empty));
 
         var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
         var cardDeletion = new CardDeletion(RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true);

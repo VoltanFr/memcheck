@@ -81,10 +81,10 @@ public class UserCardVersionsNotifierTests
 
         using var dbContext = new MemCheckDbContext(testDB);
         var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), DateTime.UtcNow).RunAsync(user1);
-        Assert.AreEqual(0, versions.Length);
+        Assert.AreEqual(0, versions.CardVersions.Length);
     }
     [TestMethod()]
-    public async Task CardWithoutPreviousVersion_NotChangedSinceLastNotif()
+    public async Task CardWithoutPreviousVersion_NotChangedAndNoDiscussionEntrySinceLastNotif()
     {
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(testDB);
@@ -95,7 +95,7 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), new DateTime(2020, 11, 5)).RunAsync(user);
-            Assert.AreEqual(0, versions.Length);
+            Assert.AreEqual(0, versions.CardVersions.Length);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -112,9 +112,12 @@ public class UserCardVersionsNotifierTests
         var card = await CardHelper.CreateAsync(testDB, user, new DateTime(2020, 11, 2));
         await CardSubscriptionHelper.CreateAsync(testDB, user, card.Id, new DateTime(2020, 11, 1));
 
+        var runDate = new DateTime(2020, 11, 3);
+
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), new DateTime(2020, 11, 2)).RunAsync(user);
+            var cardVersionsNotifierResult = await new UserCardVersionsNotifier(dbContext.AsCallContext(), runDate).RunAsync(user);
+            var versions = cardVersionsNotifierResult.CardVersions;
             Assert.AreEqual(1, versions.Length);
             Assert.AreEqual(card.Id, versions[0].CardId);
             Assert.IsTrue(versions[0].CardIsViewable);
@@ -126,7 +129,7 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var notif = dbContext.CardNotifications.Single(cn => cn.CardId == card.Id && cn.UserId == user);
-            Assert.IsTrue(notif.LastNotificationUtcDate > new DateTime(2020, 11, 1));
+            Assert.AreEqual(runDate, notif.LastNotificationUtcDate);
         }
     }
     [TestMethod()]
@@ -143,7 +146,7 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), new DateTime(2020, 11, 5)).RunAsync(user1);
-            Assert.AreEqual(0, versions.Length);
+            Assert.AreEqual(0, versions.CardVersions.Length);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -170,9 +173,10 @@ public class UserCardVersionsNotifierTests
             var notifier = new UserCardVersionsNotifier(dbContext.AsCallContext(), now);
 
             var user1versions = await notifier.RunAsync(user1);
-            Assert.AreEqual(0, user1versions.Length);
+            Assert.AreEqual(0, user1versions.CardVersions.Length);
 
-            var user2versions = await notifier.RunAsync(user2);
+            var user2CardVersionsNotifierResult = await notifier.RunAsync(user2);
+            var user2versions = user2CardVersionsNotifierResult.CardVersions;
             Assert.AreEqual(1, user2versions.Length);
             Assert.AreEqual(card.Id, user2versions[0].CardId);
             Assert.IsFalse(user2versions[0].CardIsViewable);
@@ -203,10 +207,10 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user2);
-            Assert.AreEqual(1, versions.Length);
-            Assert.AreEqual(card.Id, versions[0].CardId);
-            Assert.IsTrue(versions[0].CardIsViewable);
-            Assert.AreEqual(previousVersion.Id, versions[0].VersionIdOnLastNotification);
+            Assert.AreEqual(1, versions.CardVersions.Length);
+            Assert.AreEqual(card.Id, versions.CardVersions[0].CardId);
+            Assert.IsTrue(versions.CardVersions[0].CardIsViewable);
+            Assert.AreEqual(previousVersion.Id, versions.CardVersions[0].VersionIdOnLastNotification);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -230,10 +234,10 @@ public class UserCardVersionsNotifierTests
         {
             var notifier = new UserCardVersionsNotifier(dbContext.AsCallContext(), now);
             var versions = await notifier.RunAsync(user1);
-            Assert.AreEqual(1, versions.Length);
-            Assert.AreEqual(card.Id, versions[0].CardId);
-            Assert.IsTrue(versions[0].CardIsViewable);
-            Assert.AreEqual(previousVersion.Id, versions[0].VersionIdOnLastNotification);
+            Assert.AreEqual(1, versions.CardVersions.Length);
+            Assert.AreEqual(card.Id, versions.CardVersions[0].CardId);
+            Assert.IsTrue(versions.CardVersions[0].CardIsViewable);
+            Assert.AreEqual(previousVersion.Id, versions.CardVersions[0].VersionIdOnLastNotification);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -257,10 +261,10 @@ public class UserCardVersionsNotifierTests
         {
             var notifier = new UserCardVersionsNotifier(dbContext.AsCallContext(), now);
             var versions = await notifier.RunAsync(user1);
-            Assert.AreEqual(1, versions.Length);
-            Assert.AreEqual(card.Id, versions[0].CardId);
-            Assert.IsTrue(versions[0].CardIsViewable);
-            Assert.IsNull(versions[0].VersionIdOnLastNotification);
+            Assert.AreEqual(1, versions.CardVersions.Length);
+            Assert.AreEqual(card.Id, versions.CardVersions[0].CardId);
+            Assert.IsTrue(versions.CardVersions[0].CardIsViewable);
+            Assert.IsNull(versions.CardVersions[0].VersionIdOnLastNotification);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -284,7 +288,7 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), new DateTime(2020, 11, 5)).RunAsync(user1);
-            Assert.AreEqual(0, versions.Length);
+            Assert.AreEqual(0, versions.CardVersions.Length);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -308,10 +312,10 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user1);
-            Assert.AreEqual(1, versions.Length);
-            Assert.AreEqual(card.Id, versions[0].CardId);
-            Assert.IsTrue(versions[0].CardIsViewable);
-            Assert.AreEqual(previousVersion1.Id, versions[0].VersionIdOnLastNotification);
+            Assert.AreEqual(1, versions.CardVersions.Length);
+            Assert.AreEqual(card.Id, versions.CardVersions[0].CardId);
+            Assert.IsTrue(versions.CardVersions[0].CardIsViewable);
+            Assert.AreEqual(previousVersion1.Id, versions.CardVersions[0].VersionIdOnLastNotification);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))
@@ -334,7 +338,8 @@ public class UserCardVersionsNotifierTests
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user1);
+            var cardVersionsNotifierResult = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user1);
+            var versions = cardVersionsNotifierResult.CardVersions;
             Assert.AreEqual(1, versions.Length);
             Assert.AreEqual(card.Id, versions[0].CardId);
             Assert.IsTrue(versions[0].CardIsViewable);
@@ -383,24 +388,26 @@ public class UserCardVersionsNotifierTests
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var user1Versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user1);
-            Assert.AreEqual(4, user1Versions.Length);
+            var user1CardVersionsNotifierResult = await new UserCardVersionsNotifier(dbContext.AsCallContext(), now).RunAsync(user1);
+            var user1CardVersions = user1CardVersionsNotifierResult.CardVersions;
 
-            var notifForCard1 = user1Versions.Where(v => v.CardId == card1.Id).Single();
+            Assert.AreEqual(4, user1CardVersions.Length);
+
+            var notifForCard1 = user1CardVersions.Where(v => v.CardId == card1.Id).Single();
             Assert.IsTrue(notifForCard1.CardIsViewable);
             Assert.AreEqual(card1PV2.Id, notifForCard1.VersionIdOnLastNotification);
 
-            var notifForCard2 = user1Versions.Where(v => v.CardId == card2.Id).Single();
+            var notifForCard2 = user1CardVersions.Where(v => v.CardId == card2.Id).Single();
             Assert.IsTrue(notifForCard2.CardIsViewable);
             Assert.IsNull(notifForCard2.VersionIdOnLastNotification);
 
-            Assert.IsFalse(user1Versions.Any(v => v.CardId == card3.Id));
+            Assert.IsFalse(user1CardVersions.Any(v => v.CardId == card3.Id));
 
-            var notifForCard4 = user1Versions.Where(v => v.CardId == card4.Id).Single();
+            var notifForCard4 = user1CardVersions.Where(v => v.CardId == card4.Id).Single();
             Assert.IsFalse(notifForCard4.CardIsViewable);
             Assert.IsNull(notifForCard4.VersionIdOnLastNotification);
 
-            var notifForCard5 = user1Versions.Where(v => v.CardId == card5.Id).Single();
+            var notifForCard5 = user1CardVersions.Where(v => v.CardId == card5.Id).Single();
             Assert.IsTrue(notifForCard5.CardIsViewable);
             Assert.IsNull(notifForCard5.VersionIdOnLastNotification);
         }
