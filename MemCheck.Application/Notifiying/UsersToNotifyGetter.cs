@@ -33,7 +33,7 @@ internal sealed class UsersToNotifyGetter : IUsersToNotifyGetter
         //var userList = dbContext.Users.Where(user => user.MinimumCountOfDaysBetweenNotifs > 0;
         //Using DateDiffDay is not suitable because it counts the number of **day boundaries crossed** between the startDate and endDate
         var result = userList.ToImmutableArray();
-        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed} to list user's card subscriptions");
+        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed:hh\\:mm\\:ss\\:fff} to list the users to notify (result contains {result.Length} users)");
         callContext.TelemetryClient.TrackEvent("UsersToNotifyGetter", ClassWithMetrics.IntMetric("ResultCount", result.Length));
         return result;
     }

@@ -28,7 +28,7 @@ internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
     {
         var chrono = Stopwatch.StartNew();
         var result = await callContext.DbContext.CardNotifications.AsNoTracking().Where(notif => notif.UserId == userId).CountAsync();
-        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed:hh\\:mm\\:ss\\:fff} to list user's card subscriptions (result={result} cards)");
+        performanceIndicators.Add($"{GetType().Name} took {chrono.Elapsed:hh\\:mm\\:ss\\:fff} to count user's card subscriptions for user with id {userId} (result={result} cards)");
         callContext.TelemetryClient.TrackEvent("UserCardSubscriptionCounter", ClassWithMetrics.IntMetric("Result", result));
         return result;
     }
