@@ -42,6 +42,10 @@ jobs:
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
 
+    - name: "Tell installed dotnet SDKs"
+      # Remember that in global.json we require a precise version of the SDK
+      run: dotnet --list-sdks
+
     - name: "Clean with dotnet"
       run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
 
