@@ -297,28 +297,33 @@ public class UpdateCardTests
     public async Task ReduceVisibility_OtherUserHasView_NoUserHasInDeck_OnlyAuthor()
     {
         var db = DbHelper.GetEmptyTestDB();
-        var cardCreator = await UserHelper.CreateInDbAsync(db);
+        var cardCreatorId = await UserHelper.CreateInDbAsync(db);
         var languageId = await CardLanguageHelper.CreateAsync(db);
-        var otherUser = await UserHelper.CreateInDbAsync(db);
-        var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: new[] { cardCreator, otherUser });
+        var otherUserId = await UserHelper.CreateInDbAsync(db);
 
+        // Card is created with visibility for the two users
+        var card = await CardHelper.CreateAsync(db, cardCreatorId, userWithViewIds: new[] { cardCreatorId, otherUserId });
+
+        // We check the visibility
+        TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, cardCreatorId, card.Id);
+        TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, otherUserId, card.Id);
+
+        // We update the card, private to the creator
         using (var dbContext = new MemCheckDbContext(db))
         {
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id);
-        }
-
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
+            var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreatorId.AsArray());
             await new UpdateCard(dbContext.AsCallContext()).RunAsync(r);
         }
 
-        using (var dbContext = new MemCheckDbContext(db))
-        {
-            CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
-        }
+        // We check the visibility
+        TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, cardCreatorId, card.Id);
+        Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, otherUserId, card.Id));
+
+        // We check that the previous version is correct
+        var previousVersion = await CardPreviousVersionHelper.GetPreviousVersionAsync(db, card.Id);
+        Assert.IsNotNull(previousVersion);
+        Assert.IsTrue(CardPreviousVersionVisibilityHelper.CardIsVisibleToUser(cardCreatorId, previousVersion));
+        Assert.IsTrue(CardPreviousVersionVisibilityHelper.CardIsVisibleToUser(otherUserId, previousVersion));
     }
     [TestMethod()]
     public async Task ReduceVisibility_OtherUserHasInDeck_OnlyAuthor()
