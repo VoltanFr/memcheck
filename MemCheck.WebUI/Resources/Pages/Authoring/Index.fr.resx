@@ -265,7 +265,7 @@
     <value>Continuer sans label ?</value>
   </data>
   <data name="FailedToGetCardToEdit" xml:space="preserve">
-    <value>Impossible de charger la carde à modifier</value>
+    <value>Impossible de charger la carte à modifier</value>
   </data>
   <data name="FailedToGetDecksOfUser" xml:space="preserve">
     <value>Impossible de charger les paquets de l'utilisateur</value>
