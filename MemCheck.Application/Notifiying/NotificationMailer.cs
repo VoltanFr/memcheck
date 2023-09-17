@@ -36,31 +36,65 @@ public sealed class NotificationMailer
     {
         return linkGenerator.GetAbsoluteAddress("/Authoring/History")!;
     }
-    private void AddCardVersions(ImmutableArray<CardVersion> cardVersions, StringBuilder mailBody)
+    private void AddCardVersions(ImmutableArray<IUserCardVersionsNotifier.ResultCard> xcards, StringBuilder mailBody)
     {
-        if (!cardVersions.Any())
-            mailBody = mailBody.Append("<h1>No card with new version</h1>");
-        else
+        var cardsWithNewVersions = xcards.Where(resultCard => resultCard.CardVersions.Any()).ToImmutableArray();
+        mailBody = mailBody
+            .Append(CultureInfo.InvariantCulture, $"<h1>{cardsWithNewVersions.Length} Cards with new versions</h1>")
+            .Append("<ul>");
+        foreach (var cardWithNewVersions in cardsWithNewVersions)
         {
             mailBody = mailBody
-                .Append(CultureInfo.InvariantCulture, $"<h1>{cardVersions.Length} Cards with new versions</h1>")
+                .Append("<li>")
+                .Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={cardWithNewVersions.CardId}>{cardWithNewVersions.CardId}</a><br/>")
                 .Append("<ul>");
-            foreach (var card in cardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
+            foreach (var cardVersion in cardWithNewVersions.CardVersions.OrderBy(cardVersion => cardVersion.VersionUtcDate))
             {
                 mailBody = mailBody
                     .Append("<li>")
-                    .Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={card.CardId}>{card.FrontSide}</a><br/>")
-                    .Append(CultureInfo.InvariantCulture, $"By {card.VersionCreator}<br/>")
-                    .Append(CultureInfo.InvariantCulture, $"On {card.VersionUtcDate} (UTC)<br/>")
-                    .Append(CultureInfo.InvariantCulture, $"Version description: '{card.VersionDescription}'<br/>")
-                    .Append(CultureInfo.InvariantCulture, $"<a href={GetHistoryPageLink()}?CardId={card.CardId}>History</a> - ");
-                mailBody = card.VersionIdOnLastNotification != null
-                    ? mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetComparePageLink()}?CardId={card.CardId}&VersionId={card.VersionIdOnLastNotification}>View changes since your last notification</a>")
+                    .Append(CultureInfo.InvariantCulture, $"{cardVersion.FrontSide}<br/>")
+                    .Append(CultureInfo.InvariantCulture, $"By {cardVersion.VersionCreator}<br/>")
+                    .Append(CultureInfo.InvariantCulture, $"On {cardVersion.VersionUtcDate} (UTC)<br/>")
+                    .Append(CultureInfo.InvariantCulture, $"Version description: '{cardVersion.VersionDescription}'<br/>")
+                    .Append(CultureInfo.InvariantCulture, $"<a href={GetHistoryPageLink()}?CardId={cardVersion.CardId}>History</a> - ");
+                mailBody = cardVersion.VersionIdOnLastNotification != null
+                    ? mailBody.Append(CultureInfo.InvariantCulture, $"<a href={GetComparePageLink()}?CardId={cardVersion.CardId}&VersionId={cardVersion.VersionIdOnLastNotification}>View changes since your last notification</a>")
                     : mailBody.Append("Did not exist on your previous notifications");
                 mailBody = mailBody.Append("</li>");
             }
-            mailBody = mailBody.Append("</ul>");
+            mailBody = mailBody
+                .Append("</ul>")
+                .Append("</li>");
         }
+        mailBody = mailBody.Append("</ul>");
+    }
+    private void AddCardDiscussions(ImmutableArray<IUserCardVersionsNotifier.ResultCard> xcards, StringBuilder mailBody)
+    {
+        var cardsWithNewDiscussionEntries = xcards.Where(resultCard => resultCard.DiscussionEntries.Any()).ToImmutableArray();
+        mailBody = mailBody
+            .Append(CultureInfo.InvariantCulture, $"<h1>{cardsWithNewDiscussionEntries.Length} Cards with new discussion entries</h1>")
+            .Append("<ul>");
+        foreach (var cardWithNewDiscussionEntries in cardsWithNewDiscussionEntries)
+        {
+            mailBody = mailBody
+                .Append("<li>")
+                .Append(CultureInfo.InvariantCulture, $"<a href={GetAuthoringPageLink()}?CardId={cardWithNewDiscussionEntries.CardId}>{cardWithNewDiscussionEntries.CardId}</a><br/>")
+                .Append("<ul>");
+            foreach (var discussionEntry in cardWithNewDiscussionEntries.DiscussionEntries.OrderBy(discussionEntry => discussionEntry.CreationUtcDate))
+            {
+                mailBody = mailBody
+                    .Append("<li>")
+                    .Append(CultureInfo.InvariantCulture, $"By {discussionEntry.VersionCreator}<br/>")
+                    .Append(CultureInfo.InvariantCulture, $"On {discussionEntry.CreationUtcDate} (UTC)<br/>");
+                if (discussionEntry.Text != null)
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Text hint: '{discussionEntry.Text[..50]}'<br/>");
+                mailBody = mailBody.Append("</li>");
+            }
+            mailBody = mailBody
+                .Append("</ul>")
+                .Append("</li>");
+        }
+        mailBody = mailBody.Append("</ul>");
     }
     private static void AddCardDeletions(ImmutableArray<CardDeletion> deletedCards, StringBuilder mailBody)
     {
@@ -198,7 +232,8 @@ public sealed class NotificationMailer
             .Append(CultureInfo.InvariantCulture, $"Search finished at {DateTime.UtcNow}<br/>")
             .Append("</p>");
 
-        AddCardVersions(userNotifications.CardVersions, mailBody);
+        AddCardVersions(userNotifications.Cards, mailBody);
+        AddCardDiscussions(userNotifications.Cards, mailBody);
         AddCardDeletions(userNotifications.DeletedCards, mailBody);
         foreach (var searchNotifications in userNotifications.SearchNotificactions)
             AddSearchNotifications(searchNotifications, mailBody);
@@ -224,7 +259,7 @@ public sealed class NotificationMailer
     }
     private static bool MustSendForNotifications(Notifier.UserNotifications userNotifications)
     {
-        return userNotifications.CardVersions.Any()
+        return userNotifications.Cards.Any()
             || userNotifications.DeletedCards.Any()
             || userNotifications.SearchNotificactions.Any(searchNotificaction =>
                 searchNotificaction.TotalNewlyFoundCardCount > 0

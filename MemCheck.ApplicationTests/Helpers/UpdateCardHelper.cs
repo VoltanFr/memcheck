@@ -116,9 +116,9 @@ public static class UpdateCardHelper
             versionDescription ?? RandomHelper.String()
             );
     }
-    public static async Task RunAsync(DbContextOptions<MemCheckDbContext> db, UpdateCard.Request request)
+    public static async Task RunAsync(DbContextOptions<MemCheckDbContext> db, UpdateCard.Request request, DateTime? cardNewVersionUtcDate = null)
     {
         using var dbContext = new MemCheckDbContext(db);
-        await new UpdateCard(dbContext.AsCallContext()).RunAsync(request);
+        await new UpdateCard(dbContext.AsCallContext(), cardNewVersionUtcDate).RunAsync(request);
     }
 }

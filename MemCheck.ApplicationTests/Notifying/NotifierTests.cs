@@ -7,6 +7,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifying;
@@ -52,8 +53,10 @@ public class NotifierTests
         userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(12);
 
         var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
-        var cardVersion = new CardVersion(Guid.NewGuid(), RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true, null);
-        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new CardVersionsNotifierResult(ImmutableArray.Create(cardVersion), ImmutableArray<CardDiscussionEntryNotification>.Empty));
+        var subscription = new CardNotificationSubscription();
+        var cardId = Guid.NewGuid();
+        var cardVersion = new IUserCardVersionsNotifier.ResultCardVersion(cardId, RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true, null, subscription);
+        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new IUserCardVersionsNotifier.CardVersionsNotifierResult(new IUserCardVersionsNotifier.ResultCard[] { new IUserCardVersionsNotifier.ResultCard(cardId, ImmutableArray.Create(cardVersion), ImmutableArray<IUserCardVersionsNotifier.ResultDiscussionEntry>.Empty) }.ToImmutableArray()));
 
         var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
         userCardDeletionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray<CardDeletion>.Empty);
@@ -72,8 +75,8 @@ public class NotifierTests
         var result = await notifier.RunAsync(new Notifier.Request());
         Assert.AreEqual(1, result.UserNotifications.Length);
         Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
-        Assert.AreEqual(1, result.UserNotifications[0].CardVersions.Length);
-        Assert.AreEqual(cardVersion, result.UserNotifications[0].CardVersions[0]);
+        Assert.AreEqual(1, result.UserNotifications[0].Cards.Length);
+        Assert.AreEqual(cardVersion, result.UserNotifications[0].Cards[0].CardVersions.First());
         Assert.AreEqual(0, result.UserNotifications[0].DeletedCards.Length);
         Assert.AreEqual(12, result.UserNotifications[0].SubscribedCardCount);
 
@@ -99,7 +102,8 @@ public class NotifierTests
         userCardSubscriptionCounter.Setup(counter => counter.RunAsync(user.Id)).ReturnsAsync(1);
 
         var userCardVersionsNotifier = new Mock<IUserCardVersionsNotifier>(MockBehavior.Strict);
-        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new CardVersionsNotifierResult(ImmutableArray<CardVersion>.Empty, ImmutableArray<CardDiscussionEntryNotification>.Empty));
+        var userCardVersionsNotifierResult = new IUserCardVersionsNotifier.CardVersionsNotifierResult(ImmutableArray<IUserCardVersionsNotifier.ResultCard>.Empty);
+        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(userCardVersionsNotifierResult);
 
         var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
         var cardDeletion = new CardDeletion(RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true);
@@ -119,7 +123,7 @@ public class NotifierTests
         var result = await notifier.RunAsync(new Notifier.Request());
         Assert.AreEqual(1, result.UserNotifications.Length);
         Assert.AreEqual(user.UserName, result.UserNotifications[0].UserName);
-        Assert.AreEqual(0, result.UserNotifications[0].CardVersions.Length);
+        Assert.AreEqual(0, result.UserNotifications[0].Cards.Length);
         Assert.AreEqual(1, result.UserNotifications[0].DeletedCards.Length);
         Assert.AreEqual(cardDeletion, result.UserNotifications[0].DeletedCards[0]);
         Assert.AreEqual(1, result.UserNotifications[0].SubscribedCardCount);

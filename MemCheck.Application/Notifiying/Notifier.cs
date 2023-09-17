@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Notifiying;
 
-public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.NotifierResult>
+internal sealed class Notifier : RequestRunner<Notifier.Request, Notifier.NotifierResult>
 {
     #region Fields
     private readonly IUserCardSubscriptionCounter userCardSubscriptionCounter;
@@ -45,7 +45,7 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
             user.GetUserName(),
             user.GetEmail(),
             subscribedCardCount,
-            versionsNotifierResult.CardVersions,
+            versionsNotifierResult.Cards,
             cardDeletions,
             searchNotifs
             );
@@ -98,7 +98,7 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
         }
     }
 
-    public class NotifierResult
+    internal class NotifierResult
     {
         public NotifierResult(ImmutableArray<UserNotifications> userNotifications)
         {
@@ -106,21 +106,21 @@ public sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifier
         }
         public ImmutableArray<UserNotifications> UserNotifications { get; }
     }
-    public record UserNotifications
+    internal record UserNotifications
     {
-        public UserNotifications(string userName, string userEmail, int subscribedCardCount, IEnumerable<CardVersion> cardVersions, IEnumerable<CardDeletion> deletedCards, IEnumerable<UserSearchNotifierResult> searchNotificactions)
+        public UserNotifications(string userName, string userEmail, int subscribedCardCount, ImmutableArray<IUserCardVersionsNotifier.ResultCard> cards, IEnumerable<CardDeletion> deletedCards, IEnumerable<UserSearchNotifierResult> searchNotificactions)
         {
             UserName = userName;
             UserEmail = userEmail;
             SubscribedCardCount = subscribedCardCount;
-            CardVersions = cardVersions.ToImmutableArray();
+            Cards = cards;
             DeletedCards = deletedCards.ToImmutableArray();
             SearchNotificactions = searchNotificactions.ToImmutableArray();
         }
         public string UserName { get; }
         public string UserEmail { get; }
         public int SubscribedCardCount { get; }
-        public ImmutableArray<CardVersion> CardVersions { get; }
+        public ImmutableArray<IUserCardVersionsNotifier.ResultCard> Cards { get; }
         public ImmutableArray<CardDeletion> DeletedCards { get; }
         public ImmutableArray<UserSearchNotifierResult> SearchNotificactions { get; }
     }
