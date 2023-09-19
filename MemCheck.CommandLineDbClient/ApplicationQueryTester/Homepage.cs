@@ -43,7 +43,7 @@ internal sealed class Homepage : ICmdLinePlugin
                 logger.LogInformation($"{userDecks.First().ExpiredCardCount} expired");
                 logger.LogInformation($"{userDecks.First().UnknownCardCount} unknown");
                 logger.LogInformation($"{userDecks.First().NextExpiryUTCDate} next expiry");
-                logger.LogInformation($"{userDecks.Count()} decks in {realCodeChrono.Elapsed}");
+                logger.LogInformation($"{userDecks.Length} decks in {realCodeChrono.Elapsed}");
                 chronos.Add(realCodeChrono.Elapsed.TotalSeconds);
             }
 

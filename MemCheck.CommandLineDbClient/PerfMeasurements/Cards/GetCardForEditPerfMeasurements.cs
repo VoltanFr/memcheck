@@ -17,6 +17,7 @@ internal sealed class GetCardForEditPerfMeasurements : AbstractPerfMeasurements<
         public TestDefinition(string Description, GetCardForEdit.Request request) : base(Description)
         {
             Request = request;
+            FrontSide = "NotSet";
         }
 
         public string FrontSide { get; set; }

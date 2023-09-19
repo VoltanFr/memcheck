@@ -54,3 +54,9 @@ dotnet_diagnostic.CA1720.severity = none
 
 # I allow exceptions without standard constructors
 dotnet_diagnostic.CA1032.severity = none
+
+# I can't allow Remove unnecessary using directives with this way
+dotnet_diagnostic.IDE0005.severity = none
+
+# Allow Remove unnecessary using directives with this way
+dotnet_diagnostic.CS8019.severity = error

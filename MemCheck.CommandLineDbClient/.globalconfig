@@ -2,7 +2,6 @@
 # project, in which I am a bit relaxed about code quality
 
 # I don't care about not using the logger very well
-dotnet_diagnostic.CA1848.severity = none
 dotnet_diagnostic.CA2254.severity = none
 
 # Ok not to specify culture in string operations

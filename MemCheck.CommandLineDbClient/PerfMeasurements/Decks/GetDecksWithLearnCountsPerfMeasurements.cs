@@ -17,6 +17,7 @@ internal sealed class GetDecksWithLearnCountsPerfMeasurements : AbstractPerfMeas
         public TestDefinition(string Description, GetDecksWithLearnCounts.Request request) : base(Description)
         {
             Request = request;
+            DeckDescription = "NotSet";
         }
 
         public Guid Id { get; set; }
@@ -56,7 +57,7 @@ internal sealed class GetDecksWithLearnCountsPerfMeasurements : AbstractPerfMeas
         var result = await search.RunAsync(test.Request);
         chrono.Stop();
 
-        if (result.Count() != 1)
+        if (result.Length != 1)
             throw new InvalidProgramException("Only implemented for single deck user");
 
         var deck = result.First();

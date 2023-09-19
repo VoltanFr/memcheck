@@ -143,7 +143,7 @@ internal sealed class GetUserDecksWithTags : ICmdLinePlugin
                     oldestCard.BiggestHeapReached, oldestCard.NbTimesInNotLearnedHeap,
                     oldestCard.Card.FrontSide, oldestCard.Card.BackSide, oldestCard.Card.AdditionalInfo,
                     oldestCard.Card.VersionUtcDate,
-                    oldestCard.Card.VersionCreator.UserName,
+                    oldestCard.Card.VersionCreator.GetUserName(),
             oldestCard.Card.TagsInCards.Select(tagInCard => tagInCard.Tag.Name),
                  oldestCard.Card.UsersWithView.Select(userWithView => userWithView.User.GetUserName()),
                     //emptyResultImageModelArray,
