@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MemCheck.Basics;
 
 namespace MemCheck.Application.Notifiying;
 
@@ -87,7 +88,7 @@ public sealed class NotificationMailer
                     .Append(CultureInfo.InvariantCulture, $"By {discussionEntry.VersionCreator}<br/>")
                     .Append(CultureInfo.InvariantCulture, $"On {discussionEntry.CreationUtcDate} (UTC)<br/>");
                 if (discussionEntry.Text != null)
-                    mailBody.Append(CultureInfo.InvariantCulture, $"Text hint: '{discussionEntry.Text[..50]}'<br/>");
+                    mailBody.Append(CultureInfo.InvariantCulture, $"Text hint: '{discussionEntry.Text.Truncate(50)}'<br/>");
                 mailBody = mailBody.Append("</li>");
             }
             mailBody = mailBody
