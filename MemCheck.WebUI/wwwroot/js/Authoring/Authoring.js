@@ -339,7 +339,7 @@ const authoringApp = Vue.createApp({
         },
         onBeforeUnload(event) {
             if (this.isDirty()) {
-                (event || window.event).returnValue = 'Sure you want to lose your edits?';
+                event.returnValue = 'Sure you want to lose your edits?';
                 return 'Sure you want to lose your edits?';   // Message will not display on modern browers, but a fixed message will be displayed
             }
             return null;

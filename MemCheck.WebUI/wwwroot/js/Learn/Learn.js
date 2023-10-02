@@ -337,7 +337,7 @@ const learnApp = Vue.createApp({
         onBeforeUnload(event) {
             if (!this.canExitPageSafely()) {
                 this.userQuitAttemptDisplay = true;
-                (event || window.event).returnValue = 'Some saving operations are not finished';
+                event.returnValue = 'Sure you want to lose your edits?';
                 return 'Some saving operations are not finished';   // Message will not display on modern browers, but a fixed message will be displayed
             }
             return null;
