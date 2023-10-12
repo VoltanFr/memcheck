@@ -626,4 +626,49 @@ public class SearchController : MemCheckController
         public string ToastMesg { get; }
     }
     #endregion
+    #region GetAllCardsListData
+    [HttpGet("GetAllCardsListData")]
+    public async Task<IActionResult> GetAllCardsListData()
+    {
+        var publicCards = await new GetAllPublicCards(callContext).RunAsync(new GetAllPublicCards.Request());
+        var resultCards = publicCards.Cards.Select(publicCard => new GetAllCardsListDataResultEntry(publicCard.CardId, publicCard.FrontSide, publicCard.BackSide, publicCard.VersionUtcDate, publicCard.AverageRating));
+
+        var nonPublicCardCount = await new CountNonPublicCards(callContext).RunAsync(new CountNonPublicCards.Request());
+
+        var user = await userManager.GetUserAsync(HttpContext.User);
+        var result = new GetAllCardsListDataResult(resultCards, nonPublicCardCount.Count, user);
+        await Task.Delay(0);
+        return base.Ok(result);
+    }
+    #region Request and view model classes
+    public sealed class GetAllCardsListDataResult
+    {
+        public GetAllCardsListDataResult(IEnumerable<GetAllCardsListDataResultEntry> publicCards, int nonPublicCardCount, MemCheckUser? currentUser)
+        {
+            PublicCards = publicCards;
+            NonPublicCardCount = nonPublicCardCount;
+            ShowDebugInfo = DisplayServices.ShowDebugInfo(currentUser);
+        }
+        public int NonPublicCardCount { get; }
+        public IEnumerable<GetAllCardsListDataResultEntry> PublicCards { get; }
+        public bool ShowDebugInfo { get; }
+    }
+    public sealed class GetAllCardsListDataResultEntry
+    {
+        public GetAllCardsListDataResultEntry(Guid cardId, string frontSide, string backSide, DateTime versionUtcDate, double averageRating)
+        {
+            CardId = cardId;
+            FrontSide = frontSide;
+            BackSide = backSide;
+            VersionUtcDate = versionUtcDate;
+            AverageRating = averageRating;
+        }
+        public Guid CardId { get; }
+        public string FrontSide { get; }
+        public string BackSide { get; }
+        public DateTime VersionUtcDate { get; }
+        public double AverageRating { get; }
+    }
+    #endregion
+    #endregion
 }

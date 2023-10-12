@@ -7,7 +7,7 @@ export const CardRating = Vue.defineComponent({
         'van-rate': globalThis.vant.Rate,
     },
     props: {
-        modelValue: { required: false, type: Number },
+        modelValue: { required: false, type: Number }, // Current user rating, can be null
         average: { required: true, type: Number },
         countinaverage: { required: false, type: Number },
         micro: { required: false, type: Boolean, default: false },

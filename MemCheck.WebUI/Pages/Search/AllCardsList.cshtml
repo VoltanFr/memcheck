@@ -1,0 +1,54 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.Localization
+@using System.Web
+@inject IViewLocalizer Localizer
+@model MemCheck.WebUI.Pages.Search.AllCardsListModel
+@section head {
+    <link href="@Url.Content("~/css/allcardslist.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+}
+    @section scripts {
+    <script type="module" src="~/js/Search/AllCardsList.js" asp-append-version="true"></script>
+    <script>
+        var localized = {};
+        @foreach (var localizerEntry in Localizer.GetAllStrings())
+        {
+            @:localized.@localizerEntry.Name = "@Html.Raw(@HttpUtility.JavaScriptStringEncode(@localizerEntry.Value))";
+        }
+    </script>
+}
+    @{
+    ViewData["Title"] = @Localizer["PageTitle"];
+    ViewData["HelpPage"] = "/allcardslist";
+}
+
+<div id="AllCardsListRootDiv" v-cloak>
+    <div id="WaitingForData" v-if="!mountFinished" class="wait-div">
+        <i class="mnesios-logo-big"></i>
+        <p class="wait-message">@Localizer["PleaseWaitForMount"]</p>
+    </div>
+    <div id="AfterMount" v-if="mountFinished">
+        <h1>Liste des cartes publiques</h1>
+        <p>La base de données de Mnesios contient {{allData.publicCards.length}} cartes publiques (ainsi que {{allData.nonPublicCardCount}} cartes privées, non affichées ici).</p>
+        <table class="search-page-table table table-hover">
+            <tbody>
+                 <tr>
+                    <th>@Localizer["FrontSide"]</th>
+                    <th>@Localizer["BackSide"]</th>
+                    <th>@Localizer["VersionDate"]</th>
+                    <th>@Localizer["Rating"]</th>
+                </tr>
+                <tr id="Cards" v-for="card in allData.publicCards">
+                    <td class="search-page-widget-td"><a href="https://www.mnesios.com/Authoring?CardId={{card.cardId}}" target="_blank">{{card.frontSide}}</a></td>
+                    <td class="search-page-widget-td">{{card.backSide}}</td>
+                    <td class="search-page-widget-td">{{dateTime(card.versionUtcDate)}}</td>
+                    <td><card-rating class="rating-component" micro readonly v-bind:average="card.averageRating" averagestr='@Localizer["AverageRatingLong"]' noevaluationstr='@Localizer["NoEvaluation"]' /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="DebugInfo" class="debug-info-div collapse" v-if="showDebugInfo()">
+        <ul>
+            <li v-if="mountDebugInfo">{{mountDebugInfo}}</li>
+        </ul>
+    </div>
+</div>

@@ -117,133 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CardsOfYourMultipleDecks" xml:space="preserve">
-    <value>cards of your</value>
+  <data name="AverageRatingLong" xml:space="preserve">
+    <value>Moyenne des évaluations</value>
   </data>
-  <data name="CardsOfYourSingleDeck" xml:space="preserve">
-    <value>cards of your deck</value>
+  <data name="BackSide" xml:space="preserve">
+    <value>Arrière</value>
   </data>
-  <data name="DataTime" xml:space="preserve">
-    <value>Data time</value>
+  <data name="FrontSide" xml:space="preserve">
+    <value>Avant</value>
   </data>
-  <data name="Deck" xml:space="preserve">
-    <value>deck</value>
-  </data>
-  <data name="Decks" xml:space="preserve">
-    <value>decks</value>
-  </data>
-  <data name="ExpiredCard" xml:space="preserve">
-    <value>expired card</value>
-  </data>
-  <data name="ExpiredCards" xml:space="preserve">
-    <value>expired cards</value>
-  </data>
-  <data name="IfYouDontHaveAnAccount" xml:space="preserve">
-    <value>if you don't have an account</value>
-  </data>
-  <data name="InTheDeck" xml:space="preserve">
-    <value>In the deck</value>
-  </data>
-  <data name="LogIn" xml:space="preserve">
-    <value>log in</value>
-  </data>
-  <data name="NoUnkownOrExpiredCardAmongThe" xml:space="preserve">
-    <value>No unknown or expired card among the</value>
+  <data name="NoEvaluation" xml:space="preserve">
+    <value>Aucune évaluation</value>
   </data>
   <data name="PageTitle" xml:space="preserve">
-    <value>Home</value>
-  </data>
-  <data name="PerfectMemory" xml:space="preserve">
-    <value>Looks like total recall!</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>register</value>
-  </data>
-  <data name="TheDecksPage" xml:space="preserve">
-    <value>the Decks page</value>
-  </data>
-  <data name="TheDoc" xml:space="preserve">
-    <value>the documentation</value>
-  </data>
-  <data name="ToUseMemCheck" xml:space="preserve">
-    <value>to use Mnesios</value>
-  </data>
-  <data name="UnknownCard" xml:space="preserve">
-    <value>unknown card</value>
-  </data>
-  <data name="UnknownCards" xml:space="preserve">
-    <value>unknown cards</value>
-  </data>
-  <data name="Welcome" xml:space="preserve">
-    <value>Welcome</value>
-  </data>
-  <data name="YouCanCreateOneOn" xml:space="preserve">
-    <value>You create one on</value>
-  </data>
-  <data name="YouDontHaveADeckYet" xml:space="preserve">
-    <value>You don't have a deck yet</value>
-  </data>
-  <data name="YouHave" xml:space="preserve">
-    <value>You have</value>
-  </data>
-  <data name="YouHaveIn" xml:space="preserve">
-    <value>You have in</value>
-  </data>
-  <data name="BeforeDocLink" xml:space="preserve">
-    <value>In each Mnesios page, the menu's ❓ is a link to </value>
-  </data>
-  <data name="YouNeedTo" xml:space="preserve">
-    <value>You need to</value>
-  </data>
-  <data name="YourDeck" xml:space="preserve">
-    <value>your deck</value>
+    <value>Liste des cartes publiques</value>
   </data>
   <data name="PleaseWaitForMount" xml:space="preserve">
-    <value>Please wait, initializing data...</value>
+    <value>Chargement des données...</value>
   </data>
-  <data name="NextExpiry" xml:space="preserve">
-    <value>Next expiry:</value>
+  <data name="Rating" xml:space="preserve">
+    <value>Éval. moyenne</value>
   </data>
-  <data name="No" xml:space="preserve">
-    <value>No</value>
-  </data>
-  <data name="CreatingSome" xml:space="preserve">
-    <value>creating some</value>
-  </data>
-  <data name="OrBy" xml:space="preserve">
-    <value>or by</value>
-  </data>
-  <data name="ThereIsNoCardIn" xml:space="preserve">
-    <value>There is no card in</value>
-  </data>
-  <data name="TheSearchPage" xml:space="preserve">
-    <value>the search page</value>
-  </data>
-  <data name="YourDecks" xml:space="preserve">
-    <value>your decks</value>
-  </data>
-  <data name="YouShouldAddCardsEitherFrom" xml:space="preserve">
-    <value>You should add cards either from</value>
-  </data>
-  <data name="OnThe" xml:space="preserve">
-    <value>On the</value>
-  </data>
-  <data name="TagListPage" xml:space="preserve">
-    <value>tag list</value>
-  </data>
-  <data name="WantADemo" xml:space="preserve">
-    <value>Want a demo? Select your subject...</value>
-  </data>
-  <data name="AfterDocLink" xml:space="preserve">
-    <value> for the context.</value>
-  </data>
-  <data name="AfterAllCardsListLink" xml:space="preserve">
-    <value>.</value>
-  </data>
-  <data name="AllCardsListLink" xml:space="preserve">
-    <value>all public cards</value>
-  </data>
-  <data name="BeforeAllCardsListLink" xml:space="preserve">
-    <value>You can also get a sneak peek of </value>
+  <data name="VersionDate" xml:space="preserve">
+    <value>Date</value>
   </data>
 </root>

@@ -43,6 +43,7 @@
                 <li v-for="tag in allData.recommendedTagsForDemo"><a v-bind:href="'/Learn/Index?LearnMode=Demo&TagId='+tag.tagId">{{tag.tagName}}</a></li>
             </ul>
             <p>@Localizer["BeforeDocLink"]<a href="https://userdoc.mnesios.com/" target="_blank">@Localizer["TheDoc"]</a>@Localizer["AfterDocLink"]</p>
+            <p>@Localizer["BeforeAllCardsListLink"]<a href="/Search/AllCardsList">@Localizer["AllCardsListLink"]</a>@Localizer["AfterAllCardsListLink"]</p>
         </div>
     </div>
     <div id="DebugInfo" class="debug-info-div" v-if="showDebugInfo()">

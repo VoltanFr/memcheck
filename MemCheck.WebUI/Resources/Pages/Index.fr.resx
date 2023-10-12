@@ -237,4 +237,13 @@
   <data name="AfterDocLink" xml:space="preserve">
     <value> contextuelle.</value>
   </data>
+  <data name="AfterAllCardsListLink" xml:space="preserve">
+    <value>.</value>
+  </data>
+  <data name="AllCardsListLink" xml:space="preserve">
+    <value>toutes les cartes publiques</value>
+  </data>
+  <data name="BeforeAllCardsListLink" xml:space="preserve">
+    <value>Vous pouvez aussi avoir un apperçu de </value>
+  </data>
 </root>
