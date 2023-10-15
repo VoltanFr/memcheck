@@ -30,7 +30,8 @@
     </div>
     <div id="After mount" v-if="mountFinished && !uploading">
         <div id="Title">
-            <h1 class="title"><span v-if="editingImageId"><i class="fa-solid fa-image"></i>&nbsp;@Localizer["EditMedia"]</span><span v-else><i class="fas fa-plus"></i>&nbsp;@Localizer["AddMedia"]</span></h1>
+            <p class="mnesios-page-title"><span v-if="editingImageId"><i class="fa-solid fa-image"></i>&nbsp;@Localizer["EditMedia"]</span><span v-else><i class="fas fa-plus"></i>&nbsp;@Localizer["AddMedia"]</span></p>
+            <p class="mnesios-page-title-suffix">@Localizer["WarningPublicVisibility"]</p>
         </div>
         <div class="memcheck-input-div">
             <label>@Localizer["Name"]</label>

@@ -156,4 +156,7 @@
   <data name="VersionDescription" xml:space="preserve">
     <value>Edit summary (describe your changes)</value>
   </data>
+  <data name="WarningPublicVisibility" xml:space="preserve">
+    <value>Images are public, accessible by all connected users.</value>
+  </data>
 </root>
