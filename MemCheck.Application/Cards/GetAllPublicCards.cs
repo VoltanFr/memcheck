@@ -14,9 +14,8 @@ public sealed class GetAllPublicCards : RequestRunner<GetAllPublicCards.Request,
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var allCards = DbContext.Cards.AsNoTracking().AsSingleQuery();
-
-        var resultCards = await allCards
+        var resultCards = await DbContext.Cards
+            .AsNoTracking()
             .Where(card => !card.UsersWithView.Any())
             .Select(card => new ResultCard(card.Id, card.FrontSide, card.BackSide, card.VersionUtcDate, card.AverageRating))
             .ToImmutableArrayAsync();
