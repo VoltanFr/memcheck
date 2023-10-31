@@ -3,13 +3,13 @@
 @model UploadModel
 @inject IViewLocalizer Localizer
 @section head {
-<link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
-<link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownedit.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/markdownrendering.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link href="@Url.Content("~/css/imageincard.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
 @section scripts {
-<script type="module" src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
-<script type="module" src="~/js/Media/Upload.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/MarkdownEditor.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/Media/Upload.js" asp-append-version="true"></script>
 }
 @{
     ViewData["Title"] = @Localizer["PageTitle"];
@@ -51,19 +51,19 @@
         </div>
         <div class="memcheck-input-div" v-if="!editingImageId">
             <label>@Localizer["FilePath"]</label>
-            <br/>
+            <br />
             <input type="file" v-on:change="onFileSelected" style="display:none" ref="fileInput" />
-            <br/>
+            <br />
             <span v-if="selectedFile">{{selectedFile.name}}</span>
-            <br/>
+            <br />
             <button v-on:click="$refs.fileInput.click()" style="padding-left:10px">@Localizer["SelectFile"]</button>
         </div>
         <div class="memcheck-input-div" v-if="imagePreview">
             <label>@Localizer["Preview"]</label>
             <img class="imageincard" :src="imagePreview" />
         </div>
-    </div>
-    <div class="memcheck-bottom-button-div">
-        <button id="UploadButton" class="btn btn-success btn-lg" v-on:click="upload">@Localizer["Upload"]</button>
+        <div class="memcheck-bottom-button-div">
+            <button id="UploadButton" class="btn btn-success btn-lg" v-on:click="upload">@Localizer["Upload"]</button>
+        </div>
     </div>
 </div>
