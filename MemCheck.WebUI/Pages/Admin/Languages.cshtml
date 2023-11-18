@@ -4,6 +4,9 @@
 @section head {
     <link href="@Url.Content("~/css/toolbarbutton.css")" rel="stylesheet" type="text/css" asp-append-version="true" />
 }
+@section scripts {
+    <script type="module" src="~/js/Languages/Languages.js" asp-append-version="true"></script>
+}
 @{
     ViewData["Title"] = "Languages page";
 }
@@ -38,7 +41,3 @@
         </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/js/Languages/Languages.js" asp-append-version="true"></script>
-}
