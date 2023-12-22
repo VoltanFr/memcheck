@@ -3,3 +3,11 @@
 
 .discussion-entry-foldout-summary-caption {
 }
+
+.discussion-div-normalmode-hidden {
+    display: none;
+}
+
+.discussion-div-normalmode-visible {
+    display: initial;
+}

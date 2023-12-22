@@ -40,13 +40,13 @@
         <div id="FullImage" v-if="!initializationFailure() && currentFullScreenImage">
             <big-size-image v-bind:image="currentFullScreenImage" v-bind:labellocalizer="bigSizeImageLabelsLocalizer()" v-on:close="closeFullScreenImage()" />
         </div>
-        <div id="NormalMode" v-if="!initializationFailure() && !currentFullScreenImage && !newEntryInReview && !saving">
+        <div id="NormalMode" v-bind:class="!initializationFailure() && !currentFullScreenImage && !newEntryInReview && !saving ? 'discussion-div-normalmode-visible' : 'discussion-div-normalmode-hidden'">
             <div id="TitleAndSubtitle" class="mnesios-page-title">
                 @Localizer["MainTitle"]
                 <span class="mnesios-page-title-suffix">&nbsp;@Localizer["TalksAboutCard"] <a v-bind:href="editUrl()" target="_blank" class="discussion-cardid-link">{{cardId}}</a>.</span>
             </div>
             <div id="AddNewEntry" class="memcheck-input-div">
-                <details>
+                <details id="EditionDetails">
                     <summary class="discussion-entry-foldout-summary">
                         <span class="discussion-entry-foldout-summary-caption">@Localizer["AddEntry"]</span>
                     </summary>

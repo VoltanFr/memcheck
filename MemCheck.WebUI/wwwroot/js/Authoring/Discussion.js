@@ -142,6 +142,8 @@ const discussionApp = Vue.createApp({
             return this.renderedText(this.newEntryText);
         },
         continueEditing() {
+            const detailsElement = document.getElementById('EditionDetails');
+            detailsElement.open = true;
             this.newEntryInReview = false;
         },
         async getNextEntries() {
