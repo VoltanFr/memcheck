@@ -157,6 +157,6 @@
     <value>Edit summary (describe your changes)</value>
   </data>
   <data name="WarningPublicVisibility" xml:space="preserve">
-    <value>Images are public, accessible by all connected users.</value>
+    <value>Images and their descriptions are public, accessible by all connected users.</value>
   </data>
 </root>
