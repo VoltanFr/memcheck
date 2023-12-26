@@ -168,4 +168,7 @@
   <data name="VersionDate" xml:space="preserve">
     <value>Dernière modification :</value>
   </data>
+  <data name="WarningPublicVisibility" xml:space="preserve">
+    <value>Les labels et leurs descriptions sont publics, accessibles par tous les utilisateurs connectés.</value>
+  </data>
 </root>

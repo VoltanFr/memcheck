@@ -168,4 +168,7 @@
   <data name="VersionDate" xml:space="preserve">
     <value>Last edition:</value>
   </data>
+  <data name="WarningPublicVisibility" xml:space="preserve">
+    <value>Tags and their descriptions are public, accessible by all connected users.</value>
+  </data>
 </root>
