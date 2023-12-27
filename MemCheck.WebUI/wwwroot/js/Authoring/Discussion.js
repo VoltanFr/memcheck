@@ -73,7 +73,7 @@ const discussionApp = Vue.createApp({
             return null;
         },
         isDirty() {
-            return false;
+            return this.newEntryText.length > 0;
         },
         onPopState() {
             // If we are in full screen image mode, a state '#' has been pushed by the browser
@@ -162,6 +162,9 @@ const discussionApp = Vue.createApp({
         },
         canDownloadMore() {
             return this.entries.length < this.totalDiscussionEntries;
+        },
+        reviewChangesButtonEnabled() {
+            return this.isDirty();
         },
     },
 });

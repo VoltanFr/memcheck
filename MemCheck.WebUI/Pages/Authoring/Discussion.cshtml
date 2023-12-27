@@ -55,7 +55,7 @@
                             <markdown-editor v-model="newEntryText" v-bind:isinfrench="isInFrench()" title="@Localizer["YourMessage"]" v-bind:onimageclickfunctiontext="onImageClickFunctionText()" v-bind:images="images" />
                         </div>
                         <div>
-                            <button class="btn-success mnesios-in-page-button" v-on:click="submitNewEntryForReview">@Localizer["ReviewYourChanges"]</button>
+                            <button class="btn-success mnesios-in-page-button" v-on:click="submitNewEntryForReview" v-if="reviewChangesButtonEnabled()">@Localizer["ReviewYourChanges"]</button>
                         </div>
                     </div>
                 </details>
