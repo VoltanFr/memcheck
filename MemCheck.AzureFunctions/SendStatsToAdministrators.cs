@@ -91,7 +91,7 @@ public sealed class SendStatsToAdministrators : AbstractMemCheckAzureFunction
         {
             writer = writer
                 .Append("<tr>")
-                .Append(CultureInfo.InvariantCulture, $"<td>{recentDemo.DownloadUtcDate}</td><td>{tagNames[recentDemo.TagId]}</td><td>{recentDemo.CountOfCardsReturned}</td>")
+                .Append(CultureInfo.InvariantCulture, $"<td>{DateServices.AsIsoWithHHmm(recentDemo.DownloadUtcDate)}</td><td>{tagNames[recentDemo.TagId]}</td><td>{recentDemo.CountOfCardsReturned}</td>")
                 .Append("</tr>");
         }
 
