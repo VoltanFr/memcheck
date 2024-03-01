@@ -39,7 +39,7 @@ public sealed class AddEntryToCardDiscussion : RequestRunner<AddEntryToCardDiscu
 
         var entryCountForCard = await DbContext.CardDiscussionEntries.AsNoTracking().Where(entry => entry.Card == request.CardId).CountAsync();
 
-        return new ResultWithMetrologyProperties<Result>(new Result(entryCountForCard), ("DiscussionEntryId", entry.Id.ToString()), ("CardId", card.Id.ToString()));
+        return new ResultWithMetrologyProperties<Result>(new Result(entry.Id, entryCountForCard), ("DiscussionEntryId", entry.Id.ToString()), ("CardId", card.Id.ToString()));
     }
     #region Request & Result records
     public sealed record Request(Guid UserId, Guid CardId, string Text) : IRequest
@@ -52,6 +52,6 @@ public sealed class AddEntryToCardDiscussion : RequestRunner<AddEntryToCardDiscu
             QueryValidationHelper.CheckCanCreateCardDiscussionEntryWithText(Text);
         }
     }
-    public sealed record Result(int EntryCountForCard);
+    public sealed record Result(Guid EntryId, int EntryCountForCard);
     #endregion
 }

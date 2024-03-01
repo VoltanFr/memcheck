@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.57.0</VersionPrefix>
+		<VersionPrefix>0.58.0</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>

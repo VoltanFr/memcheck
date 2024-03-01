@@ -116,15 +116,18 @@ public class AddEntryToCardDiscussionTests
         var text = RandomHelper.String();
         var runDate = RandomHelper.Date();
 
+        Guid entryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), runDate).RunAsync(new AddEntryToCardDiscussion.Request(userId, cardId, text));
             Assert.AreEqual(1, result.EntryCountForCard);
+            entryId = result.EntryId;
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var discussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).SingleAsync();
+            Assert.AreEqual(entryId, discussionEntryFromDb.Id);
             Assert.AreEqual(cardId, discussionEntryFromDb.Card);
             Assert.AreEqual(userId, discussionEntryFromDb.Creator.Id);
             Assert.AreEqual(text, discussionEntryFromDb.Text);
@@ -149,14 +152,18 @@ public class AddEntryToCardDiscussionTests
         var newestEntryText = RandomHelper.String();
         var newestEntryRunDate = RandomHelper.Date(oldestEntryRunDate);
 
+        Guid oldestEntryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), oldestEntryRunDate).RunAsync(new AddEntryToCardDiscussion.Request(userId, cardId, oldestEntryText));
+            oldestEntryId = result.EntryId;
         }
 
+        Guid newestEntryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), newestEntryRunDate).RunAsync(new AddEntryToCardDiscussion.Request(userId, cardId, newestEntryText));
+            newestEntryId = result.EntryId;
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -168,6 +175,7 @@ public class AddEntryToCardDiscussionTests
 
             var newestDiscussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).Include(entry => entry.PreviousEntry).Where(entry => entry.Id == cardFromDb.LatestDiscussionEntry.Id).SingleAsync();
             {
+                Assert.AreEqual(newestEntryId, newestDiscussionEntryFromDb.Id);
                 Assert.AreEqual(cardId, newestDiscussionEntryFromDb.Card);
                 Assert.AreEqual(userId, newestDiscussionEntryFromDb.Creator.Id);
                 Assert.AreEqual(newestEntryText, newestDiscussionEntryFromDb.Text);
@@ -177,6 +185,7 @@ public class AddEntryToCardDiscussionTests
             }
             {
                 var oldestDiscussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).Where(entry => entry.Id == newestDiscussionEntryFromDb.PreviousEntry.Id).SingleAsync();
+                Assert.AreEqual(oldestEntryId, oldestDiscussionEntryFromDb.Id);
                 Assert.AreEqual(cardId, oldestDiscussionEntryFromDb.Card);
                 Assert.AreEqual(userId, oldestDiscussionEntryFromDb.Creator.Id);
                 Assert.AreEqual(oldestEntryText, oldestDiscussionEntryFromDb.Text);
@@ -200,30 +209,38 @@ public class AddEntryToCardDiscussionTests
         var newestEntryText = RandomHelper.String();
         var newestEntryRunDate = RandomHelper.Date(intermediaryEntryRunDate);
 
+        Guid oldestEntryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), oldestEntryRunDate).RunAsync(new AddEntryToCardDiscussion.Request(user1Id, cardId, oldestEntryText));
+            oldestEntryId = result.EntryId;
         }
 
+        Guid intermediaryEntryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), intermediaryEntryRunDate).RunAsync(new AddEntryToCardDiscussion.Request(user2Id, cardId, intermediaryEntryText));
+            intermediaryEntryId = result.EntryId;
         }
 
+        Guid newestEntryId;
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = await new AddEntryToCardDiscussion(dbContext.AsCallContext(), newestEntryRunDate).RunAsync(new AddEntryToCardDiscussion.Request(user1Id, cardId, newestEntryText));
+            newestEntryId = result.EntryId;
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var cardFromDb = await dbContext.Cards.Include(card => card.LatestDiscussionEntry).SingleAsync();
             Assert.IsNotNull(cardFromDb.LatestDiscussionEntry);
+            Assert.AreEqual(newestEntryId, cardFromDb.LatestDiscussionEntry.Id);
 
             Assert.AreEqual(3, dbContext.CardDiscussionEntries.Count());
 
             var newestDiscussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).Include(entry => entry.PreviousEntry).Where(entry => entry.Id == cardFromDb.LatestDiscussionEntry.Id).SingleAsync();
             {
+                Assert.AreEqual(newestEntryId, newestDiscussionEntryFromDb.Id);
                 Assert.AreEqual(cardId, newestDiscussionEntryFromDb.Card);
                 Assert.AreEqual(user1Id, newestDiscussionEntryFromDb.Creator.Id);
                 Assert.AreEqual(newestEntryText, newestDiscussionEntryFromDb.Text);
@@ -233,6 +250,7 @@ public class AddEntryToCardDiscussionTests
             }
             var intermediaryDiscussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).Include(entry => entry.PreviousEntry).Where(entry => entry.Id == newestDiscussionEntryFromDb.PreviousEntry.Id).SingleAsync();
             {
+                Assert.AreEqual(intermediaryEntryId, intermediaryDiscussionEntryFromDb.Id);
                 Assert.AreEqual(cardId, intermediaryDiscussionEntryFromDb.Card);
                 Assert.AreEqual(user2Id, intermediaryDiscussionEntryFromDb.Creator.Id);
                 Assert.AreEqual(intermediaryEntryText, intermediaryDiscussionEntryFromDb.Text);
@@ -242,6 +260,7 @@ public class AddEntryToCardDiscussionTests
             }
             {
                 var oldestDiscussionEntryFromDb = await dbContext.CardDiscussionEntries.Include(entry => entry.Creator).Where(entry => entry.Id == intermediaryDiscussionEntryFromDb.PreviousEntry.Id).SingleAsync();
+                Assert.AreEqual(oldestEntryId, oldestDiscussionEntryFromDb.Id);
                 Assert.AreEqual(cardId, oldestDiscussionEntryFromDb.Card);
                 Assert.AreEqual(user1Id, oldestDiscussionEntryFromDb.Creator.Id);
                 Assert.AreEqual(oldestEntryText, oldestDiscussionEntryFromDb.Text);
