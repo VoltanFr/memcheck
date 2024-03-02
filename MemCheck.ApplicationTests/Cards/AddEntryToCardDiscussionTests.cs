@@ -34,6 +34,17 @@ public class AddEntryToCardDiscussionTests
         await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddEntryToCardDiscussion(dbContext.AsCallContext()).RunAsync(new AddEntryToCardDiscussion.Request(RandomHelper.Guid(), cardId, RandomHelper.String())));
     }
     [TestMethod()]
+    public async Task UserUnregistered()
+    {
+        var db = DbHelper.GetEmptyTestDB();
+        var userId = await UserHelper.CreateInDbAsync(db);
+        var cardId = await CardHelper.CreateIdAsync(db, userId);
+        await UserHelper.DeleteAsync(db, userId);
+
+        using var dbContext = new MemCheckDbContext(db);
+        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddEntryToCardDiscussion(dbContext.AsCallContext()).RunAsync(new AddEntryToCardDiscussion.Request(RandomHelper.Guid(), cardId, RandomHelper.String())));
+    }
+    [TestMethod()]
     public async Task CardDoesNotExist()
     {
         var db = DbHelper.GetEmptyTestDB();
