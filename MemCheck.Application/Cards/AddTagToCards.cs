@@ -19,7 +19,7 @@ public sealed class AddTagToCards : RequestRunner<AddTagToCards.Request, AddTagT
         foreach (var cardId in request.CardIds)
             if (!DbContext.TagsInCards.AsNoTracking().Any(tagInCard => tagInCard.CardId == cardId && tagInCard.TagId == request.TagId))
             {
-                var previousVersionCreator = new PreviousVersionCreator(DbContext);
+                var previousVersionCreator = new PreviousCardVersionCreator(DbContext);
                 await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.GetLocalized("AddTag") + $" '{tagName}'");
                 DbContext.TagsInCards.Add(new TagInCard() { TagId = request.TagId, CardId = cardId });
             }

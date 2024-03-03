@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemCheck.Application.Cards;
 
-internal sealed class PreviousVersionCreator
+internal sealed class PreviousCardVersionCreator
 {
     #region Fields
     private readonly MemCheckDbContext dbContext;
@@ -69,7 +69,7 @@ internal sealed class PreviousVersionCreator
         return previousVersion;
     }
     #endregion
-    public PreviousVersionCreator(MemCheckDbContext dbContext)
+    public PreviousCardVersionCreator(MemCheckDbContext dbContext)
     {
         this.dbContext = dbContext;
     }
@@ -82,7 +82,6 @@ internal sealed class PreviousVersionCreator
             .Include(card => card.CardLanguage)
             .Include(card => card.TagsInCards)
             .Include(card => card.VersionCreator)
-            //.AsSingleQuery()
             .SingleAsync(card => card.Id == cardId);
 
         var previousVersion = await CreatePreviousVersionAsync(card);

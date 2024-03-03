@@ -56,7 +56,7 @@ public sealed class UpdateCard : RequestRunner<UpdateCard.Request, UpdateCard.Re
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
-        var previousVersionCreator = new PreviousVersionCreator(DbContext);
+        var previousVersionCreator = new PreviousCardVersionCreator(DbContext);
         var card = await previousVersionCreator.RunAsync(request.CardId, request.VersionCreatorId, request.VersionDescription, cardNewVersionUtcDate);
 
         card.CardLanguage = DbContext.CardLanguages.Where(language => language.Id == request.LanguageId).Single();

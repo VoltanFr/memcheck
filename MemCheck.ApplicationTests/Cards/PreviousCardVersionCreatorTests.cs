@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace MemCheck.Application.Cards;
 
 [TestClass()]
-public class PreviousVersionCreatorTests
+public class PreviousCardVersionCreatorTests
 {
     [TestMethod()]
     public async Task TestSameUserCreatesVersion()
@@ -20,7 +20,7 @@ public class PreviousVersionCreatorTests
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new PreviousVersionCreator(dbContext);
+            var request = new PreviousCardVersionCreator(dbContext);
             await request.RunAsync(card.Id, ownerId, RandomHelper.String());
             await dbContext.SaveChangesAsync();
         }
@@ -50,7 +50,7 @@ public class PreviousVersionCreatorTests
 
         using (var dbContext = new MemCheckDbContext(testDB))
         {
-            var request = new PreviousVersionCreator(dbContext);
+            var request = new PreviousCardVersionCreator(dbContext);
             await request.RunAsync(card.Id, newVersionCreatorId, RandomHelper.String());
             await dbContext.SaveChangesAsync();
         }

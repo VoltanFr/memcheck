@@ -28,7 +28,7 @@ public sealed class DeleteCards : RequestRunner<DeleteCards.Request, DeleteCards
             var cardsRatings = DbContext.UserCardRatings.Where(userRating => request.CardIds.Contains(userRating.CardId));
             DbContext.UserCardRatings.RemoveRange(cardsRatings);
 
-            var previousVersionCreator = new PreviousVersionCreator(DbContext);
+            var previousVersionCreator = new PreviousCardVersionCreator(DbContext);
             var card = await previousVersionCreator.RunAsync(cardId, request.UserId, Localized.GetLocalized("Deletion"), deletionUtcDate);
             await previousVersionCreator.RunForDeletionAsync(card, deletionUtcDate);
             await DbContext.SaveChangesAsync();
