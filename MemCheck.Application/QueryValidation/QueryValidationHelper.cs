@@ -275,6 +275,12 @@ public static class QueryValidationHelper
         if (text.Length > CardDiscussionMaxTextLength)
             throw new TextTooLongException(text.Length, CardDiscussionMinTextLength, CardDiscussionMaxTextLength);
     }
+    public static void CheckUserCanEditCardDiscussionEntry(Guid userId, CardDiscussionEntry entry)
+    {
+        // We could consider allowing administrators to edit discussion entries, but this is not implemented yet
+        if (entry.Creator.Id != userId)
+            throw new UserNotAllowedToEditDiscussionEntryException();
+    }
     public static bool TagIsPerso(Guid tagId, MemCheckDbContext dbContext)
     {
         var tag = dbContext.Tags.AsNoTracking().Single(tag => tag.Id == tagId);
