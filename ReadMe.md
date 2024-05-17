@@ -7,6 +7,8 @@ Mnesios is a flashcard web site, a tool to help you know things by heart. The [e
 
 ## Development
 
+MemCheck is developed with a push-to-deploy strategy (aka continuous delivery), thanks to the extensive set of tests.
+
 ### Technologies
 
 - The web site is an [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core) project.
