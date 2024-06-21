@@ -30,8 +30,10 @@ public class RandomHelperTests
         var length = RandomHelper.Int(100, 1000);
         var s = RandomHelper.String(length);
         Assert.AreEqual(length, s.Length);
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         Assert.IsFalse(s.ToUpperInvariant() == s, $"A string of {length} chars was all upper chars");
         Assert.IsFalse(s.ToLowerInvariant() == s, $"A string of {length} chars was all lower chars");
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
     }
     [TestMethod()]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
@@ -39,8 +41,10 @@ public class RandomHelperTests
     {
         var attempts = RandomHelper.Int(100, 1000);
         var strings = attempts.Times(() => RandomHelper.String(RandomHelper.Int(2, 5)));
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         Assert.IsFalse(strings.All(s => s.ToUpperInvariant() == s), $"Among {attempts} attempts, short strings were only upper");
         Assert.IsFalse(strings.All(s => s.ToLowerInvariant() == s), $"Among {attempts} attempts, short strings were only lower");
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
     }
     [TestMethod()]
     public void Letter_AnyCase()

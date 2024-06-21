@@ -15,7 +15,7 @@ public class IntExtensionsTests
     {
         var list = new List<int>();
         await 0.TimesAsync(async () => { list.Add(0); await Task.CompletedTask; });
-        Assert.IsFalse(list.Any());
+        Assert.AreEqual(0, list.Count);
     }
     [TestMethod()]
     public async Task Times_Negative()

@@ -16,7 +16,7 @@ public sealed class SetUserUILanguage : RequestRunner<SetUserUILanguage.Request,
         var user = await DbContext.Users.SingleAsync(user => user.Id == request.UserId);
         var cultureId = MemCheckSupportedCultures.IdFromCulture(request.Culture)!;
         user.UILanguage = cultureId;
-        DbContext.SaveChanges();
+        await DbContext.SaveChangesAsync();
         return new ResultWithMetrologyProperties<Result>(new Result(), ("CultureId", cultureId));
     }
     #region Request & Result

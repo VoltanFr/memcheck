@@ -11,7 +11,7 @@ public class ImageLoadingHelperTests
     public void NoImage(string text)
     {
         var imageNames = ImageLoadingHelper.GetMnesiosImagesFromText(text);
-        Assert.IsFalse(imageNames.Any());
+        Assert.IsTrue(imageNames.IsEmpty);
     }
     [DataTestMethod, DataRow("`![Mnesios:img]`"), DataRow("`![Mnesios:An image]`"), DataRow("text before `![Mnesios:a-b]`"),
         DataRow("`![Mnesios:a(b)] text after`"), DataRow("text before `![Mnesios`:$O&e] text after"), DataRow("`![Not an image] ![Mnesios:hé] []`"),
@@ -20,7 +20,7 @@ public class ImageLoadingHelperTests
     public void ImageInQuote(string text)
     {
         var imageNames = ImageLoadingHelper.GetMnesiosImagesFromText(text);
-        Assert.IsFalse(imageNames.Any());
+        Assert.IsTrue(imageNames.IsEmpty);
     }
     [DataTestMethod, DataRow("![Mnesios:img]", "img"), DataRow("![Mnesios:An image]", "An image"), DataRow("text before ![Mnesios:a-b]", "a-b"),
         DataRow("![Mnesios:a(b)] text after", "a(b)"), DataRow("text before ![Mnesios:$O&e] text after", "$O&e"), DataRow("![Not an image] ![Mnesios:hé] `Quote` []", "hé")]

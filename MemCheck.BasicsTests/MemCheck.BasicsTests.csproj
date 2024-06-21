@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
 		<RootNamespace>MemCheck.Basics</RootNamespace>
-		<VersionPrefix>0.12.12</VersionPrefix>
+		<VersionPrefix>0.12.13</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>

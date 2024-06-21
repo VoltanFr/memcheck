@@ -79,7 +79,7 @@ public class RefreshAverageRatingsTests
                 Rating = ratingByOtherUser
             };
             dbContext.UserCardRatings.Add(userCardRating);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         };
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -123,7 +123,7 @@ public class RefreshAverageRatingsTests
                             dbContext.UserCardRatings.Add(new Domain.UserCardRating { UserId = ratingUserIds[ratingIndex], CardId = cardId, Rating = rating });
                             ratings.Add(rating);
                         }
-                        dbContext.SaveChanges();
+                        await dbContext.SaveChangesAsync();
                     }
 
                     if (RandomHelper.Bool())

@@ -42,7 +42,7 @@ public sealed class DeleteCardPreviousVersionsOfDeletedCards : RequestRunner<Del
                 .Take(100)
                 .ToListAsync();
 
-            if (!deletionVersions.Any())
+            if (deletionVersions.Count == 0)
                 return new ResultWithMetrologyProperties<Result>(new Result());
 
             foreach (var deletionVersion in deletionVersions)

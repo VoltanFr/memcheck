@@ -60,3 +60,6 @@ dotnet_diagnostic.IDE0005.severity = none
 
 # Allow Remove unnecessary using directives with this way
 dotnet_diagnostic.CS8019.severity = error
+
+# I allow constant array arguments
+dotnet_diagnostic.CA1861.severity = none

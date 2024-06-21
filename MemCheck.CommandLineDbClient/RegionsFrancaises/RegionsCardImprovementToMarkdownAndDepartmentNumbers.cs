@@ -28,7 +28,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
             var additionalInfoLines = cardToUpdate.AdditionalInfo.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
             if (!additionalInfoLines[0].StartsWith("Elle est constituée de ces"))
                 throw new ArgumentException($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
-            if (additionalInfoLines[1].StartsWith("-"))
+            if (additionalInfoLines[1].StartsWith('-'))
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.BackSide})");
             else
             {
@@ -55,7 +55,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
             var additionalInfoLines = cardToUpdate.AdditionalInfo.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
             if (!additionalInfoLines[0].StartsWith("Elle est constituée de ces"))
                 throw new ArgumentException($"Unexpected card additional info first line: '{additionalInfoLines[0]}'");
-            if (additionalInfoLines[1].StartsWith("-"))
+            if (additionalInfoLines[1].StartsWith('-'))
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.BackSide})");
             else
             {
@@ -80,7 +80,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
         foreach (var cardToUpdate in cardsToUpdate)
         {
             var additionalInfoLines = cardToUpdate.AdditionalInfo.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
-            if (additionalInfoLines[0].StartsWith("-"))
+            if (additionalInfoLines[0].StartsWith('-'))
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.FrontSide})");
             else
             {
@@ -103,7 +103,7 @@ internal sealed class RegionsCardImprovementToMarkdownAndDepartmentNumbers : ICm
         foreach (var cardToUpdate in cardsToUpdate)
         {
             var backSideLines = cardToUpdate.BackSide.Split(Environment.NewLine).Select(line => line.Trim()).ToList();
-            if (backSideLines[0].StartsWith("-"))
+            if (backSideLines[0].StartsWith('-'))
                 logger.LogInformation($"Card is already Markdown ({cardToUpdate.FrontSide})");
             else
             {

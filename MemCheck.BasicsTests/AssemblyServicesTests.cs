@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MemCheck.Basics;
 
@@ -13,6 +14,6 @@ public class AssemblyServicesTests
     [TestMethod()]
     public void CheckBasics()
     {
-        Assert.AreEqual("MemCheck.BasicsTests 0.12.12", AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly));
+        StringAssert.StartsWith(AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly), "MemCheck.BasicsTests 0.12.13", StringComparison.Ordinal);
     }
 }

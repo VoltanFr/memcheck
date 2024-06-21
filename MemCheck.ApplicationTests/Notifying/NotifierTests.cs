@@ -56,7 +56,7 @@ public class NotifierTests
         var subscription = new CardNotificationSubscription();
         var cardId = Guid.NewGuid();
         var cardVersion = new IUserCardVersionsNotifier.ResultCardVersion(cardId, RandomHelper.String(), RandomHelper.String(), new DateTime(2029, 12, 15), RandomHelper.String(), true, null, subscription);
-        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new IUserCardVersionsNotifier.CardVersionsNotifierResult(new IUserCardVersionsNotifier.ResultCard[] { new IUserCardVersionsNotifier.ResultCard(cardId, ImmutableArray.Create(cardVersion), ImmutableArray<IUserCardVersionsNotifier.ResultDiscussionEntry>.Empty) }.ToImmutableArray()));
+        userCardVersionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(new IUserCardVersionsNotifier.CardVersionsNotifierResult(new IUserCardVersionsNotifier.ResultCard[] { new(cardId, ImmutableArray.Create(cardVersion), ImmutableArray<IUserCardVersionsNotifier.ResultDiscussionEntry>.Empty) }.ToImmutableArray()));
 
         var userCardDeletionsNotifier = new Mock<IUserCardDeletionsNotifier>(MockBehavior.Strict);
         userCardDeletionsNotifier.Setup(notifier => notifier.RunAsync(user.Id)).ReturnsAsync(ImmutableArray<CardDeletion>.Empty);

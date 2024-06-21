@@ -20,7 +20,7 @@ public static class QueryValidationHelper
     #region Private methods
     private static ImmutableHashSet<Guid> GetReservedGuids()
     {
-        var result = new HashSet<Guid> { Guid.Empty, new Guid("11111111-1111-1111-1111-111111111111") };
+        var result = new HashSet<Guid> { Guid.Empty, new("11111111-1111-1111-1111-111111111111") };
         return result.ToImmutableHashSet();
     }
     #endregion

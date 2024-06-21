@@ -20,6 +20,7 @@ internal sealed class Engine : IHostedService
     private readonly IHostApplicationLifetime hostApplicationLifetime;
     #endregion
     #region Private method
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance", Justification = "Often changes")]
     private ICmdLinePlugin GetPlugin()
     {
         return new GetCardForEditPerfMeasurements(serviceProvider);

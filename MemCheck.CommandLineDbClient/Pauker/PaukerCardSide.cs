@@ -6,7 +6,7 @@ internal sealed class PaukerCardSide
 {
     public PaukerCardSide(long? learnedTimestamp, string orientation, string repeatByTyping, string text)
     {
-        if (text == null) throw new ArgumentNullException(nameof(text));
+        ArgumentNullException.ThrowIfNull(text);
 
         LearnedTimestamp = learnedTimestamp;
         Text = text.Trim();

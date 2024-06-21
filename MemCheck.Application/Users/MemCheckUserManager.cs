@@ -58,8 +58,7 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     }
     public async Task<MemCheckUser> GetExistingUserAsync(ClaimsPrincipal principal)
     {
-        if (principal == null)
-            throw new ArgumentNullException(nameof(principal));
+        ArgumentNullException.ThrowIfNull(principal);
         var id = GetUserId(principal);
         if (id == null)
             throw new InvalidOperationException("User id");

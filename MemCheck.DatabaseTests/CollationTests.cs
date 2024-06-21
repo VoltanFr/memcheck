@@ -24,7 +24,9 @@ public sealed class CollationTests
 
         using var dbContext = new MemCheckDbContext(testDB);
         Assert.AreEqual(cardWithExactFrontSideId, dbContext.Cards.Where(c => c.FrontSide == frontSide).Single().Id);
+#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         Assert.AreEqual(cardWithExactFrontSideId, dbContext.Cards.Where(c => c.FrontSide == frontSide.ToUpperInvariant()).Single().Id);
+#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
         Assert.AreEqual(cardWithExactFrontSideId, dbContext.Cards.Where(c => EF.Functions.Like(c.FrontSide, frontSide)).Single().Id);
         Assert.AreEqual(2, dbContext.Cards.Where(c => EF.Functions.Like(c.FrontSide, $"%{frontSide}%")).Count());
     }

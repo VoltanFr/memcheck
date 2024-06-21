@@ -27,7 +27,7 @@ public sealed class AddCardsInDeck : RequestRunner<AddCardsInDeck.Request, AddCa
             BiggestHeapReached = 0
         });
         await DbContext.CardsInDecks.AddRangeAsync(toAdd);
-        DbContext.SaveChanges();
+        await DbContext.SaveChangesAsync();
 
         return new ResultWithMetrologyProperties<Result>(new Result(), ("DeckId", request.DeckId.ToString()), IntMetric("CardCount", request.CardIds.Count()));
     }

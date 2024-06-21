@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MemCheck.Application.Notifiying;
 using MemCheck.Application.Users;
 using MemCheck.Basics;
@@ -32,7 +31,7 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     {
         public string GetAbsoluteAddress(string relativeUri)
         {
-            return "https://www.Mnesios.com" + (relativeUri.StartsWith("/", StringComparison.InvariantCulture) ? "" : "/") + relativeUri;
+            return "https://www.Mnesios.com" + (relativeUri.StartsWith('/') ? "" : "/") + relativeUri;
         }
     }
     #endregion

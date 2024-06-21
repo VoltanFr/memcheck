@@ -23,7 +23,7 @@ public sealed class MailSender
     private readonly string sendGridKey;
     #endregion
     #region Private methods
-    private void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
+    private static void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
     {
         body = body
             .Append(CultureInfo.InvariantCulture, $"<p>Caught {e.GetType().Name}</p>")

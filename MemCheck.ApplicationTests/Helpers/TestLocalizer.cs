@@ -8,7 +8,7 @@ namespace MemCheck.Application.Helpers;
 internal sealed class TestLocalizer : ILocalized
 {
     #region Fields
-    private readonly IDictionary<string, string> values;
+    private readonly ImmutableDictionary<string, string> values;
     #endregion
     public TestLocalizer(params KeyValuePair<string, string>[] items)
     {

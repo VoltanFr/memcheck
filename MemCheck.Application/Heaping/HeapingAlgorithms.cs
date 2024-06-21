@@ -26,9 +26,9 @@ public sealed class HeapingAlgorithms
     public IEnumerable<int> Ids => algorithms.Keys.OrderBy(key => key);
     public HeapingAlgorithm FromId(int heapingAlgorithmId)
     {
-        return !algorithms.ContainsKey(heapingAlgorithmId)
+        return !algorithms.TryGetValue(heapingAlgorithmId, out var value)
             ? throw new ArgumentException($"Unknown heaping algorithm {heapingAlgorithmId}")
-            : algorithms[heapingAlgorithmId];
+            : value;
     }
     public static HeapingAlgorithms Instance { get; } = new();
     public static int DefaultAlgoId => DefaultHeapingAlgorithm.ID;

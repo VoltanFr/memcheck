@@ -26,7 +26,7 @@ public sealed class MemCheckUserValidator : UserValidator<MemCheckUser>
         await ValidateEmail(manager, user, errors);
         return errors.Count > 0 ? IdentityResult.Failed(errors.ToArray()) : IdentityResult.Success;
     }
-    private async Task ValidateUserName(UserManager<MemCheckUser> manager, MemCheckUser user, ICollection<IdentityError> errors)
+    private async Task ValidateUserName(UserManager<MemCheckUser> manager, MemCheckUser user, List<IdentityError> errors)
     {
         if (user.GetUserName().Trim() != user.UserName)
         {

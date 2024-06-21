@@ -29,19 +29,19 @@ internal sealed class BeaufortCardCreator : ICmdLinePlugin
     {
         var result = new List<BeaufortForce>
         {
-            new BeaufortForce(0, "Calme", 0, 0),
-            new BeaufortForce(1, "Très légère brise", 1, 3),
-            new BeaufortForce(2, "Légère brise", 4, 6),
-            new BeaufortForce(3, "Petite brise", 7, 10),
-            new BeaufortForce(4, "Jolie brise", 11, 16),
-            new BeaufortForce(5, "Bonne brise", 17, 21),
-            new BeaufortForce(6, "Vent frais", 22, 27),
-            new BeaufortForce(7, "Grand frais", 28, 33),
-            new BeaufortForce(8, "Coup de vent", 34, 40),
-            new BeaufortForce(9, "Fort coup de vent", 41, 47),
-            new BeaufortForce(10, "Tempête", 48, 55),
-            new BeaufortForce(11, "Violente tempête", 56, 63),
-            new BeaufortForce(12, "Ouragan", 64, 70)
+            new(0, "Calme", 0, 0),
+            new(1, "Très légère brise", 1, 3),
+            new(2, "Légère brise", 4, 6),
+            new(3, "Petite brise", 7, 10),
+            new(4, "Jolie brise", 11, 16),
+            new(5, "Bonne brise", 17, 21),
+            new(6, "Vent frais", 22, 27),
+            new(7, "Grand frais", 28, 33),
+            new(8, "Coup de vent", 34, 40),
+            new(9, "Fort coup de vent", 41, 47),
+            new(10, "Tempête", 48, 55),
+            new(11, "Violente tempête", 56, 63),
+            new(12, "Ouragan", 64, 70)
         };
         return result.ToImmutableArray();
     }
