@@ -78,10 +78,7 @@ public sealed class Startup
             .AddSignInManager<MemCheckSignInManager>()
             .AddClaimsPrincipalFactory<MemCheckClaimsFactory>();
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
-        });
+        services.AddAuthorizationBuilder().AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
 
         services.AddSingleton<IEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>0.16.1</VersionPrefix>
+		<VersionPrefix>0.16.2</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>

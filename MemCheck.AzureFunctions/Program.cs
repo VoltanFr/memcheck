@@ -2,7 +2,6 @@
 using MemCheck.Application.Users;
 using MemCheck.Database;
 using MemCheck.Domain;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,10 +14,6 @@ internal static class Program
     public static void Main(/*string[] args*/)
     {
         var host = new HostBuilder()
-            .ConfigureFunctionsWorkerDefaults(builder =>
-            {
-                builder.AddApplicationInsights().AddApplicationInsightsLogger();
-            })
             .ConfigureServices(services =>
                 {
                     services.AddDbContext<MemCheckDbContext>(options =>
@@ -33,6 +28,8 @@ internal static class Program
                         .AddRoles<MemCheckUserRole>()
                         .AddUserManager<MemCheckUserManager>()
                         .AddEntityFrameworkStores<MemCheckDbContext>();
+
+                    services.AddApplicationInsightsTelemetryWorkerService();
                 })
             .ConfigureLogging(loggingBuilder =>
                 {
