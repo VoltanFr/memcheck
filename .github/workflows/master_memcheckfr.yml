@@ -70,7 +70,7 @@ jobs:
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}}
 
     - name: "Publish: prepare the project WebUI for deployment"
-      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.WEBUI_PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
+      run: dotnet publish --configuration ${{env.COMPIL_CONFIG}} -o ${{env.WEBUI_PUBLISH_FOLDER}} --no-self-contained MemCheck.WebUI
 
     - name: "Telling size of WebUI publish folder"
       run: du -sh ${{env.WEBUI_PUBLISH_FOLDER}}
