@@ -37,7 +37,7 @@ public class DownloadPersonalDataModel : PageModel
             personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
         }
 
-        Response.Headers.TryAdd("Content-Disposition", "attachment; filename=PersonalData.json");
+        Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
         return new FileContentResult(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(personalData)), "text/json");
     }
 }
