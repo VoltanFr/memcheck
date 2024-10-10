@@ -160,7 +160,7 @@
     <value>ATTENTION : vous allez effacer</value>
   </data>
   <data name="AlertDeleteCardsPart2Plural" xml:space="preserve">
-    <value>cartes de Mnesios. Elles ne seront plus accessibles pour aucune utilisateur.</value>
+    <value>cartes de Mnesios. Elles ne seront plus accessibles pour aucun utilisateur.</value>
   </data>
   <data name="AlertDeleteCardsPart2Single" xml:space="preserve">
     <value>une carte de Mnesios. Elle ne sera plus accessible pour aucun utilisateur.</value>
