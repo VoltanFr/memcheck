@@ -129,9 +129,16 @@ public class MediaController : MemCheckController
     [HttpPost("GetImageMetadataFromName")] // No authorization: when running a demo without user, this is needed
     public async Task<IActionResult> GetImageMetadataFromName([FromBody] GetImageMetadataFromNameRequest request)
     {
-        var appRequest = new GetImageInfoFromName(callContext);
-        var result = await appRequest.RunAsync(new GetImageInfoFromName.Request(request.ImageName));
-        return Ok(new GetImageMetadataFromNameViewModel(result.Id, result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        try
+        {
+            var appRequest = new GetImageInfoFromName(callContext);
+            var result = await appRequest.RunAsync(new GetImageInfoFromName.Request(request.ImageName));
+            return Ok(new GetImageMetadataFromNameViewModel(result.Id, result.Description, result.Source, result.InitialUploadUtcDate, result.InitialVersionCreator, result.CurrentVersionUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        }
+        catch (ImageNotFoundException)
+        {
+            return NotFound();
+        }
     }
     public sealed class GetImageMetadataFromNameRequest
     {
@@ -174,9 +181,16 @@ public class MediaController : MemCheckController
     [HttpGet("GetImageMetadataFromId/{imageId}"), Authorize]
     public async Task<IActionResult> GetImageMetadataFromId(Guid imageId)
     {
-        var appRequest = new GetImageInfoFromId(callContext);
-        var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
-        return Ok(new GetImageMetadataFromIdViewModel(imageId, result.ImageName, result.Description, result.Source, result.InitialUploadUtcDate, result.CurrentVersionCreatorName, result.LastChangeUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        try
+        {
+            var appRequest = new GetImageInfoFromId(callContext);
+            var result = await appRequest.RunAsync(new GetImageInfoFromId.Request(imageId));
+            return Ok(new GetImageMetadataFromIdViewModel(imageId, result.ImageName, result.Description, result.Source, result.InitialUploadUtcDate, result.CurrentVersionCreatorName, result.LastChangeUtcDate, result.CurrentVersionDescription, result.CardCount, result.OriginalImageContentType, result.OriginalImageSize, result.SmallSize, result.MediumSize, result.BigSize));
+        }
+        catch (ImageNotFoundException)
+        {
+            return NotFound();
+        }
     }
     public sealed class GetImageMetadataFromIdRequest
     {

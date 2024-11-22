@@ -23,6 +23,10 @@ public sealed class GetImageFromName : RequestRunner<GetImageFromName.Request, G
             Request.ImageSize.Big => (await DbContext.Images.AsNoTracking().Select(img => new { img.Name, img.BigBlob }).SingleAsync(img => img.Name == request.ImageName)).BigBlob,
             _ => throw new NotImplementedException(request.Size.ToString()),
         };
+
+        if (result == null)
+            throw new ImageNotFoundException(request.ImageName);
+
         return new ResultWithMetrologyProperties<Result>(new Result(result.ToImmutableArray()), ("ImageName", request.ImageName), ("RequestedSize", request.Size.ToString()), IntMetric("ByteCount", result.Length));
     }
     #region Request class

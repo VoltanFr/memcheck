@@ -74,9 +74,17 @@ public class LearnController : MemCheckController
         }
 
         CheckBodyParameter(request);
-        var blob = await new GetImageFromName(callContext).RunAsync(new GetImageFromName.Request(request.ImageName, AppSizeFromWebParam(request.Size)));
-        var content = new MemoryStream(blob.ImageBytes.ToArray());
-        return base.File(content, "image/jpeg", "noname.jpg");
+
+        try
+        {
+            var blob = await new GetImageFromName(callContext).RunAsync(new GetImageFromName.Request(request.ImageName, AppSizeFromWebParam(request.Size)));
+            var content = new MemoryStream(blob.ImageBytes.ToArray());
+            return base.File(content, "image/jpeg", "noname.jpg");
+        }
+        catch (ImageNotFoundException)
+        {
+            return NotFound();
+        }
     }
     public sealed class GetImageByNameRequest
     {

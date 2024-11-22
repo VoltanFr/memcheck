@@ -1,4 +1,4 @@
-﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Cards;
+﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Images;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +23,7 @@ internal sealed class Engine : IHostedService
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance", Justification = "Often changes")]
     private ICmdLinePlugin GetPlugin()
     {
-        return new GetCardForEditPerfMeasurements(serviceProvider);
+        return new GetImageFromNamePerfMeasurements(serviceProvider);
     }
     #endregion
     public Engine(IServiceProvider serviceProvider)

@@ -202,7 +202,8 @@ const learnApp = Vue.createApp({
                     if (!this.currentCard)
                         this.getCard();
                 })
-                .catch(() => {
+                .catch((error) => {
+                    tellAxiosError(error);
                     sleep(1000).then(() => {
                         this.currentImageDetailsLoadingPromise = null;
                     });

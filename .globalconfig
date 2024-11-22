@@ -63,3 +63,6 @@ dotnet_diagnostic.CS8019.severity = error
 
 # I allow constant array arguments
 dotnet_diagnostic.CA1861.severity = none
+
+# Sometimes a good old if is more readable
+dotnet_diagnostic.IDE0046.severity = none

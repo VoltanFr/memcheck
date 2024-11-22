@@ -11,7 +11,6 @@ public static class MemCheckSupportedCultures
     public static CultureInfo French { get; } = new("fr-FR");
     public static ImmutableArray<CultureInfo> All => new[] { English, French }.ToImmutableArray();
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "More complicated")]
     public static string? IdFromCulture(CultureInfo c)
     {
         if (English.Equals(c))

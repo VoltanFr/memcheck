@@ -255,4 +255,7 @@
   <data name="UnknownImage" xml:space="preserve">
     <value>Image non trouvée</value>
   </data>
+  <data name="ImageNotFound" xml:space="preserve">
+    <value>Image inexistante</value>
+  </data>
 </root>
