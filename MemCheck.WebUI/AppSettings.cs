@@ -20,6 +20,7 @@ public sealed class AppSettings
     #region Fields
     private static readonly Action<ILogger, string, Exception?> dbInfoLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(1, "DbInfo"), "Using {DbInfo}");
     private static readonly Action<ILogger, string, Exception?> sendGridLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(2, "SendGrid"), "Using SendGrid {Info}");
+    private static readonly Action<ILogger, string, Exception?> azureMailConnectionLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(2, "AzureMailConnection"), "Using AzureMailConnection {Info}");
     #endregion
     #region Private methods
     private static string GetConnectionString(IConfiguration configuration, bool prodEnvironment, ILogger logger)
@@ -46,7 +47,7 @@ public sealed class AppSettings
             return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
         }
         var debuggingDb = configuration.RequiredValue("ConnectionStrings:DebuggingDb");
-        if (debuggingDb is "AlternativeProdDbConnection" or "Azure")
+        if (debuggingDb is "LocalReplicatedFromProd" or "Azure")
         {
             var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\SendGridSecrets.json"));
             sendGridLogMessage(logger, "prod settings from private file", null);
@@ -55,12 +56,33 @@ public sealed class AppSettings
         sendGridLogMessage(logger, "debug settings", null);
         return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
     }
+    private static string GetAzureMailConnectionString(IConfiguration configuration, bool prodEnvironment, ILogger logger)
+    {
+        if (prodEnvironment)
+        {
+            azureMailConnectionLogMessage(logger, "prod settings from app settings", null);
+            return configuration.RequiredValue("AzureMailConnectionString");
+        }
+        var debuggingDb = configuration.RequiredValue("ConnectionStrings:DebuggingDb");
+        if (debuggingDb is "LocalReplicatedFromProd" or "Azure")
+        {
+            var secrets = JsonSerializer.Deserialize<string>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\AzureMailConnectionString.json"));
+            azureMailConnectionLogMessage(logger, "prod settings from private file", null);
+            if (secrets == null)
+                throw new InvalidProgramException("Failed to load mail connection string");
+            return secrets;
+        }
+        azureMailConnectionLogMessage(logger, "debug settings", null);
+        return configuration.RequiredValue("AzureMailConnectionString");
+    }
     #endregion
     public AppSettings(IConfiguration configuration, bool prodEnvironment, ILogger<AppSettings> logger)
     {
         ConnectionString = GetConnectionString(configuration, prodEnvironment, logger);
         SendGrid = GetSendGrid(configuration, prodEnvironment, logger);
+        AzureMailConnectionString = GetAzureMailConnectionString(configuration, prodEnvironment, logger);
     }
     public SendGridSettings SendGrid { get; }
     public string ConnectionString { get; }
+    public string AzureMailConnectionString { get; }
 }
