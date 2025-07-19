@@ -24,4 +24,6 @@
 /MemCheck.AzureFunctions/bin/
 /MemCheck.AzureFunctions/obj/
 /MemCheck.AzureFunctions/local.settings.json
+/MemCheck.AzureComponents/bin/
+/MemCheck.AzureComponents/obj/
 /node_modules/

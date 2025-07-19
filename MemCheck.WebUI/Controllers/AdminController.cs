@@ -6,6 +6,7 @@ using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
@@ -53,13 +54,13 @@ public class AdminController : MemCheckController
     #endregion
     #region Fields
     private readonly CallContext callContext;
-    private readonly IAzureEmailSender azureEmailSender;
+    private readonly IEmailSender azureEmailSender;
 #pragma warning disable IDE0052 // Remove unread private members
     private readonly LinkGenerator linkGenerator;
 #pragma warning restore IDE0052 // Remove unread private members
     private readonly MemCheckUserManager userManager;
     #endregion
-    public AdminController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AdminController> localizer, IAzureEmailSender azureEmailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
+    public AdminController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AdminController> localizer, IEmailSender azureEmailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
     {
         callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
         this.azureEmailSender = azureEmailSender;
@@ -124,7 +125,7 @@ public class AdminController : MemCheckController
     public async Task<IActionResult> LaunchNotifier()
     {
         var launchingUser = await userManager.GetExistingUserAsync(HttpContext.User);
-        azureEmailSender.SendEmail(launchingUser.GetEmail(), "Notifier started", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
+        await azureEmailSender.SendEmailAsync(launchingUser.GetEmail(), "Notifier started", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
         return ControllerResultWithToast.Success("Notifications hijacked", this);
 
 

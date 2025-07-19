@@ -1,8 +1,7 @@
-﻿using Azure.Communication.Email;
-using Azure;
-using MemCheck.Application.Languages;
+﻿using MemCheck.Application.Languages;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
+using MemCheck.AzureComponents;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -20,43 +19,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MemCheck.WebUI;
-
-public interface IAzureEmailSender
-{
-    void SendEmail(string recipient, string subject, string body);
-}
-
-public sealed class AzureEmailSender : IAzureEmailSender
-{
-    private readonly EmailClient emailClient;
-    public AzureEmailSender(string connectionString)
-    {
-        emailClient = new EmailClient(connectionString);
-    }
-    public void SendEmail(string recipient, string subject, string body)
-    {
-        var emailMessage = new EmailMessage(
-            senderAddress: "DoNotReply@mnesios.com",
-            content: new EmailContent(subject)
-            {
-                PlainText = body,
-                Html = body
-            },
-            recipients: new EmailRecipients(new List<EmailAddress> { new(recipient) }));
-
-
-        var emailSendOperation = emailClient.Send(WaitUntil.Completed, emailMessage);
-
-        if (!emailSendOperation.HasCompleted)
-        {
-            Console.WriteLine("Mail sending failed");
-        }
-    }
-}
 
 public sealed class Startup
 {
@@ -118,7 +83,7 @@ public sealed class Startup
         authorizationBuilder.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
 
         services.AddSingleton<IEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
-        services.AddSingleton<IAzureEmailSender>(s => new AzureEmailSender(appSettings.AzureMailConnectionString));
+        services.AddSingleton<IEmailSender>(s => new AzureEmailSender(appSettings.AzureMailConnectionString));
 
         services.AddRazorPages().AddRazorPagesOptions(config =>
             {

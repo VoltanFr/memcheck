@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.BasicsTests", "Mem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MemCheck.AzureFunctions", "MemCheck.AzureFunctions\MemCheck.AzureFunctions.csproj", "{ED07350C-4A26-4E86-B4A4-0A2E1BCBD674}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemCheck.AzureComponents", "MemCheck.AzureComponents\MemCheck.AzureComponents.csproj", "{8EC38081-7552-4029-A652-D4D4DD968501}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{ED07350C-4A26-4E86-B4A4-0A2E1BCBD674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED07350C-4A26-4E86-B4A4-0A2E1BCBD674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED07350C-4A26-4E86-B4A4-0A2E1BCBD674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC38081-7552-4029-A652-D4D4DD968501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC38081-7552-4029-A652-D4D4DD968501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC38081-7552-4029-A652-D4D4DD968501}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC38081-7552-4029-A652-D4D4DD968501}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

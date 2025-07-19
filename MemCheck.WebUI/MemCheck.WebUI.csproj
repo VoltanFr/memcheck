@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<VersionPrefix>0.187.4</VersionPrefix>
+		<VersionPrefix>0.187.5</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+		<ProjectReference Include="..\MemCheck.AzureComponents\MemCheck.AzureComponents.csproj" />
 		<ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
 	</ItemGroup>
 
