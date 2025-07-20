@@ -48,7 +48,7 @@ public partial class IndexModel : PageModel
         if (user == null)
             return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 
-        UserEmail = user.GetEmail();
+        UserEmail = user.GetEmail().Address;
         Username = user.GetUserName();
         UILanguage = user.UILanguage ?? "<Not stored>";
         MinimumCountOfDaysBetweenNotifs = user.MinimumCountOfDaysBetweenNotifs;

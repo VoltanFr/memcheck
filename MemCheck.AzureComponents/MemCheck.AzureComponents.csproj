@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.1.0</VersionPrefix>
+		<VersionPrefix>0.1.1</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,6 +22,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />
+		<ProjectReference Include="..\MemCheck.Domain\MemCheck.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

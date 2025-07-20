@@ -19,10 +19,10 @@ public class RegisterModel : PageModel
 {
     private readonly SignInManager<MemCheckUser> _signInManager;
     private readonly UserManager<MemCheckUser> _userManager;
-    private readonly IMemCheckEmailSender _emailSender;
+    private readonly IMemCheckMailSender _emailSender;
     private readonly IStringLocalizer<RegisterModel> localizer;
 
-    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IMemCheckEmailSender emailSender, IStringLocalizer<RegisterModel> localizer)
+    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IMemCheckMailSender emailSender, IStringLocalizer<RegisterModel> localizer)
     {
         _userManager = userManager;
         _signInManager = signInManager;

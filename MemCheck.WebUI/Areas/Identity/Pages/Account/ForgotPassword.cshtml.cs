@@ -18,11 +18,11 @@ public class ForgotPasswordModel : PageModel
 {
     #region Fields
     private readonly UserManager<MemCheckUser> userManager;
-    private readonly IMemCheckEmailSender emailSender;
+    private readonly IMemCheckMailSender emailSender;
     private readonly IStringLocalizer<ForgotPasswordModel> localizer;
     #endregion
 
-    public ForgotPasswordModel(UserManager<MemCheckUser> userManager, IMemCheckEmailSender emailSender, IStringLocalizer<ForgotPasswordModel> localizer)
+    public ForgotPasswordModel(UserManager<MemCheckUser> userManager, IMemCheckMailSender emailSender, IStringLocalizer<ForgotPasswordModel> localizer)
     {
         this.userManager = userManager;
         this.emailSender = emailSender;
@@ -53,7 +53,7 @@ public class ForgotPasswordModel : PageModel
 
             var body = $"<p>{localizer["Hello"]} {user.UserName}.</p><p>{localizer["MailPhrasePart1"]} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["MailLinkText"]}</a> {localizer["MailPhrasePart2"]}.</p>";
 
-            await emailSender.SendEmailAsync(user.GetEmail(), localizer["MailSubject"], body);
+            await emailSender.SendEmailAsync(user.GetEmail().Address, localizer["MailSubject"], body);
 
             return RedirectToPage("./ForgotPasswordConfirmation");
         }

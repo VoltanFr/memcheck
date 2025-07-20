@@ -11,9 +11,9 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account;
 [AllowAnonymous]
 public class RegisterConfirmationModel : PageModel
 {
-    public RegisterConfirmationModel(IMemCheckEmailSender emailSender)
+    public RegisterConfirmationModel(IMemCheckMailSender emailSender)
     {
-        EmailSenderAddress = emailSender.SenderAddress;
+        EmailSenderAddress = emailSender.SenderAddress.Address;
     }
     [BindProperty] public string EmailSenderAddress { get; } = null!;
     [BindProperty(SupportsGet = true)] public string UserAddress { get; set; } = null!;

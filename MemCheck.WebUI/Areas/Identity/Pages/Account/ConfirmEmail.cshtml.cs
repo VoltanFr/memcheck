@@ -17,7 +17,7 @@ public class ConfirmEmailModel : PageModel
 {
     private readonly UserManager<MemCheckUser> _userManager;
     private readonly IStringLocalizer<ConfirmEmailModel> localizer;
-    private readonly IMemCheckEmailSender emailSender;
+    private readonly IMemCheckMailSender emailSender;
 
     private async Task SendWelcomeMailAsync(MemCheckUser user)
     {
@@ -30,10 +30,10 @@ public class ConfirmEmailModel : PageModel
         var appLinkText = localizer["AppLinkText"];
         var thank = localizer["Thank"];
         var body = $"<p>{hello} {user.UserName}</p><p>{welcome}</p><p>{docLine} <a href='https://userdoc.mnesios.com/'>{docLinkText}</a>.</p><p>{appLine} <a href='{appUrl}'>{appLinkText}</a>.</p><p>{thank}.</p>";
-        await emailSender.SendEmailAsync(user.GetEmail(), localizer["WelcomeMailSubject"], body);
+        await emailSender.SendEmailAsync(user.GetEmail().Address, localizer["WelcomeMailSubject"], body);
     }
 
-    public ConfirmEmailModel(UserManager<MemCheckUser> userManager, IStringLocalizer<ConfirmEmailModel> localizer, IMemCheckEmailSender emailSender)
+    public ConfirmEmailModel(UserManager<MemCheckUser> userManager, IStringLocalizer<ConfirmEmailModel> localizer, IMemCheckMailSender emailSender)
     {
         _userManager = userManager;
         this.localizer = localizer;

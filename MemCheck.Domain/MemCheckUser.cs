@@ -20,17 +20,3 @@ public sealed class MemCheckUser : IdentityUser<Guid>
     public IEnumerable<UserWithViewOnCard> UsersWithView { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
     public IEnumerable<UserWithViewOnCardPreviousVersion> UsersWithViewOnPreviousVersion { get; set; } = null!; //Empty list means public ; If not empty, version creator has to be in the list (only version creator in list means private)
 }
-
-public static class MemCheckUserExtenstions
-{
-    public static string GetUserName(this MemCheckUser user)
-    {
-        var result = user.UserName;
-        return result ?? throw new InvalidProgramException("null user name");
-    }
-    public static string GetEmail(this MemCheckUser user)
-    {
-        var result = user.Email;
-        return result ?? throw new InvalidProgramException("null user email");
-    }
-}

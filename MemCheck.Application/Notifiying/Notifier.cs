@@ -43,7 +43,7 @@ internal sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifi
 
         return new UserNotifications(
             user.GetUserName(),
-            user.GetEmail(),
+            user.GetEmail().Address,
             subscribedCardCount,
             versionsNotifierResult.Cards,
             cardDeletions,

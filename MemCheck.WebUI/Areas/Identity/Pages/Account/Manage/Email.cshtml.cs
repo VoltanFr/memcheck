@@ -16,12 +16,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage;
 public partial class EmailModel : PageModel
 {
     private readonly UserManager<MemCheckUser> _userManager;
-    private readonly IMemCheckEmailSender _emailSender;
+    private readonly IMemCheckMailSender _emailSender;
     private readonly IStringLocalizer<EmailModel> localizer;
 
     public EmailModel(
         UserManager<MemCheckUser> userManager,
-        IMemCheckEmailSender emailSender,
+        IMemCheckMailSender emailSender,
         IStringLocalizer<EmailModel> localizer)
     {
         _userManager = userManager;
@@ -131,7 +131,7 @@ public partial class EmailModel : PageModel
         mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
         mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["ThankYou"].Value}</p>");
 
-        await _emailSender.SendEmailAsync(email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
+        await _emailSender.SendEmailAsync(email.Address, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
         StatusMessage = "Verification email sent. Please check your email.";
         return RedirectToPage();

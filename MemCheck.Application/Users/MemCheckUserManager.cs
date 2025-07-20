@@ -39,7 +39,7 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     {
         user.RegistrationUtcDate = DateTime.UtcNow;
         var result = await base.CreateAsync(user);
-        callContext.TelemetryClient.TrackEvent("UserAccountCreated", ("UserName", user.GetUserName()), ("Email", user.GetEmail()), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
+        callContext.TelemetryClient.TrackEvent("UserAccountCreated", ("UserName", user.GetUserName()), ("Email", user.GetEmail().Address), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
         if (result.Succeeded)
             await new CreateDeck(callContext).RunAsync(new CreateDeck.Request(user.Id, DefaultDeckName, HeapingAlgorithms.DefaultAlgoId));
         return result;
@@ -47,7 +47,7 @@ public sealed class MemCheckUserManager : UserManager<MemCheckUser>
     public override async Task<IdentityResult> ConfirmEmailAsync(MemCheckUser user, string token)
     {
         var result = await base.ConfirmEmailAsync(user, token);
-        callContext.TelemetryClient.TrackEvent("UserAccountConfirmed", ("UserName", user.GetUserName()), ("Email", user.GetEmail()), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
+        callContext.TelemetryClient.TrackEvent("UserAccountConfirmed", ("UserName", user.GetUserName()), ("Email", user.GetEmail().Address), ("Success", result.Succeeded.ToString()), ("ErrorList", string.Concat(result.Errors.Select(error => error.Code + ": " + error.Description))));
         return result;
     }
     public static void SetupIdentityOptions(IdentityOptions options)

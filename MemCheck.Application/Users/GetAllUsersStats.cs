@@ -28,7 +28,7 @@ public sealed class GetAllUsersStats : RequestRunner<GetAllUsersStats.Request, G
         {
             var roles = await RoleChecker.GetRolesAsync(user);
             var decks = DbContext.Decks.AsNoTracking().Where(deck => deck.Owner.Id == user.Id).Select(deck => new ResultDeckModel(deck.Description, deck.CardInDecks.Count));
-            resultUsers.Add(new ResultUserModel(user.GetUserName(), user.Id, string.Join(',', roles), user.GetEmail(), user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate, decks));
+            resultUsers.Add(new ResultUserModel(user.GetUserName(), user.Id, string.Join(',', roles), user.GetEmail().Address, user.MinimumCountOfDaysBetweenNotifs, user.LastNotificationUtcDate, user.LastSeenUtcDate, user.RegistrationUtcDate, decks));
         }
         var result = new ResultModel(totalCount, pageCount, resultUsers);
         return new ResultWithMetrologyProperties<ResultModel>(result,

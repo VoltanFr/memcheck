@@ -29,10 +29,10 @@ public sealed class IndexModel : PageModel
     [BindProperty] public string ProcessWorkingSet { get; set; } = null!;
     [BindProperty] public string EnvironmentVersion { get; set; } = null!;
     [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
-    public IndexModel(IWebHostEnvironment currentEnvironment, IMemCheckEmailSender emailSender)
+    public IndexModel(IWebHostEnvironment currentEnvironment, IMemCheckMailSender emailSender)
     {
         this.currentEnvironment = currentEnvironment;
-        EmailSenderAddress = emailSender.SenderAddress;
+        EmailSenderAddress = emailSender.SenderAddress.Address;
     }
     public void OnGet()
     {

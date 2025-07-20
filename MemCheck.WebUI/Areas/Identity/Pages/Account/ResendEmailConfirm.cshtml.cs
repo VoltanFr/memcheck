@@ -20,10 +20,10 @@ public class ResendEmailConfirmModel : PageModel
 {
     #region Fields
     private readonly UserManager<MemCheckUser> userManager;
-    private readonly IMemCheckEmailSender emailSender;
+    private readonly IMemCheckMailSender emailSender;
     private readonly IStringLocalizer<ResendEmailConfirmModel> localizer;
     #endregion
-    public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IMemCheckEmailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer)
+    public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IMemCheckMailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer)
     {
         this.userManager = userManager;
         this.emailSender = emailSender;
