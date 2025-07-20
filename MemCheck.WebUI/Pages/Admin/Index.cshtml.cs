@@ -1,8 +1,8 @@
 ﻿using MemCheck.Application.QueryValidation;
+using MemCheck.AzureComponents;
 using MemCheck.Basics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
@@ -22,17 +22,17 @@ public sealed class IndexModel : PageModel
     [BindProperty] public string ApplicationName { get; set; } = null!;
     [BindProperty] public string EntryAssembly { get; set; } = null!;
     [BindProperty] public string EnvironmentName { get; set; } = null!;
-    [BindProperty] public string SendGridEmailSender { get; set; } = null!;
+    [BindProperty] public string EmailSenderAddress { get; set; } = null!;
     [BindProperty] public bool Is64BitProcess { get; set; } = false;
     [BindProperty] public string OSVersion { get; set; } = null!;
     [BindProperty] public int ProcessorCount { get; set; } = 0;
     [BindProperty] public string ProcessWorkingSet { get; set; } = null!;
     [BindProperty] public string EnvironmentVersion { get; set; } = null!;
     [BindProperty] public IEnumerable<string> MemCheckAssemblies { get; set; } = null!;
-    public IndexModel(IWebHostEnvironment currentEnvironment, IEmailSender emailSender)
+    public IndexModel(IWebHostEnvironment currentEnvironment, IMemCheckEmailSender emailSender)
     {
         this.currentEnvironment = currentEnvironment;
-        SendGridEmailSender = WebUI.SendGridEmailSender.SenderFromInterface(emailSender);
+        EmailSenderAddress = emailSender.SenderAddress;
     }
     public void OnGet()
     {

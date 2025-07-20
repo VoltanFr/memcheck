@@ -1,7 +1,7 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.AzureComponents;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -19,10 +19,10 @@ public class RegisterModel : PageModel
 {
     private readonly SignInManager<MemCheckUser> _signInManager;
     private readonly UserManager<MemCheckUser> _userManager;
-    private readonly IEmailSender _emailSender;
+    private readonly IMemCheckEmailSender _emailSender;
     private readonly IStringLocalizer<RegisterModel> localizer;
 
-    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IEmailSender emailSender, IStringLocalizer<RegisterModel> localizer)
+    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IMemCheckEmailSender emailSender, IStringLocalizer<RegisterModel> localizer)
     {
         _userManager = userManager;
         _signInManager = signInManager;

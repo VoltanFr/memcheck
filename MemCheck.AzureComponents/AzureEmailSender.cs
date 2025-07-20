@@ -3,11 +3,17 @@ using Azure;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace MemCheck.AzureComponents;
 
-public sealed class AzureEmailSender : IEmailSender
+//The redundancy of the name is because there is an interface IEMailSender in Microsoft.AspNetCore.Identity.UI.Services
+public interface IMemCheckEmailSender
+{
+    Task SendEmailAsync(string email, string subject, string htmlMessage);
+    string SenderAddress { get; }
+}
+
+public sealed class AzureEmailSender : IMemCheckEmailSender
 {
     private readonly EmailClient emailClient;
     public AzureEmailSender(string connectionString)
@@ -17,7 +23,7 @@ public sealed class AzureEmailSender : IEmailSender
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
         var emailMessage = new EmailMessage(
-            senderAddress: "DoNotReply@mnesios.com",
+            senderAddress: SenderAddress,
             content: new EmailContent(subject)
             {
                 PlainText = htmlMessage,
@@ -33,4 +39,5 @@ public sealed class AzureEmailSender : IEmailSender
             Console.WriteLine("Mail sending failed");
         }
     }
+    public string SenderAddress => "DoNotReply@mnesios.com";
 }

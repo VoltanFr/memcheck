@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
@@ -82,8 +81,7 @@ public sealed class Startup
         var authorizationBuilder = services.AddAuthorizationBuilder();
         authorizationBuilder.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
 
-        services.AddSingleton<IEmailSender>(s => new SendGridEmailSender(appSettings.SendGrid));
-        services.AddSingleton<IEmailSender>(s => new AzureEmailSender(appSettings.AzureMailConnectionString));
+        services.AddSingleton<IMemCheckEmailSender>(s => new AzureEmailSender(appSettings.AzureMailConnectionString));
 
         services.AddRazorPages().AddRazorPagesOptions(config =>
             {

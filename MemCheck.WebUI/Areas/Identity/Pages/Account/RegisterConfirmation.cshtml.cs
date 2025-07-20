@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using MemCheck.AzureComponents;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -11,11 +11,11 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account;
 [AllowAnonymous]
 public class RegisterConfirmationModel : PageModel
 {
-    public RegisterConfirmationModel(IEmailSender emailSender)
+    public RegisterConfirmationModel(IMemCheckEmailSender emailSender)
     {
-        SendGridEmailSender = WebUI.SendGridEmailSender.SenderFromInterface(emailSender);
+        EmailSenderAddress = emailSender.SenderAddress;
     }
-    [BindProperty] public string SendGridEmailSender { get; set; } = null!;
+    [BindProperty] public string EmailSenderAddress { get; } = null!;
     [BindProperty(SupportsGet = true)] public string UserAddress { get; set; } = null!;
     public async Task<IActionResult> OnGetAsync(string userAddress)
     {

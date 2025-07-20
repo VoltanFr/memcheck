@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<VersionPrefix>0.187.5</VersionPrefix>
+		<VersionPrefix>0.188.0</VersionPrefix>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Label="Package references">
 		<PackageReference Include="Azure.Communication.Email" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
@@ -16,10 +16,10 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 		<PackageReference Include="Microsoft.Web.WebJobs.Publish" />
-		<PackageReference Include="SendGrid" />
+		<PackageReference Include="Newtonsoft.Json" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Label="Project references">
 		<ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
 		<ProjectReference Include="..\MemCheck.AzureComponents\MemCheck.AzureComponents.csproj" />
 		<ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
@@ -30,7 +30,7 @@
 		<Folder Include="wwwroot\lib\" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Label="Embedded resources">
 		<EmbeddedResource Update="Resources\LocalizedIdentityErrorDescriber.fr.resx">
 			<SubType>Designer</SubType>
 		</EmbeddedResource>

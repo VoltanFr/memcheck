@@ -1,7 +1,7 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.AzureComponents;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -18,11 +18,11 @@ public class ForgotPasswordModel : PageModel
 {
     #region Fields
     private readonly UserManager<MemCheckUser> userManager;
-    private readonly IEmailSender emailSender;
+    private readonly IMemCheckEmailSender emailSender;
     private readonly IStringLocalizer<ForgotPasswordModel> localizer;
     #endregion
 
-    public ForgotPasswordModel(UserManager<MemCheckUser> userManager, IEmailSender emailSender, IStringLocalizer<ForgotPasswordModel> localizer)
+    public ForgotPasswordModel(UserManager<MemCheckUser> userManager, IMemCheckEmailSender emailSender, IStringLocalizer<ForgotPasswordModel> localizer)
     {
         this.userManager = userManager;
         this.emailSender = emailSender;

@@ -1,12 +1,12 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
+using MemCheck.AzureComponents;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Localization;
@@ -21,20 +21,6 @@ namespace MemCheck.WebUI.Controllers;
 public class AdminController : MemCheckController
 {
     #region Private classes MemCheckMailSender & MemCheckLinkGenerator
-    //private sealed class MemCheckMailSender : IMemCheckMailSender
-    //{
-    //    #region Fields
-    //    private readonly IEmailSender emailSender;
-    //    #endregion
-    //    public MemCheckMailSender(IEmailSender emailSender)
-    //    {
-    //        this.emailSender = emailSender;
-    //    }
-    //    public async Task SendAsync(string to, string subject, string body)
-    //    {
-    //        await emailSender.SendEmailAsync(to, subject, body);
-    //    }
-    //}
     //private sealed class MemCheckLinkGenerator : IMemCheckLinkGenerator
     //{
     //    #region Fields
@@ -54,13 +40,13 @@ public class AdminController : MemCheckController
     #endregion
     #region Fields
     private readonly CallContext callContext;
-    private readonly IEmailSender azureEmailSender;
+    private readonly IMemCheckEmailSender azureEmailSender;
 #pragma warning disable IDE0052 // Remove unread private members
     private readonly LinkGenerator linkGenerator;
 #pragma warning restore IDE0052 // Remove unread private members
     private readonly MemCheckUserManager userManager;
     #endregion
-    public AdminController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AdminController> localizer, IEmailSender azureEmailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
+    public AdminController(MemCheckDbContext dbContext, MemCheckUserManager userManager, IStringLocalizer<AdminController> localizer, IMemCheckEmailSender azureEmailSender, LinkGenerator linkGenerator, TelemetryClient telemetryClient) : base(localizer)
     {
         callContext = new CallContext(dbContext, new MemCheckTelemetryClient(telemetryClient), this, new ProdRoleChecker(userManager));
         this.azureEmailSender = azureEmailSender;
@@ -125,7 +111,7 @@ public class AdminController : MemCheckController
     public async Task<IActionResult> LaunchNotifier()
     {
         var launchingUser = await userManager.GetExistingUserAsync(HttpContext.User);
-        await azureEmailSender.SendEmailAsync(launchingUser.GetEmail(), "Notifier started", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
+        await azureEmailSender.SendEmailAsync(launchingUser.GetEmail(), $"Notifier started on {DateTime.Now:u}", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
         return ControllerResultWithToast.Success("Notifications hijacked", this);
 
 

@@ -1,6 +1,6 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.AzureComponents;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -16,12 +16,12 @@ namespace MemCheck.WebUI.Areas.Identity.Pages.Account.Manage;
 public partial class EmailModel : PageModel
 {
     private readonly UserManager<MemCheckUser> _userManager;
-    private readonly IEmailSender _emailSender;
+    private readonly IMemCheckEmailSender _emailSender;
     private readonly IStringLocalizer<EmailModel> localizer;
 
     public EmailModel(
         UserManager<MemCheckUser> userManager,
-        IEmailSender emailSender,
+        IMemCheckEmailSender emailSender,
         IStringLocalizer<EmailModel> localizer)
     {
         _userManager = userManager;

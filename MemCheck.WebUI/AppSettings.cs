@@ -19,7 +19,6 @@ public sealed class AppSettings
 {
     #region Fields
     private static readonly Action<ILogger, string, Exception?> dbInfoLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(1, "DbInfo"), "Using {DbInfo}");
-    private static readonly Action<ILogger, string, Exception?> sendGridLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(2, "SendGrid"), "Using SendGrid {Info}");
     private static readonly Action<ILogger, string, Exception?> azureMailConnectionLogMessage = LoggerMessage.Define<string>(LogLevel.Warning, new EventId(2, "AzureMailConnection"), "Using AzureMailConnection {Info}");
     #endregion
     #region Private methods
@@ -38,23 +37,6 @@ public sealed class AppSettings
         }
         dbInfoLogMessage(logger, $"DB '{debuggingDb}'", null);
         return configuration.RequiredValue($"ConnectionStrings:{debuggingDb}");
-    }
-    private static SendGridSettings GetSendGrid(IConfiguration configuration, bool prodEnvironment, ILogger logger)
-    {
-        if (prodEnvironment)
-        {
-            sendGridLogMessage(logger, "prod settings from app settings", null);
-            return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
-        }
-        var debuggingDb = configuration.RequiredValue("ConnectionStrings:DebuggingDb");
-        if (debuggingDb is "LocalReplicatedFromProd" or "Azure")
-        {
-            var secrets = JsonSerializer.Deserialize<SendGridSettings>(File.ReadAllText(@"C:\BackedUp\DocsBV\Synchronized\SkyDrive\Programmation\MemCheck-private-info\SendGridSecrets.json"));
-            sendGridLogMessage(logger, "prod settings from private file", null);
-            return new SendGridSettings(secrets!.SendGridUser, secrets.SendGridKey, secrets.SendGridSender);
-        }
-        sendGridLogMessage(logger, "debug settings", null);
-        return new SendGridSettings(configuration.RequiredValue("SendGrid:User"), configuration.RequiredValue("SendGrid:Key"), configuration.RequiredValue("SendGrid:Sender"));
     }
     private static string GetAzureMailConnectionString(IConfiguration configuration, bool prodEnvironment, ILogger logger)
     {
@@ -79,10 +61,8 @@ public sealed class AppSettings
     public AppSettings(IConfiguration configuration, bool prodEnvironment, ILogger<AppSettings> logger)
     {
         ConnectionString = GetConnectionString(configuration, prodEnvironment, logger);
-        SendGrid = GetSendGrid(configuration, prodEnvironment, logger);
         AzureMailConnectionString = GetAzureMailConnectionString(configuration, prodEnvironment, logger);
     }
-    public SendGridSettings SendGrid { get; }
     public string ConnectionString { get; }
     public string AzureMailConnectionString { get; }
 }

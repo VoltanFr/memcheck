@@ -1,7 +1,7 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.AzureComponents;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -17,7 +17,7 @@ public class ConfirmEmailModel : PageModel
 {
     private readonly UserManager<MemCheckUser> _userManager;
     private readonly IStringLocalizer<ConfirmEmailModel> localizer;
-    private readonly IEmailSender emailSender;
+    private readonly IMemCheckEmailSender emailSender;
 
     private async Task SendWelcomeMailAsync(MemCheckUser user)
     {
@@ -33,7 +33,7 @@ public class ConfirmEmailModel : PageModel
         await emailSender.SendEmailAsync(user.GetEmail(), localizer["WelcomeMailSubject"], body);
     }
 
-    public ConfirmEmailModel(UserManager<MemCheckUser> userManager, IStringLocalizer<ConfirmEmailModel> localizer, IEmailSender emailSender)
+    public ConfirmEmailModel(UserManager<MemCheckUser> userManager, IStringLocalizer<ConfirmEmailModel> localizer, IMemCheckEmailSender emailSender)
     {
         _userManager = userManager;
         this.localizer = localizer;

@@ -1,7 +1,7 @@
-﻿using MemCheck.Domain;
+﻿using MemCheck.AzureComponents;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -20,10 +20,10 @@ public class ResendEmailConfirmModel : PageModel
 {
     #region Fields
     private readonly UserManager<MemCheckUser> userManager;
-    private readonly IEmailSender emailSender;
+    private readonly IMemCheckEmailSender emailSender;
     private readonly IStringLocalizer<ResendEmailConfirmModel> localizer;
     #endregion
-    public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IEmailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer)
+    public ResendEmailConfirmModel(UserManager<MemCheckUser> userManager, IMemCheckEmailSender emailSender, IStringLocalizer<ResendEmailConfirmModel> localizer)
     {
         this.userManager = userManager;
         this.emailSender = emailSender;
