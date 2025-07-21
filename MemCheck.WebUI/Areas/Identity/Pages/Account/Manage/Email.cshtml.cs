@@ -98,7 +98,7 @@ public partial class EmailModel : PageModel
             mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
             mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["ThankYou"].Value}</p>");
 
-            await _emailSender.SendEmailAsync(Input.NewEmail, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
+            await _emailSender.SendEmailAsync(new MemCheckEmailAddress(Input.NewEmail, user.GetUserName()), localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
             StatusMessage = "Confirmation link to change email sent. Please check your email.";
             return RedirectToPage();
@@ -131,7 +131,7 @@ public partial class EmailModel : PageModel
         mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["PleaseConfirmYourMemcheckAccountBy"].Value} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["ClickingHere"].Value}</a>.</p>");
         mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["ThankYou"].Value}</p>");
 
-        await _emailSender.SendEmailAsync(email.Address, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
+        await _emailSender.SendEmailAsync(email, localizer["ConfirmYourEmail"].Value, mailBody.ToString());
 
         StatusMessage = "Verification email sent. Please check your email.";
         return RedirectToPage();

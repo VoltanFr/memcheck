@@ -80,7 +80,7 @@ public class RegisterModel : PageModel
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["AfterHyperLink"].Value}</p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Final"].Value}</p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["CheckTheDoc"].Value} <a href='https://userdoc.mnesios.com/'>https://userdoc.mnesios.com/</a>.</p>");
-                await _emailSender.SendEmailAsync(Input.Email, localizer["MailSubject"].Value, mailBody.ToString());
+                await _emailSender.SendEmailAsync(new MemCheckEmailAddress(Input.Email, user.GetUserName()), localizer["MailSubject"].Value, mailBody.ToString());
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     return RedirectToPage("RegisterConfirmation", new { UserAddress = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(Input.Email)) });
