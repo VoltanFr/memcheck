@@ -43,7 +43,7 @@ internal sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifi
 
         return new UserNotifications(
             user.GetUserName(),
-            user.GetEmail().Address,
+            user.GetEmail(),
             subscribedCardCount,
             versionsNotifierResult.Cards,
             cardDeletions,
@@ -108,7 +108,7 @@ internal sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifi
     }
     internal record UserNotifications
     {
-        public UserNotifications(string userName, string userEmail, int subscribedCardCount, ImmutableArray<IUserCardVersionsNotifier.ResultCard> cards, IEnumerable<CardDeletion> deletedCards, IEnumerable<UserSearchNotifierResult> searchNotificactions)
+        public UserNotifications(string userName, MemCheckEmailAddress userEmail, int subscribedCardCount, ImmutableArray<IUserCardVersionsNotifier.ResultCard> cards, IEnumerable<CardDeletion> deletedCards, IEnumerable<UserSearchNotifierResult> searchNotificactions)
         {
             UserName = userName;
             UserEmail = userEmail;
@@ -118,7 +118,7 @@ internal sealed class Notifier : RequestRunner<Notifier.Request, Notifier.Notifi
             SearchNotificactions = searchNotificactions.ToImmutableArray();
         }
         public string UserName { get; }
-        public string UserEmail { get; }
+        public MemCheckEmailAddress UserEmail { get; }
         public int SubscribedCardCount { get; }
         public ImmutableArray<IUserCardVersionsNotifier.ResultCard> Cards { get; }
         public ImmutableArray<CardDeletion> DeletedCards { get; }

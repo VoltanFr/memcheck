@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Basics;
+using MemCheck.Domain;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using SendGrid;
@@ -15,7 +16,7 @@ using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
-public sealed class MailSender
+public sealed class AzureFunctionsMailSender
 {
     #region Fields
     private readonly ILogger logger;
@@ -39,12 +40,12 @@ public sealed class MailSender
         }
     }
     #endregion
-    public MailSender(DateTime functionStartTime, ILogger logger)
+    public AzureFunctionsMailSender(DateTime functionStartTime, ILogger logger)
     {
         this.logger = logger;
         var sendGridSender = Environment.GetEnvironmentVariable("SendGridSender");
         var sendGridUser = Environment.GetEnvironmentVariable("SendGridUser");
-        SenderEmail = new EmailAddress(sendGridSender, sendGridUser);
+        SenderEmail = new MemCheckEmailAddress(sendGridSender ?? "", sendGridUser ?? "");
         sendGridKey = Environment.GetEnvironmentVariable("SendGridKey") ?? "NoSendGridKey";
         this.functionStartTime = functionStartTime;
     }
@@ -56,19 +57,19 @@ public sealed class MailSender
 
         AddExceptionDetailsToMailBody(body, e);
 
-        await SendAsync("Mnesios Azure function failure", body.ToString(), SenderEmail.AsArray());
+        await SendAsync("Mnesios Azure function failure", body.ToString(), new EmailAddress(SenderEmail.Address, SenderEmail.DisplayName).AsArray());
     }
     public async Task SendAsync(string subject, string body, IEnumerable<EmailAddress> to)
     {
         var msg = new SendGridMessage()
         {
-            From = SenderEmail,
+            From = new EmailAddress(SenderEmail.Address, SenderEmail.DisplayName),
             Subject = subject,
             HtmlContent = body
         };
 
         to.ToList().ForEach(address => msg.AddTo(address.Email, address.Name));
-        msg.AddTo(SenderEmail);
+        msg.AddTo(new EmailAddress(SenderEmail.Address, SenderEmail.DisplayName));
         msg.SetClickTracking(false, false);
 
         var sendGridClient = new SendGridClient(sendGridKey);
@@ -77,10 +78,10 @@ public sealed class MailSender
         logger.LogInformation("Mail sent, status code {StatusCode}", response.StatusCode);
         logger.LogInformation("Response body: {ResponseBody}", await response.Body.ReadAsStringAsync());
     }
-    public EmailAddress SenderEmail { get; }
+    public MemCheckEmailAddress SenderEmail { get; }
     public static string GetAssemblyVersion()
     {
-        return typeof(MailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+        return typeof(AzureFunctionsMailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     }
     public string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
     {

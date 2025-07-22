@@ -56,7 +56,7 @@ public abstract class AbstractMemCheckAzureFunction
             BotUserId = GetUserIdFromEnv("BotAccountUserId");
             roleChecker = new ProdRoleChecker(userManager);
             StartTime = DateTime.UtcNow;
-            MailSender = new MailSender(StartTime, logger);
+            MailSender = new AzureFunctionsMailSender(StartTime, logger);
             admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
         }
         catch (Exception e)
@@ -124,7 +124,7 @@ public abstract class AbstractMemCheckAzureFunction
     }
     protected abstract Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject);
     protected DateTime StartTime { get; }
-    protected MailSender MailSender { get; }
+    protected AzureFunctionsMailSender MailSender { get; }
     protected Guid AdminUserId { get; }
     protected Guid BotUserId { get; }
     protected async Task<ImmutableList<EmailAddress>> AdminsAsync() => await admins.Value;

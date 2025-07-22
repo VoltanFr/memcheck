@@ -7,13 +7,6 @@ using MemCheck.Domain;
 
 namespace MemCheck.AzureComponents;
 
-//The redundancy of the name is because there is an interface IEMailSender in Microsoft.AspNetCore.Identity.UI.Services
-public interface IMemCheckMailSender
-{
-    Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage);
-    MemCheckEmailAddress SenderAddress { get; }
-}
-
 public sealed class AzureMailSender : IMemCheckMailSender
 {
     #region Fields

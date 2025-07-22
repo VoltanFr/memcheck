@@ -1,6 +1,6 @@
 ﻿using MemCheck.Application.QueryValidation;
-using MemCheck.AzureComponents;
 using MemCheck.Basics;
+using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

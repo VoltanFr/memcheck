@@ -3,6 +3,7 @@ using MemCheck.Application.Notifiying;
 using MemCheck.Application.Users;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
@@ -16,15 +17,18 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     private sealed class MemCheckMailSender : IMemCheckMailSender
     {
         #region Fields
-        private readonly MailSender mailSender;
+        private readonly AzureFunctionsMailSender mailSender;
         #endregion
-        public MemCheckMailSender(MailSender mailSender)
+        public MemCheckMailSender(AzureFunctionsMailSender mailSender)
         {
             this.mailSender = mailSender;
         }
-        public async Task SendAsync(string to, string subject, string body)
+
+        public MemCheckEmailAddress SenderAddress => mailSender.SenderEmail;
+
+        public async Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
         {
-            await mailSender.SendAsync(subject, body, new EmailAddress(to).AsArray()).ConfigureAwait(false);
+            await mailSender.SendAsync(subject, htmlMessage, new EmailAddress(recipient.Address, recipient.DisplayName).AsArray()).ConfigureAwait(false);
         }
     }
     private sealed class MemCheckLinkGenerator : IMemCheckLinkGenerator

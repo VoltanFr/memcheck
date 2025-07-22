@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Basics;
+using MemCheck.Domain;
 
 namespace MemCheck.Application.Notifiying;
 
@@ -13,10 +14,7 @@ public interface IMemCheckLinkGenerator
 {
     string GetAbsoluteAddress(string relativeAddress);  //For example GetAbsoluteUri("/Learn/Index") returns "https://memcheckfr.azurewebsites.net/Learn/Index"
 }
-public interface IMemCheckMailSender
-{
-    Task SendAsync(string toAddress, string subject, string body);
-}
+
 public sealed class NotificationMailer
 {
     #region Fields
@@ -288,7 +286,7 @@ public sealed class NotificationMailer
             if (MustSendForNotifications(userNotifications))
             {
                 var mailBody = GetMailBodyForUser(userNotifications);
-                mailSendingsToWaitFor.Add(emailSender.SendAsync(userNotifications.UserEmail, "Mnesios notifications", mailBody));
+                mailSendingsToWaitFor.Add(emailSender.SendEmailAsync(userNotifications.UserEmail, "Mnesios notifications", mailBody));
                 sentEmailCount++;
             }
 

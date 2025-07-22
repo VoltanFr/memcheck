@@ -1,4 +1,4 @@
-﻿using MemCheck.AzureComponents;
+﻿using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
