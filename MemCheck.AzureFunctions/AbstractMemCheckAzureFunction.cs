@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using MemCheck.Application;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
+using MemCheck.Basics;
 using MemCheck.Database;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
@@ -56,7 +60,7 @@ public abstract class AbstractMemCheckAzureFunction
             BotUserId = GetUserIdFromEnv("BotAccountUserId");
             roleChecker = new ProdRoleChecker(userManager);
             StartTime = DateTime.UtcNow;
-            MailSender = new AzureFunctionsMailSender(StartTime, logger);
+            MailSender = new AzureFunctionsMailSender(logger);
             admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
         }
         catch (Exception e)
@@ -89,6 +93,57 @@ public abstract class AbstractMemCheckAzureFunction
     {
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
+    private string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
+    {
+        var listItems = new List<string> {
+            $"<li>Sent by Azure func {azureFunctionName} ({AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly)})</li>",
+            $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, started on: {DateServices.AsIsoWithHHmm(Process.GetCurrentProcess().StartTime)}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
+            $"<li>Started on {DateServices.AsIsoWithHHmmss(azureFunctionStartTime)}, mail constructed at {DateServices.AsIsoWithHHmmss(DateTime.UtcNow)} (Elapsed: {(DateTime.UtcNow - azureFunctionStartTime).ToStringWithoutMs()})</li>",
+            $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
+        };
+        if (timer.ScheduleStatus != null)
+            listItems.AddRange(new[]
+                {
+                    $"<li>Function last schedule: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.Last)}</li>",
+                    $"<li>Function last schedule updated: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.LastUpdated)}</li>",
+                    $"<li>Function next schedule: {DateServices.AsIsoWithHHmmss(timer.ScheduleStatus.Next)}</li>",
+                });
+
+        var writer = new StringBuilder()
+            .Append("<h2>Info</h2>")
+            .Append(CultureInfo.InvariantCulture, $"<ul>{string.Join("", listItems)}</ul>");
+
+        return writer.ToString();
+    }
+    private static string GetAssemblyVersion()
+    {
+        return typeof(AzureFunctionsMailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+    }
+    private static void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
+    {
+        body = body
+            .Append(CultureInfo.InvariantCulture, $"<p>Caught {e.GetType().Name}</p>")
+            .Append(CultureInfo.InvariantCulture, $"<p>Message: {e.Message}</p>");
+
+        if (e.StackTrace != null)
+            body = body.Append(CultureInfo.InvariantCulture, $"<p>Call stack: {e.StackTrace.Replace("\n", "<br/>", StringComparison.Ordinal)}</p>");
+
+        if (e.InnerException != null)
+        {
+            body = body.Append(CultureInfo.InvariantCulture, $"<p>-------- Inner ---------</p>");
+            AddExceptionDetailsToMailBody(body, e.InnerException);
+        }
+    }
+    public async Task SendFailureInfoMailAsync(string functionName, Exception e)
+    {
+        var body = new StringBuilder()
+            .Append(CultureInfo.InvariantCulture, $"<h1>Mnesios function '{functionName}' failure</h1>")
+            .Append(CultureInfo.InvariantCulture, $"<p>Sent by Azure func '{functionName}' {GetAssemblyVersion()} running on {Environment.MachineName}, started on {StartTime}, mail constructed at {DateTime.UtcNow}</p>");
+
+        AddExceptionDetailsToMailBody(body, e);
+
+        await MailSender.SendAsync("Mnesios Azure function failure", body.ToString(), new EmailAddress(MailSender.SenderEmail.Address, MailSender.SenderEmail.DisplayName).AsArray());
+    }
     protected async Task RunAsync(TimerInfo timer, FunctionContext context)
     {
         try
@@ -107,7 +162,7 @@ public abstract class AbstractMemCheckAzureFunction
                 .Append("</style>")
                 .Append(CultureInfo.InvariantCulture, $"<h1>{context.FunctionDefinition.Name}</h1>")
                 .Append(runResult.MailBodyMainPart)
-                .Append(MailSender.GetMailFooter(context.FunctionDefinition.Name, timer, StartTime, await AdminsAsync()));
+                .Append(GetMailFooter(context.FunctionDefinition.Name, timer, StartTime, await AdminsAsync()));
 
             var bodyText = reportMailBody.ToString();
 
@@ -115,7 +170,7 @@ public abstract class AbstractMemCheckAzureFunction
         }
         catch (Exception ex)
         {
-            await MailSender.SendFailureInfoMailAsync(context.FunctionDefinition.Name, ex);
+            await SendFailureInfoMailAsync(context.FunctionDefinition.Name, ex);
         }
         finally
         {
