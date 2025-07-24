@@ -1,36 +1,33 @@
 ﻿using System.Threading.Tasks;
 using MemCheck.Application.Notifiying;
 using MemCheck.Application.Users;
-using MemCheck.Basics;
 using MemCheck.Database;
-using MemCheck.Domain;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
 public sealed class SendNotifications : AbstractMemCheckAzureFunction
 {
     #region Private classes MemCheckMailSender & MemCheckLinkGenerator
-    private sealed class MemCheckMailSender : IMemCheckMailSender
-    {
-        #region Fields
-        private readonly AzureFunctionsMailSender mailSender;
-        #endregion
-        public MemCheckMailSender(AzureFunctionsMailSender mailSender)
-        {
-            this.mailSender = mailSender;
-        }
+    //private sealed class MemCheckMailSender : IMemCheckMailSender
+    //{
+    //    #region Fields
+    //    private readonly AzureFunctionsMailSender mailSender;
+    //    #endregion
+    //    public MemCheckMailSender(AzureFunctionsMailSender mailSender)
+    //    {
+    //        this.mailSender = mailSender;
+    //    }
 
-        public MemCheckEmailAddress SenderAddress => mailSender.SenderEmail;
+    //    public MemCheckEmailAddress SenderAddress => mailSender.SenderEmail;
 
-        public async Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
-        {
-            await mailSender.SendAsync(subject, htmlMessage, new EmailAddress(recipient.Address, recipient.DisplayName).AsArray()).ConfigureAwait(false);
-        }
-    }
+    //    public async Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
+    //    {
+    //        await mailSender.SendAsync(subject, htmlMessage, new EmailAddress(recipient.Address, recipient.DisplayName).AsArray()).ConfigureAwait(false);
+    //    }
+    //}
     private sealed class MemCheckLinkGenerator : IMemCheckLinkGenerator
     {
         public string GetAbsoluteAddress(string relativeUri)
@@ -50,7 +47,7 @@ public sealed class SendNotifications : AbstractMemCheckAzureFunction
     }
     protected override async Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject)
     {
-        var mailer = new NotificationMailer(NewCallContext(), new MemCheckMailSender(MailSender), new MemCheckLinkGenerator());
+        var mailer = new NotificationMailer(NewCallContext(), MailSender, new MemCheckLinkGenerator());
         var body = await mailer.RunAndCreateReportMailMainPartAsync().ConfigureAwait(false);
         return new RunResult(defaultMailSubject, body);
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MemCheck.Domain;
 
@@ -6,5 +7,6 @@ namespace MemCheck.Domain;
 public interface IMemCheckMailSender
 {
     Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage);
+    Task SendEmailAsync(IEnumerable<MemCheckEmailAddress> recipients, string subject, string htmlMessage);
     MemCheckEmailAddress SenderAddress { get; }
 }

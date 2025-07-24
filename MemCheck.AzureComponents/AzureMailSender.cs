@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MemCheck.Domain;
+using MemCheck.Basics;
+using System.Linq;
 
 namespace MemCheck.AzureComponents;
 
@@ -18,13 +20,16 @@ public sealed class AzureMailSender : IMemCheckMailSender
     }
     public async Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
     {
+        await SendEmailAsync(recipient.AsArray(), subject, htmlMessage).ConfigureAwait(false);
+    }
+    public async Task SendEmailAsync(IEnumerable<MemCheckEmailAddress> recipients, string subject, string htmlMessage)
+    {
         var content = new EmailContent(subject)
         {
             PlainText = htmlMessage,
             Html = htmlMessage
         };
-        var recipients = new EmailRecipients(new List<EmailAddress> { new(recipient.Address, recipient.DisplayName) });
-        var emailMessage = new EmailMessage(senderAddress: SenderAddress.Address, recipients, content);
+        var emailMessage = new EmailMessage(SenderAddress.Address, new EmailRecipients(recipients.Select(r => new EmailAddress(r.Address, r.DisplayName))), content);
         var emailSendOperation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
 
         if (!emailSendOperation.HasCompleted)

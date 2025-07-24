@@ -11,13 +11,14 @@ using System.Threading.Tasks;
 using MemCheck.Application;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Application.Users;
+using MemCheck.AzureComponents;
 using MemCheck.Basics;
 using MemCheck.Database;
+using MemCheck.Domain;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using SendGrid.Helpers.Mail;
 
 namespace MemCheck.AzureFunctions;
 
@@ -28,15 +29,15 @@ public abstract class AbstractMemCheckAzureFunction
     private readonly MemCheckDbContext memCheckDbContext;
     private readonly ILogger logger;
     private readonly IRoleChecker roleChecker;
-    private readonly Lazy<Task<ImmutableList<EmailAddress>>> admins;
+    private readonly Lazy<Task<ImmutableList<MemCheckEmailAddress>>> admins;
     #endregion
     #region Private methods
-    private async Task<ImmutableList<EmailAddress>> GetAdminsAsync()
+    private async Task<ImmutableList<MemCheckEmailAddress>> GetAdminsAsync()
     {
         var getter = new GetAdminEmailAddesses(NewCallContext());
         var getterResult = await getter.RunAsync(new GetAdminEmailAddesses.Request(AdminUserId));
         var result = getterResult.Users;
-        return result.Select(address => new EmailAddress(address.Email, address.Name)).ToImmutableList();
+        return result.Select(address => new MemCheckEmailAddress(address.Email, address.Name)).ToImmutableList();
     }
     private Guid GetUserIdFromEnv(string envVarName)
     {
@@ -60,8 +61,8 @@ public abstract class AbstractMemCheckAzureFunction
             BotUserId = GetUserIdFromEnv("BotAccountUserId");
             roleChecker = new ProdRoleChecker(userManager);
             StartTime = DateTime.UtcNow;
-            MailSender = new AzureFunctionsMailSender(logger);
-            admins = new Lazy<Task<ImmutableList<EmailAddress>>>(GetAdminsAsync);
+            MailSender = GetMailSender();
+            admins = new Lazy<Task<ImmutableList<MemCheckEmailAddress>>>(GetAdminsAsync);
         }
         catch (Exception e)
         {
@@ -89,17 +90,24 @@ public abstract class AbstractMemCheckAzureFunction
             throw;
         }
     }
+    private static AzureMailSender GetMailSender()
+    {
+        var connectionString = Environment.GetEnvironmentVariable("AzureMailConnectionString");
+        if (connectionString == null)
+            throw new InvalidOperationException("'AzureMailConnectionString' environment variable is not set");
+        return new AzureMailSender(connectionString);
+    }
     protected CallContext NewCallContext()
     {
         return new CallContext(memCheckDbContext, new MemCheckTelemetryClient(telemetryClient), new FakeStringLocalizer(), roleChecker);
     }
-    private string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<EmailAddress> admins)
+    private string GetMailFooter(string azureFunctionName, TimerInfo timer, DateTime azureFunctionStartTime, ImmutableList<MemCheckEmailAddress> admins)
     {
         var listItems = new List<string> {
             $"<li>Sent by Azure func {azureFunctionName} ({AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly)})</li>",
             $"<li>Running on {Environment.MachineName}, process id: {Environment.ProcessId}, process name: {Process.GetCurrentProcess().ProcessName}, started on: {DateServices.AsIsoWithHHmm(Process.GetCurrentProcess().StartTime)}, peak mem usage: {ProcessServices.GetPeakProcessMemoryUsage()} bytes</li>",
             $"<li>Started on {DateServices.AsIsoWithHHmmss(azureFunctionStartTime)}, mail constructed at {DateServices.AsIsoWithHHmmss(DateTime.UtcNow)} (Elapsed: {(DateTime.UtcNow - azureFunctionStartTime).ToStringWithoutMs()})</li>",
-            $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.Name))}</li>"
+            $"<li>Sent to {admins.Count} admins: {string.Join(",", admins.Select(a => a.DisplayName))}</li>"
         };
         if (timer.ScheduleStatus != null)
             listItems.AddRange(new[]
@@ -117,7 +125,7 @@ public abstract class AbstractMemCheckAzureFunction
     }
     private static string GetAssemblyVersion()
     {
-        return typeof(AzureFunctionsMailSender).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+        return typeof(AbstractMemCheckAzureFunction).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
     }
     private static void AddExceptionDetailsToMailBody(StringBuilder body, Exception e)
     {
@@ -142,7 +150,7 @@ public abstract class AbstractMemCheckAzureFunction
 
         AddExceptionDetailsToMailBody(body, e);
 
-        await MailSender.SendAsync("Mnesios Azure function failure", body.ToString(), new EmailAddress(MailSender.SenderEmail.Address, MailSender.SenderEmail.DisplayName).AsArray());
+        await MailSender.SendEmailAsync(await AdminsAsync().ConfigureAwait(false), "Mnesios Azure function failure", body.ToString());
     }
     protected async Task RunAsync(TimerInfo timer, FunctionContext context)
     {
@@ -166,7 +174,7 @@ public abstract class AbstractMemCheckAzureFunction
 
             var bodyText = reportMailBody.ToString();
 
-            await MailSender.SendAsync(runResult.MailSubject, bodyText, await AdminsAsync());
+            await MailSender.SendEmailAsync(await AdminsAsync(), runResult.MailSubject, bodyText);
         }
         catch (Exception ex)
         {
@@ -179,8 +187,8 @@ public abstract class AbstractMemCheckAzureFunction
     }
     protected abstract Task<RunResult> RunAndCreateReportMailMainPartAsync(string defaultMailSubject);
     protected DateTime StartTime { get; }
-    protected AzureFunctionsMailSender MailSender { get; }
+    protected IMemCheckMailSender MailSender { get; }
     protected Guid AdminUserId { get; }
     protected Guid BotUserId { get; }
-    protected async Task<ImmutableList<EmailAddress>> AdminsAsync() => await admins.Value;
+    protected async Task<ImmutableList<MemCheckEmailAddress>> AdminsAsync() => await admins.Value;
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-        <VersionPrefix>0.27.10</VersionPrefix>
+        <VersionPrefix>0.28.0</VersionPrefix>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
     <ItemGroup>
@@ -14,10 +14,10 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Logging.Configuration" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
-        <PackageReference Include="SendGrid" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+        <ProjectReference Include="..\MemCheck.AzureComponents\MemCheck.AzureComponents.csproj" />
         <ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />
         <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
     </ItemGroup>
