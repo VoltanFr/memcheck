@@ -150,7 +150,7 @@ public abstract class AbstractMemCheckAzureFunction
 
         AddExceptionDetailsToMailBody(body, e);
 
-        await MailSender.SendEmailAsync(await AdminsAsync().ConfigureAwait(false), "Mnesios Azure function failure", body.ToString());
+        await MailSender.SendAsync(await AdminsAsync().ConfigureAwait(false), "Mnesios Azure function failure", body.ToString());
     }
     protected async Task RunAsync(TimerInfo timer, FunctionContext context)
     {
@@ -174,7 +174,7 @@ public abstract class AbstractMemCheckAzureFunction
 
             var bodyText = reportMailBody.ToString();
 
-            await MailSender.SendEmailAsync(await AdminsAsync(), runResult.MailSubject, bodyText);
+            await MailSender.SendAsync(await AdminsAsync(), runResult.MailSubject, bodyText);
         }
         catch (Exception ex)
         {

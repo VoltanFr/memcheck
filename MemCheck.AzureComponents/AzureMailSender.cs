@@ -18,11 +18,11 @@ public sealed class AzureMailSender : IMemCheckMailSender
     {
         emailClient = new EmailClient(connectionString);
     }
-    public async Task SendEmailAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
+    public async Task SendAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
     {
-        await SendEmailAsync(recipient.AsArray(), subject, htmlMessage).ConfigureAwait(false);
+        await SendAsync(recipient.AsArray(), subject, htmlMessage).ConfigureAwait(false);
     }
-    public async Task SendEmailAsync(IEnumerable<MemCheckEmailAddress> recipients, string subject, string htmlMessage)
+    public async Task SendAsync(IEnumerable<MemCheckEmailAddress> recipients, string subject, string htmlMessage)
     {
         var content = new EmailContent(subject)
         {

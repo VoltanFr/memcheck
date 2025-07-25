@@ -111,7 +111,7 @@ public class AdminController : MemCheckController
     public async Task<IActionResult> LaunchNotifier()
     {
         var launchingUser = await userManager.GetExistingUserAsync(HttpContext.User);
-        await azureEmailSender.SendEmailAsync(launchingUser.GetEmail(), $"Notifier started on {DateTime.Now:u}", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
+        await azureEmailSender.SendAsync(launchingUser.GetEmail(), $"Notifier started on {DateTime.Now:u}", $"<h1>Notifier started by {launchingUser.UserName}</h1><p>Notifications will be sent to all users.</p>");
         return ControllerResultWithToast.Success("Notifications hijacked", this);
 
 

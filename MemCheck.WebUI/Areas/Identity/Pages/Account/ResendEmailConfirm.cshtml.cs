@@ -64,7 +64,7 @@ public class ResendEmailConfirmModel : PageModel
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["AfterHyperLink"].Value}</p>");
                 mailBody.Append(CultureInfo.InvariantCulture, $"<p>{localizer["Final"].Value}</p>");
 
-                await emailSender.SendEmailAsync(new MemCheckEmailAddress(Input.Email, user.GetUserName()), localizer["MailSubject"], mailBody.ToString());
+                await emailSender.SendAsync(new MemCheckEmailAddress(Input.Email, user.GetUserName()), localizer["MailSubject"], mailBody.ToString());
             }
         }
 

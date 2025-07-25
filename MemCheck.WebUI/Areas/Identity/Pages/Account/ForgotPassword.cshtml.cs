@@ -53,7 +53,7 @@ public class ForgotPasswordModel : PageModel
 
             var body = $"<p>{localizer["Hello"]} {user.UserName}.</p><p>{localizer["MailPhrasePart1"]} <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>{localizer["MailLinkText"]}</a> {localizer["MailPhrasePart2"]}.</p>";
 
-            await emailSender.SendEmailAsync(user.GetEmail(), localizer["MailSubject"], body);
+            await emailSender.SendAsync(user.GetEmail(), localizer["MailSubject"], body);
 
             return RedirectToPage("./ForgotPasswordConfirmation");
         }
