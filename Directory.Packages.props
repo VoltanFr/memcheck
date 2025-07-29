@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Azure.Communication.Email" Version="1.0.1" />
-    <PackageVersion Include="EntityFramework" Version="6.4.4" />
+    <PackageVersion Include="EntityFramework" Version="6.5.1" />
     <PackageVersion Include="HtmlAgilityPack" Version="1.11.43" />
     <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageVersion Include="Microsoft.ApplicationInsights" Version="2.22.0" />
