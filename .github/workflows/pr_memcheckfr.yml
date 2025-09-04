@@ -36,7 +36,7 @@ jobs:
         echo "NETCORE_VERSION: $env:NETCORE_VERSION"
 
     - name: "Set up .NET Core on machine (version ${{env.NETCORE_VERSION}})"
-      uses: actions/setup-dotnet@v4.0.0
+      uses: actions/setup-dotnet@v5.0.0
       with:
         dotnet-version: ${{env.NETCORE_VERSION}}
 
