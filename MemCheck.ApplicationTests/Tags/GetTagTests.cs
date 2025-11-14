@@ -13,7 +13,7 @@ public class GetTagTests
     public async Task DoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task TagNotUsedInCards()

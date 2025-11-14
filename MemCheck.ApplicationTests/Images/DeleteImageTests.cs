@@ -20,7 +20,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.Empty, image, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(Guid.NewGuid(), image, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task ImageDoesNotExist()
@@ -39,7 +39,7 @@ public class DeleteImageTests
         var user = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { user }))).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<ImageNotFoundException>(async () => await new DeleteImage(dbContext.AsCallContext(new TestRoleChecker(new[] { user }))).RunAsync(new DeleteImage.Request(user, Guid.NewGuid(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionTooShort()
@@ -49,7 +49,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength - 1))));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength - 1))));
     }
     [TestMethod()]
     public async Task DescriptionTooLong()
@@ -59,7 +59,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MaxDescriptionLength + 1))));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MaxDescriptionLength + 1))));
     }
     [TestMethod()]
     public async Task DescriptionNotTrimmed()
@@ -69,7 +69,7 @@ public class DeleteImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength) + Environment.NewLine)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(user, image, RandomHelper.String(DeleteImage.Request.MinDescriptionLength) + Environment.NewLine)));
     }
     [TestMethod()]
     public async Task UsedInCard()
@@ -83,7 +83,7 @@ public class DeleteImageTests
         var cardId = await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{imageName}]");
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<ImageUsedInCardException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<ImageUsedInCardException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
         {
@@ -112,7 +112,7 @@ public class DeleteImageTests
         await CardHelper.CreateIdAsync(db, userId, additionalInfo: $"![Mnesios:{image3Name}]![Mnesios:{image3Name}]");
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<ImageUsedInCardException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<ImageUsedInCardException>(async () => await new DeleteImage(dbContext.AsCallContext()).RunAsync(new DeleteImage.Request(userId, imageId, RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
         {

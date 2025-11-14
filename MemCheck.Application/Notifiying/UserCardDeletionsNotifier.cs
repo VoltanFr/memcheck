@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifiying;
 
 internal interface IUserCardDeletionsNotifier
 {
-    public Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId);
+    Task<ImmutableArray<CardDeletion>> RunAsync(Guid userId);
 }
 internal sealed class UserCardDeletionsNotifier : IUserCardDeletionsNotifier
 {

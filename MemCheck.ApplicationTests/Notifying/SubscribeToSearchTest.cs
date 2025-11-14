@@ -193,7 +193,7 @@ public class SubscribeToSearchTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SubscribeToSearch.Request(userId, Guid.NewGuid(), RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestBadRequiredTag()
@@ -203,7 +203,7 @@ public class SubscribeToSearchTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", new Guid[] { Guid.NewGuid() }, Array.Empty<Guid>());
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestBadExcludedTag()
@@ -213,7 +213,7 @@ public class SubscribeToSearchTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { Guid.NewGuid() });
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestSearchWithSameTagTwice()
@@ -230,7 +230,7 @@ public class SubscribeToSearchTest
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", new Guid[] { tagId, tagId }, Array.Empty<Guid>());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
         }
     }
     [TestMethod()]
@@ -248,7 +248,7 @@ public class SubscribeToSearchTest
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new SubscribeToSearch.Request(user.Id, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), new Guid[] { tagId, tagId });
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
         }
     }
     [TestMethod()]
@@ -263,7 +263,7 @@ public class SubscribeToSearchTest
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var request = new SubscribeToSearch.Request(userId, Guid.Empty, RandomHelper.String(), "", Array.Empty<Guid>(), Array.Empty<Guid>());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SubscribeToSearch(dbContext.AsCallContext()).RunAsync(request));
         }
     }
 }

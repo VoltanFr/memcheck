@@ -119,7 +119,7 @@ public class CreateCardTests
             RandomHelper.String());
         var ownerMustHaveVisibility = RandomHelper.String();
         var localizer = new TestLocalizer("OwnerMustHaveVisibility".PairedWith(ownerMustHaveVisibility));
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(ownerMustHaveVisibility, exception.Message);
     }
     [TestMethod()]
@@ -141,10 +141,10 @@ public class CreateCardTests
             RandomHelper.String());
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
-        StringAssert.Contains(exception.Message, CardInputValidator.MinFrontSideLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, CardInputValidator.MaxFrontSideLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, (CardInputValidator.MaxFrontSideLength + 1).ToString(CultureInfo.InvariantCulture));
+        var exception = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        Assert.Contains(CardInputValidator.MinFrontSideLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains(CardInputValidator.MaxFrontSideLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains((CardInputValidator.MaxFrontSideLength + 1).ToString(CultureInfo.InvariantCulture), exception.Message);
     }
     [TestMethod()]
     public async Task BackSideTooLong()
@@ -165,10 +165,10 @@ public class CreateCardTests
             RandomHelper.String());
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
-        StringAssert.Contains(exception.Message, CardInputValidator.MinBackSideLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, CardInputValidator.MaxBackSideLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, (CardInputValidator.MaxBackSideLength + 1).ToString(CultureInfo.InvariantCulture));
+        var exception = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        Assert.Contains(CardInputValidator.MinBackSideLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains(CardInputValidator.MaxBackSideLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains((CardInputValidator.MaxBackSideLength + 1).ToString(CultureInfo.InvariantCulture), exception.Message);
     }
     [TestMethod()]
     public async Task AdditionalInfoTooLong()
@@ -189,10 +189,10 @@ public class CreateCardTests
             RandomHelper.String());
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
-        StringAssert.Contains(exception.Message, CardInputValidator.MinAdditionalInfoLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, CardInputValidator.MaxAdditionalInfoLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, (CardInputValidator.MaxAdditionalInfoLength + 1).ToString(CultureInfo.InvariantCulture));
+        var exception = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        Assert.Contains(CardInputValidator.MinAdditionalInfoLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains(CardInputValidator.MaxAdditionalInfoLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains((CardInputValidator.MaxAdditionalInfoLength + 1).ToString(CultureInfo.InvariantCulture), exception.Message);
     }
     [TestMethod()]
     public async Task ReferencesTooLong()
@@ -213,10 +213,10 @@ public class CreateCardTests
             RandomHelper.String());
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
-        StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString(CultureInfo.InvariantCulture));
-        StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString(CultureInfo.InvariantCulture));
+        var exception = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateCard(dbContext.AsCallContext(new TestLocalizer())).RunAsync(request));
+        Assert.Contains(CardInputValidator.MinReferencesLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains(CardInputValidator.MaxReferencesLength.ToString(CultureInfo.InvariantCulture), exception.Message);
+        Assert.Contains((CardInputValidator.MaxReferencesLength + 1).ToString(CultureInfo.InvariantCulture), exception.Message);
     }
     [TestMethod()]
     public async Task PublicCardWithPersoTagMustFail()
@@ -240,7 +240,7 @@ public class CreateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -266,7 +266,7 @@ public class CreateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new CreateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]

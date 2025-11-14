@@ -1,5 +1,5 @@
 ﻿using MemCheck.Application.Cards;
-using MemCheck.Application.Images;
+using MemCheck.Application.Windows.Images;
 using MemCheck.Basics;
 using MemCheck.CommandLineDbClient.Pauker;
 using MemCheck.Database;

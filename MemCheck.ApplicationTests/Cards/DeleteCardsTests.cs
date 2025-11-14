@@ -22,7 +22,7 @@ public class DeleteCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var card = await CardHelper.CreateAsync(db, user);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await CardDeletionHelper.DeleteCardAsync(db, Guid.NewGuid(), card.Id));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await CardDeletionHelper.DeleteCardAsync(db, Guid.NewGuid(), card.Id));
         Assert.AreEqual("User not found", e.Message);
     }
     [TestMethod()]
@@ -39,7 +39,7 @@ public class DeleteCardsTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("YouAreNotTheCreatorOfCurrentVersion".PairedWith("YouAreNotTheCreatorOfCurrentVersion"))));
-            await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
+            await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await deleter.RunAsync(new DeleteCards.Request(otherUser, card.Id.AsArray())));
         }
     }
     [TestMethod()]
@@ -55,7 +55,7 @@ public class DeleteCardsTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var deleter = new DeleteCards(dbContext.AsCallContext());
-            var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
+            var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await deleter.RunAsync(new DeleteCards.Request(user, card.Id.AsArray())));
             Assert.AreEqual("User not found", e.Message);
         }
     }
@@ -70,7 +70,7 @@ public class DeleteCardsTests
         using var dbContext = new MemCheckDbContext(db);
         var deleter = new DeleteCards(dbContext.AsCallContext());
         var deletionRequest = new DeleteCards.Request(userId, new[] { cardId, RandomHelper.Guid() });
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await deleter.RunAsync(deletionRequest));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await deleter.RunAsync(deletionRequest));
     }
     [TestMethod()]
     public async Task DeleteDeletedCardMustFail()
@@ -79,7 +79,7 @@ public class DeleteCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var card = await CardHelper.CreateAsync(db, user);
         await CardDeletionHelper.DeleteCardAsync(db, user, card.Id);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await CardDeletionHelper.DeleteCardAsync(db, user, card.Id));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await CardDeletionHelper.DeleteCardAsync(db, user, card.Id));
     }
     [TestMethod()]
     public async Task DeletingMustNotDeleteCardNotifications()
@@ -193,8 +193,8 @@ public class DeleteCardsTests
         {
             var errorMesg = RandomHelper.String();
             var deleter = new DeleteCards(dbContext.AsCallContext(new TestLocalizer("OneUserHasCardWithFrontSide".PairedWith(errorMesg))));
-            var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(cardCreatorId, cardId.AsArray())));
-            StringAssert.Contains(e.Message, errorMesg);
+            var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await deleter.RunAsync(new DeleteCards.Request(cardCreatorId, cardId.AsArray())));
+            Assert.Contains(errorMesg, e.Message);
         }
 
         using (var dbContext = new MemCheckDbContext(db))

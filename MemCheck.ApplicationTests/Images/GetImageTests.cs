@@ -18,7 +18,7 @@ public class GetImageTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(Guid.NewGuid(), GetImage.Request.ImageSize.Medium)));
+        await Assert.ThrowsExactlyAsync<ImageNotFoundException>(async () => await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(Guid.NewGuid(), GetImage.Request.ImageSize.Medium)));
     }
     [TestMethod()]
     public async Task SmallBlob()
@@ -29,7 +29,7 @@ public class GetImageTests
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Small));
-        Assert.AreEqual(1, loaded.ImageBytes.Length);
+        Assert.HasCount(1, loaded.ImageBytes);
     }
     [TestMethod()]
     public async Task MediumBlob()
@@ -40,7 +40,7 @@ public class GetImageTests
 
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetImage(dbContext.AsCallContext()).RunAsync(new GetImage.Request(image, GetImage.Request.ImageSize.Medium));
-        Assert.AreEqual(2, loaded.ImageBytes.Length);
+        Assert.HasCount(2, loaded.ImageBytes);
     }
     [TestMethod()]
     public async Task BigBlob()

@@ -18,7 +18,7 @@ public class CardRegistrationsLoaderTests
         using var dbContext = new MemCheckDbContext(db);
         var cardId = Guid.NewGuid();
         var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, cardId.AsArray());
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
         Assert.IsFalse(result[cardId]);
     }
     [TestMethod()]
@@ -42,7 +42,7 @@ public class CardRegistrationsLoaderTests
         var otherUser = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
         var result = new CardRegistrationsLoader(dbContext).RunForCardIds(otherUser, card.Id.AsArray());
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
         Assert.IsFalse(result[card.Id]);
     }
     [TestMethod()]
@@ -54,7 +54,7 @@ public class CardRegistrationsLoaderTests
         await CardSubscriptionHelper.CreateAsync(db, user, card.Id);
         using var dbContext = new MemCheckDbContext(db);
         var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, card.Id.AsArray());
-        Assert.AreEqual(1, result.Count);
+        Assert.HasCount(1, result);
         Assert.IsTrue(result[card.Id]);
     }
     [TestMethod()]
@@ -71,7 +71,7 @@ public class CardRegistrationsLoaderTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, deletedCard.Id.AsArray());
-            Assert.AreEqual(1, result.Count);
+            Assert.HasCount(1, result);
             Assert.IsTrue(result[deletedCard.Id]);
         }
     }
@@ -97,7 +97,7 @@ public class CardRegistrationsLoaderTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var result = new CardRegistrationsLoader(dbContext).RunForCardIds(user, new[] { registeredCard1.Id, registeredCard2.Id, deletedCard.Id, nonRegisteredCard.Id });
-            Assert.AreEqual(4, result.Count);
+            Assert.HasCount(4, result);
             Assert.IsTrue(result[registeredCard1.Id]);
             Assert.IsTrue(result[registeredCard2.Id]);
             Assert.IsTrue(result[deletedCard.Id]);

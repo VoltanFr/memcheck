@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifiying;
 
 internal interface IUserSearchSubscriptionLister
 {
-    public Task<ImmutableArray<SearchSubscription>> RunAsync(Guid userId);
+    Task<ImmutableArray<SearchSubscription>> RunAsync(Guid userId);
 }
 internal sealed class UserSearchSubscriptionLister : IUserSearchSubscriptionLister
 {

@@ -25,7 +25,7 @@ public class DeleteUserAccountTests
 
         using var dbContext = new MemCheckDbContext(db);
         using var userManager = UserHelper.GetUserManager(dbContext);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.Empty, userToDelete)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.Empty, userToDelete)));
     }
     [TestMethod()]
     public async Task LoggedUserDoesNotExist()
@@ -35,7 +35,7 @@ public class DeleteUserAccountTests
 
         using var dbContext = new MemCheckDbContext(db);
         using var userManager = UserHelper.GetUserManager(dbContext);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.NewGuid(), userToDelete)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(Guid.NewGuid(), userToDelete)));
     }
     [TestMethod()]
     public async Task LoggedUserIsNotAdmin()
@@ -46,7 +46,7 @@ public class DeleteUserAccountTests
 
         using var dbContext = new MemCheckDbContext(db);
         using var userManager = UserHelper.GetUserManager(dbContext);
-        await Assert.ThrowsExceptionAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
+        await Assert.ThrowsExactlyAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
     }
     [TestMethod()]
     public async Task UserToDeleteDoesNotExist()
@@ -56,7 +56,7 @@ public class DeleteUserAccountTests
 
         using var dbContext = new MemCheckDbContext(db);
         using var userManager = UserHelper.GetUserManager(dbContext);
-        await Assert.ThrowsExceptionAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task UserToDeleteIsAdmin()
@@ -67,7 +67,7 @@ public class DeleteUserAccountTests
 
         using var dbContext = new MemCheckDbContext(db);
         using var userManager = UserHelper.GetUserManager(dbContext);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser, userToDelete)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new DeleteUserAccount(dbContext.AsCallContext(new TestRoleChecker(loggedUser, userToDelete)), userManager).RunAsync(new DeleteUserAccount.Request(loggedUser, userToDelete)));
     }
     [TestMethod()]
     public async Task DeletionByAdmin()

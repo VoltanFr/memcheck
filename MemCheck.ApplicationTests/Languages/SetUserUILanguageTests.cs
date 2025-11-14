@@ -15,13 +15,13 @@ public class SetUserUILanguageTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.Empty, MemCheckSupportedCultures.French)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.Empty, MemCheckSupportedCultures.French)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.NewGuid(), MemCheckSupportedCultures.French)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new SetUserUILanguage(dbContext.AsCallContext()).RunAsync(new SetUserUILanguage.Request(Guid.NewGuid(), MemCheckSupportedCultures.French)));
     }
     [TestMethod()]
     public async Task Success()

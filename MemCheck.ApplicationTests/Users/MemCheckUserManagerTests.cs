@@ -54,7 +54,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.IsFalse(await dbContext.Users.AnyAsync());
     }
-    [DataTestMethod, DataRow("   "), DataRow(" \t "), DataRow(" \r  "), DataRow("\t\r\n"), DataRow("\t   "), DataRow(" aaa"), DataRow("aaa "), DataRow("\taaa"), DataRow("aaa\t"), DataRow("\naaa"), DataRow("aaa\n")]
+    [TestMethod, DataRow("   "), DataRow(" \t "), DataRow(" \r  "), DataRow("\t\r\n"), DataRow("\t   "), DataRow(" aaa"), DataRow("aaa "), DataRow("\taaa"), DataRow("aaa\t"), DataRow("\naaa"), DataRow("aaa\n")]
     public async Task NameNotTrimmed(string userName)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -72,7 +72,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.IsFalse(await dbContext.Users.AnyAsync());
     }
-    [DataTestMethod, DataRow("!Toto"), DataRow("@Me"), DataRow("5Guys"), DataRow("$Money")]
+    [TestMethod, DataRow("!Toto"), DataRow("@Me"), DataRow("5Guys"), DataRow("$Money")]
     public async Task NameDoesNotStartWithALetter(string userName)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -115,7 +115,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(1, await dbContext.Users.CountAsync());
     }
-    [DataTestMethod, DataRow(" "), DataRow(" \t "), DataRow(" \r  "), DataRow("\t\r\n"), DataRow("\t   "), DataRow(" gggg@ggg"), DataRow("gggg@ggg ")]
+    [TestMethod, DataRow(" "), DataRow(" \t "), DataRow(" \r  "), DataRow("\t\r\n"), DataRow("\t   "), DataRow(" gggg@ggg"), DataRow("gggg@ggg ")]
     public async Task EmailNotTrimmed(string email)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -132,7 +132,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.IsFalse(await dbContext.Users.AnyAsync());
     }
-    [DataTestMethod, DataRow("Toto\0!"), DataRow("A\u0002AHHKHJ"), DataRow("A\nAHHKHJ"), DataRow("AA\rHHKHJ")]
+    [TestMethod, DataRow("Toto\0!"), DataRow("A\u0002AHHKHJ"), DataRow("A\nAHHKHJ"), DataRow("AA\rHHKHJ")]
     public async Task ControlChar(string userName)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -149,7 +149,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.IsFalse(await dbContext.Users.AnyAsync());
     }
-    [DataTestMethod, DataRow("Toto\t$$$")]
+    [TestMethod, DataRow("Toto\t$$$")]
     public async Task ForbiddenChar(string userName)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -166,7 +166,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.IsFalse(await dbContext.Users.AnyAsync());
     }
-    [DataTestMethod, DataRow(""), DataRow("gggg"), DataRow("@x"), DataRow("@x.com"), DataRow("dsq@")]
+    [TestMethod, DataRow(""), DataRow("gggg"), DataRow("@x"), DataRow("@x.com"), DataRow("dsq@")]
     public async Task InvalidEmail(string email)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -193,7 +193,7 @@ public class MemCheckUserManagerTests
         {
             var userFromDb = await dbContext.Users.SingleAsync(u => u.Id == createdUser.Id);
             using var userManager = UserHelper.GetUserManager(dbContext);
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await userManager.DeleteAsync(userFromDb));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await userManager.DeleteAsync(userFromDb));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -220,7 +220,7 @@ public class MemCheckUserManagerTests
             Assert.IsTrue(DateTime.UtcNow - user.RegistrationUtcDate < TimeSpan.FromMinutes(10));
         }
     }
-    [DataTestMethod, DataRow(" "), DataRow("     "), DataRow("A4!fi")]
+    [TestMethod, DataRow(" "), DataRow("     "), DataRow("A4!fi")]
     public async Task PasswordTooShort(string password)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -237,7 +237,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(0, dbContext.Users.Count());
     }
-    [DataTestMethod, DataRow("AaHJK@HGKHJHh")]
+    [TestMethod, DataRow("AaHJK@HGKHJHh")]
     public async Task PasswordWithoutDigit(string password)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -254,7 +254,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(0, dbContext.Users.Count());
     }
-    [DataTestMethod, DataRow("Aa28781")]
+    [TestMethod, DataRow("Aa28781")]
     public async Task PasswordWithoutNonAlphanumeric(string password)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -271,7 +271,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(0, dbContext.Users.Count());
     }
-    [DataTestMethod, DataRow("A28781B")]
+    [TestMethod, DataRow("A28781B")]
     public async Task PasswordWithoutLower(string password)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -288,7 +288,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(0, dbContext.Users.Count());
     }
-    [DataTestMethod, DataRow("hdqskqhkjdsh")]
+    [TestMethod, DataRow("hdqskqhkjdsh")]
     public async Task PasswordWithoutUpper(string password)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -305,7 +305,7 @@ public class MemCheckUserManagerTests
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(0, dbContext.Users.Count());
     }
-    [DataTestMethod, DataRow("toto"), DataRow("with space"), DataRow("with multi spaces"), DataRow("Avec accent Érik"), DataRow("Avec cédille comme ça")]
+    [TestMethod, DataRow("toto"), DataRow("with space"), DataRow("with multi spaces"), DataRow("Avec accent Érik"), DataRow("Avec cédille comme ça")]
     public async Task SuccessWithUserName(string userName)
     {
         var db = DbHelper.GetEmptyTestDB();
@@ -405,21 +405,4 @@ public class MemCheckUserManagerTests
             }
         }
     }
-    //[DataTestMethod, DataRow(""), DataRow("gggg"), DataRow("@x"), DataRow("@x.com"), DataRow("dsq@")]
-    //public async Task InvalidEmail(string email)
-    //{
-    //    var db = DbHelper.GetEmptyTestDB();
-
-    //    using (var dbContext = new MemCheckDbContext(db))
-    //    {
-    //        using var userManager = UserHelper.GetUserManager(dbContext);
-    //        var user = UserHelper.Create(email: email);
-    //        var identityResult = await userManager.CreateAsync(user);
-    //        Assert.IsFalse(identityResult.Succeeded);
-    //        Assert.AreEqual(nameof(IdentityErrorDescriber.InvalidEmail), identityResult.Errors.Single().Code);
-    //    }
-
-    //    using (var dbContext = new MemCheckDbContext(db))
-    //        Assert.IsFalse(await dbContext.Users.AnyAsync());
-    //}
 }

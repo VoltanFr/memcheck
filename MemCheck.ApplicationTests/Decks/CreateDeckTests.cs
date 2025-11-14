@@ -16,13 +16,13 @@ public class CreateDeckTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.Empty, RandomHelper.String(), 0)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.Empty, RandomHelper.String(), 0)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.NewGuid(), RandomHelper.String(), 0)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(Guid.NewGuid(), RandomHelper.String(), 0)));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -30,7 +30,7 @@ public class CreateDeckTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String() + '\t', 0)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String() + '\t', 0)));
     }
     [TestMethod()]
     public async Task NameTooShort()
@@ -38,7 +38,7 @@ public class CreateDeckTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0)));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMinNameLength - 1), 0)));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -46,7 +46,7 @@ public class CreateDeckTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0)));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(QueryValidationHelper.DeckMaxNameLength + 1), 0)));
     }
     [TestMethod()]
     public async Task DeckWithThisNameExists()
@@ -56,7 +56,7 @@ public class CreateDeckTests
         var otherDeckName = RandomHelper.String();
         await DeckHelper.CreateAsync(db, user, otherDeckName);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, otherDeckName, RandomHelper.HeapingAlgorithm())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, otherDeckName, RandomHelper.HeapingAlgorithm())));
     }
     [TestMethod()]
     public async Task InexistentAlgorithm()
@@ -64,7 +64,7 @@ public class CreateDeckTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids))));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateDeck(dbContext.AsCallContext()).RunAsync(new CreateDeck.Request(user, RandomHelper.String(), RandomHelper.ValueNotInSet(HeapingAlgorithms.Instance.Ids))));
     }
     [TestMethod()]
     public async Task Success()

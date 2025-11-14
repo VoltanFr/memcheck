@@ -19,7 +19,7 @@ public class RemoveCardFromDeckTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(Guid.Empty, deck, card.Id)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(Guid.Empty, deck, card.Id)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -31,7 +31,7 @@ public class RemoveCardFromDeckTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(Guid.NewGuid(), deck, card.Id)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(Guid.NewGuid(), deck, card.Id)));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -41,7 +41,7 @@ public class RemoveCardFromDeckTests
         var card = await CardHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, Guid.NewGuid(), card.Id)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, Guid.NewGuid(), card.Id)));
     }
     [TestMethod()]
     public async Task UserNotOwnerOfDeck()
@@ -54,7 +54,7 @@ public class RemoveCardFromDeckTests
         var otherUser = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(otherUser, deck, card.Id)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(otherUser, deck, card.Id)));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -64,7 +64,7 @@ public class RemoveCardFromDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, deck, Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, deck, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task CardNotInDeck()
@@ -75,7 +75,7 @@ public class RemoveCardFromDeckTests
         var card = await CardHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, deck, card.Id)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new RemoveCardFromDeck(dbContext.AsCallContext()).RunAsync(new RemoveCardFromDeck.Request(user, deck, card.Id)));
     }
     [TestMethod()]
     public async Task OnlyCardInTheDeck()

@@ -156,7 +156,7 @@ public class GetRecentDemoUsesTests
         {
             var request = new GetRecentDemoUses.Request(2);
             var result = await new GetRecentDemoUses(dbContext.AsCallContext(), getRunDate).RunAsync(request);
-            Assert.AreEqual(2, result.Entries.Length);
+            Assert.HasCount(2, result.Entries);
             Assert.AreEqual(2, result.DayCount);
 
             var entryForTag1 = result.Entries.Single(entry => entry.TagId == tag1);
@@ -172,7 +172,7 @@ public class GetRecentDemoUsesTests
         {
             var request = new GetRecentDemoUses.Request(4);
             var result = await new GetRecentDemoUses(dbContext.AsCallContext(), getRunDate).RunAsync(request);
-            Assert.AreEqual(4, result.Entries.Length);
+            Assert.HasCount(4, result.Entries);
             Assert.AreEqual(4, result.DayCount);
 
             var entryForTag1Date2 = result.Entries.Single(entry => entry.TagId == tag1 && entry.DownloadUtcDate == demoRunDate2);

@@ -16,6 +16,9 @@ public sealed class GetImageFromName : RequestRunner<GetImageFromName.Request, G
     }
     protected override async Task<ResultWithMetrologyProperties<Result>> DoRunAsync(Request request)
     {
+        if (await DbContext.Images.AsNoTracking().CountAsync(img => img.Name == request.ImageName) != 1)
+            throw new ImageNotFoundException($"Can't find image '{request.ImageName}'");
+
         var result = request.Size switch
         {
             Request.ImageSize.Small => (await DbContext.Images.AsNoTracking().Select(img => new { img.Name, img.SmallBlob }).SingleAsync(img => img.Name == request.ImageName)).SmallBlob,
@@ -25,7 +28,7 @@ public sealed class GetImageFromName : RequestRunner<GetImageFromName.Request, G
         };
 
         if (result == null)
-            throw new ImageNotFoundException(request.ImageName);
+            throw new ImageNotFoundException($"Can't find size '{request.Size}' for image '{request.ImageName}'");
 
         return new ResultWithMetrologyProperties<Result>(new Result(result.ToImmutableArray()), ("ImageName", request.ImageName), ("RequestedSize", request.Size.ToString()), IntMetric("ByteCount", result.Length));
     }

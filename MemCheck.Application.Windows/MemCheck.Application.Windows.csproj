@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <VersionPrefix>0.62.0</VersionPrefix>
+    <TargetFramework>net9.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(AssemblyName)Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" />
+    <PackageReference Include="Svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+    <ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />
+    <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
+  </ItemGroup>
+
+</Project>

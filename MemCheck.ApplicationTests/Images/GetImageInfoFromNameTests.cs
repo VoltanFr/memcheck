@@ -17,7 +17,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidImageNameLengthException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("")));
+        await Assert.ThrowsExactlyAsync<InvalidImageNameLengthException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request("")));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -27,7 +27,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<ImageNameNotTrimmedException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' ')));
+        await Assert.ThrowsExactlyAsync<ImageNameNotTrimmedException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String() + ' ')));
     }
     [TestMethod()]
     public async Task ImageDoesNotExist()
@@ -37,7 +37,7 @@ public class GetImageInfoFromNameTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<ImageNotFoundException>(async () => await new GetImageInfoFromName(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromName.Request(RandomHelper.String())));
     }
     [TestMethod()]
     public async Task Success_ImageNotUsed()

@@ -12,7 +12,7 @@ namespace MemCheck.Application.Notifiying;
 //ie, it does not take care of whether or not there are actually changes to notify
 internal interface IUsersToNotifyGetter
 {
-    public ImmutableArray<MemCheckUser> Run(DateTime? now = null);
+    ImmutableArray<MemCheckUser> Run(DateTime? now = null);
 }
 internal sealed class UsersToNotifyGetter : IUsersToNotifyGetter
 {

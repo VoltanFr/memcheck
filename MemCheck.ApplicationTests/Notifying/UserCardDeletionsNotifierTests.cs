@@ -120,7 +120,7 @@ public class UserCardDeletionsNotifierTests
         {
             var notifier = new UserCardDeletionsNotifier(dbContext.AsCallContext(), now);
             var versions = await notifier.RunAsync(user2);
-            Assert.AreEqual(1, versions.Length);
+            Assert.HasCount(1, versions);
             Assert.IsFalse(versions[0].CardIsViewable);
             Assert.IsNull(versions[0].FrontSide);
             Assert.IsNull(versions[0].DeletionDescription);

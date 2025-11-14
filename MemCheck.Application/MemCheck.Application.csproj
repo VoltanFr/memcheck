@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.60.7</VersionPrefix>
-	</PropertyGroup>
+		<VersionPrefix>0.61.0</VersionPrefix>
+    </PropertyGroup>
 
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
@@ -16,8 +16,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.ApplicationInsights" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-		<PackageReference Include="Svg" />
 	</ItemGroup>
 
 	<ItemGroup>

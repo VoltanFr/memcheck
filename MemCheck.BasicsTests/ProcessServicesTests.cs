@@ -8,6 +8,6 @@ public class ProcessServicesTests
     [TestMethod()]
     public void GetPeakProcessMemoryUsage()
     {
-        StringAssert.Contains(ProcessServices.GetPeakProcessMemoryUsage(), ",", System.StringComparison.InvariantCulture);
+        Assert.Contains(",", ProcessServices.GetPeakProcessMemoryUsage(), System.StringComparison.InvariantCulture);
     }
 }

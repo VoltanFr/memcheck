@@ -19,7 +19,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.Empty, deck, Array.Empty<Guid>())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.Empty, deck, Array.Empty<Guid>())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -29,7 +29,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(Guid.NewGuid(), deck, Array.Empty<Guid>())));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -38,7 +38,7 @@ public class AddCardsInDeckTests
         var user = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, Guid.NewGuid(), Array.Empty<Guid>())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, Guid.NewGuid(), Array.Empty<Guid>())));
     }
     [TestMethod()]
     public async Task UserNotOwnerOfDeck()
@@ -49,7 +49,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, Array.Empty<Guid>())));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -59,7 +59,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, RandomHelper.Guid().AsArray())));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, RandomHelper.Guid().AsArray())));
     }
     [TestMethod()]
     public async Task ACardDoesNotExist()
@@ -69,7 +69,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
         var card = await CardHelper.CreateAsync(db, user);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, RandomHelper.Guid() })));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(user, deck, new[] { card.Id, RandomHelper.Guid() })));
     }
     [TestMethod()]
     public async Task CardAlreadyInDeck()
@@ -108,7 +108,7 @@ public class AddCardsInDeckTests
         var deck = await DeckHelper.CreateAsync(db, deckOwner);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task UserNotAllowedToViewACard()
@@ -121,7 +121,7 @@ public class AddCardsInDeckTests
         var publicCard = await CardHelper.CreateAsync(db, cardCreator);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardsInDeck(dbContext.AsCallContext()).RunAsync(new AddCardsInDeck.Request(deckOwner, deck, new[] { publicCard.Id, cardNotAllowed.Id })));
     }
     [TestMethod()]
     public async Task Success()

@@ -25,7 +25,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), Guid.Empty);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -38,7 +38,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), Guid.NewGuid());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         await CardHelper.AssertCardHasFrontSide(db, card.Id, frontSide);
     }
     [TestMethod()]
@@ -49,7 +49,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var r = new UpdateCard.Request(Guid.NewGuid(), user, RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), RandomHelper.String(), Guid.NewGuid(), Array.Empty<Guid>(), Array.Empty<Guid>(), RandomHelper.String());
-        await Assert.ThrowsExceptionAsync<ArgumentException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+        await Assert.ThrowsExactlyAsync<ArgumentException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
     }
     [TestMethod()]
     public async Task UserNotAllowedToViewCard()
@@ -63,7 +63,7 @@ public class UpdateCardTests
 
         using var dbContext = new MemCheckDbContext(db);
         var r = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), otherUser);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         await CardHelper.AssertCardHasFrontSide(db, card.Id, frontSide);
     }
     [TestMethod()]
@@ -96,7 +96,7 @@ public class UpdateCardTests
         var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray()) with { VersionCreatorId = newVersionCreator };
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
     }
     [TestMethod()]
     public async Task DescriptionTooShort()
@@ -107,7 +107,7 @@ public class UpdateCardTests
         var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
         var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(CardInputValidator.MinVersionDescriptionLength - 1));
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task DescriptionTooLong()
@@ -118,7 +118,7 @@ public class UpdateCardTests
         var card = await CardHelper.CreateAsync(db, cardCreator, language: languageId, userWithViewIds: Array.Empty<Guid>());
         var request = UpdateCardHelper.RequestForFrontSideChange(card, RandomHelper.String(), versionDescription: RandomHelper.String(CardInputValidator.MaxVersionDescriptionLength + 1));
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserInVisibilityList()
@@ -223,7 +223,7 @@ public class UpdateCardTests
             card.TagsInCards.Select(t => t.TagId),
             card.UsersWithView.Select(uwv => uwv.UserId),
             RandomHelper.String());
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserSubscribingToCardOnEdit()
@@ -290,7 +290,7 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, cardCreator, card.Id);
-            Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
+            Assert.ThrowsExactly<UserNotAllowedToAccessCardException>(() => CardVisibilityHelper.CheckUserIsAllowedToViewCard(dbContext, otherUser, card.Id));
         }
     }
     [TestMethod()]
@@ -317,7 +317,7 @@ public class UpdateCardTests
 
         // We check the visibility
         TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, cardCreatorId, card.Id);
-        Assert.ThrowsException<UserNotAllowedToAccessCardException>(() => TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, otherUserId, card.Id));
+        Assert.ThrowsExactly<UserNotAllowedToAccessCardException>(() => TestCardVisibilityHelper.CheckUserIsAllowedToViewCard(db, otherUserId, card.Id));
 
         // We check that the previous version is correct
         var previousVersion = await CardPreviousVersionHelper.GetPreviousVersionAsync(db, card.Id);
@@ -340,14 +340,14 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray());
-            var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(otherUser.GetUserName()));
+            var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            Assert.Contains(otherUser.GetUserName(), e.Message);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, otherUser.Id.AsArray(), otherUser.Id);
-            var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
             Assert.IsTrue(e.Message.Contains(cardCreator.GetUserName()));
         }
 
@@ -381,14 +381,14 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.Id.AsArray(), cardCreator.Id);
-            var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
-            Assert.IsTrue(e.Message.Contains(newVersionCreator.GetUserName()));
+            var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            Assert.Contains(newVersionCreator.GetUserName(), e.Message);
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { newVersionCreator.Id }, newVersionCreator.Id);
-            var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
             Assert.IsTrue(e.Message.Contains(cardCreator.GetUserName()));
         }
 
@@ -426,19 +426,19 @@ public class UpdateCardTests
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, cardCreator.AsArray());
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, otherUser.AsArray(), otherUser);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
         {
             var r = UpdateCardHelper.RequestForVisibilityChange(card, new[] { userWithCardInDeck }, userWithCardInDeck);
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(r));
         }
 
         using (var dbContext = new MemCheckDbContext(db))
@@ -486,10 +486,10 @@ public class UpdateCardTests
         var request = UpdateCardHelper.RequestForReferencesChange(originalCard, RandomHelper.String(CardInputValidator.MaxReferencesLength + 1));
 
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
-        StringAssert.Contains(exception.Message, CardInputValidator.MinReferencesLength.ToString());
-        StringAssert.Contains(exception.Message, CardInputValidator.MaxReferencesLength.ToString());
-        StringAssert.Contains(exception.Message, (CardInputValidator.MaxReferencesLength + 1).ToString());
+        var exception = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateCard(dbContext.AsCallContext()).RunAsync(request));
+        Assert.Contains(CardInputValidator.MinReferencesLength.ToString(), exception.Message);
+        Assert.Contains(CardInputValidator.MaxReferencesLength.ToString(), exception.Message);
+        Assert.Contains((CardInputValidator.MaxReferencesLength + 1).ToString(), exception.Message);
     }
     [TestMethod()]
     public async Task UpdateFrontSideWithValueNotTrimmed()
@@ -604,7 +604,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(db);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -633,7 +633,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -693,7 +693,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -723,7 +723,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -782,7 +782,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]
@@ -812,7 +812,7 @@ public class UpdateCardTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(testDB);
-        var exception = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
+        var exception = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new UpdateCard(dbContext.AsCallContext(localizer)).RunAsync(request));
         Assert.AreEqual(errorMesg, exception.Message);
     }
     [TestMethod()]

@@ -21,7 +21,7 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -32,7 +32,7 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserUnregistered()
@@ -45,7 +45,7 @@ public class EditCardDiscussionEntryTests
         await UserHelper.DeleteAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(Guid.Empty, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task EntryDoesNotExist()
@@ -54,7 +54,7 @@ public class EditCardDiscussionEntryTests
         var userId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, RandomHelper.Guid(), RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentCardDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, RandomHelper.Guid(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task CardIsDeleted()
@@ -67,7 +67,7 @@ public class EditCardDiscussionEntryTests
         await CardDeletionHelper.DeleteCardAsync(db, userId, cardId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task CardIsNotViewableByUser()
@@ -79,7 +79,7 @@ public class EditCardDiscussionEntryTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(otherUserId, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(otherUserId, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserIsNotAuthorOfEntry()
@@ -91,7 +91,7 @@ public class EditCardDiscussionEntryTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(otherUserId, entryId, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(otherUserId, entryId, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task EmptyText()
@@ -102,7 +102,7 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<TextTooShortException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, "")));
+        await Assert.ThrowsExactlyAsync<TextTooShortException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, "")));
     }
     [TestMethod()]
     public async Task TextStartsWithBlanks()
@@ -113,8 +113,8 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, " " + RandomHelper.String())));
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, "\t " + RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, " " + RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, "\t " + RandomHelper.String())));
     }
     [TestMethod()]
     public async Task TextEndsWithBlanks()
@@ -125,8 +125,8 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String() + " ")));
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String() + "\t ")));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String() + " ")));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String() + "\t ")));
     }
     [TestMethod()]
     public async Task TextTooLong()
@@ -137,7 +137,7 @@ public class EditCardDiscussionEntryTests
         var entryId = (await CardDiscussionHelper.CreateEntryAsync(db, userId, cardId)).Id;
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<TextTooLongException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String(QueryValidationHelper.CardDiscussionMaxTextLength + 1))));
+        await Assert.ThrowsExactlyAsync<TextTooLongException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(userId, entryId, RandomHelper.String(QueryValidationHelper.CardDiscussionMaxTextLength + 1))));
     }
     [TestMethod()]
     public async Task Success_SingleEditOfSingleEntry_SameUser()
@@ -252,9 +252,9 @@ public class EditCardDiscussionEntryTests
         // Forbidden edit attempts
         {
             using var dbContext = new MemCheckDbContext(db);
-            await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user3Id, Card1Entry2OriginalVersion.Id, RandomHelper.String())));
-            await Assert.ThrowsExceptionAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user2Id, Card1Entry1OriginalVersion.Id, RandomHelper.String())));
-            await Assert.ThrowsExceptionAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user1Id, Card1Entry2OriginalVersion.Id, RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user3Id, Card1Entry2OriginalVersion.Id, RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user2Id, Card1Entry1OriginalVersion.Id, RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<UserNotAllowedToEditDiscussionEntryException>(async () => await new EditCardDiscussionEntry(dbContext.AsCallContext()).RunAsync(new EditCardDiscussionEntry.Request(user1Id, Card1Entry2OriginalVersion.Id, RandomHelper.String())));
         }
         // Check Card1Entry1
         {

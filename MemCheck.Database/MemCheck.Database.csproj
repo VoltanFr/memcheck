@@ -2,13 +2,11 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.13.5</VersionPrefix>
-	</PropertyGroup>
+		<VersionPrefix>0.14.0</VersionPrefix>
+    </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EntityFramework" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 	</ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
-using System.Data.SqlClient;
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -26,7 +26,7 @@ public static class DbHelper
                 }
                 return result;
             }
-            catch (SqlException e)
+            catch (Exception e)
             {
                 if (!e.Message.Contains("Connection Timeout Expired") || attempts > 10)  //Happens sometimes in GitHub actions
                     throw;

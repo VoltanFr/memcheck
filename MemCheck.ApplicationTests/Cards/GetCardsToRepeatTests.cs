@@ -24,7 +24,7 @@ public class GetCardsToRepeatTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsToRepeat.Request(Guid.Empty, deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -35,7 +35,7 @@ public class GetCardsToRepeatTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsToRepeat.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -45,7 +45,7 @@ public class GetCardsToRepeatTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsToRepeat.Request(user, Guid.NewGuid(), Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserNotOwner()
@@ -57,7 +57,7 @@ public class GetCardsToRepeatTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsToRepeat.Request(otherUser, deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardsToRepeat(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task EmptyDeck()
@@ -150,7 +150,7 @@ public class GetCardsToRepeatTests
         Assert.AreEqual(cardCount, cards.Length);
         for (var i = 1; i < cards.Length; i++)
         {
-            Assert.IsTrue(cards[i].Heap <= cards[i - 1].Heap);
+            Assert.IsLessThanOrEqualTo(cards[i - 1].Heap, cards[i].Heap);
             if (cards[i].Heap == cards[i - 1].Heap)
                 Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
         }

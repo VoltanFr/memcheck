@@ -15,19 +15,19 @@ public class GetAllTagsTests
     public async Task Page0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageIndexTooSmallException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 0, "")));
+        await Assert.ThrowsExactlyAsync<PageIndexTooSmallException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(1, 0, "")));
     }
     [TestMethod()]
     public async Task PageSize0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, 1, "")));
+        await Assert.ThrowsExactlyAsync<PageSizeTooSmallException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(0, 1, "")));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize + 1, 1, "")));
+        await Assert.ThrowsExactlyAsync<PageSizeTooBigException>(async () => await new GetAllTags(dbContext.AsCallContext()).RunAsync(new GetAllTags.Request(GetAllTags.Request.MaxPageSize + 1, 1, "")));
     }
     [TestMethod()]
     public async Task None()

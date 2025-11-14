@@ -1,14 +1,14 @@
-﻿using MemCheck.CommandLineDbClient.PerfMeasurements.Images;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MemCheck.CommandLineDbClient.ManageDB;
 using MemCheck.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient;
 
@@ -23,7 +23,7 @@ internal sealed class Engine : IHostedService
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance", Justification = "Often changes")]
     private ICmdLinePlugin GetPlugin()
     {
-        return new GetImageFromNamePerfMeasurements(serviceProvider);
+        return new MakeUserAdmin(serviceProvider);
     }
     #endregion
     public Engine(IServiceProvider serviceProvider)

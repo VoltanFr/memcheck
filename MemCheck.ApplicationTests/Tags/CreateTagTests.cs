@@ -18,7 +18,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, "", "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, "", "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -26,7 +26,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MinNameLength) + '\t', "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MinNameLength) + '\t', "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionNotTrimmed()
@@ -34,7 +34,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String() + '\t', RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String() + '\t', RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooShort()
@@ -42,7 +42,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MinNameLength - 1), "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MinNameLength - 1), "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -50,7 +50,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MaxNameLength + 1), "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(Tag.MaxNameLength + 1), "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionTooLong()
@@ -58,7 +58,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1), RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameWithForbiddenChar()
@@ -66,7 +66,7 @@ public class CreateTagTests
         var testDB = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateUserInDbAsync(testDB);
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, "a<b", "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, "a<b", "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task AlreadyExists()
@@ -77,7 +77,7 @@ public class CreateTagTests
         using (var dbContext = new MemCheckDbContext(db))
             await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, name, "", RandomHelper.String()));
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, name, "", RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, name, "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task Success()
@@ -121,6 +121,6 @@ public class CreateTagTests
         }
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new CreateTag(dbContext.AsCallContext()).RunAsync(new CreateTag.Request(user.Id, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
     }
 }

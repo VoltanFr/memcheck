@@ -21,7 +21,7 @@ namespace MemCheck.Application.Notifiying;
 
 internal interface IUserSearchNotifier
 {
-    public Task<UserSearchNotifierResult> RunAsync(Guid searchSubscriptionId);
+    Task<UserSearchNotifierResult> RunAsync(Guid searchSubscriptionId);
 }
 internal sealed class UserSearchNotifier : IUserSearchNotifier
 {

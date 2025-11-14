@@ -14,6 +14,6 @@ public class AssemblyServicesTests
     [TestMethod()]
     public void CheckBasics()
     {
-        StringAssert.StartsWith(AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly), "MemCheck.BasicsTests 0.12.13", StringComparison.Ordinal);
+        Assert.StartsWith("MemCheck.BasicsTests 0.12.13", AssemblyServices.GetDisplayInfoForAssembly(GetType().Assembly), StringComparison.Ordinal);
     }
 }

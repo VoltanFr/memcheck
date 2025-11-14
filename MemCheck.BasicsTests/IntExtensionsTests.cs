@@ -15,19 +15,19 @@ public class IntExtensionsTests
     {
         var list = new List<int>();
         await 0.TimesAsync(async () => { list.Add(0); await Task.CompletedTask; });
-        Assert.AreEqual(0, list.Count);
+        Assert.IsEmpty(list);
     }
     [TestMethod()]
     public async Task Times_Negative()
     {
-        await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await (-1).TimesAsync(async () => { await Task.CompletedTask; }));
+        await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () => await (-1).TimesAsync(async () => { await Task.CompletedTask; }));
     }
     [TestMethod()]
     public async Task Times_Once()
     {
         var list = new List<int>();
         await 1.TimesAsync(async () => { list.Add(0); await Task.CompletedTask; });
-        Assert.AreEqual(1, list.Count);
+        Assert.HasCount(1, list);
     }
     [TestMethod()]
     public async Task Times_Random()
@@ -46,13 +46,13 @@ public class IntExtensionsTests
     [TestMethod()]
     public async Task TimessWithResult_Negative()
     {
-        await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await (-1).TimesAsync(async () => { await Task.CompletedTask; return 1; }));
+        await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () => await (-1).TimesAsync(async () => { await Task.CompletedTask; return 1; }));
     }
     [TestMethod()]
     public async Task TimesWithResult_Once()
     {
         var result = await 1.TimesAsync(async () => { await Task.CompletedTask; return 1; });
-        Assert.AreEqual(1, result.Length);
+        Assert.HasCount(1, result);
         Assert.AreEqual(1, result[0]);
     }
     [TestMethod()]

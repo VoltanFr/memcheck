@@ -24,16 +24,13 @@ public class RandomHelperTests
         Assert.IsFalse(bools.All(b => !b), $"Among {attempts} attempts, Bool returned only false");
     }
     [TestMethod()]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
     public void LongStringContainsUpperAndLower()
     {
         var length = RandomHelper.Int(100, 1000);
         var s = RandomHelper.String(length);
         Assert.AreEqual(length, s.Length);
-#pragma warning disable CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
-        Assert.IsFalse(s.ToUpperInvariant() == s, $"A string of {length} chars was all upper chars");
-        Assert.IsFalse(s.ToLowerInvariant() == s, $"A string of {length} chars was all lower chars");
-#pragma warning restore CA1862 // Use the 'StringComparison' method overloads to perform case-insensitive string comparisons
+        Assert.IsFalse(s.All(char.IsUpper), $"A string of {length} chars contained only upper-case characters");
+        Assert.IsFalse(s.All(char.IsLower), $"A string of {length} chars contained only lower-case characters");
     }
     [TestMethod()]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]

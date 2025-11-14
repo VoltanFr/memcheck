@@ -20,7 +20,7 @@ public class GetSearchSubscriptionsTest
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetSearchSubscriptions.Request(userId);
         var subscriptions = await new GetSearchSubscriptions(dbContext.AsCallContext()).RunAsync(request);
-        Assert.IsTrue(!subscriptions.Any());
+        Assert.IsFalse(subscriptions.Any());
     }
     [TestMethod()]
     public async Task TestSimplestSearch()

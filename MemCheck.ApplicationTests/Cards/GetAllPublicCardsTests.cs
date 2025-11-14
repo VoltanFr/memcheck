@@ -27,7 +27,7 @@ public class GetAllPublicCardsTests
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetAllPublicCards(dbContext.AsCallContext()).RunAsync(new GetAllPublicCards.Request());
-        Assert.AreEqual(0, result.Cards.Length);
+        Assert.IsEmpty(result.Cards);
     }
     [TestMethod()]
     public async Task SingleCardVisibleToSeveralUsers()
@@ -90,7 +90,7 @@ public class GetAllPublicCardsTests
 
         using var dbContext = new MemCheckDbContext(db);
         var result = await new GetAllPublicCards(dbContext.AsCallContext()).RunAsync(new GetAllPublicCards.Request());
-        Assert.AreEqual(2, result.Cards.Length);
+        Assert.HasCount(2, result.Cards);
 
         {
             var resultCard1 = result.Cards.Single(card => card.CardId == card1Id);

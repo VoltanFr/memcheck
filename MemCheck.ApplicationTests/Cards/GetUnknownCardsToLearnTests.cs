@@ -25,7 +25,7 @@ public class GetUnknownCardsToLearnTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetUnknownCardsToLearn.Request(Guid.Empty, deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -36,7 +36,7 @@ public class GetUnknownCardsToLearnTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetUnknownCardsToLearn.Request(Guid.NewGuid(), deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -46,7 +46,7 @@ public class GetUnknownCardsToLearnTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetUnknownCardsToLearn.Request(user, Guid.NewGuid(), Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserNotOwner()
@@ -58,7 +58,7 @@ public class GetUnknownCardsToLearnTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetUnknownCardsToLearn.Request(otherUser, deck, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task OneCardToRepeat()
@@ -146,9 +146,9 @@ public class GetUnknownCardsToLearnTests
         const int requestCardCount = 10;
         var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), requestCardCount);
         var firstRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
-        Assert.AreEqual(requestCardCount, firstRunCards.Count);
+        Assert.HasCount(requestCardCount, firstRunCards);
         var secondRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
-        Assert.AreEqual(requestCardCount, secondRunCards.Count);
+        Assert.HasCount(requestCardCount, secondRunCards);
         var thirdRunCards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
         Assert.AreEqual(requestCardCount, thirdRunCards.Count);
         Assert.IsFalse(firstRunCards.SetEquals(secondRunCards));
@@ -208,7 +208,7 @@ public class GetUnknownCardsToLearnTests
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetUnknownCardsToLearn.Request(user, deck, Array.Empty<Guid>(), cardCount);
         var cards = (await new GetUnknownCardsToLearn(dbContext.AsCallContext()).RunAsync(request)).Cards.ToImmutableArray();
-        Assert.AreEqual(cardCount, cards.Length);
+        Assert.HasCount(cardCount, cards);
         for (var i = 1; i < cards.Length; i++)
             Assert.IsTrue(cards[i].LastLearnUtcTime >= cards[i - 1].LastLearnUtcTime);
     }

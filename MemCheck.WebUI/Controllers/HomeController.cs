@@ -56,7 +56,7 @@ public class HomeController : MemCheckController
             if (userDecks.Any(deck => deck.ExpiredCardCount > 0))
                 return TimeSpan.FromMinutes(10);
 
-            var sleepTimeForDecks = userDecks.Select(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow).Min();
+            var sleepTimeForDecks = userDecks.Min(deck => deck.ExpiredCardCount > 0 ? TimeSpan.FromMinutes(10) : deck.NextExpiryUTCDate - DateTime.UtcNow);
             return new[] { TimeSpan.FromMinutes(1), sleepTimeForDecks }.Max().Add(TimeSpan.FromMinutes(1));    //Not less than 2'
         }
         public GetAllResult(string? userName, bool anythingToLearn, int totalCardCountInDecksOfUser, IEnumerable<GetAllResult_Deck> userDecks, DateTime dataUTCDate, IEnumerable<GetAllResult_Tag> recommendedTagsForDemo)

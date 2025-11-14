@@ -14,13 +14,13 @@ public class GetAdminEmailAddessesTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task UserIsNotAdmin()
@@ -28,7 +28,7 @@ public class GetAdminEmailAddessesTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(user)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetAdminEmailAddesses(dbContext.AsCallContext()).RunAsync(new GetAdminEmailAddesses.Request(user)));
     }
     [TestMethod()]
     public async Task OnlyOtherUserIsNotAdmin()

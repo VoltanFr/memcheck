@@ -17,7 +17,7 @@ public class QueryValidationHelperTests
         await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
     }
     [TestMethod()]
     public async Task CheckUserExists_UserDoesNotExist()
@@ -26,7 +26,7 @@ public class QueryValidationHelperTests
         await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
     }
     [TestMethod()]
     public async Task CheckUserExists_UserExists_Single()
@@ -60,7 +60,7 @@ public class QueryValidationHelperTests
         }
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
     }
     [TestMethod()]
     public async Task CheckUserExists_UserDeleted_Multiple()
@@ -76,7 +76,7 @@ public class QueryValidationHelperTests
         }
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, RandomHelper.Guid()));
     }
     [TestMethod()]
     public async Task CheckUserExists_ComplexCase()
@@ -109,8 +109,8 @@ public class QueryValidationHelperTests
         {
             await QueryValidationHelper.CheckUserExistsAsync(dbContext, existingNonAdminUserId);
             await QueryValidationHelper.CheckUserExistsAsync(dbContext, existingAdminUserId);
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, userIdDeletedByHimself));
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, userIdDeletedByAdmin));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, userIdDeletedByHimself));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await QueryValidationHelper.CheckUserExistsAsync(dbContext, userIdDeletedByAdmin));
         }
     }
 }

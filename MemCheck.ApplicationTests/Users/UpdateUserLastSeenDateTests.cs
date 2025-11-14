@@ -16,14 +16,14 @@ public class UpdateUserLastSeenDateTests
     {
         var db = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         var db = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(RandomHelper.Guid())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(RandomHelper.Guid())));
     }
     [TestMethod()]
     public async Task UserIsDeleted()
@@ -37,7 +37,7 @@ public class UpdateUserLastSeenDateTests
             await new DeleteUserAccount(dbContext.AsCallContext(), userManager).RunAsync(new DeleteUserAccount.Request(userId, userId));
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(userId)));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateUserLastSeenDate(dbContext.AsCallContext()).RunAsync(new UpdateUserLastSeenDate.Request(userId)));
     }
     [TestMethod()]
     public async Task Success()

@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace MemCheck.Application.Helpers;
 
-internal sealed class TestLocalizer : ILocalized
+public sealed class TestLocalizer : ILocalized
 {
     #region Fields
     private readonly ImmutableDictionary<string, string> values;

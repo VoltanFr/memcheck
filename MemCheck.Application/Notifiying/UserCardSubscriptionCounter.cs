@@ -11,7 +11,7 @@ namespace MemCheck.Application.Notifiying;
 
 internal interface IUserCardSubscriptionCounter
 {
-    public Task<int> RunAsync(Guid userId);
+    Task<int> RunAsync(Guid userId);
 }
 internal sealed class UserCardSubscriptionCounter : IUserCardSubscriptionCounter
 {

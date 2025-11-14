@@ -319,7 +319,7 @@ public class UserCardVersionsNotifierTests
         using (var dbContext = new MemCheckDbContext(testDB))
         {
             var versions = await new UserCardVersionsNotifier(dbContext.AsCallContext(), new DateTime(2020, 11, 5)).RunAsync(user1);
-            Assert.AreEqual(0, versions.Cards.Length);
+            Assert.IsEmpty(versions.Cards);
         }
 
         using (var dbContext = new MemCheckDbContext(testDB))

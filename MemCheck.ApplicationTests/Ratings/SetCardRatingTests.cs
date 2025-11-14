@@ -40,7 +40,7 @@ public class SetCardRatingTests
         var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(Guid.Empty, card, RandomHelper.Rating())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(Guid.Empty, card, RandomHelper.Rating())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -51,7 +51,7 @@ public class SetCardRatingTests
         var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(Guid.NewGuid(), card, RandomHelper.Rating())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(Guid.NewGuid(), card, RandomHelper.Rating())));
     }
     [TestMethod()]
     public async Task TooSmall()
@@ -62,7 +62,7 @@ public class SetCardRatingTests
         var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user, card, 0)));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user, card, 0)));
     }
     [TestMethod()]
     public async Task TooBig()
@@ -73,7 +73,7 @@ public class SetCardRatingTests
         var card = await CardHelper.CreateIdAsync(db, user, language: languageId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user, card, 6)));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SetCardRating(dbContext.AsCallContext()).RunAsync(new SetCardRating.Request(user, card, 6)));
     }
     [TestMethod()]
     public async Task SingleUser_NoPreviousValue()

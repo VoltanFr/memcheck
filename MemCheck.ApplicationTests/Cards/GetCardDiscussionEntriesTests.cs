@@ -20,7 +20,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(Guid.Empty, cardId, 42, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(Guid.Empty, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(RandomHelper.Guid(), cardId, 42, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(RandomHelper.Guid(), cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -39,7 +39,7 @@ public class GetCardDiscussionEntriesTests
         var userId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, RandomHelper.Guid(), 42, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, RandomHelper.Guid(), 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardIsDeleted()
@@ -51,7 +51,7 @@ public class GetCardDiscussionEntriesTests
         await CardDeletionHelper.DeleteCardAsync(db, userId, cardId);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 42, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardIsNotViewableByUser()
@@ -62,7 +62,7 @@ public class GetCardDiscussionEntriesTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(otherUserId, cardId, 42, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(otherUserId, cardId, 42, Guid.Empty)));
     }
     [TestMethod()]
     public async Task PageSizeTooSmall()
@@ -72,7 +72,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MinPageSize - 1, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<PageSizeTooSmallException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MinPageSize - 1, Guid.Empty)));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
@@ -82,7 +82,7 @@ public class GetCardDiscussionEntriesTests
         var cardId = await CardHelper.CreateIdAsync(db, userId, userWithViewIds: userId.AsArray());
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MaxPageSize + 1, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<PageSizeTooBigException>(async () => await new GetCardDiscussionEntries(dbContext.AsCallContext()).RunAsync(new GetCardDiscussionEntries.Request(userId, cardId, GetCardDiscussionEntries.Request.MaxPageSize + 1, Guid.Empty)));
     }
     [TestMethod()]
     public async Task Success_CardHasNoDiscussionEntry_LastObtainedEntryIsZero()
@@ -110,7 +110,7 @@ public class GetCardDiscussionEntriesTests
 
         Assert.AreEqual(0, result.TotalCount);
         Assert.AreEqual(0, result.PageCount);
-        Assert.AreEqual(0, result.Entries.Length);
+        Assert.IsEmpty(result.Entries);
     }
     [TestMethod()]
     public async Task Success_CardHasSingleDiscussionEntry_LastObtainedEntryIsZero()
@@ -130,7 +130,7 @@ public class GetCardDiscussionEntriesTests
 
             Assert.AreEqual(1, result.TotalCount);
             Assert.AreEqual(1, result.PageCount);
-            Assert.AreEqual(1, result.Entries.Length);
+            Assert.HasCount(1, result.Entries);
             Assert.AreEqual(text, result.Entries.Single().Text);
             Assert.IsFalse(result.Entries.Single().HasBeenEdited);
             Assert.AreEqual(userId, result.Entries.Single().Creator.Id);

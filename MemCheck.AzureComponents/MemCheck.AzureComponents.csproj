@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>1.0.1</VersionPrefix>
+		<VersionPrefix>1.1.0</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,9 +16,8 @@
 
 	<ItemGroup>
         <PackageReference Include="Azure.Communication.Email" />
-        <PackageReference Include="Microsoft.ApplicationInsights" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" />
-	</ItemGroup>
+        <!--<PackageReference Include="Microsoft.ApplicationInsights" />-->
+    </ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />

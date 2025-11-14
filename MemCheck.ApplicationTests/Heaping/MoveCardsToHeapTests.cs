@@ -22,7 +22,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.Empty, deck, RandomHelper.Heap(), card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.Empty, deck, RandomHelper.Heap(), card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -34,7 +34,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.NewGuid(), deck, RandomHelper.Heap(), card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(Guid.NewGuid(), deck, RandomHelper.Heap(), card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -46,7 +46,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, Guid.NewGuid(), RandomHelper.Heap(), card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, Guid.NewGuid(), RandomHelper.Heap(), card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task UserNotOwner()
@@ -59,7 +59,7 @@ public class MoveCardsToHeapTests
         var otherUser = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(otherUser, deck, RandomHelper.Heap(), card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(otherUser, deck, RandomHelper.Heap(), card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -71,7 +71,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { card.Id, Guid.NewGuid() })));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { card.Id, Guid.NewGuid() })));
     }
     [TestMethod()]
     public async Task CardNotInDeck()
@@ -84,7 +84,7 @@ public class MoveCardsToHeapTests
         var cardNotInDeck = await CardHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { cardInDeck.Id, cardNotInDeck.Id })));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, RandomHelper.Heap(), new[] { cardInDeck.Id, cardNotInDeck.Id })));
     }
     [TestMethod()]
     public async Task HeapTooSmall()
@@ -96,7 +96,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, -1, card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, -1, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task HeapTooBig()
@@ -108,7 +108,7 @@ public class MoveCardsToHeapTests
         await DeckHelper.AddCardAsync(db, deck, card.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.MaxHeapValue + 1, card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new MoveCardsToHeap(dbContext.AsCallContext()).RunAsync(new MoveCardsToHeap.Request(user, deck, CardInDeck.MaxHeapValue + 1, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task MoveMultiple()

@@ -17,11 +17,11 @@ namespace MemCheck.Application.Notifiying;
 
 internal interface IUserCardVersionsNotifier
 {
-    public Task<CardVersionsNotifierResult> RunAsync(Guid userId);
+    Task<CardVersionsNotifierResult> RunAsync(Guid userId);
     #region Result types
-    public sealed record CardVersionsNotifierResult(ImmutableArray<ResultCard> Cards);
-    public sealed record ResultCard(Guid CardId, ImmutableArray<ResultCardVersion> CardVersions, ImmutableArray<ResultDiscussionEntry> DiscussionEntries);
-    public sealed class ResultCardVersion
+    sealed record CardVersionsNotifierResult(ImmutableArray<ResultCard> Cards);
+    sealed record ResultCard(Guid CardId, ImmutableArray<ResultCardVersion> CardVersions, ImmutableArray<ResultDiscussionEntry> DiscussionEntries);
+    sealed class ResultCardVersion
     {
         public ResultCardVersion(Guid cardId, string frontSide, string versionCreator, DateTime versionUtcDate, string versionDescription, bool cardIsViewable, Guid? versionIdOnLastNotification, CardNotificationSubscription subscription)
         {
@@ -43,7 +43,7 @@ internal interface IUserCardVersionsNotifier
         public Guid? VersionIdOnLastNotification { get; }
         public CardNotificationSubscription Subscription { get; }
     }
-    public sealed class ResultDiscussionEntry
+    sealed class ResultDiscussionEntry
     {
         public ResultDiscussionEntry(Guid discussionEntryId, string versionCreator, string text, DateTime creationUtcDate, bool cardIsViewable, CardNotificationSubscription subscription)
         {

@@ -20,7 +20,7 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetRemainingCardsInLesson.Request(Guid.Empty, deck, RandomHelper.Bool());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -31,7 +31,7 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetRemainingCardsInLesson.Request(Guid.NewGuid(), deck, RandomHelper.Bool());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task DeckDoesNotExist()
@@ -41,7 +41,7 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetRemainingCardsInLesson.Request(user, Guid.NewGuid(), RandomHelper.Bool());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserNotOwner()
@@ -53,7 +53,7 @@ public class GetRemainingCardsInLessonTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetRemainingCardsInLesson.Request(otherUser, deck, RandomHelper.Bool());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetRemainingCardsInLesson(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task EmptyDeck()

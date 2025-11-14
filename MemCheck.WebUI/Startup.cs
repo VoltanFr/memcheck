@@ -64,8 +64,8 @@ public sealed class Startup
 
         var appSettings = new AppSettings(configuration, prodEnvironment, CreateLogger());
 
-        if (!prodEnvironment)
-            services.AddDatabaseDeveloperPageExceptionFilter();
+        //if (!prodEnvironment)
+        //    services.AddDatabaseDeveloperPageExceptionFilter();
 
         services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
@@ -73,7 +73,7 @@ public sealed class Startup
             .AddEntityFrameworkStores<MemCheckDbContext>()
             .AddDefaultTokenProviders()
             .AddUserManager<MemCheckUserManager>()
-            .AddDefaultUI()
+            //.AddDefaultUI()
             .AddErrorDescriber<LocalizedIdentityErrorDescriber>()
             .AddSignInManager<MemCheckSignInManager>()
             .AddClaimsPrincipalFactory<MemCheckClaimsFactory>();

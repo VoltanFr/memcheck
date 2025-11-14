@@ -16,13 +16,13 @@ public class GetCardForEditTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.Empty, Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(Guid.NewGuid(), Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -30,7 +30,7 @@ public class GetCardForEditTests
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(userId, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task FailIfUserCanNotView()
@@ -41,7 +41,7 @@ public class GetCardForEditTests
         var card = await CardHelper.CreateAsync(db, userId, language: language, userWithViewIds: userId.AsArray());
         var otherUserId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id)));
     }
     [TestMethod()]
     public async Task CardWithPreviousVersion()
@@ -108,7 +108,7 @@ public class GetCardForEditTests
         Assert.AreEqual(2, loaded.UsersWithVisibility.Length);
         Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == creator.Id) == 1);
         Assert.AreEqual(creator.UserName, loaded.UsersWithVisibility.Single(u => u.UserId == creator.Id).UserName);
-        Assert.IsTrue(loaded.UsersWithVisibility.Count(u => u.UserId == otherUser.Id) == 1);
+        Assert.AreEqual(1, loaded.UsersWithVisibility.Count(u => u.UserId == otherUser.Id));
         Assert.AreEqual(otherUser.UserName, loaded.UsersWithVisibility.Single(u => u.UserId == otherUser.Id).UserName);
         Assert.AreEqual(creationDate, loaded.FirstVersionUtcDate);
         Assert.AreEqual(creationDate, loaded.LastVersionUtcDate);
@@ -144,7 +144,7 @@ public class GetCardForEditTests
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(creatorId, card.Id));
 
-        Assert.AreEqual(1, loaded.PossibleTargetDecksForAdd.Length);
+        Assert.HasCount(1, loaded.PossibleTargetDecksForAdd);
         Assert.AreEqual(deckId, loaded.PossibleTargetDecksForAdd[0].DeckId);
         Assert.AreEqual(deckName, loaded.PossibleTargetDecksForAdd[0].DeckName);
     }
@@ -199,7 +199,7 @@ public class GetCardForEditTests
         using var dbContext = new MemCheckDbContext(db);
         var loaded = await new GetCardForEdit(dbContext.AsCallContext()).RunAsync(new GetCardForEdit.Request(otherUserId, card.Id));
 
-        Assert.AreEqual(2, loaded.PossibleTargetDecksForAdd.Length);
+        Assert.HasCount(2, loaded.PossibleTargetDecksForAdd);
         Assert.IsTrue(loaded.PossibleTargetDecksForAdd.Any(deck => deck.DeckId == otherUserDeckId));
     }
     [TestMethod()]

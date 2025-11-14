@@ -1,15 +1,15 @@
-﻿using MemCheck.Database;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using MemCheck.Database;
 using MemCheck.Domain;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace MemCheck.CommandLineDbClient;
 
@@ -24,7 +24,7 @@ internal static class Program
         var db = config["ConnectionStrings:DebuggingDb"];
         if (!string.IsNullOrEmpty(config[$"ConnectionStrings:{db}"]))
             db = config[$"ConnectionStrings:{db}"];
-        return db ?? throw new ConfigurationErrorsException("Unable to read connection string");
+        return db ?? throw new IOException("Unable to read connection string");
     }
     private static IConfiguration GetConfig()
     {
@@ -38,10 +38,9 @@ internal static class Program
         hostBuilder = hostBuilder.ConfigureServices((hostContext, services) => services
             .AddHostedService<Engine>()
             .AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(connectionString))
-            .AddIdentity<MemCheckUser, MemCheckUserRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddIdentity<MemCheckUser, MemCheckUserRole>(options => options.SignIn.RequireConfirmedAccount = true) // (options => MemCheckUserManager.SetupIdentityOptions(options))
             .AddEntityFrameworkStores<MemCheckDbContext>()
-            .AddDefaultTokenProviders()
-            .AddDefaultUI());
+            .AddDefaultTokenProviders());
 
         hostBuilder = hostBuilder.ConfigureLogging(logging =>
         {

@@ -18,13 +18,13 @@ public class GetCardDiffTests
     public async Task EmptyDB_UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.Empty, Guid.Empty, Guid.Empty)));
     }
     [TestMethod()]
     public async Task EmptyDB_UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(Guid.NewGuid(), Guid.Empty, Guid.Empty)));
     }
     [TestMethod()]
     public async Task EmptyDB_OriginalVersionDoesNotExist()
@@ -38,7 +38,7 @@ public class GetCardDiffTests
         using (var dbContext = new MemCheckDbContext(db))
             await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync();
         using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, card.Id, Guid.NewGuid())));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, card.Id, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task EmptyDB_CurrentVersionDoesNotExist()
@@ -53,7 +53,7 @@ public class GetCardDiffTests
         using (var dbContext = new MemCheckDbContext(db))
             originalVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
         using (var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB()))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, Guid.NewGuid(), originalVersionId)));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(userId, Guid.NewGuid(), originalVersionId)));
     }
     [TestMethod()]
     public async Task FailIfUserCanNotViewOriginalVersion()
@@ -75,7 +75,7 @@ public class GetCardDiffTests
             previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
         var otherUserId = await UserHelper.CreateInDbAsync(db);
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
     }
     [TestMethod()]
     public async Task FailIfUserCanNotViewCurrentVersion()
@@ -97,7 +97,7 @@ public class GetCardDiffTests
             previousVersionId = (await dbContext.CardPreviousVersions.Where(previous => previous.Card == card.Id).SingleAsync()).Id;
         var otherUserId = await UserHelper.CreateInDbAsync(db);
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardDiff(dbContext.AsCallContext()).RunAsync(new GetCardDiff.Request(otherUserId, card.Id, previousVersionId)));
     }
     [TestMethod()]
     public async Task FrontDiff_OriginalIsPublic()

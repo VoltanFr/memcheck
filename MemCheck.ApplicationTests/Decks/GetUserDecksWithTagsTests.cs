@@ -21,7 +21,7 @@ public class GetUserDecksWithTagsTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -31,7 +31,7 @@ public class GetUserDecksWithTagsTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetUserDecksWithTags(dbContext.AsCallContext()).RunAsync(new GetUserDecksWithTags.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task NoDeck()

@@ -80,7 +80,7 @@ public class RefreshAverageRatingsTests
             };
             dbContext.UserCardRatings.Add(userCardRating);
             await dbContext.SaveChangesAsync();
-        };
+        }
 
         using (var dbContext = new MemCheckDbContext(db))
         {

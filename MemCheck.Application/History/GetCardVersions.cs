@@ -167,11 +167,11 @@ public sealed class GetCardVersions : RequestRunner<GetCardVersions.Request, IEn
     }
     public interface IResultCardVersion
     {
-        public Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
-        public DateTime VersionUtcDate { get; }
-        public string VersionCreator { get; }
-        public string VersionDescription { get; }
-        public IEnumerable<string> ChangedFieldNames { get; }
+        Guid? VersionId { get; } //null if this is the current version of the card, ie not a previous version
+        DateTime VersionUtcDate { get; }
+        string VersionCreator { get; }
+        string VersionDescription { get; }
+        IEnumerable<string> ChangedFieldNames { get; }
     }
     #endregion
 }

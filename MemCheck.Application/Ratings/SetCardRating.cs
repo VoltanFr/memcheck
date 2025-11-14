@@ -2,7 +2,6 @@
 using MemCheck.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ public sealed class SetCardRating : RequestRunner<SetCardRating.Request, SetCard
                     await DbContext.SaveChangesAsync();
                     return 0;
                 }
-                catch (SqlException e)
+                catch (Exception e)
                 {
                     if (attempts < 5 && e.Message.Contains("Violation of PRIMARY KEY constraint", StringComparison.Ordinal))
                     {

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<VersionPrefix>0.11.2</VersionPrefix>
+		<VersionPrefix>0.12.0</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,8 +15,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-		<PackageReference Include="Svg" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" />
+		<!--<PackageReference Include="Svg" />-->
 	</ItemGroup>
 
 </Project>

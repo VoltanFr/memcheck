@@ -25,39 +25,39 @@ public class GetImageListTests
     public async Task Page0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageIndexTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 0, "")));
+        await Assert.ThrowsExactlyAsync<PageIndexTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 0, "")));
     }
     [TestMethod()]
     public async Task PageSize0()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageSizeTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "")));
+        await Assert.ThrowsExactlyAsync<PageSizeTooSmallException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(0, 1, "")));
     }
     [TestMethod()]
     public async Task PageSizeTooBig()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<PageSizeTooBigException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(GetImageList.Request.MaxPageSize + 1, 1, "")));
+        await Assert.ThrowsExactlyAsync<PageSizeTooBigException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(GetImageList.Request.MaxPageSize + 1, 1, "")));
     }
     [TestMethod()]
     public async Task TextNotTrimmed_AtStart()
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
     }
     [TestMethod()]
     public async Task TextNotTrimmed_AtEnd()
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, RandomHelper.String() + '\t')));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, RandomHelper.String() + '\t')));
     }
     [TestMethod()]
     public async Task FilteredNotTrimmed()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new GetImageList(dbContext.AsCallContext()).RunAsync(new GetImageList.Request(1, 1, "  " + RandomHelper.String())));
     }
     [TestMethod()]
     public async Task OneImageInDb_NotUsed()
@@ -156,8 +156,8 @@ public class GetImageListTests
             Assert.AreEqual(2, result.TotalCount);
             Assert.IsFalse(result.Images.Any());
         }
-        Assert.IsTrue(loaded.Contains(img1));
-        Assert.IsTrue(loaded.Contains(img2));
+        Assert.Contains(img1, loaded);
+        Assert.Contains(img2, loaded);
     }
     [TestMethod()]
     public async Task Filtering()

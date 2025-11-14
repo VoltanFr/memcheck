@@ -66,3 +66,21 @@ dotnet_diagnostic.CA1861.severity = none
 
 # Sometimes a good old if is more readable
 dotnet_diagnostic.IDE0046.severity = none
+
+# I don't understand how I should make internal unit test classes static - TO BE REVISITED
+dotnet_diagnostic.CA1812.severity = none
+
+# I don't understand how I should make unit test classes internal - TO BE REVISITED
+dotnet_diagnostic.CA1515.severity = none
+
+# I don't want to pass a cancellation token in all unit tests
+dotnet_diagnostic.MSTEST0049.severity = none
+
+# I'm out of time now to replace plenty of Assert.AreEqual with Assert.HasCount - TO BE REVISITED
+dotnet_diagnostic.MSTEST0037.severity = none
+
+# I'm out of time now to replace plenty of StringAssert.StartsWith with Assert.StartsWith - TO BE REVISITED
+dotnet_diagnostic.MSTEST0046.severity = none
+
+# I'm out of time now to enforce good use of string comparison - TO BE REVISITED
+dotnet_diagnostic.CA1307.severity = none

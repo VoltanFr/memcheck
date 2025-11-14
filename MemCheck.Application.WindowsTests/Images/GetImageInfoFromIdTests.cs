@@ -1,11 +1,12 @@
-﻿using MemCheck.Application.Helpers;
+﻿using MemCheck.Application.Images;
+using MemCheck.Application.Helpers;
 using MemCheck.Application.QueryValidation;
 using MemCheck.Database;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Images;
+namespace MemCheck.Application.Windows.Images;
 
 [TestClass()]
 public class GetImageInfoFromIdTests
@@ -18,7 +19,7 @@ public class GetImageInfoFromIdTests
         var image = await ImageHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<ImageNotFoundException>(async () => await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<ImageNotFoundException>(async () => await new GetImageInfoFromId(dbContext.AsCallContext()).RunAsync(new GetImageInfoFromId.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task NotUsedInCards()
@@ -43,12 +44,12 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(versionDescription, loaded.CurrentVersionDescription);
         Assert.AreEqual(0, loaded.CardCount);
         Assert.AreEqual(ImageHelper.contentType, loaded.OriginalImageContentType);
-        Assert.IsTrue(loaded.OriginalImageSize > 0);
-        Assert.IsTrue(loaded.SmallSize > 0);
-        Assert.IsTrue(loaded.MediumSize > 0);
-        Assert.IsTrue(loaded.BigSize > 0);
-        Assert.IsTrue(loaded.MediumSize > loaded.SmallSize);
-        Assert.IsTrue(loaded.BigSize > loaded.SmallSize);
+        Assert.IsGreaterThan(0, loaded.OriginalImageSize);
+        Assert.IsGreaterThan(0, loaded.SmallSize);
+        Assert.IsGreaterThan(0, loaded.MediumSize);
+        Assert.IsGreaterThan(0, loaded.BigSize);
+        Assert.IsGreaterThan(loaded.SmallSize, loaded.MediumSize);
+        Assert.IsGreaterThan(loaded.SmallSize, loaded.BigSize);
     }
     [TestMethod()]
     public async Task UsedInCards()
@@ -77,11 +78,11 @@ public class GetImageInfoFromIdTests
         Assert.AreEqual(2, loaded.CardCount);
         Assert.AreEqual(ImageHelper.contentType, loaded.OriginalImageContentType);
         Assert.IsTrue(loaded.OriginalImageSize > 0);
-        Assert.IsTrue(loaded.SmallSize > 0);
-        Assert.IsTrue(loaded.MediumSize > 0);
-        Assert.IsTrue(loaded.BigSize > 0);
-        Assert.IsTrue(loaded.MediumSize > loaded.SmallSize);
-        Assert.IsTrue(loaded.BigSize > loaded.SmallSize);
+        Assert.IsGreaterThan(0, loaded.SmallSize);
+        Assert.IsGreaterThan(0, loaded.MediumSize);
+        Assert.IsGreaterThan(0, loaded.BigSize);
+        Assert.IsGreaterThan(loaded.SmallSize, loaded.MediumSize);
+        Assert.IsGreaterThan(loaded.SmallSize, loaded.BigSize);
     }
     [TestMethod()]
     public async Task HasNewVersion()

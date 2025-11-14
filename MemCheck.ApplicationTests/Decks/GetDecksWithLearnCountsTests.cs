@@ -17,13 +17,13 @@ public class GetDecksWithLearnCountsTests
     public async Task EmptyDB_UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.Empty)));
     }
     [TestMethod()]
     public async Task EmptyDB_UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(new GetDecksWithLearnCounts.Request(Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task OneEmptyDeck()
@@ -34,7 +34,7 @@ public class GetDecksWithLearnCountsTests
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext()).RunAsync(request);
-        Assert.AreEqual(1, result.Length);
+        Assert.HasCount(1, result);
         var loaded = result.First();
         Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loaded.Description);
         Assert.AreEqual(0, loaded.UnknownCardCount);
@@ -176,7 +176,7 @@ public class GetDecksWithLearnCountsTests
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new GetDecksWithLearnCounts.Request(userId);
         var result = await new GetDecksWithLearnCounts(dbContext.AsCallContext(), new DateTime(2030, 02, 01, 0, 30, 0)).RunAsync(request);
-        Assert.AreEqual(2, result.Length);
+        Assert.HasCount(2, result);
 
         var loadedDeck1 = result.Single(d => d.Id == deck1);
         Assert.AreEqual(MemCheckUserManager.DefaultDeckName, loadedDeck1.Description);

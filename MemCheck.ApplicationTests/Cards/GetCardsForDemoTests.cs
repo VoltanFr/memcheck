@@ -23,7 +23,7 @@ public class GetCardsForDemoTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsForDemo.Request(Guid.Empty, Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
         Assert.IsFalse(dbContext.DemoDownloadAuditTrailEntries.Any());
     }
     [TestMethod()]
@@ -33,7 +33,7 @@ public class GetCardsForDemoTests
 
         using var dbContext = new MemCheckDbContext(db);
         var request = new GetCardsForDemo.Request(RandomHelper.Guid(), Array.Empty<Guid>(), 10);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new GetCardsForDemo(dbContext.AsCallContext()).RunAsync(request));
         Assert.IsFalse(dbContext.DemoDownloadAuditTrailEntries.Any());
     }
     [TestMethod()]
@@ -305,7 +305,7 @@ public class GetCardsForDemoTests
 
         var thirdRunDate = RandomHelper.Date();
         var thirdRunCards = (await new GetCardsForDemo(dbContext.AsCallContext(), thirdRunDate).RunAsync(request)).Cards.Select(c => c.CardId).ToImmutableHashSet();
-        Assert.AreEqual(requestCardCount, thirdRunCards.Count);
+        Assert.HasCount(requestCardCount, thirdRunCards);
         CollectionAssert.IsSubsetOf(thirdRunCards, cardsWithRating5);
 
         Assert.IsFalse(firstRunCards.SetEquals(secondRunCards));

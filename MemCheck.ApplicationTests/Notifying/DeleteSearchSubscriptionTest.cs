@@ -23,7 +23,7 @@ public class DeleteSearchSubscriptionTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new DeleteSearchSubscription.Request(Guid.Empty, subscription.Id);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task InvalidSubscriptionId()
@@ -33,7 +33,7 @@ public class DeleteSearchSubscriptionTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new DeleteSearchSubscription.Request(userId, Guid.Empty);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserNotOwnerOfSubscription()
@@ -45,7 +45,7 @@ public class DeleteSearchSubscriptionTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new DeleteSearchSubscription.Request(userId, subscription.Id);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new DeleteSearchSubscription(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task CorrectDeletion_OnlySubscription()

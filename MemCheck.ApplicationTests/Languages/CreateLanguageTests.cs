@@ -15,13 +15,13 @@ public class CreateLanguageTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.Empty, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(Guid.NewGuid(), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task UserIsNotAdmin()
@@ -29,7 +29,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task EmptyName()
@@ -37,7 +37,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, "")));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, "")));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -45,7 +45,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength) + '\t')));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength) + '\t')));
     }
     [TestMethod()]
     public async Task NameTooShort()
@@ -53,7 +53,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength - 1))));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMinNameLength - 1))));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -61,7 +61,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMaxNameLength + 1))));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, RandomHelper.String(QueryValidationHelper.LanguageMaxNameLength + 1))));
     }
     [TestMethod()]
     public async Task NameWithForbiddenChar()
@@ -69,7 +69,7 @@ public class CreateLanguageTests
         var db = DbHelper.GetEmptyTestDB();
         var user = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, "a<b")));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext()).RunAsync(new CreateLanguage.Request(user, "a<b")));
     }
     [TestMethod()]
     public async Task AlreadyExists()
@@ -80,7 +80,7 @@ public class CreateLanguageTests
         using (var dbContext = new MemCheckDbContext(db))
             await new CreateLanguage(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new CreateLanguage.Request(user, name));
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new CreateLanguage.Request(user, name)));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new CreateLanguage(dbContext.AsCallContext(new TestRoleChecker(user))).RunAsync(new CreateLanguage.Request(user, name)));
     }
     [TestMethod()]
     public async Task Success()

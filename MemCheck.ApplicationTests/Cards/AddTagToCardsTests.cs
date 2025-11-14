@@ -23,7 +23,7 @@ public class AddTagToCardsTests
         var tagId = await TagHelper.CreateAsync(db, cardCreator.Id);
         var cardId = await CardHelper.CreateIdAsync(db, cardCreator.Id);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -35,7 +35,7 @@ public class AddTagToCardsTests
         var cardId = await CardHelper.CreateIdAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(RandomHelper.Guid(), tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -49,7 +49,7 @@ public class AddTagToCardsTests
         await UserHelper.DeleteAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_UserDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -60,7 +60,7 @@ public class AddTagToCardsTests
         var cardId = await CardHelper.CreateIdAsync(db, userId);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(userId, RandomHelper.Guid(), cardId.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(userId, RandomHelper.Guid(), cardId.AsArray())));
         Assert.AreEqual(QueryValidationHelper.ExceptionMesg_TagDoesNotExist, e.Message);
     }
     [TestMethod()]
@@ -71,7 +71,7 @@ public class AddTagToCardsTests
         var tagId = await TagHelper.CreateAsync(db, user.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(user.Id, tagId, Array.Empty<Guid>())));
+        var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(user.Id, tagId, Array.Empty<Guid>())));
         Assert.AreEqual(AddTagToCards.Request.ExceptionMesg_NoCard, e.Message);
     }
     [TestMethod()]
@@ -82,7 +82,7 @@ public class AddTagToCardsTests
         var tagId = await TagHelper.CreateAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, RandomHelper.Guid().AsArray())));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, RandomHelper.Guid().AsArray())));
     }
     [TestMethod()]
     public async Task ACardDoesNotExistMustFail_MultipleCards()
@@ -94,7 +94,7 @@ public class AddTagToCardsTests
         var card2Id = await CardHelper.CreateIdAsync(db, cardCreator.Id);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, new[] { card1Id, RandomHelper.Guid(), card2Id })));
+        await Assert.ThrowsExactlyAsync<NonexistentCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(cardCreator.Id, tagId, new[] { card1Id, RandomHelper.Guid(), card2Id })));
     }
     [TestMethod()]
     public async Task ACardNotViewableMustFail_OneCard()
@@ -107,7 +107,7 @@ public class AddTagToCardsTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, card.Id.AsArray())));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, card.Id.AsArray())));
     }
     [TestMethod()]
     public async Task ACardNotViewableMustFail_MultipleCards()
@@ -122,7 +122,7 @@ public class AddTagToCardsTests
         var otherUserId = await UserHelper.CreateInDbAsync(db);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, new[] { card2Id, card.Id, card3Id })));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new AddTagToCards(dbContext.AsCallContext()).RunAsync(new AddTagToCards.Request(otherUserId, tagId, new[] { card2Id, card.Id, card3Id })));
     }
     [TestMethod()]
     public async Task CheckSuccessfullAdding()
@@ -179,7 +179,7 @@ public class AddTagToCardsTests
         {
             var cardFromDb = dbContext.Cards.AsNoTracking().Include(card => card.TagsInCards).Include(card => card.VersionCreator).Single();
             CollectionAssert.Contains(cardFromDb.TagsInCards.Select(tag => tag.TagId).ToArray(), tag1Id);
-            StringAssert.Contains(cardFromDb.VersionDescription, tag1Name);
+            Assert.Contains(tag1Name, cardFromDb.VersionDescription);
             Assert.AreEqual(CardVersionType.Changes, cardFromDb.VersionType);
             Assert.AreEqual(user.Id, cardFromDb.VersionCreator.Id);
 
@@ -199,14 +199,14 @@ public class AddTagToCardsTests
             var tagsInCard = cardFromDb.TagsInCards.Select(tag => tag.TagId).ToArray();
             CollectionAssert.Contains(tagsInCard, tag1Id);
             CollectionAssert.Contains(tagsInCard, tag2Id);
-            StringAssert.Contains(cardFromDb.VersionDescription, tag2Name);
+            Assert.Contains(tag2Name, cardFromDb.VersionDescription);
             Assert.AreEqual(CardVersionType.Changes, cardFromDb.VersionType);
 
             var previousVersions = dbContext.CardPreviousVersions.ToImmutableArray();
-            Assert.AreEqual(2, previousVersions.Length);
+            Assert.HasCount(2, previousVersions);
             Assert.AreEqual(CardPreviousVersionType.Creation, previousVersions[0].VersionType);
             Assert.AreEqual(CardPreviousVersionType.Changes, previousVersions[1].VersionType);
-            StringAssert.Contains(previousVersions[1].VersionDescription, tag1Name);
+            Assert.Contains(tag1Name, previousVersions[1].VersionDescription);
         }
     }
     [TestMethod()]
@@ -221,7 +221,7 @@ public class AddTagToCardsTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user.Id, persoTagId, cardId.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user.Id, persoTagId, cardId.AsArray())));
         Assert.AreEqual(errorMesg, e.Message);
     }
     [TestMethod()]
@@ -238,7 +238,7 @@ public class AddTagToCardsTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("PersoTagAllowedOnlyOnPrivateCards".PairedWith(errorMesg));
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user.Id, persoTagId, card.Id.AsArray())));
+        var e = await Assert.ThrowsExactlyAsync<PersoTagAllowedOnlyOnPrivateCardsException>(async () => await new AddTagToCards(dbContext.AsCallContext(localizer)).RunAsync(new AddTagToCards.Request(user.Id, persoTagId, card.Id.AsArray())));
         Assert.AreEqual(errorMesg, e.Message);
     }
     [TestMethod()]

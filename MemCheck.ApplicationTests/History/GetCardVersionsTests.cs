@@ -17,13 +17,13 @@ public class GetCardVersionsTests
     public async Task UserNotLoggedIn()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(Guid.Empty, Guid.Empty)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
     {
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(Guid.NewGuid(), Guid.Empty)));
     }
     [TestMethod()]
     public async Task CardDoesNotExist()
@@ -31,7 +31,7 @@ public class GetCardVersionsTests
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(DbHelper.GetEmptyTestDB());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, Guid.NewGuid())));
     }
     [TestMethod()]
     public async Task FailIfUserCanNotViewCurrentVersion()
@@ -47,7 +47,7 @@ public class GetCardVersionsTests
         {
             var versions = await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(userId, card.Id));
             Assert.AreEqual(2, versions.Count());
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id)));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetCardVersions(dbContext.AsCallContext()).RunAsync(new GetCardVersions.Request(otherUserId, card.Id)));
         }
     }
     [TestMethod()]

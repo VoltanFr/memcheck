@@ -42,14 +42,14 @@ public class SearchCardsTests
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = ' ' + RandomHelper.String() }));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = ' ' + RandomHelper.String() }));
     }
     [TestMethod()]
     public async Task TextNotTrimmed_AtEnd()
     {
         var testDB = DbHelper.GetEmptyTestDB();
         using var dbContext = new MemCheckDbContext(testDB);
-        await Assert.ThrowsExceptionAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = RandomHelper.String() + '\n' }));
+        await Assert.ThrowsExactlyAsync<TextNotTrimmedException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { RequiredText = RandomHelper.String() + '\n' }));
     }
     [TestMethod()]
     public async Task TestDBWithOnePublicCard_FindAll()
@@ -82,12 +82,12 @@ public class SearchCardsTests
         Assert.AreEqual(0, foundCard.CountOfUserRatings);
         Assert.AreEqual(0, foundCard.AverageRating);
         Assert.AreEqual(0, foundCard.CurrentUserRating);
-        Assert.IsTrue(!foundCard.DeckInfo.Any());
+        Assert.IsFalse(foundCard.DeckInfo.Any());
         Assert.AreEqual(card.FrontSide, foundCard.FrontSide);
         Assert.AreEqual(user.Id, foundCard.VersionCreator.Id);
         Assert.AreEqual(card.VersionDescription, foundCard.VersionDescription);
         Assert.AreEqual(card.VersionUtcDate, foundCard.VersionUtcDate);
-        Assert.IsTrue(!foundCard.VisibleTo.Any());
+        Assert.IsFalse(foundCard.VisibleTo.Any());
     }
     [TestMethod()]
     public async Task Test_Privacy()
@@ -149,9 +149,9 @@ public class SearchCardsTests
             Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card1.Id));
             Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card2.Id));
 
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { Deck = user1Emptydeck }));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { Deck = user1Emptydeck }));
 
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck }));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck }));
         }
     }
     [TestMethod()]
@@ -180,9 +180,9 @@ public class SearchCardsTests
             Assert.AreEqual(1, resultOnDeck.TotalNbCards);
             Assert.IsTrue(resultOnDeck.Cards.Any(card => card.CardId == card3.Id));
 
-            await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { Deck = user1Emptydeck, DeckIsInclusive = false }));
+            await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { Deck = user1Emptydeck, DeckIsInclusive = false }));
 
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck, DeckIsInclusive = false }));
+            await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new SearchCards(dbContext.AsCallContext()).RunAsync(new SearchCards.Request { UserId = user2Id, Deck = user1deck, DeckIsInclusive = false }));
         }
     }
     [TestMethod()]

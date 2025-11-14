@@ -19,7 +19,7 @@ public class UpdateTagTests
         var db = DbHelper.GetEmptyTestDB();
         var userId = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, Guid.NewGuid(), RandomHelper.String(), "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(userId, Guid.NewGuid(), RandomHelper.String(), "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task EmptyName()
@@ -29,7 +29,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, "", "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, "", "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameNotTrimmed()
@@ -39,7 +39,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MinNameLength) + '\t', "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MinNameLength) + '\t', "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionNotTrimmed()
@@ -49,7 +49,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(), "\t", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(), "\t", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooShort()
@@ -59,7 +59,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MinNameLength - 1), "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MinNameLength - 1), "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameTooLong()
@@ -69,7 +69,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MaxNameLength + 1), "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(Tag.MaxNameLength + 1), "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task DescriptionTooLong()
@@ -79,7 +79,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1), RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, RandomHelper.String(), RandomHelper.String(Tag.MaxDescriptionLength + 1), RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NameWithForbiddenChar()
@@ -89,7 +89,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, "a<b", "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, "a<b", "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task AlreadyExists()
@@ -100,7 +100,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user);
         var otherTag = await TagHelper.CreateAsync(db, user, name);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, name, "", RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, name, "", RandomHelper.String())));
     }
     [TestMethod()]
     public async Task NoChange()
@@ -111,7 +111,7 @@ public class UpdateTagTests
         var user = await UserHelper.CreateUserInDbAsync(db);
         var tag = await TagHelper.CreateAsync(db, user, name, description);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, name, description, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(user.Id, tag, name, description, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task SuccessfulUpdateOfAllFields()
@@ -207,7 +207,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user, name);
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.Empty, tag, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
@@ -222,7 +222,7 @@ public class UpdateTagTests
         var tag = await TagHelper.CreateAsync(db, user, name);
 
         using (var dbContext = new MemCheckDbContext(db))
-            await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+            await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new UpdateTag(dbContext.AsCallContext()).RunAsync(new UpdateTag.Request(Guid.NewGuid(), tag, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
 
         using (var dbContext = new MemCheckDbContext(db))
             Assert.AreEqual(name, (await new GetTag(dbContext.AsCallContext()).RunAsync(new GetTag.Request(tag))).TagName);
@@ -239,7 +239,7 @@ public class UpdateTagTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("OnlyAdminsCanModifyPersoTag".PairedWith(errorMesg));
         var callContext = dbContext.AsCallContext(localizer);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), description, RandomHelper.String())));
+        var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), description, RandomHelper.String())));
         Assert.AreEqual(errorMesg, e.Message);
     }
     [TestMethod()]
@@ -254,7 +254,7 @@ public class UpdateTagTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("OnlyAdminsCanModifyPersoTag".PairedWith(errorMesg));
         var callContext = dbContext.AsCallContext(localizer, roleChecker);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, Tag.Perso, RandomHelper.String(), RandomHelper.String())));
+        var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, Tag.Perso, RandomHelper.String(), RandomHelper.String())));
         Assert.AreEqual(errorMesg, e.Message);
     }
     [TestMethod()]
@@ -268,7 +268,7 @@ public class UpdateTagTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("OnlyAdminsCanModifyPersoTag".PairedWith(errorMesg));
         var callContext = dbContext.AsCallContext(localizer);
-        var e = await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
+        var e = await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), RandomHelper.String(), RandomHelper.String())));
         Assert.AreEqual(errorMesg, e.Message);
     }
     [TestMethod()]
@@ -284,7 +284,7 @@ public class UpdateTagTests
         var errorMesg = RandomHelper.String();
         var localizer = new TestLocalizer("OnlyAdminsCanModifyPersoTag".PairedWith(errorMesg));
         var callContext = dbContext.AsCallContext(localizer, roleChecker);
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), description, RandomHelper.String())));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new UpdateTag(callContext).RunAsync(new UpdateTag.Request(user.Id, persoTagId, RandomHelper.String(), description, RandomHelper.String())));
     }
     [TestMethod()]
     public async Task AdminCanChangeDescriptionOfPersoTag()

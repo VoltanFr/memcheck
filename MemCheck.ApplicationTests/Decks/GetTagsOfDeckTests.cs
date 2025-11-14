@@ -20,7 +20,7 @@ public class GetTagsOfDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.Empty, deck)));
     }
     [TestMethod()]
     public async Task UserDoesNotExist()
@@ -30,7 +30,7 @@ public class GetTagsOfDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
 
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
+        await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(Guid.NewGuid(), deck)));
     }
     [TestMethod()]
     public async Task UserNotOwner()
@@ -40,7 +40,7 @@ public class GetTagsOfDeckTests
         var deck = await DeckHelper.CreateAsync(db, user);
         var otherUser = await UserHelper.CreateInDbAsync(db);
         using var dbContext = new MemCheckDbContext(db);
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(otherUser, deck)));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new GetTagsOfDeck(dbContext).RunAsync(new GetTagsOfDeck.Request(otherUser, deck)));
     }
     [TestMethod()]
     public async Task EmptyDeck()

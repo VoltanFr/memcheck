@@ -43,6 +43,6 @@ public class AddCardSubscriptionsTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new AddCardSubscriptions.Request(await UserHelper.CreateInDbAsync(testDB), new Guid[] { card.Id });
-        await Assert.ThrowsExceptionAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<UserNotAllowedToAccessCardException>(async () => await new AddCardSubscriptions(dbContext.AsCallContext()).RunAsync(request));
     }
 }

@@ -19,7 +19,7 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
         var db = DbHelper.GetEmptyTestDB();
         var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(Guid.NewGuid(), DateTime.MaxValue);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual("User not found", e.Message);
     }
     [TestMethod()]
@@ -29,7 +29,7 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
         var user = await UserHelper.CreateInDbAsync(db);
         var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
+        var e = await Assert.ThrowsExactlyAsync<UnsatisfactoryUserRoleException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual("User not admin", e.Message);
     }
     [TestMethod()]
@@ -40,7 +40,7 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
         await UserHelper.DeleteAsync(db, user);
         var request = new DeleteCardPreviousVersionsOfDeletedCards.Request(user, DateTime.MaxValue);
         using var dbContext = new MemCheckDbContext(db);
-        var e = await Assert.ThrowsExceptionAsync<NonexistentUserException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
+        var e = await Assert.ThrowsExactlyAsync<NonexistentUserException>(async () => await new DeleteCardPreviousVersionsOfDeletedCards(dbContext.AsCallContext()).RunAsync(request));
         Assert.AreEqual("User not found", e.Message);
     }
     [TestMethod()]
@@ -169,8 +169,8 @@ public class DeleteCardPreviousVersionsOfDeletedCardsTests
         {
             var previousVersions = await dbContext.CardPreviousVersions.ToListAsync();
             Assert.AreEqual(3, previousVersions.Count);
-            Assert.AreEqual(1, previousVersions.Where(pv => pv.Card == cardNotDeleted.Id).Count());
-            Assert.AreEqual(2, previousVersions.Where(pv => pv.Card == cardDeletedAfterRunDate.Id).Count());
+            Assert.AreEqual(1, previousVersions.Count(pv => pv.Card == cardNotDeleted.Id));
+            Assert.AreEqual(2, previousVersions.Count(pv => pv.Card == cardDeletedAfterRunDate.Id));
         }
     }
     [TestMethod()]

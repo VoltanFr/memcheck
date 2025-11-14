@@ -8,7 +8,7 @@ internal sealed class FakeMemCheckTelemetryClient : IMemCheckTelemetryClient
     {
     }
 }
-internal static class DbContextExtensions
+public static class DbContextExtensions
 {
     public static CallContext AsCallContext(this MemCheckDbContext dbContext)
     {

@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Images;
+namespace MemCheck.Application.Windows.Images;
 
 public sealed class UpdateImageMetadata : RequestRunner<UpdateImageMetadata.Request, UpdateImageMetadata.Result>
 {

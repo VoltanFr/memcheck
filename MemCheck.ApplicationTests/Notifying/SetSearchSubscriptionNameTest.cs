@@ -21,7 +21,7 @@ public class SetSearchSubscriptionNameTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SetSearchSubscriptionName.Request(Guid.Empty, subscription.Id, RandomHelper.String());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestInvalidSubscriptionId()
@@ -31,7 +31,7 @@ public class SetSearchSubscriptionNameTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SetSearchSubscriptionName.Request(userId, Guid.Empty, RandomHelper.String());
-        await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<InvalidOperationException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task UserNotOwnerOfSubscription()
@@ -43,7 +43,7 @@ public class SetSearchSubscriptionNameTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, RandomHelper.String());
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestTooShortName()
@@ -54,7 +54,7 @@ public class SetSearchSubscriptionNameTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, "      " + RandomHelper.String(SetSearchSubscriptionName.Request.MinNameLength - 1) + "\t\t");
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task TestTooLongName()
@@ -65,7 +65,7 @@ public class SetSearchSubscriptionNameTest
 
         using var dbContext = new MemCheckDbContext(testDB);
         var request = new SetSearchSubscriptionName.Request(userId, subscription.Id, RandomHelper.String(SetSearchSubscriptionName.Request.MaxNameLength + 1));
-        await Assert.ThrowsExceptionAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
+        await Assert.ThrowsExactlyAsync<RequestInputException>(async () => await new SetSearchSubscriptionName(dbContext.AsCallContext()).RunAsync(request));
     }
     [TestMethod()]
     public async Task NameWithMaxLengthDoesNotThrow()

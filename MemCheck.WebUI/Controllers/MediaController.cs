@@ -1,6 +1,7 @@
 ﻿using MemCheck.Application;
 using MemCheck.Application.Images;
 using MemCheck.Application.QueryValidation;
+using MemCheck.Application.Windows.Images;
 using MemCheck.Database;
 using MemCheck.Domain;
 using Microsoft.ApplicationInsights;

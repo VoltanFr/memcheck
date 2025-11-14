@@ -12,7 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MemCheck.Application.Images;
+namespace MemCheck.Application.Windows.Images;
 
 public sealed class StoreImage : RequestRunner<StoreImage.Request, StoreImage.Result>
 {
