@@ -11,13 +11,11 @@ namespace MemCheck.AzureFunctions;
 
 internal static class Program
 {
-    public static void Main(/*string[] args*/)
+    public static void Main()
     {
+        Console.WriteLine($"MemCheck.AzureFunctions, {DateTime.Now:s}");
         var host = new HostBuilder()
-            //.ConfigureFunctionsWorkerDefaults(builder =>
-            //{
-            //    builder.AddApplicationInsights().AddApplicationInsightsLogger();
-            //})
+            .ConfigureFunctionsWorkerDefaults()
             .ConfigureServices(services =>
                 {
                     services.AddDbContext<MemCheckDbContext>(options =>
