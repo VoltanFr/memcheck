@@ -33,7 +33,7 @@ internal static class Program
                 })
             .ConfigureLogging(loggingBuilder =>
                 {
-                    loggingBuilder.AddSimpleConsole();
+                    loggingBuilder.AddConsole();
                 }
             )
             .Build();
