@@ -88,7 +88,7 @@ jobs:
     #     path: ${{env.WEBUI_PUBLISH_FOLDER}}
 
     - name: "Deploy WebUI to MemCheck Azure Web App"
-      uses: azure/webapps-deploy@v3.0.0
+      uses: azure/webapps-deploy@v3.0.6
       with:
         app-name: '${{env.AZURE_WEBAPP_NAME}}'
         slot-name: 'production'
