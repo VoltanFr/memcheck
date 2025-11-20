@@ -81,7 +81,7 @@ public sealed class Startup
         var authorizationBuilder = services.AddAuthorizationBuilder();
         authorizationBuilder.AddPolicy("AdminPolicy", policy => policy.RequireRole(IRoleChecker.AdminRoleName));
 
-        services.AddSingleton<IMemCheckMailSender>(s => new AzureMailSender(appSettings.AzureMailConnectionString));
+        services.AddSingleton<IMemCheckMailSender>(s => new AzureMailSender(appSettings.AzureMailConnectionString, appSettings.RecipientToAddInBccOfAllMails));
 
         services.AddRazorPages().AddRazorPagesOptions(config =>
             {

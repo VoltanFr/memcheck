@@ -26,9 +26,11 @@ public sealed class GetAdminEmailAddesses : RequestRunner<GetAdminEmailAddesses.
         public async Task CheckValidityAsync(CallContext callContext)
         {
             QueryValidationHelper.CheckNotReservedGuid(UserId);
-            var user = await callContext.DbContext.Users.SingleAsync(u => u.Id == UserId);
+            var user = await callContext.DbContext.Users.SingleOrDefaultAsync(u => u.Id == UserId);
+            if (user == null)
+                throw new InvalidOperationException($"Admin user not found in DB: '{UserId}'");
             if (!await callContext.RoleChecker.UserIsAdminAsync(user))
-                throw new InvalidOperationException($"User not admin: {user.UserName}");
+                throw new InvalidOperationException($"User not admin: '{user.UserName}'");
         }
     }
     public sealed class ResultModel
@@ -42,3 +44,4 @@ public sealed class GetAdminEmailAddesses : RequestRunner<GetAdminEmailAddesses.
     public sealed record ResultUserModel(string Name, string Email);
     #endregion
 }
+

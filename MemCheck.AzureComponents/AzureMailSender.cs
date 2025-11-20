@@ -13,10 +13,12 @@ public sealed class AzureMailSender : IMemCheckMailSender
 {
     #region Fields
     private readonly EmailClient emailClient;
+    private readonly EmailAddress recipientToAddInBccOfAllMails;
     #endregion
-    public AzureMailSender(string connectionString)
+    public AzureMailSender(string connectionString, string recipientToAddInBccOfAllMails)
     {
         emailClient = new EmailClient(connectionString);
+        this.recipientToAddInBccOfAllMails = new EmailAddress(recipientToAddInBccOfAllMails);
     }
     public async Task SendAsync(MemCheckEmailAddress recipient, string subject, string htmlMessage)
     {
@@ -29,7 +31,8 @@ public sealed class AzureMailSender : IMemCheckMailSender
             PlainText = htmlMessage,
             Html = htmlMessage
         };
-        var emailMessage = new EmailMessage(SenderAddress.Address, new EmailRecipients(recipients.Select(r => new EmailAddress(r.Address, r.DisplayName))), content);
+        var recipientAddresses = new EmailRecipients(recipients.Select(r => new EmailAddress(r.Address, r.DisplayName)), bcc: recipientToAddInBccOfAllMails.AsArray());
+        var emailMessage = new EmailMessage(SenderAddress.Address, recipientAddresses, content);
         var emailSendOperation = await emailClient.SendAsync(WaitUntil.Completed, emailMessage);
 
         if (!emailSendOperation.HasCompleted)

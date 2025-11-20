@@ -62,7 +62,9 @@ public sealed class AppSettings
     {
         ConnectionString = GetConnectionString(configuration, prodEnvironment, logger);
         AzureMailConnectionString = GetAzureMailConnectionString(configuration, prodEnvironment, logger);
+        RecipientToAddInBccOfAllMails = configuration.RequiredValue("RecipientToAddInBccOfAllMails");
     }
     public string ConnectionString { get; }
     public string AzureMailConnectionString { get; }
+    public string RecipientToAddInBccOfAllMails { get; }
 }

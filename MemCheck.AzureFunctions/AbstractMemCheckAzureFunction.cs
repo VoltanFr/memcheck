@@ -95,7 +95,11 @@ public abstract class AbstractMemCheckAzureFunction
         var connectionString = Environment.GetEnvironmentVariable("AzureMailConnectionString");
         if (connectionString == null)
             throw new InvalidOperationException("'AzureMailConnectionString' environment variable is not set");
-        return new AzureMailSender(connectionString);
+
+        var recipientToAddInBccOfAllMails = Environment.GetEnvironmentVariable("RecipientToAddInBccOfAllMails");
+        if (recipientToAddInBccOfAllMails == null)
+            throw new InvalidOperationException("'RecipientToAddInBccOfAllMails' environment variable is not set");
+        return new AzureMailSender(connectionString, recipientToAddInBccOfAllMails);
     }
     protected CallContext NewCallContext()
     {
