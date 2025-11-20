@@ -1,31 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-    <VersionPrefix>0.31.0</VersionPrefix>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+        <VersionPrefix>0.32.0</VersionPrefix>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Abstractions" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="System.Net.NameResolution" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
-    <ProjectReference Include="..\MemCheck.AzureComponents\MemCheck.AzureComponents.csproj" />
-    <ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />
-    <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MemCheck.Application\MemCheck.Application.csproj" />
+        <ProjectReference Include="..\MemCheck.AzureComponents\MemCheck.AzureComponents.csproj" />
+        <ProjectReference Include="..\MemCheck.Basics\MemCheck.Basics.csproj" />
+        <ProjectReference Include="..\MemCheck.Database\MemCheck.Database.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="host.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <None Update="host.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="local.settings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
 </Project>
