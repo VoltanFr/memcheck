@@ -69,6 +69,8 @@ public sealed class Startup
 
         services.AddDbContext<MemCheckDbContext>(options => options.UseSqlServer(appSettings.ConnectionString));
 
+        var httpClientBuilder = services.AddHttpClient<ITurnstileValidator, TurnstileValidator>(httpClient => new TurnstileValidator(httpClient, appSettings.TurnstileSiteKey, appSettings.TurnstileSecretKey));
+
         services.AddIdentity<MemCheckUser, MemCheckUserRole>(options => MemCheckUserManager.SetupIdentityOptions(options))
             .AddEntityFrameworkStores<MemCheckDbContext>()
             .AddDefaultTokenProviders()

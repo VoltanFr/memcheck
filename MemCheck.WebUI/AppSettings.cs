@@ -63,8 +63,12 @@ public sealed class AppSettings
         ConnectionString = GetConnectionString(configuration, prodEnvironment, logger);
         AzureMailConnectionString = GetAzureMailConnectionString(configuration, prodEnvironment, logger);
         RecipientToAddInBccOfAllMails = configuration.RequiredValue("RecipientToAddInBccOfAllMails");
+        TurnstileSiteKey = configuration.RequiredValue("Turnstile:SiteKey");
+        TurnstileSecretKey = configuration.RequiredValue("Turnstile:SecretKey");
     }
     public string ConnectionString { get; }
     public string AzureMailConnectionString { get; }
     public string RecipientToAddInBccOfAllMails { get; }
+    public string TurnstileSiteKey { get; }
+    public string TurnstileSecretKey { get; }
 }

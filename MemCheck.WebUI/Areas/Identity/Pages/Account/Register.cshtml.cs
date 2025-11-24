@@ -1,4 +1,10 @@
-﻿using MemCheck.AzureComponents;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using MemCheck.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -6,11 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Localization;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace MemCheck.WebUI.Areas.Identity.Pages.Account;
 
@@ -21,14 +22,21 @@ public class RegisterModel : PageModel
     private readonly UserManager<MemCheckUser> _userManager;
     private readonly IMemCheckMailSender _emailSender;
     private readonly IStringLocalizer<RegisterModel> localizer;
+    private readonly ITurnstileValidator turnstileValidator;
+    public const string TurnstileAction = "Register";
 
-    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IMemCheckMailSender emailSender, IStringLocalizer<RegisterModel> localizer)
+    public RegisterModel(UserManager<MemCheckUser> userManager, SignInManager<MemCheckUser> signInManager, IMemCheckMailSender emailSender, IStringLocalizer<RegisterModel> localizer, ITurnstileValidator turnstileValidator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _emailSender = emailSender;
         this.localizer = localizer;
+        this.turnstileValidator = turnstileValidator;
     }
+
+    [BindProperty]
+    public string TurnstileCData { get; set; } = Guid.NewGuid().ToString("N"); //Used to correlate requests and responses, thus preventing replay attacks (attacker capturing a valid token and reusing it later)
+    public string TurnstileSiteKey => turnstileValidator.SiteKey; //I get the site key from the validator to avoid putting it in the code
 
     [BindProperty]
     public InputModel Input { get; set; } = null!;
@@ -59,6 +67,24 @@ public class RegisterModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.Clear();
+        var turnstileToken = Request.Form["cf-turnstile-response"].FirstOrDefault();
+        var siteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        if (string.IsNullOrWhiteSpace(turnstileToken) || string.IsNullOrWhiteSpace(siteIp))
+        {
+            ModelState.AddModelError(string.Empty, localizer["CantVerifyTurnstile"].Value);
+            return Page();
+        }
+
+        var turnstileValidationResult = await turnstileValidator.ValidateAsync(turnstileToken, TurnstileAction, TurnstileCData, siteIp);
+
+        if (!turnstileValidationResult.IsValid)
+        {
+            ModelState.AddModelError(string.Empty, turnstileValidationResult.ErrorMessage!);
+            return Page();
+        }
+
         if (ModelState.IsValid)
         {
             var user = new MemCheckUser { UserName = Input.UserName, Email = Input.Email };

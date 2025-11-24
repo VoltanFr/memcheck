@@ -7,6 +7,7 @@
 }
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 }
 @{
     ViewData["Title"] = @Localizer["Register"];
@@ -43,5 +44,7 @@
         <div class="form-group">
             <p>@Localizer["CheckTheDoc"] <a href="https://userdoc.mnesios.com/account.html">https://userdoc.mnesios.com/account.html</a>.</p>
         </div>
+        <input asp-for="@Model.TurnstileCData" type="hidden" />
+        <div class="cf-turnstile" data-sitekey="@Model.TurnstileSiteKey" data-action="@RegisterModel.TurnstileAction" data-cdata="@Model.TurnstileCData"></div>
     </form>
 </div>
