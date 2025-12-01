@@ -166,6 +166,11 @@ const discussionApp = Vue.createApp({
         reviewChangesButtonEnabled() {
             return this.isDirty();
         },
+        editEntry(/* entry*/) {
+        },
+        entryCanBeEdited(/* entry*/) {
+            return true; // entry.;
+        },
     },
 });
 

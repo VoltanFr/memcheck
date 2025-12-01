@@ -165,7 +165,7 @@ export function convertMarkdown(src, beautifyForFrench, mnesiosImageDefinitions,
         converter.setOption('noHeaderId', 'true');  // For size gain, even if minor
         return converter.makeHtml(beautifiedText);
     }
-    catch (error) {
+    catch {
         return src;
     }
 }

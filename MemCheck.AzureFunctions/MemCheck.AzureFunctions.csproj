@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-        <VersionPrefix>0.33.2</VersionPrefix>
+        <VersionPrefix>0.33.3</VersionPrefix>
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
