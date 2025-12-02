@@ -21,7 +21,7 @@ jobs:
       AZURE_FUNCTIONS_PROJECT_NAME: "MemCheck.AzureFunctions"
 
     steps:
-    - uses: actions/checkout@v6.0.0
+    - uses: actions/checkout@v6.0.1
 
     - name: "Tell environment variables"
       run: |
