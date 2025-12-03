@@ -4,3 +4,5 @@
 /node_modules/
 /MemCheck.AzureFunctions/local.settings.json
 /MemCheck.CommandLineDbClient/Properties/launchSettings.json
+/MemCheck.DevDatabase/MemCheckData_log.ldf
+/MemCheck.DevDatabase/MemCheckData.mdf
