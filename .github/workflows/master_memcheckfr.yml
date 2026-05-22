@@ -1,9 +1,12 @@
-name: "MemCheck build, test and deploy to Azure"
+﻿name: "MemCheck build, test and deploy to Azure"
 
 on:
   push:
     branches:
       - master
+
+permissions:
+  contents: read
 
 jobs:
   build-test-deploy:

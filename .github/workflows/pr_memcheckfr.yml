@@ -1,9 +1,12 @@
-name: "MemCheck build and test"
+﻿name: "MemCheck build and test"
 
 on:
   pull_request:
     branches:
       - master
+
+permissions:
+  contents: read
 
 jobs:
   build-test:
@@ -12,9 +15,10 @@ jobs:
     runs-on: windows-latest
 
     env:
-      NETCORE_VERSION: "6.0"
+      NETCORE_VERSION: "9.0"
       COMPIL_CONFIG: "Release"
       PUBLISH_FOLDER_PATH: "./Published"
+      AZURE_FUNCTIONS_PUBLISH_FOLDER: "./AzFuncPublished"
       AZURE_WEBAPP_NAME: "memcheckfr"
       AZURE_FUNCTION_NAME: "memcheck-notifier"
 
@@ -47,6 +51,15 @@ jobs:
     - name: "Clean with dotnet"
       run: dotnet clean --configuration ${{env.COMPIL_CONFIG}}
 
+    - name: "Install JavaScript modules"
+      run: yarn
+
+    - name: "Run JavaScript lint with ESLint"
+      run: yarn lint
+
+    - name: "Run JavaScript unit-tests with jest"
+      run: yarn unit-tests
+
     - name: "Restore NuGet packages"
       run: dotnet restore
 
@@ -56,14 +69,14 @@ jobs:
     - name: "Run unit tests"
       run: dotnet test --configuration ${{env.COMPIL_CONFIG}} --filter TestCategory!=IntegrationTests
 
-    - name: "Install JavaScript modules"
-      run: yarn
-
-    - name: Run ESLint
-      run: eslint MemCheck.WebUI/wwwroot/js
-
-    - name: "Publish: prepare the projects for deployment"
+    - name: "Publish: prepare the project WebUI for deployment"
       run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.PUBLISH_FOLDER_PATH}} --no-self-contained MemCheck.WebUI
 
     - name: "Telling size of publish folder"
       run: du -sh ${{env.PUBLISH_FOLDER_PATH}}
+
+    - name: "Publish: prepare the project ${{env.AZURE_FUNCTIONS_PROJECT_NAME}} for deployment"
+      run: dotnet publish --no-build --configuration ${{env.COMPIL_CONFIG}} -o ${{env.AZURE_FUNCTIONS_PUBLISH_FOLDER}} --no-self-contained ${{env.AZURE_FUNCTIONS_PROJECT_NAME}}
+
+    - name: "Telling size of ${{env.AZURE_FUNCTIONS_PROJECT_NAME}} publish folder"
+      run: du -sh ${{env.AZURE_FUNCTIONS_PUBLISH_FOLDER}}
