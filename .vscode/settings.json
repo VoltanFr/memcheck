@@ -1,2 +1,149 @@
 {
+  // #region Explorer configuration
+  "explorer.excludeGitIgnore": true,
+  "explorer.copyRelativePathSeparator": "/",
+  // #endregion
+  // #region Search configuration
+  "search.exclude": {
+    "*.dll": true
+  },
+  // #endregion
+  // #region Editor configuration
+  "editor.autoIndent": "full",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.foldingHighlight": true,
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.glyphMargin": false,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.highlightActiveBracketPair": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.insertSpaces": true,
+  "editor.minimap.enabled": false,
+  "editor.quickSuggestionsDelay": 1000,
+  "editor.renderControlCharacters": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.selectionHighlight": true,
+  "editor.suggestSelection": "first",
+  "editor.suggest.showWords": false,
+  "editor.tabSize": 2,
+  "editor.trimAutoWhitespace": true,
+  "editor.unicodeHighlight.ambiguousCharacters": true,
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  // #endregion
+  // #region Window configuration
+  "window.title": "${activeEditorMedium}",
+  // #endregion
+  // #region Files configuration
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 2000,
+  "files.eol": "\r\n",
+  "files.insertFinalNewline": true,
+  // #endregion
+  // #region Workbench configuration
+  "workbench.colorTheme": "Light+",
+  "workbench.editor.labelFormat": "default",
+  "workbench.editor.showTabs": "multiple",
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.preferredDarkColorTheme": "Light+",
+  "workbench.preferredHighContrastColorTheme": "Light+",
+  "workbench.sideBar.location": "left",
+  "workbench.statusBar.visible": true,
+  "workbench.editor.revealIfOpen": true,
+  "workbench.colorCustomizations": {
+    "editor.selectionBackground": "#ff0000",
+    "editor.findMatchBackground": "#ee0000",
+    "editor.findMatchBorder": "#ff0000",
+    "editor.selectionForeground": "#ff1515ff",
+    "editor.background": "#ffffff",
+    "editor.foldBackground": "#ff000000"
+  },
+  // #endregion
+  // #region Problems configuration
+  "problems.autoReveal": true,
+  "problems.defaultViewMode": "table",
+  "problems.visibility": true,
+  // #endregion
+  // #region Markdown configuration
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.wrappingIndent": "indent",
+    "editor.quickSuggestions": {
+      "other": "on",
+      "comments": "on",
+      "strings": "on"
+    }
+  },
+  "markdown.validate.enabled": true,
+  "markdown.validate.fileLinks.enabled": "error",
+  // #endregion
+  // #region Powershell configuration
+  "powershell.codeFolding.showLastLine": false,
+  "powershell.codeFormatting.autoCorrectAliases": true,
+  "powershell.codeFormatting.useConstantStrings": true,
+  "powershell.codeFormatting.useCorrectCasing": true,
+  "[powershell]": {
+    "debug.saveBeforeStart": "nonUntitledEditorsInActiveGroup",
+    "editor.semanticHighlighting.enabled": true,
+    "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+    "editor.tabSize": 4
+  },
+  // #endregion
+  // #region Fold On Open extension configuration
+  "foldOnOpen.targets": [
+    "Level2",
+    "Level3",
+    "Level4",
+    "Level5",
+    "Level6",
+    "Level7",
+  ],
+  // #endregion
+  // #region Markdownlint extension configuration
+  "markdownlint.config": {
+    "MD042": true, // Enforce links are not empty
+    "MD031": false,
+  },
+  // #endregion
+  // #region Markdown header coloring extension configuration
+  "markdown-header-coloring.userDefinedHeaderColor": {
+    "enabled": true,
+    "Header_1": {
+      "color": "#FFFF00FF",
+      "backgroundColor": "background: #00000088",
+      "textDecoration": "font-size: 2em",
+      "overviewRulerColor": "#FFAA00"
+    },
+    "Header_2": {
+      "color": "#000000FF",
+      "backgroundColor": "background: #2BC0E488",
+      "textDecoration": "font-size: 1.4em",
+      "markdown-header-coloring.overviewRulerColor": "#FFFF00"
+    },
+    "Header_3": {
+      "color": "#000000FF",
+      "backgroundColor": "background: #BFE9FF88",
+      "textDecoration": "font-size: 1.3em",
+      "markdown-header-coloring.overviewRulerColor": "#FFAA00"
+    },
+    "Header_4": {
+      "color": "#000000FF",
+      "backgroundColor": "background: #CCEE4488",
+      "textDecoration": "font-size: 1em",
+      "markdown-header-coloring.overviewRulerColor": "#FFAA00"
+    },
+    "Header_5": {
+      "color": "#00AAFFFF",
+      "backgroundColor": "background: #D2DDDD88",
+      "textDecoration": "font-size: 1em",
+      "markdown-header-coloring.overviewRulerColor": "#FFAA00"
+    },
+    "Header_6": {
+      "color": "#FFFFFFFF",
+      "backgroundColor": "background: #EEEEEE88",
+      "textDecoration": "font-size: 1em",
+      "markdown-header-coloring.overviewRulerColor": "#FFAA00"
+    }
+  }
+  // #endregion
 }
