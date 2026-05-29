@@ -39,11 +39,13 @@ public sealed class RateAllPublicCards : RequestRunner<RateAllPublicCards.Reques
                 DbContext.UserCardRatings.Add(new UserCardRating() { UserId = request.UserId, CardId = card.Id, Rating = ratingToSetForCard });
             }
             else
-            if (ratingToSetForCard != existingRating)
             {
-                var existingRatingByUser = await DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == card.Id).SingleAsync();
-                existingRatingByUser.Rating = ratingToSetForCard;
-                changedRatingsCount++;
+                if (ratingToSetForCard != existingRating)
+                {
+                    var existingRatingByUser = await DbContext.UserCardRatings.Where(rating => rating.UserId == request.UserId && rating.CardId == card.Id).SingleAsync();
+                    existingRatingByUser.Rating = ratingToSetForCard;
+                    changedRatingsCount++;
+                }
             }
         }
 

@@ -39,7 +39,7 @@ public class SubscribeToSearchTest
             Assert.AreEqual("", subscription.RequiredText);
             Assert.AreEqual(0, subscription.RequiredTags.Count());
             Assert.IsFalse(subscription.ExcludeAllTags);
-            Assert.AreEqual(0, subscription.ExcludedTags!.Count());
+            Assert.AreEqual(0, subscription.ExcludedTags.Count());
         }
     }
     [TestMethod()]
@@ -66,7 +66,7 @@ public class SubscribeToSearchTest
             Assert.AreEqual("", subscription.RequiredText);
             Assert.AreEqual(0, subscription.RequiredTags.Count());
             Assert.IsFalse(subscription.ExcludeAllTags);
-            Assert.AreEqual(0, subscription.ExcludedTags!.Count());
+            Assert.AreEqual(0, subscription.ExcludedTags.Count());
         }
     }
     [TestMethod()]
@@ -95,7 +95,7 @@ public class SubscribeToSearchTest
             Assert.AreEqual(text, subscription.RequiredText);
             Assert.AreEqual(0, subscription.RequiredTags.Count());
             Assert.IsFalse(subscription.ExcludeAllTags);
-            Assert.AreEqual(0, subscription.ExcludedTags!.Count());
+            Assert.AreEqual(0, subscription.ExcludedTags.Count());
         }
     }
     [TestMethod()]
@@ -125,7 +125,7 @@ public class SubscribeToSearchTest
             Assert.AreEqual("", subscription.RequiredText);
             Assert.AreEqual(tagId, subscription.RequiredTags.First().TagId);
             Assert.IsFalse(subscription.ExcludeAllTags);
-            Assert.AreEqual(0, subscription.ExcludedTags!.Count());
+            Assert.AreEqual(0, subscription.ExcludedTags.Count());
         }
     }
     [TestMethod()]

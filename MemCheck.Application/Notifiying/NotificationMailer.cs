@@ -25,15 +25,15 @@ public sealed class NotificationMailer
     #region Private methods
     private string GetAuthoringPageLink()
     {
-        return linkGenerator.GetAbsoluteAddress("/Authoring/Index")!;
+        return linkGenerator.GetAbsoluteAddress("/Authoring/Index");
     }
     private string GetComparePageLink()
     {
-        return linkGenerator.GetAbsoluteAddress("/Authoring/Compare")!;
+        return linkGenerator.GetAbsoluteAddress("/Authoring/Compare");
     }
     private string GetHistoryPageLink()
     {
-        return linkGenerator.GetAbsoluteAddress("/Authoring/History")!;
+        return linkGenerator.GetAbsoluteAddress("/Authoring/History");
     }
     private void AddCardVersions(ImmutableArray<IUserCardVersionsNotifier.ResultCard> xcards, StringBuilder mailBody)
     {

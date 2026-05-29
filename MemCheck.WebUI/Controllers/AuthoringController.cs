@@ -81,7 +81,7 @@ public class AuthoringController : MemCheckController
         CheckBodyParameter(card);
         var userId = await UserServices.UserIdFromContextAsync(HttpContext, userManager);
         var versionDescription = GetLocalized("InitialCardVersionCreation");
-        var request = new CreateCard.Request(userId, card.FrontSide!, card.BackSide!, card.AdditionalInfo, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
+        var request = new CreateCard.Request(userId, card.FrontSide, card.BackSide, card.AdditionalInfo, card.References, card.LanguageId, card.Tags, card.UsersWithVisibility, versionDescription);
         var cardId = (await new CreateCard(callContext).RunAsync(request)).CardId;
         if (card.AddToDeck != Guid.Empty)
             await new AddCardsInDeck(callContext).RunAsync(new AddCardsInDeck.Request(userId, card.AddToDeck, cardId.AsArray()));

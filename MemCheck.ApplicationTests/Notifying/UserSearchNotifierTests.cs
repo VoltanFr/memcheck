@@ -401,7 +401,7 @@ public class UserSearchNotifierTests
             Assert.AreEqual(1, searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Length);
             var deletedCard = searchResult.CardsNotFoundAnymoreDeletedUserAllowedToView.Single();
             Assert.IsNotNull(deletedCard.FrontSide);
-            Assert.AreEqual(card.FrontSide, deletedCard.FrontSide!);
+            Assert.AreEqual(card.FrontSide, deletedCard.FrontSide);
             Assert.AreEqual(user.UserName, deletedCard.DeletionAuthor);
             Assert.IsTrue(deletedCard.CardIsViewable);
             Assert.AreEqual(deletionDate, deletedCard.DeletionUtcDate);

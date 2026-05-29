@@ -122,7 +122,7 @@ internal sealed class UserCardVersionsNotifier : IUserCardVersionsNotifier
         chrono.Restart();
         var result = cardDiscussionEntries.Select(cardToReport =>
             new ResultDiscussionEntry(
-                cardToReport.LatestDiscussionEntry.Id,
+                cardToReport.LatestDiscussionEntry!.Id,
                 cardToReport.LatestDiscussionEntry.Creator.GetUserName(),
                 cardToReport.LatestDiscussionEntry.Text,
                 cardToReport.LatestDiscussionEntry.CreationUtcDate,

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 
 namespace MemCheck.Database;
+
 public class MemCheckDbContext : IdentityDbContext<MemCheckUser, MemCheckUserRole, Guid>
 {
     #region Private methods

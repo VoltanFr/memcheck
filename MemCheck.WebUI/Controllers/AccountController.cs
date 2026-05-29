@@ -53,8 +53,10 @@ public class AccountController : MemCheckController
             if (searchSubscription.ExcludeAllTags)
                 details.Append(localizer.GetLocalized("OnlyCardsWithNoTag") + ", ");
             else
-            if (searchSubscription.ExcludedTags.Count() == 1)
-                details.Append(localizer.GetLocalized("ExcludedTag") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+            {
+                if (searchSubscription.ExcludedTags.Count() == 1)
+                    details.Append(localizer.GetLocalized("ExcludedTag") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
+            }
             if (searchSubscription.ExcludedTags.Count() > 1)
                 details.Append(localizer.GetLocalized("ExcludedTags") + ' ' + string.Join(',', searchSubscription.ExcludedTags) + ", ");
             if (details.Length == 0)

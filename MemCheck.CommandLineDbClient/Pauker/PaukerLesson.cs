@@ -110,7 +110,7 @@ internal sealed class PaukerLesson
         var doc = new XmlDocument();
 
         var xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-        var root = doc.DocumentElement!;
+        var root = doc.DocumentElement;
         doc.InsertBefore(xmlDeclaration, root);
 
         doc.AppendChild(doc.CreateComment("This is a lesson file for Pauker (http://pauker.sourceforge.net)"));

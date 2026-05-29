@@ -52,10 +52,12 @@ public static class CardComparisonHelper
             if (expectedCard.PreviousVersion == null)
                 Assert.IsNull(actualCard.PreviousVersion);
             else
+            {
                 if (actualCard.PreviousVersion == null)
-                Assert.IsNull(expectedCard.PreviousVersion);
-            else
-                Assert.AreEqual(expectedCard.PreviousVersion.Id, actualCard.PreviousVersion.Id);
+                    Assert.IsNull(expectedCard.PreviousVersion);
+                else
+                    Assert.AreEqual(expectedCard.PreviousVersion.Id, actualCard.PreviousVersion.Id);
+            }
         }
         Assert.AreEqual(expectedCard.RatingCount, actualCard.RatingCount);
         Assert.AreEqual(expectedCard.AverageRating, actualCard.AverageRating);
