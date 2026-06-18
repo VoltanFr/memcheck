@@ -1,4 +1,4 @@
-﻿name: "MemCheck build and test"
+name: "MemCheck build and test"
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
       AZURE_FUNCTION_NAME: "memcheck-notifier"
 
     steps:
-    - uses: actions/checkout@v6.0.0
+    - uses: actions/checkout@v7.0.0
 
     - name: "Tell environment variables"
       run: |
