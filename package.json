@@ -2,7 +2,7 @@
     "name": "memcheck",
     "dependencies": {},
     "devDependencies": {
-        "@babel/core": "^7.28.5",
+        "@babel/core": "^7.29.6",
         "@babel/preset-env": "^7.28.5",
         "eslint": "^9.39.1",
         "jest": "^30.2.0"
