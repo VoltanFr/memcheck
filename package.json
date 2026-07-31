@@ -1,9 +1,10 @@
-﻿{
+{
     "name": "memcheck",
     "devDependencies": {
         "@babel/core": "^7.29.6",
         "@babel/preset-env": "^7.28.5",
         "eslint": "^10.8.0",
+        "globals": "^17.8.0",
         "jest": "^30.4.2"
     },
     "scripts": {
