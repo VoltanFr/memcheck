@@ -18,7 +18,7 @@
             "minimatch": "^10.2.6"
         },
         "@istanbuljs/load-nyc-config": {
-            "js-yaml": "^3.15.0"
+            "js-yaml": "^3.15.1"
         },
         "@eslint/config-array": {
             "minimatch": "^10.2.6"
