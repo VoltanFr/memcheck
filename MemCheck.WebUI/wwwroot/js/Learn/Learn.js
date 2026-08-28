@@ -170,14 +170,25 @@ const learnApp = Vue.createApp({
             this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
                 .then(result => {
                     image.blob = base64FromBytes(result.data);
-                    this.currentImageLoadingPromise = null;
+                })
+                .catch(async(error) => {
+                    const imageDoesNotExistForSure = error?.response?.status === 404;
+
+                    if (imageDoesNotExistForSure || (image.downloadAttemptsCount && image.downloadAttemptsCount > 5)) {
+                        image.blob = 'Image load failure';
+                    }
+                    else {
+                        if (image.downloadAttemptsCount)
+                            image.downloadAttemptsCount++;
+                        else
+                            image.downloadAttemptsCount = 1;
+                        await sleep(image.downloadAttemptsCount * 1000); // Before retrying
+                    }
+                })
+                .then(() => {
                     if (!this.currentCard)
                         this.getCard();
-                })
-                .catch(() => {
-                    sleep(1000).then(() => {
-                        this.currentImageLoadingPromise = null;
-                    });
+                    this.currentImageLoadingPromise = null;
                 });
         },
         spawnDownloadImageDetails(image) { // image is an entry of the `downloadedCards` array

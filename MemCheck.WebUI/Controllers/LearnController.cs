@@ -83,7 +83,7 @@ public class LearnController : MemCheckController
         }
         catch (ImageNotFoundException)
         {
-            return NotFound();
+            return NotFound($"Image '{request?.ImageName}' does not exist");
         }
     }
     public sealed class GetImageByNameRequest
