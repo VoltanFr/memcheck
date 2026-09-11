@@ -26,6 +26,7 @@
         "babel-plugin-istanbul": {
             "test-exclude": "8.0.0"
         },
+        "browserslist": "4.28.9",
         "glob": "13.0.6"
     },
     "repository": {
