@@ -105,6 +105,11 @@ csharp_prefer_simple_default_expression = true
 generated_code = true
 dotnet_diagnostic.CS8019.severity = none
 
+# Azure Functions generates this file with an unnecessary using directive; keep CS8019 enabled elsewhere.
+[GeneratedFunctionExecutor.g.cs]
+generated_code = true
+dotnet_diagnostic.CS8019.severity = none
+
 [MemCheck.Database/Migrations/**]
 generated_code = true
 dotnet_diagnostic.CS8019.severity = none
