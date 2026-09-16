@@ -33,7 +33,7 @@ public class DefaultHeapingAlgorithmTests
     {
         Assert.ThrowsExactly<ArgumentException>(() => algo.ExpiryUtcDate(0, DateTime.Now));
     }
-    [TestMethod, DynamicData(nameof(AllPossibleHeaps), DynamicDataSourceType.Method)]
+    [TestMethod, DynamicData(nameof(AllPossibleHeaps))]
     public void ExpiryDateInCorrectInterval(int heap)
     {
         var lastLearnDate = RandomHelper.Date();
@@ -41,7 +41,7 @@ public class DefaultHeapingAlgorithmTests
         var nbDaysForExpiration = Math.Pow(2, heap);
         DateAssert.IsInRange(lastLearnDate.AddDays(nbDaysForExpiration), TimeSpan.FromMinutes(nbDaysForExpiration * 10), expiryDate);
     }
-    [TestMethod, DynamicData(nameof(AllPossibleHeaps), DynamicDataSourceType.Method)]
+    [TestMethod, DynamicData(nameof(AllPossibleHeaps))]
     public void ExpiryDateIsRandom(int heap)
     {
         var lastLearnDate = RandomHelper.Date();
