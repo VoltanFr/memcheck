@@ -165,6 +165,17 @@ const learnApp = Vue.createApp({
         editUrl() {
             return `/Authoring?CardId=${this.currentCard.cardId}&ReturnAddress=${window.location}`;
         },
+        setImageDoesNotExist(image) { // image is an entry of the `downloadedCards` array
+            if (image.description)
+                image.description += ` - Image '${image.name}' does not exist`;
+            else
+                image.description = `Image '${image.name}' does not exist`;
+            if (!image.source)
+                image.source = `Image '${image.name}' does not exist`;
+            image.blob = `Image '${image.name}' does not exist`;
+            if (!image.imageId)
+                image.imageId = -1;
+        },
         spawnDownloadImageBlob(image) { // image is an entry of the `downloadedCards` array
             const request = { imageName: image.name, size: imageSizeMedium };
             this.currentImageLoadingPromise = axios.post('/Learn/GetImageByName/', request, { responseType: 'arraybuffer' })
@@ -173,16 +184,22 @@ const learnApp = Vue.createApp({
                 })
                 .catch(async(error) => {
                     const imageDoesNotExistForSure = error?.response?.status === 404;
-
-                    if (imageDoesNotExistForSure || (image.downloadAttemptsCount && image.downloadAttemptsCount > 5)) {
-                        image.blob = 'Image load failure';
+                    if (imageDoesNotExistForSure) {
+                        this.setImageDoesNotExist(image);
+                    }
+                    else if (image.blobDownloadAttemptsCount && image.blobDownloadAttemptsCount > 5) {
+                        if (image.description)
+                            image.description += ' - Image blob load failure';
+                        else
+                            image.description = 'Image blob load failure';
+                        image.blob = `Image blob load failure: ${image.name}`;
                     }
                     else {
-                        if (image.downloadAttemptsCount)
-                            image.downloadAttemptsCount++;
+                        if (image.blobDownloadAttemptsCount)
+                            image.blobDownloadAttemptsCount++;
                         else
-                            image.downloadAttemptsCount = 1;
-                        await sleep(image.downloadAttemptsCount * 1000); // Before retrying
+                            image.blobDownloadAttemptsCount = 1;
+                        await sleep(image.blobDownloadAttemptsCount * 1000); // Before retrying
                     }
                 })
                 .then(() => {
@@ -208,16 +225,32 @@ const learnApp = Vue.createApp({
                     image.smallSize = result.data.smallSize;
                     image.mediumSize = result.data.mediumSize;
                     image.bigSize = result.data.bigSize;
-                    image.cardCount = result.data.cardCount;
-                    this.currentImageDetailsLoadingPromise = null;
+                })
+                .catch(async(error) => {
+                    const imageDoesNotExistForSure = error?.response?.status === 404;
+                    if (imageDoesNotExistForSure) {
+                        this.setImageDoesNotExist(image);
+                    }
+                    else if (image.detailsDownloadAttemptsCount && image.detailsDownloadAttemptsCount > 5) {
+                        image.imageId = -1;
+                        image.cardCount = 0;
+                        if (image.description)
+                            image.description += ' - Image details load failure';
+                        else
+                            image.description = 'Image details load failure';
+                    }
+                    else {
+                        if (image.detailsDownloadAttemptsCount)
+                            image.detailsDownloadAttemptsCount++;
+                        else
+                            image.detailsDownloadAttemptsCount = 1;
+                        await sleep(image.detailsDownloadAttemptsCount * 1000); // Before retrying
+                    }
+                })
+                .then(() => {
                     if (!this.currentCard)
                         this.getCard();
-                })
-                .catch((error) => {
-                    tellAxiosError(error);
-                    sleep(1000).then(() => {
-                        this.currentImageDetailsLoadingPromise = null;
-                    });
+                    this.currentImageDetailsLoadingPromise = null;
                 });
         },
         onCardRemoved() {
