@@ -60,9 +60,12 @@
                     </div>
                 </details>
             </div>
-            <div id="EntryList" class="memcheck-input-div" v-for="entry in entries">
-                <div class="memcheck-input-div-header">
-                    <p>@Localizer["EntryDate"] {{dateTimeWithTime(entry.utcDate)}} @Localizer["EntryAuthor"] {{entry.authorUserName}}</p>
+            <div id="EntryList" class="memcheck-input-div-container" v-for="entry in entries">
+                <div class="memcheck-input-div-container-header">
+                    <p>
+                        @Localizer["EntryDate"] {{dateTimeWithTime(entry.utcDate)}} @Localizer["EntryAuthor"] {{entry.authorUserName}}
+                        <a v-bind:href="editEntry(entry)" v-if="entryCanBeEdited(entry)" class="memcheck-input-div-container-header-button"><i class="fas fa-pen"></i></a>
+                    </p>
                 </div>
                 <div class="markdown-render markdown-body">
                     <span v-html="renderedText(entry.text)"></span>

@@ -168,8 +168,8 @@ const discussionApp = Vue.createApp({
         },
         editEntry(/* entry*/) {
         },
-        entryCanBeEdited(/* entry*/) {
-            return true; // entry.;
+        entryCanBeEdited(entry) {
+            return entry.canBeEditedByCurrentUser;
         },
     },
 });

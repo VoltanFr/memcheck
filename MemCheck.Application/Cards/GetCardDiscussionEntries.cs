@@ -53,7 +53,7 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
 
         var resultEntries = await DbContext.CardDiscussionEntries.AsNoTracking()
             .Where(entry => entry.Card == request.CardId && resultEntryIds.Contains(entry.Id)) // The check on CardId is just for perf
-            .Select(entry => new ResultEntry(entry.Id, entry.Creator, entry.Text, entry.CreationUtcDate, false)) // false: to be implemented
+            .Select(entry => new ResultEntry(entry.Id, entry.Creator, entry.Text, entry.CreationUtcDate, false, entry.Creator.Id == request.UserId)) // HasBeenEdited: to be implemented
             .ToImmutableArrayAsync();
 
         var resultEntriesOrdered = resultEntries.OrderBy(entry => allEntriesIdsOrdered.IndexOf(entry.Id)).ToImmutableArray();
@@ -85,6 +85,6 @@ public sealed class GetCardDiscussionEntries : RequestRunner<GetCardDiscussionEn
         }
     }
     public sealed record Result(int TotalCount, int PageCount, ImmutableArray<ResultEntry> Entries);
-    public sealed record ResultEntry(Guid Id, MemCheckUser Creator, string Text, DateTime CreationUtcDate, bool HasBeenEdited);
+    public sealed record ResultEntry(Guid Id, MemCheckUser Creator, string Text, DateTime CreationUtcDate, bool HasBeenEdited, bool CanBeEditedByCurrentUser);
     #endregion
 }

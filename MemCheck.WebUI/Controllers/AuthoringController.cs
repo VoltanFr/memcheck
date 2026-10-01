@@ -428,14 +428,15 @@ public class AuthoringController : MemCheckController
             Text = applicationResultEntry.Text;
             UtcDate = applicationResultEntry.CreationUtcDate;
             HasBeenEdited = applicationResultEntry.HasBeenEdited;
+            CanBeEditedByCurrentUser = applicationResultEntry.CanBeEditedByCurrentUser;
         }
         public Guid EntryId { get; }
         public string AuthorUserName { get; }
         public string Text { get; }
         public DateTime UtcDate { get; }
         public bool HasBeenEdited { get; }
+        public bool CanBeEditedByCurrentUser { get; }
     }
-    public sealed record ResultEntry(Guid Id, MemCheckUser Creator, string Text, DateTime CreationUtcDate, bool HasBeenEdited);
     #endregion
     #endregion
 }

@@ -206,8 +206,8 @@
 
 .deck-table {
     width: 100%;
-    border-top:5px solid black;
-    text-align:center;
+    border-top: 5px solid black;
+    text-align: center;
     padding: 0px;
 }
 
@@ -293,6 +293,17 @@
     background-color: darkslategrey;
     color: white;
 }
+
+.memcheck-input-div-container-header-button {
+    color: white;
+    appearance: button;
+    height: 12px;
+    padding-left: 10px;
+}
+
+    .memcheck-input-div-container-header-button:hover {
+        color: gray;
+    }
 
 .mnesios-page-title {
     background-color: WhiteSmoke;

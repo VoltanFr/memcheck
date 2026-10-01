@@ -49,6 +49,7 @@ public static class CardHelper
         Guid versionCreatorId, DateTime? versionDate = null, IEnumerable<Guid>? userWithViewIds = null, Guid? language = null, IEnumerable<Guid>? tagIds = null,
         string? frontSide = null, string? backSide = null, string? additionalInfo = null, string? references = null, string? versionDescription = null)
     {
+        //userWithViewIds null means public card
         return (await CreateAsync(testDB, versionCreatorId, versionDate, userWithViewIds, language, tagIds, frontSide, backSide, additionalInfo, references, versionDescription)).Id;
     }
     public static async Task<Guid> CreateIdAsync(DbContextOptions<MemCheckDbContext> testDB,
