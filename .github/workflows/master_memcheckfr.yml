@@ -1,4 +1,4 @@
-﻿name: "MemCheck build, test and deploy to Azure"
+name: "MemCheck build, test and deploy to Azure"
 
 on:
   push:
