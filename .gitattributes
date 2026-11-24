@@ -1,1 +1,21 @@
+﻿# text-auto makes Git normalize line endings as LF in blobs, for new text files (CRLF is only possible with all developers having the right config on their machines). Note that existing files are not modified by this setting until Git decides to re-normalize them.
+# I don't specify eol=crlf so that Git writes files to the working copy with the line ending of the platform.
+* text=auto
+
+*.cs diff=csharp
+*.csharp diff=csharp
+*.html diff=html
+*.htm diff=html
+*.xml diff=xml
+*.json diff=json
+*.yaml diff=yaml
+*.yml diff=yaml
+*.js diff=javascript
+*.ts diff=typescript
+*.vue diff=vue
+*.sql diff=sql
+*.css diff=css
+*.scss diff=scss
+*.md diff=markdown
+
 MemCheck.WebUI/wwwroot/lib/**/* linguist-vendored

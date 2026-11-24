@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<VersionPrefix>0.194.6</VersionPrefix>
+		<VersionPrefix>0.194.7</VersionPrefix>
         <OutputType>Exe</OutputType>
         <TargetFramework>net9.0-windows</TargetFramework>
     </PropertyGroup>
